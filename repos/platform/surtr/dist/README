@@ -1,0 +1,32 @@
+COMMAND LINE
+
+To run the interactive command line:
+
+  bin/repl
+
+EXAMPLE QUERIES
+
+quirrel> count(dataset(//campaigns))
+       | <ctrl-d>
+
+count(dataset(//campaigns))
+
+
+quirrel> tests := dataset(//campaigns)
+       | count(tests where tests.gender = "male")
+       | <ctrl-d>
+
+tests := dataset(//campaigns)
+count(tests where tests.gender = "male")
+
+
+quirrel> tests := dataset(//campaigns)
+       | histogram('platform) :=
+       |   { platform: 'platform, num: count(tests where tests.platform = 'platform) }
+       | histogram
+       | <ctrl-d>
+
+tests := dataset(//campaigns)
+histogram('platform) :=
+   { platform: 'platform, num: count(tests where tests.platform = 'platform) }
+histogram
