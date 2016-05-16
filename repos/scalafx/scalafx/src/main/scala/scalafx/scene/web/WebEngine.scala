@@ -82,10 +82,10 @@ class WebEngine(override val delegate: jfxsw.WebEngine = new jfxsw.WebEngine)
     */
   def createPopupHandler = delegate.createPopupHandlerProperty
   def createPopupHandler_=(f: jfxsw.PopupFeatures => WebEngine) {
-    createPopupHandler() = new jfxu.Callback[
-        jfxsw.PopupFeatures, jfxsw.WebEngine] {
-      def call(pf: jfxsw.PopupFeatures) = f(pf)
-    }
+    createPopupHandler() =
+      new jfxu.Callback[jfxsw.PopupFeatures, jfxsw.WebEngine] {
+        def call(pf: jfxsw.PopupFeatures) = f(pf)
+      }
   }
 
   /**

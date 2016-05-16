@@ -75,7 +75,8 @@ trait RedisClientTest extends RedisTest with BeforeAndAfterAll {
 }
 
 trait RedisClientServerIntegrationTest
-    extends RedisTest with BeforeAndAfterAll {
+    extends RedisTest
+    with BeforeAndAfterAll {
 
   private[this] lazy val svcClient = ClientBuilder()
     .name("redis-client")

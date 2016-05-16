@@ -122,10 +122,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       similarUserFeatures.get(similarUser)
     }.flatten
 
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.similarUserStringIntMap.get).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.similarUserStringIntMap.get).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+          set.map(model.similarUserStringIntMap.get).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+          set.map(model.similarUserStringIntMap.get).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 

@@ -32,7 +32,8 @@ import scala.collection.{Set, mutable}
   * Date: 22.02.2008
   */
 trait ScReferenceElement
-    extends ScalaPsiElement with ResolvableReferenceElement {
+    extends ScalaPsiElement
+    with ResolvableReferenceElement {
   override def getReference = this
 
   def nameId: PsiElement
@@ -290,8 +291,8 @@ trait ScReferenceElement
           val toReplace = parts.drop(index).mkString(".")
           val ref: T = referenceCreator(toReplace, true)
           var qual = ref
-          while (qual.qualifier != None) qual = qual.qualifier.get
-            .asInstanceOf[T]
+          while (qual.qualifier != None) qual =
+            qual.qualifier.get.asInstanceOf[T]
           val resolve: Array[ResolveResult] = qual.multiResolve(false)
           def isOk: Boolean = {
             if (packagePart == "java.util")

@@ -345,8 +345,8 @@ private[ui] class BatchPage(parent: StreamingTab) extends WebUIPage("batch") {
 
       val inputMetadatas = batchUIData.streamIdToInputInfo.values.flatMap {
         inputInfo =>
-          inputInfo.metadataDescription.map(
-              desc => inputInfo.inputStreamId -> desc)
+          inputInfo.metadataDescription.map(desc =>
+                inputInfo.inputStreamId -> desc)
       }.toSeq
       val summary: NodeSeq = <div>
         <ul class="unstyled">

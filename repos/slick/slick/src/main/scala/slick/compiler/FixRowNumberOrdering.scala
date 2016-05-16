@@ -10,7 +10,8 @@ class FixRowNumberOrdering extends Phase {
 
   def apply(state: CompilerState) =
     if (state.get(Phase.resolveZipJoins).getOrElse(false))
-      state.map(n => fix(n)) else state
+      state.map(n => fix(n))
+    else state
 
   /** Push ORDER BY into RowNumbers in ordered Comprehensions. */
   def fix(n: Node, parent: Option[Comprehension] = None): Node =

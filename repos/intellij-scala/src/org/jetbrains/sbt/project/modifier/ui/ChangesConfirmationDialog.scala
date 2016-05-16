@@ -34,8 +34,8 @@ class ChangesConfirmationDialog private (
 
   def selectedChanges: List[BuildFileChange] = {
     myChangesBrowser.getViewer.getIncludedChanges
-      .map(
-          change => BuildFileChange.swap(change.asInstanceOf[BuildFileChange]))
+      .map(change =>
+            BuildFileChange.swap(change.asInstanceOf[BuildFileChange]))
       .toList
   }
 

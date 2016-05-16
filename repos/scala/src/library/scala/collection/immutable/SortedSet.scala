@@ -23,7 +23,8 @@ import generic._
   *  @define coll immutable sorted set
   */
 trait SortedSet[A]
-    extends Set[A] with scala.collection.SortedSet[A]
+    extends Set[A]
+    with scala.collection.SortedSet[A]
     with SortedSetLike[A, SortedSet[A]] {
 
   /** Needs to be overridden in subclasses. */

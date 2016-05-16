@@ -64,7 +64,8 @@ object FadeTransition extends AnimationStatics {
   */
 class FadeTransition(
     override val delegate: jfxa.FadeTransition = new jfxa.FadeTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.FadeTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.FadeTransition] {
 
   // CONSTRUCTORS
 

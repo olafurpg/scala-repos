@@ -7,7 +7,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class CommonsStatsReceiverTest
-    extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+    extends FunSuite
+    with BeforeAndAfter
+    with OneInstancePerTest {
 
   before {
     Stats.flush

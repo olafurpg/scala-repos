@@ -10,7 +10,8 @@ import akka.http.scaladsl.model.WithQValue
 import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed abstract class HttpEncodingRange
-    extends jm.headers.HttpEncodingRange with ValueRenderable
+    extends jm.headers.HttpEncodingRange
+    with ValueRenderable
     with WithQValue[HttpEncodingRange] {
   def qValue: Float
   def matches(encoding: HttpEncoding): Boolean
@@ -28,7 +29,8 @@ object HttpEncodingRange {
     def matches(encoding: HttpEncoding) = true
     def withQValue(qValue: Float) =
       if (qValue == 1.0f) `*`
-      else if (qValue != this.qValue) `*`(qValue.toFloat) else this
+      else if (qValue != this.qValue) `*`(qValue.toFloat)
+      else this
   }
   object `*` extends `*`(1.0f)
 
@@ -49,7 +51,8 @@ object HttpEncodingRange {
 }
 
 final case class HttpEncoding private[http](value: String)
-    extends jm.headers.HttpEncoding with LazyValueBytesRenderable
+    extends jm.headers.HttpEncoding
+    with LazyValueBytesRenderable
     with WithQValue[HttpEncodingRange] {
   def withQValue(qValue: Float): HttpEncodingRange =
     HttpEncodingRange(this, qValue.toFloat)

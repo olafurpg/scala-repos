@@ -13,7 +13,8 @@ import annotation.implicitNotFound
   * Handles field binding and unbinding.
   */
 @implicitNotFound(
-    msg = "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
+    msg =
+      "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
 )
 trait Formatter[T] {
 
@@ -237,7 +238,8 @@ object Formats {
         parsing(dateParse, "error.date", Nil)(key, data)
 
       def unbind(key: String, value: Date) =
-        Map(key -> formatter.print(
+        Map(
+            key -> formatter.print(
                 new org.joda.time.DateTime(value).withZone(jodaTimeZone)))
     }
 
@@ -252,9 +254,9 @@ object Formats {
     * @param pattern a date pattern as specified in `org.joda.time.format.DateTimeFormat`.
     * @param timeZone the `java.util.TimeZone` to use for parsing and formatting
     */
-  def sqlDateFormat(
-      pattern: String,
-      timeZone: TimeZone = TimeZone.getDefault): Formatter[java.sql.Date] =
+  def sqlDateFormat(pattern: String,
+                    timeZone: TimeZone =
+                      TimeZone.getDefault): Formatter[java.sql.Date] =
     new Formatter[java.sql.Date] {
 
       val dateFormatter = dateFormat(pattern, timeZone)
@@ -284,9 +286,9 @@ object Formats {
     * @param pattern a date pattern as specified in `org.joda.time.format.DateTimeFormat`.
     * @param timeZone the `org.joda.time.DateTimeZone` to use for parsing and formatting
     */
-  def jodaDateTimeFormat(
-      pattern: String,
-      timeZone: org.joda.time.DateTimeZone = org.joda.time.DateTimeZone.getDefault)
+  def jodaDateTimeFormat(pattern: String,
+                         timeZone: org.joda.time.DateTimeZone =
+                           org.joda.time.DateTimeZone.getDefault)
     : Formatter[org.joda.time.DateTime] =
     new Formatter[org.joda.time.DateTime] {
 

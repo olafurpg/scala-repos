@@ -34,11 +34,12 @@ object Message extends LilaController {
     NotForKids {
       OptionFuOk(api.thread(id, me)) { thread =>
         relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
-          html.message.thread(thread,
-                              forms.post,
-                              blocked,
-                              answerable = !Env.message.LichessSenders
-                                  .contains(thread.creatorId))
+          html.message.thread(
+              thread,
+              forms.post,
+              blocked,
+              answerable =
+                !Env.message.LichessSenders.contains(thread.creatorId))
         }
       } map NoCache
     }
@@ -52,12 +53,12 @@ object Message extends LilaController {
             relationApi.fetchBlocks(thread otherUserId me, me.id) map {
               blocked =>
                 BadRequest(
-                    html.message.thread(
-                        thread,
-                        err,
-                        blocked,
-                        answerable = !Env.message.LichessSenders
-                            .contains(thread.creatorId)))
+                    html.message.thread(thread,
+                                        err,
+                                        blocked,
+                                        answerable =
+                                          !Env.message.LichessSenders
+                                            .contains(thread.creatorId)))
           },
           text =>
             api.makePost(thread, text, me) inject Redirect(
@@ -95,8 +96,8 @@ object Message extends LilaController {
           html.message.form(f(forms thread me),
                             user,
                             title,
-                            canMessage = canMessage ||
-                              Granter(_.MessageAnyone)(me))
+                            canMessage =
+                              canMessage || Granter(_.MessageAnyone)(me))
       }
     }
 

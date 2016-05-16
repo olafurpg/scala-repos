@@ -30,7 +30,7 @@ package json
   * )
   * </pre>
   */
-case class FieldSerializer[A : Manifest](
+case class FieldSerializer[A: Manifest](
     serializer: PartialFunction[(String, Any), Option[(String, Any)]] = Map(),
     deserializer: PartialFunction[JField, JField] = Map()
 )

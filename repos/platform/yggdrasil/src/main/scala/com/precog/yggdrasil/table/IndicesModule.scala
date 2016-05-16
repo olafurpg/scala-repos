@@ -61,8 +61,10 @@ object IndicesHelper {
 import IndicesHelper._
 
 trait IndicesModule[M[+ _]]
-    extends Logging with TransSpecModule
-    with ColumnarTableTypes[M] with SliceTransforms[M] {
+    extends Logging
+    with TransSpecModule
+    with ColumnarTableTypes[M]
+    with SliceTransforms[M] {
   self: ColumnarTableModule[M] =>
 
   // we will warn for tables with >1M rows.
@@ -185,11 +187,8 @@ trait IndicesModule[M[+ _]]
       // values they don't want.
       val params: List[(Seq[Int], Seq[RValue])] = tpls.map {
         case (index, ns, jvs) =>
-          val (ns2, jvs2) = ns
-            .zip(jvs)
-            .filter(_._1 >= 0)
-            .unzip
-            (ns2, jvs2)
+          val (ns2, jvs2) = ns.zip(jvs).filter(_._1 >= 0).unzip
+          (ns2, jvs2)
       }
 
       val sll: List[List[SliceIndex]] = tpls.map(_._1.indices)
@@ -445,23 +444,24 @@ trait IndicesModule[M[+ _]]
       while (k < numKeys) {
         val st: SliceTransform1[_] = sts(k)
 
-        keys(k) = st(slice) map {
-          case (_, keySlice) => {
-              val arr = new Array[RValue](n)
+        keys(k) =
+          st(slice) map {
+            case (_, keySlice) => {
+                val arr = new Array[RValue](n)
 
-              var i = 0
-              while (i < n) {
-                val rv = keySlice.toRValue(i)
-                rv match {
-                  case CUndefined =>
-                  case rv => arr(i) = rv
+                var i = 0
+                while (i < n) {
+                  val rv = keySlice.toRValue(i)
+                  rv match {
+                    case CUndefined =>
+                    case rv => arr(i) = rv
+                  }
+                  i += 1
                 }
-                i += 1
-              }
 
-              arr
-            }
-        }
+                arr
+              }
+          }
 
         k += 1
       }

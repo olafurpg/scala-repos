@@ -261,8 +261,8 @@ private[round] final class Round(gameId: String,
       }
     } recover errorHandler("handlePov")
 
-  private def handleGame(
-      game: Fu[Option[Game]])(op: Game => Fu[Events]): Funit =
+  private def handleGame(game: Fu[Option[Game]])(
+      op: Game => Fu[Events]): Funit =
     publish {
       game flatten "game not found" flatMap op
     } recover errorHandler("handleGame")

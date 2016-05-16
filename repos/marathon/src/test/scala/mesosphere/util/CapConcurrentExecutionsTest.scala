@@ -13,8 +13,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
 class CapConcurrentExecutionsTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with ScalaFutures {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures {
   def capMetrics: CapConcurrentExecutionsMetrics =
     new CapConcurrentExecutionsMetrics(
         new Metrics(new MetricRegistry),

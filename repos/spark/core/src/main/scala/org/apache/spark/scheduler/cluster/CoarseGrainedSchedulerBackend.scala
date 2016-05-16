@@ -40,7 +40,9 @@ import org.apache.spark.util.{RpcUtils, SerializableBuffer, ThreadUtils, Utils}
   */
 private[spark] class CoarseGrainedSchedulerBackend(
     scheduler: TaskSchedulerImpl, val rpcEnv: RpcEnv)
-    extends ExecutorAllocationClient with SchedulerBackend with Logging {
+    extends ExecutorAllocationClient
+    with SchedulerBackend
+    with Logging {
   // Use an atomic variable to track total number of cores in the cluster for simplicity and speed
   var totalCoreCount = new AtomicInteger(0)
   // Total number of executors that are currently registered
@@ -80,7 +82,8 @@ private[spark] class CoarseGrainedSchedulerBackend(
 
   class DriverEndpoint(
       override val rpcEnv: RpcEnv, sparkProperties: Seq[(String, String)])
-      extends ThreadSafeRpcEndpoint with Logging {
+      extends ThreadSafeRpcEndpoint
+      with Logging {
 
     // If this DriverEndpoint is changed to support multiple threads,
     // then this may need to be changed so that we don't share the serializer

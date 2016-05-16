@@ -48,7 +48,7 @@ import org.joda.time.DateTime
   *
   * Note: setting optional_? = false will result in incorrect equals behavior when using setFromJValue
   */
-class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType : Manifest](
+class MongoListField[OwnerType <: BsonRecord[OwnerType], ListType: Manifest](
     rec: OwnerType)
     extends Field[List[ListType], OwnerType]
     with MandatoryTypedField[List[ListType]]
@@ -184,11 +184,10 @@ class MongoJsonObjectListField[OwnerType <: BsonRecord[OwnerType],
 
   override def setFromDBObject(dbo: DBObject): Box[List[JObjectType]] =
     setBox(
-        Full(dbo.keySet.toList.map(k =>
-                  {
-        valueMeta.create(JObjectParser
-              .serialize(dbo.get(k.toString))(owner.meta.formats)
-              .asInstanceOf[JObject])(owner.meta.formats)
+        Full(dbo.keySet.toList.map(k => {
+      valueMeta.create(JObjectParser
+            .serialize(dbo.get(k.toString))(owner.meta.formats)
+            .asInstanceOf[JObject])(owner.meta.formats)
     })))
 
   override def asJValue: JValue =
@@ -198,9 +197,8 @@ class MongoJsonObjectListField[OwnerType <: BsonRecord[OwnerType],
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(arr) =>
       setBox(
-          Full(arr.map(jv =>
-                    {
-          valueMeta.create(jv.asInstanceOf[JObject])(owner.meta.formats)
+          Full(arr.map(jv => {
+        valueMeta.create(jv.asInstanceOf[JObject])(owner.meta.formats)
       })))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }

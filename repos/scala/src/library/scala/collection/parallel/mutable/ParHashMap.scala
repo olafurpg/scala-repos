@@ -35,10 +35,12 @@ import scala.collection.parallel.Task
 @SerialVersionUID(1L)
 class ParHashMap[K, V] private[collection](
     contents: HashTable.Contents[K, DefaultEntry[K, V]])
-    extends ParMap[K, V] with GenericParMapTemplate[K, V, ParHashMap]
+    extends ParMap[K, V]
+    with GenericParMapTemplate[K, V, ParHashMap]
     with ParMapLike[
         K, V, ParHashMap[K, V], scala.collection.mutable.HashMap[K, V]]
-    with ParHashTable[K, DefaultEntry[K, V]] with Serializable {
+    with ParHashTable[K, DefaultEntry[K, V]]
+    with Serializable {
   self =>
   initWithContents(contents)
 
@@ -166,8 +168,9 @@ object ParHashMap extends ParMapFactory[ParHashMap] {
   def newCombiner[K, V]: Combiner[(K, V), ParHashMap[K, V]] =
     ParHashMapCombiner.apply[K, V]
 
-  implicit def canBuildFrom[K, V]: CanCombineFrom[
-      Coll, (K, V), ParHashMap[K, V]] = new CanCombineFromMap[K, V]
+  implicit def canBuildFrom[K, V]
+    : CanCombineFrom[Coll, (K, V), ParHashMap[K, V]] =
+    new CanCombineFromMap[K, V]
 }
 
 private[mutable] abstract class ParHashMapCombiner[K, V](

@@ -176,11 +176,11 @@ class ContentNegotiationSpec extends FreeSpec with Matchers {
       implicit val marshallers: ToEntityMarshaller[X] = Marshaller.oneOf(
           alternatives map {
         case Alternative.ContentType(ct) ⇒
-          Marshaller.withFixedContentType(ct)(
-              (s: X) ⇒ HttpEntity(ct, ByteString("The X")))
+          Marshaller.withFixedContentType(ct)((s: X) ⇒
+                HttpEntity(ct, ByteString("The X")))
         case Alternative.MediaType(mt) ⇒
-          Marshaller.withOpenCharset(mt)(
-              (s: X, cs) ⇒ HttpEntity(mt withCharset cs, "The X"))
+          Marshaller.withOpenCharset(mt)((s: X, cs) ⇒
+                HttpEntity(mt withCharset cs, "The X"))
       }: _*)
 
       Await.result(

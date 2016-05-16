@@ -20,7 +20,7 @@ package object interpolation {
     def apply(x: T): T
   }
 
-  abstract class HandyUnivariateInterpolator[T : ClassTag : Field : Ordering](
+  abstract class HandyUnivariateInterpolator[T: ClassTag: Field: Ordering](
       x_coords: Vector[T], y_coords: Vector[T])
       extends UnivariateInterpolator[T] {
 

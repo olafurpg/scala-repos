@@ -12,7 +12,8 @@ object SeqNo {
     override def compare(x: SeqNo, y: SeqNo): Int = {
       val sgn =
         if (x.rawValue < y.rawValue) -1
-        else if (x.rawValue > y.rawValue) 1 else 0
+        else if (x.rawValue > y.rawValue) 1
+        else 0
       if (((x.rawValue - y.rawValue) * sgn) < 0L) -sgn else sgn
     }
   }
@@ -165,8 +166,10 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
   def receive(arrivedMsg: T): AckedReceiveBuffer[T] = {
     this.copy(
         cumulativeAck = max(arrivedMsg.seq, cumulativeAck),
-        buf = if (arrivedMsg.seq > lastDelivered && !buf.contains(arrivedMsg))
-            buf + arrivedMsg else buf)
+        buf =
+          if (arrivedMsg.seq > lastDelivered && !buf.contains(arrivedMsg))
+            buf + arrivedMsg
+          else buf)
   }
 
   /**

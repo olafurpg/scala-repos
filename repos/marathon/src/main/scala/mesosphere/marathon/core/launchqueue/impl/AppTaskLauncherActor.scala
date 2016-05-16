@@ -84,7 +84,9 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
                                    rateLimiterActor: ActorRef,
                                    private[this] var app: AppDefinition,
                                    private[this] var tasksToLaunch: Int)
-    extends Actor with ActorLogging with Stash {
+    extends Actor
+    with ActorLogging
+    with Stash {
   // scalastyle:on parameter.number
 
   private[this] var inFlightTaskOperations = Map.empty[Task.Id, Cancellable]
@@ -344,7 +346,8 @@ private class AppTaskLauncherActor(config: LaunchQueueConfig,
         tasksLeftToLaunch = tasksToLaunch,
         taskLaunchesInFlight = inFlightTaskOperations.size,
         // don't count tasks that are not launched in the tasksMap
-        tasksLaunched = tasksMap.values.count(_.launched.isDefined) -
+        tasksLaunched =
+          tasksMap.values.count(_.launched.isDefined) -
           inFlightTaskOperations.size,
         backOffUntil.getOrElse(clock.now())
     )

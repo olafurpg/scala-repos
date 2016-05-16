@@ -70,8 +70,8 @@ final case class Task[T](info: Info[T], work: Action[T]) {
   def tag(tags: Tag*): Task[T] = tagw(tags.map(t => (t, 1)): _*)
   def tagw(tags: (Tag, Int)*): Task[T] =
     copy(
-        info = info.set(
-              tagsKey, info.get(tagsKey).getOrElse(Map.empty) ++ tags))
+        info =
+          info.set(tagsKey, info.get(tagsKey).getOrElse(Map.empty) ++ tags))
   def tags: TagMap = info get tagsKey getOrElse Map.empty
 }
 

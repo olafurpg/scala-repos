@@ -13,7 +13,8 @@ import com.typesafe.config.{Config, ConfigFactory}
   * Emits infinite stream of strings (representing queried for events).
   */
 class DummyReadJournal
-    extends scaladsl.ReadJournal with scaladsl.AllPersistenceIdsQuery {
+    extends scaladsl.ReadJournal
+    with scaladsl.AllPersistenceIdsQuery {
   override def allPersistenceIds(): Source[String, NotUsed] =
     Source.fromIterator(() ⇒ Iterator.from(0)).map(_.toString)
 }
@@ -23,7 +24,8 @@ object DummyReadJournal {
 }
 
 class DummyReadJournalForJava(readJournal: DummyReadJournal)
-    extends javadsl.ReadJournal with javadsl.AllPersistenceIdsQuery {
+    extends javadsl.ReadJournal
+    with javadsl.AllPersistenceIdsQuery {
   override def allPersistenceIds(
       ): akka.stream.javadsl.Source[String, NotUsed] =
     readJournal.allPersistenceIds().asJava

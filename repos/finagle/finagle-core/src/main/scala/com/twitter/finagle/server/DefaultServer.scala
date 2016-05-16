@@ -45,16 +45,16 @@ case class DefaultServer[Req, Rep, In, Out](
     requestTimeout: Duration = Duration.Top,
     maxConcurrentRequests: Int = Int.MaxValue,
     cancelOnHangup: Boolean = true,
-    prepare: ServiceFactory[Req, Rep] => ServiceFactory[Req, Rep] = (sf: ServiceFactory[
-          Req, Rep]) => sf,
+    prepare: ServiceFactory[Req, Rep] => ServiceFactory[Req, Rep] =
+      (sf: ServiceFactory[Req, Rep]) => sf,
     timer: Timer = DefaultTimer.twitter,
     monitor: Monitor = DefaultMonitor,
     logger: java.util.logging.Logger = DefaultLogger,
     statsReceiver: StatsReceiver = ServerStatsReceiver,
     tracer: Tracer = DefaultTracer,
     reporter: ReporterFactory = LoadedReporterFactory,
-    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
-        .serverModule[Req, Rep]
+    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] =
+      TraceInitializerFilter.serverModule[Req, Rep]
 )
     extends Server[Req, Rep] {
 

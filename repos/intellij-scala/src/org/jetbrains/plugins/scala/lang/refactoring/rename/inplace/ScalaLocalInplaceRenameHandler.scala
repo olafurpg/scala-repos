@@ -14,7 +14,8 @@ import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, VariableInpl
   * 1/20/14
   */
 class ScalaLocalInplaceRenameHandler
-    extends VariableInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends VariableInplaceRenameHandler
+    with ScalaInplaceRenameHandler {
 
   override def isAvailable(
       element: PsiElement, editor: Editor, file: PsiFile): Boolean = {

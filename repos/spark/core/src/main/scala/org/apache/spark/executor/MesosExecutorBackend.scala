@@ -33,7 +33,9 @@ import org.apache.spark.scheduler.cluster.mesos.MesosTaskLaunchData
 import org.apache.spark.util.Utils
 
 private[spark] class MesosExecutorBackend
-    extends MesosExecutor with ExecutorBackend with Logging {
+    extends MesosExecutor
+    with ExecutorBackend
+    with Logging {
 
   var executor: Executor = null
   var driver: ExecutorDriver = null

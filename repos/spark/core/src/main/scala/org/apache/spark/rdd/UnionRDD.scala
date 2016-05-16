@@ -35,7 +35,7 @@ import org.apache.spark.util.Utils
   * @param parentRddPartitionIndex index of the partition within the parent RDD
   *                                this partition refers to
   */
-private[spark] class UnionPartition[T : ClassTag](
+private[spark] class UnionPartition[T: ClassTag](
     idx: Int,
     @transient private val rdd: RDD[T],
     val parentRddIndex: Int,
@@ -59,7 +59,7 @@ private[spark] class UnionPartition[T : ClassTag](
 }
 
 @DeveloperApi
-class UnionRDD[T : ClassTag](sc: SparkContext, var rdds: Seq[RDD[T]])
+class UnionRDD[T: ClassTag](sc: SparkContext, var rdds: Seq[RDD[T]])
     extends RDD[T](sc, Nil) {
   // Nil since we implement getDependencies
 

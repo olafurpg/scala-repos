@@ -259,7 +259,7 @@ private[v1] class NotFoundException(msg: String)
           .status(Response.Status.NOT_FOUND)
           .entity(ErrorWrapper(msg))
           .build()
-      )
+    )
 
 private[v1] class BadParameterException(msg: String)
     extends WebApplicationException(
@@ -268,7 +268,7 @@ private[v1] class BadParameterException(msg: String)
           .status(Response.Status.BAD_REQUEST)
           .entity(ErrorWrapper(msg))
           .build()
-      ) {
+    ) {
   def this(param: String, exp: String, actual: String) = {
     this(
         raw"""Bad value for parameter "$param".  Expected a $exp, got "$actual"""")

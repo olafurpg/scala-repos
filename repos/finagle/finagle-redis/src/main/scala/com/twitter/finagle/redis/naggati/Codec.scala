@@ -93,13 +93,14 @@ object DontCareCounter extends (Int => Unit) {
   * A netty ChannelHandler for decoding data into protocol objects on the way in, and packing
   * objects into byte arrays on the way out. Optionally, the bytes in/out are tracked.
   */
-class Codec[A : Manifest](
+class Codec[A: Manifest](
     firstStage: Stage,
     encoder: Encoder[A],
     bytesReadCounter: Int => Unit,
     bytesWrittenCounter: Int => Unit
 )
-    extends FrameDecoder with ChannelDownstreamHandler {
+    extends FrameDecoder
+    with ChannelDownstreamHandler {
   def this(firstStage: Stage, encoder: Encoder[A]) =
     this(firstStage, encoder, DontCareCounter, DontCareCounter)
 

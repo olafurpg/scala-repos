@@ -80,7 +80,8 @@ trait MethodImpl[A, +R] {
 }
 
 trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
-    extends ((A, B) => R) with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] {
+    extends ((A, B) => R)
+    with MMRegistry2[Method[_ <: A, _ <: B, _ <: R]] {
   this: Method[A, B, R] =>
   protected def bindingMissing(a: A, b: B): R =
     throw new UnsupportedOperationException(
@@ -138,7 +139,8 @@ trait Multimethod2[Method[AA, BB, RR] <: Function2[AA, BB, RR], A, B, R]
   * @author dlwh
   */
 trait Multiproc2[Method[AA, BB] <: (AA, BB) => Unit, A <: AnyRef, B]
-    extends ((A, B) => Unit) with MMRegistry2[Method[_ <: A, _ <: B]] {
+    extends ((A, B) => Unit)
+    with MMRegistry2[Method[_ <: A, _ <: B]] {
   this: Method[A, B] =>
   protected def bindingMissing(a: A, b: B): Unit =
     throw new UnsupportedOperationException("Types not found!")
@@ -365,9 +367,10 @@ trait MMRegistry1[M] {
       case None =>
         val newCA = checkedA ++ a.getInterfaces
         val sa = a.getSuperclass +: a.getInterfaces.filterNot(checkedA)
-        val allParents = for (aa <- sa; if aa != null; m <- resolve(aa, newCA)) yield {
-          m
-        }
+        val allParents =
+          for (aa <- sa; if aa != null; m <- resolve(aa, newCA)) yield {
+            m
+          }
         allParents.toMap
     }
   }

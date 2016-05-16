@@ -169,8 +169,9 @@ object MarathonTestHelper {
     builder.build()
   }
 
-  def reservation(principal: String, labels: Map[String, String] = Map.empty)
-    : Mesos.Resource.ReservationInfo = {
+  def reservation(principal: String,
+                  labels: Map[String, String] =
+                    Map.empty): Mesos.Resource.ReservationInfo = {
     val labelsBuilder = Mesos.Labels.newBuilder()
     labels.foreach {
       case (k, v) =>
@@ -281,14 +282,14 @@ object MarathonTestHelper {
     Task.LaunchedEphemeral(
         taskId = Task.Id(taskInfo.getTaskId),
         agentInfo = Task.AgentInfo(
-              host = offer.getHostname,
-              agentId = Some(offer.getSlaveId.getValue),
-              attributes = offer.getAttributesList.asScala
-          ),
+            host = offer.getHostname,
+            agentId = Some(offer.getSlaveId.getValue),
+            attributes = offer.getAttributesList.asScala
+        ),
         appVersion = version,
         status = Task.Status(
-              stagedAt = now
-          ),
+            stagedAt = now
+        ),
         networking = Task.HostPorts(Seq(1, 2, 3))
     )
   }
@@ -329,19 +330,21 @@ object MarathonTestHelper {
                               store: PersistentStore = new InMemoryStore,
                               config: MarathonConf = defaultConfig(),
                               metrics: Metrics = new Metrics(
-                                    new MetricRegistry)): TaskTrackerModule = {
+                                  new MetricRegistry)): TaskTrackerModule = {
 
     val metrics = new Metrics(new MetricRegistry)
     val taskRepo = new TaskRepository(
-        new MarathonStore[MarathonTaskState](
-            store = store,
-            metrics = metrics,
-            newState = () =>
-                MarathonTaskState(MarathonTask
-                      .newBuilder()
-                      .setId(UUID.randomUUID().toString)
-                      .build()),
-            prefix = TaskRepository.storePrefix),
+        new MarathonStore[MarathonTaskState](store = store,
+                                             metrics = metrics,
+                                             newState = () =>
+                                               MarathonTaskState(MarathonTask
+                                                     .newBuilder()
+                                                     .setId(UUID
+                                                           .randomUUID()
+                                                           .toString)
+                                                     .build()),
+                                             prefix =
+                                               TaskRepository.storePrefix),
         metrics
     )
 
@@ -383,10 +386,10 @@ object MarathonTestHelper {
             host = "host.some", agentId = None, attributes = Iterable.empty),
         appVersion = now,
         status = Task.Status(
-              stagedAt = now,
-              startedAt = None,
-              mesosStatus = None
-          ),
+            stagedAt = now,
+            startedAt = None,
+            mesosStatus = None
+        ),
         networking = Task.NoNetworking
     )
   }
@@ -448,11 +451,11 @@ object MarathonTestHelper {
     stagedTask(Task.Id.forApp(appId).idString,
                appVersion = appVersion,
                stagedAt = stagedAt)
-  def stagedTask(
-      taskId: String,
-      appVersion: Timestamp = Timestamp(1),
-      stagedAt: Long = 2,
-      mesosStatus: Option[Mesos.TaskStatus] = None): Task.LaunchedEphemeral =
+  def stagedTask(taskId: String,
+                 appVersion: Timestamp = Timestamp(1),
+                 stagedAt: Long = 2,
+                 mesosStatus: Option[Mesos.TaskStatus] =
+                   None): Task.LaunchedEphemeral =
     Task.LaunchedEphemeral(
         Task.Id(taskId),
         Task.AgentInfo("some.host", Some("agent-1"), Iterable.empty),
@@ -460,8 +463,8 @@ object MarathonTestHelper {
         Task.Status(
             stagedAt = Timestamp(stagedAt),
             startedAt = None,
-            mesosStatus = Some(
-                  statusForState(taskId, Mesos.TaskState.TASK_STAGING))
+            mesosStatus =
+              Some(statusForState(taskId, Mesos.TaskState.TASK_STAGING))
         ),
         Task.NoNetworking
     )
@@ -563,7 +566,7 @@ object MarathonTestHelper {
               .setPrincipal("principal")
               .setLabels(
                   TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
-          )
+        )
         .setDisk(Mesos.Resource.DiskInfo
               .newBuilder()
               .setPersistence(Mesos.Resource.DiskInfo.Persistence
@@ -580,8 +583,8 @@ object MarathonTestHelper {
     import scala.collection.JavaConverters._
     MarathonTestHelper
       .makeBasicOffer(
-          reservation = Some(
-                TaskLabels.labelsForTask(frameworkId, Task.Id(taskId))),
+          reservation =
+            Some(TaskLabels.labelsForTask(frameworkId, Task.Id(taskId))),
           role = "test"
       )
       .addAllResources(persistentVolumeResources(Task.Id(taskId),
@@ -606,8 +609,8 @@ object MarathonTestHelper {
       .copy(
           container = Some(mesosContainerWithPersistentVolume),
           residency = Some(
-                Residency(Residency.defaultRelaunchEscalationTimeoutSeconds,
-                          Residency.defaultTaskLostBehaviour))
+              Residency(Residency.defaultRelaunchEscalationTimeoutSeconds,
+                        Residency.defaultTaskLostBehaviour))
       )
   }
 
@@ -622,27 +625,28 @@ object MarathonTestHelper {
     Task.LaunchedOnReservation(
         taskId = Task.Id.forApp(appId),
         agentInfo = Task.AgentInfo(
-              host = "host.some", agentId = None, attributes = Iterable.empty),
+            host = "host.some", agentId = None, attributes = Iterable.empty),
         appVersion = now,
         status = Task.Status(
-              stagedAt = now,
-              startedAt = None,
-              mesosStatus = None
-          ),
+            stagedAt = now,
+            startedAt = None,
+            mesosStatus = None
+        ),
         networking = Task.NoNetworking,
         reservation = Task.Reservation(
-              localVolumeIds, Task.Reservation.State.Launched))
+            localVolumeIds, Task.Reservation.State.Launched))
   }
 
   def mesosContainerWithPersistentVolume = Container(
       `type` = Mesos.ContainerInfo.Type.MESOS,
       volumes = Seq[Volume](
-            PersistentVolume(
-                containerPath = "persistent-volume",
-                persistent = PersistentVolumeInfo(10), // must match persistentVolumeResources
-                mode = Mesos.Volume.Mode.RW
-            )
-        ),
+          PersistentVolume(
+              containerPath = "persistent-volume",
+              persistent =
+                PersistentVolumeInfo(10), // must match persistentVolumeResources
+              mode = Mesos.Volume.Mode.RW
+          )
+      ),
       docker = None
   )
 

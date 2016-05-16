@@ -10,7 +10,8 @@ import org.ensime.fixture._
 import org.ensime.util.EnsimeSpec
 
 class RefactoringHandlerSpec
-    extends EnsimeSpec with IsolatedAnalyzerFixture
+    extends EnsimeSpec
+    with IsolatedAnalyzerFixture
     with RichPresentationCompilerTestUtils {
 
   val encoding = "UTF-16"

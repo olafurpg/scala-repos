@@ -207,11 +207,11 @@ object Evolutions {
     * @param autocommit Whether to use autocommit or not, evolutions will be manually committed if false.
     * @param schema The schema where all the play evolution tables are saved in
     */
-  def applyEvolutions(
-      database: Database,
-      evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
-      autocommit: Boolean = true,
-      schema: String = ""): Unit = {
+  def applyEvolutions(database: Database,
+                      evolutionsReader: EvolutionsReader =
+                        ThisClassLoaderEvolutionsReader,
+                      autocommit: Boolean = true,
+                      schema: String = ""): Unit = {
     val dbEvolutions = new DatabaseEvolutions(database, schema)
     val evolutions = dbEvolutions.scripts(evolutionsReader)
     dbEvolutions.evolve(evolutions, autocommit)

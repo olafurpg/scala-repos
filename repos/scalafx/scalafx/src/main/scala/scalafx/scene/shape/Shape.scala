@@ -64,7 +64,8 @@ object Shape {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Shape.html]].
   */
 abstract class Shape(override val delegate: jfxss.Shape)
-    extends Node(delegate) with SFXDelegate[jfxss.Shape] {
+    extends Node(delegate)
+    with SFXDelegate[jfxss.Shape] {
 
   /**
     * Defines parameters to fill the interior of an Shape using the settings of the Paint context.

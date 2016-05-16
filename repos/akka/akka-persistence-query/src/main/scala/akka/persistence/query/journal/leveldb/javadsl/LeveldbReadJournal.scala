@@ -27,9 +27,12 @@ import akka.stream.javadsl.Source
   */
 class LeveldbReadJournal(
     scaladslReadJournal: akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal)
-    extends ReadJournal with AllPersistenceIdsQuery
-    with CurrentPersistenceIdsQuery with EventsByPersistenceIdQuery
-    with CurrentEventsByPersistenceIdQuery with EventsByTagQuery
+    extends ReadJournal
+    with AllPersistenceIdsQuery
+    with CurrentPersistenceIdsQuery
+    with EventsByPersistenceIdQuery
+    with CurrentEventsByPersistenceIdQuery
+    with EventsByTagQuery
     with CurrentEventsByTagQuery {
 
   /**

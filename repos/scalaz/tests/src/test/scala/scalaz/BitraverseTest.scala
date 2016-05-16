@@ -38,9 +38,9 @@ object BitraverseTest extends SpecLite {
     import scalaz.syntax.either._
 
     Bitraverse[\/].rightTraverse.traverse(42.left[Int])(x => Vector(x + 3)) must_===
-    (Vector(-\/(42)))
+      (Vector(-\/(42)))
     Bitraverse[\/].leftTraverse.traverse(42.left[Int])(x => Vector(x + 3)) must_===
-    (Vector(-\/(45)))
+      (Vector(-\/(45)))
 
     Bifoldable[\/].leftFoldable.foldMap(42.left[Int])(identity) must_=== (42)
     Bifoldable[\/].rightFoldable.foldMap(42.left[Int])(identity) must_=== (0)

@@ -19,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, Type
   * Date: 06.03.2008
   */
 class ScThisReferenceImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScThisReference {
+    extends ScalaPsiElementImpl(node)
+    with ScThisReference {
   override def toString: String = "ThisReference"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] =
@@ -43,7 +44,8 @@ class ScThisReferenceImpl(node: ASTNode)
         if (encl != null)
           Some(
               PsiTreeUtil.getContextOfType(
-                  encl, false, classOf[ScTemplateDefinition])) else None
+                  encl, false, classOf[ScTemplateDefinition]))
+        else None
       }
   }
 

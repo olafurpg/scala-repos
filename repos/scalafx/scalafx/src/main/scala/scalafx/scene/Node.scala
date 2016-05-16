@@ -70,7 +70,9 @@ object Node {
   * @param delegate JavaFX Node
   */
 abstract class Node protected (override val delegate: jfxs.Node)
-    extends EventHandlerDelegate with Styleable with SFXDelegate[jfxs.Node] {
+    extends EventHandlerDelegate
+    with Styleable
+    with SFXDelegate[jfxs.Node] {
 
   /**
     * The accessible text for this `Node`.

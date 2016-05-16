@@ -175,21 +175,14 @@ object SQLConf {
                     defaultValue: Option[T] = None,
                     doc: String = "",
                     isPublic: Boolean = true): SQLConfEntry[T] =
-      SQLConfEntry(key,
-                   defaultValue,
-                   v =>
-                     {
-                       val _v = valueConverter(v)
-                       if (!validValues.contains(_v)) {
-                         throw new IllegalArgumentException(
-                             s"The value of $key should be one of ${validValues
-                           .mkString(", ")}, but was $v")
-                       }
-                       _v
-                   },
-                   _.toString,
-                   doc,
-                   isPublic)
+      SQLConfEntry(key, defaultValue, v => {
+        val _v = valueConverter(v)
+        if (!validValues.contains(_v)) {
+          throw new IllegalArgumentException(
+              s"The value of $key should be one of ${validValues.mkString(", ")}, but was $v")
+        }
+        _v
+      }, _.toString, doc, isPublic)
 
     def seqConf[T](key: String,
                    valueConverter: String => T,
@@ -217,7 +210,8 @@ object SQLConf {
   val ALLOW_MULTIPLE_CONTEXTS = booleanConf(
       "spark.sql.allowMultipleContexts",
       defaultValue = Some(true),
-      doc = "When set to true, creating multiple SQLContexts/HiveContexts is allowed. " +
+      doc =
+        "When set to true, creating multiple SQLContexts/HiveContexts is allowed. " +
         "When set to false, only one SQLContext/HiveContext is allowed to be created " +
         "through the constructor (new SQLContexts/HiveContexts created through newSession " +
         "method is allowed). Please note that this conf needs to be set in Spark Conf. Once " +
@@ -228,21 +222,24 @@ object SQLConf {
   val COMPRESS_CACHED = booleanConf(
       "spark.sql.inMemoryColumnarStorage.compressed",
       defaultValue = Some(true),
-      doc = "When set to true Spark SQL will automatically select a compression codec for each " +
+      doc =
+        "When set to true Spark SQL will automatically select a compression codec for each " +
         "column based on statistics of the data.",
       isPublic = false)
 
   val COLUMN_BATCH_SIZE = intConf(
       "spark.sql.inMemoryColumnarStorage.batchSize",
       defaultValue = Some(10000),
-      doc = "Controls the size of batches for columnar caching.  Larger batch sizes can improve " +
+      doc =
+        "Controls the size of batches for columnar caching.  Larger batch sizes can improve " +
         "memory utilization and compression, but risk OOMs when caching data.",
       isPublic = false)
 
   val IN_MEMORY_PARTITION_PRUNING = booleanConf(
       "spark.sql.inMemoryColumnarStorage.partitionPruning",
       defaultValue = Some(true),
-      doc = "When true, enable partition pruning for in-memory columnar tables.",
+      doc =
+        "When true, enable partition pruning for in-memory columnar tables.",
       isPublic = false)
 
   val PREFER_SORTMERGEJOIN = booleanConf(
@@ -254,14 +251,16 @@ object SQLConf {
   val AUTO_BROADCASTJOIN_THRESHOLD = intConf(
       "spark.sql.autoBroadcastJoinThreshold",
       defaultValue = Some(10 * 1024 * 1024),
-      doc = "Configures the maximum size in bytes for a table that will be broadcast to all worker " +
+      doc =
+        "Configures the maximum size in bytes for a table that will be broadcast to all worker " +
         "nodes when performing a join.  By setting this value to -1 broadcasting can be disabled. " +
         "Note that currently statistics are only supported for Hive Metastore tables where the " +
         "command<code>ANALYZE TABLE &lt;tableName&gt; COMPUTE STATISTICS noscan</code> has been run.")
 
   val DEFAULT_SIZE_IN_BYTES = longConf(
       "spark.sql.defaultSizeInBytes",
-      doc = "The default table size used in query planning. By default, it is set to a larger " +
+      doc =
+        "The default table size used in query planning. By default, it is set to a larger " +
         "value than `spark.sql.autoBroadcastJoinThreshold` to be more conservative. That is to say " +
         "by default the optimizer will not choose to broadcast a table unless it knows for sure " +
         "its size is small enough.",
@@ -270,7 +269,8 @@ object SQLConf {
   val SHUFFLE_PARTITIONS = intConf(
       "spark.sql.shuffle.partitions",
       defaultValue = Some(200),
-      doc = "The default number of partitions to use when shuffling data for joins or aggregations.")
+      doc =
+        "The default number of partitions to use when shuffling data for joins or aggregations.")
 
   val SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE = longMemConf(
       "spark.sql.adaptive.shuffle.targetPostShuffleInputSize",
@@ -285,7 +285,8 @@ object SQLConf {
   val SHUFFLE_MIN_NUM_POSTSHUFFLE_PARTITIONS = intConf(
       "spark.sql.adaptive.minNumPostShufflePartitions",
       defaultValue = Some(-1),
-      doc = "The advisory minimal number of post-shuffle partitions provided to " +
+      doc =
+        "The advisory minimal number of post-shuffle partitions provided to " +
         "ExchangeCoordinator. This setting is used in our test to make sure we " +
         "have enough parallelism to expose issues that will not be exposed with a " +
         "single partition. When the value is a non-positive value, this setting will " +
@@ -306,14 +307,16 @@ object SQLConf {
   val PARQUET_SCHEMA_MERGING_ENABLED = booleanConf(
       "spark.sql.parquet.mergeSchema",
       defaultValue = Some(false),
-      doc = "When true, the Parquet data source merges schemas collected from all data files, " +
+      doc =
+        "When true, the Parquet data source merges schemas collected from all data files, " +
         "otherwise the schema is picked from the summary file or a random data file " +
         "if no summary file is available.")
 
   val PARQUET_SCHEMA_RESPECT_SUMMARIES = booleanConf(
       "spark.sql.parquet.respectSummaryFiles",
       defaultValue = Some(false),
-      doc = "When true, we make assumption that all part-files of Parquet are consistent with " +
+      doc =
+        "When true, we make assumption that all part-files of Parquet are consistent with " +
         "summary files and we will ignore them when merging schema. Otherwise, if this is " +
         "false, which is the default, we will merge all part-files. This should be considered " +
         "as expert-only option, and shouldn't be enabled before knowing what it means exactly.")
@@ -321,7 +324,8 @@ object SQLConf {
   val PARQUET_BINARY_AS_STRING = booleanConf(
       "spark.sql.parquet.binaryAsString",
       defaultValue = Some(false),
-      doc = "Some other Parquet-producing systems, in particular Impala and older versions of " +
+      doc =
+        "Some other Parquet-producing systems, in particular Impala and older versions of " +
         "Spark SQL, do not differentiate between binary data and strings when writing out the " +
         "Parquet schema. This flag tells Spark SQL to interpret binary data as a string to provide " +
         "compatibility with these systems.")
@@ -329,7 +333,8 @@ object SQLConf {
   val PARQUET_INT96_AS_TIMESTAMP = booleanConf(
       "spark.sql.parquet.int96AsTimestamp",
       defaultValue = Some(true),
-      doc = "Some Parquet-producing systems, in particular Impala, store Timestamp into INT96. " +
+      doc =
+        "Some Parquet-producing systems, in particular Impala, store Timestamp into INT96. " +
         "Spark would also store Timestamp as INT96 because we need to avoid precision lost of the " +
         "nanoseconds field. This flag tells Spark SQL to interpret INT96 data as a timestamp to " +
         "provide compatibility with these systems.")
@@ -337,14 +342,16 @@ object SQLConf {
   val PARQUET_CACHE_METADATA = booleanConf(
       "spark.sql.parquet.cacheMetadata",
       defaultValue = Some(true),
-      doc = "Turns on caching of Parquet schema metadata. Can speed up querying of static data.")
+      doc =
+        "Turns on caching of Parquet schema metadata. Can speed up querying of static data.")
 
   val PARQUET_COMPRESSION = enumConf(
       "spark.sql.parquet.compression.codec",
       valueConverter = v => v.toLowerCase,
       validValues = Set("uncompressed", "snappy", "gzip", "lzo"),
       defaultValue = Some("gzip"),
-      doc = "Sets the compression codec use when writing Parquet files. Acceptable values include: " +
+      doc =
+        "Sets the compression codec use when writing Parquet files. Acceptable values include: " +
         "uncompressed, snappy, gzip, lzo.")
 
   val PARQUET_FILTER_PUSHDOWN_ENABLED = booleanConf(
@@ -355,13 +362,15 @@ object SQLConf {
   val PARQUET_WRITE_LEGACY_FORMAT = booleanConf(
       key = "spark.sql.parquet.writeLegacyFormat",
       defaultValue = Some(false),
-      doc = "Whether to follow Parquet's format specification when converting Parquet schema to " +
+      doc =
+        "Whether to follow Parquet's format specification when converting Parquet schema to " +
         "Spark SQL schema and vice versa.")
 
   val PARQUET_OUTPUT_COMMITTER_CLASS = stringConf(
       key = "spark.sql.parquet.output.committer.class",
       defaultValue = Some(classOf[ParquetOutputCommitter].getName),
-      doc = "The output committer class used by Parquet. The specified class needs to be a " +
+      doc =
+        "The output committer class used by Parquet. The specified class needs to be a " +
         "subclass of org.apache.hadoop.mapreduce.OutputCommitter.  Typically, it's also a subclass " +
         "of org.apache.parquet.hadoop.ParquetOutputCommitter.  NOTE: 1. Instead of SQLConf, this " +
         "option must be set in Hadoop Configuration.  2. This option overrides " +
@@ -380,19 +389,22 @@ object SQLConf {
   val HIVE_VERIFY_PARTITION_PATH = booleanConf(
       "spark.sql.hive.verifyPartitionPath",
       defaultValue = Some(false),
-      doc = "When true, check all the partition paths under the table\'s root directory " +
+      doc =
+        "When true, check all the partition paths under the table\'s root directory " +
         "when reading data stored in HDFS.")
 
   val HIVE_METASTORE_PARTITION_PRUNING = booleanConf(
       "spark.sql.hive.metastorePartitionPruning",
       defaultValue = Some(false),
-      doc = "When true, some predicates will be pushed down into the Hive metastore so that " +
+      doc =
+        "When true, some predicates will be pushed down into the Hive metastore so that " +
         "unmatching partitions can be eliminated earlier.")
 
   val NATIVE_VIEW = booleanConf(
       "spark.sql.nativeView",
       defaultValue = Some(false),
-      doc = "When true, CREATE VIEW will be handled by Spark SQL instead of Hive native commands.  " +
+      doc =
+        "When true, CREATE VIEW will be handled by Spark SQL instead of Hive native commands.  " +
         "Note that this function is experimental and should ony be used when you are using " +
         "non-hive-compatible tables written by Spark SQL.  The SQL string used to create " +
         "view should be fully qualified, i.e. use `tbl1`.`col1` instead of `*` whenever " +
@@ -402,7 +414,8 @@ object SQLConf {
   val CANONICAL_NATIVE_VIEW = booleanConf(
       "spark.sql.nativeView.canonical",
       defaultValue = Some(true),
-      doc = "When this option and spark.sql.nativeView are both true, Spark SQL tries to handle " +
+      doc =
+        "When this option and spark.sql.nativeView are both true, Spark SQL tries to handle " +
         "CREATE VIEW statement using SQL query string generated from view definition logical " +
         "plan.  If the logical plan doesn't have a SQL representation, we fallback to the " +
         "original native view implementation.",
@@ -411,12 +424,14 @@ object SQLConf {
   val COLUMN_NAME_OF_CORRUPT_RECORD = stringConf(
       "spark.sql.columnNameOfCorruptRecord",
       defaultValue = Some("_corrupt_record"),
-      doc = "The name of internal column for storing raw/un-parsed JSON records that fail to parse.")
+      doc =
+        "The name of internal column for storing raw/un-parsed JSON records that fail to parse.")
 
   val BROADCAST_TIMEOUT = intConf(
       "spark.sql.broadcastTimeout",
       defaultValue = Some(5 * 60),
-      doc = "Timeout in seconds for the broadcast wait time in broadcast joins.")
+      doc =
+        "Timeout in seconds for the broadcast wait time in broadcast joins.")
 
   // This is only used for the thriftserver
   val THRIFTSERVER_POOL = stringConf(
@@ -426,12 +441,14 @@ object SQLConf {
   val THRIFTSERVER_UI_STATEMENT_LIMIT = intConf(
       "spark.sql.thriftserver.ui.retainedStatements",
       defaultValue = Some(200),
-      doc = "The number of SQL statements kept in the JDBC/ODBC web UI history.")
+      doc =
+        "The number of SQL statements kept in the JDBC/ODBC web UI history.")
 
   val THRIFTSERVER_UI_SESSION_LIMIT = intConf(
       "spark.sql.thriftserver.ui.retainedSessions",
       defaultValue = Some(200),
-      doc = "The number of SQL client sessions kept in the JDBC/ODBC web UI history.")
+      doc =
+        "The number of SQL client sessions kept in the JDBC/ODBC web UI history.")
 
   // This is used to set the default data source
   val DEFAULT_DATA_SOURCE_NAME = stringConf(
@@ -446,7 +463,8 @@ object SQLConf {
   val SCHEMA_STRING_LENGTH_THRESHOLD = intConf(
       "spark.sql.sources.schemaStringLengthThreshold",
       defaultValue = Some(4000),
-      doc = "The maximum length allowed in a single cell when " +
+      doc =
+        "The maximum length allowed in a single cell when " +
         "storing additional schema information in Hive's metastore.",
       isPublic = false)
 
@@ -458,12 +476,14 @@ object SQLConf {
   val PARTITION_COLUMN_TYPE_INFERENCE = booleanConf(
       "spark.sql.sources.partitionColumnTypeInference.enabled",
       defaultValue = Some(true),
-      doc = "When true, automatically infer the data types for partitioned columns.")
+      doc =
+        "When true, automatically infer the data types for partitioned columns.")
 
   val PARTITION_MAX_FILES = intConf(
       "spark.sql.sources.maxConcurrentWrites",
       defaultValue = Some(1),
-      doc = "The maximum number of concurrent files to open before falling back on sorting when " +
+      doc =
+        "The maximum number of concurrent files to open before falling back on sorting when " +
         "writing out files using dynamic partitioning.")
 
   val BUCKETING_ENABLED = booleanConf(
@@ -474,7 +494,8 @@ object SQLConf {
   val ORDER_BY_ORDINAL = booleanConf(
       "spark.sql.orderByOrdinal",
       defaultValue = Some(true),
-      doc = "When true, the ordinal numbers are treated as the position in the select list. " +
+      doc =
+        "When true, the ordinal numbers are treated as the position in the select list. " +
         "When false, the ordinal numbers in order/sort By clause are ignored.")
 
   // The output committer class used by HadoopFsRelation. The specified class needs to be a
@@ -490,7 +511,8 @@ object SQLConf {
   val PARALLEL_PARTITION_DISCOVERY_THRESHOLD = intConf(
       key = "spark.sql.sources.parallelPartitionDiscovery.threshold",
       defaultValue = Some(32),
-      doc = "The degree of parallelism for schema merging and partition discovery of " +
+      doc =
+        "The degree of parallelism for schema merging and partition discovery of " +
         "Parquet data sources.")
 
   // Whether to perform eager analysis when constructing a dataframe.
@@ -498,7 +520,8 @@ object SQLConf {
   val DATAFRAME_EAGER_ANALYSIS = booleanConf(
       "spark.sql.eagerAnalysis",
       defaultValue = Some(true),
-      doc = "When true, eagerly applies query analysis on DataFrame operations.",
+      doc =
+        "When true, eagerly applies query analysis on DataFrame operations.",
       isPublic = false)
 
   // Whether to automatically resolve ambiguity in join conditions for self-joins.
@@ -517,7 +540,8 @@ object SQLConf {
   val DATAFRAME_PIVOT_MAX_VALUES = intConf(
       "spark.sql.pivotMaxValues",
       defaultValue = Some(10000),
-      doc = "When doing a pivot without specifying values for the pivot column this is the maximum " +
+      doc =
+        "When doing a pivot without specifying values for the pivot column this is the maximum " +
         "number of (distinct) values that will be collected without error."
   )
 
@@ -525,13 +549,15 @@ object SQLConf {
       "spark.sql.runSQLOnFiles",
       defaultValue = Some(true),
       isPublic = false,
-      doc = "When true, we could use `datasource`.`path` as table in SQL query.")
+      doc =
+        "When true, we could use `datasource`.`path` as table in SQL query.")
 
   val PARSER_SUPPORT_QUOTEDID = booleanConf(
       "spark.sql.parser.supportQuotedIdentifiers",
       defaultValue = Some(true),
       isPublic = false,
-      doc = "Whether to use quoted identifier.\n  false: default(past) behavior. Implies only" +
+      doc =
+        "Whether to use quoted identifier.\n  false: default(past) behavior. Implies only" +
         "alphaNumeric and underscore are valid characters in identifiers.\n" +
         "  true: implies column names can contain any character.")
 
@@ -539,25 +565,29 @@ object SQLConf {
       "spark.sql.parser.supportSQL11ReservedKeywords",
       defaultValue = Some(false),
       isPublic = false,
-      doc = "This flag should be set to true to enable support for SQL2011 reserved keywords.")
+      doc =
+        "This flag should be set to true to enable support for SQL2011 reserved keywords.")
 
   val WHOLESTAGE_CODEGEN_ENABLED = booleanConf(
       "spark.sql.codegen.wholeStage",
       defaultValue = Some(true),
-      doc = "When true, the whole stage (of multiple operators) will be compiled into single java" +
+      doc =
+        "When true, the whole stage (of multiple operators) will be compiled into single java" +
         " method.",
       isPublic = false)
 
   val FILES_MAX_PARTITION_BYTES = longConf(
       "spark.sql.files.maxPartitionBytes",
       defaultValue = Some(128 * 1024 * 1024), // parquet.block.size
-      doc = "The maximum number of bytes to pack into a single partition when reading files.",
+      doc =
+        "The maximum number of bytes to pack into a single partition when reading files.",
       isPublic = true)
 
   val EXCHANGE_REUSE_ENABLED = booleanConf(
       "spark.sql.exchange.reuse",
       defaultValue = Some(true),
-      doc = "When true, the planner will try to find out duplicated exchanges and re-use them.",
+      doc =
+        "When true, the planner will try to find out duplicated exchanges and re-use them.",
       isPublic = false)
 
   object Deprecated {
@@ -583,7 +613,10 @@ object SQLConf {
   * SQLConf is thread-safe (internally synchronized, so safe to be used in multiple threads).
   */
 class SQLConf
-    extends Serializable with CatalystConf with ParserConf with Logging {
+    extends Serializable
+    with CatalystConf
+    with ParserConf
+    with Logging {
   import SQLConf._
 
   /** Only low degree of contention is expected for conf, thus NOT using ConcurrentHashMap. */

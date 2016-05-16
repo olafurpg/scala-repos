@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Date: 28.02.2008
   */
 class ScLiteralPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScLiteralPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScLiteralPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

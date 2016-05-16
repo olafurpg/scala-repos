@@ -131,8 +131,8 @@ private object PoolConductor {
           override def onPush(): Unit = {
             val ctx = grab(ctxIn)
             val slot = nextSlot
-            slotStates(slot) = slotStateAfterDispatch(
-                slotStates(slot), ctx.request.method)
+            slotStates(slot) =
+              slotStateAfterDispatch(slotStates(slot), ctx.request.method)
             nextSlot = bestSlot()
             emit(out, SwitchCommand(ctx, slot), tryPullCtx)
           }
@@ -142,11 +142,11 @@ private object PoolConductor {
           override def onPush(): Unit = {
             grab(slotIn) match {
               case SlotEvent.RequestCompleted(slotIx) ⇒
-                slotStates(slotIx) = slotStateAfterRequestCompleted(
-                    slotStates(slotIx))
+                slotStates(slotIx) =
+                  slotStateAfterRequestCompleted(slotStates(slotIx))
               case SlotEvent.Disconnected(slotIx, failed) ⇒
-                slotStates(slotIx) = slotStateAfterDisconnect(
-                    slotStates(slotIx), failed)
+                slotStates(slotIx) =
+                  slotStateAfterDisconnect(slotStates(slotIx), failed)
             }
             pull(slotIn)
             val wasBlocked = nextSlot == -1

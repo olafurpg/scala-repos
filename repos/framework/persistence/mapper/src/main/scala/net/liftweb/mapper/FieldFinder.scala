@@ -19,7 +19,7 @@ package mapper
 
 import scala.reflect.{ClassTag, classTag}
 
-class FieldFinder[T : ClassTag](
+class FieldFinder[T: ClassTag](
     metaMapper: AnyRef, logger: net.liftweb.common.Logger) {
   import java.lang.reflect._
 

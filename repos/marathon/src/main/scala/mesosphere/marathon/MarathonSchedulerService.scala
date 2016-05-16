@@ -78,7 +78,8 @@ class MarathonSchedulerService @Inject()(
     @Named(EventModule.busName) eventStream: EventStream,
     leadershipCallbacks: Seq[LeadershipCallback] = Seq.empty,
     metrics: Metrics = new Metrics(new MetricRegistry))
-    extends AbstractExecutionThreadService with Leader
+    extends AbstractExecutionThreadService
+    with Leader
     with LeadershipAbdication {
 
   import scala.concurrent.ExecutionContext.Implicits.global

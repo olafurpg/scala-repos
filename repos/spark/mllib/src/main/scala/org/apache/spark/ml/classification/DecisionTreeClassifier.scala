@@ -47,7 +47,8 @@ final class DecisionTreeClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends ProbabilisticClassifier[
         Vector, DecisionTreeClassifier, DecisionTreeClassificationModel]
-    with DecisionTreeClassifierParams with DefaultParamsWritable {
+    with DecisionTreeClassifierParams
+    with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("dtc"))
@@ -167,8 +168,11 @@ final class DecisionTreeClassificationModel private[ml](
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
     extends ProbabilisticClassificationModel[
-        Vector, DecisionTreeClassificationModel] with DecisionTreeModel
-    with DecisionTreeClassifierParams with MLWritable with Serializable {
+        Vector, DecisionTreeClassificationModel]
+    with DecisionTreeModel
+    with DecisionTreeClassifierParams
+    with MLWritable
+    with Serializable {
 
   require(
       rootNode != null,
@@ -291,11 +295,11 @@ object DecisionTreeClassificationModel
   }
 
   /** Convert a model from the old API */
-  private[ml] def fromOld(
-      oldModel: OldDecisionTreeModel,
-      parent: DecisionTreeClassifier,
-      categoricalFeatures: Map[Int, Int],
-      numFeatures: Int = -1): DecisionTreeClassificationModel = {
+  private[ml] def fromOld(oldModel: OldDecisionTreeModel,
+                          parent: DecisionTreeClassifier,
+                          categoricalFeatures: Map[Int, Int],
+                          numFeatures: Int =
+                            -1): DecisionTreeClassificationModel = {
     require(
         oldModel.algo == OldAlgo.Classification,
         s"Cannot convert non-classification DecisionTreeModel (old API) to" +

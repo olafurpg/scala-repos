@@ -31,8 +31,8 @@ case class PortsMatch(hostPortsWithRole: Seq[PortWithRole]) {
   */
 class PortsMatcher(app: AppDefinition,
                    offer: MesosProtos.Offer,
-                   resourceSelector: ResourceSelector = ResourceSelector(
-                         Set("*"), reserved = false),
+                   resourceSelector: ResourceSelector =
+                     ResourceSelector(Set("*"), reserved = false),
                    random: Random = Random)
     extends Logging {
 
@@ -111,8 +111,8 @@ class PortsMatcher(app: AppDefinition,
 
       // available ports without the ports that have been preset in the port mappings
       val availablePortsWithoutStaticHostPorts: Iterator[PortWithRole] =
-        shuffledAvailablePorts.filter(
-            portWithRole => !hostPortsFromMappings(portWithRole.port))
+        shuffledAvailablePorts.filter(portWithRole =>
+              !hostPortsFromMappings(portWithRole.port))
 
       mappings.iterator.map {
         case PortMapping(
@@ -152,11 +152,11 @@ class PortsMatcher(app: AppDefinition,
   private[this] lazy val offeredPortRanges: Seq[PortRange] = {
     val portRangeIter = for {
       resource <- offer.getResourcesList.asScala.iterator
-                     if resourceSelector(resource) &&
-                 resource.getName == Resource.PORTS
+      if resourceSelector(resource) && resource.getName == Resource.PORTS
       rangeInResource <- resource.getRanges.getRangeList.asScala
       reservation = if (resource.hasReservation)
-        Option(resource.getReservation) else None
+        Option(resource.getReservation)
+      else None
     } yield
       PortRange(resource.getRole,
                 rangeInResource.getBegin.toInt,

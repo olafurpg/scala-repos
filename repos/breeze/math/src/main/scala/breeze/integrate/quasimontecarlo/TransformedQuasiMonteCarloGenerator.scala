@@ -169,7 +169,7 @@ trait ProvidesTransformedQuasiMonteCarlo {
         val next = baseGenerator.getNextUnsafe
         var inputPosition = 0
         var i = 0
-        while ( (i < dimension) && accepted) {
+        while ((i < dimension) && accepted) {
           variables(i) match {
             case (v: TransformingQuasiRandomVariableSpec) => {
                 currentValue(i) = v.transform(next, inputPosition)

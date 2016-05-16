@@ -29,7 +29,8 @@ import org.specs2.mutable._
 import scalaz._
 
 trait IdSourceScannerModuleSpec[M[+ _]]
-    extends IdSourceScannerModule with TableModuleTestSupport[M]
+    extends IdSourceScannerModule
+    with TableModuleTestSupport[M]
     with Specification {
   private val blockSize = 10000
 

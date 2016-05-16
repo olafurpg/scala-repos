@@ -4,8 +4,11 @@ import mesosphere.marathon.integration.setup.{IntegrationFunSuite, SingleMaratho
 import org.scalatest._
 
 class EventSubscribersIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   before(cleanUp())
 

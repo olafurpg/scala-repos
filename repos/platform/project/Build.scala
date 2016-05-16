@@ -128,12 +128,12 @@ object PlatformBuild extends Build {
       jprofilerLib := "/Applications/jprofiler7/bin/macos/libjprofilerti.jnilib",
       jprofilerConf := "src/main/resources/jprofile.xml",
       jprofilerId := "116",
-      javaOptions in profileTask <<= (
-          javaOptions,
-          jprofilerLib,
-          jprofilerConf,
-          jprofilerId,
-          baseDirectory) map { (opts, lib, conf, id, d) =>
+      javaOptions in profileTask <<=
+        (javaOptions,
+       jprofilerLib,
+       jprofilerConf,
+       jprofilerId,
+       baseDirectory) map { (opts, lib, conf, id, d) =>
         // download jnilib if necessary. a bit sketchy, but convenient
         Process("./jprofiler/setup-jnilib.py").!!
         opts ++ Seq(

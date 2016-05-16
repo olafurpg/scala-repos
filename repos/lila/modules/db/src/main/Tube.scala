@@ -34,7 +34,9 @@ case class BsTube[Doc](handler: BSONHandler[BSONDocument, Doc])
 case class JsTube[Doc](reader: Reads[Doc],
                        writer: Writes[Doc],
                        flags: Seq[JsTube.Flag.type => JsTube.Flag] = Seq.empty)
-    extends Tube[Doc] with Reads[Doc] with Writes[Doc] {
+    extends Tube[Doc]
+    with Reads[Doc]
+    with Writes[Doc] {
 
   import play.modules.reactivemongo.json._
 

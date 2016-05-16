@@ -152,9 +152,7 @@ class MarathonHealthCheckManager @Inject()(
             // since only current version tasks are launched.
             for {
               (version, activeHealthChecks) <- ahcs(appId)
-                                                  if version != app.version &&
-                                              !activeAppVersions.contains(
-                                                  version)
+              if version != app.version && !activeAppVersions.contains(version)
               activeHealthCheck <- activeHealthChecks
             } remove(appId, version, activeHealthCheck.healthCheck)
 

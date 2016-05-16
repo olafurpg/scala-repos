@@ -51,11 +51,14 @@ trait ParquetTupleSource extends FileSource with HasFilterPredicate {
   */
 class DailySuffixParquetTuple(
     path: String, dateRange: DateRange, override val fields: Fields)
-    extends DailySuffixSource(path, dateRange) with ParquetTupleSource
+    extends DailySuffixSource(path, dateRange)
+    with ParquetTupleSource
 
 class HourlySuffixParquetTuple(
     path: String, dateRange: DateRange, override val fields: Fields)
-    extends HourlySuffixSource(path, dateRange) with ParquetTupleSource
+    extends HourlySuffixSource(path, dateRange)
+    with ParquetTupleSource
 
 class FixedPathParquetTuple(override val fields: Fields, paths: String*)
-    extends FixedPathSource(paths: _*) with ParquetTupleSource
+    extends FixedPathSource(paths: _*)
+    with ParquetTupleSource

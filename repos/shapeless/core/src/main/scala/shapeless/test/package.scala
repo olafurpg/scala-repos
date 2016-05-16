@@ -33,8 +33,8 @@ package object test {
 class TestMacros(val c: blackbox.Context) {
   import c.universe._
 
-  def showTypeNoValue[T : WeakTypeTag]: Tree =
+  def showTypeNoValue[T: WeakTypeTag]: Tree =
     q"${weakTypeOf[T].dealias.toString}"
 
-  def showType[T : WeakTypeTag](t: Tree): Tree = showTypeNoValue[T]
+  def showType[T: WeakTypeTag](t: Tree): Tree = showTypeNoValue[T]
 }

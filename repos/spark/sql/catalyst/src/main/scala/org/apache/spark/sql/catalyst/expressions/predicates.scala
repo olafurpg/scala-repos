@@ -89,7 +89,9 @@ trait PredicateHelper {
 }
 
 case class Not(child: Expression)
-    extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+    extends UnaryExpression
+    with Predicate
+    with ImplicitCastInputTypes {
 
   override def toString: String = s"NOT $child"
 
@@ -109,7 +111,8 @@ case class Not(child: Expression)
   * Evaluates to `true` if `list` contains `value`.
   */
 case class In(value: Expression, list: Seq[Expression])
-    extends Predicate with ImplicitCastInputTypes {
+    extends Predicate
+    with ImplicitCastInputTypes {
 
   require(list != null, "list should not be null")
 
@@ -190,7 +193,8 @@ case class In(value: Expression, list: Seq[Expression])
   * static.
   */
 case class InSet(child: Expression, hset: Set[Any])
-    extends UnaryExpression with Predicate {
+    extends UnaryExpression
+    with Predicate {
 
   require(hset != null, "hset could not be null")
 
@@ -247,7 +251,8 @@ case class InSet(child: Expression, hset: Set[Any])
 }
 
 case class And(left: Expression, right: Expression)
-    extends BinaryOperator with Predicate {
+    extends BinaryOperator
+    with Predicate {
 
   override def inputType: AbstractDataType = BooleanType
 
@@ -298,7 +303,8 @@ case class And(left: Expression, right: Expression)
 }
 
 case class Or(left: Expression, right: Expression)
-    extends BinaryOperator with Predicate {
+    extends BinaryOperator
+    with Predicate {
 
   override def inputType: AbstractDataType = BooleanType
 
@@ -360,7 +366,7 @@ abstract class BinaryComparison extends BinaryOperator with Predicate {
       defineCodeGen(ctx,
                     ev,
                     (c1,
-                    c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
+                     c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
     }
   }
 }

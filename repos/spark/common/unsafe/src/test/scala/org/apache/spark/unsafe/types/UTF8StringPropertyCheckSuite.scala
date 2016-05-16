@@ -29,7 +29,9 @@ import org.apache.spark.unsafe.types.UTF8String.{fromString => toUTF8}
   * This TestSuite utilize ScalaCheck to generate randomized inputs for UTF8String testing.
   */
 class UTF8StringPropertyCheckSuite
-    extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
+    with Matchers {
 // scalastyle:on
 
   test("toString") {
@@ -111,7 +113,7 @@ class UTF8StringPropertyCheckSuite
     def lTrim(s: String): String = {
       var st = 0
       val array: Array[Char] = s.toCharArray
-      while ( (st < s.length) && (array(st) <= ' ')) {
+      while ((st < s.length) && (array(st) <= ' ')) {
         st += 1
       }
       if (st > 0) s.substring(st, s.length) else s
@@ -119,7 +121,7 @@ class UTF8StringPropertyCheckSuite
     def rTrim(s: String): String = {
       var len = s.length
       val array: Array[Char] = s.toCharArray
-      while ( (len > 0) && (array(len - 1) <= ' ')) {
+      while ((len > 0) && (array(len - 1) <= ' ')) {
         len -= 1
       }
       if (len < s.length) s.substring(0, len) else s

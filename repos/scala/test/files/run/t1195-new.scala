@@ -10,7 +10,7 @@ object Test {
   val g1 = g()
   val h1 = h()
 
-  def m[T : WeakTypeTag](x: T) =
+  def m[T: WeakTypeTag](x: T) =
     println(weakTypeOf[T] + ", underlying = " + weakTypeOf[T].typeSymbol.info)
 
   def main(args: Array[String]): Unit = {

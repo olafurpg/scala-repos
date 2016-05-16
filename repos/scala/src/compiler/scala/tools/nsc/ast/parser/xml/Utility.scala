@@ -143,8 +143,7 @@ object Utility {
     import java.lang.Character._
     // The constants represent groups Mc, Me, Mn, Lm, and Nd.
 
-    isNameStart(ch) ||
-    (getType(ch).toByte match {
+    isNameStart(ch) || (getType(ch).toByte match {
           case COMBINING_SPACING_MARK | ENCLOSING_MARK | NON_SPACING_MARK |
               MODIFIER_LETTER | DECIMAL_DIGIT_NUMBER =>
             true

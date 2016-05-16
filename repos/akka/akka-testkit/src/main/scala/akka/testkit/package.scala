@@ -10,8 +10,8 @@ import scala.collection.immutable
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 package object testkit {
-  def filterEvents[T](eventFilters: Iterable[EventFilter])(block: ⇒ T)(
-      implicit system: ActorSystem): T = {
+  def filterEvents[T](eventFilters: Iterable[EventFilter])(
+      block: ⇒ T)(implicit system: ActorSystem): T = {
     def now = System.currentTimeMillis
 
     system.eventStream.publish(TestEvent.Mute(eventFilters.to[immutable.Seq]))

@@ -123,25 +123,25 @@ trait Reifiers { self: Quasiquotes =>
                 Ident(nme.WILDCARD), EmptyTree, fail) :: Nil
           }
         // q"new { def unapply(tree: $AnyClass) = { ..${unlifters.preamble()}; tree match { case ..$cases } } }.unapply(..$args)"
-        Apply(Select(SyntacticNew(Nil,
+        Apply(
+            Select(SyntacticNew(
+                       Nil,
+                       Nil,
+                       noSelfType,
+                       List(
+                           DefDef(NoMods,
+                                  nme.unapply,
                                   Nil,
-                                  noSelfType,
-                                  List(
-                                      DefDef(NoMods,
-                                             nme.unapply,
-                                             Nil,
-                                             List(List(ValDef(NoMods,
-                                                              nme.tree,
-                                                              TypeTree(
-                                                                  AnyClass.toType),
-                                                              EmptyTree))),
-                                             TypeTree(),
-                                             SyntacticBlock(
-                                                 unlifters.preamble() :+ Match(
-                                                     Ident(nme.tree),
-                                                     cases))))),
-                     nme.unapply),
-              args)
+                                  List(List(ValDef(NoMods,
+                                                   nme.tree,
+                                                   TypeTree(AnyClass.toType),
+                                                   EmptyTree))),
+                                  TypeTree(),
+                                  SyntacticBlock(unlifters.preamble() :+ Match(
+                                          Ident(nme.tree),
+                                          cases))))),
+                   nme.unapply),
+            args)
       }
 
     def reifyFillingHoles(tree: Tree): Tree = {

@@ -53,7 +53,8 @@ private[akka] class ReplayFilter(persistentActor: ActorRef,
                                  windowSize: Int,
                                  maxOldWriters: Int,
                                  debugEnabled: Boolean)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import JournalProtocol._
   import ReplayFilter.{Warn, Fail, RepairByDiscardOld, Disabled}
 

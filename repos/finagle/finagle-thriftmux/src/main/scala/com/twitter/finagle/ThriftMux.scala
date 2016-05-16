@@ -46,8 +46,10 @@ import org.jboss.netty.buffer.ChannelBuffer
   * @define serverExampleObject ThriftMux
   */
 object ThriftMux
-    extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
-    with Server[Array[Byte], Array[Byte]] with ThriftRichServer {
+    extends Client[ThriftClientRequest, Array[Byte]]
+    with ThriftRichClient
+    with Server[Array[Byte], Array[Byte]]
+    with ThriftRichServer {
 
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux clients.
@@ -60,8 +62,8 @@ object ThriftMux
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux servers.
     */
-  private[twitter] val BaseServerStack: Stack[ServiceFactory[
-          mux.Request, mux.Response]] =
+  private[twitter] val BaseServerStack: Stack[
+      ServiceFactory[mux.Request, mux.Response]] =
     // NOTE: ideally this would not use the `prepConn` role, but it's conveniently
     // located in the right location of the stack and is defaulted to a no-op.
     // We would like this located anywhere before the StatsFilter so that success
@@ -99,14 +101,19 @@ object ThriftMux
 
   case class Client(
       muxer: StackClient[mux.Request, mux.Response] = Mux.client
-          .copy(stack = BaseClientStack)
-          .configured(ProtocolLibrary("thriftmux")))
+        .copy(stack = BaseClientStack)
+        .configured(ProtocolLibrary("thriftmux")))
       extends StackBasedClient[ThriftClientRequest, Array[Byte]]
-      with Stack.Parameterized[Client] with Stack.Transformable[Client]
-      with CommonParams[Client] with ClientParams[Client]
-      with WithClientTransport[Client] with WithClientAdmissionControl[Client]
-      with WithSession[Client] with WithSessionQualifier[Client]
-      with WithDefaultLoadBalancer[Client] with ThriftRichClient {
+      with Stack.Parameterized[Client]
+      with Stack.Transformable[Client]
+      with CommonParams[Client]
+      with ClientParams[Client]
+      with WithClientTransport[Client]
+      with WithClientAdmissionControl[Client]
+      with WithSession[Client]
+      with WithSessionQualifier[Client]
+      with WithDefaultLoadBalancer[Client]
+      with ThriftRichClient {
 
     def stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       muxer.stack
@@ -286,7 +293,8 @@ object ThriftMux
     * tracing support).
     */
   case class ServerMuxer(
-      stack: Stack[ServiceFactory[mux.Request, mux.Response]] = BaseServerStack,
+      stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
+        BaseServerStack,
       params: Stack.Params = Mux.server.params + ProtocolLibrary("thriftmux"))
       extends StdStackServer[mux.Request, mux.Response, ServerMuxer] {
 
@@ -395,9 +403,11 @@ object ThriftMux
 
   case class Server(
       muxer: StackServer[mux.Request, mux.Response] = serverMuxer)
-      extends StackBasedServer[Array[Byte], Array[Byte]] with ThriftRichServer
+      extends StackBasedServer[Array[Byte], Array[Byte]]
+      with ThriftRichServer
       with Stack.Parameterized[Server]
-      with CommonParams[Server] with WithServerTransport[Server]
+      with CommonParams[Server]
+      with WithServerTransport[Server]
       with WithServerAdmissionControl[Server] {
 
     import Server.MuxToArrayFilter

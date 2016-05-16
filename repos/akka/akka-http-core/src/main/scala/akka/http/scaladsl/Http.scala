@@ -35,7 +35,8 @@ import scala.util.control.NonFatal
 import scala.compat.java8.FutureConverters._
 
 class HttpExt(private val config: Config)(implicit val system: ActorSystem)
-    extends akka.actor.Extension with DefaultSSLContextCreation {
+    extends akka.actor.Extension
+    with DefaultSSLContextCreation {
 
   import Http._
 
@@ -162,13 +163,13 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * To configure additional settings for a server started using this method,
     * use the `akka.http.server` config section or pass in a [[akka.http.scaladsl.settings.ServerSettings]] explicitly.
     */
-  def bindAndHandleSync(
-      handler: HttpRequest ⇒ HttpResponse,
-      interface: String,
-      port: Int = DefaultPortForProtocol,
-      connectionContext: ConnectionContext = defaultServerHttpContext,
-      settings: ServerSettings = ServerSettings(system),
-      log: LoggingAdapter = system.log)(
+  def bindAndHandleSync(handler: HttpRequest ⇒ HttpResponse,
+                        interface: String,
+                        port: Int = DefaultPortForProtocol,
+                        connectionContext: ConnectionContext =
+                          defaultServerHttpContext,
+                        settings: ServerSettings = ServerSettings(system),
+                        log: LoggingAdapter = system.log)(
       implicit fm: Materializer): Future[ServerBinding] =
     bindAndHandle(Flow[HttpRequest].map(handler),
                   interface,
@@ -194,8 +195,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       connectionContext: ConnectionContext = defaultServerHttpContext,
       settings: ServerSettings = ServerSettings(system),
       parallelism: Int = 1,
-      log: LoggingAdapter = system.log)(
-      implicit fm: Materializer): Future[ServerBinding] =
+      log: LoggingAdapter =
+        system.log)(implicit fm: Materializer): Future[ServerBinding] =
     bindAndHandle(Flow[HttpRequest].mapAsync(parallelism)(handler),
                   interface,
                   port,
@@ -221,8 +222,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     */
   def serverLayer(settings: ServerSettings,
                   remoteAddress: Option[InetSocketAddress] = None,
-                  log: LoggingAdapter = system.log)(
-      implicit mat: Materializer): ServerLayer =
+                  log: LoggingAdapter =
+                    system.log)(implicit mat: Materializer): ServerLayer =
     HttpServerBluePrint(settings, remoteAddress, log)
 
   // ** CLIENT ** //
@@ -392,8 +393,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * In order to allow for easy response-to-request association the flow takes in a custom, opaque context
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
-  private[akka] def newHostConnectionPool[T](
-      setup: HostConnectionPoolSetup)(implicit fm: Materializer)
+  private[akka] def newHostConnectionPool[T](setup: HostConnectionPoolSetup)(
+      implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] = {
     val gatewayFuture =
       FastFuture.successful(new PoolGateway(setup, Promise()))
@@ -470,8 +471,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * In order to allow for easy response-to-request association the flow takes in a custom, opaque context
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
-  private def cachedHostConnectionPool[T](
-      setup: HostConnectionPoolSetup)(implicit fm: Materializer)
+  private def cachedHostConnectionPool[T](setup: HostConnectionPoolSetup)(
+      implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] =
     gatewayClientFlow(setup, cachedGateway(setup))
 
@@ -653,11 +654,11 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
   private[http] val hostPoolCache =
     new ConcurrentHashMap[HostConnectionPoolSetup, Future[PoolGateway]]
 
-  private def cachedGateway(request: HttpRequest,
-                            settings: ConnectionPoolSettings,
-                            connectionContext: ConnectionContext,
-                            log: LoggingAdapter)(
-      implicit fm: Materializer): Future[PoolGateway] =
+  private def cachedGateway(
+      request: HttpRequest,
+      settings: ConnectionPoolSettings,
+      connectionContext: ConnectionContext,
+      log: LoggingAdapter)(implicit fm: Materializer): Future[PoolGateway] =
     if (request.uri.scheme.nonEmpty && request.uri.authority.nonEmpty) {
       val httpsCtx =
         if (request.uri.scheme.equalsIgnoreCase("https")) connectionContext
@@ -689,8 +690,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         val fastFuture = FastFuture.successful(gateway)
         hostPoolCache.put(setup, fastFuture) // optimize subsequent gateway accesses
         gatewayPromise.success(gateway) // satisfy everyone who got a hold of our promise while we were starting up
-        whenShuttingDown.future.onComplete(
-            _ ⇒ hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
+        whenShuttingDown.future.onComplete(_ ⇒
+              hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
         fastFuture
 
       case future ⇒ future // return cached instance
@@ -698,8 +699,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
   }
 
   private def gatewayClientFlow[T](
-      hcps: HostConnectionPoolSetup,
-      gatewayFuture: Future[PoolGateway])(implicit fm: Materializer)
+      hcps: HostConnectionPoolSetup, gatewayFuture: Future[PoolGateway])(
+      implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] =
     clientFlow[T](hcps.setup.settings)(_ -> gatewayFuture)
       .mapMaterializedValue(_ ⇒ HostConnectionPool(hcps)(gatewayFuture))
@@ -717,8 +718,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
           Promise[(Try[HttpResponse], T)]() // TODO: simplify to `transformWith` when on Scala 2.12
         gatewayFuture
           .flatMap(_ (effectiveRequest))(fm.executionContext)
-          .onComplete(
-              responseTry ⇒ result.success(responseTry -> userContext))(
+          .onComplete(responseTry ⇒
+                result.success(responseTry -> userContext))(
               fm.executionContext)
         result.future
     }
@@ -750,8 +751,8 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     *                +------+
     * }}}
     */
-  type ServerLayer = BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed]
+  type ServerLayer =
+    BidiFlow[HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed]
   //#
 
   //#client-layer
@@ -767,8 +768,8 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     *                +------+
     * }}}
     */
-  type ClientLayer = BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed]
+  type ClientLayer =
+    BidiFlow[HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed]
   //#
 
   /**

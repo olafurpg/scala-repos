@@ -40,7 +40,8 @@ package mongotestrecords {
   import field._
 
   class TstRecord private ()
-      extends MongoRecord[TstRecord] with UUIDPk[TstRecord] {
+      extends MongoRecord[TstRecord]
+      with UUIDPk[TstRecord] {
 
     def meta = TstRecord
 
@@ -77,7 +78,8 @@ package mongotestrecords {
   object Person extends JsonObjectMeta[Person]
 
   class MainDoc private ()
-      extends MongoRecord[MainDoc] with ObjectIdPk[MainDoc] {
+      extends MongoRecord[MainDoc]
+      with ObjectIdPk[MainDoc] {
     def meta = MainDoc
 
     object name extends StringField(this, 12)
@@ -94,13 +96,15 @@ package mongotestrecords {
 
   // uuid as id
   class RefUuidDoc private ()
-      extends MongoRecord[RefUuidDoc] with UUIDPk[RefUuidDoc] {
+      extends MongoRecord[RefUuidDoc]
+      with UUIDPk[RefUuidDoc] {
     def meta = RefUuidDoc
   }
   object RefUuidDoc extends RefUuidDoc with MongoMetaRecord[RefUuidDoc]
 
   class ListDoc private ()
-      extends MongoRecord[ListDoc] with ObjectIdPk[ListDoc] {
+      extends MongoRecord[ListDoc]
+      with ObjectIdPk[ListDoc] {
     def meta = ListDoc
 
     import scala.collection.JavaConversions._
@@ -128,9 +132,8 @@ package mongotestrecords {
           {
             val dbo = new BasicDBObject
 
-            m.keys.foreach(k =>
-                  {
-                dbo.put(k.toString, m.getOrElse(k, ""))
+            m.keys.foreach(k => {
+              dbo.put(k.toString, m.getOrElse(k, ""))
             })
 
             dbl.add(dbo)
@@ -143,17 +146,15 @@ package mongotestrecords {
       override def setFromDBObject(
           dbo: DBObject): Box[List[Map[String, String]]] = {
         val lst: List[Map[String, String]] = dbo.keySet.toList
-          .map(k =>
-                {
-              dbo.get(k.toString) match {
-                case bdbo: BasicDBObject
-                    if
-                    (bdbo.containsField("name") &&
-                        bdbo.containsField("type")) =>
-                  Map("name" -> bdbo.getString("name"),
-                      "type" -> bdbo.getString("type"))
-                case _ => null
-              }
+          .map(k => {
+            dbo.get(k.toString) match {
+              case bdbo: BasicDBObject
+                  if (bdbo.containsField("name") &&
+                      bdbo.containsField("type")) =>
+                Map("name" -> bdbo.getString("name"),
+                    "type" -> bdbo.getString("type"))
+              case _ => null
+            }
           })
           .filter(_ != null)
         Full(set(lst))
@@ -177,7 +178,8 @@ package mongotestrecords {
   }
 
   class OptionalDoc private ()
-      extends MongoRecord[OptionalDoc] with ObjectIdPk[OptionalDoc] {
+      extends MongoRecord[OptionalDoc]
+      with ObjectIdPk[OptionalDoc] {
     def meta = OptionalDoc
     // optional fields
     object stringbox extends StringField(this, 32) {
@@ -188,7 +190,8 @@ package mongotestrecords {
   object OptionalDoc extends OptionalDoc with MongoMetaRecord[OptionalDoc]
 
   class StrictDoc private ()
-      extends MongoRecord[StrictDoc] with ObjectIdPk[StrictDoc] {
+      extends MongoRecord[StrictDoc]
+      with ObjectIdPk[StrictDoc] {
     def meta = StrictDoc
     object name extends StringField(this, 32)
   }
@@ -331,12 +334,11 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     // get the docs back from the db
     MainDoc
       .find(md1.id.get)
-      .foreach(m =>
-            {
-          m.name.value must_== md1.name.value
-          m.cnt.value must_== md1.cnt.value
-          m.refdocId.value must_== md1.refdocId.value
-          m.refuuid.value must_== md1.refuuid.value
+      .foreach(m => {
+        m.name.value must_== md1.name.value
+        m.cnt.value must_== md1.cnt.value
+        m.refdocId.value must_== md1.refdocId.value
+        m.refuuid.value must_== md1.refuuid.value
       })
 
     // fetch a refdoc
@@ -396,10 +398,9 @@ class MongoRecordExamplesSpec extends Specification with MongoTestKit {
     val mdq5 = MainDoc.find("_id", md1.id.get)
     mdq5.isDefined must_== true
     mdq5.map(
-        m =>
-          {
-        m.name.value must_== "md1a"
-        m.cnt.value must_== 1
+        m => {
+      m.name.value must_== "md1a"
+      m.cnt.value must_== 1
     })
 
     if (!debug) {

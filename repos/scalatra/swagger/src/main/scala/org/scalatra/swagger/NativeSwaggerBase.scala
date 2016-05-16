@@ -6,5 +6,7 @@ package swagger
 import org.scalatra.json.NativeJsonSupport
 
 trait NativeSwaggerBase
-    extends ScalatraBase with NativeJsonSupport with CorsSupport
+    extends ScalatraBase
+    with NativeJsonSupport
+    with CorsSupport
     with SwaggerBase

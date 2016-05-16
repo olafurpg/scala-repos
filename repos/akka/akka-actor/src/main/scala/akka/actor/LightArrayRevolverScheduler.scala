@@ -36,7 +36,8 @@ import akka.dispatch.AbstractNodeQueue
 class LightArrayRevolverScheduler(config: Config,
                                   log: LoggingAdapter,
                                   threadFactory: ThreadFactory)
-    extends Scheduler with Closeable {
+    extends Scheduler
+    with Closeable {
 
   import Helpers.Requiring
   import Helpers.ConfigOps
@@ -225,8 +226,9 @@ class LightArrayRevolverScheduler(config: Config,
           case x ⇒ collect(q, acc :+ x)
         }
       }
-      ((0 until WheelSize) flatMap (i ⇒ collect(wheel(i), Vector.empty))) ++ collect(
-          queue, Vector.empty)
+      ((0 until WheelSize) flatMap (i ⇒
+                collect(wheel(i), Vector.empty))) ++ collect(queue,
+                                                             Vector.empty)
     }
 
     @tailrec

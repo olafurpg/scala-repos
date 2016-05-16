@@ -45,8 +45,8 @@ class FlowBatchSpec extends AkkaSpec {
 
       Source
         .fromPublisher(publisher)
-        .batch(max = Long.MaxValue, seed = i ⇒ List(i))(aggregate = (ints,
-              i) ⇒ i :: ints)
+        .batch(max = Long.MaxValue, seed = i ⇒ List(i))(aggregate = (ints, i) ⇒
+              i :: ints)
         .to(Sink.fromSubscriber(subscriber))
         .run()
       val sub = subscriber.expectSubscription()

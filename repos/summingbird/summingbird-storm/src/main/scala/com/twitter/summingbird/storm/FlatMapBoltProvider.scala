@@ -75,7 +75,7 @@ case class FlatMapBoltProvider(
   import FlatMapBoltProvider._
   import Producer2FlatMapOperation._
 
-  def getOrElse[T <: AnyRef : Manifest](
+  def getOrElse[T <: AnyRef: Manifest](
       default: T, queryNode: StormNode = node) =
     storm.getOrElse(stormDag, queryNode, default)
 

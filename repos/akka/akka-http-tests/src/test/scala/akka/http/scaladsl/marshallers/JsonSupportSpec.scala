@@ -36,7 +36,9 @@ object Employee {
 
 /** Common infrastructure needed for several json support subprojects */
 abstract class JsonSupportSpec
-    extends WordSpec with Matchers with ScalatestRouteTest {
+    extends WordSpec
+    with Matchers
+    with ScalatestRouteTest {
   require(getClass.getSimpleName.endsWith("Spec"))
   // assuming that the classname ends with "Spec"
   def name: String = getClass.getSimpleName.dropRight(4)

@@ -271,7 +271,8 @@ final class Decimal extends Ordered[Decimal] with Serializable {
     if (decimalVal.eq(null) && other.decimalVal.eq(null) &&
         _scale == other._scale) {
       if (longVal < other.longVal) -1
-      else if (longVal == other.longVal) 0 else 1
+      else if (longVal == other.longVal) 0
+      else 1
     } else {
       toBigDecimal.compare(other.toBigDecimal)
     }
@@ -431,13 +432,15 @@ object Decimal {
 
   /** A [[scala.math.Fractional]] evidence parameter for Decimals. */
   private[sql] object DecimalIsFractional
-      extends DecimalIsConflicted with Fractional[Decimal] {
+      extends DecimalIsConflicted
+      with Fractional[Decimal] {
     override def div(x: Decimal, y: Decimal): Decimal = x / y
   }
 
   /** A [[scala.math.Integral]] evidence parameter for Decimals. */
   private[sql] object DecimalAsIfIntegral
-      extends DecimalIsConflicted with Integral[Decimal] {
+      extends DecimalIsConflicted
+      with Integral[Decimal] {
     override def quot(x: Decimal, y: Decimal): Decimal = x / y
     override def rem(x: Decimal, y: Decimal): Decimal = x % y
   }

@@ -24,11 +24,11 @@ class ScalaCodeBlockSelectioner extends ExtendWordSelectionHandlerBase {
     if (firstChild.getElementType == ScalaTokenTypes.tLBRACE &&
         lastChild.getElementType == ScalaTokenTypes.tRBRACE) {
       while (firstChild.getTreeNext != null &&
-      firstChild.getTreeNext.getElementType == TokenType.WHITE_SPACE) {
+             firstChild.getTreeNext.getElementType == TokenType.WHITE_SPACE) {
         firstChild = firstChild.getTreeNext
       }
       while (lastChild.getTreePrev != null &&
-      lastChild.getTreePrev.getElementType == TokenType.WHITE_SPACE) {
+             lastChild.getTreePrev.getElementType == TokenType.WHITE_SPACE) {
         lastChild = lastChild.getTreePrev
       }
       val start = firstChild.getTextRange.getEndOffset

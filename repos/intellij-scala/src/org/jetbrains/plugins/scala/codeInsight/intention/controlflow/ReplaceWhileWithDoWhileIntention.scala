@@ -27,7 +27,8 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
       project: Project, editor: Editor, element: PsiElement): Boolean = {
     for {
       whileStmt <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
+                      PsiTreeUtil.getParentOfType(
+                          element, classOf[ScWhileStmt], false))
       condition <- whileStmt.condition
       body <- whileStmt.body
     } {

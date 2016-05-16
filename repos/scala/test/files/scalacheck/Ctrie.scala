@@ -118,8 +118,7 @@ object Test extends Properties("concurrent.TrieMap") {
       val growing = true //checker.get
 
       val ok =
-        growing &&
-        ((0 until sz) forall {
+        growing && ((0 until sz) forall {
               case i => ct.get(Wrap(i)) == Some(i)
             })
 
@@ -167,8 +166,7 @@ object Test extends Properties("concurrent.TrieMap") {
       elementRange(idx, p, sz) find (i => ct.putIfAbsent(Wrap(i), i) != None)
     }
 
-    (results forall (_ == None)) &&
-    ((0 until sz) forall {
+    (results forall (_ == None)) && ((0 until sz) forall {
           case i => ct.get(Wrap(i)) == Some(i)
         })
   }
@@ -185,8 +183,7 @@ object Test extends Properties("concurrent.TrieMap") {
         }
       }
 
-      (totalInserts.get == sz) &&
-      ((0 until sz) forall {
+      (totalInserts.get == sz) && ((0 until sz) forall {
             case i => ct(Wrap(i)).split(":")(1).toInt == i
           })
   }

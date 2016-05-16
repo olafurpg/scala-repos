@@ -37,7 +37,8 @@ class MockSampler extends RandomSampler[Long, Long] {
 }
 
 class PartitionwiseSampledRDDSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
 
   test("seed distribution") {
     val rdd = sc.makeRDD(Array(1L, 2L, 3L, 4L), 2)
@@ -51,8 +52,8 @@ class PartitionwiseSampledRDDSuite
     // SPARK-2251: zip with self computes each partition twice.
     // We want to make sure there are no concurrency issues.
     val rdd = sc.parallelize(0 until 111, 10)
-    for (sampler <- Seq(
-        new BernoulliSampler[Int](0.5), new PoissonSampler[Int](0.5))) {
+    for (sampler <- Seq(new BernoulliSampler[Int](0.5),
+                        new PoissonSampler[Int](0.5))) {
       val sampled = new PartitionwiseSampledRDD[Int, Int](rdd, sampler, true)
       sampled.zip(sampled).count()
     }

@@ -86,7 +86,7 @@ class CustomPersistenceEngine(serializer: Serializer)
     * Gives all objects, matching a prefix. This defines how objects are
     * read/deserialized back.
     */
-  override def read[T : ClassTag](prefix: String): Seq[T] = {
+  override def read[T: ClassTag](prefix: String): Seq[T] = {
     CustomPersistenceEngine.readAttempts += 1
     val results = for ((name, bytes) <- data; if name.startsWith(prefix)) yield
       serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))

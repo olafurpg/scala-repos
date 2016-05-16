@@ -10,8 +10,12 @@ import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
 class PrintersTest
-    extends BasePrintTests with ClassPrintTests with TraitPrintTests
-    with ValAndDefPrintTests with QuasiTreesPrintTests with PackagePrintTests
+    extends BasePrintTests
+    with ClassPrintTests
+    with TraitPrintTests
+    with ValAndDefPrintTests
+    with QuasiTreesPrintTests
+    with PackagePrintTests
 
 object PrinterHelper {
   val toolbox = cm.mkToolBox()
@@ -332,22 +336,28 @@ trait BasePrintTests {
   @Test def testFunc1 =
     assertResultCode(code = "List(1, 2, 3).map((i: Int) => i - 1)")(
         parsedCode = "List(1, 2, 3).map(((i: Int) => i.-(1)))",
-        typedCode = sm"scala.collection.immutable.List.apply[Int](1, 2, 3).map[Int, List[Int]](((i: scala.Int) => i.-(1)))(scala.collection.immutable.List.canBuildFrom[Int])")
+        typedCode =
+          sm"scala.collection.immutable.List.apply[Int](1, 2, 3).map[Int, List[Int]](((i: scala.Int) => i.-(1)))(scala.collection.immutable.List.canBuildFrom[Int])")
 
   @Test def testFunc2 =
     assertResultCode(code = "val sum: Seq[Int] => Int = _ reduceLeft (_+_)")(
-        parsedCode = "val sum: _root_.scala.Function1[Seq[Int], Int] = ((x$1) => x$1.reduceLeft(((x$2, x$3) => x$2.+(x$3))))",
-        typedCode = "val sum: _root_.scala.Function1[scala.`package`.Seq[scala.Int], scala.Int] = ((x$1: Seq[Int]) => x$1.reduceLeft[Int](((x$2: Int, x$3: Int) => x$2.+(x$3))))")
+        parsedCode =
+          "val sum: _root_.scala.Function1[Seq[Int], Int] = ((x$1) => x$1.reduceLeft(((x$2, x$3) => x$2.+(x$3))))",
+        typedCode =
+          "val sum: _root_.scala.Function1[scala.`package`.Seq[scala.Int], scala.Int] = ((x$1: Seq[Int]) => x$1.reduceLeft[Int](((x$2: Int, x$3: Int) => x$2.+(x$3))))")
 
   @Test def testFunc3 =
     assertResultCode(code = "List(1, 2, 3) map (_ - 1)")(
         parsedCode = "List(1, 2, 3).map(((x$1) => x$1.-(1))) ",
-        typedCode = "scala.collection.immutable.List.apply[Int](1, 2, 3).map[Int, List[Int]](((x$1: Int) => x$1.-(1)))(scala.collection.immutable.List.canBuildFrom[Int])")
+        typedCode =
+          "scala.collection.immutable.List.apply[Int](1, 2, 3).map[Int, List[Int]](((x$1: Int) => x$1.-(1)))(scala.collection.immutable.List.canBuildFrom[Int])")
 
   @Test def testFunc4 =
     assertResultCode(code = "val x: String => Int = ((str: String) => 1)")(
-        parsedCode = "val x: _root_.scala.Function1[String, Int] = ((str: String) => 1)",
-        typedCode = " val x: _root_.scala.Function1[_root_.scala.Predef.String, _root_.scala.Int] = ((str: _root_.scala.Predef.String) => 1)",
+        parsedCode =
+          "val x: _root_.scala.Function1[String, Int] = ((str: String) => 1)",
+        typedCode =
+          " val x: _root_.scala.Function1[_root_.scala.Predef.String, _root_.scala.Int] = ((str: _root_.scala.Predef.String) => 1)",
         printRoot = true)
 
   @Test def testAssign1 =
@@ -1146,8 +1156,10 @@ trait ValAndDefPrintTests {
   @Test def testAnnotated4 =
     assertResultCode(
         code = "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())")(
-        parsedCode = "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())",
-        typedCode = "def foo = (42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]()))",
+        parsedCode =
+          "def foo = 42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]())",
+        typedCode =
+          "def foo = (42: @foo3[A1, B1](4)(2.0F, new foo1[A1, B1]()))",
         wrap = true)
 
   @Test def testAnnotated5 = assertPrintedCode(sm"""

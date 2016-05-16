@@ -7,8 +7,10 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class SourceResolverSpec
-    extends EnsimeSpec with SharedEnsimeVFSFixture
-    with SharedSourceResolverFixture with SourceResolverTestUtils {
+    extends EnsimeSpec
+    with SharedEnsimeVFSFixture
+    with SharedSourceResolverFixture
+    with SourceResolverTestUtils {
 
   def original = EnsimeConfigFixture.SimpleTestProject
 

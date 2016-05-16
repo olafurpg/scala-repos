@@ -30,12 +30,12 @@ trait Function1ish[A, B] {
 }
 
 object Test {
-  def lambdaFactory[A, B](
-      hostClass: Class[_],
-      instantiatedParam: Class[A],
-      instantiatedRet: Class[B],
-      accessorName: String,
-      capturedParams: Array[(Class[_], AnyRef)] = Array()) = {
+  def lambdaFactory[A, B](hostClass: Class[_],
+                          instantiatedParam: Class[A],
+                          instantiatedRet: Class[B],
+                          accessorName: String,
+                          capturedParams: Array[(Class[_], AnyRef)] =
+                            Array()) = {
     val caller = MethodHandles.lookup
     val methodType =
       MethodType.methodType(classOf[AnyRef], Array[Class[_]](classOf[AnyRef]))

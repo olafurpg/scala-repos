@@ -91,7 +91,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .collect()
           .toSeq
           .map(r => Row(f(r.getDouble(0), r.getDouble(0))))
-      )
+    )
 
     checkAnswer(
         nnDoubleData.select(c('a, 'b)),
@@ -99,7 +99,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .collect()
           .toSeq
           .map(r => Row(f(r.getDouble(0), r.getDouble(1))))
-      )
+    )
 
     checkAnswer(
         nnDoubleData.select(d('a, 2.0)),
@@ -162,7 +162,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         Seq((1, 2))
           .toDF()
           .select(toDegrees(lit(0)), toDegrees(lit(1)), toDegrees(lit(1.5)))
-      )
+    )
   }
 
   test("toRadians") {
@@ -172,7 +172,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         Seq((1, 2))
           .toDF()
           .select(toRadians(lit(0)), toRadians(lit(1)), toRadians(lit(1.5)))
-      )
+    )
   }
 
   test("cbrt") {
@@ -304,7 +304,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         Seq((1, 2))
           .toDF()
           .select(logarithm(lit(0)), logarithm(lit(1)), logarithm(lit(1.5)))
-      )
+    )
   }
 
   test("log10") {

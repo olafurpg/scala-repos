@@ -165,8 +165,7 @@ object ScalaClassNameCompletionContributor {
       if (isExcluded) return
 
       val isAccessible =
-        invocationCount >= 2 ||
-        (typeToImport.element match {
+        invocationCount >= 2 || (typeToImport.element match {
               case member: PsiMember =>
                 ResolveUtils.isAccessible(
                     member, position, forCompletion = true)
@@ -188,11 +187,12 @@ object ScalaClassNameCompletionContributor {
         .map(_._1)
       for {
         el <- LookupElementManager.getLookupElement(
-            new ScalaResolveResult(typeToImport.element, nameShadow = renamed),
-            isClassName = true,
-            isInImport = isInImport,
-            isInStableCodeReference = stableRefElement != null,
-            isInSimpleString = inString)
+                 new ScalaResolveResult(
+                     typeToImport.element, nameShadow = renamed),
+                 isClassName = true,
+                 isInImport = isInImport,
+                 isInStableCodeReference = stableRefElement != null,
+                 isInSimpleString = inString)
       } {
         if (!afterNewPattern.accepts(dummyPosition, context))
           result.addElement(el)
@@ -215,8 +215,8 @@ object ScalaClassNameCompletionContributor {
 
     for {
       clazz <- SyntheticClasses.get(project).all.valuesIterator
-                  if checkSynthetic ||
-              !ScType.baseTypesQualMap.contains(clazz.qualifiedName)
+      if checkSynthetic ||
+      !ScType.baseTypesQualMap.contains(clazz.qualifiedName)
     } addTypeForCompletion(ClassTypeToImport(clazz))
 
     val prefixMatcher = result.getPrefixMatcher
@@ -238,19 +238,18 @@ object ScalaClassNameCompletionContributor {
 
     for {
       name <- ScalaPsiManager.instance(project).getStableTypeAliasesNames
-                 if prefixMatcher.prefixMatches(name)
+      if prefixMatcher.prefixMatches(name)
       alias <- ScalaPsiManager
-        .instance(project)
-        .getStableAliasesByName(name, position.getResolveScope)
+                .instance(project)
+                .getStableAliasesByName(name, position.getResolveScope)
     } {
       addTypeForCompletion(TypeAliasToImport(alias))
     }
 
     for {
       (name, elem: PsiNamedElement) <- reverseRenamesMap
-                                          if prefixMatcher.prefixMatches(name)
-                                      if !prefixMatcher.prefixMatches(
-                                          elem.name)
+      if prefixMatcher.prefixMatches(name)
+      if !prefixMatcher.prefixMatches(elem.name)
     } {
       elem match {
         case clazz: PsiClass => addTypeForCompletion(ClassTypeToImport(clazz))

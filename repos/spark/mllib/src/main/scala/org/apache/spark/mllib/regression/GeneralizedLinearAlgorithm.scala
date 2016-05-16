@@ -103,7 +103,8 @@ abstract class GeneralizedLinearModel @Since("1.0.0")(
 @Since("0.8.0")
 @DeveloperApi
 abstract class GeneralizedLinearAlgorithm[M <: GeneralizedLinearModel]
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   protected val validators: Seq[RDD[LabeledPoint] => Boolean] = List()
 

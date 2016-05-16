@@ -37,8 +37,11 @@ import org.apache.spark.deploy.DeployMessages._
 import org.apache.spark.rpc.{RpcEndpoint, RpcEnv}
 
 class MasterSuite
-    extends SparkFunSuite with Matchers with Eventually
-    with PrivateMethodTester with BeforeAndAfter {
+    extends SparkFunSuite
+    with Matchers
+    with Eventually
+    with PrivateMethodTester
+    with BeforeAndAfter {
 
   private var _master: Master = _
 
@@ -88,12 +91,12 @@ class MasterSuite
         startTime = 0,
         id = "test_driver",
         desc = new DriverDescription(
-              jarUrl = "",
-              mem = 0,
-              cores = 0,
-              supervise = false,
-              command = commandToPersist
-          ),
+            jarUrl = "",
+            mem = 0,
+            cores = 0,
+            supervise = false,
+            command = commandToPersist
+        ),
         submitDate = new Date()
     )
 

@@ -107,21 +107,21 @@ case object AhcWSRequest {
 /**
   * A Ahc WS Request.
   */
-case class AhcWSRequest(
-    client: AhcWSClient,
-    url: String,
-    method: String,
-    body: WSBody,
-    headers: Map[String, Seq[String]],
-    queryString: Map[String, Seq[String]],
-    calc: Option[WSSignatureCalculator],
-    auth: Option[(String, String, WSAuthScheme)],
-    followRedirects: Option[Boolean],
-    requestTimeout: Option[Int],
-    virtualHost: Option[String],
-    proxyServer: Option[WSProxyServer],
-    disableUrlEncoding: Option[Boolean],
-    filters: Seq[WSRequestFilter] = Nil)(implicit materializer: Materializer)
+case class AhcWSRequest(client: AhcWSClient,
+                        url: String,
+                        method: String,
+                        body: WSBody,
+                        headers: Map[String, Seq[String]],
+                        queryString: Map[String, Seq[String]],
+                        calc: Option[WSSignatureCalculator],
+                        auth: Option[(String, String, WSAuthScheme)],
+                        followRedirects: Option[Boolean],
+                        requestTimeout: Option[Int],
+                        virtualHost: Option[String],
+                        proxyServer: Option[WSProxyServer],
+                        disableUrlEncoding: Option[Boolean],
+                        filters: Seq[WSRequestFilter] = Nil)(
+    implicit materializer: Materializer)
     extends WSRequest {
 
   def sign(calc: WSSignatureCalculator): WSRequest = copy(calc = Some(calc))
@@ -245,10 +245,10 @@ case class AhcWSRequest(
   /**
     * Add http auth headers. Defaults to HTTP Basic.
     */
-  private[libs] def auth(
-      username: String,
-      password: String,
-      scheme: Realm.AuthScheme = Realm.AuthScheme.BASIC): Realm = {
+  private[libs] def auth(username: String,
+                         password: String,
+                         scheme: Realm.AuthScheme =
+                           Realm.AuthScheme.BASIC): Realm = {
     new Realm.Builder(username, password)
       .setScheme(scheme)
       .setUsePreemptiveAuth(true)
@@ -401,8 +401,8 @@ case class AhcWSRequest(
         case _ => scala.sys.error("Unrecognized protocol!")
       }
       realmBuilder.setScheme(scheme)
-      wsProxyServer.encoding.foreach(
-          enc => realmBuilder.setCharset(Charset.forName(enc)))
+      wsProxyServer.encoding.foreach(enc =>
+            realmBuilder.setCharset(Charset.forName(enc)))
       wsProxyServer.ntlmDomain.foreach(realmBuilder.setNtlmDomain)
       proxyBuilder.setRealm(realmBuilder)
     }

@@ -8,7 +8,7 @@ object Opt extends OptVersions {
   def apply[A](a: A): Opt[A] = new Opt(a)
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 
-  implicit def Eq[A : Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
+  implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
       if (x.isEmpty) y.isEmpty else x.ref === y.ref
   }

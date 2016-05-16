@@ -531,8 +531,8 @@ object DataInputStreamTest extends JasmineTest {
     }
   }
 
-  tests("java.io.DataInputStream - generic case")(
-      bytes => new ByteArrayInputStream(bytes.toArray))
+  tests("java.io.DataInputStream - generic case")(bytes =>
+        new ByteArrayInputStream(bytes.toArray))
 
   tests("java.io.DataInputStream - ArrayBufferInputStream case")(bytes =>
         new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))

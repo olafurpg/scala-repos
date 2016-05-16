@@ -70,7 +70,8 @@ object ProdServerStartSpec extends Specification {
   // A family of fake servers for us to test
 
   class FakeServer(context: ServerProvider.Context)
-      extends Server with ServerWithStop {
+      extends Server
+      with ServerWithStop {
     def config = context.config
     def applicationProvider = context.appProvider
     def mode = config.mode
@@ -95,8 +96,8 @@ object ProdServerStartSpec extends Specification {
       tempDir =>
         val process = new FakeServerProcess(
             args = Seq(tempDir.getAbsolutePath),
-            propertyMap = Map("play.server.provider" -> classOf[
-                      FakeServerProvider].getName),
+            propertyMap = Map(
+                "play.server.provider" -> classOf[FakeServerProvider].getName),
             pid = Some("999")
         )
         val pidFile = new File(tempDir, "RUNNING_PID")
@@ -120,11 +121,11 @@ object ProdServerStartSpec extends Specification {
       val process = new FakeServerProcess(
           args = Seq(tempDir.getAbsolutePath),
           propertyMap = Map(
-                "play.server.provider" -> classOf[FakeServerProvider].getName,
-                "play.server.http.port" -> "disabled",
-                "play.server.https.port" -> "443",
-                "play.server.http.address" -> "localhost"
-            ),
+              "play.server.provider" -> classOf[FakeServerProvider].getName,
+              "play.server.http.port" -> "disabled",
+              "play.server.https.port" -> "443",
+              "play.server.http.address" -> "localhost"
+          ),
           pid = Some("123")
       )
       val pidFile = new File(tempDir, "RUNNING_PID")
@@ -149,11 +150,11 @@ object ProdServerStartSpec extends Specification {
       val process = new FakeServerProcess(
           args = Seq(tempDir.getAbsolutePath),
           propertyMap = Map(
-                "play.server.provider" -> classOf[FakeServerProvider].getName,
-                "play.server.http.port" -> "80",
-                "play.server.https.port" -> "disabled",
-                "play.server.http.address" -> "localhost"
-            ),
+              "play.server.provider" -> classOf[FakeServerProvider].getName,
+              "play.server.http.port" -> "80",
+              "play.server.https.port" -> "disabled",
+              "play.server.http.address" -> "localhost"
+          ),
           pid = Some("123")
       )
       val pidFile = new File(tempDir, "RUNNING_PID")

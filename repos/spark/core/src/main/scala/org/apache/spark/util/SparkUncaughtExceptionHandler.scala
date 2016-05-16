@@ -25,7 +25,8 @@ import org.apache.spark.internal.Logging
   * to fail fast when things go wrong.
   */
 private[spark] object SparkUncaughtExceptionHandler
-    extends Thread.UncaughtExceptionHandler with Logging {
+    extends Thread.UncaughtExceptionHandler
+    with Logging {
 
   override def uncaughtException(thread: Thread, exception: Throwable) {
     try {

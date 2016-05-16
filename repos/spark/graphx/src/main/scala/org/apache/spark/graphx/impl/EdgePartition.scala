@@ -57,8 +57,8 @@ private[graphx] class EdgePartition[@specialized(Char,
                                                  Byte,
                                                  Long,
                                                  Float,
-                                                 Double) ED : ClassTag,
-                                    VD : ClassTag](
+                                                 Double) ED: ClassTag,
+                                    VD: ClassTag](
     localSrcIds: Array[Int],
     localDstIds: Array[Int],
     data: Array[ED],
@@ -73,7 +73,7 @@ private[graphx] class EdgePartition[@specialized(Char,
   private def this() = this(null, null, null, null, null, null, null, null)
 
   /** Return a new `EdgePartition` with the specified edge data. */
-  def withData[ED2 : ClassTag](data: Array[ED2]): EdgePartition[ED2, VD] = {
+  def withData[ED2: ClassTag](data: Array[ED2]): EdgePartition[ED2, VD] = {
     new EdgePartition(localSrcIds,
                       localDstIds,
                       data,
@@ -117,7 +117,7 @@ private[graphx] class EdgePartition[@specialized(Char,
   }
 
   /** Return a new `EdgePartition` without any locally cached vertex attributes. */
-  def withoutVertexAttributes[VD2 : ClassTag](): EdgePartition[ED, VD2] = {
+  def withoutVertexAttributes[VD2: ClassTag](): EdgePartition[ED, VD2] = {
     val newVertexAttrs = new Array[VD2](vertexAttrs.length)
     new EdgePartition(localSrcIds,
                       localDstIds,
@@ -178,7 +178,7 @@ private[graphx] class EdgePartition[@specialized(Char,
     * @return a new edge partition with the result of the function `f`
     *         applied to each edge
     */
-  def map[ED2 : ClassTag](f: Edge[ED] => ED2): EdgePartition[ED2, VD] = {
+  def map[ED2: ClassTag](f: Edge[ED] => ED2): EdgePartition[ED2, VD] = {
     val newData = new Array[ED2](data.length)
     val edge = new Edge[ED]()
     val size = data.length
@@ -205,7 +205,7 @@ private[graphx] class EdgePartition[@specialized(Char,
     * @tparam ED2 the type of the new attribute
     * @return a new edge partition with the attribute values replaced
     */
-  def map[ED2 : ClassTag](iter: Iterator[ED2]): EdgePartition[ED2, VD] = {
+  def map[ED2: ClassTag](iter: Iterator[ED2]): EdgePartition[ED2, VD] = {
     // Faster than iter.toArray, because the expected size is known.
     val newData = new Array[ED2](data.length)
     var i = 0
@@ -310,7 +310,7 @@ private[graphx] class EdgePartition[@specialized(Char,
     * If there are multiple edges with the same src and dst in `other`, `f` will only be invoked
     * once.
     */
-  def innerJoin[ED2 : ClassTag, ED3 : ClassTag](other: EdgePartition[ED2, _])(
+  def innerJoin[ED2: ClassTag, ED3: ClassTag](other: EdgePartition[ED2, _])(
       f: (VertexId, VertexId, ED, ED2) => ED3): EdgePartition[ED3, VD] = {
     val builder = new ExistingEdgePartitionBuilder[ED3, VD](
         global2local, local2global, vertexAttrs, activeSet)
@@ -324,7 +324,7 @@ private[graphx] class EdgePartition[@specialized(Char,
       while (j < other.size && other.srcIds(j) < srcId) { j += 1 }
       if (j < other.size && other.srcIds(j) == srcId) {
         while (j < other.size && other.srcIds(j) == srcId &&
-        other.dstIds(j) < dstId) { j += 1 }
+               other.dstIds(j) < dstId) { j += 1 }
         if (j < other.size && other.srcIds(j) == srcId &&
             other.dstIds(j) == dstId) {
           // ... run `f` on the matching edge
@@ -415,7 +415,7 @@ private[graphx] class EdgePartition[@specialized(Char,
     *
     * @return iterator aggregated messages keyed by the receiving vertex id
     */
-  def aggregateMessagesEdgeScan[A : ClassTag](
+  def aggregateMessagesEdgeScan[A: ClassTag](
       sendMsg: EdgeContext[VD, ED, A] => Unit,
       mergeMsg: (A, A) => A,
       tripletFields: TripletFields,
@@ -470,7 +470,7 @@ private[graphx] class EdgePartition[@specialized(Char,
     *
     * @return iterator aggregated messages keyed by the receiving vertex id
     */
-  def aggregateMessagesIndexScan[A : ClassTag](
+  def aggregateMessagesIndexScan[A: ClassTag](
       sendMsg: EdgeContext[VD, ED, A] => Unit,
       mergeMsg: (A, A) => A,
       tripletFields: TripletFields,

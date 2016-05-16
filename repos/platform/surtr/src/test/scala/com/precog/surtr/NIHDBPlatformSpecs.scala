@@ -94,9 +94,12 @@ object NIHDBTestStack extends NIHDBTestStack {
 }
 
 trait NIHDBTestActors
-    extends ActorVFSModule with ActorPlatformSpecs with YggConfigComponent {
+    extends ActorVFSModule
+    with ActorPlatformSpecs
+    with YggConfigComponent {
   trait NIHDBTestActorsConfig
-      extends BaseConfig with BlockStoreColumnarTableModuleConfig {
+      extends BaseConfig
+      with BlockStoreColumnarTableModuleConfig {
     val cookThreshold = 10
     val storageTimeout = Timeout(300 * 1000)
     val quiescenceTimeout = Duration(300, "seconds")
@@ -134,15 +137,21 @@ trait NIHDBTestActors
 }
 
 trait NIHDBTestStack
-    extends TestStackLike[Future] with SecureVFSModule[Future, Slice]
-    with LongIdMemoryDatasetConsumer[Future] with NIHDBTestActors
+    extends TestStackLike[Future]
+    with SecureVFSModule[Future, Slice]
+    with LongIdMemoryDatasetConsumer[Future]
+    with NIHDBTestActors
     with VFSColumnarTableModule {
   self =>
 
   abstract class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with StandaloneShardSystemConfig with ColumnarTableModuleConfig
-      with BlockStoreColumnarTableModuleConfig with NIHDBTestActorsConfig {
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with StandaloneShardSystemConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
+      with NIHDBTestActorsConfig {
     val ingestConfig = None
   }
 
@@ -185,15 +194,18 @@ trait NIHDBTestStack
 }
 
 class NIHDBBasicValidationSpecs
-    extends BasicValidationSpecs with NIHDBPlatformSpecs
+    extends BasicValidationSpecs
+    with NIHDBPlatformSpecs
 
 class NIHDBHelloQuirrelSpecs extends HelloQuirrelSpecs with NIHDBPlatformSpecs
 
 class NIHDBLogisticRegressionSpecs
-    extends LogisticRegressionSpecs with NIHDBPlatformSpecs
+    extends LogisticRegressionSpecs
+    with NIHDBPlatformSpecs
 
 class NIHDBLinearRegressionSpecs
-    extends LinearRegressionSpecs with NIHDBPlatformSpecs
+    extends LinearRegressionSpecs
+    with NIHDBPlatformSpecs
 
 class NIHDNormalizationSpecs extends NormalizationSpecs with NIHDBPlatformSpecs
 
@@ -206,13 +218,15 @@ class NIHDBRandomForestSpecs extends RandomForestSpecs with NIHDBPlatformSpecs
 class NIHDBMiscStackSpecs extends MiscStackSpecs with NIHDBPlatformSpecs
 
 class NIHDBNonObjectStackSpecs
-    extends NonObjectStackSpecs with NIHDBPlatformSpecs
+    extends NonObjectStackSpecs
+    with NIHDBPlatformSpecs
 
 class NIHDBRankSpecs extends RankSpecs with NIHDBPlatformSpecs
 
 class NIHDBRenderStackSpecs extends RenderStackSpecs with NIHDBPlatformSpecs
 
 class NIHDBUndefinedLiteralSpecs
-    extends UndefinedLiteralSpecs with NIHDBPlatformSpecs
+    extends UndefinedLiteralSpecs
+    with NIHDBPlatformSpecs
 
 class NIHDBRandomSpecs extends RandomStackSpecs with NIHDBPlatformSpecs

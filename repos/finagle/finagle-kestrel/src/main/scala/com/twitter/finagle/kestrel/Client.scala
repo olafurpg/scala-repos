@@ -340,9 +340,8 @@ abstract protected[kestrel] class CommandExecutorFactory[U] extends Closable {
   * @tparam ItemId the type used by {{CommandExecutor}} to identify returned
   *                items
   */
-abstract protected[kestrel] class ClientBase[
-    CommandExecutor <: Closable, Reply, ItemId](
-    underlying: CommandExecutorFactory[CommandExecutor])
+abstract protected[kestrel] class ClientBase[CommandExecutor <: Closable,
+    Reply, ItemId](underlying: CommandExecutorFactory[CommandExecutor])
     extends Client {
 
   /**
@@ -530,7 +529,8 @@ protected[kestrel] class ConnectedClient(
   */
 protected[kestrel] class FinagledClosableClient(
     service: Service[ThriftClientRequest, Array[Byte]])
-    extends FinagledClient(service) with Closable {
+    extends FinagledClient(service)
+    with Closable {
   def close(time: Time): Future[Unit] = service.close(time)
 }
 
@@ -616,8 +616,8 @@ protected[kestrel] class ThriftConnectedClient(
       })
   }
 
-  private def openRead(queueName: String)(
-      client: FinagledClosableClient): Future[Seq[Item]] =
+  private def openRead(
+      queueName: String)(client: FinagledClosableClient): Future[Seq[Item]] =
     client.get(queueName,
                1,
                Int.MaxValue,

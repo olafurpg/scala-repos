@@ -25,7 +25,9 @@ import org.scalatest.prop._;
 // VonMises variance depends on some reasonable handling of % 2 * pi, so we'll not include it.
 @RunWith(classOf[JUnitRunner])
 class VonMisesTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
     with ExpFamTest[VonMises, Double] {
   import Arbitrary.arbitrary;
 
@@ -33,7 +35,7 @@ class VonMisesTest
 
   implicit def arbParameter = Arbitrary {
     for (mu <- arbitrary[Double].map { _.abs % (2 * math.Pi) }; // Gamma pdf at 0 not defined when shape == 1
-    k <- arbitrary[Double].map { _.abs % 3.0 + 1.5 }) yield (mu, k);
+         k <- arbitrary[Double].map { _.abs % 3.0 + 1.5 }) yield (mu, k);
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -50,11 +52,11 @@ class VonMisesTest
 
   implicit def arbDistr = Arbitrary {
     for (shape <- arbitrary[Double].map { x =>
-      math.abs(x) % (2 * math.Pi)
-    };
-    scale <- arbitrary[Double].map { x =>
-      math.abs(x) % 3.0 + 1.1
-    }) yield new VonMises(shape, scale);
+                   math.abs(x) % (2 * math.Pi)
+                 };
+         scale <- arbitrary[Double].map { x =>
+                   math.abs(x) % 3.0 + 1.1
+                 }) yield new VonMises(shape, scale);
   }
 
   type Distr = VonMises

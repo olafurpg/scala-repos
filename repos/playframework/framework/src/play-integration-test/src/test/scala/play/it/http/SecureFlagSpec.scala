@@ -15,15 +15,18 @@ import scala.io.Source
 import java.net.URL
 
 object NettySecureFlagSpec
-    extends SecureFlagSpec with NettyIntegrationSpecification
+    extends SecureFlagSpec
+    with NettyIntegrationSpecification
 object AkkaHttpSecureFlagSpec
-    extends SecureFlagSpec with AkkaHttpIntegrationSpecification
+    extends SecureFlagSpec
+    with AkkaHttpIntegrationSpecification
 
 /**
   * Specs for the "secure" flag on requests
   */
 trait SecureFlagSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   sequential
 

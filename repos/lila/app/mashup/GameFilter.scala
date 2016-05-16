@@ -111,10 +111,9 @@ object GameFilterMenu {
       case Loss => std(Query loss user)
       case Draw => std(Query draw user)
       case Playing =>
-        pag(selector = Query nowPlaying user.id,
-            sort = Seq(),
-            nb = nb)(page) addEffect { p =>
-          p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
+        pag(selector = Query nowPlaying user.id, sort = Seq(), nb = nb)(page) addEffect {
+          p =>
+            p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
         }
       case Search => userGameSearch(user, page)
     }

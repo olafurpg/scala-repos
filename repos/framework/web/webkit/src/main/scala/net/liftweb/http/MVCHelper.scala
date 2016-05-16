@@ -89,25 +89,19 @@ trait MVCHelper extends LiftRules.DispatchPF {
     val path = in.path.partPath
     S.session match {
       case Full(_) =>
-        val resp = dispatch
-          .find(_.isDefinedAt(path))
-          .get
-          .apply(path)
-          .toResponse
+        val resp =
+          dispatch.find(_.isDefinedAt(path)).get.apply(path).toResponse
 
-          () =>
-            resp
+        () =>
+          resp
 
         case _ =>
         S.init(Box !! in, curSession.is) {
-          val resp = dispatch
-            .find(_.isDefinedAt(path))
-            .get
-            .apply(path)
-            .toResponse
+          val resp =
+            dispatch.find(_.isDefinedAt(path)).get.apply(path).toResponse
 
-            () =>
-              resp
+          () =>
+            resp
         }
     }
   }
@@ -232,11 +226,10 @@ trait MVCHelper extends LiftRules.DispatchPF {
     def validate: List[FieldError];
     def save(): Boolean
   }, where: String) =
-    () =>
-      {
-        what.validate match {
-          case Nil => what.save(); S.redirectTo(where)
-          case xs => S.error(xs)
-        }
+    () => {
+      what.validate match {
+        case Nil => what.save(); S.redirectTo(where)
+        case xs => S.error(xs)
+      }
     }
 }

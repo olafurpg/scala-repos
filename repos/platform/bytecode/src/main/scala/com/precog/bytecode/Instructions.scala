@@ -91,9 +91,11 @@ trait Instructions {
 
     case class Map1(op: UnaryOperation) extends Instruction
     case class Map2Match(op: BinaryOperation)
-        extends Instruction with JoinInstr
+        extends Instruction
+        with JoinInstr
     case class Map2Cross(op: BinaryOperation)
-        extends Instruction with JoinInstr
+        extends Instruction
+        with JoinInstr
 
     case class Reduce(red: BuiltInReduction) extends Instruction
     case class Morph1(m1: BuiltInMorphism1) extends Instruction
@@ -123,7 +125,8 @@ trait Instructions {
     case class Swap(depth: Int) extends Instruction with DataInstr
 
     case class Line(line: Int, col: Int, text: String)
-        extends Instruction with DataInstr {
+        extends Instruction
+        with DataInstr {
       override def toString = "<%d:%d>".format(line, col)
     }
 
@@ -134,9 +137,13 @@ trait Instructions {
     sealed trait RootInstr extends Instruction
 
     case class PushString(str: String)
-        extends Instruction with DataInstr with RootInstr
+        extends Instruction
+        with DataInstr
+        with RootInstr
     case class PushNum(num: String)
-        extends Instruction with DataInstr with RootInstr
+        extends Instruction
+        with DataInstr
+        with RootInstr
     case object PushTrue extends Instruction with RootInstr
     case object PushFalse extends Instruction with RootInstr
     case object PushNull extends Instruction with RootInstr

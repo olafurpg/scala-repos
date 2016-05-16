@@ -78,9 +78,10 @@ trait HttpClientModule[M[+ _]] {
 
     def map[B](f: A => B): Request[B] =
       copy(
-          body = body map {
-        case Request.Body(ct, data) => Request.Body(ct, f(data))
-      })
+          body =
+            body map {
+          case Request.Body(ct, data) => Request.Body(ct, f(data))
+        })
   }
 
   object Request {

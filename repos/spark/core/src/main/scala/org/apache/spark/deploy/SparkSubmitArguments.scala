@@ -120,8 +120,8 @@ private[deploy] class SparkSubmitArguments(
     */
   private def mergeDefaultSparkProperties(): Unit = {
     // Use common defaults file, if not specified by user
-    propertiesFile = Option(propertiesFile).getOrElse(
-        Utils.getDefaultPropertiesFile(env))
+    propertiesFile =
+      Option(propertiesFile).getOrElse(Utils.getDefaultPropertiesFile(env))
     // Honor --conf before the defaults file
     defaultSparkProperties.foreach {
       case (k, v) =>
@@ -195,9 +195,8 @@ private[deploy] class SparkSubmitArguments(
       .orNull
     numExecutors = Option(numExecutors).getOrElse(
         sparkProperties.get("spark.executor.instances").orNull)
-    keytab = Option(keytab)
-      .orElse(sparkProperties.get("spark.yarn.keytab"))
-      .orNull
+    keytab =
+      Option(keytab).orElse(sparkProperties.get("spark.yarn.keytab")).orNull
     principal = Option(principal)
       .orElse(sparkProperties.get("spark.yarn.principal"))
       .orNull
@@ -212,8 +211,8 @@ private[deploy] class SparkSubmitArguments(
           try {
             val jar = new JarFile(uri.getPath)
             // Note that this might still return null if no main-class is set; we catch that later
-            mainClass = jar.getManifest.getMainAttributes
-              .getValue("Main-Class")
+            mainClass =
+              jar.getManifest.getMainAttributes.getValue("Main-Class")
           } catch {
             case e: Exception =>
               SparkSubmit.printErrorAndExit(
@@ -483,12 +482,12 @@ private[deploy] class SparkSubmitArguments(
       SparkSubmit.printErrorAndExit(s"Unrecognized option '$opt'.")
     }
 
-    primaryResource = if (!SparkSubmit.isShell(opt) &&
-                          !SparkSubmit.isInternal(opt)) {
-      Utils.resolveURI(opt).toString
-    } else {
-      opt
-    }
+    primaryResource =
+      if (!SparkSubmit.isShell(opt) && !SparkSubmit.isInternal(opt)) {
+        Utils.resolveURI(opt).toString
+      } else {
+        opt
+      }
     isPython = SparkSubmit.isPython(opt)
     isR = SparkSubmit.isR(opt)
     false

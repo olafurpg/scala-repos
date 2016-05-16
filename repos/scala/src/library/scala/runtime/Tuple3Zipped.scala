@@ -33,9 +33,11 @@ object ZippedTraversable3 {
 }
 
 final class Tuple3Zipped[El1, Repr1, El2, Repr2, El3, Repr3](
-    val colls: (TraversableLike[El1, Repr1], IterableLike[El2, Repr2],
-    IterableLike[El3, Repr3]))
-    extends AnyVal with ZippedTraversable3[El1, El2, El3] {
+    val colls: (TraversableLike[El1, Repr1],
+                IterableLike[El2, Repr2],
+                IterableLike[El3, Repr3]))
+    extends AnyVal
+    with ZippedTraversable3[El1, El2, El3] {
 
   def map[B, To](f: (El1, El2, El3) => B)(
       implicit cbf: CBF[Repr1, B, To]): To = {
@@ -141,7 +143,7 @@ object Tuple3Zipped {
       val it2 = x._2.toIterator
       val it3 = x._3.toIterator
       while (it1.hasNext && it2.hasNext && it3.hasNext) buf +=
-      ((it1.next(), it2.next(), it3.next()))
+        ((it1.next(), it2.next(), it3.next()))
 
       buf.result()
     }

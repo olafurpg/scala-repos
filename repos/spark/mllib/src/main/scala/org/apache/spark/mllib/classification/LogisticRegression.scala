@@ -49,8 +49,11 @@ class LogisticRegressionModel @Since("1.3.0")(
     @Since("1.0.0") override val intercept: Double,
     @Since("1.3.0") val numFeatures: Int,
     @Since("1.3.0") val numClasses: Int)
-    extends GeneralizedLinearModel(weights, intercept) with ClassificationModel
-    with Serializable with Saveable with PMMLExportable {
+    extends GeneralizedLinearModel(weights, intercept)
+    with ClassificationModel
+    with Serializable
+    with Saveable
+    with PMMLExportable {
 
   if (numClasses == 2) {
     require(

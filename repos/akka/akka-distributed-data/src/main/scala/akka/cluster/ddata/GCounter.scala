@@ -41,8 +41,10 @@ object GCounter {
 @SerialVersionUID(1L)
 final class GCounter private[akka](
     private[akka] val state: Map[UniqueAddress, BigInt] = Map.empty)
-    extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning with FastMerge {
+    extends ReplicatedData
+    with ReplicatedDataSerialization
+    with RemovedNodePruning
+    with FastMerge {
 
   import GCounter.Zero
 
@@ -138,4 +140,5 @@ object GCounterKey {
 
 @SerialVersionUID(1L)
 final case class GCounterKey(_id: String)
-    extends Key[GCounter](_id) with ReplicatedDataSerialization
+    extends Key[GCounter](_id)
+    with ReplicatedDataSerialization

@@ -128,8 +128,8 @@ object KMeans {
    */
   def kmeans(k: Int,
              clusters: ValuePipe[List[LabeledVector]],
-             points: TypedPipe[LabeledVector]): Execution[(Int, ValuePipe[List[
-              LabeledVector]], TypedPipe[LabeledVector])] = {
+             points: TypedPipe[LabeledVector]): Execution[
+      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
 
     val key = StatKey("changed", "scalding.kmeans")
 

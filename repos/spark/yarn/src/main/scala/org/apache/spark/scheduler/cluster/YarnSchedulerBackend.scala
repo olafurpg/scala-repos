@@ -212,7 +212,8 @@ private[spark] abstract class YarnSchedulerBackend(
     * An [[RpcEndpoint]] that communicates with the ApplicationMaster.
     */
   private class YarnSchedulerEndpoint(override val rpcEnv: RpcEnv)
-      extends ThreadSafeRpcEndpoint with Logging {
+      extends ThreadSafeRpcEndpoint
+      with Logging {
     private var amEndpoint: Option[RpcEndpointRef] = None
 
     private val askAmThreadPool = ThreadUtils.newDaemonCachedThreadPool(

@@ -47,7 +47,8 @@ object TreeCell {
   */
 class TreeCell[T](
     override val delegate: jfxsc.TreeCell[T] = new jfxsc.TreeCell[T])
-    extends IndexedCell(delegate) with SFXDelegate[jfxsc.TreeCell[T]] {
+    extends IndexedCell(delegate)
+    with SFXDelegate[jfxsc.TreeCell[T]] {
 
   /**
     * The disclosure node is commonly seen represented as a triangle that rotates on screen to indicate whether or

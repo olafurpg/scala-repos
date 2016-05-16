@@ -118,9 +118,9 @@ class BrowseSupport[M[+ _]: Bind](vfs: VFSMetadata[M]) {
   }
 }
 
-class BrowseServiceHandler[A](
-    vfs0: VFSMetadata[Future],
-    legacy: Boolean = false /* Enterprise software! */ )(
+class BrowseServiceHandler[A](vfs0: VFSMetadata[Future],
+                              legacy: Boolean =
+                                false /* Enterprise software! */ )(
     implicit M: Monad[Future])
     extends BrowseSupport[Future](vfs0)
     with CustomHttpService[A, (APIKey, Path) => Future[HttpResponse[JValue]]]
@@ -164,31 +164,30 @@ class BrowseServiceHandler[A](
         HttpResponse[JValue](OK, content = Some(content0))
       } valueOr {
         _.fold(
-            fatalError =>
-              {
-                logger.error(
-                    "A fatal error was encountered handling browse request %s: %s"
-                      .format(request.shows, fatalError))
-                HttpResponse[JValue](
-                    InternalServerError,
-                    content = Some(JObject("errors" -> JArray(
-                                  "sorry, we're looking into it!".serialize))))
+            fatalError => {
+              logger.error(
+                  "A fatal error was encountered handling browse request %s: %s"
+                    .format(request.shows, fatalError))
+              HttpResponse[JValue](
+                  InternalServerError,
+                  content = Some(JObject("errors" -> JArray(
+                              "sorry, we're looking into it!".serialize))))
             }, {
               case ResourceError.NotFound(message) =>
                 HttpResponse[JValue](
                     HttpStatusCodes.NotFound,
                     content = Some(JObject("errors" -> JArray(
-                                  "Could not find any resource that corresponded to path %s: %s"
-                                    .format(path.path, message)
-                                    .serialize))))
+                                "Could not find any resource that corresponded to path %s: %s"
+                                  .format(path.path, message)
+                                  .serialize))))
 
               case PermissionsError(message) =>
                 HttpResponse[JValue](
                     Forbidden,
                     content = Some(JObject("errors" -> JArray(
-                                  "API key %s does not have the ability to browse path %s: %s"
-                                    .format(apiKey, path.path, message)
-                                    .serialize))))
+                                "API key %s does not have the ability to browse path %s: %s"
+                                  .format(apiKey, path.path, message)
+                                  .serialize))))
 
               case unexpected =>
                 logger.error(
@@ -197,7 +196,7 @@ class BrowseServiceHandler[A](
                 HttpResponse[JValue](
                     InternalServerError,
                     content = Some(JObject(
-                              "errors" -> "sorry, we're looking into it!".serialize)))
+                            "errors" -> "sorry, we're looking into it!".serialize)))
             }
         )
       }

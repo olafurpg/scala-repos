@@ -38,8 +38,8 @@ object PartitionUtil {
         val value = Tuple.size(valueConverter.arity)
         val partition = Tuple.size(partitionConverter.arity)
 
-        (0 until valueConverter.arity)
-          .foreach(idx => value.set(idx, te.getObject(idx)))
+        (0 until valueConverter.arity).foreach(idx =>
+              value.set(idx, te.getObject(idx)))
         (0 until partitionConverter.arity).foreach(idx =>
               partition.set(idx, te.getObject(idx + valueConverter.arity)))
 
@@ -64,10 +64,10 @@ object PartitionUtil {
         val value = valueSetter(in._2)
         val output = Tuple.size(partition.size + value.size)
 
-        (0 until value.size)
-          .foreach(idx => output.set(idx, value.getObject(idx)))
-        (0 until partition.size).foreach(
-            idx => output.set(idx + value.size, partition.getObject(idx)))
+        (0 until value.size).foreach(idx =>
+              output.set(idx, value.getObject(idx)))
+        (0 until partition.size).foreach(idx =>
+              output.set(idx + value.size, partition.getObject(idx)))
 
         output
       }

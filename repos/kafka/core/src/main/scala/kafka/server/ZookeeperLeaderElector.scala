@@ -36,7 +36,8 @@ class ZookeeperLeaderElector(controllerContext: ControllerContext,
                              onBecomingLeader: () => Unit,
                              onResigningAsLeader: () => Unit,
                              brokerId: Int)
-    extends LeaderElector with Logging {
+    extends LeaderElector
+    with Logging {
   var leaderId = -1
   // create the election path in ZK, if one does not exist
   val index = electionPath.lastIndexOf("/")

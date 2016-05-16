@@ -32,11 +32,12 @@ import org.apache.spark.internal.Logging
   *
   */
 class SequenceFileRDDFunctions[
-    K <% Writable : ClassTag, V <% Writable : ClassTag](
+    K <% Writable: ClassTag, V <% Writable: ClassTag](
     self: RDD[(K, V)],
     _keyWritableClass: Class[_ <: Writable],
     _valueWritableClass: Class[_ <: Writable])
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   private val keyWritableClass =
     if (_keyWritableClass == null) {
@@ -54,7 +55,7 @@ class SequenceFileRDDFunctions[
       _valueWritableClass
     }
 
-  private def getWritableClass[T <% Writable : ClassTag](
+  private def getWritableClass[T <% Writable: ClassTag](
       ): Class[_ <: Writable] = {
     val c = {
       if (classOf[Writable].isAssignableFrom(classTag[T].runtimeClass)) {

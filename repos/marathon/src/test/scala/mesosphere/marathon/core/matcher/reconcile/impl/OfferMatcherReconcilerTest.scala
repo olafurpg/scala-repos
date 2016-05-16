@@ -15,7 +15,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class OfferMatcherReconcilerTest
-    extends FunSuite with GivenWhenThen with Mockito with Matchers
+    extends FunSuite
+    with GivenWhenThen
+    with Mockito
+    with Matchers
     with ScalaFutures {
   import scala.collection.JavaConverters._
 

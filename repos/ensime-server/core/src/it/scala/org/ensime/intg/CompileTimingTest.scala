@@ -14,8 +14,10 @@ import org.ensime.util.file._
   * (which also tests the file watchers).
   */
 class CompileTimingTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.TimingTestProject
 

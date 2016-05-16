@@ -37,8 +37,8 @@ class RollingBounceTest extends ZooKeeperTestHarness {
     configs(3).put("controlled.shutdown.retry.backoff.ms", "100")
 
     // start all the servers
-    servers = configs.map(
-        c => TestUtils.createServer(KafkaConfig.fromProps(c)))
+    servers =
+      configs.map(c => TestUtils.createServer(KafkaConfig.fromProps(c)))
   }
 
   @After

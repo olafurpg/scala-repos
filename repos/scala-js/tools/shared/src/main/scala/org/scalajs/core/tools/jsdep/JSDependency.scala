@@ -38,11 +38,11 @@ final class JSDependency(val resourceName: String,
   def minified(name: String): JSDependency =
     copy(minifiedResourceName = Some(name))
 
-  private def copy(
-      resourceName: String = this.resourceName,
-      dependencies: List[String] = this.dependencies,
-      commonJSName: Option[String] = this.commonJSName,
-      minifiedResourceName: Option[String] = this.minifiedResourceName) = {
+  private def copy(resourceName: String = this.resourceName,
+                   dependencies: List[String] = this.dependencies,
+                   commonJSName: Option[String] = this.commonJSName,
+                   minifiedResourceName: Option[String] =
+                     this.minifiedResourceName) = {
     new JSDependency(
         resourceName, dependencies, commonJSName, minifiedResourceName)
   }

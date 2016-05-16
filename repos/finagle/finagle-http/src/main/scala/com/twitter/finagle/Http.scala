@@ -41,7 +41,8 @@ trait HttpRichClient { self: Client[Request, Response] =>
   * Http protocol support, including client and server.
   */
 object Http
-    extends Client[Request, Response] with HttpRichClient
+    extends Client[Request, Response]
+    with HttpRichClient
     with Server[Request, Response] {
 
   object param {
@@ -116,10 +117,11 @@ object Http
 
   case class Client(
       stack: Stack[ServiceFactory[Request, Response]] = Client.stack,
-      params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
-            "http"))
+      params: Stack.Params =
+        StackClient.defaultParams + ProtocolLibrary("http"))
       extends StdStackClient[Request, Response, Client]
-      with WithSessionPool[Client] with WithDefaultLoadBalancer[Client] {
+      with WithSessionPool[Client]
+      with WithDefaultLoadBalancer[Client] {
 
     protected type In = Any
     protected type Out = Any
@@ -234,8 +236,8 @@ object Http
 
   case class Server(
       stack: Stack[ServiceFactory[Request, Response]] = Server.stack,
-      params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
-            "http"))
+      params: Stack.Params =
+        StackServer.defaultParams + ProtocolLibrary("http"))
       extends StdStackServer[Request, Response, Server] {
 
     protected type In = Any

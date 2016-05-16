@@ -44,7 +44,8 @@ object Tab {
 }
 
 class Tab(override val delegate: jfxsc.Tab = new jfxsc.Tab)
-    extends Styleable with SFXDelegate[jfxsc.Tab] {
+    extends Styleable
+    with SFXDelegate[jfxsc.Tab] {
 
   /**
     * The closable state for this tab.

@@ -66,8 +66,8 @@ object CommonCompareBinary {
 }
 object TreeOrderedBuf {
   import CompileTimeLengthTypes._
-  def toOrderedSerialization[T](c: Context)(
-      t: TreeOrderedBuf[c.type])(implicit T: t.ctx.WeakTypeTag[T])
+  def toOrderedSerialization[T](c: Context)(t: TreeOrderedBuf[c.type])(
+      implicit T: t.ctx.WeakTypeTag[T])
     : t.ctx.Expr[OrderedSerialization[T]] = {
     import t.ctx.universe._
     def freshT(id: String) = newTermName(c.fresh(s"fresh_$id"))

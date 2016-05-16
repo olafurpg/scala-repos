@@ -6,9 +6,11 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * @author Nikolay.Tropin
   */
 class CodeFragmentEvaluationTest
-    extends CodeFragmentEvaluationTestBase with ScalaVersion_2_11
+    extends CodeFragmentEvaluationTestBase
+    with ScalaVersion_2_11
 class CodeFragmentEvaluationTest_212
-    extends CodeFragmentEvaluationTestBase with ScalaVersion_2_12
+    extends CodeFragmentEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
 

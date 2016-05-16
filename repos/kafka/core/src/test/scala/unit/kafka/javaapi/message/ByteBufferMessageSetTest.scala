@@ -23,10 +23,9 @@ import kafka.message.{DefaultCompressionCodec, CompressionCodec, NoCompressionCo
 class ByteBufferMessageSetTest
     extends kafka.javaapi.message.BaseMessageSetTestCases {
 
-  override def createMessageSet(
-      messages: Seq[Message],
-      compressed: CompressionCodec = NoCompressionCodec)
-    : ByteBufferMessageSet =
+  override def createMessageSet(messages: Seq[Message],
+                                compressed: CompressionCodec =
+                                  NoCompressionCodec): ByteBufferMessageSet =
     new ByteBufferMessageSet(new kafka.message.ByteBufferMessageSet(
             compressed, messages: _*).buffer)
 

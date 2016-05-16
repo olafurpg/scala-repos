@@ -21,7 +21,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AppTasksResourceTest
-    extends MarathonSpec with Matchers with GivenWhenThen with Mockito {
+    extends MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
 
   test("deleteMany") {
     val appId = "/my/app"

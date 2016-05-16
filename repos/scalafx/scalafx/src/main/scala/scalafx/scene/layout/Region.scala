@@ -110,7 +110,8 @@ object Region {
 }
 
 class Region(override val delegate: jfxsl.Region = new jfxsl.Region())
-    extends Parent(delegate) with SFXDelegate[jfxsl.Region] {
+    extends Parent(delegate)
+    with SFXDelegate[jfxsl.Region] {
 
   /** The background of the Region, which is made up of zero or more BackgroundFills,
     * and zero or more BackgroundImages.

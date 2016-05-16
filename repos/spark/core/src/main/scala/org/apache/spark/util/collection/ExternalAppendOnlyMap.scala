@@ -60,7 +60,9 @@ class ExternalAppendOnlyMap[K, V, C](
     serializer: Serializer = SparkEnv.get.serializer,
     blockManager: BlockManager = SparkEnv.get.blockManager,
     context: TaskContext = TaskContext.get())
-    extends Iterable[(K, C)] with Serializable with Logging
+    extends Iterable[(K, C)]
+    with Serializable
+    with Logging
     with Spillable[SizeTracker] {
 
   if (context == null) {
@@ -150,10 +152,9 @@ class ExternalAppendOnlyMap[K, V, C](
     // An update function for the map that we reuse across entries to avoid allocating
     // a new closure each time
     var curEntry: Product2[K, V] = null
-    val update: (Boolean, C) => C = (hadVal, oldVal) =>
-      {
-        if (hadVal) mergeValue(oldVal, curEntry._2)
-        else createCombiner(curEntry._2)
+    val update: (Boolean, C) => C = (hadVal, oldVal) => {
+      if (hadVal) mergeValue(oldVal, curEntry._2)
+      else createCombiner(curEntry._2)
     }
 
     while (entries.hasNext) {
@@ -343,7 +344,8 @@ class ExternalAppendOnlyMap[K, V, C](
       */
     private def removeFromBuffer[T](buffer: ArrayBuffer[T], index: Int): T = {
       val elem = buffer(index)
-      buffer(index) = buffer(buffer.size - 1) // This also works if index == buffer.size - 1
+      buffer(index) =
+        buffer(buffer.size - 1) // This also works if index == buffer.size - 1
       buffer.reduceToSize(buffer.size - 1)
       elem
     }
@@ -417,7 +419,8 @@ class ExternalAppendOnlyMap[K, V, C](
       override def compareTo(other: StreamBuffer): Int = {
         // descending order because mutable.PriorityQueue dequeues the max, not the min
         if (other.minKeyHash < minKeyHash) -1
-        else if (other.minKeyHash == minKeyHash) 0 else 1
+        else if (other.minKeyHash == minKeyHash) 0
+        else 1
       }
     }
   }

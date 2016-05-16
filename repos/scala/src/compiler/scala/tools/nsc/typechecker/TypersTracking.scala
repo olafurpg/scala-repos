@@ -20,22 +20,24 @@ trait TypersTracking { self: Analyzer =>
   var lastTreeToTyper: Tree = EmptyTree
 
   def fullSiteString(context: Context): String = {
-    def owner_long_s = (if (settings.debug.value) {
-                          def flags_s = context.owner.debugFlagString match {
-                            case "" => ""
-                            case s => " with flags " + inLightMagenta(s)
-                          }
-                          s", a ${context.owner.shortSymbolClass}$flags_s"
-                        } else "")
+    def owner_long_s =
+      (if (settings.debug.value) {
+         def flags_s = context.owner.debugFlagString match {
+           case "" => ""
+           case s => " with flags " + inLightMagenta(s)
+         }
+         s", a ${context.owner.shortSymbolClass}$flags_s"
+       } else "")
     def marker = if (context.bufferErrors) "silent" else "site"
     def undet_s = context.undetparams match {
       case Nil => ""
       case ps => ps.mkString(" solving: ", ",", "")
     }
-    def implicits_s = (if (context.enrichmentEnabled)
-                         if (context.implicitsEnabled) ""
-                         else inLightRed("enrichment only")
-                       else inLightRed("implicits disabled"))
+    def implicits_s =
+      (if (context.enrichmentEnabled)
+         if (context.implicitsEnabled) ""
+         else inLightRed("enrichment only")
+       else inLightRed("implicits disabled"))
 
     s"($marker$undet_s: ${context.siteString}$owner_long_s) $implicits_s"
   }

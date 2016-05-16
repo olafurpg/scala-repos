@@ -76,7 +76,9 @@ object NoStacktrace {
   * before a request could be successfully serviced.
   */
 class RequestException(message: String, cause: Throwable)
-    extends Exception(message, cause) with NoStacktrace with SourcedException {
+    extends Exception(message, cause)
+    with NoStacktrace
+    with SourcedException {
   def this() = this(null, null)
   def this(cause: Throwable) = this(null, cause)
   override def getStackTrace =
@@ -108,7 +110,8 @@ class RequestTimeoutException(
     protected val timeout: Duration,
     protected val explanation: String
 )
-    extends RequestException with TimeoutException
+    extends RequestException
+    with TimeoutException
 
 /**
   * Indicates that a single Finagle-level request timed out. In contrast to
@@ -218,7 +221,8 @@ class CancelledConnectionException(cause: Throwable)
   *      for additional details.
   */
 class FailedFastException(message: String)
-    extends RequestException(message, cause = null) with WriteException {
+    extends RequestException(message, cause = null)
+    with WriteException {
   def this() = this(null)
 }
 
@@ -268,7 +272,9 @@ object ChannelException {
   * An exception encountered within the context of a given socket channel.
   */
 class ChannelException(underlying: Throwable, val remoteAddress: SocketAddress)
-    extends Exception(underlying) with SourcedException with HasLogLevel {
+    extends Exception(underlying)
+    with SourcedException
+    with HasLogLevel {
   def this(underlying: Throwable) = this(underlying, null)
   def this() = this(null, null)
   override def exceptionMessage = {
@@ -293,7 +299,8 @@ class ChannelException(underlying: Throwable, val remoteAddress: SocketAddress)
   */
 class ConnectionFailedException(
     underlying: Throwable, remoteAddress: SocketAddress)
-    extends ChannelException(underlying, remoteAddress) with NoStacktrace {
+    extends ChannelException(underlying, remoteAddress)
+    with NoStacktrace {
   def this() = this(null, null)
 }
 
@@ -303,7 +310,8 @@ class ConnectionFailedException(
   */
 class ChannelClosedException(
     underlying: Throwable, remoteAddress: SocketAddress)
-    extends ChannelException(underlying, remoteAddress) with NoStacktrace {
+    extends ChannelException(underlying, remoteAddress)
+    with NoStacktrace {
   def this(remoteAddress: SocketAddress) = this(null, remoteAddress)
   def this() = this(null, null)
 }
@@ -361,7 +369,8 @@ trait WriteException extends Exception with SourcedException
   * Default implementation for [[WriteException]] that wraps an underlying exception.
   */
 case class ChannelWriteException(underlying: Throwable)
-    extends ChannelException(underlying) with WriteException
+    extends ChannelException(underlying)
+    with WriteException
     with NoStacktrace {
   override def fillInStackTrace: NoStacktrace = this
   override def getStackTrace: Array[StackTraceElement] =
@@ -442,7 +451,9 @@ class ServiceNotAvailableException extends ServiceException
   * This type of exception should generally be safe to retry.
   */
 class ServiceTimeoutException(override protected val timeout: Duration)
-    extends WriteException with ServiceException with TimeoutException {
+    extends WriteException
+    with ServiceException
+    with TimeoutException {
   override protected def explanation =
     "creating a service/connection or reserving a service/connection from the service/connection pool " +
     serviceName

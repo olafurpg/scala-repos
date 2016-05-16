@@ -41,7 +41,8 @@ trait LinkConverter { self: RequestCache =>
           .replace("&", "&amp;")
           .replace("<", "&lt;")
           .replace(">", "&gt;")
-          .replace("\"", "&quot;") else text
+          .replace("\"", "&quot;")
+      else text
 
     escaped
     // convert username/project@SHA to link

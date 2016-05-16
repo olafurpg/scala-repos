@@ -63,8 +63,8 @@ final case class OneAnd[F[_], A](head: A, tail: F[A]) {
   /**
     * Right-associative fold on the structure using f.
     */
-  def foldRight[B](lb: Eval[B])(f: (A, Eval[B]) => Eval[B])(
-      implicit F: Foldable[F]): Eval[B] =
+  def foldRight[B](lb: Eval[B])(
+      f: (A, Eval[B]) => Eval[B])(implicit F: Foldable[F]): Eval[B] =
     Eval.defer(f(head, F.foldRight(tail, lb)(f)))
 
   /**
@@ -113,8 +113,8 @@ private[data] sealed trait OneAndInstances extends OneAndLowPriority2 {
         a combine b
     }
 
-  implicit def oneAndSemigroup[
-      F[_]: MonadCombine, A]: Semigroup[OneAnd[F, A]] =
+  implicit def oneAndSemigroup[F[_]: MonadCombine, A]
+    : Semigroup[OneAnd[F, A]] =
     oneAndSemigroupK[F].algebra
 
   implicit def oneAndReducible[F[_]](
@@ -177,8 +177,8 @@ trait OneAndLowPriority2 extends OneAndLowPriority1 {
   implicit def oneAndTraverse[F[_]](
       implicit F: Traverse[F]): Traverse[OneAnd[F, ?]] =
     new Traverse[OneAnd[F, ?]] {
-      def traverse[G[_], A, B](fa: OneAnd[F, A])(f: (A) => G[B])(
-          implicit G: Applicative[G]): G[OneAnd[F, B]] = {
+      def traverse[G[_], A, B](fa: OneAnd[F, A])(
+          f: (A) => G[B])(implicit G: Applicative[G]): G[OneAnd[F, B]] = {
         val tail = F.traverse(fa.tail)(f)
         val head = f(fa.head)
         G.ap2[B, F[B], OneAnd[F, B]](G.pure(OneAnd(_, _)))(head, tail)

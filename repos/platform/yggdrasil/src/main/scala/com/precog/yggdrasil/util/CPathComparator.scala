@@ -247,7 +247,8 @@ private[yggdrasil] final class HalfArrayCPathComparator[
     @spec(Boolean, Long, Double) A, @spec(Boolean, Long, Double) B](
     lPath: CPath, lCol: HomogeneousArrayColumn[_], rCol: Int => B)(
     implicit ma: Manifest[A], ho: HetOrder[A, B])
-    extends CPathComparator with ArrayCPathComparatorSupport {
+    extends CPathComparator
+    with ArrayCPathComparatorSupport {
 
   final lazy val lMask: Array[Boolean] = makeMask(lPath)
 
@@ -280,7 +281,8 @@ private[yggdrasil] final class ArrayCPathComparator[
     rPath: CPath,
     rCol: HomogeneousArrayColumn[_])(
     implicit ma: Manifest[A], mb: Manifest[B], ho: HetOrder[A, B])
-    extends CPathComparator with ArrayCPathComparatorSupport {
+    extends CPathComparator
+    with ArrayCPathComparatorSupport {
 
   // FIXME: These are lazy to get around a bug in @spec. We can probably remove
   // this in 2.10.

@@ -11,8 +11,12 @@ import scala.collection.mutable
 import scala.concurrent.Future
 
 class EntityStoreCacheTest
-    extends MarathonSpec with GivenWhenThen with Matchers with BeforeAndAfter
-    with ScalaFutures with Mockito {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers
+    with BeforeAndAfter
+    with ScalaFutures
+    with Mockito {
 
   test("The onElected trigger fills the cache") {
     Given("A store with some entries")
@@ -206,9 +210,8 @@ class EntityStoreCacheTest
     Given("A pre-filled entityCache")
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
-    content ++=
-    (names.map(t => t -> TestApp(t)) ++ names.map(
-            t => s"$t:$now" -> TestApp(t, now)))
+    content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t =>
+              s"$t:$now" -> TestApp(t, now)))
     content should have size 6
     entityCache.onElected.futureValue
 
@@ -226,9 +229,8 @@ class EntityStoreCacheTest
     Given("A store with three entries")
     val names = Set("a", "b", "c")
     val now = Timestamp.now()
-    content ++=
-    (names.map(t => t -> TestApp(t)) ++ names.map(
-            t => s"$t:$now" -> TestApp(t, now)))
+    content ++= (names.map(t => t -> TestApp(t)) ++ names.map(t =>
+              s"$t:$now" -> TestApp(t, now)))
     content should have size 6
 
     When("Get all names in the cache")

@@ -268,7 +268,8 @@ class ThreadPoolScheduler(
     val name: String,
     val executorFactory: ThreadFactory => ExecutorService
 )
-    extends Scheduler with ExecutorScheduler {
+    extends Scheduler
+    with ExecutorScheduler {
   def this(name: String) = this(name, Executors.newCachedThreadPool(_))
 }
 
@@ -285,7 +286,8 @@ class BridgedThreadPoolScheduler(
     val name: String,
     val executorFactory: ThreadFactory => ExecutorService
 )
-    extends Scheduler with ExecutorScheduler {
+    extends Scheduler
+    with ExecutorScheduler {
   private[this] val local = new LocalScheduler
 
   def this(name: String) = this(name, Executors.newCachedThreadPool(_))

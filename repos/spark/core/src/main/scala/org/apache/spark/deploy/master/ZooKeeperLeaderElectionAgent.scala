@@ -26,7 +26,9 @@ import org.apache.spark.internal.Logging
 
 private[master] class ZooKeeperLeaderElectionAgent(
     val masterInstance: LeaderElectable, conf: SparkConf)
-    extends LeaderLatchListener with LeaderElectionAgent with Logging {
+    extends LeaderLatchListener
+    with LeaderElectionAgent
+    with Logging {
 
   val WORKING_DIR =
     conf.get("spark.deploy.zookeeper.dir", "/spark") + "/leader_election"

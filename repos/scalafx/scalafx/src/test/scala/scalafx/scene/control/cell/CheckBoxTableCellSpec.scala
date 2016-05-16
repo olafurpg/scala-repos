@@ -44,4 +44,5 @@ class CheckBoxTableCellSpec[S, T]
     extends SimpleSFXDelegateSpec[
         jfxscc.CheckBoxTableCell[S, T], CheckBoxTableCell[S, T]](
         classOf[jfxscc.CheckBoxTableCell[S, T]],
-        classOf[CheckBoxTableCell[S, T]]) with RunOnApplicationThread
+        classOf[CheckBoxTableCell[S, T]])
+    with RunOnApplicationThread

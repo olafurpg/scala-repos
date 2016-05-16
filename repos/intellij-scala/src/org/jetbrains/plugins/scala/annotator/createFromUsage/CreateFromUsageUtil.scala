@@ -39,25 +39,19 @@ object CreateFromUsageUtil {
   def nameAndTypeForArg(arg: PsiElement): (String, ScType) = arg match {
     case ref: ScReferenceExpression => (ref.refName, ref.getType().getOrAny)
     case expr: ScExpression =>
-      val tp = expr
-        .getType()
-        .getOrAny
-        (nameByType(tp), tp)
+      val tp = expr.getType().getOrAny
+      (nameByType(tp), tp)
     case bp: ScBindingPattern if !bp.isWildcard =>
       (bp.name, bp.getType(TypingContext.empty).getOrAny)
     case p: ScPattern =>
-      val tp: ScType = p
-        .getType(TypingContext.empty)
-        .getOrAny
-        (nameByType(tp), tp)
+      val tp: ScType = p.getType(TypingContext.empty).getOrAny
+      (nameByType(tp), tp)
     case _ => ("value", scTypeAny)
   }
 
   def paramsText(args: Seq[PsiElement]) = {
-    val (names, types) = args
-      .map(nameAndTypeForArg)
-      .unzip
-      (uniqueNames(names), types).zipped
+    val (names, types) = args.map(nameAndTypeForArg).unzip
+    (uniqueNames(names), types).zipped
       .map((name, tpe) => s"$name: ${tpe.canonicalText}")
       .mkString("(", ", ", ")")
   }

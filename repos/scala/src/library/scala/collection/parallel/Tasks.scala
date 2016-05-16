@@ -47,7 +47,8 @@ trait Task[R, +Tp] {
     try {
       tryBreakable {
         leaf(lastres)
-        result = result // ensure that effects of `leaf` are visible to readers of `result`
+        result =
+          result // ensure that effects of `leaf` are visible to readers of `result`
       } catchBreak {
         signalAbort()
       }
@@ -374,7 +375,8 @@ trait HavingForkJoinPool {
 trait ForkJoinTasks extends Tasks with HavingForkJoinPool {
 
   trait WrappedTask[R, +Tp]
-      extends RecursiveAction with super.WrappedTask[R, Tp] {
+      extends RecursiveAction
+      with super.WrappedTask[R, Tp] {
     def start() = fork
     def sync() = join
     def tryCancel = tryUnfork
@@ -441,7 +443,8 @@ object ForkJoinTasks {
 /* Some boilerplate due to no deep mixin composition. Not sure if it can be done differently without them.
  */
 trait AdaptiveWorkStealingForkJoinTasks
-    extends ForkJoinTasks with AdaptiveWorkStealingTasks {
+    extends ForkJoinTasks
+    with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
       extends super [ForkJoinTasks].WrappedTask[R, Tp]
@@ -454,7 +457,8 @@ trait AdaptiveWorkStealingForkJoinTasks
 
 @deprecated("Use `AdaptiveWorkStealingForkJoinTasks` instead.", "2.11.0")
 trait AdaptiveWorkStealingThreadPoolTasks
-    extends ThreadPoolTasks with AdaptiveWorkStealingTasks {
+    extends ThreadPoolTasks
+    with AdaptiveWorkStealingTasks {
 
   class WrappedTask[R, Tp](val body: Task[R, Tp])
       extends super [ThreadPoolTasks].WrappedTask[R, Tp]
@@ -521,9 +525,8 @@ private[parallel] final class FutureTasks(executor: ExecutionContext)
 
   def execute[R, Tp](task: Task[R, Tp]): () => R = {
     val future = exec(task)
-    val callback = () =>
-      {
-        Await.result(future, scala.concurrent.duration.Duration.Inf)
+    val callback = () => {
+      Await.result(future, scala.concurrent.duration.Duration.Inf)
     }
     callback
   }

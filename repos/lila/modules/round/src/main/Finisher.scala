@@ -102,7 +102,8 @@ private[round] final class Finisher(messenger: Messenger,
     UserRepo.incNbGames(user.id,
                         game.rated,
                         game.hasAi,
-                        result = if (game.winnerUserId exists (user.id ==)) 1
+                        result =
+                          if (game.winnerUserId exists (user.id ==)) 1
                           else if (game.loserUserId exists (user.id ==)) -1
                           else 0,
                         totalTime = totalTime,

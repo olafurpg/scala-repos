@@ -37,7 +37,8 @@ import org.apache.spark.sql.types.{ByteType, DataType, IntegerType, NullType}
   * A place holder for generated SQL for subquery expression.
   */
 case class SubqueryHolder(query: String)
-    extends LeafExpression with Unevaluable {
+    extends LeafExpression
+    with Unevaluable {
   override def dataType: DataType = NullType
   override def nullable: Boolean = true
   override def sql: String = s"($query)"
@@ -359,11 +360,11 @@ class SQLBuilder(logicalPlan: LogicalPlan, sqlContext: SQLContext)
           case ar: AttributeReference if ar == gid => GroupingID(Nil)
           case ar: AttributeReference if groupByAttrMap.contains(ar) =>
             groupByAttrMap(ar)
-          case a @ Cast(
-              BitwiseAnd(ShiftRight(ar: AttributeReference,
-                                    Literal(value: Any, IntegerType)),
-                         Literal(1, IntegerType)),
-              ByteType) if ar == gid =>
+          case a @ Cast(BitwiseAnd(ShiftRight(ar: AttributeReference,
+                                              Literal(value: Any,
+                                                      IntegerType)),
+                                   Literal(1, IntegerType)),
+                        ByteType) if ar == gid =>
             // for converting an expression to its original SQL format grouping(col)
             val idx = groupByExprs.length - 1 - value.asInstanceOf[Int]
             groupByExprs.lift(idx).map(Grouping).getOrElse(a)

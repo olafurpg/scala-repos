@@ -78,9 +78,9 @@ object BijectionT extends BijectionTInstances {
 
   type Bijection[A, B] = BijectionT[Id, Id, A, B]
 
-  def liftBijection[F[_], G[_], A, B](t: A => B, f: B => A)(
-      implicit PF: Applicative[F],
-      PG: Applicative[G]): BijectionT[F, G, A, B] =
+  def liftBijection[F[_], G[_], A, B](
+      t: A => B, f: B => A)(implicit PF: Applicative[F],
+                            PG: Applicative[G]): BijectionT[F, G, A, B] =
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
   def bijectionId[F[_], G[_], A](implicit PF: Applicative[F],
@@ -124,20 +124,20 @@ object BijectionT extends BijectionTInstances {
       case (a, (b, (c, d))) => (a, b, c, d)
     })
 
-  def tuple5B[
-      A, B, C, D, E]: Bijection[(A, B, C, D, E), (A, (B, (C, (D, E))))] =
+  def tuple5B[A, B, C, D, E]
+    : Bijection[(A, B, C, D, E), (A, (B, (C, (D, E))))] =
     bijection({ case (a, b, c, d, e) => (a, (b, (c, (d, e)))) }, {
       case (a, (b, (c, (d, e)))) => (a, b, c, d, e)
     })
 
-  def tuple6B[A, B, C, D, E, H]: Bijection[
-      (A, B, C, D, E, H), (A, (B, (C, (D, (E, H)))))] =
+  def tuple6B[A, B, C, D, E, H]
+    : Bijection[(A, B, C, D, E, H), (A, (B, (C, (D, (E, H)))))] =
     bijection({ case (a, b, c, d, e, h) => (a, (b, (c, (d, (e, h))))) }, {
       case (a, (b, (c, (d, (e, h))))) => (a, b, c, d, e, h)
     })
 
-  def tuple7B[A, B, C, D, E, H, I]: Bijection[
-      (A, B, C, D, E, H, I), (A, (B, (C, (D, (E, (H, I))))))] =
+  def tuple7B[A, B, C, D, E, H, I]
+    : Bijection[(A, B, C, D, E, H, I), (A, (B, (C, (D, (E, (H, I))))))] =
     bijection({ case (a, b, c, d, e, h, i) => (a, (b, (c, (d, (e, (h, i)))))) }, {
       case (a, (b, (c, (d, (e, (h, i)))))) => (a, b, c, d, e, h, i)
     })
@@ -179,7 +179,8 @@ private trait BijectionTSplit[F[_], G[_]]
 }
 
 private trait BijectionTCategory[F[_], G[_]]
-    extends Category[BijectionT[F, G, ?, ?]] with BijectionTSplit[F, G] {
+    extends Category[BijectionT[F, G, ?, ?]]
+    with BijectionTSplit[F, G] {
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 

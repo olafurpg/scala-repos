@@ -102,8 +102,7 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
   def caseModuleDef(cdef: ClassDef): ModuleDef = {
     val params = constrParamss(cdef)
     def inheritFromFun =
-      !cdef.mods.hasAbstractFlag && cdef.tparams.isEmpty &&
-      (params match {
+      !cdef.mods.hasAbstractFlag && cdef.tparams.isEmpty && (params match {
             case List(ps) if ps.length <= MaxFunctionArity => true
             case _ => false
           })
@@ -124,10 +123,10 @@ trait Unapplies extends ast.TreeDSL { self: Analyzer =>
     companionModuleDef(cdef, parents, List(toString))
   }
 
-  def companionModuleDef(
-      cdef: ClassDef,
-      parents: List[Tree] = Nil,
-      body: List[Tree] = Nil): ModuleDef = atPos(cdef.pos.focus) {
+  def companionModuleDef(cdef: ClassDef,
+                         parents: List[Tree] = Nil,
+                         body: List[Tree] =
+                           Nil): ModuleDef = atPos(cdef.pos.focus) {
     ModuleDef(Modifiers(cdef.mods.flags & AccessFlags | SYNTHETIC,
                         cdef.mods.privateWithin),
               cdef.name.toTermName,

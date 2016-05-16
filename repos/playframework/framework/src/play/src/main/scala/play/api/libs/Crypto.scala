@@ -13,7 +13,9 @@ import play.api.libs.crypto._
     "This class is deprecated and will be removed in future versions", "2.5.0")
 class Crypto @Inject()(
     signer: CookieSigner, tokenSigner: CSRFTokenSigner, aesCrypter: AESCrypter)
-    extends CookieSigner with CSRFTokenSigner with AESCrypter {
+    extends CookieSigner
+    with CSRFTokenSigner
+    with AESCrypter {
 
   override def signToken(token: String): String = tokenSigner.signToken(token)
 

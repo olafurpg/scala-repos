@@ -402,7 +402,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
             //   by generating valid main methods as static in module classes
             //   not sure what the jvm allows here
             // + "  You can still run the program by calling it as " + sym.javaSimpleName + " instead."
-            )
+        )
         false
       }
       def failNoForwarder(msg: String) = {
@@ -489,7 +489,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    */
   def fieldSymbols(cls: Symbol): List[Symbol] = {
     for (f <- cls.info.decls.toList; if !f.isMethod && f.isTerm &&
-             !f.isModule) yield f
+         !f.isModule) yield f
   }
 
   /*
@@ -644,7 +644,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       // Phase travel (exitingPickler) required for SI-6613 - linkedCoC is only reliable in early phases (nesting)
       val classSym =
         if (sym.isJavaDefined && sym.isModuleClass)
-          exitingPickler(sym.linkedClassOfClass) else sym
+          exitingPickler(sym.linkedClassOfClass)
+        else sym
       classBTypeFromSymbol(classSym).internalName
     }
 
@@ -871,7 +872,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       val annotationss = pannotss map (_ filter shouldEmitAnnotation)
       if (annotationss forall (_.isEmpty)) return
       for ((annots, idx) <- annotationss.zipWithIndex;
-      annot <- annots) {
+           annot <- annots) {
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val pannVisitor: asm.AnnotationVisitor =
@@ -1120,14 +1121,13 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           s"Potentially conflicting names for forwarders: $conflictingNames")
 
       for (m <- moduleClass.info.membersBasedOnFlags(
-          BCodeHelpers.ExcludedForwarderFlags, symtab.Flags.METHOD)) {
+                   BCodeHelpers.ExcludedForwarderFlags, symtab.Flags.METHOD)) {
         if (m.isType || m.isDeferred || (m.owner eq definitions.ObjectClass) ||
             m.isConstructor)
           debuglog(
               s"No forwarder for '$m' from $jclassName to '$moduleClass': ${m.isType} || ${m.isDeferred} || ${m.owner eq definitions.ObjectClass} || ${m.isConstructor}")
         else if (conflictingNames(m.name))
-          log(
-              s"No forwarder for $m due to conflict with ${linkedClass.info
+          log(s"No forwarder for $m due to conflict with ${linkedClass.info
             .member(m.name)}")
         else if (m.hasAccessBoundary)
           log(s"No forwarder for non-public member $m")
@@ -1184,7 +1184,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
   /* functionality for building plain and mirror classes */
   abstract class JCommonBuilder
-      extends BCInnerClassGen with BCAnnotGen with BCForwardersGen
+      extends BCInnerClassGen
+      with BCAnnotGen
+      with BCForwardersGen
       with BCPickles {}
 
   /* builder of mirror classes */
@@ -1271,18 +1273,18 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       var fieldList = List[String]()
 
       for (f <- fieldSymbols if f.hasGetter;
-      g = f.getterIn(cls);
-      s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
+           g = f.getterIn(cls);
+           s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
         // inserting $outer breaks the bean
-        fieldList = javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
-                                                                 javaSimpleName(
-                                                                     s)
-                                                               else null) :: fieldList
+        fieldList =
+          javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
+                                                       javaSimpleName(s)
+                                                     else null) :: fieldList
       }
 
       val methodList: List[String] =
         for (m <- methodSymbols if !m.isConstructor && m.isPublic &&
-                 !(m.name startsWith "$") && !m.isGetter && !m.isSetter) yield
+             !(m.name startsWith "$") && !m.isGetter && !m.isSetter) yield
           javaSimpleName(m)
 
       val constructor = beanInfoClass.visitMethod(

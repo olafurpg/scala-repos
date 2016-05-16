@@ -103,8 +103,8 @@ class ScParameterizedType private (
     this match {
       case ScParameterizedType(ScDesignatorType(ta: ScTypeAlias), args) =>
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters.map(
-                tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+            ta.typeParameters.map(tp =>
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         Some(
             AliasType(ta,
@@ -115,8 +115,8 @@ class ScParameterizedType private (
         val ta: ScTypeAlias = p.actualElement.asInstanceOf[ScTypeAlias]
         val subst: ScSubstitutor = p.actualSubst
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters.map(
-                tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+            ta.typeParameters.map(tp =>
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         val s = subst.followed(genericSubst)
         Some(AliasType(
@@ -246,9 +246,9 @@ class ScParameterizedType private (
         t = Conformance.conformsInner(r, subst.subst(lower), Set.empty, t._2)
         if (!t._1) return (false, uSubst)
         (true, t._2)
-      case (
-          ScParameterizedType(proj @ ScProjectionType(projected, _, _), args),
-          _) if proj.actualElement.isInstanceOf[ScTypeAliasDefinition] =>
+      case (ScParameterizedType(
+            proj @ ScProjectionType(projected, _, _), args),
+            _) if proj.actualElement.isInstanceOf[ScTypeAliasDefinition] =>
         isAliasType match {
           case Some(AliasType(ta: ScTypeAliasDefinition, lower, _)) =>
             Equivalence.equivInner(lower match {
@@ -388,8 +388,8 @@ case class ScTypeParameterType(name: String,
   override def hashCode: Int = {
     if (hash == -1) {
       hash =
-      (((param.hashCode() * 31 + upper.hashCode) * 31 +
-              lower.hashCode()) * 31 + args.hashCode()) * 31 + name.hashCode
+        (((param.hashCode() * 31 + upper.hashCode) * 31 +
+                lower.hashCode()) * 31 + args.hashCode()) * 31 + name.hashCode
     }
     hash
   }
@@ -408,15 +408,16 @@ case class ScTypeParameterType(name: String,
           s.subst(tp.lowerBound.getOrNothing)
         })
       case _ =>
-        new Suspension[ScType]({ () =>
-          s.subst(
-              ScCompoundType(ptp.getExtendsListTypes
-                               .map(ScType.create(_, ptp.getProject))
-                               .toSeq ++ ptp.getImplementsListTypes
-                               .map(ScType.create(_, ptp.getProject))
-                               .toSeq,
-                             Map.empty,
-                             Map.empty))
+        new Suspension[ScType]({
+          () =>
+            s.subst(
+                ScCompoundType(ptp.getExtendsListTypes
+                                 .map(ScType.create(_, ptp.getProject))
+                                 .toSeq ++ ptp.getImplementsListTypes
+                                 .map(ScType.create(_, ptp.getProject))
+                                 .toSeq,
+                               Map.empty,
+                               Map.empty))
         })
     }, ptp match {
       case tp: ScTypeParam =>
@@ -480,16 +481,10 @@ private[types] object CyclicHelper {
   def compute[R](pn1: PsiNamedElement, pn2: PsiNamedElement)(
       fun: () => R): Option[R] = {
     import org.jetbrains.plugins.scala.caches.ScalaRecursionManager._
-    doComputationsForTwoElements(pn1,
-                                 pn2,
-                                 (p: Object, searches: Seq[Object]) =>
-                                   {
-                                     !searches.contains(p)
-                                 },
-                                 pn2,
-                                 pn1,
-                                 fun(),
-                                 CYCLIC_HELPER_KEY)
+    doComputationsForTwoElements(
+        pn1, pn2, (p: Object, searches: Seq[Object]) => {
+      !searches.contains(p)
+    }, pn2, pn1, fun(), CYCLIC_HELPER_KEY)
   }
 }
 

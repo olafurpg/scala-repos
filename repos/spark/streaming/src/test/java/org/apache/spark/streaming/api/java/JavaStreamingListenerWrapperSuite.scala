@@ -72,21 +72,20 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         BatchInfo(
             batchTime = Time(1000L),
             streamIdToInputInfo = Map(
-                  0 -> StreamInputInfo(
-                      inputStreamId = 0,
-                      numRecords = 1000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
-                  1 -> StreamInputInfo(
-                      inputStreamId = 1,
-                      numRecords = 2000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
+                0 -> StreamInputInfo(
+                    inputStreamId = 0,
+                    numRecords = 1000,
+                    metadata = Map(StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
+                1 -> StreamInputInfo(
+                    inputStreamId = 1,
+                    numRecords = 2000,
+                    metadata = Map(
+                        StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
             submissionTime = 1001L,
             None,
             None,
-            outputOperationInfos = Map(
-                  0 -> OutputOperationInfo(batchTime = Time(1000L),
+            outputOperationInfos =
+              Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
                                            id = 0,
                                            name = "op1",
                                            description = "operation1",
@@ -109,21 +108,20 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         BatchInfo(
             batchTime = Time(1000L),
             streamIdToInputInfo = Map(
-                  0 -> StreamInputInfo(
-                      inputStreamId = 0,
-                      numRecords = 1000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
-                  1 -> StreamInputInfo(
-                      inputStreamId = 1,
-                      numRecords = 2000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
+                0 -> StreamInputInfo(
+                    inputStreamId = 0,
+                    numRecords = 1000,
+                    metadata = Map(StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
+                1 -> StreamInputInfo(
+                    inputStreamId = 1,
+                    numRecords = 2000,
+                    metadata = Map(
+                        StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
             submissionTime = 1001L,
             Some(1002L),
             None,
-            outputOperationInfos = Map(
-                  0 -> OutputOperationInfo(batchTime = Time(1000L),
+            outputOperationInfos =
+              Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
                                            id = 0,
                                            name = "op1",
                                            description = "operation1",
@@ -145,21 +143,20 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
         BatchInfo(
             batchTime = Time(1000L),
             streamIdToInputInfo = Map(
-                  0 -> StreamInputInfo(
-                      inputStreamId = 0,
-                      numRecords = 1000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
-                  1 -> StreamInputInfo(
-                      inputStreamId = 1,
-                      numRecords = 2000,
-                      metadata = Map(
-                            StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
+                0 -> StreamInputInfo(
+                    inputStreamId = 0,
+                    numRecords = 1000,
+                    metadata = Map(StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver1")),
+                1 -> StreamInputInfo(
+                    inputStreamId = 1,
+                    numRecords = 2000,
+                    metadata = Map(
+                        StreamInputInfo.METADATA_KEY_DESCRIPTION -> "receiver2"))),
             submissionTime = 1001L,
             Some(1002L),
             Some(1010L),
-            outputOperationInfos = Map(
-                  0 -> OutputOperationInfo(batchTime = Time(1000L),
+            outputOperationInfos =
+              Map(0 -> OutputOperationInfo(batchTime = Time(1000L),
                                            id = 0,
                                            name = "op1",
                                            description = "operation1",

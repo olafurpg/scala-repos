@@ -156,8 +156,8 @@ object ChoiceBoxListCell {
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   */
 class ChoiceBoxListCell[T](
-    override val delegate: jfxscc.ChoiceBoxListCell[T] = new jfxscc.ChoiceBoxListCell[
-          T])
+    override val delegate: jfxscc.ChoiceBoxListCell[T] =
+      new jfxscc.ChoiceBoxListCell[T])
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.ChoiceBoxListCell[T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxListCell[T], T]

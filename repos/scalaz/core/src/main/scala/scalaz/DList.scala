@@ -88,10 +88,9 @@ object DList extends DListInstances {
 
   def replicate[A](n: Int, a: A): DList[A] =
     DL(
-        xs =>
-          {
-        def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
-        go(n)
+        xs => {
+      def go(m: Int): IList[A] = if (m <= 0) xs else a :: go(m - 1)
+      go(n)
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {
     def go(b: B, f: B => Option[(A, B)]): Trampoline[DList[A]] =
@@ -123,7 +122,7 @@ sealed abstract class DListInstances {
     def tailrecM[A, B](f: A => DList[A \/ B])(a: A): DList[B] =
       DList.fromIList(BindRec[IList].tailrecM[A, B](f(_).toIList)(a))
   }
-  implicit def dlistEqual[A : Equal]: Equal[DList[A]] = {
+  implicit def dlistEqual[A: Equal]: Equal[DList[A]] = {
     import std.list._
     Equal[List[A]].contramap((_: DList[A]).toList)
   }

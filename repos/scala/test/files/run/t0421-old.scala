@@ -3,7 +3,7 @@
 @deprecated("Suppress warnings", since = "2.11")
 object Test extends App {
 
-  def transpose[A : ClassManifest](xss: Array[Array[A]]) = {
+  def transpose[A: ClassManifest](xss: Array[Array[A]]) = {
     for (i <- Array.range(0, xss(0).length)) yield for (xs <- xss) yield xs(i)
   }
 

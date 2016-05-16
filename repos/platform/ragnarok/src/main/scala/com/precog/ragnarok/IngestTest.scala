@@ -94,8 +94,7 @@ object IngestTest {
             (stats, _) =>
               config.ingest.foldLeft(stats) {
                 case (stats, (path, file)) =>
-                  stats +
-                  (path ->
+                  stats + (path ->
                       (stats.getOrElse(path, None) |+| Some(
                               timeIngest(path, file))))
               }

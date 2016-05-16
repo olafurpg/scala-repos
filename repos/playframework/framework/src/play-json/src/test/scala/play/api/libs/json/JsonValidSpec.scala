@@ -442,7 +442,8 @@ object JsonValidSpec extends Specification {
           "field3" -> Json.obj("field31" -> "beta", "field32" -> 345)
       )
       val reads1 = (__ \ 'field3).json.pick
-      val reads2 = ((__ \ 'field32).read[Int] and (__ \ 'field31).read[String]).tupled
+      val reads2 =
+        ((__ \ 'field32).read[Int] and (__ \ 'field31).read[String]).tupled
 
       js.validate(reads1 andThen reads2).get must beEqualTo(345 -> "beta")
     }
@@ -499,18 +500,19 @@ object JsonValidSpec extends Specification {
       val dt = (new java.util.Date).getTime()
       def func = { JsNumber(dt + 100) }
 
-      val jsonTransformer = ((__ \ "key1").json.pickBranch and (__ \ "key2").json
-            .pickBranch(
-              ((__ \ "key22").json.update((__ \ "key222").json.pick) and
-                  (__ \ "key233").json.copyFrom((__ \ "key23").json.pick)).reduce
-          ) and (__ \ "key3").json.pickBranch[JsArray](pure(Json.arr("delta"))) and
-          (__ \ "key4").json.put(
-              Json.obj(
-                  "key41" -> 345,
-                  "key42" -> "alpha",
-                  "key43" -> func
-              )
-          )).reduce
+      val jsonTransformer =
+        ((__ \ "key1").json.pickBranch and (__ \ "key2").json.pickBranch(
+                ((__ \ "key22").json.update((__ \ "key222").json.pick) and
+                    (__ \ "key233").json.copyFrom((__ \ "key23").json.pick)).reduce
+            ) and (__ \ "key3").json
+              .pickBranch[JsArray](pure(Json.arr("delta"))) and
+            (__ \ "key4").json.put(
+                Json.obj(
+                    "key41" -> 345,
+                    "key42" -> "alpha",
+                    "key43" -> func
+                )
+            )).reduce
 
       val res = Json.obj(
           "key1" -> "value1",
@@ -624,8 +626,8 @@ object JsonValidSpec extends Specification {
     "mix reads constraints" in {
       case class User(id: Long, email: String, age: Int)
 
-      implicit val UserReads = ((__ \ 'id).read[Long] and (__ \ 'email)
-            .read(Reads.email andKeep Reads.minLength[String](5)) and
+      implicit val UserReads = ((__ \ 'id).read[Long] and (__ \ 'email).read(
+              Reads.email andKeep Reads.minLength[String](5)) and
           (__ \ 'age).read(Reads.max(55) or Reads.min(65)))(User)
 
       Json
@@ -742,12 +744,13 @@ object JsonValidSpec extends Specification {
     }
 
     "lots of fields to read" in {
-      val myReads = ((__ \ 'field1).read[String] and (__ \ 'field2).read[Long] and
-          (__ \ 'field3).read[Float] and (__ \ 'field4).read[Boolean] and
-          (__ \ 'field5).read[List[String]] and (__ \ 'field6).read[String] and
-          (__ \ 'field7).read[String] and (__ \ 'field8).read[String] and
-          (__ \ 'field9).read[String] and (__ \ 'field10).read[String] and
-          (__ \ 'field11).read[String] and (__ \ 'field12).read[String]).tupled
+      val myReads =
+        ((__ \ 'field1).read[String] and (__ \ 'field2).read[Long] and
+            (__ \ 'field3).read[Float] and (__ \ 'field4).read[Boolean] and
+            (__ \ 'field5).read[List[String]] and (__ \ 'field6).read[String] and
+            (__ \ 'field7).read[String] and (__ \ 'field8).read[String] and
+            (__ \ 'field9).read[String] and (__ \ 'field10).read[String] and
+            (__ \ 'field11).read[String] and (__ \ 'field12).read[String]).tupled
 
       Json
         .obj(
@@ -933,8 +936,8 @@ object JsonValidSpec extends Specification {
     }
 
     "join" in {
-      val joinWrites = ((__ \ 'alpha).write[JsString] and (__ \ 'beta)
-            .write[JsValue]).join
+      val joinWrites =
+        ((__ \ 'alpha).write[JsString] and (__ \ 'beta).write[JsValue]).join
 
       joinWrites.writes(JsString("toto")) must beEqualTo(
           Json.obj("alpha" -> "toto", "beta" -> "toto"))

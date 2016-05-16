@@ -31,7 +31,8 @@ import specs2._
 import scalaz._
 
 class ScenariosTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
   val dummyEvents = """
 { "data": "Hello world" }
 { "data": "Goodbye cruel world" }

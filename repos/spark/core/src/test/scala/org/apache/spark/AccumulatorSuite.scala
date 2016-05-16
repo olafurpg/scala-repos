@@ -32,7 +32,9 @@ import org.apache.spark.scheduler._
 import org.apache.spark.serializer.JavaSerializer
 
 class AccumulatorSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
   import AccumulatorParam._
 
   override def afterEach(): Unit = {

@@ -113,7 +113,8 @@ trait Holes { self: Quasiquotes =>
       val suggestRank = annotatedRank != iterableRank || annotatedRank != NoDot
       val unquoteeRankMsg =
         if (annotatedRank != iterableRank && iterableRank != NoDot)
-          s"using $iterableRank" else "omitting the dots"
+          s"using $iterableRank"
+        else "omitting the dots"
       val rankSuggestion = if (suggestRank) unquoteeRankMsg else ""
       val suggestLifting =
         (annotatedRank == NoDot || iterableRank != NoDot) &&
@@ -122,7 +123,8 @@ trait Holes { self: Quasiquotes =>
         if (annotatedRank != NoDot) iterableType else unquotee.tpe
       val liftSuggestion =
         if (suggestLifting)
-          s"providing an implicit instance of Liftable[$liftedTpe]" else ""
+          s"providing an implicit instance of Liftable[$liftedTpe]"
+        else ""
       val advice =
         if (isBottomType(iterableType))
           "bottom type values often indicate programmer mistake"

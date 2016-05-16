@@ -101,14 +101,18 @@ private object BSONHandlers {
   implicit def EntryBSONHandler = new BSON[Entry] {
     import Entry.BSONFields._
     def reads(r: Reader) =
-      Entry(id = r.str(id),
-            number = r.int(number),
-            userId = r.str(userId),
-            color = r.get[Color](color),
-            perf = r.get[PerfType](perf),
-            eco = r.getO[Ecopening](eco),
-            myCastling = r.get[Castling](myCastling),
-            opponentRating = r.int(opponentRating),
+      Entry(
+          id =
+            r.str(id),
+          number = r.int(number),
+          userId = r.str(userId),
+          color = r.get[Color](color),
+          perf =
+            r.get[PerfType](perf),
+          eco =
+            r.getO[Ecopening](eco),
+          myCastling = r.get[Castling](myCastling),
+          opponentRating = r.int(opponentRating),
             opponentStrength = r.get[RelativeStrength](opponentStrength),
             opponentCastling = r.get[Castling](opponentCastling),
             moves = r.get[List[Move]](moves),

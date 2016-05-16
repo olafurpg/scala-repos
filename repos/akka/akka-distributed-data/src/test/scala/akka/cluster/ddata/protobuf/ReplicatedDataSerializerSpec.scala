@@ -32,7 +32,10 @@ class ReplicatedDataSerializerSpec
             ConfigFactory.parseString("""
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
-    """))) with WordSpecLike with Matchers with BeforeAndAfterAll {
+    """)))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val serializer = new ReplicatedDataSerializer(
       system.asInstanceOf[ExtendedActorSystem])

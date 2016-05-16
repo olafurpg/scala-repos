@@ -29,7 +29,10 @@ class TestKitUsageSpec
     extends TestKit(
         ActorSystem("TestKitUsageSpec",
                     ConfigFactory.parseString(TestKitUsageSpec.config)))
-    with DefaultTimeout with ImplicitSender with WordSpecLike with Matchers
+    with DefaultTimeout
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
     with BeforeAndAfterAll {
   import TestKitUsageSpec._
 

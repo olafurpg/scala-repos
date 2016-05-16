@@ -16,7 +16,8 @@ import scala.compat.java8.OptionConverters._
 // see http://tools.ietf.org/html/rfc6265
 // sealed abstract to prevent generation of default apply method in companion
 sealed abstract case class HttpCookiePair private (name: String, value: String)
-    extends jm.headers.HttpCookiePair with ToStringRenderable {
+    extends jm.headers.HttpCookiePair
+    with ToStringRenderable {
 
   def render[R <: Rendering](r: R): r.type = r ~~ name ~~ '=' ~~ value
   def toCookie: HttpCookie = HttpCookie.fromPair(this)
@@ -64,7 +65,8 @@ final case class HttpCookie(name: String,
                             secure: Boolean = false,
                             httpOnly: Boolean = false,
                             extension: Option[String] = None)
-    extends jm.headers.HttpCookie with ToStringRenderable {
+    extends jm.headers.HttpCookie
+    with ToStringRenderable {
 
   /** Returns the name/value pair for this cookie, to be used in [[Cookie]] headers. */
   def pair: HttpCookiePair = HttpCookiePair(name, value)

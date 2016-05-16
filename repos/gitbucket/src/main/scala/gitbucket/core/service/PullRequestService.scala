@@ -88,11 +88,11 @@ trait PullRequestService { self: IssuesService =>
                                     commitIdFrom,
                                     commitIdTo)
 
-  def getPullRequestsByRequest(userName: String,
-                               repositoryName: String,
-                               branch: String,
-                               closed: Boolean)(
-      implicit s: Session): List[PullRequest] =
+  def getPullRequestsByRequest(
+      userName: String,
+      repositoryName: String,
+      branch: String,
+      closed: Boolean)(implicit s: Session): List[PullRequest] =
     PullRequests
       .innerJoin(Issues)
       .on { (t1, t2) =>
@@ -128,7 +128,8 @@ trait PullRequestService { self: IssuesService =>
         case (t1, t2) =>
           (t1.requestUserName === userName.bind) &&
           (t1.requestRepositoryName === repositoryName.bind) &&
-          (t1.requestBranch === branch.bind) && (t1.userName === userName.bind) &&
+          (t1.requestBranch === branch.bind) &&
+          (t1.userName === userName.bind) &&
           (t1.repositoryName === repositoryName.bind) &&
           (t2.closed === false.bind)
       }
@@ -217,9 +218,8 @@ object PullRequestService {
             statuses.find(_.context == context).map(_.state) != Some(
                 CommitState.SUCCESS))
     val hasProblem =
-      hasRequiredStatusProblem || hasConflict ||
-      (!statuses.isEmpty &&
-          CommitState.combine(statuses.map(_.state).toSet) != CommitState.SUCCESS)
+      hasRequiredStatusProblem || hasConflict || (!statuses.isEmpty && CommitState
+            .combine(statuses.map(_.state).toSet) != CommitState.SUCCESS)
     val canUpdate = branchIsOutOfDate && !hasConflict
     val canMerge =
       hasMergePermission && !hasConflict && !hasRequiredStatusProblem

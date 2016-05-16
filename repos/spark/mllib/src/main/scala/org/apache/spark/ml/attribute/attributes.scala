@@ -486,7 +486,8 @@ object NominalAttribute extends AttributeFactory {
       else None
     val numValues =
       if (metadata.contains(NUM_VALUES))
-        Some(metadata.getLong(NUM_VALUES).toInt) else None
+        Some(metadata.getLong(NUM_VALUES).toInt)
+      else None
     val values =
       if (metadata.contains(VALUES)) Some(metadata.getStringArray(VALUES))
       else None

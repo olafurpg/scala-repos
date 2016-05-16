@@ -81,7 +81,8 @@ trait Creator[T] extends Serializable {
 
 object JavaPartialFunction {
   sealed abstract class NoMatchException
-      extends RuntimeException with NoStackTrace
+      extends RuntimeException
+      with NoStackTrace
   case object NoMatch extends NoMatchException
   final def noMatch(): RuntimeException = NoMatch
 }

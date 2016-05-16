@@ -120,9 +120,12 @@ class DataFrameNaFunctionsSuite extends QueryTest with SharedSQLContext {
   }
 
   test("fill with map") {
-    val df = Seq[
-        (String, String, java.lang.Long, java.lang.Double, java.lang.Boolean)](
-        (null, null, null, null, null)).toDF("a", "b", "c", "d", "e")
+    val df = Seq[(String,
+                  String,
+                  java.lang.Long,
+                  java.lang.Double,
+                  java.lang.Boolean)]((null, null, null, null, null))
+      .toDF("a", "b", "c", "d", "e")
     checkAnswer(df.na.fill(Map(
                         "a" -> "test",
                         "c" -> 1,

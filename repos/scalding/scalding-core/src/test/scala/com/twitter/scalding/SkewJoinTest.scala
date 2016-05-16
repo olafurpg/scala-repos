@@ -54,10 +54,8 @@ object JoinTestHelper {
   val rng = new java.util.Random
   def generateInput(size: Int, max: Int): List[(String, String, String)] = {
     def next: String =
-      rng
-        .nextInt(max)
-        .toString
-      (0 to size).map { i =>
+      rng.nextInt(max).toString
+    (0 to size).map { i =>
       (next, next, next)
     }.toList
   }
@@ -89,7 +87,7 @@ object JoinTestHelper {
       .run
       //.runHadoop //this takes MUCH longer to run. Commented out by default, but tests pass on my machine
       .finish
-      (skewResult.toList.sorted, innerResult.toList.sorted)
+    (skewResult.toList.sorted, innerResult.toList.sorted)
   }
 }
 

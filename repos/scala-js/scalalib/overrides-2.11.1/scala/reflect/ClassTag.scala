@@ -36,7 +36,9 @@ import scala.runtime.ScalaRunTime.{arrayClass, arrayElementClass}
   */
 @scala.annotation.implicitNotFound(msg = "No ClassTag available for ${T}")
 trait ClassTag[T]
-    extends ClassManifestDeprecatedApis[T] with Equals with Serializable {
+    extends ClassManifestDeprecatedApis[T]
+    with Equals
+    with Serializable {
   // please, don't add any APIs here, like it was with `newWrappedArray` and `newArrayBuilder`
   // class tags, and all tags in general, should be as minimalistic as possible
 
@@ -88,7 +90,7 @@ trait ClassTag[T]
   def unapply(x: Boolean): Option[T] = unapply_impl(x)
   def unapply(x: Unit): Option[T] = unapply_impl(x)
 
-  private def unapply_impl[U : ClassTag](x: U): Option[T] =
+  private def unapply_impl[U: ClassTag](x: U): Option[T] =
     if (x == null) None
     else {
       val staticClass = classTag[U].runtimeClass

@@ -18,9 +18,9 @@ trait ThriftTest { self: FunSuite =>
   def ifaceManifest: ClassTag[Iface]
   val processor: Iface
   val ifaceToService: (Iface,
-  TProtocolFactory) => Service[Array[Byte], Array[Byte]]
+                       TProtocolFactory) => Service[Array[Byte], Array[Byte]]
   val serviceToIface: (Service[ThriftClientRequest, Array[Byte]],
-  TProtocolFactory) => Iface
+                       TProtocolFactory) => Iface
   val loopback = InetAddress.getLoopbackAddress
 
   /**
@@ -70,7 +70,8 @@ trait ThriftTest { self: FunSuite =>
   }
 
   private val newBuilderClient = (protocolFactory: TProtocolFactory,
-  addr: SocketAddress, clientIdOpt: Option[ClientId]) =>
+                                  addr: SocketAddress,
+                                  clientIdOpt: Option[ClientId]) =>
     new {
       val serviceFactory = ClientBuilder()
         .hosts(Seq(addr.asInstanceOf[InetSocketAddress]))
@@ -102,7 +103,8 @@ trait ThriftTest { self: FunSuite =>
   }
 
   private val newAPIClient = (protocolFactory: TProtocolFactory,
-  addr: SocketAddress, clientIdOpt: Option[ClientId]) =>
+                              addr: SocketAddress,
+                              clientIdOpt: Option[ClientId]) =>
     new {
       implicit val cls = ifaceManifest
       val client = {
@@ -128,7 +130,7 @@ trait ThriftTest { self: FunSuite =>
 
   // For some reason, the compiler needs some help here.
   private type NewClient = (TProtocolFactory, SocketAddress,
-  Option[ClientId]) => {
+                            Option[ClientId]) => {
     def close()
     val client: Iface
   }

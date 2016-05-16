@@ -43,8 +43,8 @@ sealed trait CPathTraversal { self =>
     */
   def rowOrder(cpaths: List[CPath],
                left: Map[CPath, Set[Column]],
-               optRight: Option[Map[CPath, Set[Column]]] = None)
-    : spire.math.Order[Int] = {
+               optRight: Option[Map[CPath, Set[Column]]] =
+                 None): spire.math.Order[Int] = {
     val right = optRight getOrElse left
 
     def plan0(t: CPathTraversal,
@@ -64,7 +64,7 @@ sealed trait CPathTraversal { self =>
         val rCols = makeCols(right)
 
         val comparators: Array[CPathComparator] = (for ((lPath, lCol) <- lCols;
-        (rPath, rCol) <- rCols) yield {
+                                                        (rPath, rCol) <- rCols) yield {
           CPathComparator(lPath, lCol, rPath, rCol)
         })(collection.breakOut)
 
@@ -105,8 +105,8 @@ sealed trait CPathTraversal { self =>
           def compare(r1: Int, r2: Int, indices: Array[Int]): MaybeOrdering = {
             var i = 0
             var result: MaybeOrdering = NoComp
-            while ( (result == Eq || result == NoComp) &&
-            i < comparators.length) {
+            while ((result == Eq || result == NoComp) &&
+                   i < comparators.length) {
               val iResult = comparators(i).compare(r1, r2, indices)
               if (iResult != NoComp) {
                 result = iResult

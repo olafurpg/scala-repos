@@ -58,13 +58,15 @@ class Use extends ScalaMatchingTask {
         log(
             "Compiling " + includedFiles.length + " file" +
             (if (includedFiles.length > 1)
-               "s" else "") + " to " + compiler.settings.d.getAbsolutePath)
+               "s"
+             else "") + " to " + compiler.settings.d.getAbsolutePath)
         val (errors, warnings) = compiler.compile(includedFiles)
         if (errors > 0)
-          sys.error("Compilation failed with " + errors + " error" +
-              (if (errors > 1) "s" else "") + ".")
+          sys.error("Compilation failed with " + errors +
+              " error" + (if (errors > 1) "s" else "") + ".")
         else if (warnings > 0)
-          log("Compilation succeeded with " + warnings + " warning" +
+          log(
+              "Compilation succeeded with " + warnings + " warning" +
               (if (warnings > 1) "s" else "") + ".")
       } catch {
         case CompilationFailure(msg, ex) =>

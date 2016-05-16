@@ -5,8 +5,8 @@ package a {
 
   trait GenericCons[U, M[_ <: U], T <: GenericList[U, M]]
       extends GenericList[U, M] {
-    type Transformed[N[MMB <: U]] = GenericCons[
-        U, N, GenericList[U, M]#Transformed[N]]
+    type Transformed[N[MMB <: U]] =
+      GenericCons[U, N, GenericList[U, M]#Transformed[N]]
   }
 }
 

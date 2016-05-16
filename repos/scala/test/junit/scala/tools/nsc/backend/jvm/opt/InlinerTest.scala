@@ -52,7 +52,7 @@ class InlinerTest extends ClearAfterClass {
   def compile(scalaCode: String,
               javaCode: List[(String, String)] = Nil,
               allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+                false): List[ClassNode] = {
     InlinerTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(scalaCode, javaCode, allowMessage)
     // Use the class nodes stored in the byteCodeRepository. The ones returned by compileClasses are not the same,
@@ -92,7 +92,7 @@ class InlinerTest extends ClearAfterClass {
 
   def canInlineTest(code: String,
                     mod: ClassNode => Unit = _ =>
-                        ()): Option[OptimizerWarning] = {
+                      ()): Option[OptimizerWarning] = {
     val cs = gMethAndFCallsite(code, mod)._2
     inliner.earlyCanInlineCheck(cs) orElse inliner.canInlineBody(cs)
   }
@@ -184,13 +184,10 @@ class InlinerTest extends ClearAfterClass {
         |}
       """.stripMargin
 
-    val can = canInlineTest(code,
-                            cls =>
-                              {
-                                val f =
-                                  cls.methods.asScala.find(_.name == "f").get
-                                f.access |= ACC_SYNCHRONIZED
-                            })
+    val can = canInlineTest(code, cls => {
+      val f = cls.methods.asScala.find(_.name == "f").get
+      f.access |= ACC_SYNCHRONIZED
+    })
     assert(can.nonEmpty && can.get.isInstanceOf[SynchronizedMethod], can)
   }
 
@@ -273,9 +270,9 @@ class InlinerTest extends ClearAfterClass {
     assert(gIns contains invokeG, gIns) // f is inlined into g, g invokes itself recursively
 
     assert(callGraph.callsites.size == 3, callGraph.callsites)
-    for (callsite <- callGraph.callsites.valuesIterator
-                      .flatMap(_.valuesIterator)
-                        if methods.contains(callsite.callsiteMethod)) {
+    for (callsite <- callGraph.callsites.valuesIterator.flatMap(
+                        _.valuesIterator)
+         if methods.contains(callsite.callsiteMethod)) {
       checkCallsite(callsite, g)
     }
   }
@@ -301,9 +298,9 @@ class InlinerTest extends ClearAfterClass {
     assert(
         callGraph.callsites.valuesIterator.flatMap(_.valuesIterator).size == 7,
         callGraph.callsites)
-    for (callsite <- callGraph.callsites.valuesIterator
-                      .flatMap(_.valuesIterator)
-                        if methods.contains(callsite.callsiteMethod)) {
+    for (callsite <- callGraph.callsites.valuesIterator.flatMap(
+                        _.valuesIterator)
+         if methods.contains(callsite.callsiteMethod)) {
       checkCallsite(callsite, g)
     }
   }
@@ -347,8 +344,7 @@ class InlinerTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compile(code)
-    assert(
-        callGraph.callsites.valuesIterator.flatMap(_.valuesIterator) exists
+    assert(callGraph.callsites.valuesIterator.flatMap(_.valuesIterator) exists
         (_.callsiteInstruction.name == "clone"))
   }
 
@@ -472,9 +468,10 @@ class InlinerTest extends ClearAfterClass {
         |Note that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: A""".stripMargin
 
     var c = 0
-    val List(b) = compile(scalaCode,
-                          List((javaCode, "A.java")),
-                          allowMessage = i => { c += 1; i.msg contains warn })
+    val List(b) = compile(
+        scalaCode, List((javaCode, "A.java")), allowMessage = i => {
+      c += 1; i.msg contains warn
+    })
     assert(c == 1, c)
     val ins = getSingleMethod(b, "g").instructions
     val invokeFlop = Invoke(INVOKEVIRTUAL, "B", "flop", "()I", false)
@@ -543,9 +540,9 @@ class InlinerTest extends ClearAfterClass {
         "C::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
         "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
     var count = 0
-    val List(c, t) = compile(
-        code,
-        allowMessage = i => { count += 1; warns.exists(i.msg contains _) })
+    val List(c, t) = compile(code, allowMessage = i => {
+      count += 1; warns.exists(i.msg contains _)
+    })
     // 3rd warnings because of mixin-method, see SD-86
     assert(count == 3, count)
     assertInvoke(getSingleMethod(c, "t1"), "T", "f")
@@ -588,9 +585,9 @@ class InlinerTest extends ClearAfterClass {
         |The callee O$::f()I contains the instruction INVOKESPECIAL T.f ()I
         |that would cause an IllegalAccessError when inlined into class C""".stripMargin)
     var count = 0
-    val List(c, oMirror, oModule, t) = compile(
-        code,
-        allowMessage = i => { count += 1; warns.exists(i.msg contains _) })
+    val List(c, oMirror, oModule, t) = compile(code, allowMessage = i => {
+      count += 1; warns.exists(i.msg contains _)
+    })
     assert(count == 3, count) // SD-86
 
 //    assertNoInvoke(getSingleMethod(oModule, "f")) // SD-86
@@ -701,9 +698,9 @@ class InlinerTest extends ClearAfterClass {
         "T2a::g2a()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
         "T1::g1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden")
     var count = 0
-    val List(ca, cb, t1, t2a, t2b) = compile(
-        code,
-        allowMessage = i => { count += 1; warnings.exists(i.msg contains _) })
+    val List(ca, cb, t1, t2a, t2b) = compile(code, allowMessage = i => {
+      count += 1; warnings.exists(i.msg contains _)
+    })
     assert(count == 8, count) // see comments, f is not inlined 4 times, additional warnings due to SD-86
 
     assertNoInvoke(getSingleMethod(t2a, "g2a"))
@@ -767,8 +764,8 @@ class InlinerTest extends ClearAfterClass {
     val t1 = getSingleMethod(t, "t1")
     val t2 = getSingleMethod(t, "t2")
     val cast = TypeOp(CHECKCAST, "C")
-    Set(t1, t2).foreach(
-        m => assert(m.instructions.contains(cast), m.instructions))
+    Set(t1, t2).foreach(m =>
+          assert(m.instructions.contains(cast), m.instructions))
   }
 
   @Test
@@ -846,7 +843,8 @@ class InlinerTest extends ClearAfterClass {
 
     val List(c, t, u) = compile(
         code,
-        allowMessage = _.msg contains "i()I is annotated @inline but cannot be inlined")
+        allowMessage =
+          _.msg contains "i()I is annotated @inline but cannot be inlined")
     val m1 = getSingleMethod(c, "m1")
     assertInvoke(m1, "T", "a")
     assertInvoke(m1, "T", "b")
@@ -907,9 +905,9 @@ class InlinerTest extends ClearAfterClass {
 
     compileClasses(
         newCompiler(extraArgs = InlinerTest.args + " -Yopt-warnings:_"))(
-        scalaCode,
-        List((javaCode, "A.java")),
-        allowMessage = i => { c += 1; i.msg contains warn })
+        scalaCode, List((javaCode, "A.java")), allowMessage = i => {
+      c += 1; i.msg contains warn
+    })
     assert(c == 1, c)
   }
 
@@ -947,8 +945,9 @@ class InlinerTest extends ClearAfterClass {
         |The callee B::f1()I contains the instruction INVOKESPECIAL Aa.f1 ()I
         |that would cause an IllegalAccessError when inlined into class T.""".stripMargin
     var c = 0
-    val List(a, b, t) = compile(
-        code, allowMessage = i => { c += 1; i.msg contains warn })
+    val List(a, b, t) = compile(code, allowMessage = i => {
+      c += 1; i.msg contains warn
+    })
     assert(c == 1, c)
 
     assertInvoke(getSingleMethod(b, "t1"), "Aa", "f1")
@@ -968,8 +967,8 @@ class InlinerTest extends ClearAfterClass {
         |  def t = System.arraycopy(null, 0, null, 0, 0)
         |}
       """.stripMargin
-    val List(c) = compileClasses(newCompiler(extraArgs = InlinerTest.args +
-              " -Yopt-inline-heuristics:everything"))(code)
+    val List(c) = compileClasses(newCompiler(extraArgs =
+              InlinerTest.args + " -Yopt-inline-heuristics:everything"))(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/System", "arraycopy")
   }
 
@@ -1065,10 +1064,9 @@ class InlinerTest extends ClearAfterClass {
     assert(warning.isEmpty, warning)
 
     inliner.inline(
-        InlineRequest(
-            hCall,
-            post = List(InlineRequest(
-                      gCall, post = List(InlineRequest(fCall, Nil))))))
+        InlineRequest(hCall,
+                      post = List(InlineRequest(
+                              gCall, post = List(InlineRequest(fCall, Nil))))))
     assertNoInvoke(convertMethod(iMeth)) // no invoke in i: first h is inlined, then the inlined call to g is also inlined, etc for f
     assertInvoke(convertMethod(gMeth), "C", "f") // g itself still has the call to f
   }

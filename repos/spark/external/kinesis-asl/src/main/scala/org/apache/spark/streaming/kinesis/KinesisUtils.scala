@@ -59,7 +59,7 @@ object KinesisUtils {
     * @param messageHandler A custom message handler that can generate a generic output from a
     *                       Kinesis `Record`, which contains both message data, and metadata.
     */
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,
@@ -117,7 +117,7 @@ object KinesisUtils {
     * @param awsSecretKey  AWS SecretKey (if null, will use DefaultAWSCredentialsProviderChain)
     */
   // scalastyle:off
-  def createStream[T : ClassTag](
+  def createStream[T: ClassTag](
       ssc: StreamingContext,
       kinesisAppName: String,
       streamName: String,

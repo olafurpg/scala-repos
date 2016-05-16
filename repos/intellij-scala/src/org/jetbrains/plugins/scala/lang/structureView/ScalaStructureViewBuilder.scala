@@ -12,9 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * @author Alexander.Podkhalyuz
   * Date: 04.05.2008
   */
-class ScalaStructureViewBuilder(
-    private val myPsiFile: ScalaFile,
-    private val console: ScalaLanguageConsole = null)
+class ScalaStructureViewBuilder(private val myPsiFile: ScalaFile,
+                                private val console: ScalaLanguageConsole =
+                                  null)
     extends TreeBasedStructureViewBuilder {
 
   @NotNull

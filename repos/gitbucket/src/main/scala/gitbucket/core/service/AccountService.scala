@@ -124,8 +124,8 @@ trait AccountService {
           (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
           (t.removed === false.bind, !includeRemoved)) firstOption
 
-  def getAllUsers(
-      includeRemoved: Boolean = true)(implicit s: Session): List[Account] =
+  def getAllUsers(includeRemoved: Boolean = true)(
+      implicit s: Session): List[Account] =
     if (includeRemoved) {
       Accounts sortBy (_.userName) list
     } else {
@@ -184,8 +184,8 @@ trait AccountService {
       .map(_.lastLoginDate)
       .update(currentDate)
 
-  def createGroup(
-      groupName: String, url: Option[String])(implicit s: Session): Unit =
+  def createGroup(groupName: String, url: Option[String])(
+      implicit s: Session): Unit =
     Accounts insert Account(userName = groupName,
                             password = "",
                             fullName = groupName,

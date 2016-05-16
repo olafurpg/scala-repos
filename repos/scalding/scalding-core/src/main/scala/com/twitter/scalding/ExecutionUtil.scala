@@ -25,8 +25,8 @@ object ExecutionUtil {
     * @param fn Function to run a execution given a date range
     * @return Seq of Dates split by Duration with corresponding execution result
     */
-  def runDatesWithParallelism[T](duration: Duration, parallelism: Int = 1)(
-      fn: DateRange => Execution[T])(
+  def runDatesWithParallelism[T](
+      duration: Duration, parallelism: Int = 1)(fn: DateRange => Execution[T])(
       implicit dr: DateRange): Execution[Seq[(DateRange, T)]] = {
 
     val dates = dr.each(duration).toSeq

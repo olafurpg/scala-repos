@@ -39,9 +39,9 @@ package object util {
     * @param ignoreSerialVersionUID this is not a safe thing to do, but sometimes...
     * @return
     */
-  def nonstupidObjectInputStream(
-      stream: InputStream,
-      ignoreSerialVersionUID: Boolean = false): ObjectInputStream = {
+  def nonstupidObjectInputStream(stream: InputStream,
+                                 ignoreSerialVersionUID: Boolean =
+                                   false): ObjectInputStream = {
     new ObjectInputStream(stream) with SerializableLogging {
       @throws[IOException]
       @throws[ClassNotFoundException]
@@ -86,7 +86,8 @@ package object util {
               s.append(" stream serialVersionUID = ").append(streamSUID)
               val e = new InvalidClassException(s.toString())
               logger.error("Potentially Fatal Deserialization Operation.", e);
-              resultClassDescriptor = localClassDescriptor; // Use local class descriptor for deserialization
+              resultClassDescriptor =
+                localClassDescriptor; // Use local class descriptor for deserialization
             }
           }
         }

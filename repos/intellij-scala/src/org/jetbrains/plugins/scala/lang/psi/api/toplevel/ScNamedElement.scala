@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.JavaIdentifi
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 trait ScNamedElement
-    extends ScalaPsiElement with PsiNameIdentifierOwner
+    extends ScalaPsiElement
+    with PsiNameIdentifierOwner
     with NavigatablePsiElement {
   def name: String = {
     this match {

@@ -109,7 +109,7 @@ object Pregel extends Logging {
     * @return the resulting graph at the end of the computation
     *
     */
-  def apply[VD : ClassTag, ED : ClassTag, A : ClassTag](
+  def apply[VD: ClassTag, ED: ClassTag, A: ClassTag](
       graph: Graph[VD, ED],
       initialMsg: A,
       maxIterations: Int = Int.MaxValue,

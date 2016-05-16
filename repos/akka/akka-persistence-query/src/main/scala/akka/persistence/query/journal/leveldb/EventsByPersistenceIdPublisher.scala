@@ -58,7 +58,8 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
     val fromSequenceNr: Long,
     val maxBufSize: Int,
     val writeJournalPluginId: String)
-    extends ActorPublisher[EventEnvelope] with DeliveryBuffer[EventEnvelope]
+    extends ActorPublisher[EventEnvelope]
+    with DeliveryBuffer[EventEnvelope]
     with ActorLogging {
   import EventsByPersistenceIdPublisher._
 

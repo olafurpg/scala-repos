@@ -45,10 +45,10 @@ object ResourceMatcher {
     *                 a ReservationInfo are considered.
     * @param requiredLabels only resources with the given keys/values are matched.
     */
-  case class ResourceSelector(
-      acceptedRoles: Set[String],
-      reserved: Boolean,
-      requiredLabels: ResourceLabels = ResourceLabels.empty) {
+  case class ResourceSelector(acceptedRoles: Set[String],
+                              reserved: Boolean,
+                              requiredLabels: ResourceLabels =
+                                ResourceLabels.empty) {
     def apply(resource: Protos.Resource): Boolean = {
       // resources with disks are matched by the VolumeMatcher or not at all
       val noAssociatedDisk = !resource.hasDisk
@@ -169,17 +169,16 @@ object ResourceMatcher {
       selector: ResourceSelector)(
       name: String,
       requiredValue: Double,
-      scope: ScalarMatchResult.Scope = ScalarMatchResult.Scope.NoneDisk)
-    : ScalarMatchResult = {
+      scope: ScalarMatchResult.Scope =
+        ScalarMatchResult.Scope.NoneDisk): ScalarMatchResult = {
 
     require(scope == ScalarMatchResult.Scope.NoneDisk || name == Resource.DISK)
 
     @tailrec
-    def findMatches(
-        valueLeft: Double,
-        resourcesLeft: Iterable[Protos.Resource],
-        resourcesConsumed: List[ScalarMatch.Consumption] = List.empty)
-      : ScalarMatchResult = {
+    def findMatches(valueLeft: Double,
+                    resourcesLeft: Iterable[Protos.Resource],
+                    resourcesConsumed: List[ScalarMatch.Consumption] =
+                      List.empty): ScalarMatchResult = {
       if (valueLeft <= 0) {
         ScalarMatch(name, requiredValue, resourcesConsumed, scope = scope)
       } else {
@@ -192,7 +191,8 @@ object ResourceMatcher {
             val newValueLeft = valueLeft - consume
             val reservation =
               if (nextResource.hasReservation)
-                Option(nextResource.getReservation) else None
+                Option(nextResource.getReservation)
+              else None
             val consumedValue = ScalarMatch.Consumption(
                 consume, nextResource.getRole, reservation)
             findMatches(newValueLeft,

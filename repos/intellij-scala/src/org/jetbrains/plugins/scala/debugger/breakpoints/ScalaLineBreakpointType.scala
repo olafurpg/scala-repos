@@ -114,8 +114,9 @@ class ScalaLineBreakpointType
 
     var ordinal: Int = 0
     for ((lambda, ord) <- lambdas.zipWithIndex) {
-      res = res :+ new ExactScalaBreakpointVariant(
-          XSourcePositionImpl.createByElement(lambda), lambda, ordinal)
+      res =
+        res :+ new ExactScalaBreakpointVariant(
+            XSourcePositionImpl.createByElement(lambda), lambda, ordinal)
       ordinal += 1
     }
 

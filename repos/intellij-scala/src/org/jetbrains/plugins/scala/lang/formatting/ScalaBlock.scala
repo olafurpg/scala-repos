@@ -33,7 +33,9 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
                  protected var myWrap: Wrap,
                  protected val mySettings: CodeStyleSettings,
                  val subBlocksContext: Option[SubBlocksContext] = None)
-    extends Object with ScalaTokenTypes with ASTBlock {
+    extends Object
+    with ScalaTokenTypes
+    with ASTBlock {
 
   protected var mySubBlocks: util.List[Block] = null
 
@@ -69,8 +71,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       mySettings.BRACE_STYLE == CommonCodeStyleSettings.NEXT_LINE_SHIFTED
     def isBlockOnlyScope(scope: PsiElement) =
       !isLeaf && Set(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tLPARENTHESIS)
-        .contains(scope.getNode.getElementType) &&
-      (scope.getParent match {
+        .contains(scope.getNode.getElementType) && (scope.getParent match {
             case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
             case _ => false
           })
@@ -182,8 +183,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
   private def isConstructorArgOrMemberFunctionParameter(
       paramClause: ScParameterClause): Boolean = {
     val owner = paramClause.owner
-    owner != null &&
-    (owner.isInstanceOf[ScPrimaryConstructor] ||
+    owner != null && (owner.isInstanceOf[ScPrimaryConstructor] ||
         owner.isInstanceOf[ScFunction])
   }
 
@@ -211,8 +211,8 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     if (node.getPsi.isInstanceOf[PsiErrorElement]) return true
     var lastChild = node.getLastChildNode
     while (lastChild != null &&
-    (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
-        lastChild.getPsi.isInstanceOf[PsiComment])) {
+           (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
+               lastChild.getPsi.isInstanceOf[PsiComment])) {
       lastChild = lastChild.getTreePrev
     }
     if (lastChild == null) {

@@ -4,7 +4,9 @@ package transform
 import scala.collection.mutable
 
 abstract class LazyVals
-    extends Transform with TypingTransformers with ast.TreeDSL {
+    extends Transform
+    with TypingTransformers
+    with ast.TreeDSL {
   // inherits abstract value `global` and class `Phase` from Transform
 
   import global._ // the global environment
@@ -60,8 +62,7 @@ abstract class LazyVals
 
     import symtab.Flags._
     private def flattenThickets(stats: List[Tree]): List[Tree] =
-      stats.flatMap(
-          _ match {
+      stats.flatMap(_ match {
         case b @ Block(List(d1 @ DefDef(_, n1, _, _, _, _)),
                        d2 @ DefDef(_, n2, _, _, _, _))
             if b.tpe == null && n1.endsWith(nme.LAZY_SLOW_SUFFIX) =>
@@ -154,7 +155,8 @@ abstract class LazyVals
 
             val ddef1 = deriveDefDef(tree)(_ =>
                   if (LocalLazyValFinder.find(res))
-                    typed(addBitmapDefs(sym, res)) else res)
+                    typed(addBitmapDefs(sym, res))
+                  else res)
             if (slowPathDef != EmptyTree) {
               // The contents of this block are flattened into the enclosing statement sequence, see flattenThickets
               // This is a poor man's version of dotty's Thicket: https://github.com/lampepfl/dotty/blob/d5280358d1/src/dotty/tools/dotc/ast/Trees.scala#L707
@@ -184,17 +186,16 @@ abstract class LazyVals
                 val toAdd0 =
                   bitmaps(currentOwner).map(s => typed(ValDef(s, ZERO)))
                 toAdd0.foreach(
-                    t =>
-                      {
-                    if (currentOwner.info.decl(t.symbol.name) == NoSymbol) {
-                      t.symbol.setFlag(PROTECTED)
-                      currentOwner.info.decls.enter(t.symbol)
-                    }
+                    t => {
+                  if (currentOwner.info.decl(t.symbol.name) == NoSymbol) {
+                    t.symbol.setFlag(PROTECTED)
+                    currentOwner.info.decls.enter(t.symbol)
+                  }
                 })
                 toAdd0
               } else List()
-            deriveTemplate(tree)(
-                _ => innerClassBitmaps ++ flattenThickets(stats))
+            deriveTemplate(tree)(_ =>
+                  innerClassBitmaps ++ flattenThickets(stats))
           }
 
         case ValDef(_, _, _, _) if !sym.owner.isModule && !sym.owner.isClass =>

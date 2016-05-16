@@ -64,7 +64,8 @@ trait Reshape { self: Reifier =>
           val discardedParents =
             parents collect { case tt: TypeTree => tt } filter isDiscarded
           if (reifyDebug && discardedParents.length > 0)
-            println("discarding parents in Template: " +
+            println(
+                "discarding parents in Template: " +
                 discardedParents.mkString(", "))
           val parents1 = parents diff discardedParents
           val body1 = reshapeLazyVals(trimSyntheticCaseClassCompanions(body))
@@ -172,8 +173,7 @@ trait Reshape { self: Reifier =>
         if (reifyDebug)
           println("TypeTree, essential: %s (%s)".format(tt.tpe, tt.tpe.kind))
         if (reifyDebug)
-          println(
-              "verdict: rolled back to original %s".format(
+          println("verdict: rolled back to original %s".format(
                   tt.original.toString.replaceAll("\\s+", " ")))
         transform(tt.original)
       } else {
@@ -291,38 +291,38 @@ trait Reshape { self: Reifier =>
           (vodeff => vodeff.symbol -> vodeff)).toMap
       val accessors = scala.collection.mutable.Map[ValDef, List[DefDef]]()
       stats collect { case ddef: DefDef => ddef } foreach
-      (defdef =>
-            {
-              val valdef =
-                symdefs get defdef.symbol.accessedOrSelf collect {
-                  case vdef: ValDef => vdef
-                } getOrElse null
-              if (valdef != null)
-                accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
+      (defdef => {
+            val valdef =
+              symdefs get defdef.symbol.accessedOrSelf collect {
+                case vdef: ValDef => vdef
+              } getOrElse null
+            if (valdef != null)
+              accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
 
-              def detectBeanAccessors(prefix: String): Unit = {
-                if (defdef.name.startsWith(prefix)) {
-                  val name = defdef.name.toString.substring(prefix.length)
-                  def uncapitalize(s: String) =
-                    if (s.length == 0) ""
-                    else {
-                      val chars = s.toCharArray; chars(0) = chars(0).toLower;
-                      new String(chars)
-                    }
-                  def findValDef(name: String) = symdefs.values collectFirst {
-                    case vdef: ValDef if vdef.name.dropLocal string_== name =>
-                      vdef
+            def detectBeanAccessors(prefix: String): Unit = {
+              if (defdef.name.startsWith(prefix)) {
+                val name = defdef.name.toString.substring(prefix.length)
+                def uncapitalize(s: String) =
+                  if (s.length == 0) ""
+                  else {
+                    val chars = s.toCharArray; chars(0) = chars(0).toLower;
+                    new String(chars)
                   }
-                  val valdef = findValDef(name)
-                    .orElse(findValDef(uncapitalize(name)))
-                    .orNull
-                  if (valdef != null)
-                    accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
+                def findValDef(name: String) = symdefs.values collectFirst {
+                  case vdef: ValDef if vdef.name.dropLocal string_== name =>
+                    vdef
                 }
+                val valdef = findValDef(name)
+                  .orElse(findValDef(uncapitalize(name)))
+                  .orNull
+                if (valdef != null)
+                  accessors(valdef) =
+                    accessors.getOrElse(valdef, Nil) :+ defdef
               }
-              detectBeanAccessors("get")
-              detectBeanAccessors("set")
-              detectBeanAccessors("is")
+            }
+            detectBeanAccessors("get")
+            detectBeanAccessors("set")
+            detectBeanAccessors("is")
           })
 
       val stats1 =
@@ -419,17 +419,16 @@ trait Reshape { self: Reifier =>
         stats: List[Tree]): List[Tree] =
       stats diff
       (stats collect { case moddef: ModuleDef => moddef } filter
-          (moddef =>
-                {
-                  val isSynthetic = moddef.symbol.isSynthetic
-                  // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
-                  // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
-                  // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
-                  val isCaseCompanion = true
-                  if (isSynthetic && isCaseCompanion && reifyDebug)
-                    println(
-                        "discarding synthetic case class companion: " + moddef)
-                  isSynthetic && isCaseCompanion
+          (moddef => {
+                val isSynthetic = moddef.symbol.isSynthetic
+                // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
+                // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
+                // val isCaseCompanion = moddef.symbol.companionClass.isCaseClass
+                val isCaseCompanion = true
+                if (isSynthetic && isCaseCompanion && reifyDebug)
+                  println(
+                      "discarding synthetic case class companion: " + moddef)
+                isSynthetic && isCaseCompanion
               }))
   }
 }

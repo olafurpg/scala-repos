@@ -50,7 +50,7 @@ trait BooleanTypedField extends TypedField[Boolean] {
     SHtml.checkbox(
         valueBox openOr false,
         (b: Boolean) => this.setBox(Full(b)),
-        ( ("tabindex" -> tabIndex.toString): SHtml.ElemAttr) :: attrs.toList: _*)
+        (("tabindex" -> tabIndex.toString): SHtml.ElemAttr) :: attrs.toList: _*)
 
   def toForm: Box[NodeSeq] =
     // FIXME? no support for optional_?
@@ -70,7 +70,8 @@ trait BooleanTypedField extends TypedField[Boolean] {
 }
 
 class BooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Boolean, OwnerType] with MandatoryTypedField[Boolean]
+    extends Field[Boolean, OwnerType]
+    with MandatoryTypedField[Boolean]
     with BooleanTypedField {
 
   def owner = rec
@@ -84,7 +85,8 @@ class BooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalBooleanField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Boolean, OwnerType] with OptionalTypedField[Boolean]
+    extends Field[Boolean, OwnerType]
+    with OptionalTypedField[Boolean]
     with BooleanTypedField {
 
   def owner = rec

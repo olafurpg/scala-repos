@@ -239,8 +239,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     new Task(get.unsafePerformTimed(timeoutInMillis).map(_.join))
 
   def unsafePerformTimed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Task[A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Task[A] =
     unsafePerformTimed(timeout.toMillis)
 
   @deprecated("use unsafePerformTimed", "7.2")
@@ -249,9 +249,8 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     unsafePerformTimed(timeoutInMillis)
 
   @deprecated("use unsafePerformTimed", "7.2")
-  def timed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Task[A] =
+  def timed(timeout: Duration)(implicit scheduler: ScheduledExecutorService =
+                                 Strategy.DefaultTimeoutScheduler): Task[A] =
     unsafePerformTimed(timeout)
 
   /**
@@ -262,14 +261,15 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     */
   def unsafePerformRetryAccumulating(
       delays: Seq[Duration],
-      p: (Throwable => Boolean) = _.isInstanceOf[Exception])
-    : Task[(A, List[Throwable])] =
+      p: (Throwable => Boolean) =
+        _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
     unsafeRetryInternal(delays, p, true)
 
   @deprecated("use unsafePerformRetryAccumulating", "7.2")
-  def retryAccumulating(delays: Seq[Duration],
-                        p: (Throwable => Boolean) = _.isInstanceOf[Exception])
-    : Task[(A, List[Throwable])] =
+  def retryAccumulating(
+      delays: Seq[Duration],
+      p: (Throwable => Boolean) =
+        _.isInstanceOf[Exception]): Task[(A, List[Throwable])] =
     unsafePerformRetryAccumulating(delays, p)
 
   /**
@@ -277,9 +277,9 @@ class Task[+A](val get: Future[Throwable \/ A]) {
     * each retry delayed by the corresponding duration.
     * A retriable failure is one for which the predicate `p` returns `true`.
     */
-  def unsafePerformRetry(
-      delays: Seq[Duration],
-      p: (Throwable => Boolean) = _.isInstanceOf[Exception]): Task[A] =
+  def unsafePerformRetry(delays: Seq[Duration],
+                         p: (Throwable => Boolean) =
+                           _.isInstanceOf[Exception]): Task[A] =
     unsafeRetryInternal(delays, p, false).map(_._1)
 
   @deprecated("use unsafePerformRetry", "7.2")
@@ -334,8 +334,8 @@ object Task {
           a.map((_, residuals.map(new Task(_))))
       })
     override def gatherUnordered[A](fs: Seq[Task[A]]): Task[List[A]] = {
-      new Task(F.map(F.gatherUnordered(fs.map(_ get)))(
-              eithers => Traverse[List].sequenceU(eithers)))
+      new Task(F.map(F.gatherUnordered(fs.map(_ get)))(eithers =>
+                Traverse[List].sequenceU(eithers)))
     }
     def fail[A](e: Throwable): Task[A] = new Task(Future.now(-\/(e)))
     def attempt[A](a: Task[A]): Task[Throwable \/ A] = a.attempt
@@ -381,9 +381,8 @@ object Task {
     }))
 
   /** Create a `Task` that will evaluate `a` using the given `ExecutorService`. */
-  def apply[A](a: => A)(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Task[A] =
+  def apply[A](a: => A)(implicit pool: ExecutorService =
+                          Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Try(a))(pool))
 
   /**
@@ -392,9 +391,8 @@ object Task {
     * `unsafePerformIO`. The resulting `Task` cannot be rerun to repeat the effects.
     * Use with care.
     */
-  def unsafeStart[A](a: => A)(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Task[A] =
+  def unsafeStart[A](a: => A)(implicit pool: ExecutorService =
+                                Strategy.DefaultExecutorService): Task[A] =
     new Task(Future(Task.Try(a))(pool).unsafeStart)
 
   /**
@@ -403,9 +401,8 @@ object Task {
     * the given `ExecutorService`. Note that this forking is only described
     * by the returned `Task`--nothing occurs until the `Task` is run.
     */
-  def fork[A](a: => Task[A])(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Task[A] =
+  def fork[A](a: => Task[A])(implicit pool: ExecutorService =
+                               Strategy.DefaultExecutorService): Task[A] =
     apply(a).join
 
   /**
@@ -417,9 +414,10 @@ object Task {
   def async[A](register: ((Throwable \/ A) => Unit) => Unit): Task[A] =
     new Task(Future.async(register))
 
-  def schedule[A](a: => A, delay: Duration)(
-      implicit pool: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Task[A] = new Task(Future.schedule(Try(a), delay))
+  def schedule[A](
+      a: => A, delay: Duration)(implicit pool: ScheduledExecutorService =
+                                  Strategy.DefaultTimeoutScheduler): Task[A] =
+    new Task(Future.schedule(Try(a), delay))
 
   /**
     * Like `Nondeterminism[Task].gatherUnordered`, but if `exceptionCancels` is true,
@@ -459,8 +457,8 @@ object Task {
 
                   // only last completed f will hit the 0 here.
                   if (togo.decrementAndGet() == 0)
-                    cb(\/-(results.toList.foldLeft(R.zero)((a,
-                                b) => R.append(a, b))))
+                    cb(\/-(results.toList.foldLeft(R.zero)((a, b) =>
+                                  R.append(a, b))))
                   else Trampoline.done(())
                 case e @ (-\/(failure)) =>
                   // Only allow the first failure to invoke the callback, so we

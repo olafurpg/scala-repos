@@ -33,7 +33,8 @@ case class LogicalRelation(
     relation: BaseRelation,
     expectedOutputAttributes: Option[Seq[Attribute]] = None,
     metastoreTableIdentifier: Option[TableIdentifier] = None)
-    extends LeafNode with MultiInstanceRelation {
+    extends LeafNode
+    with MultiInstanceRelation {
 
   override val output: Seq[AttributeReference] = {
     val attrs = relation.schema.toAttributes

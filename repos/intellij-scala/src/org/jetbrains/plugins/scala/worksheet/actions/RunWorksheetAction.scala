@@ -110,22 +110,17 @@ object RunWorksheetAction {
 
         def runnable() = {
           new WorksheetCompiler().compileAndRun(
-              editor,
-              file,
-              (className: String, addToCp: String) =>
-                {
-                  ApplicationManager.getApplication invokeLater new Runnable {
-                    override def run() {
-                      executeWorksheet(file.getName,
-                                       project,
-                                       file.getContainingFile,
-                                       className,
-                                       addToCp)
-                    }
-                  }
-              },
-              Option(editor),
-              auto)
+              editor, file, (className: String, addToCp: String) => {
+            ApplicationManager.getApplication invokeLater new Runnable {
+              override def run() {
+                executeWorksheet(file.getName,
+                                 project,
+                                 file.getContainingFile,
+                                 className,
+                                 addToCp)
+              }
+            }
+          }, Option(editor), auto)
         }
 
         if (WorksheetCompiler isMakeBeforeRun psiFile) {

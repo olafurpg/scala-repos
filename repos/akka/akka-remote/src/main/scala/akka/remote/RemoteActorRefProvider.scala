@@ -34,7 +34,8 @@ private[akka] object RemoteActorRefProvider {
   case object Finished extends TerminatorState
 
   private class RemotingTerminator(systemGuardian: ActorRef)
-      extends Actor with FSM[TerminatorState, Option[Internals]]
+      extends Actor
+      with FSM[TerminatorState, Option[Internals]]
       with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
     import context.dispatcher
 
@@ -184,13 +185,13 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
     val internals = Internals(
         remoteDaemon = {
-          val d = new RemoteSystemDaemon(
-              system,
-              local.rootPath / "remote",
-              rootGuardian,
-              remotingTerminator,
-              log,
-              untrustedMode = remoteSettings.UntrustedMode)
+          val d = new RemoteSystemDaemon(system,
+                                         local.rootPath / "remote",
+                                         rootGuardian,
+                                         remotingTerminator,
+                                         log,
+                                         untrustedMode =
+                                           remoteSettings.UntrustedMode)
           local.registerExtraNames(Map(("remote", d)))
           d
         },
@@ -214,11 +215,12 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
         configureDispatcher(
-            RemoteWatcher.props(
-                failureDetector,
-                heartbeatInterval = WatchHeartBeatInterval,
-                unreachableReaperInterval = WatchUnreachableReaperInterval,
-                heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter)),
+            RemoteWatcher.props(failureDetector,
+                                heartbeatInterval = WatchHeartBeatInterval,
+                                unreachableReaperInterval =
+                                  WatchUnreachableReaperInterval,
+                                heartbeatExpectedResponseAfter =
+                                  WatchHeartbeatExpectedResponseAfter)),
         "remote-watcher")
   }
 
@@ -553,7 +555,8 @@ private[akka] class RemoteActorRef private[akka](
     val getParent: InternalActorRef,
     props: Option[Props],
     deploy: Option[Deploy])
-    extends InternalActorRef with RemoteRef {
+    extends InternalActorRef
+    with RemoteRef {
 
   def getChild(name: Iterator[String]): InternalActorRef = {
     val s = name.toStream

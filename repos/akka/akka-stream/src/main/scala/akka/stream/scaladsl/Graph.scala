@@ -175,12 +175,10 @@ final class MergePreferred[T] private (
 
       setHandler(out, eagerTerminateOutput)
 
-      val pullMe = Array.tabulate(secondaryPorts)(
-          i ⇒
-            {
-          val port = in(i)
-          () ⇒
-            tryPull(port)
+      val pullMe = Array.tabulate(secondaryPorts)(i ⇒ {
+        val port = in(i)
+        () ⇒
+          tryPull(port)
       })
 
       /*
@@ -204,11 +202,10 @@ final class MergePreferred[T] private (
           tryPull(preferred)
         }
 
-        val emitted = () ⇒
-          {
-            preferredEmitting -= 1
-            if (isAvailable(preferred)) emitPreferred()
-            else if (preferredEmitting == 0) emitSecondary()
+        val emitted = () ⇒ {
+          preferredEmitting -= 1
+          if (isAvailable(preferred)) emitPreferred()
+          else if (preferredEmitting == 0) emitSecondary()
         }
 
         def emitSecondary(): Unit = {
@@ -249,10 +246,10 @@ object Interleave {
     * @param segmentSize number of elements to send downstream before switching to next input port
     * @param eagerClose if true, interleave completes upstream if any of its upstream completes.
     */
-  def apply[T](
-      inputPorts: Int,
-      segmentSize: Int,
-      eagerClose: Boolean = false): Graph[UniformFanInShape[T, T], NotUsed] =
+  def apply[T](inputPorts: Int,
+               segmentSize: Int,
+               eagerClose: Boolean =
+                 false): Graph[UniformFanInShape[T, T], NotUsed] =
     GraphStages.withDetachedInputs(
         new Interleave[T](inputPorts, segmentSize, eagerClose))
 }
@@ -351,8 +348,7 @@ final class Interleave[T] private (
   *
   * '''Cancels when''' downstream cancels
   */
-final class MergeSorted[T : Ordering]
-    extends GraphStage[FanInShape2[T, T, T]] {
+final class MergeSorted[T: Ordering] extends GraphStage[FanInShape2[T, T, T]] {
   private val left = Inlet[T]("left")
   private val right = Inlet[T]("right")
   private val out = Outlet[T]("out")
@@ -386,12 +382,10 @@ final class MergeSorted[T : Ordering]
     override def preStart(): Unit = {
       // all fan-in stages need to eagerly pull all inputs to get cycles started
       pull(right)
-      read(left)(l ⇒
-                   {
-                     other = l
-                     readR()
-                 },
-                 () ⇒ passAlong(right, out))
+      read(left)(l ⇒ {
+        other = l
+        readR()
+      }, () ⇒ passAlong(right, out))
     }
   }
 }
@@ -499,7 +493,8 @@ final class Broadcast[T](private val outputPorts: Int, eagerCancel: Boolean)
 object Partition {
 
   case class PartitionOutOfBoundsException(msg: String)
-      extends IndexOutOfBoundsException(msg) with NoStackTrace
+      extends IndexOutOfBoundsException(msg)
+      with NoStackTrace
 
   /**
     * Create a new `Partition` stage with the specified input type.
@@ -830,7 +825,7 @@ final class Concat[T](inputPorts: Int)
                 activeStream += 1
                 // Skip closed inputs
                 while (activeStream < inputPorts &&
-                isClosed(in(activeStream))) activeStream += 1
+                       isClosed(in(activeStream))) activeStream += 1
                 if (activeStream == inputPorts) completeStage()
                 else if (isAvailable(out)) pull(in(activeStream))
               }
@@ -1138,30 +1133,36 @@ object GraphDSL extends GraphApply {
     }
 
     implicit final class FanInOps[In, Out](val j: UniformFanInShape[In, Out])
-        extends AnyVal with CombinerBase[Out] with ReverseCombinerBase[In] {
+        extends AnyVal
+        with CombinerBase[Out]
+        with ReverseCombinerBase[In] {
       override def importAndGetPort(b: Builder[_]): Outlet[Out] = j.out
       override def importAndGetPortReverse(b: Builder[_]): Inlet[In] =
         findIn(b, j, 0)
     }
 
     implicit final class FanOutOps[In, Out](val j: UniformFanOutShape[In, Out])
-        extends AnyVal with ReverseCombinerBase[In] {
+        extends AnyVal
+        with ReverseCombinerBase[In] {
       override def importAndGetPortReverse(b: Builder[_]): Inlet[In] = j.in
     }
 
     implicit final class SinkArrow[T](val s: Graph[SinkShape[T], _])
-        extends AnyVal with ReverseCombinerBase[T] {
+        extends AnyVal
+        with ReverseCombinerBase[T] {
       override def importAndGetPortReverse(b: Builder[_]): Inlet[T] =
         b.add(s).in
     }
 
     implicit final class SinkShapeArrow[T](val s: SinkShape[T])
-        extends AnyVal with ReverseCombinerBase[T] {
+        extends AnyVal
+        with ReverseCombinerBase[T] {
       override def importAndGetPortReverse(b: Builder[_]): Inlet[T] = s.in
     }
 
     implicit final class FlowShapeArrow[I, O](val f: FlowShape[I, O])
-        extends AnyVal with ReverseCombinerBase[I] {
+        extends AnyVal
+        with ReverseCombinerBase[I] {
       override def importAndGetPortReverse(b: Builder[_]): Inlet[I] = f.in
 
       def <~>[I2, O2, Mat](bidi: Graph[BidiShape[O, O2, I2, I], Mat])(
@@ -1261,12 +1262,14 @@ object GraphDSL extends GraphApply {
       new PortOpsImpl(f.out, b)
 
     implicit final class SourceArrow[T](val s: Graph[SourceShape[T], _])
-        extends AnyVal with CombinerBase[T] {
+        extends AnyVal
+        with CombinerBase[T] {
       override def importAndGetPort(b: Builder[_]): Outlet[T] = b.add(s).out
     }
 
     implicit final class SourceShapeArrow[T](val s: SourceShape[T])
-        extends AnyVal with CombinerBase[T] {
+        extends AnyVal
+        with CombinerBase[T] {
       override def importAndGetPort(b: Builder[_]): Outlet[T] = s.out
     }
   }

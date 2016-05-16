@@ -410,10 +410,9 @@ private[stream] final class GraphInterpreter(
 
   private def queueStatus: String = {
     val contents = (queueHead until queueTail).map(
-        idx ⇒
-          {
-        val conn = eventQueue(idx & mask)
-        (conn, portStates(conn), connectionSlots(conn))
+        idx ⇒ {
+      val conn = eventQueue(idx & mask)
+      (conn, portStates(conn), connectionSlots(conn))
     })
     s"(${eventQueue.length}, $queueHead, $queueTail)(${contents.mkString(", ")})"
   }
@@ -652,8 +651,7 @@ private[stream] final class GraphInterpreter(
       val stageId = assembly.outOwners(connection)
       activeStage = safeLogics(stageId)
       if (Debug)
-        println(
-            s"$Name CANCEL ${inOwnerName(connection)} -> ${outOwnerName(
+        println(s"$Name CANCEL ${inOwnerName(connection)} -> ${outOwnerName(
             connection)} (${outHandlers(connection)}) [${outLogicName(connection)}]")
       portStates(connection) |= OutClosed
       completeConnection(stageId)

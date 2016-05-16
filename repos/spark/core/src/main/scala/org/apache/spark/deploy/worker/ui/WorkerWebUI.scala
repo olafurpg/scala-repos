@@ -35,7 +35,8 @@ private[worker] class WorkerWebUI(
                   worker.securityMgr.getSSLOptions("standalone"),
                   requestedPort,
                   worker.conf,
-                  name = "WorkerUI") with Logging {
+                  name = "WorkerUI")
+    with Logging {
 
   private[ui] val timeout = RpcUtils.askRpcTimeout(worker.conf)
 
@@ -49,11 +50,11 @@ private[worker] class WorkerWebUI(
     attachHandler(
         createStaticHandler(WorkerWebUI.STATIC_RESOURCE_BASE, "/static"))
     attachHandler(
-        createServletHandler(
-            "/log",
-            (request: HttpServletRequest) => logPage.renderLog(request),
-            worker.securityMgr,
-            worker.conf))
+        createServletHandler("/log",
+                             (request: HttpServletRequest) =>
+                               logPage.renderLog(request),
+                             worker.securityMgr,
+                             worker.conf))
   }
 }
 

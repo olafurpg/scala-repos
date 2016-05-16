@@ -92,8 +92,8 @@ final class ScalaJSRunner private[testadapter](
     }
 
     // Now we wait for everyone to be completely stopped
-    val slavesStopped = slaves.values.toList
-      .map(s => Try(s.awaitOrStop(slavesDeadline.timeLeft)))
+    val slavesStopped = slaves.values.toList.map(s =>
+          Try(s.awaitOrStop(slavesDeadline.timeLeft)))
     val masterStopped = Try(master.awaitOrStop(masterDeadline.timeLeft))
 
     // Cleanup

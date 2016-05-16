@@ -7,8 +7,8 @@ object Nats {
     type FoldR[Init <: Type, Type, F <: Fold[Nat, Type]] = Init
   }
   sealed trait Succ[N <: Nat] extends Nat {
-    type FoldR[Init <: Type, Type, F <: Fold[Nat, Type]] = F#Apply[
-        Succ[N], N#FoldR[Init, Type, F]]
+    type FoldR[Init <: Type, Type, F <: Fold[Nat, Type]] =
+      F#Apply[Succ[N], N#FoldR[Init, Type, F]]
   }
 
   type Add[A <: Nat, B <: Nat] = A#FoldR[B, Nat, Inc]

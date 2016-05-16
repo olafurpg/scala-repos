@@ -1,7 +1,7 @@
 import scala.reflect.{ClassTag, classTag}
 
 object Test extends App {
-  def classTagIsnotManifest[T : ClassTag] = {
+  def classTagIsnotManifest[T: ClassTag] = {
     println(manifest[T])
   }
 

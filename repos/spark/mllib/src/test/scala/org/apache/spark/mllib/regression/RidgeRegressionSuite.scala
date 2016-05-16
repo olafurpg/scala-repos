@@ -106,7 +106,8 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
 }
 
 class RidgeRegressionClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite
+    with LocalClusterSparkContext {
 
   test("task size should be small in both training and prediction") {
     val m = 4

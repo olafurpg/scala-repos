@@ -298,22 +298,22 @@ object DiscoveryClientSpec extends Specification with Mockito {
 
         new URL(redirectUrl).hostAndPath must be equalTo "http://www.example.com:8080/openidserver/openid.server"
 
-        verifyValidOpenIDRequest(
-            parseQueryString(redirectUrl),
-            "http://example.com/",
-            returnTo,
-            opLocalIdentifier = Some("http://exampleuser.example.com/"))
+        verifyValidOpenIDRequest(parseQueryString(redirectUrl),
+                                 "http://example.com/",
+                                 returnTo,
+                                 opLocalIdentifier =
+                                   Some("http://exampleuser.example.com/"))
       }
     }
   }
 
   // See 9.1 http://openid.net/specs/openid-authentication-2_0.html#anchor27
-  private def verifyValidOpenIDRequest(
-      params: Map[String, Seq[String]],
-      claimedId: String,
-      returnTo: String,
-      opLocalIdentifier: Option[String] = None,
-      realm: Option[String] = None) = {
+  private def verifyValidOpenIDRequest(params: Map[String, Seq[String]],
+                                       claimedId: String,
+                                       returnTo: String,
+                                       opLocalIdentifier: Option[String] =
+                                         None,
+                                       realm: Option[String] = None) = {
     "valid request parameters need to be present" in {
       params.get("openid.ns") must_==
         Some(Seq("http://specs.openid.net/auth/2.0"))

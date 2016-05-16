@@ -51,7 +51,8 @@ private[streams] object SubscriberIteratee {
 import SubscriberIteratee._
 
 private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
-    extends StateMachine[State](NotSubscribed) with Subscription
+    extends StateMachine[State](NotSubscribed)
+    with Subscription
     with Iteratee[T, Unit] {
   self =>
 

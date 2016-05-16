@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[StandardScaler]] and [[StandardScalerModel]].
   */
 private[feature] trait StandardScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * Whether to center the data with mean before scaling.
@@ -70,7 +72,8 @@ private[feature] trait StandardScalerParams
   */
 @Experimental
 class StandardScaler(override val uid: String)
-    extends Estimator[StandardScalerModel] with StandardScalerParams
+    extends Estimator[StandardScalerModel]
+    with StandardScalerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("stdScal"))
@@ -130,7 +133,8 @@ object StandardScaler extends DefaultParamsReadable[StandardScaler] {
 @Experimental
 class StandardScalerModel private[ml](
     override val uid: String, val std: Vector, val mean: Vector)
-    extends Model[StandardScalerModel] with StandardScalerParams
+    extends Model[StandardScalerModel]
+    with StandardScalerParams
     with MLWritable {
 
   import StandardScalerModel._

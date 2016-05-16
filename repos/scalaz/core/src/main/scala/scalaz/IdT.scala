@@ -98,7 +98,8 @@ private trait IdTApply[F[_]] extends Apply[IdT[F, ?]] with IdTFunctor[F] {
 }
 
 private trait IdTApplicative[F[_]]
-    extends Applicative[IdT[F, ?]] with IdTApply[F] {
+    extends Applicative[IdT[F, ?]]
+    with IdTApply[F] {
   implicit def F: Applicative[F]
 
   def point[A](a: => A) = new IdT[F, A](F.point(a))
@@ -118,7 +119,9 @@ private trait IdTBindRec[F[_]] extends BindRec[IdT[F, ?]] with IdTBind[F] {
 }
 
 private trait IdTMonad[F[_]]
-    extends Monad[IdT[F, ?]] with IdTApplicative[F] with IdTBind[F] {
+    extends Monad[IdT[F, ?]]
+    with IdTApplicative[F]
+    with IdTBind[F] {
   implicit def F: Monad[F]
 }
 
@@ -130,7 +133,9 @@ private trait IdTFoldable[F[_]] extends Foldable.FromFoldr[IdT[F, ?]] {
 }
 
 private trait IdTTraverse[F[_]]
-    extends Traverse[IdT[F, ?]] with IdTFoldable[F] with IdTFunctor[F] {
+    extends Traverse[IdT[F, ?]]
+    with IdTFoldable[F]
+    with IdTFunctor[F] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: IdT[F, A])(

@@ -66,8 +66,8 @@ class UnnecessaryParenthesesQuickFix(
     val replaced =
       parenthExpr.replaceExpression(newExpr, removeParenthesis = true)
 
-    val comments = Option(parenthExpr.expr.get)
-      .map(expr => IntentionUtil.collectComments(expr))
+    val comments = Option(parenthExpr.expr.get).map(expr =>
+          IntentionUtil.collectComments(expr))
     comments.foreach(value =>
           IntentionUtil.addComments(value, replaced.getParent, replaced))
 

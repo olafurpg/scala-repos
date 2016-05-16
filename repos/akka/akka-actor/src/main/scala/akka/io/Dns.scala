@@ -93,8 +93,8 @@ class DnsExt(system: ExtendedActorSystem) extends IO.Extension {
 
   val manager: ActorRef = {
     system.systemActorOf(props = Props(classOf[SimpleDnsManager], this)
-                             .withDeploy(Deploy.local)
-                             .withDispatcher(Settings.Dispatcher),
+                           .withDeploy(Deploy.local)
+                           .withDispatcher(Settings.Dispatcher),
                          name = "IO-DNS")
   }
 

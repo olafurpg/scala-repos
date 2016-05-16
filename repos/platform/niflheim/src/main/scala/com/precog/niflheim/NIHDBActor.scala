@@ -155,7 +155,9 @@ trait NIHDB {
 private[niflheim] class NIHDBImpl private[niflheim](
     actor: ActorRef, timeout: Timeout, val authorities: Authorities)(
     implicit executor: ExecutionContext)
-    extends NIHDB with GracefulStopSupport with AskSupport {
+    extends NIHDB
+    with GracefulStopSupport
+    with AskSupport {
   private implicit val impTimeout = timeout
 
   val projectionId = NIHDB.projectionIdGen.getAndIncrement
@@ -228,9 +230,9 @@ private[niflheim] object NIHDBActor extends Logging {
         val state = ProjectionState.empty(authorities)
         for {
           _ <- IO {
-            logger.info("No current descriptor found for " + baseDir + "; " +
-                authorities + ", creating fresh descriptor")
-          }
+                logger.info("No current descriptor found for " + baseDir +
+                    "; " + authorities + ", creating fresh descriptor")
+              }
           _ <- ProjectionState.toFile(state, descriptorFile)
         } yield {
           success(state)
@@ -294,7 +296,8 @@ private[niflheim] class NIHDBActor private (
     chef: ActorRef,
     cookThreshold: Int,
     txLogScheduler: ScheduledExecutorService)
-    extends Actor with Logging {
+    extends Actor
+    with Logging {
 
   import NIHDBActor._
 
@@ -421,8 +424,7 @@ private[niflheim] class NIHDBActor private (
   private def computeBlockMap(current: BlockState) = {
     val allBlocks: List[StorageReader] =
       (current.cooked ++ current.pending.values :+ current.rawLog)
-    SortedMap(
-        allBlocks.map { r =>
+    SortedMap(allBlocks.map { r =>
       r.id -> r
     }.toSeq: _*)
   }
@@ -444,7 +446,8 @@ private[niflheim] class NIHDBActor private (
       // ID
       //TODO: LENSES!!!!!!!~
       state.blockState = state.blockState.copy(
-          cooked = CookedReader.load(cookedDir, file) :: state.blockState.cooked
+          cooked =
+            CookedReader.load(cookedDir, file) :: state.blockState.cooked
               .filterNot(_.id == id),
           pending = state.blockState.pending - id
       )

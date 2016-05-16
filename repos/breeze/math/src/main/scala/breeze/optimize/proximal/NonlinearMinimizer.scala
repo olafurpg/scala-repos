@@ -191,11 +191,11 @@ object NonlinearMinimizer {
     * AdmmObj(x, u, z) = f(x) + rho/2*||x - z + u||2
     * dAdmmObj/dx = df/dx + rho*(x - z + u)
     */
-  case class ProximalPrimal[T](primal: DiffFunction[T],
-                               u: T,
-                               z: T,
-                               rho: Double)(
-      implicit space: MutableInnerProductModule[T, Double])
+  case class ProximalPrimal[T](
+      primal: DiffFunction[T],
+      u: T,
+      z: T,
+      rho: Double)(implicit space: MutableInnerProductModule[T, Double])
       extends DiffFunction[T] {
 
     import space._
@@ -224,12 +224,12 @@ object NonlinearMinimizer {
     * @param proximal operator that defines proximal algorithm
     * @return FirstOrderMinimizer to optimize on f(x) and proximal operator
     */
-  def project(
-      proximal: Proximal,
-      maxIter: Int = -1,
-      m: Int = 10,
-      tolerance: Double = 1e-6,
-      usePQN: Boolean = false): FirstOrderMinimizer[BDV, DiffFunction[BDV]] = {
+  def project(proximal: Proximal,
+              maxIter: Int = -1,
+              m: Int = 10,
+              tolerance: Double = 1e-6,
+              usePQN: Boolean =
+                false): FirstOrderMinimizer[BDV, DiffFunction[BDV]] = {
     val projectionOp = Projection(proximal)
     if (usePQN)
       new ProjectedQuasiNewton(projection = projectionOp.project,
@@ -251,11 +251,11 @@ object NonlinearMinimizer {
     * @param lambda the regularization parameter for most of the constraints
     * @return FirstOrderMinimizer to optimize on f(x) and proximal operator
     */
-  def apply(
-      ndim: Int,
-      constraint: Constraint,
-      lambda: Double,
-      usePQN: Boolean = false): FirstOrderMinimizer[BDV, DiffFunction[BDV]] = {
+  def apply(ndim: Int,
+            constraint: Constraint,
+            lambda: Double,
+            usePQN: Boolean =
+              false): FirstOrderMinimizer[BDV, DiffFunction[BDV]] = {
     constraint match {
       case IDENTITY => project(ProjectIdentity())
       case POSITIVE => project(ProjectPos())

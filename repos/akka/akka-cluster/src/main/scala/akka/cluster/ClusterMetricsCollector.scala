@@ -41,7 +41,8 @@ import java.lang.management.MemoryUsage
   * [[akka.cluster.EWMA]] for exponential weighted moving average.
   */
 private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import InternalClusterAction._
   import ClusterEvent._
@@ -132,9 +133,10 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     * Updates the initial node ring for those nodes that are [[akka.cluster.MemberStatus]] `Up`.
     */
   def receiveState(state: CurrentClusterState): Unit =
-    nodes = state.members collect {
-      case m if m.status == Up || m.status == WeaklyUp ⇒ m.address
-    }
+    nodes =
+      state.members collect {
+        case m if m.status == Up || m.status == WeaklyUp ⇒ m.address
+      }
 
   /**
     * Samples the latest metrics for the node, updates metrics statistics in
@@ -230,7 +232,9 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
   def :+(newNodeMetrics: NodeMetrics): MetricsGossip =
     nodeMetricsFor(newNodeMetrics.address) match {
       case Some(existingNodeMetrics) ⇒
-        copy(nodes = nodes - existingNodeMetrics +
+        copy(
+            nodes =
+              nodes - existingNodeMetrics +
               (existingNodeMetrics merge newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }
@@ -821,10 +825,10 @@ class SigarMetricsCollector(
   override def systemLoadAverage: Option[Metric] =
     Metric.create(name = SystemLoadAverage,
                   value = Try(
-                        LoadAverage.get
-                          .invoke(sigar)
-                          .asInstanceOf[Array[AnyRef]](0)
-                          .asInstanceOf[Number]),
+                      LoadAverage.get
+                        .invoke(sigar)
+                        .asInstanceOf[Array[AnyRef]](0)
+                        .asInstanceOf[Number]),
                   decayFactor = None) orElse super.systemLoadAverage
 
   /**
@@ -840,9 +844,9 @@ class SigarMetricsCollector(
   def cpuCombined: Option[Metric] =
     Metric.create(name = CpuCombined,
                   value = Try(
-                        CombinedCpu.get
-                          .invoke(Cpu.get.invoke(sigar))
-                          .asInstanceOf[Number]),
+                      CombinedCpu.get
+                        .invoke(Cpu.get.invoke(sigar))
+                        .asInstanceOf[Number]),
                   decayFactor = decayFactorOption)
 
   /**
@@ -851,10 +855,10 @@ class SigarMetricsCollector(
   override def close(): Unit =
     Try(createMethodFrom(sigar, "close").get.invoke(sigar))
 
-  private def createMethodFrom(
-      ref: AnyRef,
-      method: String,
-      types: Array[(Class[_])] = EmptyClassArray): Option[Method] =
+  private def createMethodFrom(ref: AnyRef,
+                               method: String,
+                               types: Array[(Class[_])] =
+                                 EmptyClassArray): Option[Method] =
     Try(ref.getClass.getMethod(method, types: _*)).toOption
 }
 

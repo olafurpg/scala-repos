@@ -239,7 +239,8 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
             """
             |0
             |
-            |""") should generalMultiParseTo(Right(baseRequest.withEntity(
+            |""") should generalMultiParseTo(
+            Right(baseRequest.withEntity(
                     Chunked(`application/pdf`,
                             source(Chunk(ByteString("abc")),
                                    Chunk(ByteString("0123456789ABCDEF"),
@@ -266,12 +267,12 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
             | apo
             |Bar: xyz
             |
-            |""") should generalMultiParseTo(Right(baseRequest.withEntity(
-                    Chunked(`application/pdf`,
-                            source(LastChunk("nice=true",
-                                             List(RawHeader("Foo", "pip apo"),
-                                                  RawHeader("Bar",
-                                                            "xyz"))))))))
+            |""") should generalMultiParseTo(
+            Right(baseRequest.withEntity(Chunked(
+                        `application/pdf`,
+                        source(LastChunk("nice=true",
+                                         List(RawHeader("Foo", "pip apo"),
+                                              RawHeader("Bar", "xyz"))))))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -313,10 +314,10 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
 
     "support `rawRequestUriHeader` setting" in new Test {
       override protected def newParser: HttpRequestParser =
-        new HttpRequestParser(
-            parserSettings,
-            rawRequestUriHeader = true,
-            _headerParser = HttpHeaderParser(parserSettings)())
+        new HttpRequestParser(parserSettings,
+                              rawRequestUriHeader = true,
+                              _headerParser =
+                                HttpHeaderParser(parserSettings)())
 
       """GET /f%6f%6fbar?q=b%61z HTTP/1.1
         |Host: ping
@@ -518,8 +519,8 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
     class StrictEqualHttpRequest(val req: HttpRequest) {
       override def equals(other: scala.Any): Boolean = other match {
         case other: StrictEqualHttpRequest ⇒
-          this.req.copy(entity = HttpEntity.Empty) == other.req.copy(
-              entity = HttpEntity.Empty) && this.req.entity
+          this.req.copy(entity = HttpEntity.Empty) == other.req
+            .copy(entity = HttpEntity.Empty) && this.req.entity
             .toStrict(awaitAtMost)
             .awaitResult(awaitAtMost) == other.req.entity
             .toStrict(awaitAtMost)
@@ -593,8 +594,8 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
           Source.fromFuture {
             x match {
               case Right(request) ⇒
-                compactEntity(request.entity).fast.map(
-                    x ⇒ Right(request.withEntity(x)))
+                compactEntity(request.entity).fast.map(x ⇒
+                      Right(request.withEntity(x)))
               case Left(error) ⇒ FastFuture.successful(Left(error))
             }
           }
@@ -612,8 +613,8 @@ class RequestParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
     private def compactEntity(entity: RequestEntity): Future[RequestEntity] =
       entity match {
         case x: Chunked ⇒
-          compactEntityChunks(x.chunks).fast
-            .map(compacted ⇒ x.copy(chunks = source(compacted: _*)))
+          compactEntityChunks(x.chunks).fast.map(compacted ⇒
+                x.copy(chunks = source(compacted: _*)))
         case _ ⇒ entity.toStrict(awaitAtMost)
       }
 

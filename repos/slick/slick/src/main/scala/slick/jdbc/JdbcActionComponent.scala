@@ -22,10 +22,10 @@ import slick.util.{CloseableIterator, DumpInfo, SQLBuilder, ignoreFollowOnError}
 
 trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedSqlAction[
-      R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] = FixedSqlStreamingAction[
-      R, T, E]
+  type ProfileAction[+R, +S <: NoStream, -E <: Effect] =
+    FixedSqlAction[R, S, E]
+  type StreamingProfileAction[+R, +T, -E <: Effect] =
+    FixedSqlStreamingAction[R, T, E]
 
   abstract class SimpleJdbcProfileAction[+R](
       _name: String, val statements: Vector[String])
@@ -107,15 +107,15 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
             .cleanUp(eo => if (eo.isEmpty) Commit else Rollback)(
                 DBIO.sameThreadExecutionContext)
             .asInstanceOf[DBIOAction[R, S, E with Effect.Transactional]]
-        )
+      )
 
     /** Run this Action with the specified transaction isolation level. This should be used around
       * the outermost `transactionally` Action. The semantics of using it inside a transaction are
       * database-dependent. It does not create a transaction by itself but it pins the session. */
     def withTransactionIsolation(
         ti: TransactionIsolation): DBIOAction[R, S, E] = {
-      val isolated = (new SetTransactionIsolation(ti.intValue))
-        .flatMap(old => a.andFinally(new SetTransactionIsolation(old)))(
+      val isolated = (new SetTransactionIsolation(ti.intValue)).flatMap(old =>
+            a.andFinally(new SetTransactionIsolation(old)))(
           DBIO.sameThreadExecutionContext)
       val fused =
         if (a.isInstanceOf[SynchronousDatabaseAction[_, _, _, _]])
@@ -151,10 +151,10 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   //////////////////////////////////////////////////////////// Query Actions
   ///////////////////////////////////////////////////////////////////////////////////////////////
 
-  type QueryActionExtensionMethods[R, S <: NoStream] = QueryActionExtensionMethodsImpl[
-      R, S]
-  type StreamingQueryActionExtensionMethods[R, T] = StreamingQueryActionExtensionMethodsImpl[
-      R, T]
+  type QueryActionExtensionMethods[R, S <: NoStream] =
+    QueryActionExtensionMethodsImpl[R, S]
+  type StreamingQueryActionExtensionMethods[R, T] =
+    StreamingQueryActionExtensionMethodsImpl[R, T]
 
   def createQueryActionExtensionMethods[R, S <: NoStream](
       tree: Node, param: Any): QueryActionExtensionMethods[R, S] =
@@ -327,10 +327,10 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       *                      set, poviding you with a chance to insert additional rows after
       *                      seeing all results. Only `end` (to check for this special event) and
       *                      `insert` may be called in the ResultSetMutator in this case. */
-    def mutate(sendEndMarker: Boolean = false)
-      : ProfileAction[Nothing,
-                      Streaming[ResultSetMutator[T]],
-                      Effect.Read with Effect.Write] = {
+    def mutate(sendEndMarker: Boolean =
+          false): ProfileAction[Nothing,
+                                Streaming[ResultSetMutator[T]],
+                                Effect.Read with Effect.Write] = {
       val sql = tree
         .findNode(_.isInstanceOf[CompiledStatement])
         .get
@@ -521,8 +521,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       : String
 
     /** Insert a single row from a scalar expression */
-    def forceInsertExpr[TT](
-        c: TT)(implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
+    def forceInsertExpr[TT](c: TT)(
+        implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
       : ProfileAction[QueryInsertResult, NoStream, Effect.Write]
 
     /** Insert data produced by another query */
@@ -549,7 +549,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
   /** An InsertActionComposer that returns generated keys or other columns. */
   trait ReturningInsertActionComposer[U, RU]
-      extends InsertActionComposer[U] with IntoInsertActionComposer[U, RU] {
+      extends InsertActionComposer[U]
+      with IntoInsertActionComposer[U, RU] {
     self =>
 
     /** Specifies a mapping from inserted values and generated keys to a desired value.
@@ -617,8 +618,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         compiledQuery: CompiledStreamingExecutable[Query[TT, U, C], _, _]) =
       buildQueryBasedInsert(compiledQuery).sql
 
-    def forceInsertExpr[TT](
-        c: TT)(implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
+    def forceInsertExpr[TT](c: TT)(
+        implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
       : ProfileAction[QueryInsertResult, NoStream, Effect.Write] =
       new InsertQueryAction(buildQueryBasedInsert((Query(c)(shape))), null)
 
@@ -827,8 +828,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
             "Only a single AutoInc column may be returned from an insertOrUpdate call")
 
     protected def buildKeysResult(st: Statement): Invoker[QR] =
-      ResultSetInvoker[QR](_ => st.getGeneratedKeys)(
-          pr => keyConverter.read(pr.rs).asInstanceOf[QR])
+      ResultSetInvoker[QR](_ => st.getGeneratedKeys)(pr =>
+            keyConverter.read(pr.rs).asInstanceOf[QR])
 
     // Returning keys from batch inserts is generally not supported
     override protected def useBatchUpdates(implicit session: Backend#Session) =

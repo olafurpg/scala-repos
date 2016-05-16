@@ -16,7 +16,8 @@ class BinaryListIntCustomTest extends FunSuite {
         implicit format: PickleFormat): HandwrittenListIntPicklerUnpickler =
       new HandwrittenListIntPicklerUnpickler
     class HandwrittenListIntPicklerUnpickler(implicit val format: PickleFormat)
-        extends Pickler[::[Int]] with Unpickler[::[Int]] {
+        extends Pickler[::[Int]]
+        with Unpickler[::[Int]] {
       def pickle(picklee: ::[Int], builder: PBuilder): Unit = {
         builder.beginEntry(picklee, tag)
         val arr = picklee.toArray

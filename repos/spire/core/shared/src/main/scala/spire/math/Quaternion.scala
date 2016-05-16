@@ -32,8 +32,10 @@ object Quaternion extends QuaternionInstances {
 
 // really a skew field
 private[math] trait QuaternionAlgebra[A]
-    extends Field[Quaternion[A]] with Eq[Quaternion[A]]
-    with NRoot[Quaternion[A]] with InnerProductSpace[Quaternion[A], A]
+    extends Field[Quaternion[A]]
+    with Eq[Quaternion[A]]
+    with NRoot[Quaternion[A]]
+    with InnerProductSpace[Quaternion[A], A]
     with FieldAlgebra[Quaternion[A], A] {
 
   implicit def f: Fractional[A]
@@ -83,7 +85,10 @@ trait QuaternionInstances {
 }
 
 final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
-    extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable {
+  lhs =>
 
   // junky ScalaNumber stuff
   override def byteValue: Byte = longValue.toByte

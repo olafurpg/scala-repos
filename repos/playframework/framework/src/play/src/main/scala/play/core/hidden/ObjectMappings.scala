@@ -95,7 +95,8 @@ class ObjectMapping1[R, A1](apply: Function1[A1, R],
                             f1: (String, Mapping[A1]),
                             val key: String = "",
                             val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -148,7 +149,8 @@ class ObjectMapping2[R, A1, A2](apply: Function2[A1, A2, R],
                                 f2: (String, Mapping[A2]),
                                 val key: String = "",
                                 val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -207,7 +209,8 @@ class ObjectMapping3[R, A1, A2, A3](
     f3: (String, Mapping[A3]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -274,7 +277,8 @@ class ObjectMapping4[R, A1, A2, A3, A4](
     f4: (String, Mapping[A4]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -356,7 +360,8 @@ class ObjectMapping5[R, A1, A2, A3, A4, A5](
     f5: (String, Mapping[A5]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -446,7 +451,8 @@ class ObjectMapping6[R, A1, A2, A3, A4, A5, A6](
     f6: (String, Mapping[A6]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -543,7 +549,8 @@ class ObjectMapping7[R, A1, A2, A3, A4, A5, A6, A7](
     f7: (String, Mapping[A7]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -659,7 +666,8 @@ class ObjectMapping8[R, A1, A2, A3, A4, A5, A6, A7, A8](
     f8: (String, Mapping[A8]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -783,7 +791,8 @@ class ObjectMapping9[R, A1, A2, A3, A4, A5, A6, A7, A8, A9](
     f9: (String, Mapping[A9]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -915,7 +924,8 @@ class ObjectMapping10[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10](
     f10: (String, Mapping[A10]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1056,7 +1066,8 @@ class ObjectMapping11[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11](
     f11: (String, Mapping[A11]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1206,7 +1217,8 @@ class ObjectMapping12[R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12](
     f12: (String, Mapping[A12]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1366,7 +1378,8 @@ class ObjectMapping13[
     f13: (String, Mapping[A13]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1536,7 +1549,8 @@ class ObjectMapping14[
     f14: (String, Mapping[A14]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1696,10 +1710,22 @@ class ObjectMapping15[
     R, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15](
     apply: Function15[
         A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15)]],
+    unapply: Function1[R,
+                       Option[(A1,
+                               A2,
+                               A3,
+                               A4,
+                               A5,
+                               A6,
+                               A7,
+                               A8,
+                               A9,
+                               A10,
+                               A11,
+                               A12,
+                               A13,
+                               A14,
+                               A15)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -1717,7 +1743,8 @@ class ObjectMapping15[
     f15: (String, Mapping[A15]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -1899,10 +1926,23 @@ class ObjectMapping16[
                       A15,
                       A16,
                       R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16)]],
+    unapply: Function1[R,
+                       Option[(A1,
+                               A2,
+                               A3,
+                               A4,
+                               A5,
+                               A6,
+                               A7,
+                               A8,
+                               A9,
+                               A10,
+                               A11,
+                               A12,
+                               A13,
+                               A14,
+                               A15,
+                               A16)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -1921,7 +1961,8 @@ class ObjectMapping16[
     f16: (String, Mapping[A16]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -2141,49 +2182,63 @@ class ObjectMapping17[R,
                       A14,
                       A15,
                       A16,
-                      A17](
-    apply: Function17[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+                      A17](apply: Function17[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -2441,51 +2496,66 @@ class ObjectMapping18[R,
                       A15,
                       A16,
                       A17,
-                      A18](
-    apply: Function18[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      A18,
-                      R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    f18: (String, Mapping[A18]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+                      A18](apply: Function18[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             A18,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17,
+                                                      A18)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           f18: (String, Mapping[A18]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -2755,53 +2825,69 @@ class ObjectMapping19[R,
                       A16,
                       A17,
                       A18,
-                      A19](
-    apply: Function19[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      A18,
-                      A19,
-                      R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    f18: (String, Mapping[A18]),
-    f19: (String, Mapping[A19]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+                      A19](apply: Function19[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             A18,
+                                             A19,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17,
+                                                      A18,
+                                                      A19)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           f18: (String, Mapping[A18]),
+                           f19: (String, Mapping[A19]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -3084,55 +3170,72 @@ class ObjectMapping20[R,
                       A17,
                       A18,
                       A19,
-                      A20](
-    apply: Function20[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      A18,
-                      A19,
-                      A20,
-                      R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    f18: (String, Mapping[A18]),
-    f19: (String, Mapping[A19]),
-    f20: (String, Mapping[A20]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+                      A20](apply: Function20[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             A18,
+                                             A19,
+                                             A20,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17,
+                                                      A18,
+                                                      A19,
+                                                      A20)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           f18: (String, Mapping[A18]),
+                           f19: (String, Mapping[A19]),
+                           f20: (String, Mapping[A20]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -3427,57 +3530,75 @@ class ObjectMapping21[R,
                       A18,
                       A19,
                       A20,
-                      A21](
-    apply: Function21[A1,
-                      A2,
-                      A3,
-                      A4,
-                      A5,
-                      A6,
-                      A7,
-                      A8,
-                      A9,
-                      A10,
-                      A11,
-                      A12,
-                      A13,
-                      A14,
-                      A15,
-                      A16,
-                      A17,
-                      A18,
-                      A19,
-                      A20,
-                      A21,
-                      R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21)]],
-    f1: (String, Mapping[A1]),
-    f2: (String, Mapping[A2]),
-    f3: (String, Mapping[A3]),
-    f4: (String, Mapping[A4]),
-    f5: (String, Mapping[A5]),
-    f6: (String, Mapping[A6]),
-    f7: (String, Mapping[A7]),
-    f8: (String, Mapping[A8]),
-    f9: (String, Mapping[A9]),
-    f10: (String, Mapping[A10]),
-    f11: (String, Mapping[A11]),
-    f12: (String, Mapping[A12]),
-    f13: (String, Mapping[A13]),
-    f14: (String, Mapping[A14]),
-    f15: (String, Mapping[A15]),
-    f16: (String, Mapping[A16]),
-    f17: (String, Mapping[A17]),
-    f18: (String, Mapping[A18]),
-    f19: (String, Mapping[A19]),
-    f20: (String, Mapping[A20]),
-    f21: (String, Mapping[A21]),
-    val key: String = "",
-    val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+                      A21](apply: Function21[A1,
+                                             A2,
+                                             A3,
+                                             A4,
+                                             A5,
+                                             A6,
+                                             A7,
+                                             A8,
+                                             A9,
+                                             A10,
+                                             A11,
+                                             A12,
+                                             A13,
+                                             A14,
+                                             A15,
+                                             A16,
+                                             A17,
+                                             A18,
+                                             A19,
+                                             A20,
+                                             A21,
+                                             R],
+                           unapply: Function1[R,
+                                              Option[(A1,
+                                                      A2,
+                                                      A3,
+                                                      A4,
+                                                      A5,
+                                                      A6,
+                                                      A7,
+                                                      A8,
+                                                      A9,
+                                                      A10,
+                                                      A11,
+                                                      A12,
+                                                      A13,
+                                                      A14,
+                                                      A15,
+                                                      A16,
+                                                      A17,
+                                                      A18,
+                                                      A19,
+                                                      A20,
+                                                      A21)]],
+                           f1: (String, Mapping[A1]),
+                           f2: (String, Mapping[A2]),
+                           f3: (String, Mapping[A3]),
+                           f4: (String, Mapping[A4]),
+                           f5: (String, Mapping[A5]),
+                           f6: (String, Mapping[A6]),
+                           f7: (String, Mapping[A7]),
+                           f8: (String, Mapping[A8]),
+                           f9: (String, Mapping[A9]),
+                           f10: (String, Mapping[A10]),
+                           f11: (String, Mapping[A11]),
+                           f12: (String, Mapping[A12]),
+                           f13: (String, Mapping[A13]),
+                           f14: (String, Mapping[A14]),
+                           f15: (String, Mapping[A15]),
+                           f16: (String, Mapping[A16]),
+                           f17: (String, Mapping[A17]),
+                           f18: (String, Mapping[A18]),
+                           f19: (String, Mapping[A19]),
+                           f20: (String, Mapping[A20]),
+                           f21: (String, Mapping[A21]),
+                           val key: String = "",
+                           val constraints: Seq[Constraint[R]] = Nil)
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 
@@ -3808,10 +3929,30 @@ class ObjectMapping22[R,
                       A21,
                       A22,
                       R],
-    unapply: Function1[
-        R,
-        Option[
-            (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22)]],
+    unapply: Function1[R,
+                       Option[
+                           (A1,
+                            A2,
+                            A3,
+                            A4,
+                            A5,
+                            A6,
+                            A7,
+                            A8,
+                            A9,
+                            A10,
+                            A11,
+                            A12,
+                            A13,
+                            A14,
+                            A15,
+                            A16,
+                            A17,
+                            A18,
+                            A19,
+                            A20,
+                            A21,
+                            A22)]],
     f1: (String, Mapping[A1]),
     f2: (String, Mapping[A2]),
     f3: (String, Mapping[A3]),
@@ -3836,7 +3977,8 @@ class ObjectMapping22[R,
     f22: (String, Mapping[A22]),
     val key: String = "",
     val constraints: Seq[Constraint[R]] = Nil)
-    extends Mapping[R] with ObjectMapping {
+    extends Mapping[R]
+    with ObjectMapping {
 
   val field1 = f1._2.withPrefix(f1._1).withPrefix(key)
 

@@ -40,7 +40,8 @@ object ColorAdjust {
 
 class ColorAdjust(
     override val delegate: jfxse.ColorAdjust = new jfxse.ColorAdjust)
-    extends Effect(delegate) with InputDelegate[jfxse.ColorAdjust]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.ColorAdjust]
     with SFXDelegate[jfxse.ColorAdjust] {
 
   /**

@@ -65,7 +65,8 @@ object DialogPane {
   */
 class DialogPane(
     override val delegate: jfxsc.DialogPane = new jfxsc.DialogPane())
-    extends Pane(delegate) with SFXDelegate[jfxsc.DialogPane] {
+    extends Pane(delegate)
+    with SFXDelegate[jfxsc.DialogPane] {
 
   /**
     * The dialog graphic, presented either in the header, if one is showing, or

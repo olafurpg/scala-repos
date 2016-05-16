@@ -71,8 +71,8 @@ object BuildDef extends Build {
 
   lazy val actor = coreProject("actor")
     .dependsOn(common)
-    .settings(description := "Simple Actor",
-              parallelExecution in Test := false)
+    .settings(
+        description := "Simple Actor", parallelExecution in Test := false)
 
   lazy val markdown = coreProject("markdown").settings(
       description := "Markdown Parser",
@@ -219,8 +219,8 @@ object BuildDef extends Build {
     * @param prefix   the prefix of project module.
     * @param module   the name of the project module. Typically, a project id is of the form lift-`module`.
     */
-  def liftProject(
-      base: String, prefix: String = "lift-")(module: String): Project =
+  def liftProject(base: String, prefix: String = "lift-")(
+      module: String): Project =
     liftProject(
         id = if (module.startsWith(prefix)) module else prefix + module,
         base = file(base) / module.stripPrefix(prefix))

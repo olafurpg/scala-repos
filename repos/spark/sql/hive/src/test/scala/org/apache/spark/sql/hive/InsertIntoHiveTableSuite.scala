@@ -33,7 +33,9 @@ case class TestData(key: Int, value: String)
 case class ThreeCloumntable(key: Int, value: String, key1: String)
 
 class InsertIntoHiveTableSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfter {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfter {
   import hiveContext.implicits._
   import hiveContext.sql
 
@@ -168,8 +170,8 @@ class InsertIntoHiveTableSuite
   test("Insert ArrayType.containsNull == false") {
     val schema = StructType(
         Seq(StructField("a", ArrayType(StringType, containsNull = false))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Seq(s"value$i"))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+              Row(Seq(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithArrayValue")
     sql("CREATE TABLE hiveTableWithArrayValue(a Array <STRING>)")
@@ -185,8 +187,8 @@ class InsertIntoHiveTableSuite
     val schema = StructType(Seq(StructField(
                 "m",
                 MapType(StringType, StringType, valueContainsNull = false))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Map(s"key$i" -> s"value$i"))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+              Row(Map(s"key$i" -> s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithMapValue")
     sql("CREATE TABLE hiveTableWithMapValue(m Map <STRING, STRING>)")
@@ -203,8 +205,8 @@ class InsertIntoHiveTableSuite
         Seq(StructField("s",
                         StructType(Seq(StructField(
                                     "f", StringType, nullable = false))))))
-    val rowRDD = hiveContext.sparkContext.parallelize(
-        (1 to 100).map(i => Row(Row(s"value$i"))))
+    val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
+              Row(Row(s"value$i"))))
     val df = hiveContext.createDataFrame(rowRDD, schema)
     df.registerTempTable("tableWithStructValue")
     sql("CREATE TABLE hiveTableWithStructValue(s Struct <f: STRING>)")

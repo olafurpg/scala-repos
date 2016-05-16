@@ -20,7 +20,9 @@ import spire.std.bigInteger._
   * to a Long when possible.
   */
 sealed abstract class SafeLong
-    extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Ordered[SafeLong] {
   lhs =>
 
   def isZero: Boolean
@@ -514,7 +516,9 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 trait SafeLongInstances {
   @SerialVersionUID(1L)
   implicit object SafeLongAlgebra
-      extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+      extends SafeLongIsEuclideanRing
+      with SafeLongIsNRoot
+      with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -536,7 +540,8 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
 }
 
 private[math] trait SafeLongIsEuclideanRing
-    extends EuclideanRing[SafeLong] with SafeLongIsRing {
+    extends EuclideanRing[SafeLong]
+    with SafeLongIsRing {
   def quot(a: SafeLong, b: SafeLong): SafeLong = a / b
   def mod(a: SafeLong, b: SafeLong): SafeLong = a % b
   override def quotmod(a: SafeLong, b: SafeLong): (SafeLong, SafeLong) = a /% b
@@ -571,7 +576,9 @@ private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
 }
 
 private[math] trait SafeLongIsReal
-    extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+    extends IsIntegral[SafeLong]
+    with SafeLongOrder
+    with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

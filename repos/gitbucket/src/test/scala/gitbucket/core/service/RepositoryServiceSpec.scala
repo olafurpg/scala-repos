@@ -4,7 +4,9 @@ import gitbucket.core.model._
 import org.scalatest.FunSuite
 
 class RepositoryServiceSpec
-    extends FunSuite with ServiceSpecBase with RepositoryService
+    extends FunSuite
+    with ServiceSpecBase
+    with RepositoryService
     with AccountService {
   test("renameRepository can rename CommitState, ProtectedBranches") {
     withTestDB { implicit session =>

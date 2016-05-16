@@ -189,8 +189,12 @@ object StandardMetrics {
       * necessary cpu metrics.
       * @return if possible a tuple matching the Cpu constructor parameters
       */
-    def unapply(nodeMetrics: NodeMetrics): Option[(Address, Long, Option[
-            Double], Option[Double], Option[Double], Int)] = {
+    def unapply(nodeMetrics: NodeMetrics): Option[(Address,
+                                                   Long,
+                                                   Option[Double],
+                                                   Option[Double],
+                                                   Option[Double],
+                                                   Int)] = {
       for {
         processors ← nodeMetrics.metric(Processors)
       } yield
@@ -406,7 +410,9 @@ private[metrics] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
   def :+(newNodeMetrics: NodeMetrics): MetricsGossip =
     nodeMetricsFor(newNodeMetrics.address) match {
       case Some(existingNodeMetrics) ⇒
-        copy(nodes = nodes - existingNodeMetrics +
+        copy(
+            nodes =
+              nodes - existingNodeMetrics +
               (existingNodeMetrics update newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
     }

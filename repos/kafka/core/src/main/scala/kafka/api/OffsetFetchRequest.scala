@@ -38,16 +38,13 @@ object OffsetFetchRequest extends Logging {
     // Read the OffsetFetchRequest
     val consumerGroupId = readShortString(buffer)
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(
-        _ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            TopicAndPartition(topic, partitionId)
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        TopicAndPartition(topic, partitionId)
+      })
     })
     OffsetFetchRequest(
         consumerGroupId, pairs, versionId, correlationId, clientId)
@@ -73,16 +70,13 @@ case class OffsetFetchRequest(
     // Write OffsetFetchRequest
     writeShortString(buffer, groupId) // consumer group
     buffer.putInt(requestInfoGroupedByTopic.size) // number of topics
-    requestInfoGroupedByTopic.foreach(
-        t1 =>
-          {
-        // (topic, Seq[TopicAndPartition])
-        writeShortString(buffer, t1._1) // topic
-        buffer.putInt(t1._2.size) // number of partitions for this topic
-        t1._2.foreach(t2 =>
-              {
-            buffer.putInt(t2.partition)
-        })
+    requestInfoGroupedByTopic.foreach(t1 => {
+      // (topic, Seq[TopicAndPartition])
+      writeShortString(buffer, t1._1) // topic
+      buffer.putInt(t1._2.size) // number of partitions for this topic
+      t1._2.foreach(t2 => {
+        buffer.putInt(t2.partition)
+      })
     })
   }
 
@@ -91,12 +85,10 @@ case class OffsetFetchRequest(
     4 + /* correlationId */
     shortStringLength(clientId) + shortStringLength(groupId) + 4 +
     /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)(
-        (count, t) =>
-          {
-        count + shortStringLength(t._1) + /* topic */
-        4 + /* number of partitions */
-        t._2.size * 4 /* partition */
+    requestInfoGroupedByTopic.foldLeft(0)((count, t) => {
+      count + shortStringLength(t._1) + /* topic */
+      4 + /* number of partitions */
+      t._2.size * 4 /* partition */
     })
 
   override def handleError(e: Throwable,

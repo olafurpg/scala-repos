@@ -10,7 +10,7 @@ object Interpolation {
 }
 
 object Macros {
-  def unapplyImpl[T : c.WeakTypeTag](c: Context)(x: c.Tree) = {
+  def unapplyImpl[T: c.WeakTypeTag](c: Context)(x: c.Tree) = {
     import c.universe._
     q"""
       new {

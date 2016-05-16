@@ -21,7 +21,9 @@ import HttpEntity._
 import HttpMethods._
 
 class RequestRendererSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll {
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.event-handlers = ["akka.testkit.TestEventListener"]
@@ -172,8 +174,8 @@ class RequestRendererSpec
             POST,
             "/abc/xyz",
             entity = Chunked(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
+                ContentTypes.`text/plain(UTF-8)`,
+                source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
           """POST /abc/xyz HTTP/1.1
               |Host: test.com:8080
               |User-Agent: akka-http/1.0.0
@@ -247,8 +249,8 @@ class RequestRendererSpec
             "/abc/xyz",
             List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
             entity = Chunked(
-                  ContentTypes.`text/plain(UTF-8)`,
-                  source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
+                ContentTypes.`text/plain(UTF-8)`,
+                source("XXXX", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))) should renderTo {
           """POST /abc/xyz HTTP/1.1
               |Transfer-Encoding: fancy, chunked
               |Host: test.com:8080
@@ -343,10 +345,10 @@ class RequestRendererSpec
 
   override def afterAll() = system.terminate()
 
-  class TestSetup(val userAgent: Option[`User-Agent`] = Some(
-                        `User-Agent`("akka-http/1.0.0")),
+  class TestSetup(val userAgent: Option[`User-Agent`] =
+                    Some(`User-Agent`("akka-http/1.0.0")),
                   serverAddress: InetSocketAddress = new InetSocketAddress(
-                        "test.com", 8080))
+                      "test.com", 8080))
       extends HttpRequestRendererFactory(
           userAgent, requestHeaderSizeHint = 64, NoLogging) {
 

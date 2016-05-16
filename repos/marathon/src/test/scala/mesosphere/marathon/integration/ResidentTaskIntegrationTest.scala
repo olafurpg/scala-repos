@@ -14,8 +14,11 @@ import scala.util.Try
 import scala.concurrent.duration._
 
 class ResidentTaskIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   import Fixture._
 
@@ -80,8 +83,8 @@ class ResidentTaskIntegrationTest
 
   test("resident task is launched completely on reserved resources") { f =>
     Given("A resident app")
-    val app = f.residentApp(
-        portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
+    val app = f.residentApp(portDefinitions =
+          Seq.empty /* prevent problems by randomized port assignment */ )
 
     When("A task is launched")
     f.createSuccessfully(app)
@@ -247,8 +250,8 @@ class ResidentTaskIntegrationTest
                     cmd: String = "sleep 1000",
                     instances: Int = 1,
                     backoffDuration: FiniteDuration = 1.hour,
-                    portDefinitions: Seq[PortDefinition] = PortDefinitions(0))
-      : AppDefinition = {
+                    portDefinitions: Seq[PortDefinition] =
+                      PortDefinitions(0)): AppDefinition = {
 
       val appId: PathId = PathId(
           s"/$testBasePath/app-${IdGenerator.generate()}")
@@ -263,15 +266,15 @@ class ResidentTaskIntegrationTest
           appId,
           instances = instances,
           residency = Some(
-                Residency(
-                    Residency.defaultRelaunchEscalationTimeoutSeconds,
-                    Residency.defaultTaskLostBehaviour
-                )),
+              Residency(
+                  Residency.defaultRelaunchEscalationTimeoutSeconds,
+                  Residency.defaultTaskLostBehaviour
+              )),
           container = Some(
-                Container(
-                    `type` = Mesos.ContainerInfo.Type.MESOS,
-                    volumes = Seq(persistentVolume)
-                )),
+              Container(
+                  `type` = Mesos.ContainerInfo.Type.MESOS,
+                  volumes = Seq(persistentVolume)
+              )),
           cmd = Some(cmd),
           executor = "",
           // cpus, mem and disk are really small because otherwise we'll soon run out of reservable resources

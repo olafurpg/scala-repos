@@ -10,7 +10,9 @@ import org.apache.parquet.filter2.predicate.{FilterApi, FilterPredicate}
 import org.apache.parquet.io.api.Binary
 
 class TypedParquetTupleTest
-    extends WordSpec with Matchers with HadoopPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopPlatformTest {
   "TypedParquetTuple" should {
 
     "read and write correctly" in {

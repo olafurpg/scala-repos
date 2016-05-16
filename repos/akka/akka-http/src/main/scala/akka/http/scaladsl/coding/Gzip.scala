@@ -14,7 +14,8 @@ import ByteStringParser.{ParseResult, ParseStep}
 import akka.util.ByteString
 
 class Gzip(val messageFilter: HttpMessage ⇒ Boolean)
-    extends Coder with StreamDecoder {
+    extends Coder
+    with StreamDecoder {
   val encoding = HttpEncodings.gzip
   def newCompressor = new GzipCompressor
   def newDecompressorStage(maxBytesPerChunk: Int) =

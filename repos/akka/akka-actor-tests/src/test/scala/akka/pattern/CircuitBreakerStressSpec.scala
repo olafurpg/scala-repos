@@ -21,7 +21,9 @@ object CircuitBreakerStressSpec {
       doneCount: Int, timeoutCount: Int, failCount: Int, circCount: Int)
 
   class StressActor(breaker: CircuitBreaker)
-      extends Actor with ActorLogging with PipeToSupport {
+      extends Actor
+      with ActorLogging
+      with PipeToSupport {
     import context.dispatcher
 
     private var doneCount = 0

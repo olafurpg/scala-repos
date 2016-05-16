@@ -37,7 +37,8 @@ import scala.collection._
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class ZookeeperConsumerConnectorTest
-    extends KafkaServerTestHarness with Logging {
+    extends KafkaServerTestHarness
+    with Logging {
 
   val RebalanceBackoffMs = 5000
   var dirs: ZKGroupTopicDirs = null
@@ -124,8 +125,8 @@ class ZookeeperConsumerConnectorTest
 
     // also check partition ownership
     val actual_1 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_1 = List(("0", "group1_consumer1-0"),
-                          ("1", "group1_consumer1-0"))
+    val expected_1 = List(
+        ("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
     assertEquals(expected_1, actual_1)
 
     // commit consumed offsets
@@ -155,8 +156,8 @@ class ZookeeperConsumerConnectorTest
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(("0", "group1_consumer1-0"),
-                          ("1", "group1_consumer2-0"))
+    val expected_2 = List(
+        ("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
     assertEquals(expected_2, actual_2)
 
     // create a consumer with empty map
@@ -228,8 +229,8 @@ class ZookeeperConsumerConnectorTest
 
     // also check partition ownership
     val actual_1 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_1 = List(("0", "group1_consumer1-0"),
-                          ("1", "group1_consumer1-0"))
+    val expected_1 = List(
+        ("0", "group1_consumer1-0"), ("1", "group1_consumer1-0"))
     assertEquals(expected_1, actual_1)
 
     // commit consumed offsets
@@ -259,8 +260,8 @@ class ZookeeperConsumerConnectorTest
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(("0", "group1_consumer1-0"),
-                          ("1", "group1_consumer2-0"))
+    val expected_2 = List(
+        ("0", "group1_consumer1-0"), ("1", "group1_consumer2-0"))
     assertEquals(expected_2, actual_2)
 
     // create a consumer with empty map
@@ -317,8 +318,8 @@ class ZookeeperConsumerConnectorTest
 
     // also check partition ownership
     val actual_2 = getZKChildrenValues(dirs.consumerOwnerDir)
-    val expected_2 = List(("0", "group1_consumer0-0"),
-                          ("1", "group1_consumer0-0"))
+    val expected_2 = List(
+        ("0", "group1_consumer0-0"), ("1", "group1_consumer0-0"))
     assertEquals(expected_2, actual_2)
 
     zkConsumerConnector1.shutdown

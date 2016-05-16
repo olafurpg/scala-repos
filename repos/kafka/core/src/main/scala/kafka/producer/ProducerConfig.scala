@@ -61,7 +61,8 @@ object ProducerConfig extends Config {
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 class ProducerConfig private (val props: VerifiableProperties)
-    extends AsyncProducerConfig with SyncProducerConfigShared {
+    extends AsyncProducerConfig
+    with SyncProducerConfigShared {
   import ProducerConfig._
 
   def this(originalProps: Properties) {

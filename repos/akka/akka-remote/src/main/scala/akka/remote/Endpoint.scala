@@ -80,8 +80,7 @@ private[remote] class DefaultMessageDispatcher(
         if (LogReceive) log.debug("received local message {}", msgLog)
         payload match {
           case sel: ActorSelectionMessage ⇒
-            if (UntrustedMode &&
-                (!TrustedSelectionPaths.contains(
+            if (UntrustedMode && (!TrustedSelectionPaths.contains(
                         sel.elements.mkString("/", "/", "")) ||
                     sel.msg.isInstanceOf[PossiblyHarmful] ||
                     l != provider.rootGuardian))
@@ -131,7 +130,8 @@ private[remote] class DefaultMessageDispatcher(
   */
 @SerialVersionUID(1L)
 private[remote] class EndpointException(msg: String, cause: Throwable)
-    extends AkkaException(msg, cause) with OnlyCauseStackTrace {
+    extends AkkaException(msg, cause)
+    with OnlyCauseStackTrace {
   def this(msg: String) = this(msg, null)
 }
 
@@ -237,7 +237,8 @@ private[remote] class ReliableDeliverySupervisor(
     val settings: RemoteSettings,
     val codec: AkkaPduCodec,
     val receiveBuffers: ConcurrentHashMap[Link, ResendState])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ReliableDeliverySupervisor._
   import context.dispatcher
 
@@ -265,8 +266,8 @@ private[remote] class ReliableDeliverySupervisor(
       if (bufferWasInUse) {
         if ((resendBuffer.nacked.nonEmpty || resendBuffer.nonAcked.nonEmpty) &&
             bailoutAt.isEmpty)
-          bailoutAt = Some(
-              Deadline.now + settings.InitialSysMsgDeliveryTimeout)
+          bailoutAt =
+            Some(Deadline.now + settings.InitialSysMsgDeliveryTimeout)
         context.become(
             gated(writerTerminated = false, earlyUngateRequested = false))
         currentHandle = None
@@ -523,7 +524,8 @@ private[remote] abstract class EndpointActor(val localAddress: Address,
                                              val transport: Transport,
                                              val settings: RemoteSettings,
                                              val codec: AkkaPduCodec)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   def inbound: Boolean
 
@@ -751,14 +753,14 @@ private[remote] class EndpointWriter(
     maxWriteCount = math.max(writeCount, maxWriteCount)
     if (writeCount <= SendBufferBatchSize) {
       fullBackoff = true
-      adaptiveBackoffNanos = math.min(
-          (adaptiveBackoffNanos * 1.2).toLong, MaxAdaptiveBackoffNanos)
+      adaptiveBackoffNanos =
+        math.min((adaptiveBackoffNanos * 1.2).toLong, MaxAdaptiveBackoffNanos)
     } else if (writeCount >= maxWriteCount * 0.6)
-      adaptiveBackoffNanos = math.max(
-          (adaptiveBackoffNanos * 0.9).toLong, MinAdaptiveBackoffNanos)
+      adaptiveBackoffNanos =
+        math.max((adaptiveBackoffNanos * 0.9).toLong, MinAdaptiveBackoffNanos)
     else if (writeCount <= maxWriteCount * 0.2)
-      adaptiveBackoffNanos = math.min(
-          (adaptiveBackoffNanos * 1.1).toLong, MaxAdaptiveBackoffNanos)
+      adaptiveBackoffNanos =
+        math.min((adaptiveBackoffNanos * 1.1).toLong, MaxAdaptiveBackoffNanos)
 
     writeCount = 0
   }
@@ -1091,8 +1093,8 @@ private[remote] class EndpointReader(
       } else if (!receiveBuffers.replace(
                      key,
                      expectedState,
-                     merge(ResendState(uid, ackedReceiveBuffer),
-                           expectedState)))
+                     merge(
+                         ResendState(uid, ackedReceiveBuffer), expectedState)))
         updateSavedState(key, receiveBuffers.get(key))
     }
 

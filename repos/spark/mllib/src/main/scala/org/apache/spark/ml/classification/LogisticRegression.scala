@@ -44,9 +44,15 @@ import org.apache.spark.storage.StorageLevel
   * Params for logistic regression.
   */
 private[classification] trait LogisticRegressionParams
-    extends ProbabilisticClassifierParams with HasRegParam
-    with HasElasticNetParam with HasMaxIter with HasFitIntercept with HasTol
-    with HasStandardization with HasWeightCol with HasThreshold {
+    extends ProbabilisticClassifierParams
+    with HasRegParam
+    with HasElasticNetParam
+    with HasMaxIter
+    with HasFitIntercept
+    with HasTol
+    with HasStandardization
+    with HasWeightCol
+    with HasThreshold {
 
   /**
     * Set threshold in binary classification, in range [0, 1].
@@ -169,7 +175,9 @@ class LogisticRegression @Since("1.2.0")(
     @Since("1.4.0") override val uid: String)
     extends ProbabilisticClassifier[
         Vector, LogisticRegression, LogisticRegressionModel]
-    with LogisticRegressionParams with DefaultParamsWritable with Logging {
+    with LogisticRegressionParams
+    with DefaultParamsWritable
+    with Logging {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("logreg"))
@@ -290,13 +298,14 @@ class LogisticRegression @Since("1.2.0")(
 
     val (summarizer, labelSummarizer) = {
       val seqOp = (c: (MultivariateOnlineSummarizer, MultiClassSummarizer),
-      instance: Instance) =>
+                   instance: Instance) =>
         (c._1.add(instance.features, instance.weight),
          c._2.add(instance.label, instance.weight))
 
-      val combOp = (c1: (MultivariateOnlineSummarizer, MultiClassSummarizer),
-      c2: (MultivariateOnlineSummarizer, MultiClassSummarizer)) =>
-        (c1._1.merge(c2._1), c1._2.merge(c2._2))
+      val combOp =
+        (c1: (MultivariateOnlineSummarizer, MultiClassSummarizer),
+         c2: (MultivariateOnlineSummarizer, MultiClassSummarizer)) =>
+          (c1._1.merge(c2._1), c1._2.merge(c2._2))
 
       instances.treeAggregate(new MultivariateOnlineSummarizer,
                               new MultiClassSummarizer)(seqOp, combOp)
@@ -369,24 +378,24 @@ class LogisticRegression @Since("1.2.0")(
           } else {
             val standardizationParam = $(standardization)
             def regParamL1Fun =
-              (index: Int) =>
-                {
-                  // Remove the L1 penalization on the intercept
-                  if (index == numFeatures) {
-                    0.0
+              (index: Int) => {
+                // Remove the L1 penalization on the intercept
+                if (index == numFeatures) {
+                  0.0
+                } else {
+                  if (standardizationParam) {
+                    regParamL1
                   } else {
-                    if (standardizationParam) {
-                      regParamL1
-                    } else {
-                      // If `standardization` is false, we still standardize the data
-                      // to improve the rate of convergence; as a result, we have to
-                      // perform this reverse standardization by penalizing each component
-                      // differently to get effectively the same objective function when
-                      // the training dataset is not standardized.
-                      if (featuresStd(index) != 0.0)
-                        regParamL1 / featuresStd(index) else 0.0
-                    }
+                    // If `standardization` is false, we still standardize the data
+                    // to improve the rate of convergence; as a result, we have to
+                    // perform this reverse standardization by penalizing each component
+                    // differently to get effectively the same objective function when
+                    // the training dataset is not standardized.
+                    if (featuresStd(index) != 0.0)
+                      regParamL1 / featuresStd(index)
+                    else 0.0
                   }
+                }
               }
             new BreezeOWLQN[Int, BDV[Double]](
                 $(maxIter), 10, regParamL1Fun, $(tol))
@@ -427,8 +436,8 @@ class LogisticRegression @Since("1.2.0")(
                b = \log{P(1) / P(0)} = \log{count_1 / count_0}
              }}}
            */
-          initialCoefficientsWithIntercept.toArray(numFeatures) = math.log(
-              histogram(1) / histogram(0))
+          initialCoefficientsWithIntercept.toArray(numFeatures) =
+            math.log(histogram(1) / histogram(0))
         }
 
         val states = optimizer.iterations(
@@ -517,7 +526,8 @@ class LogisticRegressionModel private[spark](
     @Since("1.6.0") val coefficients: Vector,
     @Since("1.3.0") val intercept: Double)
     extends ProbabilisticClassificationModel[Vector, LogisticRegressionModel]
-    with LogisticRegressionParams with MLWritable {
+    with LogisticRegressionParams
+    with MLWritable {
 
   @deprecated("Use coefficients instead.", "1.6.0")
   def weights: Vector = coefficients
@@ -537,16 +547,14 @@ class LogisticRegressionModel private[spark](
   override def getThresholds: Array[Double] = super.getThresholds
 
   /** Margin (rawPrediction) for class label 1.  For binary classification only. */
-  private val margin: Vector => Double = (features) =>
-    {
-      BLAS.dot(features, coefficients) + intercept
+  private val margin: Vector => Double = (features) => {
+    BLAS.dot(features, coefficients) + intercept
   }
 
   /** Score (probability) for class label 1.  For binary classification only. */
-  private val score: Vector => Double = (features) =>
-    {
-      val m = margin(features)
-      1.0 / (1.0 + math.exp(-m))
+  private val score: Vector => Double = (features) => {
+    val m = margin(features)
+    1.0 / (1.0 + math.exp(-m))
   }
 
   @Since("1.6.0")
@@ -692,7 +700,8 @@ object LogisticRegressionModel extends MLReadable[LogisticRegressionModel] {
   /** [[MLWriter]] instance for [[LogisticRegressionModel]] */
   private[LogisticRegressionModel] class LogisticRegressionModelWriter(
       instance: LogisticRegressionModel)
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(numClasses: Int,
                             numFeatures: Int,

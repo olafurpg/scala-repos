@@ -117,12 +117,12 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
 
   def readFromLog(log: Log): Iterable[(Int, Int)] = {
     for (segment <- log.logSegments; entry <- segment.log;
-    messageAndOffset <- {
-      // create single message iterator or deep iterator depending on compression codec
-      if (entry.message.compressionCodec == NoCompressionCodec)
-        Stream.cons(entry, Stream.empty).iterator
-      else ByteBufferMessageSet.deepIterator(entry)
-    }) yield {
+         messageAndOffset <- {
+           // create single message iterator or deep iterator depending on compression codec
+           if (entry.message.compressionCodec == NoCompressionCodec)
+             Stream.cons(entry, Stream.empty).iterator
+           else ByteBufferMessageSet.deepIterator(entry)
+         }) yield {
       val key = TestUtils.readString(messageAndOffset.message.key).toInt
       val value = TestUtils.readString(messageAndOffset.message.payload).toInt
       key -> value

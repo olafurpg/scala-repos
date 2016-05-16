@@ -63,7 +63,9 @@ object ExpiringJobManager {
 }
 
 trait BaseInMemoryJobManager[M[+ _]]
-    extends JobManager[M] with JobStateManager[M] with JobResultManager[M] {
+    extends JobManager[M]
+    with JobStateManager[M]
+    with JobResultManager[M] {
 
   import scalaz.syntax.monad._
   import JobState._
@@ -150,8 +152,8 @@ trait BaseInMemoryJobManager[M[+ _]]
         val data = jobs(jobId)
         val posts = data.channels.getOrElse(channel, Nil)
         val message = Message(jobId, posts.size, channel, value)
-        jobs(jobId) = data.copy(
-            channels = data.channels + (channel -> (message :: posts)))
+        jobs(jobId) =
+          data.copy(channels = data.channels + (channel -> (message :: posts)))
         message
       }
     }

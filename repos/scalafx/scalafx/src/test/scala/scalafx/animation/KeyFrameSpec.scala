@@ -90,13 +90,12 @@ class KeyFrameSpec
   it should "have a simpler syntax for finish handlers as non-param functions" in {
     var callCount1 = 0
     var callCount2 = 0
-    val finishHandler = () =>
-      {
-        // There is a potential problems with code blocks as event handlers,
-        // only the last statement is executed during handler invocation
-        // prior statements are executed only once during construction.
-        callCount1 += 1
-        callCount2 += 1
+    val finishHandler = () => {
+      // There is a potential problems with code blocks as event handlers,
+      // only the last statement is executed during handler invocation
+      // prior statements are executed only once during construction.
+      callCount1 += 1
+      callCount2 += 1
     }
     // Call the handler 3 times
     KeyFrame(10 ms, onFinished = finishHandler).onFinished.handle(null)

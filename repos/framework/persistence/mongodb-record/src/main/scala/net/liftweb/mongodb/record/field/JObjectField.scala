@@ -30,7 +30,8 @@ import scala.xml.NodeSeq
 import com.mongodb._
 
 class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[JObject, OwnerType] with MandatoryTypedField[JObject]
+    extends Field[JObject, OwnerType]
+    with MandatoryTypedField[JObject]
     with MongoFieldFlavor[JObject] {
 
   def owner = rec

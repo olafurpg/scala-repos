@@ -50,8 +50,8 @@ abstract class AbstractTestRunConfiguration(
     val project: Project,
     val configurationFactory: ConfigurationFactory,
     val name: String,
-    private var envs: java.util.Map[String, String] = new mutable.HashMap[
-          String, String](),
+    private var envs: java.util.Map[String, String] =
+      new mutable.HashMap[String, String](),
     private var addIntegrationTestsClasspath: Boolean = false)
     extends ModuleBasedConfiguration[RunConfigurationModule](
         name, new RunConfigurationModule(project), configurationFactory)
@@ -181,7 +181,8 @@ abstract class AbstractTestRunConfiguration(
     val objectClasses = classes.filter(_.isInstanceOf[ScObject])
     val nonObjectClasses = classes.filter(!_.isInstanceOf[ScObject])
     if (nonObjectClasses.nonEmpty) nonObjectClasses(0)
-    else if (objectClasses.nonEmpty) objectClasses(0) else null
+    else if (objectClasses.nonEmpty) objectClasses(0)
+    else null
   }
 
   def getPackage(path: String): PsiPackage = {
@@ -449,7 +450,7 @@ abstract class AbstractTestRunConfiguration(
           case SearchForTest.IN_WHOLE_PROJECT =>
             var jdk: Sdk = null
             for (module <- ModuleManager.getInstance(project).getModules
-                              if jdk == null) {
+                 if jdk == null) {
               jdk = JavaParameters.getModuleJdk(module)
             }
             params.configureByProject(
@@ -553,7 +554,7 @@ abstract class AbstractTestRunConfiguration(
         }
 
         for (ext <- Extensions.getExtensions(
-            RunConfigurationExtension.EP_NAME)) {
+                       RunConfigurationExtension.EP_NAME)) {
           ext.updateJavaParameters(
               currentConfiguration, params, getRunnerSettings)
         }
@@ -646,13 +647,13 @@ abstract class AbstractTestRunConfiguration(
     for (search <- SearchForTest.values()) {
       if (search.toString == s) searchTest = search
     }
-    testName = Option(JDOMExternalizer.readString(element, "testName"))
-      .getOrElse("")
+    testName =
+      Option(JDOMExternalizer.readString(element, "testName")).getOrElse("")
     testKind = TestKind.fromString(
         Option(JDOMExternalizer.readString(element, "testKind"))
           .getOrElse("Class"))
-    showProgressMessages = JDOMExternalizer.readBoolean(
-        element, "showProgressMessages")
+    showProgressMessages =
+      JDOMExternalizer.readBoolean(element, "showProgressMessages")
   }
 }
 

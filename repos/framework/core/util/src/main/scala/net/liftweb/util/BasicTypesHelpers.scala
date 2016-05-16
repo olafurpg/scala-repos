@@ -47,7 +47,9 @@ object AvoidTypeErasureIssues1 {
   * This object adds functionality to Scala standard types.
   */
 object BasicTypesHelpers
-    extends BasicTypesHelpers with StringHelpers with ControlHelpers
+    extends BasicTypesHelpers
+    with StringHelpers
+    with ControlHelpers
 
 /**
   * This trait adds functionality to Scala standard types
@@ -193,8 +195,7 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     * A helper class that facilitates wrapping of one PartialFunction
     * around another
     */
-  final implicit class PartialFunctionWrapper[
-      A](around: PartialFunction[A, _]) {
+  final implicit class PartialFunctionWrapper[A](around: PartialFunction[A, _]) {
 
     /**
       * Allows you to put a guard around a partial function

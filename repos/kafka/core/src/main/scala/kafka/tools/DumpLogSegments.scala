@@ -133,21 +133,17 @@ object DumpLogSegments {
     misMatchesForIndexFilesMap.foreach {
       case (fileName, listOfMismatches) => {
           System.err.println("Mismatches in :" + fileName)
-          listOfMismatches.foreach(
-              m =>
-                {
-              System.err.println(
-                  "  Index offset: %d, log offset: %d".format(m._1, m._2))
+          listOfMismatches.foreach(m => {
+            System.err
+              .println("  Index offset: %d, log offset: %d".format(m._1, m._2))
           })
         }
     }
     nonConsecutivePairsForLogFilesMap.foreach {
       case (fileName, listOfNonConsecutivePairs) => {
           System.err.println("Non-secutive offsets in :" + fileName)
-          listOfNonConsecutivePairs.foreach(
-              m =>
-                {
-              System.err.println("  %d is followed by %d".format(m._1, m._2))
+          listOfNonConsecutivePairs.foreach(m => {
+            System.err.println("  %d is followed by %d".format(m._1, m._2))
           })
         }
     }
@@ -183,7 +179,7 @@ object DumpLogSegments {
         var misMatchesSeq = misMatchesForIndexFilesMap.getOrElse(
             file.getAbsolutePath, List[(Long, Long)]())
         misMatchesSeq ::=
-        (entry.offset + index.baseOffset, messageAndOffset.offset)
+          (entry.offset + index.baseOffset, messageAndOffset.offset)
         misMatchesForIndexFilesMap.put(file.getAbsolutePath, misMatchesSeq)
       }
       // since it is a sparse file, in the event of a crash there may be many zero entries, stop if we see one

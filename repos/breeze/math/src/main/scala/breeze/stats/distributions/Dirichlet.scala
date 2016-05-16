@@ -67,8 +67,8 @@ case class Dirichlet[T, @specialized(Int) I](
     * Returns the log pdf function of the Dirichlet up to a constant evaluated at m
     */
   override def unnormalizedLogPdf(m: T) = {
-    val parts = for ((k, v) <- params.activeIterator) yield (v - 1) * math.log(
-        m(k))
+    val parts = for ((k, v) <- params.activeIterator) yield
+      (v - 1) * math.log(m(k))
     parts.sum
   }
 

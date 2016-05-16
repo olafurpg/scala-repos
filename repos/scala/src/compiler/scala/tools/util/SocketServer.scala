@@ -46,14 +46,13 @@ abstract class SocketServer(fixPort: Int = 0) extends CompileOutputCommon {
   protected var idleMinutes = 30
   private var savedTimeout = 0
   private val acceptBox = new Socket.Box(
-      () =>
-        {
-      // update the timeout if it has changed
-      if (savedTimeout != idleMinutes) {
-        savedTimeout = idleMinutes
-        setTimeoutOnSocket(savedTimeout)
-      }
-      new Socket(serverSocket.accept())
+      () => {
+    // update the timeout if it has changed
+    if (savedTimeout != idleMinutes) {
+      savedTimeout = idleMinutes
+      setTimeoutOnSocket(savedTimeout)
+    }
+    new Socket(serverSocket.accept())
   })
   private def setTimeoutOnSocket(mins: Int) = {
     try {

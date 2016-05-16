@@ -15,7 +15,7 @@ trait Aliases { self: Context =>
 
   override type Expr[+T] = universe.Expr[T]
   override val Expr = universe.Expr
-  def Expr[T : WeakTypeTag](tree: Tree): Expr[T] =
+  def Expr[T: WeakTypeTag](tree: Tree): Expr[T] =
     universe.Expr[T](mirror, universe.FixedMirrorTreeCreator(mirror, tree))
 
   override type WeakTypeTag[T] = universe.WeakTypeTag[T]

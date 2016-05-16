@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Bounds, ScType}
   * @author Alexander Podkhalyuzin
   */
 class ScNamingPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScNamingPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScNamingPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

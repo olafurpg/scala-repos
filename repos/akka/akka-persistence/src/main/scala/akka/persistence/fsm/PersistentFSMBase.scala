@@ -93,7 +93,9 @@ import scala.concurrent.duration.FiniteDuration
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 trait PersistentFSMBase[S, D, E]
-    extends Actor with Listeners with ActorLogging {
+    extends Actor
+    with Listeners
+    with ActorLogging {
 
   import akka.persistence.fsm.PersistentFSM._
 
@@ -516,7 +518,8 @@ trait PersistentFSMBase[S, D, E]
         val t = timeout.get
         if (t.isFinite && t.length >= 0) {
           import context.dispatcher
-          timeoutFuture = Some(context.system.scheduler
+          timeoutFuture = Some(
+              context.system.scheduler
                 .scheduleOnce(t, self, TimeoutMarker(generation)))
         }
       }

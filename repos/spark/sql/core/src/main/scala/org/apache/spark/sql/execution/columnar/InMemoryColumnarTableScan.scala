@@ -68,7 +68,8 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
     @transient private[sql] var _statistics: Statistics = null,
     private[sql] var _batchStats: Accumulable[
         ArrayBuffer[InternalRow], InternalRow] = null)
-    extends logical.LeafNode with MultiInstanceRelation {
+    extends logical.LeafNode
+    with MultiInstanceRelation {
 
   override def producedAttributes: AttributeSet = outputSet
 
@@ -151,7 +152,7 @@ private[sql] case class InMemoryRelation(output: Seq[Attribute],
             var rowCount = 0
             var totalSize = 0L
             while (rowIterator.hasNext && rowCount < batchSize &&
-            totalSize < ColumnBuilder.MAX_BATCH_SIZE_IN_BYTE) {
+                   totalSize < ColumnBuilder.MAX_BATCH_SIZE_IN_BYTE) {
               val row = rowIterator.next()
 
               // Added for SPARK-6082. This assertion can be useful for scenarios when something
@@ -294,8 +295,8 @@ private[sql] case class InMemoryColumnarTableScan(
                                        allowFailures = true))
 
       boundFilter.foreach(_ =>
-            filter.foreach(
-                f => logInfo(s"Predicate $p generates partition filter: $f")))
+            filter.foreach(f =>
+                  logInfo(s"Predicate $p generates partition filter: $f")))
 
       // If the filter can't be resolved then we are missing required statistics.
       boundFilter.filter(_.resolved)

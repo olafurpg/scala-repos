@@ -75,7 +75,8 @@ class SerialServerDispatcherTest extends FunSuite with MockitoSugar {
     val service = new Service[String, String] {
       override def apply(request: String): Future[String] = Future.value {
         if (Contexts.local.get(RemoteInfo.Upstream.AddressCtx) == Some(
-                mockAddr)) "ok" else "not ok"
+                mockAddr)) "ok"
+        else "not ok"
       }
     }
 

@@ -278,7 +278,8 @@ object TableView {
   */
 class TableView[S](
     override val delegate: jfxsc.TableView[S] = new jfxsc.TableView[S])
-    extends Control(delegate) with SFXDelegate[jfxsc.TableView[S]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TableView[S]] {
 
   /**
     * Creates a TableView with the content provided in the items ObservableBuffer.
@@ -451,8 +452,9 @@ class TableView[S](
     delegate.onScrollToColumnProperty
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]) {
-    ObjectProperty.fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[
-                jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
+    ObjectProperty.fillProperty[
+        jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]](
+        onScrollToColumn, v)
   }
 
   /** Called when there's a request to sort the control. */

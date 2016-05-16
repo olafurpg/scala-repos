@@ -113,14 +113,15 @@ object SizeEstimator extends Logging {
     is64bit = arch.contains("64") || arch.contains("s390x")
     isCompressedOops = getIsCompressedOops
 
-    objectSize = if (!is64bit) 8
-    else {
-      if (!isCompressedOops) {
-        16
-      } else {
-        12
+    objectSize =
+      if (!is64bit) 8
+      else {
+        if (!isCompressedOops) {
+          16
+        } else {
+          12
+        }
       }
-    }
     pointerSize = if (is64bit && !isCompressedOops) 8 else 4
     classInfos.clear()
     classInfos.put(classOf[Object], new ClassInfo(objectSize, Nil))
@@ -366,8 +367,8 @@ object SizeEstimator extends Logging {
     for (size <- fieldSizes if sizeCount(size) > 0) {
       val count = sizeCount(size).toLong
       // If there are internal gaps, smaller field can fit in.
-      alignedSize = math.max(
-          alignedSize, alignSizeUp(shellSize, size) + size * count)
+      alignedSize =
+        math.max(alignedSize, alignSizeUp(shellSize, size) + size * count)
       shellSize += size * count
     }
 

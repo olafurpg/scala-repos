@@ -25,7 +25,7 @@ object SourceGenerator {
      scalaVersion,
      streams) map {
       (mName, baseDir, srcDir, androidClasses, androidApiVersion, scalaVersion,
-      s) =>
+       s) =>
         import NameFilter._
 
         if (mName == "parent") Nil

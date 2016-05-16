@@ -23,7 +23,8 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * Date: 28.02.2008
   */
 class ScConstructorPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstructorPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScConstructorPattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -86,8 +87,7 @@ class ScConstructorPatternImpl(node: ASTNode)
             val newSubst = {
               val clazzType = ScParameterizedType(
                   refType,
-                  td.getTypeParameters.map(
-                      tp =>
+                  td.getTypeParameters.map(tp =>
                         ScUndefinedType(tp match {
                       case tp: ScTypeParam =>
                         new ScTypeParameterType(tp, r.substitutor)

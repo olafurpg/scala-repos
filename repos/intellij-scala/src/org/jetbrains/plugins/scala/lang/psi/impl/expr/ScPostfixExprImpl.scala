@@ -16,7 +16,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScPostfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPostfixExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScPostfixExpr {
   override def toString: String = "PostfixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty

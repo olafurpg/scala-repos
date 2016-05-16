@@ -44,8 +44,8 @@ object Delegates extends Properties("delegates") {
       global forall { _ == Global }
     }
   }
-  property("Initial scope present with all combinations of Global axes") = allAxes(
-      globalCombinations)
+  property("Initial scope present with all combinations of Global axes") =
+    allAxes(globalCombinations)
 
   property("initial scope first") = forAll { (keys: Keys) =>
     allDelegates(keys) { (scope, ds) =>
@@ -68,8 +68,7 @@ object Delegates extends Properties("delegates") {
       }
     }
   def allDelegates(keys: Keys)(f: (Scope, Seq[Scope]) => Prop): Prop =
-    all(
-        keys.scopes map { scope =>
+    all(keys.scopes map { scope =>
       val delegates = keys.env.delegates(scope)
       ("Scope: " + Scope.display(scope, "_")) |:
       ("Delegates:\n\t" + delegates

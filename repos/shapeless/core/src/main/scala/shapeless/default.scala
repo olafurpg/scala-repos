@@ -81,7 +81,8 @@ object Default {
     type Aux[T, Out0 <: HList] = AsRecord[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Labels <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L]
+        with Serializable {
       type Out <: HList
     }
 
@@ -90,9 +91,10 @@ object Default {
           implicit helper: Helper[L, Labels]): Aux[L, Labels, helper.Out] =
         helper
 
-      type Aux[L <: HList, Labels <: HList, Out0 <: HList] = Helper[L, Labels] {
-        type Out = Out0
-      }
+      type Aux[L <: HList, Labels <: HList, Out0 <: HList] =
+        Helper[L, Labels] {
+          type Out = Out0
+        }
 
       implicit def hnilHelper: Aux[HNil, HNil, HNil] =
         new Helper[HNil, HNil] {
@@ -164,7 +166,8 @@ object Default {
     type Aux[T, Out0 <: HList] = AsOptions[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Repr <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L]
+        with Serializable {
       type Out <: HList
     }
 
@@ -219,7 +222,7 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
   def someTpe = typeOf[Some[_]].typeConstructor
   def noneTpe = typeOf[None.type]
 
-  def materialize[T : WeakTypeTag, L : WeakTypeTag]: Tree = {
+  def materialize[T: WeakTypeTag, L: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
 
     if (!isCaseClassLike(classSym(tpe)))

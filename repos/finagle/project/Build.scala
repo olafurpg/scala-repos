@@ -85,7 +85,7 @@ object Finagle extends Build {
       ),
       resolvers += "twitter-repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
-      (CrossVersion.partialVersion(scalaVersion.value) match {
+        (CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, 10)) => false
             case _ => true
           }),
@@ -171,7 +171,8 @@ object Finagle extends Build {
     Project(
         id = "finagle",
         base = file("."),
-        settings = Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings ++ Seq(
+        settings =
+          Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings ++ Seq(
               unidocProjectFilter in (ScalaUnidoc, unidoc) :=
                 inAnyProject -- inProjects(finagleExample)
           )
@@ -563,7 +564,8 @@ object Finagle extends Build {
   lazy val finagleBenchmark = Project(
       id = "finagle-benchmark",
       base = file("finagle-benchmark"),
-      settings = Defaults.coreDefaultSettings ++ sharedSettings ++ JmhPlugin.projectSettings
+      settings =
+        Defaults.coreDefaultSettings ++ sharedSettings ++ JmhPlugin.projectSettings
   ).enablePlugins(JmhPlugin)
     .settings(
         name := "finagle-benchmark",
@@ -605,32 +607,33 @@ object Finagle extends Build {
     )
     .dependsOn(finagleCore)
 
-  lazy val finagleDoc = Project(
-      id = "finagle-doc",
-      base = file("doc"),
-      settings = Defaults.coreDefaultSettings ++ site.settings ++ site
-          .sphinxSupport() ++ sharedSettings ++ Seq(
-            scalacOptions in doc <++= version.map(
-                v => Seq("-doc-title", "Finagle", "-doc-version", v)),
-            includeFilter in Sphinx :=
-            ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
-            // Workaround for sbt bug: Without a testGrouping for all test configs,
-            // the wrong tests are run
-            testGrouping <<= definedTests in Test map partitionTests,
-            testGrouping in DocTest <<=
-              definedTests in DocTest map partitionTests
-        ))
-    .configs(DocTest)
-    .settings(inConfig(DocTest)(Defaults.testSettings): _*)
-    .settings(
-        unmanagedSourceDirectories in DocTest <+=
-          baseDirectory { _ / "src/sphinx/code" },
-        //resourceDirectory in DocTest <<= baseDirectory { _ / "src/test/resources" }
+  lazy val finagleDoc =
+    Project(id = "finagle-doc",
+            base = file("doc"),
+            settings =
+              Defaults.coreDefaultSettings ++ site.settings ++ site
+                .sphinxSupport() ++ sharedSettings ++ Seq(
+                  scalacOptions in doc <++= version.map(
+                      v => Seq("-doc-title", "Finagle", "-doc-version", v)),
+                  includeFilter in Sphinx :=
+                    ("*.html" | "*.png" | "*.svg" | "*.js" | "*.css" | "*.gif" | "*.txt"),
+                  // Workaround for sbt bug: Without a testGrouping for all test configs,
+                  // the wrong tests are run
+                  testGrouping <<= definedTests in Test map partitionTests,
+                  testGrouping in DocTest <<=
+                    definedTests in DocTest map partitionTests
+              ))
+      .configs(DocTest)
+      .settings(inConfig(DocTest)(Defaults.testSettings): _*)
+      .settings(
+          unmanagedSourceDirectories in DocTest <+=
+            baseDirectory { _ / "src/sphinx/code" },
+          //resourceDirectory in DocTest <<= baseDirectory { _ / "src/test/resources" }
 
-        // Make the "test" command run both, test and doctest:test
-        test <<= Seq(test in Test, test in DocTest).dependOn
-    )
-    .dependsOn(finagleCore, finagleHttp, finagleMySQL)
+          // Make the "test" command run both, test and doctest:test
+          test <<= Seq(test in Test, test in DocTest).dependOn
+      )
+      .dependsOn(finagleCore, finagleHttp, finagleMySQL)
 
   /* Test Configuration for running tests on doc sources */
   lazy val DocTest = config("doctest") extend Test

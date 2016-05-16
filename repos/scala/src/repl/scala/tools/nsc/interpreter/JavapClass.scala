@@ -178,13 +178,14 @@ class JavapClass(
                 isAnonymized(method))
           }
         }
-        filtering = if (filtering) {
-          // next blank line terminates section
-          // in non-verbose mode, next line is next method, more or less
-          line.trim.nonEmpty && (!isAnyMethod || isOurMethod)
-        } else {
-          isAnyMethod && isOurMethod
-        }
+        filtering =
+          if (filtering) {
+            // next blank line terminates section
+            // in non-verbose mode, next line is next method, more or less
+            line.trim.nonEmpty && (!isAnyMethod || isOurMethod)
+          } else {
+            isAnyMethod && isOurMethod
+          }
         filtering
       }
       // do we output this line?
@@ -223,7 +224,8 @@ class JavapClass(
       ) orFailed null
 
     class JavaReporter
-        extends DiagnosticListener[JavaFileObject] with Clearable {
+        extends DiagnosticListener[JavaFileObject]
+        with Clearable {
       type D = Diagnostic[_ <: JavaFileObject]
       val diagnostics = new ConcurrentLinkedQueue[D]
       override def report(d: Diagnostic[_ <: JavaFileObject]) {

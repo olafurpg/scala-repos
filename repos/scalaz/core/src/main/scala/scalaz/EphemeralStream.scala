@@ -107,8 +107,8 @@ sealed abstract class EphemeralStream[A] {
 
   def unzip[X, Y](
       implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
-    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(
-        q => r => (cons(q._1, r._1), cons(q._2, r._2)))
+    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q =>
+          r => (cons(q._1, r._1), cons(q._2, r._2)))
 
   def alignWith[B, C](f: A \&/ B => C)(
       b: EphemeralStream[B]): EphemeralStream[C] =
@@ -196,8 +196,8 @@ sealed abstract class EphemeralStreamInstances {
           fa: EphemeralStream[A], fb: EphemeralStream[B])(
           f: (Option[A], B) => C) =
         zipWithL(fb, fa)((b, a) => f(a, b))
-      def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(
-          implicit G: Applicative[G]): G[EphemeralStream[B]] = {
+      def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(
+          f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
         val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
         fa.foldRight(seed) { x => ys =>
@@ -234,7 +234,7 @@ sealed abstract class EphemeralStreamInstances {
 
   import std.list._
 
-  implicit def ephemeralStreamEqual[A : Equal]: Equal[EphemeralStream[A]] =
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] =
     Equal[List[A]] contramap { (_: EphemeralStream[A]).toList }
 }
 

@@ -50,49 +50,44 @@ class ScalaCopyPastePostProcessor
     try {
       ProgressManager
         .getInstance()
-        .runProcess(
-            new Runnable {
-              override def run(): Unit = {
-                breakable {
-                  for ((startOffset, endOffset) <- startOffsets.zip(
-                      endOffsets);
-                  element <- getElementsStrictlyInRange(
-                      file, startOffset, endOffset);
-                  reference <- element.asOptionOf[ScReferenceElement];
-                  dependency <- Dependency.dependencyFor(reference)
-                                   if dependency.isExternal;
-                  range = dependency.source.getTextRange
-                    .shiftRight(-startOffset)) {
-                    if (System.currentTimeMillis > timeBound) {
-                      Log.warn(
-                          "Time-out while collecting dependencies in %s:\n%s"
-                            .format(
-                              file.getName,
-                              file.getText.substring(startOffset, endOffset)))
-                      break()
-                    }
-                    associations ::=
-                      Association(dependency.kind, range, dependency.path)
-                  }
+        .runProcess(new Runnable {
+          override def run(): Unit = {
+            breakable {
+              for ((startOffset, endOffset) <- startOffsets.zip(endOffsets);
+                   element <- getElementsStrictlyInRange(
+                                 file, startOffset, endOffset);
+                   reference <- element.asOptionOf[ScReferenceElement];
+                   dependency <- Dependency.dependencyFor(reference)
+                   if dependency.isExternal;
+                   range = dependency.source.getTextRange.shiftRight(
+                       -startOffset)) {
+                if (System.currentTimeMillis > timeBound) {
+                  Log.warn("Time-out while collecting dependencies in %s:\n%s"
+                        .format(
+                          file.getName,
+                          file.getText.substring(startOffset, endOffset)))
+                  break()
                 }
+                associations ::=
+                  Association(dependency.kind, range, dependency.path)
               }
-            },
-            new AbstractProgressIndicatorBase {
-              override def isCanceled: scala.Boolean = {
-                System.currentTimeMillis > timeBound || super.isCanceled
-              }
-            })
+            }
+          }
+        }, new AbstractProgressIndicatorBase {
+          override def isCanceled: scala.Boolean = {
+            System.currentTimeMillis > timeBound || super.isCanceled
+          }
+        })
     } catch {
       case p: ProcessCanceledException =>
-        Log.warn(
-            "Time-out while collecting dependencies in %s:\n%s".format(
+        Log.warn("Time-out while collecting dependencies in %s:\n%s".format(
                 file.getName,
                 file.getText.substring(startOffsets(0), endOffsets(0))))
       case e: Exception =>
-        val selections = (startOffsets, endOffsets).zipped
-          .map((a, b) => file.getText.substring(a, b))
-        val attachments = selections.zipWithIndex.map(
-            p => new Attachment(s"Selection-${p._2 + 1}.scala", p._1))
+        val selections = (startOffsets, endOffsets).zipped.map((a, b) =>
+              file.getText.substring(a, b))
+        val attachments = selections.zipWithIndex.map(p =>
+              new Attachment(s"Selection-${p._2 + 1}.scala", p._1))
         Log.error(
             LogMessageEx.createEvent(e.getMessage,
                                      ExceptionUtil.getThrowableText(e),
@@ -160,7 +155,7 @@ class ScalaCopyPastePostProcessor
     val bindings = (for {
       association <- value.associations
       element <- elementFor(association, file, offset)
-                    if !association.isSatisfiedIn(element)
+      if !association.isSatisfiedIn(element)
     } yield
       Binding(element,
               association.path.asString(ScalaCodeStyleSettings
@@ -180,7 +175,7 @@ class ScalaCopyPastePostProcessor
 
     inWriteAction {
       for (Binding(ref, path) <- bindingsToRestore;
-      holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject)) holder
+           holder = ScalaImportTypeFix.getImportHolder(ref, file.getProject)) holder
         .addImportForPath(path, ref)
     }
   }
@@ -191,7 +186,7 @@ class ScalaCopyPastePostProcessor
     val range = dependency.range.shiftRight(offset)
 
     for (ref <- Option(file.findElementAt(range.getStartOffset));
-    parent <- ref.parent if parent.getTextRange == range) yield parent
+         parent <- ref.parent if parent.getTextRange == range) yield parent
   }
 
   private def getElementsStrictlyInRange(

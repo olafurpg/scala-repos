@@ -381,7 +381,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
   }
 
-  private def collapse[@specialized(Double) A : Manifest](
+  private def collapse[@specialized(Double) A: Manifest](
       chunks0: List[Array[A]]): Array[A] = {
     val len = chunks0.foldLeft(0)(_ + _.length)
     val array = new Array[A](len)
@@ -402,7 +402,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     array
   }
 
-  private def sliceToArray[@specialized(Double) A : Manifest](
+  private def sliceToArray[@specialized(Double) A: Manifest](
       slice: Slice, zero: => A)(
       pf: PartialFunction[Column, Int => A]): Option[Array[A]] = {
     slice.columns.values.collectFirst {
@@ -423,7 +423,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
   }
 
-  private def extract[@specialized(Double) A : Manifest](table: Table)(
+  private def extract[@specialized(Double) A: Manifest](table: Table)(
       pf: PartialFunction[Column, Int => A]): M[Array[A]] = {
     def die = sys.error("Cannot handle undefined rows. Expected dense column.")
 
@@ -558,7 +558,7 @@ trait RandomForestLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       }
     }
 
-    abstract class RandomForest[A : Manifest, F <: Forest[A]: Monoid](
+    abstract class RandomForest[A: Manifest, F <: Forest[A]: Monoid](
         namespace: Vector[String], name: String)
         extends Morphism2(namespace, name) {
       import trans._

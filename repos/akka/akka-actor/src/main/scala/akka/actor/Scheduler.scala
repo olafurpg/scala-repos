@@ -12,7 +12,8 @@ import scala.util.control.NoStackTrace
   * possible, e.g. after shutting down the Scheduler.
   */
 private final case class SchedulerException(msg: String)
-    extends akka.AkkaException(msg) with NoStackTrace
+    extends akka.AkkaException(msg)
+    with NoStackTrace
 
 // The Scheduler trait is included in the documentation. KEEP THE LINES SHORT!!!
 //#scheduler

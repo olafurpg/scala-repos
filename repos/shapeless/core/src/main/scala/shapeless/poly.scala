@@ -280,8 +280,8 @@ class PolyMacros(val c: whitebox.Context) {
 
   import PolyDefns.Case
 
-  def materializeFromValueImpl[
-      P : WeakTypeTag, FT : WeakTypeTag, T : WeakTypeTag]: Tree = {
+  def materializeFromValueImpl[P: WeakTypeTag, FT: WeakTypeTag, T: WeakTypeTag]
+    : Tree = {
     val pTpe = weakTypeOf[P]
     val ftTpe = weakTypeOf[FT]
     val tTpe = weakTypeOf[T]

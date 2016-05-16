@@ -13,7 +13,8 @@ package math
   *  extend ScalaNumber (which excludes value classes.)
   */
 trait ScalaNumericConversions
-    extends ScalaNumber with ScalaNumericAnyConversions {
+    extends ScalaNumber
+    with ScalaNumericAnyConversions {
   def underlying(): Object
 }
 

@@ -123,7 +123,7 @@ trait RawJsonStorageModule[M[+ _]] { self =>
             projections.keySet
               .filter(_.isDirectChildOf(path))
               .map(PathMetadata(_, DataOnly(FileContent.XQuirrelData)))
-          )
+        )
       }
 
     def pathStructure(
@@ -155,7 +155,8 @@ trait RawJsonStorageModule[M[+ _]] { self =>
 }
 
 trait RawJsonColumnarTableStorageModule[M[+ _]]
-    extends RawJsonStorageModule[M] with ColumnarTableModuleTestSupport[M] {
+    extends RawJsonStorageModule[M]
+    with ColumnarTableModuleTestSupport[M] {
   import trans._
   import TableModule._
 

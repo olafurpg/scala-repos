@@ -47,7 +47,8 @@ object RoutingSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RoutingSpec
-    extends AkkaSpec(RoutingSpec.config) with DefaultTimeout
+    extends AkkaSpec(RoutingSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
   implicit val ec = system.dispatcher
   import RoutingSpec._

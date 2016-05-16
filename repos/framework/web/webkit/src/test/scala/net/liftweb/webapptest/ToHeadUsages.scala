@@ -85,10 +85,9 @@ object ToHeadUsages extends Specification {
     "not merge for bodyless html" in {
       jetty.browse(
           "/basicDiv",
-          html =>
-            {
-              html.getElementById("fruit") must not(beNull when jetty.running)
-              html.getElementById("bat") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("fruit") must not(beNull when jetty.running)
+            html.getElementById("bat") must not(beNull when jetty.running)
           }
       )
     }
@@ -96,9 +95,8 @@ object ToHeadUsages extends Specification {
     "not merge for headless bodyless html" in {
       jetty.browse(
           "/h1",
-          html =>
-            {
-              html.getElementById("h1") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("h1") must not(beNull when jetty.running)
           }
       )
     }
@@ -118,9 +116,8 @@ object ToHeadUsages extends Specification {
     "not merge non-html" in {
       jetty.browse(
           "/non_html",
-          html =>
-            {
-              html.getElementById("frog") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("frog") must not(beNull when jetty.running)
           }
       )
     }
@@ -158,9 +155,8 @@ object ToHeadUsages extends Specification {
     "render" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementById("second") must not(beNull when jetty.running)
+          html => {
+            html.getElementById("second") must not(beNull when jetty.running)
           }
       )
     }
@@ -168,11 +164,10 @@ object ToHeadUsages extends Specification {
     "not deferred not in actor" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementByXPath(
-                  "/html/body/span[@id='whack1']/span[@id='actor_false']") must not(
-                  beNull when jetty.running)
+          html => {
+            html.getElementByXPath(
+                "/html/body/span[@id='whack1']/span[@id='actor_false']") must not(
+                beNull when jetty.running)
           }
       )
     }
@@ -180,11 +175,10 @@ object ToHeadUsages extends Specification {
     "deferred in actor" in {
       jetty.browse(
           "/deferred",
-          html =>
-            {
-              html.getElementByXPath(
-                  "/html/body/span[@id='whack2']/span[@id='actor_true']") must not(
-                  beNull when jetty.running)
+          html => {
+            html.getElementByXPath(
+                "/html/body/span[@id='whack2']/span[@id='actor_true']") must not(
+                beNull when jetty.running)
           }
       )
     }

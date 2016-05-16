@@ -48,7 +48,8 @@ trait FindMembers {
       if (Statistics.canEnable) Statistics.incCounter(findMemberCount)
       val start =
         if (Statistics.canEnable)
-          Statistics.pushTimer(typeOpsStack, findMemberNanos) else null
+          Statistics.pushTimer(typeOpsStack, findMemberNanos)
+        else null
       try searchConcreteThenDeferred finally if (Statistics.canEnable)
         Statistics.popTimer(typeOpsStack, start)
     }
@@ -122,7 +123,8 @@ trait FindMembers {
           //           => private members should be included from T1, ... Tn. (SI-7475)
           refinementParents :::= currentBaseClass.parentSymbols
         else if (currentBaseClass.isClass)
-          seenFirstNonRefinementClass = true // only inherit privates of refinement parents after this point
+          seenFirstNonRefinementClass =
+            true // only inherit privates of refinement parents after this point
 
         bcs = bcs.tail
       }
@@ -153,8 +155,7 @@ trait FindMembers {
       def admitPrivate(sym: Symbol): Boolean =
         (selectorClass == owner) ||
         (!isPrivateLocal // private[this] only a member from within the selector class. (Optimization only? Does the spec back this up?)
-            &&
-            (!seenFirstNonRefinementClass ||
+            && (!seenFirstNonRefinementClass ||
                 refinementParents.contains(owner)))
 
       (!isPrivate || admitPrivate(sym)) &&
@@ -165,10 +166,10 @@ trait FindMembers {
     protected def isNewMember(member: Symbol, other: Symbol): Boolean =
       ((other ne member) &&
           ((member.owner eq other.owner) // same owner, therefore overload
-              || (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
-              || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
               ||
-              !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
+              (member.flags & PRIVATE) != 0 // (unqualified) private members never participate in overriding
+              || (other.flags & PRIVATE) != 0 // ... as overrider or overridee.
+              || !(memberTypeLow(member) matches memberTypeHi(other)) // do the member types match? If so, it's an override. Otherwise it's an overload.
               ))
 
     // Cache for the member type of a candidate member when comparing against multiple, already-found existing members
@@ -219,10 +220,11 @@ trait FindMembers {
       val members = membersScope
       var others = members.lookupEntry(sym.name)
       var isNew = true
-      while ( (others ne null) && isNew) {
+      while ((others ne null) && isNew) {
         val member = others.sym
         if (!isNewMember(member, sym)) isNew = false
-        others = members lookupNextEntry others // next existing member with the same name.
+        others =
+          members lookupNextEntry others // next existing member with the same name.
       }
       if (isNew) members.enter(sym)
     }
@@ -247,7 +249,8 @@ trait FindMembers {
     }
 
     protected def shortCircuit(sym: Symbol): Boolean =
-      (name.isTypeName || (stableOnly && sym.isStable && !sym.hasVolatileType)) && {
+      (name.isTypeName ||
+          (stableOnly && sym.isStable && !sym.hasVolatileType)) && {
         clearAndAddResult(sym)
         true
       }
@@ -267,7 +270,7 @@ trait FindMembers {
         var ms: List[Symbol] = members
 
         var isNew = true
-        while ( (ms ne null) && isNew) {
+        while ((ms ne null) && isNew) {
           val member = ms.head
           if (!isNewMember(member, sym)) isNew = false
           ms = ms.tail

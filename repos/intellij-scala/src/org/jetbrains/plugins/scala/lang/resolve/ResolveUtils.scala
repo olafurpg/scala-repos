@@ -38,8 +38,7 @@ import _root_.scala.collection.Set
 object ResolveUtils {
   def kindMatches(
       element: PsiElement, kinds: Set[ResolveTargets.Value]): Boolean =
-    kinds == null ||
-    (element match {
+    kinds == null || (element match {
           case _: PsiPackage | _: ScPackaging => kinds contains PACKAGE
           case obj: ScObject if obj.isPackageObject => kinds contains PACKAGE
           case obj: ScObject =>
@@ -112,17 +111,18 @@ object ResolveUtils {
     new ScMethodType(retType, m match {
       case f: FakePsiMethod => f.params.toSeq
       case _ =>
-        m.getParameterList.getParameters.map { param =>
-          val scType = s.subst(param.exactParamType())
-          new Parameter("",
-                        None,
-                        scType,
-                        scType,
-                        false,
-                        param.isVarArgs,
-                        false,
-                        param.index,
-                        Some(param))
+        m.getParameterList.getParameters.map {
+          param =>
+            val scType = s.subst(param.exactParamType())
+            new Parameter("",
+                          None,
+                          scType,
+                          scType,
+                          false,
+                          param.isVarArgs,
+                          false,
+                          param.index,
+                          Some(param))
         }
     }, false)(m.getProject, scope)
   }
@@ -286,9 +286,11 @@ object ResolveUtils {
                                                   classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
-                  placeEnclosing.isInstanceOf[ScObject] && !placeEnclosing
-                    .asInstanceOf[ScObject]
-                    .isPackageObject) placeEnclosing = context(placeEnclosing)
+                         placeEnclosing.isInstanceOf[ScObject] &&
+                         !placeEnclosing
+                           .asInstanceOf[ScObject]
+                           .isPackageObject) placeEnclosing = context(
+                      placeEnclosing)
                   if (placeEnclosing == null) return false //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""
@@ -305,8 +307,7 @@ object ResolveUtils {
                           .getCompanionModule(td)
                           .getOrElse(null: PsiElement),
                         place,
-                        false) ||
-                    (td.isInstanceOf[ScObject] &&
+                        false) || (td.isInstanceOf[ScObject] &&
                         td.asInstanceOf[ScObject].isPackageObject &&
                         processPackage(td.qualifiedName))
                   case pack: PsiPackage =>
@@ -371,9 +372,11 @@ object ResolveUtils {
                                                   classOf[ScalaFile])
                   var placeEnclosing: PsiElement = context(place)
                   while (placeEnclosing != null &&
-                  placeEnclosing.isInstanceOf[ScObject] && !placeEnclosing
-                    .asInstanceOf[ScObject]
-                    .isPackageObject) placeEnclosing = context(placeEnclosing)
+                         placeEnclosing.isInstanceOf[ScObject] &&
+                         !placeEnclosing
+                           .asInstanceOf[ScObject]
+                           .isPackageObject) placeEnclosing = context(
+                      placeEnclosing)
                   if (placeEnclosing == null) return Some(false) //not Scala
                   val placePackageName = placeEnclosing match {
                     case file: ScalaFile => ""

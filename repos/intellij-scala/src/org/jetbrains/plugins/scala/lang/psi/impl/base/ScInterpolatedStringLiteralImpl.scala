@@ -12,7 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, T
   * Date: 3/17/12
   */
 class ScInterpolatedStringLiteralImpl(node: ASTNode)
-    extends ScLiteralImpl(node) with ScInterpolatedStringLiteral {
+    extends ScLiteralImpl(node)
+    with ScInterpolatedStringLiteral {
   def getType: InterpolatedStringType.StringType =
     getNode.getFirstChildNode.getText match {
       case "s" => InterpolatedStringType.STANDART

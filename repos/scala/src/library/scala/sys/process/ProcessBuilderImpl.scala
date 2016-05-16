@@ -94,7 +94,9 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
   }
 
   private[scala] abstract class AbstractBuilder
-      extends ProcessBuilder with Sink with Source {
+      extends ProcessBuilder
+      with Sink
+      with Source {
     protected def toSource = this
     protected def toSink = this
 
@@ -177,7 +179,9 @@ private[process] trait ProcessBuilderImpl { self: ProcessBuilder.type =>
     protected def toSource = new URLInput(url)
   }
   private[process] class FileImpl(base: File)
-      extends FileBuilder with Sink with Source {
+      extends FileBuilder
+      with Sink
+      with Source {
     protected def toSource = new FileInput(base)
     protected def toSink = new FileOutput(base, false)
 

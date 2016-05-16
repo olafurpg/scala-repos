@@ -153,8 +153,8 @@ object MovieLensALS {
          * the confidence. The error is the difference between prediction and either 1 or 0,
          * depending on whether r is positive or negative.
          */
-        splits(1).map(
-            x => Rating(x.user, x.product, if (x.rating > 0) 1.0 else 0.0))
+        splits(1).map(x =>
+              Rating(x.user, x.product, if (x.rating > 0) 1.0 else 0.0))
       } else {
         splits(1)
       }.cache()

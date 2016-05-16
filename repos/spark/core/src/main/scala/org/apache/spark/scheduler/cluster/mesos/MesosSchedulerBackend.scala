@@ -40,7 +40,9 @@ import org.apache.spark.util.Utils
   */
 private[spark] class MesosSchedulerBackend(
     scheduler: TaskSchedulerImpl, sc: SparkContext, master: String)
-    extends SchedulerBackend with MScheduler with MesosSchedulerUtils {
+    extends SchedulerBackend
+    with MScheduler
+    with MesosSchedulerUtils {
 
   // Stores the slave ids that has launched a Mesos executor.
   val slaveIdToExecutorInfo = new HashMap[String, MesosExecutorInfo]
@@ -78,7 +80,7 @@ private[spark] class MesosSchedulerBackend(
         sc.conf
           .getOption("spark.mesos.driver.webui.url")
           .orElse(sc.ui.map(_.appUIAddress))
-      )
+    )
     startScheduler(driver)
   }
 
@@ -165,14 +167,12 @@ private[spark] class MesosSchedulerBackend(
       .setCommand(command)
       .setData(ByteString.copyFrom(createExecArg()))
 
-    sc.conf
-      .getOption("spark.mesos.executor.docker.image")
-      .foreach { image =>
-        MesosSchedulerBackendUtil.setupContainerBuilderDockerInfo(
-            image, sc.conf, executorInfo.getContainerBuilder())
-      }
+    sc.conf.getOption("spark.mesos.executor.docker.image").foreach { image =>
+      MesosSchedulerBackendUtil.setupContainerBuilderDockerInfo(
+          image, sc.conf, executorInfo.getContainerBuilder())
+    }
 
-      (executorInfo.build(), resourcesAfterMem.asJava)
+    (executorInfo.build(), resourcesAfterMem.asJava)
   }
 
   /**
@@ -365,8 +365,8 @@ private[spark] class MesosSchedulerBackend(
 
       // Decline offers that weren't used
       // NOTE: This logic assumes that we only get a single offer for each host in a given batch
-      for (o <- usableOffers if !slavesIdsOfAcceptedOffers.contains(
-                   o.getSlaveId.getValue)) {
+      for (o <- usableOffers
+           if !slavesIdsOfAcceptedOffers.contains(o.getSlaveId.getValue)) {
         d.declineOffer(o.getId)
       }
     }
@@ -395,7 +395,7 @@ private[spark] class MesosSchedulerBackend(
       .addAllResources(cpuResources.asJava)
       .setData(MesosTaskLaunchData(task.serializedTask, task.attemptNumber).toByteString)
       .build()
-      (taskInfo, finalResources.asJava)
+    (taskInfo, finalResources.asJava)
   }
 
   override def statusUpdate(d: SchedulerDriver, status: TaskStatus) {
@@ -467,8 +467,7 @@ private[spark] class MesosSchedulerBackend(
                             status: Int) {
     logInfo(
         "Executor lost: %s, marking slave %s as lost".format(
-            executorId.getValue,
-            slaveId.getValue))
+            executorId.getValue, slaveId.getValue))
     recordSlaveLost(d, slaveId, ExecutorExited(status, exitCausedByApp = true))
   }
 

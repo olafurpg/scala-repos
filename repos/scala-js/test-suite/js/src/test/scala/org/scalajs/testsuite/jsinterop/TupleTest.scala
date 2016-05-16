@@ -158,8 +158,8 @@ class TupleTest {
 
   @Test def should_support_tuple_of_8(): Unit = {
     val jsObj = js.Tuple8("1", "2", "3", "4", "5", "6", "7", 8)
-    val scalaObj: (String, String, String, String, String, String, String,
-    Int) = jsObj
+    val scalaObj: (String, String, String, String, String, String, String, Int) =
+      jsObj
     val t8IsInt: Int = js.Tuple8.unapply(jsObj).get._8
 
     assertEquals(8, jsObj._8)
@@ -172,8 +172,15 @@ class TupleTest {
 
   @Test def should_support_tuple_of_9(): Unit = {
     val jsObj = js.Tuple9("1", "2", "3", "4", "5", "6", "7", "8", 9)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t9IsInt: Int = js.Tuple9.unapply(jsObj).get._9
 
     assertEquals(9, jsObj._9)
@@ -186,8 +193,16 @@ class TupleTest {
 
   @Test def should_support_tuple_of_10(): Unit = {
     val jsObj = js.Tuple10("1", "2", "3", "4", "5", "6", "7", "8", "9", 10)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t10IsInt: Int = js.Tuple10.unapply(jsObj).get._10
 
     assertEquals(10, jsObj._10)
@@ -202,8 +217,17 @@ class TupleTest {
   @Test def should_support_tuple_of_11(): Unit = {
     val jsObj =
       js.Tuple11("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 11)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t11IsInt: Int = js.Tuple11.unapply(jsObj).get._11
 
     assertEquals(11, jsObj._11)
@@ -218,8 +242,18 @@ class TupleTest {
   @Test def should_support_tuple_of_12(): Unit = {
     val jsObj =
       js.Tuple12("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", 12)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t12IsInt: Int = js.Tuple12.unapply(jsObj).get._12
 
     assertEquals(12, jsObj._12)
@@ -234,8 +268,19 @@ class TupleTest {
   @Test def should_support_tuple_of_13(): Unit = {
     val jsObj = js.Tuple13(
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", 13)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t13IsInt: Int = js.Tuple13.unapply(jsObj).get._13
 
     assertEquals(13, jsObj._13)
@@ -263,8 +308,20 @@ class TupleTest {
                            "12",
                            "13",
                            14)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t14IsInt: Int = js.Tuple14.unapply(jsObj).get._14
 
     assertEquals(14, jsObj._14)
@@ -304,8 +361,21 @@ class TupleTest {
                            "13",
                            "14",
                            15)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t15IsInt: Int = js.Tuple15.unapply(jsObj).get._15
 
     assertEquals(15, jsObj._15)
@@ -347,9 +417,22 @@ class TupleTest {
                            "14",
                            "15",
                            16)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, Int) =
-      jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t16IsInt: Int = js.Tuple16.unapply(jsObj).get._16
 
     assertEquals(16, jsObj._16)
@@ -393,9 +476,23 @@ class TupleTest {
                            "15",
                            "16",
                            17)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t17IsInt: Int = js.Tuple17.unapply(jsObj).get._17
 
     assertEquals(17, jsObj._17)
@@ -441,9 +538,24 @@ class TupleTest {
                            "16",
                            "17",
                            18)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t18IsInt: Int = js.Tuple18.unapply(jsObj).get._18
 
     assertEquals(18, jsObj._18)
@@ -491,9 +603,25 @@ class TupleTest {
                            "17",
                            "18",
                            19)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t19IsInt: Int = js.Tuple19.unapply(jsObj).get._19
 
     assertEquals(19, jsObj._19)
@@ -543,9 +671,26 @@ class TupleTest {
                            "18",
                            "19",
                            20)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t20IsInt: Int = js.Tuple20.unapply(jsObj).get._20
 
     assertEquals(20, jsObj._20)
@@ -597,9 +742,27 @@ class TupleTest {
                            "19",
                            "20",
                            21)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t21IsInt: Int = js.Tuple21.unapply(jsObj).get._21
 
     assertEquals(21, jsObj._21)
@@ -652,9 +815,28 @@ class TupleTest {
                            "20",
                            "21",
                            22)
-    val scalaObj: (String, String, String, String, String, String, String,
-    String, String, String, String, String, String, String, String, String,
-    String, String, String, String, String, Int) = jsObj
+    val scalaObj: (String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   String,
+                   Int) = jsObj
     val t22IsInt: Int = js.Tuple22.unapply(jsObj).get._22
 
     assertEquals(22, jsObj._22)

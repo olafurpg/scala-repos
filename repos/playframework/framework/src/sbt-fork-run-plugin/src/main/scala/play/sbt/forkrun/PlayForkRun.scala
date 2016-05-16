@@ -71,8 +71,9 @@ object PlayForkRun extends AutoPlugin {
       playForkNotifyStart <<= serverStartedTask,
       playForkStarted <<= publishUrlTask,
       playForkReload <<= compileTask,
-      SerializersKeys.registeredSerializers ++= Serializers.serializers.map(
-          x => RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
+      SerializersKeys.registeredSerializers ++=
+        Serializers.serializers.map(x =>
+            RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
   )
 
   val allInput: Parser[String] = {
@@ -93,8 +94,8 @@ object PlayForkRun extends AutoPlugin {
         jvmOptions = (javaOptions in (Compile, run)).value,
         classpath = (managedClasspath in ForkRun).value.files,
         baseDirectory = (baseDirectory in ThisBuild).value,
-        configKey = thisProjectRef.value.project + "/" +
-          playForkConfig.key.label,
+        configKey =
+          thisProjectRef.value.project + "/" + playForkConfig.key.label,
         logLevel = ((logLevel in (Compile, run)) ?? Level.Info).value,
         logSbtEvents = playForkLogSbtEvents.value,
         shutdownTimeout = playForkShutdownTimeout.value)
@@ -125,15 +126,19 @@ object PlayForkRun extends AutoPlugin {
     ForkConfig(
         projectDirectory = baseDirectory.value,
         javaOptions = (javaOptions in Runtime).value,
-        dependencyClasspath = PlayInternalKeys.playDependencyClasspath.value.files,
+        dependencyClasspath =
+          PlayInternalKeys.playDependencyClasspath.value.files,
         allAssets = PlayInternalKeys.playAllAssets.value,
-        docsClasspath = (managedClasspath in PlayRun.DocsApplication).value.files,
-        docsJar = PlayKeys.playDocsJar.value,
-        devSettings = PlayKeys.devSettings.value,
-        defaultHttpPort = PlayKeys.playDefaultPort.value,
+        docsClasspath =
+          (managedClasspath in PlayRun.DocsApplication).value.files,
+        docsJar =
+          PlayKeys.playDocsJar.value,
+        devSettings =
+          PlayKeys.devSettings.value,
+        defaultHttpPort =
+          PlayKeys.playDefaultPort.value,
         defaultHttpAddress = PlayKeys.playDefaultAddress.value,
-        watchService = ForkConfig.identifyWatchService(
-              PlayKeys.fileWatchService.value),
+        watchService = ForkConfig.identifyWatchService(PlayKeys.fileWatchService.value),
         monitoredFiles = PlayKeys.playMonitoredFiles.value,
         targetDirectory = target.value,
         pollInterval = pollInterval.value,

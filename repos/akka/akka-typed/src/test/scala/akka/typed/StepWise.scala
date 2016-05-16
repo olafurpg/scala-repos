@@ -82,73 +82,72 @@ object StepWise {
       copy(ops = ThunkV(thunk.asInstanceOf[Any ⇒ Any]) :: ops)
 
     def keep(thunk: U ⇒ Unit): Steps[T, U] =
-      copy(ops = ThunkV(value ⇒
-                  { thunk.asInstanceOf[Any ⇒ Any](value); value }) :: ops)
+      copy(ops =
+            ThunkV(value ⇒ { thunk.asInstanceOf[Any ⇒ Any](value); value }) :: ops)
 
     def expectMessage[V](timeout: FiniteDuration)(f: (T, U) ⇒ V): Steps[T, V] =
       copy(
-          ops = Message(timeout, f.asInstanceOf[(Any, Any) ⇒ Any], getTrace()) :: ops)
+          ops =
+            Message(timeout, f.asInstanceOf[(Any, Any) ⇒ Any], getTrace()) :: ops)
 
     def expectMultipleMessages[V](
         timeout: FiniteDuration, count: Int)(f: (Seq[T], U) ⇒ V): Steps[T, V] =
       copy(
-          ops = MultiMessage(timeout,
-                             count,
-                             f.asInstanceOf[(Seq[Any], Any) ⇒ Any],
-                             getTrace()) :: ops)
+          ops =
+            MultiMessage(timeout,
+                         count,
+                         f.asInstanceOf[(Seq[Any], Any) ⇒ Any],
+                         getTrace()) :: ops)
 
     def expectFailure[V](timeout: FiniteDuration)(
         f: (Failed, U) ⇒ (Failed.Decision, V)): Steps[T, V] =
       copy(
-          ops = Failure(timeout,
-                        f.asInstanceOf[(Failed, Any) ⇒ (Failed.Decision, Any)],
-                        getTrace()) :: ops)
+          ops =
+            Failure(timeout,
+                    f.asInstanceOf[(Failed, Any) ⇒ (Failed.Decision, Any)],
+                    getTrace()) :: ops)
 
     def expectTermination[V](
         timeout: FiniteDuration)(f: (Terminated, U) ⇒ V): Steps[T, V] =
       copy(
-          ops = Termination(timeout,
-                            f.asInstanceOf[(Terminated, Any) ⇒ Any],
-                            getTrace()) :: ops)
-
-    def expectMessageKeep(timeout: FiniteDuration)(
-        f: (T, U) ⇒ Unit): Steps[T, U] =
-      copy(
-          ops = Message(timeout,
-                        (msg, value) ⇒
-                          {
-                      f.asInstanceOf[(Any, Any) ⇒ Any](msg, value); value
-                  },
+          ops =
+            Termination(timeout,
+                        f.asInstanceOf[(Terminated, Any) ⇒ Any],
                         getTrace()) :: ops)
+
+    def expectMessageKeep(
+        timeout: FiniteDuration)(f: (T, U) ⇒ Unit): Steps[T, U] =
+      copy(
+          ops =
+            Message(timeout, (msg, value) ⇒ {
+          f.asInstanceOf[(Any, Any) ⇒ Any](msg, value); value
+        }, getTrace()) :: ops)
 
     def expectMultipleMessagesKeep(timeout: FiniteDuration, count: Int)(
         f: (Seq[T], U) ⇒ Unit): Steps[T, U] =
       copy(
-          ops = MultiMessage(timeout,
-                             count,
-                             (msgs, value) ⇒
-                               {
-                           f.asInstanceOf[(Seq[Any], Any) ⇒ Any](msgs, value); value
-                       },
-                             getTrace()) :: ops)
+          ops =
+            MultiMessage(timeout, count, (msgs, value) ⇒ {
+          f.asInstanceOf[(Seq[Any], Any) ⇒ Any](msgs, value); value
+        }, getTrace()) :: ops)
 
     def expectFailureKeep(timeout: FiniteDuration)(
         f: (Failed, U) ⇒ Failed.Decision): Steps[T, U] =
       copy(
-          ops = Failure(timeout,
-                        (failed, value) ⇒
-                          f.asInstanceOf[(Failed, Any) ⇒ Failed.Decision](
-                              failed, value) -> value,
-                        getTrace()) :: ops)
+          ops =
+            Failure(timeout,
+                    (failed, value) ⇒
+                      f.asInstanceOf[(Failed, Any) ⇒ Failed.Decision](
+                          failed, value) -> value,
+                    getTrace()) :: ops)
 
-    def expectTerminationKeep(timeout: FiniteDuration)(
-        f: (Terminated, U) ⇒ Unit): Steps[T, U] =
+    def expectTerminationKeep(
+        timeout: FiniteDuration)(f: (Terminated, U) ⇒ Unit): Steps[T, U] =
       copy(
-          ops = Termination(
-                timeout,
-                (t, value) ⇒
-                  { f.asInstanceOf[(Terminated, Any) ⇒ Any](t, value); value },
-                getTrace()) :: ops)
+          ops =
+            Termination(timeout, (t, value) ⇒ {
+          f.asInstanceOf[(Terminated, Any) ⇒ Any](t, value); value
+        }, getTrace()) :: ops)
 
     def withKeepTraces(b: Boolean): Steps[T, U] = copy(keepTraces = b)
   }

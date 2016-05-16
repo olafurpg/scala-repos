@@ -48,8 +48,8 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
   test("works for one range with four ports") {
     withRandomSeeds(
         input = Seq(
-              portRange("role", 10, 13)
-          ),
+            portRange("role", 10, 13)
+        ),
         expectedOutput = (10 to 13).map(PortWithRole("role", _))
     )
   }
@@ -57,12 +57,13 @@ class PortWithRoleRandomPortsFromRangesTest extends MarathonSpec {
   test("works for multiple ranges") {
     withRandomSeeds(
         input = Seq(
-              portRange("role", 10, 13),
-              portRange("marathon", 14, 20),
-              portRange("role", 21, 30)
-          ),
-        expectedOutput = (10 to 13).map(PortWithRole("role", _)) ++ (14 to 20)
-            .map(PortWithRole("marathon", _)) ++ (21 to 30).map(
+            portRange("role", 10, 13),
+            portRange("marathon", 14, 20),
+            portRange("role", 21, 30)
+        ),
+        expectedOutput =
+          (10 to 13).map(PortWithRole("role", _)) ++ (14 to 20).map(
+              PortWithRole("marathon", _)) ++ (21 to 30).map(
               PortWithRole("role", _))
     )
   }

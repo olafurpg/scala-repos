@@ -39,5 +39,6 @@ object MoveTo {
 }
 
 class MoveTo(override val delegate: jfxss.MoveTo = new jfxss.MoveTo())
-    extends PathElement(delegate) with PositionDelegate[jfxss.MoveTo]
+    extends PathElement(delegate)
+    with PositionDelegate[jfxss.MoveTo]
     with SFXDelegate[jfxss.MoveTo] {}

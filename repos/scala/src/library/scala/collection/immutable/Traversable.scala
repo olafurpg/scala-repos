@@ -21,7 +21,8 @@ trait Traversable[+A]
     extends scala.collection.Traversable[A]
 //                         with GenTraversable[A]
     with GenericTraversableTemplate[A, Traversable]
-    with TraversableLike[A, Traversable[A]] with Immutable {
+    with TraversableLike[A, Traversable[A]]
+    with Immutable {
   override def companion: GenericCompanion[Traversable] = Traversable
   override def seq: Traversable[A] = this
 }

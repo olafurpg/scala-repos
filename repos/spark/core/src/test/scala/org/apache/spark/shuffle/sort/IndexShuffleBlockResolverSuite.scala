@@ -33,7 +33,8 @@ import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
 class IndexShuffleBlockResolverSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   @Mock(answer = RETURNS_SMART_NULLS)
   private var blockManager: BlockManager = _

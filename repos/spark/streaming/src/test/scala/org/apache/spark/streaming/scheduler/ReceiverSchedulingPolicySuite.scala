@@ -112,8 +112,8 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
       case (receiverId, locations) =>
         assert(locations.size == 1)
         assert(locations(0).isInstanceOf[ExecutorCacheTaskLocation])
-        numReceiversOnExecutor(locations(0)) = numReceiversOnExecutor
-          .getOrElse(locations(0), 0) + 1
+        numReceiversOnExecutor(locations(0)) =
+          numReceiversOnExecutor.getOrElse(locations(0), 0) + 1
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 2).toMap)
   }
@@ -132,8 +132,8 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         assert(locations.size == 2)
         locations.foreach { l =>
           assert(l.isInstanceOf[ExecutorCacheTaskLocation])
-          numReceiversOnExecutor(l) = numReceiversOnExecutor.getOrElse(l, 0) +
-          1
+          numReceiversOnExecutor(l) =
+            numReceiversOnExecutor.getOrElse(l, 0) + 1
         }
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 1).toMap)
@@ -158,8 +158,8 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         assert(executors.size == 1)
         executors.foreach { l =>
           assert(l.isInstanceOf[ExecutorCacheTaskLocation])
-          numReceiversOnExecutor(l) = numReceiversOnExecutor.getOrElse(l, 0) +
-          1
+          numReceiversOnExecutor(l) =
+            numReceiversOnExecutor.getOrElse(l, 0) + 1
         }
     }
     assert(numReceiversOnExecutor === executors.map(_ -> 1).toMap)
@@ -169,8 +169,7 @@ class ReceiverSchedulingPolicySuite extends SparkFunSuite {
         case (receiverId, executors) => receiverId >= 3
       }.flatMap(_._2)
     // We can simply check the executor set because we only know each receiver only has 1 executor
-    assert(
-        executorsForReceiversWithPreferredLocation.toSet === (0 until 3)
+    assert(executorsForReceiversWithPreferredLocation.toSet === (0 until 3)
           .map(executorId =>
                 ExecutorCacheTaskLocation("localhost", executorId.toString))
           .toSet)

@@ -177,7 +177,7 @@ object HRavenHistoryService extends HistoryService {
 
       // query hRaven for matching flows
       flows <- fetchSuccessfulFlows(
-          client, cluster, user, batch, signature, max, conf.maxFetch)
+                  client, cluster, user, batch, signature, max, conf.maxFetch)
     } yield flows
 
     // Find the FlowStep in the hRaven flow that corresponds to the current step

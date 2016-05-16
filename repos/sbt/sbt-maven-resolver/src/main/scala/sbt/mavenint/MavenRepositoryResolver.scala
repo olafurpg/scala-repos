@@ -112,9 +112,9 @@ abstract class MavenRepositoryResolver(settings: IvySettings)
     for {
       i <- 0 until count
       name <- Option(map.get(SbtPomExtraProperties.makeLicenseName(i)))
-        .map(_.toString)
+               .map(_.toString)
       url <- Option(map.get(SbtPomExtraProperties.makeLicenseUrl(i)))
-        .map(_.toString)
+              .map(_.toString)
     } md.addLicense(new License(name, url))
   }
 

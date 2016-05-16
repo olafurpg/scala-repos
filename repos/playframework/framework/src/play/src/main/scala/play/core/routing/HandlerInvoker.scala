@@ -199,22 +199,22 @@ object HandlerInvokerFactory {
       }
   }
 
-  implicit def javaBytesWebSocket: HandlerInvokerFactory[LegacyWebSocket[
-          Array[Byte]]] =
+  implicit def javaBytesWebSocket: HandlerInvokerFactory[
+      LegacyWebSocket[Array[Byte]]] =
     new JavaWebSocketInvokerFactory[LegacyWebSocket[Array[Byte]], Array[Byte]] {
       def webSocketCall(call: => LegacyWebSocket[Array[Byte]]) =
         JavaWebSocket.ofBytes(call)
     }
 
-  implicit def javaStringWebSocket: HandlerInvokerFactory[LegacyWebSocket[
-          String]] =
+  implicit def javaStringWebSocket: HandlerInvokerFactory[
+      LegacyWebSocket[String]] =
     new JavaWebSocketInvokerFactory[LegacyWebSocket[String], String] {
       def webSocketCall(call: => LegacyWebSocket[String]) =
         JavaWebSocket.ofString(call)
     }
 
-  implicit def javaJsonWebSocket: HandlerInvokerFactory[LegacyWebSocket[
-          JsonNode]] =
+  implicit def javaJsonWebSocket: HandlerInvokerFactory[
+      LegacyWebSocket[JsonNode]] =
     new JavaWebSocketInvokerFactory[LegacyWebSocket[JsonNode], JsonNode] {
       def webSocketCall(call: => LegacyWebSocket[JsonNode]) =
         JavaWebSocket.ofJson(call)

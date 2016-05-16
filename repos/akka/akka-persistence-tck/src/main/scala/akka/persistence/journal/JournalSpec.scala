@@ -35,7 +35,9 @@ object JournalSpec {
   * @see [[akka.persistence.japi.journal.JavaJournalPerfSpec]]
   */
 abstract class JournalSpec(config: Config)
-    extends PluginSpec(config) with MayVerb with OptionalTests
+    extends PluginSpec(config)
+    with MayVerb
+    with OptionalTests
     with JournalCapabilityFlags {
 
   implicit lazy val system: ActorSystem = ActorSystem(

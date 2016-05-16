@@ -210,8 +210,8 @@ object ContravariantCoyonedaUsage extends App {
   val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
     (ccord, i) <- decomposedSortKeys
   } yield
-    (schwartzian[Vector[String], ccord.I](unstructuredData)(
-        v => ccord.k(v(i)))(ccord.fi))
+    (schwartzian[Vector[String], ccord.I](unstructuredData)(v =>
+          ccord.k(v(i)))(ccord.fi))
 
   // `I' is the “pivot”, how the function `k' result type and `fi'
   // order type relate to each other.  As seen above, this existential

@@ -11,10 +11,10 @@ import org.scalatest.DoNotDiscover
 class LeveldbJournalNativePerfSpec
     extends JournalPerfSpec(
         config = PersistenceSpec.config(
-              "leveldb",
-              "LeveldbJournalNativePerfSpec",
-              extraConfig = Some(
-                    "akka.persistence.journal.leveldb.native = on")))
+            "leveldb",
+            "LeveldbJournalNativePerfSpec",
+            extraConfig =
+              Some("akka.persistence.journal.leveldb.native = on")))
     with PluginCleanup {
 
   override def supportsRejectingNonSerializableObjects = true

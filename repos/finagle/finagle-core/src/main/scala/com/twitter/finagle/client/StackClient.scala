@@ -396,7 +396,7 @@ trait StackClient[Req, Rep]
 
   // these are necessary to have the right types from Java
   def withParams(ps: Stack.Params): StackClient[Req, Rep]
-  def configured[P : Stack.Param](p: P): StackClient[Req, Rep]
+  def configured[P: Stack.Param](p: P): StackClient[Req, Rep]
   def configured[P](psp: (P, Stack.Param[P])): StackClient[Req, Rep]
 }
 
@@ -410,10 +410,14 @@ trait StackClient[Req, Rep]
   *      clients.
   */
 trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
-    extends StackClient[Req, Rep] with Stack.Parameterized[This]
-    with CommonParams[This] with ClientParams[This]
-    with WithClientAdmissionControl[This] with WithClientTransport[This]
-    with WithSession[This] with WithSessionQualifier[This] {
+    extends StackClient[Req, Rep]
+    with Stack.Parameterized[This]
+    with CommonParams[This]
+    with ClientParams[This]
+    with WithClientAdmissionControl[This]
+    with WithClientTransport[This]
+    with WithSession[This]
+    with WithSessionQualifier[This] {
   self =>
 
   /**
@@ -458,7 +462,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
   /**
     * Creates a new StackClient with parameter `p`.
     */
-  override def configured[P : Stack.Param](p: P): This =
+  override def configured[P: Stack.Param](p: P): This =
     withParams(params + p)
 
   /**
@@ -492,9 +496,10 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     * A copy constructor in lieu of defining StackClient as a
     * case class.
     */
-  protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
-                      params: Stack.Params = this.params)
-    : This { type In = self.In; type Out = self.Out }
+  protected def copy1(
+      stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
+      params: Stack.Params =
+        this.params): This { type In = self.In; type Out = self.Out }
 
   /**
     * A stackable module that creates new `Transports` (via transporter)

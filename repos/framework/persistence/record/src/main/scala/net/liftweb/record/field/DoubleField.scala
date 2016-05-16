@@ -51,7 +51,8 @@ trait DoubleTypedField extends NumericTypedField[Double] {
 }
 
 class DoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Double, OwnerType] with MandatoryTypedField[Double]
+    extends Field[Double, OwnerType]
+    with MandatoryTypedField[Double]
     with DoubleTypedField {
 
   def this(rec: OwnerType, value: Double) = {
@@ -63,7 +64,8 @@ class DoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalDoubleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Double, OwnerType] with OptionalTypedField[Double]
+    extends Field[Double, OwnerType]
+    with OptionalTypedField[Double]
     with DoubleTypedField {
 
   def this(rec: OwnerType, value: Box[Double]) = {

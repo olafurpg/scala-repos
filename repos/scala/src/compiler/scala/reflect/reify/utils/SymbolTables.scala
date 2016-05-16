@@ -9,10 +9,10 @@ trait SymbolTables { self: Utils =>
   import global._
 
   class SymbolTable private[SymbolTable](
-      private[SymbolTable] val symtab: immutable.ListMap[Symbol, Tree] = immutable
-          .ListMap[Symbol, Tree](),
-      private[SymbolTable] val aliases: List[(Symbol, TermName)] = List[
-            (Symbol, TermName)](),
+      private[SymbolTable] val symtab: immutable.ListMap[Symbol, Tree] =
+        immutable.ListMap[Symbol, Tree](),
+      private[SymbolTable] val aliases: List[(Symbol, TermName)] =
+        List[(Symbol, TermName)](),
       private[SymbolTable] val original: Option[List[Tree]] = None) {
 
     def syms: List[Symbol] = symtab.keys.toList
@@ -115,19 +115,21 @@ trait SymbolTables { self: Utils =>
     private def remove(name: TermName): SymbolTable = {
       var newSymtab = symtab
       val newAliases = aliases filter (_._2 != name)
-      newSymtab = newSymtab filter {
-        case ((sym, _)) => newAliases exists (_._1 == sym)
-      }
-      newSymtab = newSymtab map {
-        case ((sym, tree)) =>
-          val ValDef(mods, primaryName, tpt, rhs) = tree
-          val tree1 =
-            if (!(newAliases contains ((sym, primaryName)))) {
-              val primaryName1 = newAliases.find(_._1 == sym).get._2
-              ValDef(mods, primaryName1, tpt, rhs).copyAttrs(tree)
-            } else tree
-          (sym, tree1)
-      }
+      newSymtab =
+        newSymtab filter {
+          case ((sym, _)) => newAliases exists (_._1 == sym)
+        }
+      newSymtab =
+        newSymtab map {
+          case ((sym, tree)) =>
+            val ValDef(mods, primaryName, tpt, rhs) = tree
+            val tree1 =
+              if (!(newAliases contains ((sym, primaryName)))) {
+                val primaryName1 = newAliases.find(_._1 == sym).get._2
+                ValDef(mods, primaryName1, tpt, rhs).copyAttrs(tree)
+              } else tree
+            (sym, tree1)
+        }
       new SymbolTable(newSymtab, newAliases)
     }
 
@@ -143,7 +145,8 @@ trait SymbolTables { self: Utils =>
         .map(entry => s"${symName(entry._1)} -> ${entry._2}")
         .mkString(", ")
       s"""symtab = [$symtabString], aliases = [$aliasesString]${if (original.isDefined)
-        ", has original" else ""}"""
+        ", has original"
+      else ""}"""
     }
 
     def debugString: String = {
@@ -235,28 +238,25 @@ trait SymbolTables { self: Utils =>
 
         val withAliases =
           cumulativeSymtab flatMap
-          (entry =>
-                {
-                  val result = mutable.ListBuffer[Tree]()
-                  result += entry
-                  val sym = reifyBinding(entry).symbol
-                  if (sym != NoSymbol)
-                    result ++= cumulativeAliases.distinct filter
-                    (alias =>
-                          alias._1 == sym &&
-                          alias._2 != currtab.symName(sym)) map
-                    (alias =>
-                          {
-                            val canonicalName = currtab.symName(sym)
-                            val aliasName = alias._2
-                            ValDef(
-                                NoMods,
-                                aliasName,
-                                TypeTree(),
-                                Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
-                                sym, aliasName)
-                        })
-                  result.toList
+          (entry => {
+                val result = mutable.ListBuffer[Tree]()
+                result += entry
+                val sym = reifyBinding(entry).symbol
+                if (sym != NoSymbol)
+                  result ++= cumulativeAliases.distinct filter
+                  (alias =>
+                        alias._1 == sym &&
+                        alias._2 != currtab.symName(sym)) map
+                  (alias => {
+                        val canonicalName = currtab.symName(sym)
+                        val aliasName = alias._2
+                        ValDef(NoMods,
+                               aliasName,
+                               TypeTree(),
+                               Ident(canonicalName)) updateAttachment ReifyAliasAttachment(
+                            sym, aliasName)
+                      })
+                result.toList
               })
 
         withAliases.toList

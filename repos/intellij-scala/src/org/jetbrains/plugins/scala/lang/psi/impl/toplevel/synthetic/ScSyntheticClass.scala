@@ -50,7 +50,8 @@ abstract class SyntheticNamedElement(val manager: PsiManager, name: String)
 
 class ScSyntheticTypeParameter(
     manager: PsiManager, override val name: String, val owner: ScFun)
-    extends SyntheticNamedElement(manager, name) with ScTypeParam
+    extends SyntheticNamedElement(manager, name)
+    with ScTypeParam
     with PsiClassFake {
   def typeParameterText: String = name
 
@@ -84,7 +85,8 @@ class ScSyntheticTypeParameter(
 // with class types, but it is simpler to indicate types corresponding to synthetic classes explicitly
 class ScSyntheticClass(
     manager: PsiManager, val className: String, val t: StdType)
-    extends SyntheticNamedElement(manager, className) with PsiClass
+    extends SyntheticNamedElement(manager, className)
+    with PsiClass
     with PsiClassFake {
   override def getPresentation: ItemPresentation = {
     new ItemPresentation {
@@ -170,7 +172,8 @@ class ScSyntheticFunction(manager: PsiManager,
                           val retType: ScType,
                           val paramClauses: Seq[Seq[Parameter]],
                           typeParameterNames: Seq[String])
-    extends SyntheticNamedElement(manager, name) with ScFun {
+    extends SyntheticNamedElement(manager, name)
+    with ScFun {
   def isStringPlusMethod: Boolean = {
     if (name != "+") return false
     ScType.extractClass(retType, Some(manager.getProject)) match {
@@ -225,7 +228,8 @@ import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.project.Project
 
 class SyntheticClasses(project: Project)
-    extends PsiElementFinder with ProjectComponent {
+    extends PsiElementFinder
+    with ProjectComponent {
   def projectOpened() {}
   def projectClosed() {}
   def getComponentName = "SyntheticClasses"

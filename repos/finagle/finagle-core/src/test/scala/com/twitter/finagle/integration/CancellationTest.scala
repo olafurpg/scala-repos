@@ -13,7 +13,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class CancellationTest
-    extends FunSuite with IntegrationBase with MockitoSugar {
+    extends FunSuite
+    with IntegrationBase
+    with MockitoSugar {
   test("cancel while waiting for a reply") {
     val m = new MockChannel
     val cli = m.build()
@@ -43,8 +45,7 @@ class CancellationTest
     val seCaptor =
       ArgumentCaptor.forClass(classOf[DownstreamChannelStateEvent])
     verify(m.channelPipeline, times(2)).sendDownstream(seCaptor.capture)
-    assert(
-        seCaptor.getValue match {
+    assert(seCaptor.getValue match {
       case event: DownstreamChannelStateEvent => {
           assert(event.getChannel == m.channel)
           assert(event.getState == ChannelState.OPEN)

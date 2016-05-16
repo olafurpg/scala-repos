@@ -45,7 +45,9 @@ import org.apache.spark.deploy.yarn.config._
 import org.apache.spark.util.{ResetSystemProperties, SparkConfWithEnv, Utils}
 
 class ClientSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterAll
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterAll
     with ResetSystemProperties {
 
   import Client._
@@ -160,15 +162,13 @@ class ClientSuite
       // staging dir.
       val expected = ADDED
         .split(",")
-        .map(
-            p =>
-              {
-            val uri = new URI(p)
-            if (LOCAL_SCHEME == uri.getScheme()) {
-              p
-            } else {
-              Option(uri.getFragment()).getOrElse(new File(p).getName())
-            }
+        .map(p => {
+          val uri = new URI(p)
+          if (LOCAL_SCHEME == uri.getScheme()) {
+            p
+          } else {
+            Option(uri.getFragment()).getOrElse(new File(p).getName())
+          }
         })
         .mkString(",")
 
@@ -366,7 +366,7 @@ class ClientSuite
       .getOrElse(defaults)
   }
 
-  def getFieldValue2[A : ClassTag, A1 : ClassTag, B](
+  def getFieldValue2[A: ClassTag, A1: ClassTag, B](
       clazz: Class[_], field: String, defaults: => B)(mapTo: A => B)(
       mapTo1: A1 => B): B = {
     Try(clazz.getField(field))

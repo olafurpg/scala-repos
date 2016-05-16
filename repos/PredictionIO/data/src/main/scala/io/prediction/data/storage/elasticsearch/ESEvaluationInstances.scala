@@ -31,7 +31,8 @@ import org.json4s.native.Serialization.write
 
 class ESEvaluationInstances(
     client: Client, config: StorageClientConfig, index: String)
-    extends EvaluationInstances with Logging {
+    extends EvaluationInstances
+    with Logging {
   implicit val formats = DefaultFormats + new EvaluationInstanceSerializer
   private val estype = "evaluation_instances"
 

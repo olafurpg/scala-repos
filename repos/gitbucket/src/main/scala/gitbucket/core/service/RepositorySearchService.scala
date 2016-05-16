@@ -113,7 +113,7 @@ object RepositorySearchService {
         .replaceAll(
             "(?i)(" + keywords.map("\\Q" + _ + "\\E").mkString("|") + ")",
             "<span class=\"highlight\">$1</span>")
-        (highlightText, lineNumber + 1)
+      (highlightText, lineNumber + 1)
     } else {
       (content.split("\n").take(5).mkString("\n"), 1)
     }

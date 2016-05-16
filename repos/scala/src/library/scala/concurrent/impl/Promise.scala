@@ -19,7 +19,8 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import java.util.concurrent.atomic.AtomicReference
 
 private[concurrent] trait Promise[T]
-    extends scala.concurrent.Promise[T] with scala.concurrent.Future[T] {
+    extends scala.concurrent.Promise[T]
+    with scala.concurrent.Future[T] {
   def future: this.type = this
 
   import scala.concurrent.Future
@@ -59,7 +60,8 @@ private[concurrent] trait Promise[T]
  */
 private final class CallbackRunnable[T](
     val executor: ExecutionContext, val onComplete: Try[T] => Any)
-    extends Runnable with OnCompleteRunnable {
+    extends Runnable
+    with OnCompleteRunnable {
   // must be filled in before running it
   var value: Try[T] = null
 
@@ -108,7 +110,8 @@ private[concurrent] object Promise {
     * http://creativecommons.org/publicdomain/zero/1.0/
     */
   private final class CompletionLatch[T]
-      extends AbstractQueuedSynchronizer with (Try[T] => Unit) {
+      extends AbstractQueuedSynchronizer
+      with (Try[T] => Unit) {
     override protected def tryAcquireShared(ignored: Int): Int =
       if (getState != 0) 1 else -1
     override protected def tryReleaseShared(ignore: Int): Boolean = {
@@ -197,7 +200,8 @@ private[concurrent] object Promise {
   // Left non-final to enable addition of extra fields by Java/Scala converters
   // in scala-java8-compat.
   class DefaultPromise[T]
-      extends AtomicReference[AnyRef](Nil) with Promise[T] {
+      extends AtomicReference[AnyRef](Nil)
+      with Promise[T] {
 
     /** Get the root promise for this promise, compressing the link chain to that
       *  promise if necessary.

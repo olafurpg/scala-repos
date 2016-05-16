@@ -189,8 +189,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
 
         val transformed = transformTypeTagEvidenceParams(
             macroImplRef, (param, tparam) => tparam)
-        mmap(transformed)(
-            p => if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
+        mmap(transformed)(p =>
+              if (p.isTerm) fingerprint(p.info) else Tagged(p.paramPos))
       }
 
       val payload = List[(String, Any)](
@@ -305,8 +305,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
         var runtimeType = decreaseMetalevel(macroImpl.info.finalResultType)
 
         // Step II. Transform type parameters of a macro implementation into type arguments in a macro definition's body
-        runtimeType = runtimeType.substituteTypes(
-            macroImpl.typeParams, targs map (_.tpe))
+        runtimeType =
+          runtimeType.substituteTypes(macroImpl.typeParams, targs map (_.tpe))
 
         // Step III. Transform c.prefix.value.XXX to this.XXX and implParam.value.YYY to defParam.YYY
         def unsigma(tpe: Type): Type =
@@ -472,39 +472,37 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           // wrap argss in c.Expr if necessary (i.e. if corresponding macro impl param is of type c.Expr[T])
           // expand varargs (nb! varargs can apply to any parameter section, not necessarily to the last one)
           val trees = map3(argss, paramss, signature)(
-              (args, defParams, implParams) =>
-                {
-              val isVarargs = isVarArgsList(defParams)
-              if (isVarargs) {
-                if (defParams.length > args.length + 1)
-                  MacroTooFewArgumentsError(expandee)
-              } else {
-                if (defParams.length < args.length)
-                  MacroTooManyArgumentsError(expandee)
-                if (defParams.length > args.length)
-                  MacroTooFewArgumentsError(expandee)
+              (args, defParams, implParams) => {
+            val isVarargs = isVarArgsList(defParams)
+            if (isVarargs) {
+              if (defParams.length > args.length + 1)
+                MacroTooFewArgumentsError(expandee)
+            } else {
+              if (defParams.length < args.length)
+                MacroTooManyArgumentsError(expandee)
+              if (defParams.length > args.length)
+                MacroTooFewArgumentsError(expandee)
+            }
+
+            val wrappedArgs = mapWithIndex(args)((arg, j) => {
+              val fingerprint = implParams(min(j, implParams.length - 1))
+              val duplicatedArg = duplicateAndKeepPositions(arg)
+              fingerprint match {
+                case LiftedTyped =>
+                  context.Expr[Nothing](duplicatedArg)(TypeTag.Nothing) // TODO: SI-5752
+                case LiftedUntyped => duplicatedArg
+                case _ =>
+                  abort(
+                      s"unexpected fingerprint $fingerprint in $binding with paramss being $paramss " +
+                      s"corresponding to arg $arg in $argss")
               }
+            })
 
-              val wrappedArgs = mapWithIndex(args)((arg, j) =>
-                    {
-                  val fingerprint = implParams(min(j, implParams.length - 1))
-                  val duplicatedArg = duplicateAndKeepPositions(arg)
-                  fingerprint match {
-                    case LiftedTyped =>
-                      context.Expr[Nothing](duplicatedArg)(TypeTag.Nothing) // TODO: SI-5752
-                    case LiftedUntyped => duplicatedArg
-                    case _ =>
-                      abort(
-                          s"unexpected fingerprint $fingerprint in $binding with paramss being $paramss " +
-                          s"corresponding to arg $arg in $argss")
-                  }
-              })
-
-              if (isVarargs) {
-                val (normal, varargs) =
-                  wrappedArgs splitAt (defParams.length - 1)
-                normal :+ varargs // pack all varargs into a single Seq argument (varargs Scala style)
-              } else wrappedArgs
+            if (isVarargs) {
+              val (normal, varargs) =
+                wrappedArgs splitAt (defParams.length - 1)
+              normal :+ varargs // pack all varargs into a single Seq argument (varargs Scala style)
+            } else wrappedArgs
           })
           macroLogVerbose(s"trees: $trees")
 
@@ -527,25 +525,24 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
           // also, macro implementation reference may contain a regular type as a type argument, then we pass it verbatim
           val tags =
             signature.flatten collect { case f if f.isTag => f.paramPos } map
-            (paramPos =>
-                  {
-                    val targ = binding.targs(paramPos).tpe.typeSymbol
-                    val tpe =
-                      if (targ.isTypeParameterOrSkolem) {
-                        if (targ.owner == macroDef) {
-                          // doesn't work when macro def is compiled separately from its usages
-                          // then targ is not a skolem and isn't equal to any of macroDef.typeParams
-                          // val argPos = targ.deSkolemize.paramPos
-                          val argPos =
-                            macroDef.typeParams.indexWhere(_.name == targ.name)
-                          targs(argPos).tpe
-                        } else
-                          targ.tpe.asSeenFrom(if (prefix == EmptyTree)
-                                                macroDef.owner.tpe
-                                              else prefix.tpe,
-                                              macroDef.owner)
-                      } else targ.tpe
-                    context.WeakTypeTag(tpe)
+            (paramPos => {
+                  val targ = binding.targs(paramPos).tpe.typeSymbol
+                  val tpe =
+                    if (targ.isTypeParameterOrSkolem) {
+                      if (targ.owner == macroDef) {
+                        // doesn't work when macro def is compiled separately from its usages
+                        // then targ is not a skolem and isn't equal to any of macroDef.typeParams
+                        // val argPos = targ.deSkolemize.paramPos
+                        val argPos =
+                          macroDef.typeParams.indexWhere(_.name == targ.name)
+                        targs(argPos).tpe
+                      } else
+                        targ.tpe.asSeenFrom(if (prefix == EmptyTree)
+                                              macroDef.owner.tpe
+                                            else prefix.tpe,
+                                            macroDef.owner)
+                    } else targ.tpe
+                  context.WeakTypeTag(tpe)
                 })
           macroLogVerbose(s"tags: $tags")
 
@@ -634,7 +631,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
         showRaw(tree, printIds = true, printTypes = true)
       def summary() =
         s"expander = $this, expandee = ${showDetailed(expandee)}, desugared = ${if (expandee == desugared)
-          () else showDetailed(desugared)}"
+          ()
+        else showDetailed(desugared)}"
       if (macroDebugVerbose) println(s"macroExpand: ${summary()}")
       linkExpandeeAndDesugared(expandee, desugared)
 
@@ -645,7 +643,8 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       try {
         withInfoLevel(nodePrinters.InfoLevel.Quiet) {
           // verbose printing might cause recursive macro expansions
-          if (expandee.symbol.isErroneous || (expandee exists (_.isErroneous))) {
+          if (expandee.symbol.isErroneous ||
+              (expandee exists (_.isErroneous))) {
             val reason =
               if (expandee.symbol.isErroneous)
                 "not found or incompatible macro implementation"
@@ -972,14 +971,13 @@ trait Macros extends MacroRuntimes with Traces with Helpers { self: Analyzer =>
       delayed.getOrElse(expandee, {
         val calculated = scala.collection.mutable.Set[Symbol]()
         expandee foreach
-        (sub =>
-              {
-                def traverse(sym: Symbol) =
-                  if (sym != null && (undetparams contains sym.id))
-                    calculated += sym
-                if (sub.symbol != null) traverse(sub.symbol)
-                if (sub.tpe != null)
-                  sub.tpe foreach (sub => traverse(sub.typeSymbol))
+        (sub => {
+              def traverse(sym: Symbol) =
+                if (sym != null && (undetparams contains sym.id))
+                  calculated += sym
+              if (sub.symbol != null) traverse(sub.symbol)
+              if (sub.tpe != null)
+                sub.tpe foreach (sub => traverse(sub.typeSymbol))
             })
         macroLogVerbose("calculateUndetparams: %s".format(calculated))
         calculated map (_.id)

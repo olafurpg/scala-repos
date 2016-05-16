@@ -243,8 +243,8 @@ object SerializationTestDefns {
   /**
     * A `CanBuildFrom` for `List` implementing `Serializable`, unlike the one provided by the standard library.
     */
-  implicit def listSerializableCanBuildFrom[T]: CanBuildFrom[
-      List[T], T, List[T]] =
+  implicit def listSerializableCanBuildFrom[T]
+    : CanBuildFrom[List[T], T, List[T]] =
     new CanBuildFrom[List[T], T, List[T]] with Serializable {
       def apply(from: List[T]) = from.genericBuilder[T]
       def apply() = List.newBuilder[T]
@@ -966,8 +966,8 @@ class SerializationTests {
 
     assertSerializableBeforeAfter(
         implicitly[Lazy[Lazy.Values[Generic[Wibble] :: HNil]]])(_.value)
-    assertSerializableBeforeAfter(implicitly[Lazy[
-                Lazy.Values[Generic[Wibble] :: Generic1[Box, TC1] :: HNil]]])(
+    assertSerializableBeforeAfter(implicitly[
+            Lazy[Lazy.Values[Generic[Wibble] :: Generic1[Box, TC1] :: HNil]]])(
         _.value)
   }
 

@@ -291,14 +291,13 @@ abstract class BTypes {
       // Here we are parsing from a classfile and we don't need to do anything special. Many of these
       // primitives don't even exist, for example Any.isInstanceOf.
       val methodInfos = classNode.methods.asScala
-        .map(methodNode =>
-              {
-            val info = MethodInlineInfo(
-                effectivelyFinal = BytecodeUtils.isFinalMethod(methodNode),
-                traitMethodWithStaticImplementation = false,
-                annotatedInline = false,
-                annotatedNoInline = false)
-            (methodNode.name + methodNode.desc, info)
+        .map(methodNode => {
+          val info = MethodInlineInfo(
+              effectivelyFinal = BytecodeUtils.isFinalMethod(methodNode),
+              traitMethodWithStaticImplementation = false,
+              annotatedInline = false,
+              annotatedNoInline = false)
+          (methodNode.name + methodNode.desc, info)
         })
         .toMap
       InlineInfo(traitImplClassSelfType = None,
@@ -985,21 +984,18 @@ abstract class BTypes {
       info.map(_.nestedInfo.isDefined)
 
     def enclosingNestedClassesChain: Either[NoClassBTypeInfo, List[ClassBType]] = {
-      isNestedClass.flatMap(
-          isNested =>
-            {
-          // if isNested is true, we know that info.get is defined, and nestedInfo.get is also defined.
-          if (isNested)
-            info.get.nestedInfo.get.enclosingClass.enclosingNestedClassesChain
-              .map(this :: _)
-          else Right(Nil)
+      isNestedClass.flatMap(isNested => {
+        // if isNested is true, we know that info.get is defined, and nestedInfo.get is also defined.
+        if (isNested)
+          info.get.nestedInfo.get.enclosingClass.enclosingNestedClassesChain
+            .map(this :: _)
+        else Right(Nil)
       })
     }
 
     def innerClassAttributeEntry: Either[
         NoClassBTypeInfo, Option[InnerClassEntry]] =
-      info.map(
-          i =>
+      info.map(i =>
             i.nestedInfo map {
           case NestedInfo(_, outerName, innerName, isStaticNestedClass) =>
             InnerClassEntry(
@@ -1016,16 +1012,14 @@ abstract class BTypes {
       })
 
     def inlineInfoAttribute: Either[NoClassBTypeInfo, InlineInfoAttribute] =
-      info.map(
-          i =>
-            {
-          // InlineInfos are serialized for classes being compiled. For those the info was built by
-          // buildInlineInfoFromClassSymbol, which only adds a warning under SI-9111, which in turn
-          // only happens for class symbols of java source files.
-          // we could put this assertion into InlineInfoAttribute, but it is more safe to put it here
-          // where it affect only GenBCode, and not add any assertion to GenASM in 2.11.6.
-          assert(i.inlineInfo.warning.isEmpty, i.inlineInfo.warning)
-          InlineInfoAttribute(i.inlineInfo)
+      info.map(i => {
+        // InlineInfos are serialized for classes being compiled. For those the info was built by
+        // buildInlineInfoFromClassSymbol, which only adds a warning under SI-9111, which in turn
+        // only happens for class symbols of java source files.
+        // we could put this assertion into InlineInfoAttribute, but it is more safe to put it here
+        // where it affect only GenBCode, and not add any assertion to GenASM in 2.11.6.
+        assert(i.inlineInfo.warning.isEmpty, i.inlineInfo.warning)
+        InlineInfoAttribute(i.inlineInfo)
       })
 
     def isSubtypeOf(other: ClassBType): Either[NoClassBTypeInfo, Boolean] =

@@ -38,7 +38,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 @Since("0.8.0")
 class KMeansModel @Since("1.1.0")(
     @Since("1.0.0") val clusterCenters: Array[Vector])
-    extends Saveable with Serializable with PMMLExportable {
+    extends Saveable
+    with Serializable
+    with PMMLExportable {
 
   /**
     * A Java-friendly constructor that takes an Iterable of Vectors.
@@ -67,8 +69,7 @@ class KMeansModel @Since("1.1.0")(
   def predict(points: RDD[Vector]): RDD[Int] = {
     val centersWithNorm = clusterCentersWithNorm
     val bcCentersWithNorm = points.context.broadcast(centersWithNorm)
-    points.map(
-        p =>
+    points.map(p =>
           KMeans
             .findClosest(bcCentersWithNorm.value, new VectorWithNorm(p))
             ._1)

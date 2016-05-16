@@ -26,7 +26,8 @@ import org.apache.spark.shuffle._
   * mapper (possibly reusing these across waves of tasks).
   */
 private[spark] class HashShuffleManager(conf: SparkConf)
-    extends ShuffleManager with Logging {
+    extends ShuffleManager
+    with Logging {
 
   if (!conf.getBoolean("spark.shuffle.spill", true)) {
     logWarning(

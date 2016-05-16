@@ -192,7 +192,7 @@ class SbtBuilder extends ModuleLevelBuilder(BuilderCategory.TRANSLATOR) {
     }
 
     for (target <- chunk.getTargets.asScala ++ sourceTargets;
-    root <- rootIndex.getTargetRoots(target, context).asScala) {
+         root <- rootIndex.getTargetRoots(target, context).asScala) {
       FileUtil.processFilesRecursively(root.getRootFile, new Processor[File] {
         def process(file: File) = {
           if (!excludeIndex.isExcluded(file)) {

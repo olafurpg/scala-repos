@@ -29,7 +29,8 @@ import org.apache.spark.scheduler.TaskSchedulerImpl
 
 private[spark] class YarnClientSchedulerBackend(
     scheduler: TaskSchedulerImpl, sc: SparkContext)
-    extends YarnSchedulerBackend(scheduler, sc) with Logging {
+    extends YarnSchedulerBackend(scheduler, sc)
+    with Logging {
 
   private var client: Client = null
   private var monitorThread: MonitorThread = null

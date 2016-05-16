@@ -21,7 +21,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 07.03.2008
   */
 trait ScPrimaryConstructor
-    extends ScMember with ScMethodLike with ScAnnotationsHolder {
+    extends ScMember
+    with ScMethodLike
+    with ScAnnotationsHolder {
   def hasMalformedSignature = parameterList.clauses.exists {
     _.parameters.dropRight(1).exists(_.isRepeatedParameter)
   }
@@ -120,15 +122,17 @@ trait ScPrimaryConstructor
       name: String, clausePosition: Int = -1): Option[ScParameter] = {
     clausePosition match {
       case -1 =>
-        for (param <- parameters if ScalaPsiUtil.memberNamesEquals(
-                         param.name, name)) return Some(param)
+        for (param <- parameters
+             if ScalaPsiUtil.memberNamesEquals(param.name, name)) return Some(
+            param)
         None
       case i if i < 0 => None
       case i if i >= effectiveParameterClauses.length => None
       case i =>
         val clause: ScParameterClause = effectiveParameterClauses.apply(i)
-        for (param <- clause.parameters if ScalaPsiUtil.memberNamesEquals(
-                         param.name, name)) return Some(param)
+        for (param <- clause.parameters
+             if ScalaPsiUtil.memberNamesEquals(param.name, name)) return Some(
+            param)
         None
     }
   }
@@ -139,7 +143,7 @@ trait ScPrimaryConstructor
     buffer += new ScPrimaryConstructorWrapper(this)
     for {
       first <- parameterList.clauses.headOption if first.hasRepeatedParam
-              if hasAnnotation("scala.annotation.varargs").isDefined
+      if hasAnnotation("scala.annotation.varargs").isDefined
     } {
       buffer += new ScPrimaryConstructorWrapper(this, isJavaVarargs = true)
     }

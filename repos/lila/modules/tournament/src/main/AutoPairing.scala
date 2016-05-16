@@ -26,19 +26,21 @@ final class AutoPairing(
       user1 ← getUser(pairing.user1)
       user2 ← getUser(pairing.user2)
       game1 = Game.make(
-          game = chess.Game(
+          game =
+            chess.Game(
                 variant = tour.variant.some,
                 fen = tour.position.some.filterNot(_.initial).map(_.fen)
             ) |> { g =>
-            val turns = g.player.fold(0, 1)
-            g.copy(clock = tour.clock.chessClock.some,
-                   turns = turns,
-                   startedAtTurn = turns)
-          },
+              val turns = g.player.fold(0, 1)
+              g.copy(clock = tour.clock.chessClock.some,
+                     turns = turns,
+                     startedAtTurn = turns)
+            },
           whitePlayer = GamePlayer.white,
           blackPlayer = GamePlayer.black,
           mode = tour.mode,
-          variant = if (tour.position.initial) tour.variant
+          variant =
+            if (tour.position.initial) tour.variant
             else chess.variant.FromPosition,
           source = Source.Tournament,
           pgnImport = None)
@@ -53,9 +55,9 @@ final class AutoPairing(
         .withId(pairing.gameId)
         .start
       _ ← (GameRepo insertDenormalized game2) >>- scheduleIdleCheck(
-          PovRef(game2.id, game2.turnColor),
-          SecondsToDoFirstMove.secondsToMoveFor(tour),
-          true) >>- onStart(game2.id)
+             PovRef(game2.id, game2.turnColor),
+             SecondsToDoFirstMove.secondsToMoveFor(tour),
+             true) >>- onStart(game2.id)
     } yield game2
 
   private def getUser(username: String): Fu[User] =

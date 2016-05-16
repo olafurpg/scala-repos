@@ -39,7 +39,7 @@ sealed abstract class FreeAp[F[_], A] {
     *   })
     * }}}
     */
-  def analyze[M : Monoid](f: F ~> λ[α => M]): M =
+  def analyze[M: Monoid](f: F ~> λ[α => M]): M =
     foldMap[Const[M, ?]](new (F ~> Const[M, ?]) {
       def apply[X](x: F[X]): Const[M, X] = Const(f(x))
     }).getConst

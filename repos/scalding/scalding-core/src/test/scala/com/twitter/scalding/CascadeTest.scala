@@ -50,7 +50,9 @@ class CascadeTestJob(args: Args) extends CascadeJob(args) {
 }
 
 class TwoPhaseCascadeTest
-    extends WordSpec with Matchers with FieldConversions {
+    extends WordSpec
+    with Matchers
+    with FieldConversions {
   "A Cascade job" should {
     CascadeTest("com.twitter.scalding.CascadeTestJob")
       .arg("input0", "input0")

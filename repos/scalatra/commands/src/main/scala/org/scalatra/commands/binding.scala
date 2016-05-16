@@ -146,7 +146,7 @@ sealed trait Binding {
 
 trait BindingSyntax extends BindingValidatorImplicits {
 
-  implicit def asType[T : Manifest](name: String): FieldDescriptor[T] =
+  implicit def asType[T: Manifest](name: String): FieldDescriptor[T] =
     FieldDescriptor[T](name)
 
   def asBoolean(name: String): FieldDescriptor[Boolean] =
@@ -167,7 +167,7 @@ trait BindingSyntax extends BindingValidatorImplicits {
   def asDate(name: String): FieldDescriptor[Date] = FieldDescriptor[Date](name)
   def asDateTime(name: String): FieldDescriptor[DateTime] =
     FieldDescriptor[DateTime](name)
-  def asSeq[T : Manifest](name: String): FieldDescriptor[Seq[T]] =
+  def asSeq[T: Manifest](name: String): FieldDescriptor[Seq[T]] =
     FieldDescriptor[Seq[T]](name)
 }
 
@@ -179,23 +179,24 @@ object BindingSyntax extends BindingSyntax
   * @author mmazzarolo
   */
 trait BindingImplicits
-    extends DefaultImplicitConversions with BindingValidatorImplicits {
+    extends DefaultImplicitConversions
+    with BindingValidatorImplicits {
 
-  implicit def stringToDateTime(implicit df: DateParser = JodaDateFormats.Web)
-    : TypeConverter[String, DateTime] =
+  implicit def stringToDateTime(implicit df: DateParser =
+        JodaDateFormats.Web): TypeConverter[String, DateTime] =
     safeOption(df.parse)
 
-  implicit def stringToDate(implicit df: DateParser = JodaDateFormats.Web)
-    : TypeConverter[String, Date] =
+  implicit def stringToDate(implicit df: DateParser =
+        JodaDateFormats.Web): TypeConverter[String, Date] =
     safeOption(df.parse(_).map(_.toDate))
 
   implicit def stringToSeqDateTime(
-      implicit df: DateParser = JodaDateFormats.Web)
-    : TypeConverter[String, Seq[DateTime]] =
+      implicit df: DateParser =
+        JodaDateFormats.Web): TypeConverter[String, Seq[DateTime]] =
     stringToSeq(stringToDateTime)
 
-  implicit def stringToSeqDate(implicit df: DateParser = JodaDateFormats.Web)
-    : TypeConverter[String, Seq[Date]] =
+  implicit def stringToSeqDate(implicit df: DateParser =
+        JodaDateFormats.Web): TypeConverter[String, Seq[Date]] =
     stringToSeq(stringToDate)
 }
 

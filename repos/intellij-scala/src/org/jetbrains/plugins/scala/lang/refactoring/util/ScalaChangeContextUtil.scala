@@ -51,8 +51,8 @@ object ScalaChangeContextUtil {
     elem.getCopyableUserData(ASSOCIATIONS_KEY) match {
       case null =>
       case as: Associations =>
-        as.associations.foreach(
-            a => a.range = a.range.shiftRight(offsetChange))
+        as.associations.foreach(a =>
+              a.range = a.range.shiftRight(offsetChange))
     }
   }
 }

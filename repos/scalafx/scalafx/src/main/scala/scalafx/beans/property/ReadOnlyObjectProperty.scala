@@ -40,7 +40,8 @@ object ReadOnlyObjectProperty {
 
 class ReadOnlyObjectProperty[T <: Any](
     override val delegate: jfxbp.ReadOnlyObjectProperty[T])
-    extends ObjectExpression[T](delegate) with ReadOnlyProperty[T, T]
+    extends ObjectExpression[T](delegate)
+    with ReadOnlyProperty[T, T]
     with SFXDelegate[jfxbp.ReadOnlyObjectProperty[T]] {
 
   def this(bean: Object, name: String, value: T) =

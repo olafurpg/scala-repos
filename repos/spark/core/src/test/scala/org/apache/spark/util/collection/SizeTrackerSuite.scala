@@ -69,7 +69,7 @@ class SizeTrackerSuite extends SparkFunSuite {
     testMap[String, Int](10000, i => (randString(0, 10000), i))
   }
 
-  def testVector[T : ClassTag](numElements: Int, makeElement: Int => T) {
+  def testVector[T: ClassTag](numElements: Int, makeElement: Int => T) {
     val vector = new SizeTrackingVector[T]
     for (i <- 0 until numElements) {
       val item = makeElement(i)

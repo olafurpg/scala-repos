@@ -63,8 +63,8 @@ class ComposeTests extends CatsSuite {
   {
     // Reducible composition
 
-    implicit val reducibleListVector: Reducible[Lambda[A => NonEmptyList[
-                NonEmptyVector[A]]]] =
+    implicit val reducibleListVector: Reducible[
+        Lambda[A => NonEmptyList[NonEmptyVector[A]]]] =
       Reducible[NonEmptyList] compose Reducible[NonEmptyVector]
 
     // No Reducible-specific laws, so check the Foldable laws are satisfied

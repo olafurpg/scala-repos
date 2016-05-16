@@ -36,7 +36,7 @@ abstract class BinaryInput {
   private val chunkSize = 1024
   private val chunk = Array.ofDim[Byte](chunkSize)
 
-  protected def getArrayByChunk[T <: AnyVal : ClassTag](
+  protected def getArrayByChunk[T <: AnyVal: ClassTag](
       offset: Long, eltSize: Int): Array[T] = {
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)
@@ -159,7 +159,7 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
     res |= (data(idx) << 24)
     res |= (data(idx + 1) << 16) & 0xFF0000
     res |= (data(idx + 2) << 8) & 0xFF00
-    res |=(data(idx + 3)) & 0xFF
+    res |= (data(idx + 3)) & 0xFF
     idx += 4
     res
   }
@@ -198,7 +198,7 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
   }
 
   //override array for faster copy (get rid of ckunk)
-  override protected def getArrayByChunk[T <: AnyVal : ClassTag](
+  override protected def getArrayByChunk[T <: AnyVal: ClassTag](
       offset: Long, eltSize: Int): Array[T] = {
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)

@@ -10,7 +10,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.concurrent.Future
 
 class AppVersionsResourceTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("access without authentication is denied") {
     Given("An unauthenticated request")

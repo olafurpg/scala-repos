@@ -6,7 +6,7 @@ object Test {
   /** Collects symbols by the given name, even if they're not
     *  named CC.
     */
-  def collectSymbols[T : TypeTag](
+  def collectSymbols[T: TypeTag](
       inMethod: TermName, name: String): List[String] = {
     val m = typeOf[T] member inMethod infoIn typeOf[T]
     var buf: List[Symbol] = Nil

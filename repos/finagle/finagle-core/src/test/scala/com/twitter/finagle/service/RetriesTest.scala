@@ -41,9 +41,11 @@ class RetriesTest extends FunSuite {
 
   private def newBudget(): RetryBudget =
     RetryBudget(
-        ttl = 1.second, // simplifies the math such that minRetries == minRetriesPerSecond
+        ttl =
+          1.second, // simplifies the math such that minRetries == minRetriesPerSecond
         minRetriesPerSec = minBudget,
-        percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
+        percentCanRetry =
+          0.0, // this shouldn't be a factor because we are relying on the reserve
         nowMillis = Stopwatch.timeMillis)
 
   test("moduleRetryableWrites only does requeues") {
@@ -139,7 +141,8 @@ class RetriesTest extends FunSuite {
     val budget = RetryBudget(
         ttl = 20.seconds, // give a long window so we don't need to worry
         minRetriesPerSec = 1, // works out to 20 minimum retries per ttl
-        percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
+        percentCanRetry =
+          0.0, // this shouldn't be a factor because we are relying on the reserve
         nowMillis = Stopwatch.systemMillis)
 
     val params =

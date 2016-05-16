@@ -59,7 +59,8 @@ class GenObjectInput(booleanIter: Iterator[Boolean],
 
 case class GenObjectOutput(
     val booleanArrBuf: ArrayBuffer[Boolean] = new ArrayBuffer[Boolean],
-    val byteArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int], // Byte stored as Int
+    val byteArrBuf: ArrayBuffer[Int] =
+      new ArrayBuffer[Int], // Byte stored as Int
     val charArrBuf: ArrayBuffer[Int] = new ArrayBuffer[Int],
     val doubleArrBuf: ArrayBuffer[Double] = new ArrayBuffer[Double],
     val floatArrBuf: ArrayBuffer[Float] = new ArrayBuffer[Float],

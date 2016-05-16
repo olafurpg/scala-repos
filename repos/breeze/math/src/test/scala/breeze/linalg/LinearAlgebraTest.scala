@@ -38,7 +38,10 @@ import breeze.{math => bmath}
   */
 @RunWith(classOf[JUnitRunner])
 class LinearAlgebraTest
-    extends FunSuite with Checkers with Matchers with DoubleImplicits {
+    extends FunSuite
+    with Checkers
+    with Matchers
+    with DoubleImplicits {
   test("kron") {
     val a = DenseMatrix((1, 2), (3, 4))
     val b = DenseMatrix((0, 5), (6, 7))
@@ -178,7 +181,7 @@ class LinearAlgebraTest
     implicit def arb3DVector: Arbitrary[DenseVector[Double]] = Arbitrary {
       for {
         els <- Gen.containerOfN[Array, Double](
-            3, Gen.chooseNum[Double](-100.0, 100.0))
+                  3, Gen.chooseNum[Double](-100.0, 100.0))
       } yield DenseVector(els(0), els(1), els(2))
     }
     check { (a: DenseVector[Double], b: DenseVector[Double]) =>
@@ -850,10 +853,10 @@ class LinearAlgebraTest
 
   test("diag test") {
     val testDV = DenseVector(0.1, 1.1, 2.1, 3.1, 4.1)
-    val testDM = DenseMatrix.tabulate[Double](5, 5)(
-        (r, c) => if (r == c) r.toDouble + 0.1 else 0.0)
-    val testCSC = CSCMatrix.tabulate[Double](5, 5)(
-        (r, c) => if (r == c) r.toDouble + 0.1 else 0.0)
+    val testDM = DenseMatrix.tabulate[Double](5, 5)((r, c) =>
+          if (r == c) r.toDouble + 0.1 else 0.0)
+    val testCSC = CSCMatrix.tabulate[Double](5, 5)((r, c) =>
+          if (r == c) r.toDouble + 0.1 else 0.0)
     val testSV = SparseVector(0.1, 1.1, 2.1, 3.1, 4.1)
 
     assert(diag(testDV) === testDM)

@@ -350,10 +350,8 @@ object FSpec extends Specification with ExecutionSpecification {
       : (Promise[Int], Promise[String], F.Promise[F.Either[Int, String]]) = {
       val pl = Promise[Int]()
       val pr = Promise[String]()
-      val por = F.Promise
-        .wrap(pl.future)
-        .or(F.Promise.wrap(pr.future))
-        (pl, pr, por)
+      val por = F.Promise.wrap(pl.future).or(F.Promise.wrap(pr.future))
+      (pl, pr, por)
     }
 
     "combine with another promise with 'or'" in {

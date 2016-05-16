@@ -54,9 +54,12 @@ object Stack extends SeqFactory[Stack] {
   *  @define willNotTerminateInf
   */
 class Stack[A] private (var elems: List[A])
-    extends AbstractSeq[A] with Seq[A] with SeqLike[A, Stack[A]]
+    extends AbstractSeq[A]
+    with Seq[A]
+    with SeqLike[A, Stack[A]]
     with GenericTraversableTemplate[A, Stack]
-    with Cloneable[Stack[A]] with Serializable {
+    with Cloneable[Stack[A]]
+    with Serializable {
   def this() = this(Nil)
 
   override def companion = Stack

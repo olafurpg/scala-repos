@@ -99,7 +99,8 @@ object V1CookedBlockFormat extends CookedBlockFormat with Chunker {
 }
 
 case class VersionedCookedBlockFormat(formats: Map[Int, CookedBlockFormat])
-    extends CookedBlockFormat with Versioning {
+    extends CookedBlockFormat
+    with Versioning {
   val magic: Short = 0xB10C.toShort
   val (version, format) = {
     val (ver, fmt) = formats.maxBy(_._1)

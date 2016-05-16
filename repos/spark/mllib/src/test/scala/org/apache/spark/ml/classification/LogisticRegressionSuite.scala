@@ -33,7 +33,8 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.lit
 
 class LogisticRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   @transient var dataset: DataFrame = _
@@ -827,12 +828,12 @@ class LogisticRegressionSuite
       case Row(label: Double, features: Vector) => label
     }.treeAggregate(new MultiClassSummarizer)(
           seqOp = (c, v) =>
-              (c, v) match {
+            (c, v) match {
               case (classSummarizer: MultiClassSummarizer, label: Double) =>
                 classSummarizer.add(label)
           },
           combOp = (c1, c2) =>
-              (c1, c2) match {
+            (c1, c2) match {
               case (classSummarizer1: MultiClassSummarizer,
                     classSummarizer2: MultiClassSummarizer) =>
                 classSummarizer1.merge(classSummarizer2)

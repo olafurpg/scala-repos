@@ -60,8 +60,8 @@ class LAFuture[T](val scheduler: LAScheduler) {
         notifyAll()
       }
     }
-    funcs.foreach(
-        f => LAFuture.executeWithObservers(scheduler, () => f(value)))
+    funcs.foreach(f =>
+          LAFuture.executeWithObservers(scheduler, () => f(value)))
   }
 
   /**
@@ -113,8 +113,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
 
   def flatMap[A](f: T => LAFuture[A]): LAFuture[A] = {
     val ret = new LAFuture[A](scheduler)
-    onComplete(
-        v =>
+    onComplete(v =>
           v match {
         case Full(v) =>
           Box.tryo(f(v)) match {
@@ -233,10 +232,10 @@ class LAFuture[T](val scheduler: LAScheduler) {
       if (!satisfied && !aborted) {
         aborted = true
         failure = e
-        onFailure.foreach(
-            f => LAFuture.executeWithObservers(scheduler, () => f(e)))
-        onComplete.foreach(
-            f => LAFuture.executeWithObservers(scheduler, () => f(e)))
+        onFailure.foreach(f =>
+              LAFuture.executeWithObservers(scheduler, () => f(e)))
+        onComplete.foreach(f =>
+              LAFuture.executeWithObservers(scheduler, () => f(e)))
         onComplete = Nil
         onFailure = Nil
         toDo = Nil
@@ -273,13 +272,12 @@ object LAFuture {
   def apply[T](f: () => T, scheduler: LAScheduler = LAScheduler): LAFuture[T] = {
     val ret = new LAFuture[T](scheduler)
     scheduler.execute(
-        () =>
-          {
-        try {
-          ret.satisfy(f())
-        } catch {
-          case e: Exception => ret.fail(e)
-        }
+        () => {
+      try {
+        ret.satisfy(f())
+      } catch {
+        case e: Exception => ret.fail(e)
+      }
     })
     ret
   }
@@ -311,15 +309,14 @@ object LAFuture {
   private def executeWithObservers(scheduler: LAScheduler, f: () => Unit) {
     val cur = threadInfo.get()
     scheduler.execute(
-        () =>
-          {
-        val old = threadInfo.get()
-        threadInfo.set(cur)
-        try {
-          f()
-        } finally {
-          threadInfo.set(old)
-        }
+        () => {
+      val old = threadInfo.get()
+      threadInfo.set(cur)
+      try {
+        f()
+      } finally {
+        threadInfo.set(old)
+      }
     })
   }
 

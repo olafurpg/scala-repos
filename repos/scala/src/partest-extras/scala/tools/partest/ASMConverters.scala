@@ -24,8 +24,8 @@ object ASMConverters {
     def ===(other: List[Instruction]) = equivalentBytecode(self, other)
 
     def dropLinesFrames =
-      self.filterNot(
-          i => i.isInstanceOf[LineNumber] || i.isInstanceOf[FrameEntry])
+      self.filterNot(i =>
+            i.isInstanceOf[LineNumber] || i.isInstanceOf[FrameEntry])
 
     private def referencedLabels(instruction: Instruction): Set[Instruction] =
       instruction match {
@@ -216,8 +216,7 @@ object ASMConverters {
     }
 
     private def convertLocalVars(method: t.MethodNode): List[LocalVariable] = {
-      method.localVariables.asScala.map(
-          v =>
+      method.localVariables.asScala.map(v =>
             LocalVariable(v.name,
                           v.desc,
                           Option(v.signature),

@@ -36,8 +36,8 @@ class PatternAnnotatorTest
     val patterns = getFileAdapter.depthFirst.collect {
       case p: ScPattern => p
     }
-    patterns.foreach(
-        p => annotator.annotatePattern(p, mock, highlightErrors = true))
+    patterns.foreach(p =>
+          annotator.annotatePattern(p, mock, highlightErrors = true))
     mock.annotations
   }
 

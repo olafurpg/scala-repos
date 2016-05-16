@@ -60,7 +60,7 @@ object PromiseMock {
     private def resolve[A](value: A | js.Thenable[A]): MockPromise[A] = {
       new MockPromise[A]({
         (resolve: js.Function1[A | js.Thenable[A], _],
-        reject: js.Function1[Any, _]) =>
+         reject: js.Function1[Any, _]) =>
           resolve(value)
       })
     }
@@ -69,7 +69,7 @@ object PromiseMock {
     private def reject(reason: Any): MockPromise[Nothing] = {
       new MockPromise[Nothing]({
         (resolve: js.Function1[Nothing | js.Thenable[Nothing], _],
-        reject: js.Function1[Any, _]) =>
+         reject: js.Function1[Any, _]) =>
           reject(reason)
       })
     }
@@ -119,7 +119,8 @@ object PromiseMock {
   @ScalaJSDefined
   private class MockPromise[+A](executor: js.Function2[
           js.Function1[A | Thenable[A], _], js.Function1[scala.Any, _], _])
-      extends js.Object with js.Thenable[A] {
+      extends js.Object
+      with js.Thenable[A] {
 
     import MockPromise._
 
@@ -205,7 +206,7 @@ object PromiseMock {
 
       new MockPromise[B]({
         (innerResolve: js.Function1[B | Thenable[B], _],
-        innerReject: js.Function1[scala.Any, _]) =>
+         innerReject: js.Function1[scala.Any, _]) =>
           def doFulfilled(value: A): Unit = {
             tryCatchAny[Unit] {
               innerResolve(onFulfilled(value))

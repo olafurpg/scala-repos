@@ -35,8 +35,8 @@ object JsonExtractor {
   def toJValue(extractorOption: JsonExtractorOption,
                o: Any,
                json4sFormats: Formats = Utils.json4sDefaultFormats,
-               gsonTypeAdapterFactories: Seq[TypeAdapterFactory] = Seq
-                   .empty[TypeAdapterFactory]): JValue = {
+               gsonTypeAdapterFactories: Seq[TypeAdapterFactory] =
+                 Seq.empty[TypeAdapterFactory]): JValue = {
 
     extractorOption match {
       case JsonExtractorOption.Both =>
@@ -56,8 +56,8 @@ object JsonExtractor {
                  json: String,
                  clazz: Class[T],
                  json4sFormats: Formats = Utils.json4sDefaultFormats,
-                 gsonTypeAdapterFactories: Seq[TypeAdapterFactory] = Seq
-                     .empty[TypeAdapterFactory]): T = {
+                 gsonTypeAdapterFactories: Seq[TypeAdapterFactory] =
+                   Seq.empty[TypeAdapterFactory]): T = {
 
     extractorOption match {
       case JsonExtractorOption.Both =>
@@ -118,8 +118,8 @@ object JsonExtractor {
 
     val algorithmParamsJValue = paramsToJValue(
         extractorOption, params.algorithmParamsList)
-    jValue = jValue.replace(
-        "algorithmParamsList" :: Nil, algorithmParamsJValue)
+    jValue =
+      jValue.replace("algorithmParamsList" :: Nil, algorithmParamsJValue)
 
     val servingParamsJValue = toJValue(
         extractorOption, params.servingParams._2)

@@ -78,22 +78,22 @@ final class QaApi(questionColl: Coll,
                           page: Int,
                           perPage: Int): Fu[Paginator[Question]] =
       Paginator(adapter = new BSONAdapter[Question](
-                      collection = questionColl,
-                      selector = selector,
-                      projection = BSONDocument(),
-                      sort = sort
-                  ),
+                    collection = questionColl,
+                    selector = selector,
+                    projection = BSONDocument(),
+                    sort = sort
+                ),
                 currentPage = page,
                 maxPerPage = perPage)
 
     private def popularCache =
       mongoCache(prefix = "qa:popular",
                  f = (nb: Int) =>
-                     questionColl
-                       .find(BSONDocument())
-                       .sort(BSONDocument("vote.score" -> -1))
-                       .cursor[Question]()
-                       .collect[List](nb),
+                   questionColl
+                     .find(BSONDocument())
+                     .sort(BSONDocument("vote.score" -> -1))
+                     .cursor[Question]()
+                     .collect[List](nb),
                  timeToLive = 3 hour)
 
     def popular(max: Int): Fu[List[Question]] = popularCache(max)

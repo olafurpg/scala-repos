@@ -113,10 +113,10 @@ sealed trait Matrix2[R, C, V] extends Serializable {
     * BloomFilters or CountMinSketch.
     * TODO This is a special kind of product that could be optimized like Product is
     */
-  def propagate[C2, VecV](vec: Matrix2[C, C2, VecV])(
-      implicit ev: =:=[V, Boolean],
-      mon: Monoid[VecV],
-      mj: MatrixJoiner2): Matrix2[R, C2, VecV] = {
+  def propagate[C2, VecV](
+      vec: Matrix2[C, C2, VecV])(implicit ev: =:=[V, Boolean],
+                                 mon: Monoid[VecV],
+                                 mj: MatrixJoiner2): Matrix2[R, C2, VecV] = {
 
     //This cast will always succeed:
     lazy val joinedBool =
@@ -492,8 +492,8 @@ case class Sum[R, C, V](
 
   override lazy val toTypedPipe: TypedPipe[(R, C, V)] = {
     if (left.equals(right)) {
-      left.optimizedSelf.toTypedPipe
-        .map(v => (v._1, v._2, mon.plus(v._3, v._3)))
+      left.optimizedSelf.toTypedPipe.map(v =>
+            (v._1, v._2, mon.plus(v._3, v._3)))
     } else {
       collectAddends(this)
         .reduce((x, y) => x ++ y)
@@ -539,8 +539,8 @@ case class HadamardProduct[R, C, V](
   // TODO: optimize / combine with Sums: https://github.com/tomtau/scalding/issues/14#issuecomment-22971582
   override lazy val toTypedPipe: TypedPipe[(R, C, V)] = {
     if (left.equals(right)) {
-      left.optimizedSelf.toTypedPipe
-        .map(v => (v._1, v._2, ring.times(v._3, v._3)))
+      left.optimizedSelf.toTypedPipe.map(v =>
+            (v._1, v._2, ring.times(v._3, v._3)))
     } else {
       // tracking values which were reduced (multiplied by non-zero) or non-reduced (multiplied by zero) with a boolean
       (left.optimizedSelf.toTypedPipe.map {
@@ -633,15 +633,15 @@ trait Scalar2[V] extends Serializable {
         Product(toMatrix, OneR[Unit, V](), ring).asInstanceOf[Matrix2[R, C, V]]
     }
 
-  def divMatrix[R, C](
-      that: Matrix2[R, C, V])(implicit f: Field[V]): MatrixLiteral[R, C, V] =
+  def divMatrix[R, C](that: Matrix2[R, C, V])(
+      implicit f: Field[V]): MatrixLiteral[R, C, V] =
     MatrixLiteral(that.toTypedPipe.mapWithValue(value) {
       case ((r, c, v), optV) =>
         (r, c, f.div(v, optV.getOrElse(f.zero)))
     }, that.sizeHint)(that.rowOrd, that.colOrd)
 
-  def timesLiteral[R, C](
-      that: Matrix2[R, C, V])(implicit ring: Ring[V]): MatrixLiteral[R, C, V] =
+  def timesLiteral[R, C](that: Matrix2[R, C, V])(
+      implicit ring: Ring[V]): MatrixLiteral[R, C, V] =
     MatrixLiteral(that.toTypedPipe.mapWithValue(value) {
       case ((r, c, v), optV) =>
         (r, c, ring.times(optV.getOrElse(ring.zero), v))
@@ -670,7 +670,7 @@ object Scalar2 {
 }
 
 object Matrix2 {
-  def apply[R : Ordering, C : Ordering, V](
+  def apply[R: Ordering, C: Ordering, V](
       t: TypedPipe[(R, C, V)], hint: SizeHint): Matrix2[R, C, V] =
     MatrixLiteral(t, hint)
 
@@ -769,8 +769,10 @@ object Matrix2 {
       * Recursive function - returns a flatten product chain and optimizes product chains under sums
       */
     def optimizeBasicBlocks(
-        mf: Matrix2[Any, Any, V]): (List[Matrix2[Any, Any, V]], BigInt,
-    Option[Ring[V]], Option[MatrixJoiner2]) = {
+        mf: Matrix2[Any, Any, V]): (List[Matrix2[Any, Any, V]],
+                                    BigInt,
+                                    Option[Ring[V]],
+                                    Option[MatrixJoiner2]) = {
 
       mf match {
         // basic block of one matrix

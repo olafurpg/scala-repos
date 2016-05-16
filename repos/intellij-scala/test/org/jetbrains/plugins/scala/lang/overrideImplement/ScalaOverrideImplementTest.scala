@@ -20,7 +20,8 @@ class ScalaOverrideImplementTest
               needsInferType: Boolean = true) {
     configureFromFileTextAdapter(
         "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = needsInferType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      needsInferType
     ScalaOIUtil.invokeOverrideImplement(getProjectAdapter,
                                         getEditorAdapter,
                                         getFileAdapter,

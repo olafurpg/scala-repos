@@ -4,7 +4,9 @@ import java.util._
 import scala.collection.JavaConversions._
 
 class ConcurrentLinkedQueue[E]()
-    extends AbstractQueue[E] with Queue[E] with Serializable {
+    extends AbstractQueue[E]
+    with Queue[E]
+    with Serializable {
 
   def this(c: Collection[_ <: E]) = {
     this()
@@ -74,7 +76,7 @@ class ConcurrentLinkedQueue[E]()
       var prev = head
       var current: Node[E] = head.next
 
-      while ( (current ne null) && (current ne node)) {
+      while ((current ne null) && (current ne node)) {
         prev = current
         current = current.next
       }

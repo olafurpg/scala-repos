@@ -252,12 +252,12 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler = new BernoulliSampler[Int](1.0)
     sampler.sample(data.iterator).toArray should be(data)
 
-    sampler = new BernoulliSampler[Int](
-        0.0 - (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new BernoulliSampler[Int](0.0 - (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
-    sampler = new BernoulliSampler[Int](
-        1.0 + (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new BernoulliSampler[Int](1.0 + (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(data)
   }
 
@@ -423,8 +423,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     var sampler = new PoissonSampler[Int](0.0)
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
-    sampler = new PoissonSampler[Int](
-        0.0 - (RandomSampler.roundingEpsilon / 2.0))
+    sampler =
+      new PoissonSampler[Int](0.0 - (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
 
     // sampling with replacement has no upper bound on sampling fraction

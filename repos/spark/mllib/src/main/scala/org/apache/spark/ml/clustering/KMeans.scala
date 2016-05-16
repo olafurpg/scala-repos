@@ -35,8 +35,12 @@ import org.apache.spark.sql.types.{IntegerType, StructType}
   * Common params for KMeans and KMeansModel
   */
 private[clustering] trait KMeansParams
-    extends Params with HasMaxIter with HasFeaturesCol with HasSeed
-    with HasPredictionCol with HasTol {
+    extends Params
+    with HasMaxIter
+    with HasFeaturesCol
+    with HasSeed
+    with HasPredictionCol
+    with HasTol {
 
   /**
     * Set the number of clusters to create (k). Must be > 1. Default: 2.
@@ -103,7 +107,9 @@ private[clustering] trait KMeansParams
 @Experimental
 class KMeansModel private[ml](@Since("1.5.0") override val uid: String,
                               private val parentModel: MLlibKMeansModel)
-    extends Model[KMeansModel] with KMeansParams with MLWritable {
+    extends Model[KMeansModel]
+    with KMeansParams
+    with MLWritable {
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): KMeansModel = {
@@ -222,7 +228,8 @@ object KMeansModel extends MLReadable[KMeansModel] {
 @Since("1.5.0")
 @Experimental
 class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
-    extends Estimator[KMeansModel] with KMeansParams
+    extends Estimator[KMeansModel]
+    with KMeansParams
     with DefaultParamsWritable {
 
   setDefault(k -> 2,

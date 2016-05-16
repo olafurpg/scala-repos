@@ -536,7 +536,8 @@ object JqJsCmds {
     * @param time the duration of the effect.
     */
   class Show(val uid: String, val time: Box[TimeSpan])
-      extends JsCmd with HasTime {
+      extends JsCmd
+      with HasTime {
     def toJsCmd =
       "try{jQuery(" + ("#" + uid).encJs + ").show(" + timeStr +
       ");} catch (e) {}"
@@ -567,7 +568,8 @@ object JqJsCmds {
     * Hide an element identified by uid and the animation will last @time
     */
   class Hide(val uid: String, val time: Box[TimeSpan])
-      extends JsCmd with HasTime {
+      extends JsCmd
+      with HasTime {
     def toJsCmd =
       "try{jQuery(" + ("#" + uid).encJs + ").hide(" + timeStr +
       ");} catch (e) {}"

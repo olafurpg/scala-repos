@@ -235,7 +235,7 @@ object LiftJavaScriptSpec extends Specification {
   object withPolishLocale extends WithLocale(Locale.forLanguageTag("pl-PL"))
 
   class WithLocale(locale: Locale) extends Around {
-    override def around[T : AsResult](test: => T): Result = {
+    override def around[T: AsResult](test: => T): Result = {
       val savedDefaultLocale = Locale.getDefault
       Locale.setDefault(locale)
       try {

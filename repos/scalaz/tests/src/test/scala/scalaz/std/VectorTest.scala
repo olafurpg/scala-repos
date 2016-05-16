@@ -9,7 +9,7 @@ import Id._
 import org.scalacheck.Prop.forAll
 
 object VectorTest extends SpecLite {
-  implicit def vectorArb[A : Arbitrary] =
+  implicit def vectorArb[A: Arbitrary] =
     Arbitrary(implicitly[Arbitrary[List[A]]].arbitrary map (_.toVector))
 
   import std.vector._
@@ -54,14 +54,14 @@ object VectorTest extends SpecLite {
 
   "groupWhen" ! forAll { (xs: Vector[Int]) =>
     (xs.groupWhen(_ < _) must_===
-        (list.groupWhen(xs.toList)(_ < _).map(_.toVector).toVector))
+          (list.groupWhen(xs.toList)(_ < _).map(_.toVector).toVector))
   }
 
   "partitionM" ! forAll { (xs: Vector[Int]) =>
     val (evens, odds) = xs.partitionM[Id](evenp)
     (evens.toSet & odds.toSet) must_=== (Set[Int]())
     (evens.filter(evenp) ++ odds.filter(i => !evenp(i))).toSet must_===
-    (xs.toSet)
+      (xs.toSet)
   }
 
   "findM" ! forAll { (xs: Vector[Int]) =>
@@ -76,18 +76,18 @@ object VectorTest extends SpecLite {
 
   "mapAccumLeft" ! forAll { (xs: Vector[Int]) =>
     mapAccumLeft(xs)(Vector[Int](), (c: Vector[Int], a) => (c :+ a, a)) must_===
-    (xs, xs)
+      (xs, xs)
   }
 
   "mapAccumRight" ! forAll { (xs: Vector[Int]) =>
     mapAccumRight(xs)(Vector[Int](), (c: Vector[Int], a) => (c :+ a, a)) must_===
-    (xs.reverse, xs)
+      (xs.reverse, xs)
   }
 
   "Issue #266" in {
     import syntax.std.list._
     List(1, 2, 4).groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1).length must_===
-    (2)
+      (2)
     List(1, 2, 4).toVector
       .groupWhen((i1, i2) => scala.math.abs(i1 - i2) <= 1)
       .length must_=== (2)
@@ -103,9 +103,9 @@ object VectorTest extends SpecLite {
   }
 
   object instances {
-    def equal[A : Equal] = Equal[Vector[A]]
-    def order[A : Order] = Order[Vector[A]]
-    def semigroup[A : Semigroup] = Monoid[Vector[A]]
+    def equal[A: Equal] = Equal[Vector[A]]
+    def order[A: Order] = Order[Vector[A]]
+    def semigroup[A: Semigroup] = Monoid[Vector[A]]
     def bindRec = BindRec[Vector]
     def monadPlus = MonadPlus[Vector]
     def traverse = Traverse[Vector]

@@ -75,7 +75,8 @@ object ComboBoxListCell {
     * $FLVINITDEPREC
     */
   @deprecated(
-      message = "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
+      message =
+        "Use forListView[T](T => ObservableValue[Boolean, java.lang.Boolean])",
       since = "1.0")
   def forListView[T](items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxListCell.forListView(items)
@@ -150,8 +151,8 @@ object ComboBoxListCell {
   * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user. 
   */
 class ComboBoxListCell[T](
-    override val delegate: jfxscc.ComboBoxListCell[T] = new jfxscc.ComboBoxListCell[
-          T])
+    override val delegate: jfxscc.ComboBoxListCell[T] =
+      new jfxscc.ComboBoxListCell[T])
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.ComboBoxListCell[T], T, T]
     with ComboBoxEditableCell[jfxscc.ComboBoxListCell[T], T]

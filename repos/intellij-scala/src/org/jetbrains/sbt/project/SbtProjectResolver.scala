@@ -155,8 +155,8 @@ class SbtProjectResolver
     projects.map { project =>
       val moduleNode = createModule(project, moduleFilesDirectory)
       val contentRootNode = createContentRoot(project)
-      project.android.foreach(
-          a => a.apklibs.foreach(addApklibDirs(contentRootNode, _)))
+      project.android.foreach(a =>
+            a.apklibs.foreach(addApklibDirs(contentRootNode, _)))
       moduleNode.add(contentRootNode)
       moduleNode.addAll(
           createLibraryDependencies(project.dependencies.modules)(
@@ -208,8 +208,8 @@ class SbtProjectResolver
   private def createModuleExtData(
       project: sbtStructure.ProjectData): ModuleExtNode = {
     val scalaVersion = project.scala.map(s => Version(s.version))
-    val scalacClasspath = project.scala.fold(Seq.empty[File])(
-        s => s.compilerJar +: s.libraryJar +: s.extraJars)
+    val scalacClasspath = project.scala.fold(Seq.empty[File])(s =>
+          s.compilerJar +: s.libraryJar +: s.extraJars)
     val scalacOptions = project.scala.fold(Seq.empty[String])(_.options)
     val javacOptions = project.java.fold(Seq.empty[String])(_.options)
     val jdk = project.android
@@ -320,15 +320,15 @@ class SbtProjectResolver
     if (extractedExcludes.nonEmpty) return extractedExcludes.distinct
 
     val managedDirectories = project.configurations
-      .flatMap(
-          configuration => configuration.sources ++ configuration.resources)
+      .flatMap(configuration =>
+            configuration.sources ++ configuration.resources)
       .filter(_.managed)
       .map(_.file)
 
     val defaultNames = Set("main", "test")
 
-    val relevantDirectories = managedDirectories.filter(
-        file => file.exists || !defaultNames.contains(file.getName))
+    val relevantDirectories = managedDirectories.filter(file =>
+          file.exists || !defaultNames.contains(file.getName))
     def isRelevant(f: File): Boolean =
       !relevantDirectories.forall(_.isOutsideOf(f))
 

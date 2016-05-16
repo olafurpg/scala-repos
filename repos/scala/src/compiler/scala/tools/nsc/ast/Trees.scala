@@ -25,7 +25,8 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
 
   /** Array selection `<qualifier> . <name>` only used during erasure */
   case class SelectFromArray(qualifier: Tree, name: Name, erasure: Type)
-      extends RefTree with TermTree
+      extends RefTree
+      with TermTree
 
   /** Derived value class injection (equivalent to: `new C(arg)` after erasure); only used during erasure.
     *  The class `C` is stored as a tree attachment.
@@ -70,7 +71,8 @@ trait Trees extends scala.reflect.internal.Trees { self: Global =>
     ClassDef(sym,
              gen.mkTemplate(sym.info.parents map TypeTree,
                             if (sym.thisSym == sym || phase.erasedTypes)
-                              noSelfType else ValDef(sym.thisSym),
+                              noSelfType
+                            else ValDef(sym.thisSym),
                             constrMods,
                             vparamss,
                             body,

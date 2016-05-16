@@ -128,7 +128,8 @@ object ScalaCollectionRenderer {
             val typeName =
               if (objRef.referenceType() != null)
                 ScalaCollectionRenderer.transformName(
-                    objRef.referenceType().name) else ""
+                    objRef.referenceType().name)
+              else ""
             val sizeValue =
               if (!hasDefiniteSize(objRef, evaluationContext)) "?"
               else size(objRef, evaluationContext)
@@ -176,7 +177,8 @@ object ScalaCollectionRenderer {
   }
 
   object ScalaToArrayRenderer
-      extends ReferenceRenderer(collectionClassName) with ChildrenRenderer {
+      extends ReferenceRenderer(collectionClassName)
+      with ChildrenRenderer {
 
     private lazy val toArrayEvaluator = {
       val classTagObjectEval = {

@@ -10,7 +10,8 @@ import akka.actor.{ActorSystem, ExtensionId, ExtensionIdProvider, ExtendedActorS
   * that is built into Akka
   */
 object SerializationExtension
-    extends ExtensionId[Serialization] with ExtensionIdProvider {
+    extends ExtensionId[Serialization]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): Serialization = super.get(system)
   override def lookup = SerializationExtension
   override def createExtension(system: ExtendedActorSystem): Serialization =

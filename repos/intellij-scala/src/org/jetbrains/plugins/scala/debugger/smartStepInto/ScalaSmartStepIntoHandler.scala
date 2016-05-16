@@ -41,7 +41,7 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
       sf @ (_sf: ScalaFile) <- position.getFile.toOption if !sf.isCompiled
       vFile <- sf.getVirtualFile.toOption
       doc <- FileDocumentManager.getInstance().getDocument(vFile).toOption
-                if doc.getLineCount > line
+      if doc.getLineCount > line
     } yield {
       val startOffset: Int = doc.getLineStartOffset(line)
       val offset: Int =
@@ -135,8 +135,8 @@ class ScalaSmartStepIntoHandler extends JvmSmartStepIntoHandler {
           constr <- findConstructor(typeElem)
           ref <- constr.reference
         } yield {
-          label = constr.simpleTypeElement.fold("")(
-              ste => s"new ${ste.getText}.")
+          label =
+            constr.simpleTypeElement.fold("")(ste => s"new ${ste.getText}.")
 
           val generateAnonClass = DebuggerUtil.generatesAnonClass(templ)
           val method = ref.resolve() match {

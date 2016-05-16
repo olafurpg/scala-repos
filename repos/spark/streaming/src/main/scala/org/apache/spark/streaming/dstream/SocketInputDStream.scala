@@ -30,7 +30,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.receiver.Receiver
 import org.apache.spark.util.NextIterator
 
-private[streaming] class SocketInputDStream[T : ClassTag](
+private[streaming] class SocketInputDStream[T: ClassTag](
     _ssc: StreamingContext,
     host: String,
     port: Int,
@@ -44,13 +44,14 @@ private[streaming] class SocketInputDStream[T : ClassTag](
   }
 }
 
-private[streaming] class SocketReceiver[T : ClassTag](
+private[streaming] class SocketReceiver[T: ClassTag](
     host: String,
     port: Int,
     bytesToObjects: InputStream => Iterator[T],
     storageLevel: StorageLevel
 )
-    extends Receiver[T](storageLevel) with Logging {
+    extends Receiver[T](storageLevel)
+    with Logging {
 
   private var socket: Socket = _
 

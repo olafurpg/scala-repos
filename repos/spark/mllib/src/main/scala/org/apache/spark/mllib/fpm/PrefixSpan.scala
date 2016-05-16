@@ -55,7 +55,8 @@ import org.apache.spark.storage.StorageLevel
 class PrefixSpan private (private var minSupport: Double,
                           private var maxPatternLength: Int,
                           private var maxLocalProjDBSize: Long)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   import PrefixSpan._
 
   /**
@@ -128,7 +129,7 @@ class PrefixSpan private (private var minSupport: Double,
     * @return a [[PrefixSpanModel]] that contains the frequent patterns
     */
   @Since("1.5.0")
-  def run[Item : ClassTag](
+  def run[Item: ClassTag](
       data: RDD[Array[Array[Item]]]): PrefixSpanModel[Item] = {
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning("Input data is not cached.")

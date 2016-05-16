@@ -37,7 +37,8 @@ import java.util.Properties
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class PrimitiveApiTest
-    extends ProducerConsumerTestHarness with ZooKeeperTestHarness {
+    extends ProducerConsumerTestHarness
+    with ZooKeeperTestHarness {
   val requestHandlerLogger = Logger.getLogger(classOf[KafkaRequestHandler])
 
   def generateConfigs() =
@@ -166,8 +167,8 @@ class PrimitiveApiTest
       try {
         val request = builder.build()
         val response = consumer.fetch(request)
-        response.data.values
-          .foreach(pdata => ErrorMapping.maybeThrowException(pdata.error))
+        response.data.values.foreach(pdata =>
+              ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid offset")
       } catch {
         case e: OffsetOutOfRangeException => "this is good"
@@ -182,8 +183,8 @@ class PrimitiveApiTest
       try {
         val request = builder.build()
         val response = consumer.fetch(request)
-        response.data.values
-          .foreach(pdata => ErrorMapping.maybeThrowException(pdata.error))
+        response.data.values.foreach(pdata =>
+              ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid partition")
       } catch {
         case e: UnknownTopicOrPartitionException => "this is good"
@@ -201,8 +202,8 @@ class PrimitiveApiTest
 
   private def multiProduce(producer: Producer[String, String]) {
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
-    topics.keys.map(
-        topic => TestUtils.createTopic(zkUtils, topic, servers = servers))
+    topics.keys.map(topic =>
+          TestUtils.createTopic(zkUtils, topic, servers = servers))
 
     val messages = new mutable.HashMap[String, Seq[String]]
     val builder = new FetchRequestBuilder()
@@ -248,8 +249,8 @@ class PrimitiveApiTest
   @Test
   def testPipelinedProduceRequests() {
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
-    topics.keys.map(
-        topic => TestUtils.createTopic(zkUtils, topic, servers = servers))
+    topics.keys.map(topic =>
+          TestUtils.createTopic(zkUtils, topic, servers = servers))
     val props = new Properties()
     props.put("request.required.acks", "0")
     val pipelinedProducer: Producer[String, String] =
@@ -273,76 +274,60 @@ class PrimitiveApiTest
     }
 
     // wait until the messages are published
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.logManager
-                                  .getLog(TopicAndPartition("test1", 0))
-                                  .get
-                                  .logEndOffset == 2
-                            },
-                            "Published messages should be in the log")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.logManager
-                                  .getLog(TopicAndPartition("test2", 0))
-                                  .get
-                                  .logEndOffset == 2
-                            },
-                            "Published messages should be in the log")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.logManager
-                                  .getLog(TopicAndPartition("test3", 0))
-                                  .get
-                                  .logEndOffset == 2
-                            },
-                            "Published messages should be in the log")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.logManager
-                                  .getLog(TopicAndPartition("test4", 0))
-                                  .get
-                                  .logEndOffset == 2
-                            },
-                            "Published messages should be in the log")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.logManager
+        .getLog(TopicAndPartition("test1", 0))
+        .get
+        .logEndOffset == 2
+    }, "Published messages should be in the log")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.logManager
+        .getLog(TopicAndPartition("test2", 0))
+        .get
+        .logEndOffset == 2
+    }, "Published messages should be in the log")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.logManager
+        .getLog(TopicAndPartition("test3", 0))
+        .get
+        .logEndOffset == 2
+    }, "Published messages should be in the log")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.logManager
+        .getLog(TopicAndPartition("test4", 0))
+        .get
+        .logEndOffset == 2
+    }, "Published messages should be in the log")
 
     val replicaId = servers.head.config.brokerId
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.replicaManager
-                                  .getReplica("test1", 0, replicaId)
-                                  .get
-                                  .highWatermark
-                                  .messageOffset == 2
-                            },
-                            "High watermark should equal to log end offset")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.replicaManager
-                                  .getReplica("test2", 0, replicaId)
-                                  .get
-                                  .highWatermark
-                                  .messageOffset == 2
-                            },
-                            "High watermark should equal to log end offset")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.replicaManager
-                                  .getReplica("test3", 0, replicaId)
-                                  .get
-                                  .highWatermark
-                                  .messageOffset == 2
-                            },
-                            "High watermark should equal to log end offset")
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                servers.head.replicaManager
-                                  .getReplica("test4", 0, replicaId)
-                                  .get
-                                  .highWatermark
-                                  .messageOffset == 2
-                            },
-                            "High watermark should equal to log end offset")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.replicaManager
+        .getReplica("test1", 0, replicaId)
+        .get
+        .highWatermark
+        .messageOffset == 2
+    }, "High watermark should equal to log end offset")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.replicaManager
+        .getReplica("test2", 0, replicaId)
+        .get
+        .highWatermark
+        .messageOffset == 2
+    }, "High watermark should equal to log end offset")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.replicaManager
+        .getReplica("test3", 0, replicaId)
+        .get
+        .highWatermark
+        .messageOffset == 2
+    }, "High watermark should equal to log end offset")
+    TestUtils.waitUntilTrue(() => {
+      servers.head.replicaManager
+        .getReplica("test4", 0, replicaId)
+        .get
+        .highWatermark
+        .messageOffset == 2
+    }, "High watermark should equal to log end offset")
 
     // test if the consumer received the messages in the correct order when producer has enabled request pipelining
     val request = builder.build()

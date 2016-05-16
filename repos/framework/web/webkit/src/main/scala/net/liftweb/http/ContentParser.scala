@@ -82,10 +82,10 @@ object ContentParser {
     * @param surroundFunction the function for surrounding the content returned by the `parseFunction`.
     *                         See [[defaultSurround]].
     */
-  def apply(
-      templateSuffix: String,
-      parseFunction: String => Box[NodeSeq],
-      surroundFunction: NodeSeq => NodeSeq = defaultSurround): ContentParser =
+  def apply(templateSuffix: String,
+            parseFunction: String => Box[NodeSeq],
+            surroundFunction: NodeSeq => NodeSeq =
+              defaultSurround): ContentParser =
     new ContentParser {
       override def templateSuffixes: Seq[String] = Seq(templateSuffix)
       override def parse(content: InputStream): Box[NodeSeq] =

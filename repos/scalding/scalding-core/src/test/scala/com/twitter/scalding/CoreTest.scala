@@ -473,7 +473,9 @@ class TinyThenSmallJoin(args: Args) extends Job(args) {
 case class TC(val n: Int)
 
 class TinyThenSmallJoinTest
-    extends WordSpec with Matchers with FieldConversions {
+    extends WordSpec
+    with Matchers
+    with FieldConversions {
   "A TinyThenSmallJoin" should {
     val input0 = List((1, TC(2)), (2, TC(3)), (3, TC(4)))
     val input1 = List((1, TC(20)), (2, TC(30)), (3, TC(40)))
@@ -596,10 +598,8 @@ class LeftJoinWithLargerTest extends WordSpec with Matchers {
 
 class MergeTestJob(args: Args) extends Job(args) {
   val in = TextLine(args("in")).read.mapTo(1 -> ('x, 'y)) { line: String =>
-    val p = line
-      .split(" ")
-      .map { _.toDouble }
-      (p(0), p(1))
+    val p = line.split(" ").map { _.toDouble }
+    (p(0), p(1))
   }
   val big = in.filter('x) { (x: Double) =>
     (x > 0.5)
@@ -622,10 +622,8 @@ class MergeTest extends WordSpec with Matchers {
     //Here is our expected output:
     val parsed = input.map {
       case (line: String, x: String) =>
-        val t = x
-          .split(" ")
-          .map { _.toDouble }
-          (t(0), t(1))
+        val t = x.split(" ").map { _.toDouble }
+        (t(0), t(1))
     }
     val big = parsed.filter(_._1 > 0.5)
     val small = parsed.filter(_._1 <= 0.5)
@@ -659,11 +657,8 @@ class MergeTest extends WordSpec with Matchers {
 class SizeAveStdJob(args: Args) extends Job(args) {
   TextLine(args("input"))
     .mapTo('x, 'y) { line =>
-      val p = line
-        .split(" ")
-        .map { _.toDouble }
-        .slice(0, 2)
-        (p(0), p(1))
+      val p = line.split(" ").map { _.toDouble }.slice(0, 2)
+      (p(0), p(1))
     }
     .map('x -> 'x) { (x: Double) =>
       (4 * x).toInt

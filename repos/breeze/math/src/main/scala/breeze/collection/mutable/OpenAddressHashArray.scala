@@ -28,16 +28,16 @@ import scala.util.hashing.MurmurHash3
   * @author dlwh
   */
 @SerialVersionUID(1L)
-final class OpenAddressHashArray[
-    @specialized(Int, Float, Long, Double) V] private[mutable](
+final class OpenAddressHashArray[@specialized(Int, Float, Long, Double) V] private[mutable](
     protected var _index: Array[Int],
     protected var _data: Array[V],
     protected var load: Int,
     val size: Int,
     val default: ConfigurableDefault[V] = ConfigurableDefault.default[V])(
-    implicit protected val manElem: ClassTag[V],
-    val zero: Zero[V])
-    extends Storage[V] with ArrayLike[V] with Serializable {
+    implicit protected val manElem: ClassTag[V], val zero: Zero[V])
+    extends Storage[V]
+    with ArrayLike[V]
+    with Serializable {
   require(size > 0, "Size must be positive, but got " + size)
 
   def this(size: Int, default: ConfigurableDefault[V], initialSize: Int)(
@@ -200,7 +200,7 @@ final class OpenAddressHashArray[
 }
 
 object OpenAddressHashArray {
-  def apply[@specialized(Int, Float, Long, Double) T : ClassTag : Zero](
+  def apply[@specialized(Int, Float, Long, Double) T: ClassTag: Zero](
       values: T*) = {
     val rv = new OpenAddressHashArray[T](values.length)
     val zero = implicitly[Zero[T]].zero

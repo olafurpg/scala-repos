@@ -73,30 +73,30 @@ object Test {
       case (false, false) => NONE
     }
 
-  def assertAnyRef[T : Manifest] =
+  def assertAnyRef[T: Manifest] =
     List(
         manifest[T] <:< manifest[Any],
         manifest[T] <:< manifest[AnyRef],
         !(manifest[T] <:< manifest[AnyVal])
     ) foreach (assert(_, "assertAnyRef"))
 
-  def assertAnyVal[T : Manifest] =
+  def assertAnyVal[T: Manifest] =
     List(
         manifest[T] <:< manifest[Any],
         !(manifest[T] <:< manifest[AnyRef]),
         manifest[T] <:< manifest[AnyVal]
     ) foreach (assert(_, "assertAnyVal"))
 
-  def assertSameType[T : Manifest, U : Manifest] =
+  def assertSameType[T: Manifest, U: Manifest] =
     assert(typeCompare[T, U] == SAME, "assertSameType")
-  def assertSuperType[T : Manifest, U : Manifest] =
+  def assertSuperType[T: Manifest, U: Manifest] =
     assert(typeCompare[T, U] == SUPER, "assertSuperType")
-  def assertSubType[T : Manifest, U : Manifest] =
+  def assertSubType[T: Manifest, U: Manifest] =
     assert(typeCompare[T, U] == SUB, "assertSubType")
-  def assertNoRelationship[T : Manifest, U : Manifest] =
+  def assertNoRelationship[T: Manifest, U: Manifest] =
     assert(typeCompare[T, U] == NONE, "assertNoRelationship")
 
-  def testVariancesVia[T : Manifest, U : Manifest] = assert(
+  def testVariancesVia[T: Manifest, U: Manifest] = assert(
       typeCompare[T, U] == SUB &&
       showsCovariance[T, U, List] && showsInvariance[T, U, Set],
       "testVariancesVia"

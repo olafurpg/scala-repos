@@ -30,7 +30,7 @@ private[spark] object SamplingUtils {
     * @param seed random seed
     * @return (samples, input size)
     */
-  def reservoirSampleAndCount[T : ClassTag](
+  def reservoirSampleAndCount[T: ClassTag](
       input: Iterator[T],
       k: Int,
       seed: Long = Random.nextLong()): (Array[T], Long) = {

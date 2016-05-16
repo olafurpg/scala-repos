@@ -109,7 +109,8 @@ private[twitter] object ThriftUtil {
         baseName <- findRootWithSuffix(clsName, "$FutureIface")
         clientCls <- findClass[Iface](baseName + "$FinagledClient")
         cons <- findConstructor(
-            clientCls, scrooge3FinagleClientWithRepClassifierParamTypes: _*)
+                   clientCls,
+                   scrooge3FinagleClientWithRepClassifierParamTypes: _*)
       } yield
         cons.newInstance(
             underlying, protocolFactory, "", sr, responseClassifier)
@@ -132,8 +133,10 @@ private[twitter] object ThriftUtil {
       for {
         swiftClass <- findSwiftClass(cls)
         proxy <- findClass1("com.twitter.finagle.exp.swift.SwiftProxy")
-        meth <- findMethod(
-            proxy, "newClient", classOf[Service[_, _]], classOf[ClassTag[_]])
+        meth <- findMethod(proxy,
+                           "newClient",
+                           classOf[Service[_, _]],
+                           classOf[ClassTag[_]])
       } yield {
         val manifest = ClassTag(swiftClass).asInstanceOf[ClassTag[Iface]]
         meth.invoke(null, underlying, manifest).asInstanceOf[Iface]
@@ -169,9 +172,9 @@ private[twitter] object ThriftUtil {
     def tryScroogeFinagleService(iface: Class[_]): Option[BinaryService] =
       (for {
         baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-            iface.getName)
+                       iface.getName)
         serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-            BinaryService](baseName + "$FinagledService")
+                         BinaryService](baseName + "$FinagledService")
         baseClass <- findClass1(baseName)
       } yield {
         // The new constructor takes one more 'label' paramater than the old one, so we first try find
@@ -200,9 +203,9 @@ private[twitter] object ThriftUtil {
         iface: Class[_]): Option[BinaryService] =
       for {
         baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-            iface.getName)
+                       iface.getName)
         serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-            BinaryService](baseName + "$FinagledService")
+                         BinaryService](baseName + "$FinagledService")
         cons <- findConstructor(serviceCls, iface, classOf[TProtocolFactory])
       } yield cons.newInstance(impl, protocolFactory)
 
@@ -210,7 +213,7 @@ private[twitter] object ThriftUtil {
       for {
         _ <- findSwiftClass(iface)
         swiftServiceCls <- findClass1(
-            "com.twitter.finagle.exp.swift.SwiftService")
+                              "com.twitter.finagle.exp.swift.SwiftService")
         const <- findConstructor(swiftServiceCls, classOf[Object])
       } yield const.newInstance(impl).asInstanceOf[BinaryService]
 
@@ -340,17 +343,17 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  def newIface[Iface : ClassTag](dest: String): Iface = {
+  def newIface[Iface: ClassTag](dest: String): Iface = {
     val (n, l) = Resolver.evalLabeled(dest)
     newIface[Iface](n, l)
   }
 
-  def newIface[Iface : ClassTag](dest: String, label: String): Iface = {
+  def newIface[Iface: ClassTag](dest: String, label: String): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](Resolver.eval(dest), label, cls)
   }
 
-  def newIface[Iface : ClassTag](dest: Name, label: String): Iface = {
+  def newIface[Iface: ClassTag](dest: Name, label: String): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](dest, label, cls)
   }
@@ -360,7 +363,7 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
     */
   @deprecated(
       "Use destination names via newIface(String) or newIface(Name)", "6.7.x")
-  def newIface[Iface : ClassTag](group: Group[SocketAddress]): Iface = {
+  def newIface[Iface: ClassTag](group: Group[SocketAddress]): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](group, cls)
   }

@@ -135,18 +135,19 @@ private final class AggregationPipeline {
                     matchMoves(BSONDocument(F.moves("o") -> BSONDocument(
                                 "$exists" -> true))),
                     sampleMoves,
-                    group(dimension,
-                          GroupFunction("$push",
-                                        BSONDocument(
-                                            "$cond" -> BSONArray(
-                                                "$" +
-                                                F.moves("o"),
-                                                1,
-                                                0)
-                                        ))),
+                    group(
+                        dimension,
+                        GroupFunction(
+                            "$push",
+                            BSONDocument(
+                                "$cond" -> BSONArray(
+                                    "$" +
+                                    F.moves("o"),
+                                    1,
+                                    0)
+                            ))),
                     sliceIds,
-                    Project(
-                        BSONDocument(
+                    Project(BSONDocument(
                             "_id" -> true,
                             "v" -> BSONDocument("$multiply" -> BSONArray(100,
                                                                          BSONDocument(
@@ -162,18 +163,19 @@ private final class AggregationPipeline {
                     matchMoves(BSONDocument(F.moves("l") -> BSONDocument(
                                 "$exists" -> true))),
                     sampleMoves,
-                    group(dimension,
-                          GroupFunction("$push",
-                                        BSONDocument(
-                                            "$cond" -> BSONArray(
-                                                "$" +
-                                                F.moves("l"),
-                                                1,
-                                                0)
-                                        ))),
+                    group(
+                        dimension,
+                        GroupFunction(
+                            "$push",
+                            BSONDocument(
+                                "$cond" -> BSONArray(
+                                    "$" +
+                                    F.moves("l"),
+                                    1,
+                                    0)
+                            ))),
                     sliceIds,
-                    Project(
-                        BSONDocument(
+                    Project(BSONDocument(
                             "_id" -> true,
                             "v" -> BSONDocument("$multiply" -> BSONArray(100,
                                                                          BSONDocument(

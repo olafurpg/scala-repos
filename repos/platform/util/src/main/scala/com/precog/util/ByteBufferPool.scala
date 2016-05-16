@@ -70,8 +70,9 @@ final class ByteBufferPool(val capacity: Int = 16 * 1024,
 
     if (buffer == null) {
       _misses.incrementAndGet()
-      buffer = if (direct) ByteBuffer.allocateDirect(capacity)
-      else ByteBuffer.allocate(capacity)
+      buffer =
+        if (direct) ByteBuffer.allocateDirect(capacity)
+        else ByteBuffer.allocate(capacity)
     } else {
       _hits.incrementAndGet()
     }
@@ -101,7 +102,8 @@ object ByteBufferPool {
   type ByteBufferPoolS[+A] = State[(ByteBufferPool, List[ByteBuffer]), A]
 
   implicit object ByteBufferPoolMonad
-      extends ByteBufferMonad[ByteBufferPoolS] with Monad[ByteBufferPoolS] {
+      extends ByteBufferMonad[ByteBufferPoolS]
+      with Monad[ByteBufferPoolS] {
 
     def point[A](a: => A): ByteBufferPoolS[A] = State.state(a)
 

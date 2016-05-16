@@ -42,12 +42,12 @@ case class ApiIssue(number: Int,
 object ApiIssue {
   def apply(
       issue: Issue, repositoryName: RepositoryName, user: ApiUser): ApiIssue =
-    ApiIssue(
-        number = issue.issueId,
-        title = issue.title,
-        user = user,
-        state = if (issue.closed) { "closed" } else { "open" },
-        body = issue.content.getOrElse(""),
-        created_at = issue.registeredDate,
-        updated_at = issue.updatedDate)(repositoryName, issue.isPullRequest)
+    ApiIssue(number = issue.issueId,
+             title = issue.title,
+             user = user,
+             state = if (issue.closed) { "closed" } else { "open" },
+             body = issue.content.getOrElse(""),
+             created_at = issue.registeredDate,
+             updated_at =
+               issue.updatedDate)(repositoryName, issue.isPullRequest)
 }

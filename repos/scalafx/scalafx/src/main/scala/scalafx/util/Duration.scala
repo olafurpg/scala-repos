@@ -76,7 +76,8 @@ object Duration {
   * @define D `Duration`
   */
 class Duration(override val delegate: jfxu.Duration)
-    extends SFXDelegate[jfxu.Duration] with Ordered[Duration] {
+    extends SFXDelegate[jfxu.Duration]
+    with Ordered[Duration] {
 
   /**
     * The constructor of $D

@@ -626,7 +626,8 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
 class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                                   val homeAddress: Option[InetSocketAddress],
                                   val clientManaged: Boolean = false)
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef
+    with ScalaActorRef {
   protected[akka] val guard = new ReentrantGuard
 
   @volatile
@@ -951,10 +952,12 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
           try {
             cancelReceiveTimeout // FIXME: leave this here?
             actor(messageHandle.message)
-            currentMessage = null // reset current message after successful invocation
+            currentMessage =
+              null // reset current message after successful invocation
           } catch {
             case e: InterruptedException =>
-              currentMessage = null // received message while actor is shutting down, ignore
+              currentMessage =
+                null // received message while actor is shutting down, ignore
             case e =>
               handleExceptionInDispatch(e, messageHandle.message)
           } finally {
@@ -1264,7 +1267,8 @@ private[akka] case class RemoteActorRef private[akka](
     _timeout: Long,
     loader: Option[ClassLoader],
     val actorType: ActorType = ActorType.ScalaActor)
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef
+    with ScalaActorRef {
 
   ensureRemotingEnabled
 
@@ -1577,13 +1581,13 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   /**
     * Atomically create (from actor class) and start an actor.
     */
-  def spawn[T <: Actor : ClassTag]: ActorRef =
+  def spawn[T <: Actor: ClassTag]: ActorRef =
     spawn(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]])
 
   /**
     * Atomically create (from actor class), start and make an actor remote.
     */
-  def spawnRemote[T <: Actor : ClassTag](
+  def spawnRemote[T <: Actor: ClassTag](
       hostname: String, port: Int, timeout: Long): ActorRef = {
     ensureRemotingEnabled
     spawnRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
@@ -1595,13 +1599,13 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
   /**
     * Atomically create (from actor class), start and link an actor.
     */
-  def spawnLink[T <: Actor : ClassTag]: ActorRef =
+  def spawnLink[T <: Actor: ClassTag]: ActorRef =
     spawnLink(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]])
 
   /**
     * Atomically create (from actor class), start, link and make an actor remote.
     */
-  def spawnLinkRemote[T <: Actor : ClassTag](
+  def spawnLinkRemote[T <: Actor: ClassTag](
       hostname: String, port: Int, timeout: Long): ActorRef = {
     ensureRemotingEnabled
     spawnLinkRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],

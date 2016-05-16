@@ -48,8 +48,10 @@ class NewRemoteActorMultiJvmNode1 extends NewRemoteActorSpec
 class NewRemoteActorMultiJvmNode2 extends NewRemoteActorSpec
 
 class NewRemoteActorSpec
-    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import NewRemoteActorMultiJvmSpec._
 
   def initialParticipants = roles.size

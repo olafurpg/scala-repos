@@ -98,10 +98,11 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     */
   def withDateHeaders(headers: (String, DateTime)*): Result = {
     copy(
-        header = header.copy(headers = header.headers ++ headers.map {
-      case (name, dateTime) =>
-        (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
-    }))
+        header = header.copy(headers =
+              header.headers ++ headers.map {
+        case (name, dateTime) =>
+          (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
+      }))
   }
 
   /**
@@ -420,8 +421,8 @@ trait Results {
               play.api.libs.MimeTypes
                 .forFileName(name)
                 .orElse(Some(play.api.http.ContentTypes.BINARY))
-            )
-        )
+          )
+      )
     }
 
     /**
@@ -435,8 +436,8 @@ trait Results {
                  inline: Boolean = false,
                  fileName: java.io.File => String = _.getName,
                  onClose: () => Unit = () => ()): Result = {
-      streamFile(StreamConverters.fromInputStream(
-                     () => Files.newInputStream(content.toPath)),
+      streamFile(StreamConverters.fromInputStream(() =>
+                       Files.newInputStream(content.toPath)),
                  fileName(content),
                  content.length,
                  inline)
@@ -453,8 +454,8 @@ trait Results {
                  inline: Boolean = false,
                  fileName: Path => String = _.getFileName.toString,
                  onClose: () => Unit = () => ()): Result = {
-      streamFile(StreamConverters.fromInputStream(
-                     () => Files.newInputStream(content)),
+      streamFile(StreamConverters.fromInputStream(() =>
+                       Files.newInputStream(content)),
                  fileName(content),
                  Files.size(content),
                  inline)
@@ -467,10 +468,10 @@ trait Results {
       * @param classLoader The classloader to load it from, defaults to the classloader for this class.
       * @param inline Whether it should be served as an inline file, or as an attachment.
       */
-    def sendResource(
-        resource: String,
-        classLoader: ClassLoader = Results.getClass.getClassLoader,
-        inline: Boolean = true): Result = {
+    def sendResource(resource: String,
+                     classLoader: ClassLoader =
+                       Results.getClass.getClassLoader,
+                     inline: Boolean = true): Result = {
       val stream = classLoader.getResourceAsStream(resource)
       val fileName = resource.split('/').last
       streamFile(StreamConverters.fromInputStream(() => stream),
@@ -495,8 +496,8 @@ trait Results {
       Result(
           header = header,
           body = HttpEntity.Chunked(
-                content.map(c => HttpChunk.Chunk(writeable.transform(c))),
-                writeable.contentType)
+              content.map(c => HttpChunk.Chunk(writeable.transform(c))),
+              writeable.contentType)
       )
     }
 
@@ -528,11 +529,11 @@ trait Results {
       Result(
           header = header,
           body = HttpEntity.Streamed(
-                Source
-                  .fromPublisher(Streams.enumeratorToPublisher(content))
-                  .map(writeable.transform),
-                None,
-                writeable.contentType)
+              Source
+                .fromPublisher(Streams.enumeratorToPublisher(content))
+                .map(writeable.transform),
+              None,
+              writeable.contentType)
       )
     }
 
@@ -729,8 +730,8 @@ trait Results {
         .map { params =>
           (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap {
             pair =>
-              pair._2.map(
-                  value => (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
+              pair._2.map(value =>
+                    (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
           }.mkString("&")
         }
         .getOrElse("")

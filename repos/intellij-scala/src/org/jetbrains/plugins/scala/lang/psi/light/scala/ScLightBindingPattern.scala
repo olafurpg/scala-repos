@@ -13,7 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   * @since 04/04/14.
   */
 class ScLightBindingPattern(rt: ScType, val b: ScBindingPattern)
-    extends LightElement(b.getManager, b.getLanguage) with ScBindingPattern {
+    extends LightElement(b.getManager, b.getLanguage)
+    with ScBindingPattern {
   setNavigationElement(b)
 
   override def nameId: PsiElement = b.nameId

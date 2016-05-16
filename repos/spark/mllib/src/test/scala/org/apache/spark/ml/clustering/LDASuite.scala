@@ -57,7 +57,8 @@ object LDASuite {
 }
 
 class LDASuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   val k: Int = 5
@@ -213,8 +214,8 @@ class LDASuite
     topics.select("termWeights").collect().foreach {
       case r: Row =>
         val termWeights = r.getAs[Seq[Double]](0)
-        assert(termWeights.length === 3 &&
-            termWeights.forall(w => w >= 0.0 && w <= 1.0))
+        assert(termWeights.length === 3 && termWeights.forall(w =>
+                  w >= 0.0 && w <= 1.0))
     }
   }
 

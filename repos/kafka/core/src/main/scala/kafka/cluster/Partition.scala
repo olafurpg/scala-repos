@@ -44,7 +44,8 @@ class Partition(val topic: String,
                 val partitionId: Int,
                 time: Time,
                 replicaManager: ReplicaManager)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
   private val localBrokerId = replicaManager.config.brokerId
   private val logManager = replicaManager.logManager
   private val zkUtils = replicaManager.zkUtils
@@ -325,18 +326,15 @@ class Partition(val topic: String,
       case Some(leaderReplica) =>
         // keep the current immutable replica list reference
         val curInSyncReplicas = inSyncReplicas
-        val numAcks =
-          curInSyncReplicas.count(
-              r =>
-                {
-              if (!r.isLocal)
-                if (r.logEndOffset.messageOffset >= requiredOffset) {
-                  trace("Replica %d of %s-%d received offset %d".format(
-                          r.brokerId, topic, partitionId, requiredOffset))
-                  true
-                } else false
-              else true /* also count the local (leader) replica */
-          })
+        val numAcks = curInSyncReplicas.count(r => {
+          if (!r.isLocal)
+            if (r.logEndOffset.messageOffset >= requiredOffset) {
+              trace("Replica %d of %s-%d received offset %d".format(
+                      r.brokerId, topic, partitionId, requiredOffset))
+              true
+            } else false
+          else true /* also count the local (leader) replica */
+        })
 
         trace(
             "%d acks satisfied for %s-%d with acks = -1".format(
@@ -455,8 +453,8 @@ class Partition(val topic: String,
     val leaderLogEndOffset = leaderReplica.logEndOffset
     val candidateReplicas = inSyncReplicas - leaderReplica
 
-    val laggingReplicas = candidateReplicas.filter(
-        r => (time.milliseconds - r.lastCaughtUpTimeMs) > maxLagMs)
+    val laggingReplicas = candidateReplicas.filter(r =>
+          (time.milliseconds - r.lastCaughtUpTimeMs) > maxLagMs)
     if (laggingReplicas.size > 0)
       debug(
           "Lagging replicas for partition %s are %s".format(

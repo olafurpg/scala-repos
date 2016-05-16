@@ -291,7 +291,8 @@ object ButtonBar {
 
   */
 class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
-    extends Control(delegate) with SFXDelegate[jfxsc.ButtonBar] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ButtonBar] {
 
   /**
     * Creates a ButtonBar with the given button order (refer to

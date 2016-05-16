@@ -35,9 +35,10 @@ object HourlySuffixTsv {
     new HourlySuffixTsv(prefix)
 }
 
-class HourlySuffixTsv(prefix: String)(
-    override implicit val dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with DelimitedScheme
+class HourlySuffixTsv(
+    prefix: String)(override implicit val dateRange: DateRange)
+    extends HourlySuffixSource(prefix, dateRange)
+    with DelimitedScheme
 
 object HourlySuffixTypedTsv {
   def apply[T](prefix: String)(implicit dateRange: DateRange,
@@ -52,15 +53,17 @@ class HourlySuffixTypedTsv[T](prefix: String)(
     override val mf: Manifest[T],
     override val conv: TupleConverter[T],
     override val tset: TupleSetter[T])
-    extends HourlySuffixSource(prefix, dateRange) with TypedDelimited[T]
+    extends HourlySuffixSource(prefix, dateRange)
+    with TypedDelimited[T]
 
 object HourlySuffixCsv {
   def apply(prefix: String)(implicit dateRange: DateRange) =
     new HourlySuffixCsv(prefix)
 }
 
-class HourlySuffixCsv(
-    prefix: String)(override implicit val dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with DelimitedScheme {
+class HourlySuffixCsv(prefix: String)(
+    override implicit val dateRange: DateRange)
+    extends HourlySuffixSource(prefix, dateRange)
+    with DelimitedScheme {
   override val separator = ","
 }

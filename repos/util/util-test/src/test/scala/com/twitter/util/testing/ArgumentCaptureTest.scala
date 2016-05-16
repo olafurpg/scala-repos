@@ -9,7 +9,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class ArgumentCaptureTest
-    extends FunSuite with MockitoSugar with ArgumentCapture {
+    extends FunSuite
+    with MockitoSugar
+    with ArgumentCapture {
   class MockSubject {
     def method1(arg: String): Long = 0L
     def method2(arg1: String, arg2: String): Long = 0L

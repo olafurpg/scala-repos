@@ -19,7 +19,8 @@ import akka.serialization.SerializerWithStringManifest
   */
 private[akka] class ClusterSingletonMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
 
   private lazy val serialization = SerializationExtension(system)
 

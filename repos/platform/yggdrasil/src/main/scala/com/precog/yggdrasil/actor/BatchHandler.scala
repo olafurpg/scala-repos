@@ -62,7 +62,8 @@ class BatchHandler(ingestActor: ActorRef,
                    requestor: ActorRef,
                    checkpoint: YggCheckpoint,
                    ingestTimeout: Timeout)
-    extends Actor with Logging {
+    extends Actor
+    with Logging {
   private var remaining = -1
 
   override def preStart() = {

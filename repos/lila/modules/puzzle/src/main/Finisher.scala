@@ -29,18 +29,19 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
             s"puzzle ${puzzle.id} user")(puzzleRating, date)
         val userPerf = user.perfs.puzzle.addOrReset(
             _.puzzle.crazyGlicko, s"puzzle ${puzzle.id}")(userRating, date)
-        val a = new Attempt(
-            id = Attempt.makeId(puzzle.id, user.id),
-            puzzleId = puzzle.id,
-            userId = user.id,
-            date = DateTime.now,
-            win = data.isWin,
-            time = math.min(data.time, maxTime),
-            vote = none,
-            puzzleRating = puzzle.perf.intRating,
-            puzzleRatingDiff = puzzlePerf.intRating - puzzle.perf.intRating,
-            userRating = user.perfs.puzzle.intRating,
-            userRatingDiff = userPerf.intRating - user.perfs.puzzle.intRating)
+        val a = new Attempt(id = Attempt.makeId(puzzle.id, user.id),
+                            puzzleId = puzzle.id,
+                            userId = user.id,
+                            date = DateTime.now,
+                            win = data.isWin,
+                            time = math.min(data.time, maxTime),
+                            vote = none,
+                            puzzleRating = puzzle.perf.intRating,
+                            puzzleRatingDiff =
+                              puzzlePerf.intRating - puzzle.perf.intRating,
+                            userRating = user.perfs.puzzle.intRating,
+                            userRatingDiff =
+                              userPerf.intRating - user.perfs.puzzle.intRating)
         ((api.attempt add a) >> {
               puzzleColl.update(
                   BSONDocument("_id" -> puzzle.id),
@@ -49,8 +50,8 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
                           Puzzle.BSONFields.wins -> BSONInteger(
                               data.isWin ? 1 | 0)
                       )) ++ BSONDocument("$set" -> BSONDocument(
-                          Puzzle.BSONFields.perf -> Perf.perfBSONHandler.write(
-                              puzzlePerf)
+                          Puzzle.BSONFields.perf -> Perf.perfBSONHandler
+                            .write(puzzlePerf)
                       ))) zip UserRepo.setPerf(user.id, "puzzle", userPerf)
             }) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
     }

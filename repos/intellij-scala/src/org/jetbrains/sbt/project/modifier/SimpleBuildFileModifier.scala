@@ -23,9 +23,9 @@ class SimpleBuildFileModifier(
     val resolvers: Seq[String],
     val scalacOptions: Seq[String],
     val buildFileProviders: List[BuildFileProvider] = List(
-          SimpleModuleBuildFileProvider, ProjectRootBuildFileProvider),
-    val buildFileLocationProviders: List[BuildFileModificationLocationProvider] = List(
-          EndOfFileLocationProvider))
+        SimpleModuleBuildFileProvider, ProjectRootBuildFileProvider),
+    val buildFileLocationProviders: List[BuildFileModificationLocationProvider] =
+      List(EndOfFileLocationProvider))
     extends BuildFileModifier {
 
   /**
@@ -63,9 +63,13 @@ class SimpleBuildFileModifier(
                   .map(locationProvider =>
                         buildPsiElement(
                             module.getProject,
-                            Option(if (buildFileEntry.isModuleLocal)
-                                  null else module.getName),
-                            elementType).map(
+                            Option(
+                                if (buildFileEntry.isModuleLocal)
+                                  null
+                                else
+                                  module.getName),
+                            elementType)
+                          .map(
                             SimpleBuildFileModifier.addElementsToBuildFile(
                                 module,
                                 locationProvider,

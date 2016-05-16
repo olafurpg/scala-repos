@@ -21,7 +21,9 @@ import akka.testkit._
 import akka.util.Timeout
 
 class ConsumerIntegrationTest
-    extends WordSpec with Matchers with NonSharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with NonSharedCamelSystem {
   "ConsumerIntegrationTest" must {
     val defaultTimeoutDuration = 10 seconds
     implicit val defaultTimeout = Timeout(defaultTimeoutDuration)
@@ -124,12 +126,11 @@ class ConsumerIntegrationTest
     "Error passing consumer supports error handling through route modification" in {
       val ref = start(new ErrorThrowingConsumer("direct:error-handler-test") {
         override def onRouteDefinition =
-          (rd: RouteDefinition) ⇒
-            {
-              rd.onException(classOf[TestException])
-                .handled(true)
-                .transform(Builder.exceptionMessage)
-                .end
+          (rd: RouteDefinition) ⇒ {
+            rd.onException(classOf[TestException])
+              .handled(true)
+              .transform(Builder.exceptionMessage)
+              .end
           }
       }, name = "direct-error-handler-test")
       filterEvents(EventFilter[TestException](occurrences = 1)) {
@@ -142,9 +143,8 @@ class ConsumerIntegrationTest
     "Error passing consumer supports redelivery through route modification" in {
       val ref = start(new FailingOnceConsumer("direct:failing-once-concumer") {
         override def onRouteDefinition =
-          (rd: RouteDefinition) ⇒
-            {
-              rd.onException(classOf[TestException]).maximumRedeliveries(1).end
+          (rd: RouteDefinition) ⇒ {
+            rd.onException(classOf[TestException]).maximumRedeliveries(1).end
           }
       }, name = "direct-failing-once-consumer")
       filterEvents(EventFilter[TestException](occurrences = 1)) {
@@ -227,13 +227,12 @@ class ErrorRespondingConsumer(override val endpointUri: String)
     case msg: CamelMessage ⇒ throw new TestException("Error!")
   }
   override def onRouteDefinition =
-    (rd: RouteDefinition) ⇒
-      {
-        // Catch TestException and handle it by returning a modified version of the in message
-        rd.onException(classOf[TestException])
-          .handled(true)
-          .transform(Builder.body.append(" has an error"))
-          .end
+    (rd: RouteDefinition) ⇒ {
+      // Catch TestException and handle it by returning a modified version of the in message
+      rd.onException(classOf[TestException])
+        .handled(true)
+        .transform(Builder.body.append(" has an error"))
+        .end
     }
 
   final override def preRestart(reason: Throwable, message: Option[Any]) {

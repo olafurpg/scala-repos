@@ -44,11 +44,11 @@ object LowPriorityDerivationTests {
 
     implicit val intTC: TC[Int] = instance[Int](_ => "Int")
     implicit val booleanTC: TC[Boolean] = instance[Boolean](_ => "Boolean")
-    implicit def optionTC[T : TC]: TC[Option[T]] =
+    implicit def optionTC[T: TC]: TC[Option[T]] =
       instance[Option[T]](n => s"Option[${apply[T].msg(n - 1)}]")
-    implicit def tuple2TC[A : TC, B : TC]: TC[(A, B)] =
-      instance[(A, B)](
-          n => s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
+    implicit def tuple2TC[A: TC, B: TC]: TC[(A, B)] =
+      instance[(A, B)](n =>
+            s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
     implicit val cc1TC: TC[CC1] = instance[CC1](_ => "CC1")
   }
 
@@ -72,11 +72,11 @@ object LowPriorityDerivationTests {
 
     implicit val intTC: TC0[Int] = instance[Int](_ => "Int")
     implicit val booleanTC: TC0[Boolean] = instance[Boolean](_ => "Boolean")
-    implicit def optionTC[T : TC0]: TC0[Option[T]] =
+    implicit def optionTC[T: TC0]: TC0[Option[T]] =
       instance[Option[T]](n => s"Option[${apply[T].msg(n - 1)}]")
-    implicit def tuple2TC[A : TC0, B : TC0]: TC0[(A, B)] =
-      instance[(A, B)](
-          n => s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
+    implicit def tuple2TC[A: TC0, B: TC0]: TC0[(A, B)] =
+      instance[(A, B)](n =>
+            s"(${apply[A].msg(n - 1)}, ${apply[B].msg(n - 1)})")
     implicit val cc1TC: TC0[CC1] = instance[CC1](_ => "CC1")
   }
 
@@ -96,8 +96,8 @@ object LowPriorityDerivationTests {
           implicit head: Strict[TC[H]],
           tail: MkHListTC[T]): MkHListTC[H :: T] =
         new MkHListTC[H :: T] {
-          lazy val tc = instance[H :: T](
-              n => s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
+          lazy val tc = instance[H :: T](n =>
+                s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -114,8 +114,8 @@ object LowPriorityDerivationTests {
           implicit head: Strict[TC[H]],
           tail: MkCoproductTC[T]): MkCoproductTC[H :+: T] =
         new MkCoproductTC[H :+: T] {
-          lazy val tc = instance[H :+: T](
-              n => s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
+          lazy val tc = instance[H :+: T](n =>
+                s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -192,8 +192,8 @@ object LowPriorityDerivationTests {
         new MkGenericTupleTC[H :: T] {
           lazy val tc = instance[H :: T] { n =>
             val tailMsg = tail.tc.msg(n - 1)
-            head.value.msg(n - 1) +
-            (if (tailMsg.isEmpty) "" else ", " + tailMsg)
+            head.value.msg(n - 1) + (if (tailMsg.isEmpty) ""
+                                     else ", " + tailMsg)
           }
         }
     }
@@ -222,8 +222,8 @@ object LowPriorityDerivationTests {
           implicit head: Strict[TC[H]],
           tail: MkHListTC[T]): MkHListTC[H :: T] =
         new MkHListTC[H :: T] {
-          lazy val tc = instance[H :: T](
-              n => s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
+          lazy val tc = instance[H :: T](n =>
+                s"${head.value.msg(n - 1)} :: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -238,8 +238,8 @@ object LowPriorityDerivationTests {
           implicit head: Strict[TC[H]],
           tail: MkCoproductTC[T]): MkCoproductTC[H :+: T] =
         new MkCoproductTC[H :+: T] {
-          lazy val tc = instance[H :+: T](
-              n => s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
+          lazy val tc = instance[H :+: T](n =>
+                s"${head.value.msg(n - 1)} :+: ${tail.tc.msg(n - 1)}")
         }
     }
 
@@ -292,12 +292,12 @@ object LowPriorityDerivationTests {
 class LowPriorityDerivationTests {
   import LowPriorityDerivationTests._
 
-  def validateTC[T : TC](expected: String, n: Int = Int.MaxValue): Unit = {
+  def validateTC[T: TC](expected: String, n: Int = Int.MaxValue): Unit = {
     val msg = TC[T].msg(n)
     assert(expected == msg)
   }
 
-  def validateTC0[T : TC0](expected: String, n: Int = Int.MaxValue): Unit = {
+  def validateTC0[T: TC0](expected: String, n: Int = Int.MaxValue): Unit = {
     val msg = TC0[T].msg(n)
     assert(expected == msg)
   }

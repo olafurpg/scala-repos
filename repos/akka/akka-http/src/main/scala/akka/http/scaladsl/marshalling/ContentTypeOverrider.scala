@@ -18,8 +18,8 @@ object ContentTypeOverrider {
         value.withContentType(newContentType).asInstanceOf[T] // can't be expressed in types
     }
 
-  implicit def forHeadersAndEntity[T <: HttpEntity]: ContentTypeOverrider[
-      (immutable.Seq[HttpHeader], T)] =
+  implicit def forHeadersAndEntity[T <: HttpEntity]
+    : ContentTypeOverrider[(immutable.Seq[HttpHeader], T)] =
     new ContentTypeOverrider[(immutable.Seq[HttpHeader], T)] {
       def apply(
           value: (immutable.Seq[HttpHeader], T), newContentType: ContentType) =

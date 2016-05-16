@@ -44,7 +44,7 @@ class CountMinSketchSuite extends FunSuite {
     assert(sketch === deserialized)
   }
 
-  def testAccuracy[T : ClassTag](typeName: String)(
+  def testAccuracy[T: ClassTag](typeName: String)(
       itemGenerator: Random => T): Unit = {
     test(s"accuracy - $typeName") {
       // Uses fixed seed to ensure reproducible test execution
@@ -85,7 +85,7 @@ class CountMinSketchSuite extends FunSuite {
     }
   }
 
-  def testMergeInPlace[T : ClassTag](typeName: String)(
+  def testMergeInPlace[T: ClassTag](typeName: String)(
       itemGenerator: Random => T): Unit = {
     test(s"mergeInPlace - $typeName") {
       // Uses fixed seed to ensure reproducible test execution
@@ -125,7 +125,7 @@ class CountMinSketchSuite extends FunSuite {
     }
   }
 
-  def testItemType[T : ClassTag](typeName: String)(
+  def testItemType[T: ClassTag](typeName: String)(
       itemGenerator: Random => T): Unit = {
     testAccuracy[T](typeName)(itemGenerator)
     testMergeInPlace[T](typeName)(itemGenerator)

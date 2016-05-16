@@ -39,7 +39,7 @@ import scala.reflect._
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
+abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
     extends BaseAlgorithm[PD, M, Q, P] {
 
   def trainBase(sc: SparkContext, pd: PD): M = train(sc, pd)

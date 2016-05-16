@@ -63,10 +63,9 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
       val consumerMetadataResponse =
         simpleConsumer.send(consumerMetadataRequest)
       consumerMetadataResponse.coordinatorOpt.isDefined
-    }.dropWhile(success =>
-          {
-        if (!success) Thread.sleep(1000)
-        !success
+    }.dropWhile(success => {
+      if (!success) Thread.sleep(1000)
+      !success
     })
   }
 
@@ -113,8 +112,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     // Commit a new offset
     val commitRequest1 = OffsetCommitRequest(
         group,
-        immutable.Map(
-            topicAndPartition -> OffsetAndMetadata(
+        immutable.Map(topicAndPartition -> OffsetAndMetadata(
                 offset = 100L,
                 metadata = "some metadata"
             )))
@@ -307,8 +305,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         immutable.Map(
             topicAndPartition -> OffsetAndMetadata(
                 offset = 42L,
-                metadata = random.nextString(
-                      server.config.offsetMetadataMaxSize)
+                metadata =
+                  random.nextString(server.config.offsetMetadataMaxSize)
             )))
     val commitResponse = simpleConsumer.commitOffsets(commitRequest)
 
@@ -320,8 +318,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
         immutable.Map(
             topicAndPartition -> OffsetAndMetadata(
                 offset = 42L,
-                metadata = random.nextString(
-                      server.config.offsetMetadataMaxSize + 1)
+                metadata =
+                  random.nextString(server.config.offsetMetadataMaxSize + 1)
             )))
     val commitResponse1 = simpleConsumer.commitOffsets(commitRequest1)
 
@@ -343,8 +341,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     // committed offset should not exist with fetch version 1 since it was stored in ZK
     val commitRequest0 = OffsetCommitRequest(
         groupId = group,
-        requestInfo = immutable.Map(
-              topicPartition -> OffsetAndMetadata(1L, "metadata")),
+        requestInfo =
+          immutable.Map(topicPartition -> OffsetAndMetadata(1L, "metadata")),
         versionId = 0
     )
     assertEquals(Errors.NONE.code,
@@ -377,7 +375,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     val commitRequest1 = OffsetCommitRequest(
         groupId = group,
         requestInfo = immutable.Map(
-              topicPartition -> OffsetAndMetadata(2L, "metadata", -1L)),
+            topicPartition -> OffsetAndMetadata(2L, "metadata", -1L)),
         versionId = 1
     )
     assertEquals(Errors.NONE.code,
@@ -400,10 +398,10 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     val commitRequest2 = OffsetCommitRequest(
         groupId = group,
         requestInfo = immutable.Map(
-              topicPartition -> OffsetAndMetadata(3L,
-                                                  "metadata",
-                                                  SystemTime.milliseconds -
-                                                  2 * 24 * 60 * 60 * 1000L)),
+            topicPartition -> OffsetAndMetadata(3L,
+                                                "metadata",
+                                                SystemTime.milliseconds -
+                                                2 * 24 * 60 * 60 * 1000L)),
         versionId = 1
     )
     assertEquals(Errors.NONE.code,
@@ -426,7 +424,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     val commitRequest3 = OffsetCommitRequest(
         groupId = group,
         requestInfo = immutable.Map(
-              topicPartition -> OffsetAndMetadata(4L, "metadata", -1L)),
+            topicPartition -> OffsetAndMetadata(4L, "metadata", -1L)),
         versionId = 2,
         retentionMs = 1000 * 60 * 60L
     )
@@ -449,8 +447,8 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     // committed offset should expire
     val commitRequest4 = OffsetCommitRequest(
         groupId = "test-group",
-        requestInfo = immutable.Map(
-              TopicAndPartition(topic, 0) -> OffsetAndMetadata(
+        requestInfo =
+          immutable.Map(TopicAndPartition(topic, 0) -> OffsetAndMetadata(
                   5L, "metadata", -1L)),
         versionId = 2,
         retentionMs = 0L

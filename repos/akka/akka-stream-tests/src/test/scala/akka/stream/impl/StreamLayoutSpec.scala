@@ -145,8 +145,8 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "starting from a Source" in {
         val g = (1 to tooDeepForStack).foldLeft(
-            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-            i) ⇒ f.map(identity))
+            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+              f.map(identity))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -163,8 +163,8 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "using .via" in {
         val g = (1 to tooDeepForStack).foldLeft(
-            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-            i) ⇒ f.via(Flow[Int].map(identity)))
+            Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+              f.via(Flow[Int].map(identity)))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -176,8 +176,8 @@ class StreamLayoutSpec extends AkkaSpec {
       "starting from a Source" in {
         val g =
           Source fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-                  i) ⇒ f.map(identity)))
+                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+                    f.map(identity)))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -185,8 +185,9 @@ class StreamLayoutSpec extends AkkaSpec {
 
       "starting from a Flow" in {
         val g =
-          Flow fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Flow[Int])((f, i) ⇒ f.map(identity)))
+          Flow fromGraph Fusing.aggressive(
+              (1 to tooDeepForStack).foldLeft(Flow[Int])((f, i) ⇒
+                    f.map(identity)))
         val (mat, fut) =
           g.runWith(Source.single(42).mapMaterializedValue(_ ⇒ 1), Sink.seq)
         mat should ===(1)
@@ -196,8 +197,8 @@ class StreamLayoutSpec extends AkkaSpec {
       "using .via" in {
         val g =
           Source fromGraph Fusing.aggressive((1 to tooDeepForStack).foldLeft(
-                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f,
-                  i) ⇒ f.via(Flow[Int].map(identity))))
+                  Source.single(42).mapMaterializedValue(_ ⇒ 1))((f, i) ⇒
+                    f.via(Flow[Int].map(identity))))
         val (mat, fut) = g.toMat(Sink.seq)(Keep.both).run()
         mat should ===(1)
         fut.futureValue should ===(List(42))
@@ -206,7 +207,8 @@ class StreamLayoutSpec extends AkkaSpec {
   }
 
   case class TestPublisher(owner: Module, port: OutPort)
-      extends Publisher[Any] with Subscription {
+      extends Publisher[Any]
+      with Subscription {
     var downstreamModule: Module = _
     var downstreamPort: InPort = _
 

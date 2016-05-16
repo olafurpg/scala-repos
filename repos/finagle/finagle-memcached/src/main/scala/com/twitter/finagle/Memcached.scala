@@ -232,7 +232,8 @@ object Memcached
       stack: Stack[ServiceFactory[Command, Response]] = Client.newStack,
       params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Response, Client]
-      with WithConcurrentLoadBalancer[Client] with MemcachedRichClient {
+      with WithConcurrentLoadBalancer[Client]
+      with MemcachedRichClient {
 
     import Client.mkDestination
 

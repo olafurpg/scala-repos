@@ -230,7 +230,9 @@ trait NoDocTemplate extends TemplateEntity {
   *  in the source: trait U extends T -- C appears in U as a MemberTemplateImpl
   *    -- that is, U has a member for it but C doesn't get its own page */
 trait MemberTemplateEntity
-    extends TemplateEntity with MemberEntity with HigherKinded {
+    extends TemplateEntity
+    with MemberEntity
+    with HigherKinded {
 
   /** The value parameters of this case class, or an empty list if this class is not a case class. As case class value
     * parameters cannot be curried, the outer list has exactly one element. */
@@ -307,13 +309,14 @@ trait DocTemplateEntity extends MemberTemplateEntity {
   def implicitsShadowing: Map[MemberEntity, ImplicitMemberShadowing]
 
   /** Classes that can be implicitly converted to this class */
-  def incomingImplicitlyConvertedClasses: List[
-      (DocTemplateEntity, ImplicitConversion)]
+  def incomingImplicitlyConvertedClasses: List[(DocTemplateEntity,
+                                                ImplicitConversion)]
 
   /** Classes to which this class can be implicitly converted to
       NOTE: Some classes might not be included in the scaladoc run so they will be NoDocTemplateEntities */
-  def outgoingImplicitlyConvertedClasses: List[
-      (TemplateEntity, TypeEntity, ImplicitConversion)]
+  def outgoingImplicitlyConvertedClasses: List[(TemplateEntity,
+                                                TypeEntity,
+                                                ImplicitConversion)]
 
   /** If this template takes place in inheritance and implicit conversion relations, it will be shown in this diagram */
   def inheritanceDiagram: Option[Diagram]
@@ -540,7 +543,8 @@ trait ImplicitInScopeConstraint extends Constraint {
 }
 
 trait TypeClassConstraint
-    extends ImplicitInScopeConstraint with TypeParamConstraint {
+    extends ImplicitInScopeConstraint
+    with TypeParamConstraint {
 
   /** Type class name */
   def typeClassEntity: TemplateEntity

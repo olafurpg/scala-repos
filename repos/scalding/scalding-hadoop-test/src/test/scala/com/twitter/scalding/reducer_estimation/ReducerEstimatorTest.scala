@@ -88,7 +88,9 @@ class SimpleMapOnlyJob(args: Args, customConfig: Config) extends Job(args) {
 }
 
 class ReducerEstimatorTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
   import HipJob._
 
   "Single-step job with reducer estimator" should {

@@ -56,18 +56,19 @@ object PhysicalOperation extends PredicateHelper {
     * }}}
     */
   private def collectProjectsAndFilters(
-      plan: LogicalPlan): (Option[Seq[NamedExpression]], Seq[Expression],
-  LogicalPlan, Map[Attribute, Expression]) =
+      plan: LogicalPlan): (Option[Seq[NamedExpression]],
+                           Seq[Expression],
+                           LogicalPlan,
+                           Map[Attribute, Expression]) =
     plan match {
       case Project(fields, child) if fields.forall(_.deterministic) =>
         val (_, filters, other, aliases) = collectProjectsAndFilters(child)
-        val substitutedFields = fields
-          .map(substitute(aliases))
-          .asInstanceOf[Seq[NamedExpression]]
-          (Some(substitutedFields),
-           filters,
-           other,
-           collectAliases(substitutedFields))
+        val substitutedFields =
+          fields.map(substitute(aliases)).asInstanceOf[Seq[NamedExpression]]
+        (Some(substitutedFields),
+         filters,
+         other,
+         collectAliases(substitutedFields))
 
       case Filter(condition, child) if condition.deterministic =>
         val (fields, filters, other, aliases) = collectProjectsAndFilters(
@@ -117,8 +118,12 @@ object PhysicalOperation extends PredicateHelper {
 object ExtractEquiJoinKeys extends Logging with PredicateHelper {
 
   /** (joinType, leftKeys, rightKeys, condition, leftChild, rightChild) */
-  type ReturnType = (JoinType, Seq[Expression], Seq[Expression],
-  Option[Expression], LogicalPlan, LogicalPlan)
+  type ReturnType = (JoinType,
+                     Seq[Expression],
+                     Seq[Expression],
+                     Option[Expression],
+                     LogicalPlan,
+                     LogicalPlan)
 
   def unapply(plan: LogicalPlan): Option[ReturnType] = plan match {
     case join @ Join(left, right, joinType, condition) =>

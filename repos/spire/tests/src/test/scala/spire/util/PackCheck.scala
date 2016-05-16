@@ -9,7 +9,9 @@ import prop._
 import java.nio.ByteBuffer
 
 class PackCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   import Pack.{intToByte, longToByte}
 
   property("int <=> bytes") {

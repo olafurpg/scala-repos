@@ -18,7 +18,9 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
 class PartialSyntaxTest
-    extends FunSuite with Checkers with BaseSyntaxTest
+    extends FunSuite
+    with Checkers
+    with BaseSyntaxTest
     with NonImplicitAssertions {
 
   implicit val IntGroup: Group[Int] = implicitly[AdditiveGroup[Int]].additive
@@ -35,13 +37,13 @@ class PartialSyntaxTest
     testPartialActionSyntax(seq, perm.map)
   }))
 
-  def testSemigroupoidSyntax[A : Semigroupoid : Eq](a: A, b: A) = {
+  def testSemigroupoidSyntax[A: Semigroupoid: Eq](a: A, b: A) = {
     import spire.syntax.semigroupoid._
     ((a |+|? b) === Semigroupoid[A].partialOp(a, b)) &&
     ((a |+|?? b) === Semigroupoid[A].opIsDefined(a, b))
   }
 
-  def testGroupoidSyntax[A : Groupoid : Eq](a: A, b: A) = {
+  def testGroupoidSyntax[A: Groupoid: Eq](a: A, b: A) = {
     import spire.syntax.groupoid._
     (a.isId === Groupoid[A].isId(a)) && (a.leftId === Groupoid[A].leftId(a)) &&
     (a.rightId === Groupoid[A].rightId(a)) &&

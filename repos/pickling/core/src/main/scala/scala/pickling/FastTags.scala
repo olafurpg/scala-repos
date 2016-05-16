@@ -80,7 +80,7 @@ object FastTypeTag {
   implicit def materializeFastTypeTagOfClassTag[T]: FastTypeTag[ClassTag[T]] = macro Compat
     .FastTypeTagMacros_implClassTag[T]
 
-  private def stdTag[T : ru.TypeTag]: FastTypeTag[T] =
+  private def stdTag[T: ru.TypeTag]: FastTypeTag[T] =
     apply(scala.reflect.runtime.currentMirror, ru.typeOf[T], ru.typeOf[T].key)
       .asInstanceOf[FastTypeTag[T]]
 
@@ -167,7 +167,7 @@ object FastTypeTag {
   /** Construct  anew fast type tage using the currently active pickling Mirror and lazily instantiate the Type. */
   def apply(key: String): FastTypeTag[_] = macro Compat.FastTypeTagMacros_apply
 
-  def apply[T : ru.TypeTag]: FastTypeTag[T] = {
+  def apply[T: ru.TypeTag]: FastTypeTag[T] = {
     val ruTpe = implicitly[ru.TypeTag[T]].tpe
     new FastTypeTag[T] {
       def mirror = scala.reflect.runtime.currentMirror
@@ -294,7 +294,7 @@ object FastTypeTag {
 }
 
 trait FastTypeTagMacros extends Macro {
-  def impl[T : c.WeakTypeTag]: c.Tree = {
+  def impl[T: c.WeakTypeTag]: c.Tree = {
     import c.universe._
     val T = weakTypeOf[T]
     if (T.typeSymbol.isParameter)
@@ -310,7 +310,7 @@ trait FastTypeTagMacros extends Macro {
       }
     """
   }
-  def implClassTag[T : c.WeakTypeTag]: c.Tree = {
+  def implClassTag[T: c.WeakTypeTag]: c.Tree = {
     import c.universe._
     val T = weakTypeOf[T]
     q"""

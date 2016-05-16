@@ -33,8 +33,8 @@ class ScalaMethodImplementor extends MethodImplementor {
     (for {
       td <- inClass.asOptionOf[ScTemplateDefinition].toSeq
       member <- ScalaOIUtil.getMembersToImplement(td).collect {
-        case mm: ScMethodMember if mm.getElement == method => mm
-      }
+                 case mm: ScMethodMember if mm.getElement == method => mm
+               }
     } yield {
       val specifyType =
         ScalaApplicationSettings.getInstance().SPECIFY_RETURN_TYPE_EXPLICITLY
@@ -107,8 +107,8 @@ private class ScalaPsiMethodGenerationInfo(
         case _ =>
       }
 
-      prevBaseMethod = PsiTreeUtil.getPrevSiblingOfType(
-          prevBaseMethod, classOf[PsiMethod])
+      prevBaseMethod =
+        PsiTreeUtil.getPrevSiblingOfType(prevBaseMethod, classOf[PsiMethod])
     }
 
     var nextBaseMethod: PsiMethod =
@@ -120,8 +120,8 @@ private class ScalaPsiMethodGenerationInfo(
         case method: PsiMethod if method.isPhysical => return method
         case _ =>
       }
-      nextBaseMethod = PsiTreeUtil.getNextSiblingOfType(
-          nextBaseMethod, classOf[PsiMethod])
+      nextBaseMethod =
+        PsiTreeUtil.getNextSiblingOfType(nextBaseMethod, classOf[PsiMethod])
     }
 
     null

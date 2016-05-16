@@ -53,8 +53,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue > 0.05 && res.method == WelchTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+              res.pValue > 0.05 && res.method == WelchTTest.methodName))
   }
 
   test("accuracy for alternative hypothesis using welch t-test") {
@@ -82,8 +82,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue < 0.05 && res.method == WelchTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+              res.pValue < 0.05 && res.method == WelchTTest.methodName))
   }
 
   test("accuracy for null hypothesis using student t-test") {
@@ -111,8 +111,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue > 0.05 && res.method == StudentTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+              res.pValue > 0.05 && res.method == StudentTTest.methodName))
   }
 
   test("accuracy for alternative hypothesis using student t-test") {
@@ -140,8 +140,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue < 0.05 && res.method == StudentTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+              res.pValue < 0.05 && res.method == StudentTTest.methodName))
   }
 
   test("batches within same test window are grouped") {
@@ -203,8 +203,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[(Boolean, Double)](ssc, numBatches, numBatches)
 
-    assert(
-        outputBatches.flatten.length == (numBatches - peacePeriod) * pointsPerBatch)
+    assert(outputBatches.flatten.length == (numBatches -
+            peacePeriod) * pointsPerBatch)
   }
 
   test("null hypothesis when only data from one group is present") {
@@ -229,8 +229,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            result => (result.pValue - 1.0).abs < 0.001))
+    assert(outputBatches.flatten.forall(result =>
+              (result.pValue - 1.0).abs < 0.001))
   }
 
   // Generate testing input with half of the entries in group A and half in group B

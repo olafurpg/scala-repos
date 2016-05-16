@@ -239,7 +239,8 @@ object DispatcherDocSpec {
   import akka.dispatch.BoundedMessageQueueSemantics
 
   class MyBoundedActor
-      extends MyActor with RequiresMessageQueue[BoundedMessageQueueSemantics]
+      extends MyActor
+      with RequiresMessageQueue[BoundedMessageQueueSemantics]
   //#required-mailbox-class
 
   //#require-mailbox-on-actor

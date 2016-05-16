@@ -41,17 +41,17 @@ object Validators {
   /**
     * Must be a non-empty [String]. null, " ", and "" are not allowed.
     */
-  def nonEmptyString(
-      fieldName: String,
-      messageFormat: String = "%s must be present."): Validator[String] =
+  def nonEmptyString(fieldName: String,
+                     messageFormat: String =
+                       "%s must be present."): Validator[String] =
     new PredicateValidator[String](fieldName, _.nonBlank, messageFormat)
 
   /**
     * Must be non-null.
     */
-  def notNull(
-      fieldName: String,
-      messageFormat: String = "%s must be present."): Validator[AnyRef] =
+  def notNull(fieldName: String,
+              messageFormat: String =
+                "%s must be present."): Validator[AnyRef] =
     new PredicateValidator[AnyRef](fieldName, _ != null, messageFormat)
 
   /**
@@ -74,11 +74,11 @@ object Validators {
   /**
     * Must be a valid absolute URL, parseable by the Apache Commons URI class.
     */
-  def validAbsoluteUrl(
-      fieldName: String,
-      allowLocalHost: Boolean,
-      messageFormat: String = "%s must be a valid absolute url.",
-      schemes: Seq[String] = Seq("http", "https")) =
+  def validAbsoluteUrl(fieldName: String,
+                       allowLocalHost: Boolean,
+                       messageFormat: String =
+                         "%s must be a valid absolute url.",
+                       schemes: Seq[String] = Seq("http", "https")) =
     buildUrlValidator(fieldName,
                       absolute = true,
                       allowLocalHost = allowLocalHost,
@@ -111,11 +111,11 @@ object Validators {
   /**
     * The confirmation fieldName must have a true value.
     */
-  def validConfirmation(
-      fieldName: String,
-      confirmationFieldName: String,
-      confirmationValue: => String,
-      messageFormat: String = "%%s must match %s."): Validator[String] =
+  def validConfirmation(fieldName: String,
+                        confirmationFieldName: String,
+                        confirmationValue: => String,
+                        messageFormat: String =
+                          "%%s must match %s."): Validator[String] =
     new PredicateValidator[String](
         fieldName,
         _ == confirmationValue,
@@ -148,8 +148,8 @@ object Validators {
   def greaterThanOrEqualTo[T <% Ordered[T]](
       fieldName: String,
       min: T,
-      messageFormat: String = "%%s must be greater than or equal to %s.")
-    : Validator[T] =
+      messageFormat: String =
+        "%%s must be greater than or equal to %s."): Validator[T] =
     new PredicateValidator[T](fieldName, _ >= min, messageFormat format min)
 
   /**
@@ -158,8 +158,8 @@ object Validators {
   def lessThanOrEqualTo[T <% Ordered[T]](
       fieldName: String,
       max: T,
-      messageFormat: String = "%%s must be less than or equal to %s.")
-    : Validator[T] =
+      messageFormat: String =
+        "%%s must be less than or equal to %s."): Validator[T] =
     new PredicateValidator[T](fieldName, _ <= max, messageFormat.format(max))
 
   /**
@@ -168,8 +168,8 @@ object Validators {
   def minLength(
       fieldName: String,
       min: Int,
-      messageFormat: String = "%%s must be at least %s characters long.")
-    : Validator[String] =
+      messageFormat: String =
+        "%%s must be at least %s characters long."): Validator[String] =
     new PredicateValidator[String](
         fieldName, _.size >= min, messageFormat.format(min))
 
@@ -187,25 +187,24 @@ object Validators {
   /**
     * Checks if the value of the data is a value of the specified enum.
     */
-  def enumValue(
-      fieldName: String,
-      enum: Enumeration,
-      messageFormat: String = "%%s must be one of %s."): Validator[String] =
+  def enumValue(fieldName: String,
+                enum: Enumeration,
+                messageFormat: String =
+                  "%%s must be one of %s."): Validator[String] =
     oneOf(fieldName, messageFormat, enum.values.map(_.toString).toSeq)
 
-  private def buildUrlValidator(
-      fieldName: String,
-      absolute: Boolean,
-      allowLocalHost: Boolean,
-      messageFormat: String = "%s must be a valid url.",
-      schemes: Seq[String]): Validator[String] = {
-    val validator = (url: String) ⇒
-      {
-        (allCatch opt {
-              val u = URI.create(url).normalize()
-              !absolute || u.isAbsolute
-            }).isDefined &&
-        (allowLocalHost || UrlValidator.getInstance().isValid(url))
+  private def buildUrlValidator(fieldName: String,
+                                absolute: Boolean,
+                                allowLocalHost: Boolean,
+                                messageFormat: String =
+                                  "%s must be a valid url.",
+                                schemes: Seq[String]): Validator[String] = {
+    val validator = (url: String) ⇒ {
+      (allCatch opt {
+            val u = URI.create(url).normalize()
+            !absolute || u.isAbsolute
+          }).isDefined &&
+      (allowLocalHost || UrlValidator.getInstance().isValid(url))
     }
     new PredicateValidator[String](fieldName, validator, messageFormat)
   }

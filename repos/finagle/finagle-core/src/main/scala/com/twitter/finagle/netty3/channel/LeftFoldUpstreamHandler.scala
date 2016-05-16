@@ -111,7 +111,8 @@ class LeftFoldUpstreamHandler {
 
 private[channel] class LeftFoldHandlerToChannelHandler(
     initial: LeftFoldUpstreamHandler)
-    extends SimpleChannelUpstreamHandler with Serialized {
+    extends SimpleChannelUpstreamHandler
+    with Serialized {
   private[this] var state = initial
 
   override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) =

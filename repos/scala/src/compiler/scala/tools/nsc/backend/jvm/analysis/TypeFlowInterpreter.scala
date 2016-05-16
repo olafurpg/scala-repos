@@ -13,8 +13,7 @@ abstract class TypeFlowInterpreter extends BasicInterpreter {
   }
 
   def isRef(tp: Type) =
-    tp != null &&
-    (tp.getSort match {
+    tp != null && (tp.getSort match {
           case Type.OBJECT | Type.ARRAY => true
           case _ => false
         })

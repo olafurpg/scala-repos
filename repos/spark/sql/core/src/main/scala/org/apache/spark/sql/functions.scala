@@ -2698,7 +2698,7 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[RT : TypeTag](f: Function0[RT]): UserDefinedFunction = {
+  def udf[RT: TypeTag](f: Function0[RT]): UserDefinedFunction = {
     val inputTypes = Try(Nil).toOption
     UserDefinedFunction(
         f, ScalaReflection.schemaFor(typeTag[RT]).dataType, inputTypes)
@@ -2711,7 +2711,7 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[RT : TypeTag, A1 : TypeTag](
+  def udf[RT: TypeTag, A1: TypeTag](
       f: Function1[A1, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: Nil).toOption
@@ -2726,7 +2726,7 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[RT : TypeTag, A1 : TypeTag, A2 : TypeTag](
+  def udf[RT: TypeTag, A1: TypeTag, A2: TypeTag](
       f: Function2[A1, A2, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2743,7 +2743,7 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag](
+  def udf[RT: TypeTag, A1: TypeTag, A2: TypeTag, A3: TypeTag](
       f: Function3[A1, A2, A3, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2760,8 +2760,7 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag](
+  def udf[RT: TypeTag, A1: TypeTag, A2: TypeTag, A3: TypeTag, A4: TypeTag](
       f: Function4[A1, A2, A3, A4, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2780,8 +2779,12 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag](
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag](
       f: Function5[A1, A2, A3, A4, A5, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2800,8 +2803,13 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag, A6 : TypeTag](
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag,
+          A6: TypeTag](
       f: Function6[A1, A2, A3, A4, A5, A6, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2822,8 +2830,14 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag, A6 : TypeTag, A7 : TypeTag](
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag,
+          A6: TypeTag,
+          A7: TypeTag](
       f: Function7[A1, A2, A3, A4, A5, A6, A7, RT]): UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2844,9 +2858,15 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag, A6 : TypeTag, A7 : TypeTag, A8 : TypeTag](
-      f: Function8[A1, A2, A3, A4, A5, A6, A7, A8, RT])
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag,
+          A6: TypeTag,
+          A7: TypeTag,
+          A8: TypeTag](f: Function8[A1, A2, A3, A4, A5, A6, A7, A8, RT])
     : UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2869,9 +2889,16 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag, A6 : TypeTag, A7 : TypeTag, A8 : TypeTag, A9 : TypeTag](
-      f: Function9[A1, A2, A3, A4, A5, A6, A7, A8, A9, RT])
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag,
+          A6: TypeTag,
+          A7: TypeTag,
+          A8: TypeTag,
+          A9: TypeTag](f: Function9[A1, A2, A3, A4, A5, A6, A7, A8, A9, RT])
     : UserDefinedFunction = {
     val inputTypes = Try(
         ScalaReflection.schemaFor(typeTag[A1]).dataType :: ScalaReflection
@@ -2894,8 +2921,17 @@ object functions {
     * @group udf_funcs
     * @since 1.3.0
     */
-  def udf[
-      RT : TypeTag, A1 : TypeTag, A2 : TypeTag, A3 : TypeTag, A4 : TypeTag, A5 : TypeTag, A6 : TypeTag, A7 : TypeTag, A8 : TypeTag, A9 : TypeTag, A10 : TypeTag](
+  def udf[RT: TypeTag,
+          A1: TypeTag,
+          A2: TypeTag,
+          A3: TypeTag,
+          A4: TypeTag,
+          A5: TypeTag,
+          A6: TypeTag,
+          A7: TypeTag,
+          A8: TypeTag,
+          A9: TypeTag,
+          A10: TypeTag](
       f: Function10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, RT])
     : UserDefinedFunction = {
     val inputTypes = Try(

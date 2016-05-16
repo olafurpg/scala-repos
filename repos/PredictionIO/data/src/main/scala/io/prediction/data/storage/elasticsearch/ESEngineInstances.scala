@@ -31,7 +31,8 @@ import org.json4s.native.Serialization.write
 
 class ESEngineInstances(
     client: Client, config: StorageClientConfig, index: String)
-    extends EngineInstances with Logging {
+    extends EngineInstances
+    with Logging {
   implicit val formats = DefaultFormats + new EngineInstanceSerializer
   private val estype = "engine_instances"
 

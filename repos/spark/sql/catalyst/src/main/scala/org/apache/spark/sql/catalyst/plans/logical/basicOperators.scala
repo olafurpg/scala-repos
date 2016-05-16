@@ -103,7 +103,8 @@ case class Generate(generator: Generator,
 }
 
 case class Filter(condition: Expression, child: LogicalPlan)
-    extends UnaryNode with PredicateHelper {
+    extends UnaryNode
+    with PredicateHelper {
   override def output: Seq[Attribute] = child.output
 
   override def maxRows: Option[Long] = child.maxRows
@@ -264,7 +265,8 @@ case class Join(left: LogicalPlan,
                 right: LogicalPlan,
                 joinType: JoinType,
                 condition: Option[Expression])
-    extends BinaryNode with PredicateHelper {
+    extends BinaryNode
+    with PredicateHelper {
 
   override def output: Seq[Attribute] = {
     joinType match {
@@ -398,7 +400,8 @@ case class Range(start: Long,
                  step: Long,
                  numSlices: Int,
                  output: Seq[Attribute])
-    extends LeafNode with MultiInstanceRelation {
+    extends LeafNode
+    with MultiInstanceRelation {
   require(step != 0, "step cannot be 0")
   val numElements: BigInt = {
     val safeStart = BigInt(start)
@@ -583,12 +586,12 @@ case class Pivot(groupByExprs: Seq[NamedExpression],
   override def output: Seq[Attribute] =
     groupByExprs.map(_.toAttribute) ++ aggregates match {
       case agg :: Nil =>
-        pivotValues.map(
-            value => AttributeReference(value.toString, agg.dataType)())
+        pivotValues.map(value =>
+              AttributeReference(value.toString, agg.dataType)())
       case _ =>
         pivotValues.flatMap { value =>
-          aggregates.map(
-              agg => AttributeReference(value + "_" + agg.sql, agg.dataType)())
+          aggregates.map(agg =>
+                AttributeReference(value + "_" + agg.sql, agg.dataType)())
         }
     }
 }

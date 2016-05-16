@@ -15,7 +15,8 @@ import annotation.tailrec
   */
 class BoundedBlockingQueue[E <: AnyRef](
     val maxCapacity: Int, private val backing: Queue[E])
-    extends AbstractQueue[E] with BlockingQueue[E] {
+    extends AbstractQueue[E]
+    with BlockingQueue[E] {
 
   backing match {
     case null ⇒
@@ -254,8 +255,8 @@ class BoundedBlockingQueue[E <: AnyRef](
           last = -1 //To avoid 2 subsequent removes without a next in between
           lock.lock()
           try {
-            @tailrec def removeTarget(i: Iterator[E] = backing.iterator())
-              : Unit =
+            @tailrec def removeTarget(i: Iterator[E] =
+                  backing.iterator()): Unit =
               if (i.hasNext) {
                 if (i.next eq target) {
                   i.remove()

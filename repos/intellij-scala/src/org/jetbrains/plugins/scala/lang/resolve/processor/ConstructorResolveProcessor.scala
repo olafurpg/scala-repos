@@ -61,18 +61,17 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                        isAccessible = accessible))
           } else {
             addResults(
-                constructors.toSeq.map(
-                    constr =>
-                      new ScalaResolveResult(
-                          constr,
-                          subst,
-                          getImports(state),
-                          nameShadow0,
-                          parentElement = Some(clazz),
-                          boundClass = getBoundClass(state),
-                          fromType = fromType,
-                          isAccessible = isAccessible(constr, ref) &&
-                            accessible)))
+                constructors.toSeq.map(constr =>
+                      new ScalaResolveResult(constr,
+                                             subst,
+                                             getImports(state),
+                                             nameShadow0,
+                                             parentElement = Some(clazz),
+                                             boundClass = getBoundClass(state),
+                                             fromType = fromType,
+                                             isAccessible =
+                                               isAccessible(constr, ref) &&
+                                               accessible)))
           }
         case ta: ScTypeAliasDeclaration =>
           addResult(
@@ -107,8 +106,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
               if (constructors.isEmpty) addResult(r)
               else {
                 addResults(
-                    constructors.toSeq.map(
-                        constr =>
+                    constructors.toSeq.map(constr =>
                           new ScalaResolveResult(
                               constr,
                               subst.followed(s),
@@ -117,8 +115,8 @@ class ConstructorResolveProcessor(constr: PsiElement,
                               parentElement = Some(ta),
                               boundClass = getBoundClass(state),
                               fromType = fromType,
-                              isAccessible = isAccessible(constr, ref) &&
-                                accessible)))
+                              isAccessible =
+                                isAccessible(constr, ref) && accessible)))
               }
             case _ =>
               addResult(r)

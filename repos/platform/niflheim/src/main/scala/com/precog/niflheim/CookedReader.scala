@@ -34,10 +34,10 @@ import scalaz.std.list._
 object CookedReader {
   def load(baseDir: File,
            metadataFile: File,
-           blockFormat: CookedBlockFormat = VersionedCookedBlockFormat(
-                 Map(1 -> V1CookedBlockFormat)),
+           blockFormat: CookedBlockFormat =
+             VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
            segmentFormat: SegmentFormat = VersionedSegmentFormat(
-                 Map(1 -> V1SegmentFormat))): CookedReader =
+               Map(1 -> V1SegmentFormat))): CookedReader =
     new CookedReader(baseDir, metadataFile, blockFormat, segmentFormat)
 }
 

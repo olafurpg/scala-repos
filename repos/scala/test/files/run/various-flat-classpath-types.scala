@@ -200,11 +200,11 @@ object Test {
     createSources(
         RootPackage,
         srcDir,
-        DirRep("",
-               nestedDirs = Seq(
-                     DirRep("nested",
-                            sourceFiles = Seq("Nested" + baseFileName))),
-               sourceFiles = Seq(baseFileName)))
+        DirRep(
+            "",
+            nestedDirs = Seq(
+                DirRep("nested", sourceFiles = Seq("Nested" + baseFileName))),
+            sourceFiles = Seq(baseFileName)))
 
   private def createSources(
       pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {

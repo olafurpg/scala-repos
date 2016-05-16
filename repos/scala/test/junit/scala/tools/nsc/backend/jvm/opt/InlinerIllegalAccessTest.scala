@@ -144,9 +144,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
       cCl.methods.asScala.toList.filter(m => names(m.name))
 
     def checkAccess(a: MethodNode, expected: Int): Unit = {
-      assert((a.access &
-                 (ACC_STATIC | ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE)) == expected,
-             s"${a.name}, ${a.access}")
+      assert(
+          (a.access &
+              (ACC_STATIC | ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE)) == expected,
+          s"${a.name}, ${a.access}")
     }
 
     checkAccess(a, ACC_PUBLIC)
@@ -193,7 +194,7 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
 
     // default access OK in same package
     for ((m, declCls) <- Set((rbC, cCl), (rfC, cCl), (rbD, dCl), (rfD, dCl));
-    c <- allClasses) {
+         c <- allClasses) {
       if (c.name startsWith "a/") check(m, declCls, c, assertEmpty)
       else check(m, declCls, c, cOrDOwner)
     }
@@ -203,7 +204,8 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // protected static accessed in same class, or protected static accessed in subclass(rgD).
     // can be inlined to sub- and superclasses, and classes in the same package (gCl)
     for ((m, declCls) <- Set((rgC, cCl), (rgD, dCl));
-    c <- Set(cCl, dCl, eCl, fCl, gCl, hCl)) check(m, declCls, c, assertEmpty)
+         c <- Set(cCl, dCl, eCl, fCl, gCl, hCl)) check(
+        m, declCls, c, assertEmpty)
 
     // protected in non-subclass and different package
     for (m <- Set(rcC, rgC)) check(m, cCl, iCl, cOrDOwner)
@@ -213,7 +215,7 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // AND if the receiver object is a subtype of the destination class
     // TODO: we cannot check this yet, so the check flags the instruction as causing an IllegalAccess. https://github.com/scala-opt/scala/issues/13
     for ((m, declCls) <- Set((rcC, cCl), (rcD, dCl));
-    c <- Set(cCl, dCl, eCl, fCl, gCl)) check(m, declCls, c, cOrDOwner)
+         c <- Set(cCl, dCl, eCl, fCl, gCl)) check(m, declCls, c, cOrDOwner)
 
     // rcD cannot be inlined into non-related classes, if the declaration and destination are not in the same package
     for (c <- Set(hCl, iCl)) check(rcD, dCl, c, cOrDOwner)

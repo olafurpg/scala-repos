@@ -27,8 +27,9 @@ object Supervision {
       restartStrategy: FaultHandlingStrategy,
       worker: List[Server],
       maxRestartsHandler: (ActorRef,
-      MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = { (aRef, max) =>
-        ()
+                           MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = {
+        (aRef, max) =>
+          ()
       })
       extends Server {
     //Java API

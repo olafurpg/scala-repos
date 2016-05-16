@@ -225,7 +225,9 @@ private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
 }
 
 private[serverset2] trait ZooKeeperRW
-    extends ZooKeeperReader with ZooKeeperWriter
+    extends ZooKeeperReader
+    with ZooKeeperWriter
 
 private[serverset2] trait ZooKeeperRWMulti
-    extends ZooKeeperRW with ZooKeeperMulti
+    extends ZooKeeperRW
+    with ZooKeeperMulti

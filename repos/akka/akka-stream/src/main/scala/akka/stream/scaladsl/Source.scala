@@ -28,7 +28,8 @@ import scala.compat.java8.FutureConverters._
   * a Reactive Streams `Publisher` (at least conceptually).
   */
 final class Source[+Out, +Mat](private[stream] override val module: Module)
-    extends FlowOpsMat[Out, Mat] with Graph[SourceShape[Out], Mat] {
+    extends FlowOpsMat[Out, Mat]
+    with Graph[SourceShape[Out], Mat] {
 
   override type Repr[+O] = Source[O, Mat @uncheckedVariance]
   override type ReprMat[+O, +M] = Source[O, M]
@@ -356,7 +357,8 @@ object Source {
     * with None.
     */
   def maybe[T]: Source[T, Promise[Option[T]]] =
-    new Source(new MaybeSource[T](
+    new Source(
+        new MaybeSource[T](
             DefaultAttributes.maybeSource, shape("MaybeSource")))
 
   /**

@@ -91,7 +91,8 @@ package object util {
   }
 
   implicit class StackTraceOps(private val e: Throwable)
-      extends AnyVal with StackTracing {
+      extends AnyVal
+      with StackTracing {
 
     /** Format the stack trace, returning the prefix consisting of frames that satisfy
       *  a given predicate.
@@ -129,7 +130,8 @@ package object util {
 
   @deprecated(
       "Moved to scala.reflect.internal.util.AbstractFileClassLoader", "2.11.0")
-  type AbstractFileClassLoader = scala.reflect.internal.util.AbstractFileClassLoader
+  type AbstractFileClassLoader =
+    scala.reflect.internal.util.AbstractFileClassLoader
 
   @deprecated(
       "Moved to scala.reflect.internal.util.ScalaClassLoader", "2.11.0")

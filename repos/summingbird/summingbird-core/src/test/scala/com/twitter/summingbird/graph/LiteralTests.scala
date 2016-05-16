@@ -22,9 +22,9 @@ import org.scalacheck.{Arbitrary, Gen, Properties}
 object LiteralTests extends Properties("Literal") {
   case class Box[T](get: T)
 
-  def transitiveClosure[N[_]](
-      l: Literal[_, N],
-      acc: Set[Literal[_, N]] = Set.empty[Literal[_, N]]): Set[Literal[_, N]] =
+  def transitiveClosure[N[_]](l: Literal[_, N],
+                              acc: Set[Literal[_, N]] =
+                                Set.empty[Literal[_, N]]): Set[Literal[_, N]] =
     l match {
       case c @ ConstLit(_) => acc + c
       case u @ UnaryLit(prev, _) =>
@@ -49,11 +49,11 @@ object LiteralTests extends Properties("Literal") {
     for {
       fn <- Arbitrary.arbitrary[(Int, Int) => (Int)]
       bfn = { case (Box(l), Box(r)) => Box(fn(l, r)) }: (Box[Int],
-      Box[Int]) => Box[Int]
+                                                         Box[Int]) => Box[Int]
       left <- genLiteral
       // We have to make dags, so select from the closure of left sometimes
       right <- Gen.oneOf(
-          genLiteral, genChooseFrom(transitiveClosure[Box](left)))
+                  genLiteral, genChooseFrom(transitiveClosure[Box](left)))
     } yield BinaryLit(left, right, bfn)
 
   def genChooseFrom[N[_]](s: Set[Literal[_, N]]): Gen[Literal[Int, N]] =
@@ -73,8 +73,8 @@ object LiteralTests extends Properties("Literal") {
     case BinaryLit(a, b, fn) => fn(slowEvaluate(a), slowEvaluate(b))
   }
 
-  property("Literal.evaluate must match simple explanation") = forAll(
-      genLiteral) { (l: Literal[Int, Box]) =>
-    l.evaluate == slowEvaluate(l)
-  }
+  property("Literal.evaluate must match simple explanation") =
+    forAll(genLiteral) { (l: Literal[Int, Box]) =>
+      l.evaluate == slowEvaluate(l)
+    }
 }

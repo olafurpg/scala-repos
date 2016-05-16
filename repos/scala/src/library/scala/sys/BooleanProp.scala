@@ -34,7 +34,8 @@ trait BooleanProp extends Prop[Boolean] {
 
 object BooleanProp {
   private[sys] class BooleanPropImpl(key: String, valueFn: String => Boolean)
-      extends PropImpl(key, valueFn) with BooleanProp {
+      extends PropImpl(key, valueFn)
+      with BooleanProp {
     override def setValue[T1 >: Boolean](newValue: T1): Boolean =
       newValue match {
         case x: Boolean if !x => val old = value; clear(); old

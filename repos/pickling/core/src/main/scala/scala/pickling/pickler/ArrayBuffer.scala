@@ -6,7 +6,7 @@ import scala.collection.mutable.ArrayBuffer
 
 trait ArrayBufferPicklers {
   // TODO(jsuereth) - Add pickler generator
-  implicit def arrayBufferPickler[T : FastTypeTag](
+  implicit def arrayBufferPickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[ArrayBuffer[T]],

@@ -111,7 +111,8 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   override def keySet: immutable.Set[A] = new ImmutableDefaultKeySet
 
   protected class ImmutableDefaultKeySet
-      extends super.DefaultKeySet with immutable.Set[A] {
+      extends super.DefaultKeySet
+      with immutable.Set[A] {
     override def +(elem: A): immutable.Set[A] =
       if (this(elem)) this
       else immutable.Set[A]() ++ this + elem

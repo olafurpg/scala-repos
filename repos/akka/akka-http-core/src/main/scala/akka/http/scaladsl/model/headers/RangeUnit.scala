@@ -7,7 +7,8 @@ import akka.http.impl.util.{Rendering, ValueRenderable}
 import akka.http.javadsl.{model ⇒ jm}
 
 sealed abstract class RangeUnit
-    extends jm.headers.RangeUnit with ValueRenderable {
+    extends jm.headers.RangeUnit
+    with ValueRenderable {
   def name: String
 }
 

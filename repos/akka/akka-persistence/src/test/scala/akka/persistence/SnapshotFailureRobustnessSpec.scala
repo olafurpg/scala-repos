@@ -105,10 +105,12 @@ class SnapshotFailureRobustnessSpec
             "leveldb",
             "SnapshotFailureRobustnessSpec",
             serialization = "off",
-            extraConfig = Some("""
+            extraConfig =
+              Some("""
   akka.persistence.snapshot-store.local.class = "akka.persistence.SnapshotFailureRobustnessSpec$FailingLocalSnapshotStore"
   akka.persistence.snapshot-store.local-delete-fail.class = "akka.persistence.SnapshotFailureRobustnessSpec$DeleteFailingLocalSnapshotStore"
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
 
   import SnapshotFailureRobustnessSpec._
 

@@ -216,7 +216,8 @@ private[http] object WebSocket {
       new GraphStageLogic(shape) {
 
         class PassAlong[T <: AnyRef](from: Inlet[T])
-            extends InHandler with (() ⇒ Unit) {
+            extends InHandler
+            with (() ⇒ Unit) {
           override def apply(): Unit = tryPull(from)
           override def onPush(): Unit = emit(out, grab(from), this)
           override def onUpstreamFinish(): Unit =

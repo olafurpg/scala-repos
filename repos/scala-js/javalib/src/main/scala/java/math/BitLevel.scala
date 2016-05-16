@@ -310,7 +310,7 @@ private[math] object BitLevel {
       if (source.sign < 0) {
         // Checking if the dropped bits are zeros (the remainder equals to 0)
         var i: Int = 0
-        while ( (i < intCount) && (source.digits(i) == 0)) {
+        while ((i < intCount) && (source.digits(i) == 0)) {
           i += 1
         }
         // If the remainder is not zero, add 1 to the result
@@ -360,8 +360,9 @@ private[math] object BitLevel {
       allZero &= ((source(i) << leftShiftCount) == 0)
       i = 0
       while (i < resultLen - 1) {
-        result(i) = (source(i + intCount) >>> count) |
-        (source(i + intCount + 1) << leftShiftCount)
+        result(i) =
+          (source(i + intCount) >>> count) |
+          (source(i + intCount + 1) << leftShiftCount)
         i += 1
       }
       result(i) = source(i + intCount) >>> count

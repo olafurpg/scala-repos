@@ -24,8 +24,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class GaussianTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with ExpFamTest[Gaussian, Double]
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with ExpFamTest[Gaussian, Double]
     with HasCdfTestBase {
   override type Distr = Gaussian
   val expFam = Gaussian
@@ -33,9 +36,9 @@ class GaussianTest
 
   def arbParameter = Arbitrary {
     for (mean <- arbitrary[Double].map { _ % 10000.0 };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + .1
-    }) yield (mean, std)
+         std <- arbitrary[Double].map { x =>
+                 math.abs(x) % 8.0 + .1
+               }) yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -68,11 +71,11 @@ class GaussianTest
 
   implicit def arbDistr: Arbitrary[Distr] = Arbitrary {
     for (mean <- arbitrary[Double].map { x =>
-      math.abs(x) % 10000.0
-    };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + .1
-    }) yield new Gaussian(mean, std);
+                  math.abs(x) % 10000.0
+                };
+         std <- arbitrary[Double].map { x =>
+                 math.abs(x) % 8.0 + .1
+               }) yield new Gaussian(mean, std);
   }
 
   def asDouble(x: Double) = x

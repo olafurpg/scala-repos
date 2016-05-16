@@ -82,7 +82,7 @@ private[spark] abstract class SortDataFormat[K, Buffer] {
   * @tparam T Type of the Array we're sorting. Typically this must extend AnyRef, to support cases
   *           when the keys and values are not the same type.
   */
-private[spark] class KVArraySortDataFormat[K, T <: AnyRef : ClassTag]
+private[spark] class KVArraySortDataFormat[K, T <: AnyRef: ClassTag]
     extends SortDataFormat[K, Array[T]] {
 
   override def getKey(data: Array[T], pos: Int): K =

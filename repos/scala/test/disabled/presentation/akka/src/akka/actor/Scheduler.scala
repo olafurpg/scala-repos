@@ -144,8 +144,8 @@ object Scheduler {
   def restart() {
     synchronized {
       shutdown()
-      service = Executors.newSingleThreadScheduledExecutor(
-          SchedulerThreadFactory)
+      service =
+        Executors.newSingleThreadScheduledExecutor(SchedulerThreadFactory)
     }
   }
 }

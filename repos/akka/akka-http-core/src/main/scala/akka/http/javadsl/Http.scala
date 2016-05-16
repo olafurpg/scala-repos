@@ -855,10 +855,10 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
   }
 
   private def adaptOutgoingFlow[T, Mat](
-      scalaFlow: stream.scaladsl.Flow[
-          scaladsl.model.HttpRequest,
-          scaladsl.model.HttpResponse,
-          Future[scaladsl.Http.OutgoingConnection]])
+      scalaFlow: stream.scaladsl.Flow[scaladsl.model.HttpRequest,
+                                      scaladsl.model.HttpResponse,
+                                      Future[
+                                          scaladsl.Http.OutgoingConnection]])
     : Flow[HttpRequest, HttpResponse, CompletionStage[OutgoingConnection]] =
     Flow.fromGraph {
       akka.stream.scaladsl
@@ -923,8 +923,8 @@ class Http(system: ExtendedActorSystem) extends akka.actor.Extension {
       .map(_.asScala)
 
   private def adaptWsResultTuple[T](
-      result: (Future[scaladsl.model.ws.WebSocketUpgradeResponse],
-      T)): Pair[CompletionStage[WebSocketUpgradeResponse], T] =
+      result: (Future[scaladsl.model.ws.WebSocketUpgradeResponse], T))
+    : Pair[CompletionStage[WebSocketUpgradeResponse], T] =
     result match {
       case (fut, tMat) ⇒ Pair(adaptWsUpgradeResponse(fut), tMat)
     }

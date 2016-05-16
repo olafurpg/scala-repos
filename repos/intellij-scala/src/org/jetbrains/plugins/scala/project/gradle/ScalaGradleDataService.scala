@@ -109,7 +109,8 @@ private object ScalaGradleDataService {
 
         val additionalOptions =
           if (options.getAdditionalParameters != null)
-            options.getAdditionalParameters.asScala else Seq.empty
+            options.getAdditionalParameters.asScala
+          else Seq.empty
 
         presentations.flatMap((include _).tupled) ++ additionalOptions
       }

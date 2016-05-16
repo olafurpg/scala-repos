@@ -42,9 +42,11 @@ private case class ClientSensors(
   *
   */
 case class ClientQuotaManagerConfig(
-    quotaBytesPerSecondDefault: Long = ClientQuotaManagerConfig.QuotaBytesPerSecondDefault,
+    quotaBytesPerSecondDefault: Long =
+      ClientQuotaManagerConfig.QuotaBytesPerSecondDefault,
     numQuotaSamples: Int = ClientQuotaManagerConfig.DefaultNumQuotaSamples,
-    quotaWindowSizeSeconds: Int = ClientQuotaManagerConfig.DefaultQuotaWindowSizeSeconds)
+    quotaWindowSizeSeconds: Int =
+      ClientQuotaManagerConfig.DefaultQuotaWindowSizeSeconds)
 
 object ClientQuotaManagerConfig {
   val QuotaBytesPerSecondDefault = Long.MaxValue

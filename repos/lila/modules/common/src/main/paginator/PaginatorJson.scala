@@ -5,7 +5,7 @@ import play.api.libs.json._
 
 object PaginatorJson {
 
-  def apply[A : Writes](p: Paginator[A]): JsObject =
+  def apply[A: Writes](p: Paginator[A]): JsObject =
     Json.obj("currentPage" -> p.currentPage,
              "maxPerPage" -> p.maxPerPage,
              "currentPageResults" -> p.currentPageResults,

@@ -10,7 +10,9 @@ import org.mockito.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class MarathonLeaderInfoTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   class Fixture {
     lazy val candidate = mock[Candidate]
     lazy val maybeCandidate = Some(candidate)

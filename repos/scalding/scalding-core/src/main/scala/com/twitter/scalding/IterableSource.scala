@@ -38,7 +38,8 @@ import scala.collection.JavaConverters._
 case class IterableSource[+T](
     @transient iter: Iterable[T], inFields: Fields = Fields.NONE)(
     implicit set: TupleSetter[T], conv: TupleConverter[T])
-    extends Source with Mappable[T] {
+    extends Source
+    with Mappable[T] {
 
   def fields = {
     if (inFields.isNone && set.arity > 0) {

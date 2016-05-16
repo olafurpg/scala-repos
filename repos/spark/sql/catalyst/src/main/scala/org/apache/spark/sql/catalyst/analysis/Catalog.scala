@@ -146,9 +146,9 @@ trait OverrideCatalog extends Catalog {
     }
   }
 
-  abstract override def lookupRelation(
-      tableIdent: TableIdentifier,
-      alias: Option[String] = None): LogicalPlan = {
+  abstract override def lookupRelation(tableIdent: TableIdentifier,
+                                       alias: Option[String] =
+                                         None): LogicalPlan = {
     getOverriddenTable(tableIdent) match {
       case Some(table) =>
         val tableName = getTableName(tableIdent)

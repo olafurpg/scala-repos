@@ -115,8 +115,8 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     def buildFactory() = clientBuilder.buildFactory()
 
     case class Client(
-        stack: Stack[ServiceFactory[String, String]] = StackClient
-            .newStack[String, String],
+        stack: Stack[ServiceFactory[String, String]] =
+          StackClient.newStack[String, String],
         params: Stack.Params = StackClient.defaultParams
     )
         extends StdStackClient[String, String, Client] {

@@ -26,17 +26,17 @@ private[collection] object RedBlackTree {
 
   def isEmpty(tree: Tree[_, _]): Boolean = tree eq null
 
-  def contains[A : Ordering](tree: Tree[A, _], x: A): Boolean =
+  def contains[A: Ordering](tree: Tree[A, _], x: A): Boolean =
     lookup(tree, x) ne null
-  def get[A : Ordering, B](tree: Tree[A, B], x: A): Option[B] =
+  def get[A: Ordering, B](tree: Tree[A, B], x: A): Option[B] =
     lookup(tree, x) match {
       case null => None
       case tree => Some(tree.value)
     }
 
   @tailrec
-  def lookup[A, B](tree: Tree[A, B], x: A)(
-      implicit ordering: Ordering[A]): Tree[A, B] =
+  def lookup[A, B](
+      tree: Tree[A, B], x: A)(implicit ordering: Ordering[A]): Tree[A, B] =
     if (tree eq null) null
     else {
       val cmp = ordering.compare(x, tree.key)
@@ -71,12 +71,12 @@ private[collection] object RedBlackTree {
           1 + countInRange(tree.left, from, None) + countInRange(
               tree.right, None, to)
       }
-  def update[A : Ordering, B, B1 >: B](
+  def update[A: Ordering, B, B1 >: B](
       tree: Tree[A, B], k: A, v: B1, overwrite: Boolean): Tree[A, B1] =
     blacken(upd(tree, k, v, overwrite))
-  def delete[A : Ordering, B](tree: Tree[A, B], k: A): Tree[A, B] =
+  def delete[A: Ordering, B](tree: Tree[A, B], k: A): Tree[A, B] =
     blacken(del(tree, k))
-  def rangeImpl[A : Ordering, B](
+  def rangeImpl[A: Ordering, B](
       tree: Tree[A, B], from: Option[A], until: Option[A]): Tree[A, B] =
     (from, until) match {
       case (Some(from), Some(until)) => this.range(tree, from, until)
@@ -84,20 +84,20 @@ private[collection] object RedBlackTree {
       case (None, Some(until)) => this.until(tree, until)
       case (None, None) => tree
     }
-  def range[A : Ordering, B](tree: Tree[A, B], from: A, until: A): Tree[A, B] =
+  def range[A: Ordering, B](tree: Tree[A, B], from: A, until: A): Tree[A, B] =
     blacken(doRange(tree, from, until))
-  def from[A : Ordering, B](tree: Tree[A, B], from: A): Tree[A, B] =
+  def from[A: Ordering, B](tree: Tree[A, B], from: A): Tree[A, B] =
     blacken(doFrom(tree, from))
-  def to[A : Ordering, B](tree: Tree[A, B], to: A): Tree[A, B] =
+  def to[A: Ordering, B](tree: Tree[A, B], to: A): Tree[A, B] =
     blacken(doTo(tree, to))
-  def until[A : Ordering, B](tree: Tree[A, B], key: A): Tree[A, B] =
+  def until[A: Ordering, B](tree: Tree[A, B], key: A): Tree[A, B] =
     blacken(doUntil(tree, key))
 
-  def drop[A : Ordering, B](tree: Tree[A, B], n: Int): Tree[A, B] =
+  def drop[A: Ordering, B](tree: Tree[A, B], n: Int): Tree[A, B] =
     blacken(doDrop(tree, n))
-  def take[A : Ordering, B](tree: Tree[A, B], n: Int): Tree[A, B] =
+  def take[A: Ordering, B](tree: Tree[A, B], n: Int): Tree[A, B] =
     blacken(doTake(tree, n))
-  def slice[A : Ordering, B](
+  def slice[A: Ordering, B](
       tree: Tree[A, B], from: Int, until: Int): Tree[A, B] =
     blacken(doSlice(tree, from, until))
 
@@ -132,13 +132,13 @@ private[collection] object RedBlackTree {
     if (tree.right ne null) _foreachKey(tree.right, f)
   }
 
-  def iterator[A : Ordering, B](
+  def iterator[A: Ordering, B](
       tree: Tree[A, B], start: Option[A] = None): Iterator[(A, B)] =
     new EntriesIterator(tree, start)
-  def keysIterator[A : Ordering](
+  def keysIterator[A: Ordering](
       tree: Tree[A, _], start: Option[A] = None): Iterator[A] =
     new KeysIterator(tree, start)
-  def valuesIterator[A : Ordering, B](
+  def valuesIterator[A: Ordering, B](
       tree: Tree[A, B], start: Option[A] = None): Iterator[B] =
     new ValuesIterator(tree, start)
 
@@ -252,8 +252,8 @@ private[collection] object RedBlackTree {
   /* Based on Stefan Kahrs' Haskell version of Okasaki's Red&Black Trees
    * Constructing Red-Black Trees, Ralf Hinze: http://www.cs.ox.ac.uk/ralf.hinze/publications/WAAAPL99b.ps.gz
    * Red-Black Trees in a Functional Setting, Chris Okasaki: https://wiki.rice.edu/confluence/download/attachments/2761212/Okasaki-Red-Black.pdf */
-  private[this] def del[A, B](
-      tree: Tree[A, B], k: A)(implicit ordering: Ordering[A]): Tree[A, B] =
+  private[this] def del[A, B](tree: Tree[A, B], k: A)(
+      implicit ordering: Ordering[A]): Tree[A, B] =
     if (tree eq null) null
     else {
       def balance(x: A, xv: B, tl: Tree[A, B], tr: Tree[A, B]) =
@@ -745,19 +745,19 @@ private[collection] object RedBlackTree {
     private[this] def goRight(tree: Tree[A, B]) = tree.right
   }
 
-  private[this] class EntriesIterator[A : Ordering, B](
+  private[this] class EntriesIterator[A: Ordering, B](
       tree: Tree[A, B], focus: Option[A])
       extends TreeIterator[A, B, (A, B)](tree, focus) {
     override def nextResult(tree: Tree[A, B]) = (tree.key, tree.value)
   }
 
-  private[this] class KeysIterator[A : Ordering, B](
+  private[this] class KeysIterator[A: Ordering, B](
       tree: Tree[A, B], focus: Option[A])
       extends TreeIterator[A, B, A](tree, focus) {
     override def nextResult(tree: Tree[A, B]) = tree.key
   }
 
-  private[this] class ValuesIterator[A : Ordering, B](
+  private[this] class ValuesIterator[A: Ordering, B](
       tree: Tree[A, B], focus: Option[A])
       extends TreeIterator[A, B, B](tree, focus) {
     override def nextResult(tree: Tree[A, B]) = tree.value

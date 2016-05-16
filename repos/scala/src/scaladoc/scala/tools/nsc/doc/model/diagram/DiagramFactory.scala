@@ -138,8 +138,8 @@ trait DiagramFactory extends DiagramDirectiveParser {
         val nodesAll =
           pack.members collect {
             case d: TemplateEntity
-                if
-                ((!diagramFilter.hideInheritedNodes) || (d.inTemplate == pack)) =>
+                if ((!diagramFilter.hideInheritedNodes) ||
+                    (d.inTemplate == pack)) =>
               d
           }
 
@@ -210,10 +210,11 @@ trait DiagramFactory extends DiagramDirectiveParser {
               val allAnyRefTypes = aggregationNode("All AnyRef subtypes")
               val nullTemplate = makeTemplate(NullClass)
               if (nullTemplate.isDocTemplate)
-                ContentDiagram(allAnyRefTypes :: nodes,
-                               (mapNodes(nullTemplate),
-                                allAnyRefTypes :: anyRefSubtypes) :: edges
-                                 .filterNot(_._1.tpl == Some(nullTemplate)))
+                ContentDiagram(
+                    allAnyRefTypes :: nodes,
+                    (mapNodes(nullTemplate),
+                     allAnyRefTypes :: anyRefSubtypes) :: edges.filterNot(
+                        _._1.tpl == Some(nullTemplate)))
               else ContentDiagram(nodes, edges)
             } else ContentDiagram(nodes, edges)
 

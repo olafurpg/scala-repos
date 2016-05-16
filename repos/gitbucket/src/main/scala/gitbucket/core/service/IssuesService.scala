@@ -136,9 +136,15 @@ trait IssuesService { self: AccountService =>
       }
       import gitbucket.core.model.Profile.commitStateColumnType
       val query = Q.query[Seq[(String, String, Int)],
-                          (String, String, Int, Int, Int, Option[String],
-                          Option[CommitState], Option[String],
-                          Option[String])](s"""
+                          (String,
+                           String,
+                           Int,
+                           Int,
+                           Int,
+                           Option[String],
+                           Option[CommitState],
+                           Option[String],
+                           Option[String])](s"""
         SELECT SUMM.USER_NAME, SUMM.REPOSITORY_NAME, SUMM.ISSUE_ID, CS_ALL, CS_SUCCESS
              , CSD.CONTEXT, CSD.STATE, CSD.TARGET_URL, CSD.DESCRIPTION
         FROM (SELECT
@@ -327,8 +333,8 @@ trait IssuesService { self: AccountService =>
       (t1.assignedUserName === condition.assigned.get.bind,
           condition.assigned.isDefined) &&
       (t1.openedUserName === condition.author.get.bind,
-          condition.author.isDefined) && (t1.pullRequest === pullRequest.bind) &&
-      // Milestone filter
+          condition.author.isDefined) &&
+      (t1.pullRequest === pullRequest.bind) && // Milestone filter
       (Milestones filter { t2 =>
             (t2.byPrimaryKey(t1.userName, t1.repositoryName, t1.milestoneId)) &&
             (t2.title === condition.milestone.get.get.bind)
@@ -648,7 +654,8 @@ object IssuesService {
     def toURL: String =
       "?" + List(
           if (labels.isEmpty)
-            None else Some("labels=" + urlEncode(labels.mkString(","))),
+            None
+          else Some("labels=" + urlEncode(labels.mkString(","))),
           milestone.map {
             _ match {
               case Some(x) => "milestone=" + urlEncode(x)
@@ -674,7 +681,8 @@ object IssuesService {
                       allow: Seq[String] = Nil): Option[String] = {
       val value = request.getParameter(name)
       if (value == null || value.isEmpty ||
-          (allow.nonEmpty && !allow.contains(value))) None else Some(value)
+          (allow.nonEmpty && !allow.contains(value))) None
+      else Some(value)
     }
 
     /**

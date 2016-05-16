@@ -68,8 +68,8 @@ class NettyBlockTransferService(
                                   securityManager.isSaslEncryptionEnabled()))
     }
     transportContext = new TransportContext(transportConf, rpcHandler)
-    clientFactory = transportContext.createClientFactory(
-        clientBootstrap.toSeq.asJava)
+    clientFactory =
+      transportContext.createClientFactory(clientBootstrap.toSeq.asJava)
     server = createServer(serverBootstrap.toList)
     appId = conf.getAppId
     logInfo("Server created on " + server.getPort)

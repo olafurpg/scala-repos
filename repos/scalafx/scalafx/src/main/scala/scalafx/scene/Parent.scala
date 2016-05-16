@@ -43,7 +43,8 @@ object Parent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Parent.html]].
   */
 abstract class Parent(override val delegate: jfxs.Parent)
-    extends Node(delegate) with SFXDelegate[jfxs.Parent] {
+    extends Node(delegate)
+    with SFXDelegate[jfxs.Parent] {
 
   /**
     * Indicates that this Node and its subnodes requires a layout pass on the next pulse.

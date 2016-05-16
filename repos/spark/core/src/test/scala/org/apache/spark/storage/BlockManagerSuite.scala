@@ -47,8 +47,11 @@ import org.apache.spark.util._
 import org.apache.spark.util.io.ChunkedByteBuffer
 
 class BlockManagerSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with PrivateMethodTester with ResetSystemProperties {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with PrivateMethodTester
+    with ResetSystemProperties {
 
   import BlockManagerSuite._
 
@@ -70,12 +73,11 @@ class BlockManagerSuite
   implicit def StringToBlockId(value: String): BlockId = new TestBlockId(value)
   def rdd(rddId: Int, splitId: Int): RDDBlockId = RDDBlockId(rddId, splitId)
 
-  private def makeBlockManager(
-      maxMem: Long,
-      name: String = SparkContext.DRIVER_IDENTIFIER,
-      master: BlockManagerMaster = this.master,
-      transferService: Option[BlockTransferService] = Option.empty)
-    : BlockManager = {
+  private def makeBlockManager(maxMem: Long,
+                               name: String = SparkContext.DRIVER_IDENTIFIER,
+                               master: BlockManagerMaster = this.master,
+                               transferService: Option[BlockTransferService] =
+                                 Option.empty): BlockManager = {
     val serializer = new KryoSerializer(conf)
     val transfer = transferService.getOrElse(
         new NettyBlockTransferService(conf, securityMgr, numCores = 1))
@@ -1426,13 +1428,9 @@ class BlockManagerSuite
     val blockId = BlockId("rdd_3_10")
     store.blockInfoManager.lockNewBlockForWriting(
         blockId, new BlockInfo(StorageLevel.MEMORY_ONLY, tellMaster = false))
-    memoryStore.putBytes(
-        blockId,
-        13000,
-        () =>
-          {
-            fail("A big ByteBuffer that cannot be put into MemoryStore should not be created")
-        })
+    memoryStore.putBytes(blockId, 13000, () => {
+      fail("A big ByteBuffer that cannot be put into MemoryStore should not be created")
+    })
   }
 
   test("put a small ByteBuffer to MemoryStore") {
@@ -1440,14 +1438,10 @@ class BlockManagerSuite
     val memoryStore = store.memoryStore
     val blockId = BlockId("rdd_3_10")
     var bytes: ChunkedByteBuffer = null
-    memoryStore.putBytes(
-        blockId,
-        10000,
-        () =>
-          {
-            bytes = new ChunkedByteBuffer(ByteBuffer.allocate(10000))
-            bytes
-        })
+    memoryStore.putBytes(blockId, 10000, () => {
+      bytes = new ChunkedByteBuffer(ByteBuffer.allocate(10000))
+      bytes
+    })
     assert(memoryStore.getSize(blockId) === 10000)
   }
 
@@ -1501,11 +1495,11 @@ class BlockManagerSuite
     }
     when(mockBlockManagerMaster.getLocations(mc.any[BlockId]))
       .thenReturn(blockManagerIds)
-    store = makeBlockManager(
-        8000,
-        "executor1",
-        mockBlockManagerMaster,
-        transferService = Option(mockBlockTransferService))
+    store = makeBlockManager(8000,
+                             "executor1",
+                             mockBlockManagerMaster,
+                             transferService =
+                               Option(mockBlockTransferService))
     val block = store.getRemoteBytes("item").asInstanceOf[Option[ByteBuffer]]
     assert(block.isDefined)
     verify(mockBlockManagerMaster, times(2)).getLocations("item")
@@ -1578,13 +1572,12 @@ private object BlockManagerSuite {
     }
 
     private def wrapGet[T](f: BlockId => Option[T]): BlockId => Option[T] =
-      (blockId: BlockId) =>
-        {
-          val result = f(blockId)
-          if (result.isDefined) {
-            store.releaseLock(blockId)
-          }
-          result
+      (blockId: BlockId) => {
+        val result = f(blockId)
+        if (result.isDefined) {
+          store.releaseLock(blockId)
+        }
+        result
       }
 
     def hasLocalBlock(blockId: BlockId): Boolean = {

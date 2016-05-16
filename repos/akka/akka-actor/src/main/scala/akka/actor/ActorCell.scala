@@ -395,9 +395,14 @@ private[akka] class ActorCell(
     final val props: Props, // Must be final so that it can be properly cleared in clearActorCellFields
     val dispatcher: MessageDispatcher,
     val parent: InternalActorRef)
-    extends UntypedActorContext with AbstractActorContext with Cell
-    with dungeon.ReceiveTimeout with dungeon.Children with dungeon.Dispatch
-    with dungeon.DeathWatch with dungeon.FaultHandling {
+    extends UntypedActorContext
+    with AbstractActorContext
+    with Cell
+    with dungeon.ReceiveTimeout
+    with dungeon.Children
+    with dungeon.Dispatch
+    with dungeon.DeathWatch
+    with dungeon.FaultHandling {
 
   import ActorCell._
 
@@ -516,7 +521,8 @@ private[akka] class ActorCell(
         case msg: AutoReceivedMessage ⇒ autoReceiveMessage(messageHandle)
         case msg ⇒ receiveMessage(msg)
       }
-      currentMessage = null // reset current message after successful invocation
+      currentMessage =
+        null // reset current message after successful invocation
     } catch handleNonFatalOrInterruptedException { e ⇒
       handleInvokeFailure(Nil, e)
     } finally {
@@ -561,9 +567,10 @@ private[akka] class ActorCell(
   }
 
   def become(behavior: Actor.Receive, discardOld: Boolean = true): Unit =
-    behaviorStack = behavior ::
-    (if (discardOld && behaviorStack.nonEmpty) behaviorStack.tail
-     else behaviorStack)
+    behaviorStack =
+      behavior ::
+      (if (discardOld && behaviorStack.nonEmpty) behaviorStack.tail
+       else behaviorStack)
 
   def become(behavior: Procedure[Any]): Unit =
     become(behavior, discardOld = true)
@@ -573,9 +580,10 @@ private[akka] class ActorCell(
 
   def unbecome(): Unit = {
     val original = behaviorStack
-    behaviorStack = if (original.isEmpty || original.tail.isEmpty)
-      actor.receive :: emptyBehaviorStack
-    else original.tail
+    behaviorStack =
+      if (original.isEmpty || original.tail.isEmpty)
+        actor.receive :: emptyBehaviorStack
+      else original.tail
   }
 
   /*
@@ -594,8 +602,10 @@ private[akka] class ActorCell(
             self, "Actor instance passed to actorOf can't be 'null'")
 
       // If no becomes were issued, the actors behavior is its receive method
-      behaviorStack = if (behaviorStack.isEmpty)
-        instance.receive :: behaviorStack else behaviorStack
+      behaviorStack =
+        if (behaviorStack.isEmpty)
+          instance.receive :: behaviorStack
+        else behaviorStack
       instance
     } finally {
       val stackAfter = contextStack.get

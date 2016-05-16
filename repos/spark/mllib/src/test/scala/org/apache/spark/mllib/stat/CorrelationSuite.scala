@@ -26,7 +26,9 @@ import org.apache.spark.mllib.stat.correlation.{Correlations, PearsonCorrelation
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class CorrelationSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Logging {
 
   // test input data
   val xData = Array(1.0, 0.0, -2.0)

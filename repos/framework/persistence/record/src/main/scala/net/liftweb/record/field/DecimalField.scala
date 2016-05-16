@@ -75,7 +75,8 @@ trait DecimalTypedField extends NumericTypedField[BigDecimal] {
   */
 class DecimalField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val context: MathContext, val scale: Int)
-    extends Field[BigDecimal, OwnerType] with MandatoryTypedField[BigDecimal]
+    extends Field[BigDecimal, OwnerType]
+    with MandatoryTypedField[BigDecimal]
     with DecimalTypedField {
 
   /**
@@ -129,7 +130,8 @@ class DecimalField[OwnerType <: Record[OwnerType]](
   */
 class OptionalDecimalField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val context: MathContext, val scale: Int)
-    extends Field[BigDecimal, OwnerType] with OptionalTypedField[BigDecimal]
+    extends Field[BigDecimal, OwnerType]
+    with OptionalTypedField[BigDecimal]
     with DecimalTypedField {
 
   /**

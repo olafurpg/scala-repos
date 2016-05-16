@@ -73,8 +73,8 @@ class HDFSCheckpointStore(val config: HDFSState.Config)(
   val startBatch: InclusiveLower[BatchID] = config.startTime
     .map(batcher.batchOf(_))
     .orElse {
-      val mostRecentB = versionedStore.mostRecentVersion.map(
-          t => batcher.batchOf(Timestamp(t)).next)
+      val mostRecentB = versionedStore.mostRecentVersion.map(t =>
+            batcher.batchOf(Timestamp(t)).next)
       logger.info("Most recent batch found on disk: " + mostRecentB.toString)
       mostRecentB
     }

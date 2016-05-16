@@ -20,7 +20,8 @@ class TCPServer(
     shutdownOnLastDisconnect: Boolean,
     preferredPort: Option[Int]
 )
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import Tcp._
   import context.system

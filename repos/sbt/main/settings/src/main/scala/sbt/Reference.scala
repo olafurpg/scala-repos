@@ -24,14 +24,16 @@ final case object ThisBuild extends BuildReference
 
 /** Uniquely identifies a build by a URI. */
 final case class BuildRef(build: URI)
-    extends BuildReference with ResolvedReference
+    extends BuildReference
+    with ResolvedReference
 
 /** Identifies a project. */
 sealed trait ProjectReference extends Reference
 
 /** Uniquely references a project by a URI and a project identifier String. */
 final case class ProjectRef(build: URI, project: String)
-    extends ProjectReference with ResolvedReference
+    extends ProjectReference
+    with ResolvedReference
 
 /** Identifies a project in the current build context. */
 final case class LocalProject(project: String) extends ProjectReference

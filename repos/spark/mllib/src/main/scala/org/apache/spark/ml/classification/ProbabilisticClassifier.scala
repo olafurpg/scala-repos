@@ -29,7 +29,9 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * (private[classification])  Params for probabilistic classification.
   */
 private[classification] trait ProbabilisticClassifierParams
-    extends ClassifierParams with HasProbabilityCol with HasThresholds {
+    extends ClassifierParams
+    with HasProbabilityCol
+    with HasThresholds {
   override protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
@@ -54,7 +56,8 @@ abstract class ProbabilisticClassifier[
     FeaturesType,
     E <: ProbabilisticClassifier[FeaturesType, E, M],
     M <: ProbabilisticClassificationModel[FeaturesType, M]]
-    extends Classifier[FeaturesType, E, M] with ProbabilisticClassifierParams {
+    extends Classifier[FeaturesType, E, M]
+    with ProbabilisticClassifierParams {
 
   /** @group setParam */
   def setProbabilityCol(value: String): E =

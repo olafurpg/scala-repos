@@ -100,8 +100,7 @@ object AsyncExecutor extends Logging {
     }
   }
 
-  val loggingReporter: Throwable => Unit = (t: Throwable) =>
-    {
-      logger.warn("Execution of asynchronous I/O action failed", t)
+  val loggingReporter: Throwable => Unit = (t: Throwable) => {
+    logger.warn("Execution of asynchronous I/O action failed", t)
   }
 }

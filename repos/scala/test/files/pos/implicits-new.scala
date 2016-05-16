@@ -62,7 +62,7 @@ object Test1625 {
 }
 
 object Test2188 {
-  implicit def toJavaList[A : ClassTag](
+  implicit def toJavaList[A: ClassTag](
       t: collection.Seq[A]): java.util.List[A] =
     java.util.Arrays.asList(t.toArray: _*)
 

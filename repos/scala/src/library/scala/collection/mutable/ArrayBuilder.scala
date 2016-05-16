@@ -19,7 +19,8 @@ import scala.reflect.ClassTag
   *  @tparam T    the type of the elements for the builder.
   */
 abstract class ArrayBuilder[T]
-    extends ReusableBuilder[T, Array[T]] with Serializable
+    extends ReusableBuilder[T, Array[T]]
+    with Serializable
 
 /** A companion object for array builders.
   *
@@ -32,7 +33,7 @@ object ArrayBuilder {
     *  @tparam T     type of the elements for the array builder, with a `ClassTag` context bound.
     *  @return       a new empty array builder.
     */
-  def make[T : ClassTag](): ArrayBuilder[T] = {
+  def make[T: ClassTag](): ArrayBuilder[T] = {
     val tag = implicitly[ClassTag[T]]
     tag.runtimeClass match {
       case java.lang.Byte.TYPE =>
@@ -69,7 +70,7 @@ object ArrayBuilder {
   @deprecatedInheritance(
       "ArrayBuilder.ofRef is an internal implementation not intended for subclassing.",
       "2.11.0")
-  class ofRef[T <: AnyRef : ClassTag] extends ArrayBuilder[T] {
+  class ofRef[T <: AnyRef: ClassTag] extends ArrayBuilder[T] {
 
     private var elems: Array[T] = _
     private var capacity: Int = 0

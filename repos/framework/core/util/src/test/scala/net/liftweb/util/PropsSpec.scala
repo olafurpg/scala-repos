@@ -40,16 +40,15 @@ object PropsSpec extends Specification {
       val originalWtl = testProps.whereToLook
 
       var wasCalled = false
-      testProps.whereToLook = () =>
-        {
-          wasCalled = true
+      testProps.whereToLook = () => {
+        wasCalled = true
 
-          List(
-              ("test propsters",
-               () =>
-                 Full(new ByteArrayInputStream(
-                         "test.prop=value".getBytes("UTF-8"))))
-          )
+        List(
+            ("test propsters",
+             () =>
+               Full(new ByteArrayInputStream(
+                       "test.prop=value".getBytes("UTF-8"))))
+        )
       }
 
       testProps.getInt("jetty.port") must_== Empty

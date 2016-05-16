@@ -200,13 +200,15 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val collidingTerms = columns.map(_.rawName) intersect scalaKeywords
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala keywords and were escaped: " +
-            collidingTerms.mkString(", ") else ""
+            collidingTerms.mkString(", ")
+          else ""
         } + {
           val collidingTerms =
             columns.map(_.rawName) intersect slickTableTermMembersNoArgs
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala method names and were disambiguated: " +
-            collidingTerms.mkString(", ") else ""
+            collidingTerms.mkString(", ")
+          else ""
         }
       def rawName: String = tableName(model.name.table)
       def code: Code

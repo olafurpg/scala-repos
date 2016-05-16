@@ -18,7 +18,8 @@ sealed trait ToContravariantOps0 {
 }
 
 trait ToContravariantOps
-    extends ToContravariantOps0 with ToInvariantFunctorOps {
+    extends ToContravariantOps0
+    with ToInvariantFunctorOps {
   implicit def ToContravariantOps[F[_], A](v: F[A])(
       implicit F0: Contravariant[F]) =
     new ContravariantOps[F, A](v)

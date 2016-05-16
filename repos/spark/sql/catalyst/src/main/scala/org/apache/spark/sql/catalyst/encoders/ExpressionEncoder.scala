@@ -44,7 +44,7 @@ import org.apache.spark.util.Utils
   *    to the name `value`.
   */
 object ExpressionEncoder {
-  def apply[T : TypeTag](): ExpressionEncoder[T] = {
+  def apply[T: TypeTag](): ExpressionEncoder[T] = {
     // We convert the not-serializable TypeTag into StructType and ClassTag.
     val mirror = typeTag[T].mirror
     val cls = mirror.runtimeClass(typeTag[T].tpe)
@@ -260,8 +260,7 @@ case class ExpressionEncoder[T](schema: StructType,
     * has not been done already in places where we plan to do later composition of encoders.
     */
   def assertUnresolved(): Unit = {
-    (fromRowExpression +: toRowExpressions).foreach(
-        _.foreach {
+    (fromRowExpression +: toRowExpressions).foreach(_.foreach {
       case a: AttributeReference if a.name != "loopVar" =>
         sys.error(s"Unresolved encoder expected, but $a was found.")
       case _ =>
@@ -338,7 +337,8 @@ case class ExpressionEncoder[T](schema: StructType,
     val analyzedPlan = SimpleAnalyzer.execute(plan)
     SimpleAnalyzer.checkAnalysis(analyzedPlan)
     copy(
-        fromRowExpression = SimplifyCasts(analyzedPlan).expressions.head.children.head)
+        fromRowExpression =
+          SimplifyCasts(analyzedPlan).expressions.head.children.head)
   }
 
   /**
@@ -348,8 +348,8 @@ case class ExpressionEncoder[T](schema: StructType,
     */
   def bind(schema: Seq[Attribute]): ExpressionEncoder[T] = {
     copy(
-        fromRowExpression = BindReferences.bindReference(
-              fromRowExpression, schema))
+        fromRowExpression =
+          BindReferences.bindReference(fromRowExpression, schema))
   }
 
   /**
@@ -357,9 +357,10 @@ case class ExpressionEncoder[T](schema: StructType,
     */
   def shift(delta: Int): ExpressionEncoder[T] = {
     copy(
-        fromRowExpression = fromRowExpression transform {
-      case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
-    })
+        fromRowExpression =
+          fromRowExpression transform {
+        case r: BoundReference => r.copy(ordinal = r.ordinal + delta)
+      })
   }
 
   protected val attrs = toRowExpressions.flatMap(

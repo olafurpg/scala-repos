@@ -81,7 +81,7 @@ object StormPlanTopology extends Properties("StormDag") {
     List((i -> i))
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   var dumpNumber = 1
   def dumpGraph(dag: StormDag) = {

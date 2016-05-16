@@ -108,7 +108,8 @@ class HadoopRDD[K, V](sc: SparkContext,
                       keyClass: Class[K],
                       valueClass: Class[V],
                       minPartitions: Int)
-    extends RDD[(K, V)](sc, Nil) with Logging {
+    extends RDD[(K, V)](sc, Nil)
+    with Logging {
 
   if (initLocalJobConfFuncOpt.isDefined) {
     sparkContext.clean(initLocalJobConfFuncOpt.get)
@@ -320,7 +321,7 @@ class HadoopRDD[K, V](sc: SparkContext,
 
   /** Maps over a partition, providing the InputSplit that was used as the base of the partition. */
   @DeveloperApi
-  def mapPartitionsWithInputSplit[U : ClassTag](
+  def mapPartitionsWithInputSplit[U: ClassTag](
       f: (InputSplit, Iterator[(K, V)]) => Iterator[U],
       preservesPartitioning: Boolean = false): RDD[U] = {
     new HadoopMapPartitionsWithSplitRDD(this, f, preservesPartitioning)
@@ -408,9 +409,9 @@ private[spark] object HadoopRDD extends Logging {
     * the given function rather than the index of the partition.
     */
   private[spark] class HadoopMapPartitionsWithSplitRDD[
-      U : ClassTag, T : ClassTag](prev: RDD[T],
-                                  f: (InputSplit, Iterator[T]) => Iterator[U],
-                                  preservesPartitioning: Boolean = false)
+      U: ClassTag, T: ClassTag](prev: RDD[T],
+                                f: (InputSplit, Iterator[T]) => Iterator[U],
+                                preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =

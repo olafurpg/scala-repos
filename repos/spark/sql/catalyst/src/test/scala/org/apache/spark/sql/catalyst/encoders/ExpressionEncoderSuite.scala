@@ -77,7 +77,7 @@ class JavaSerializable(val value: Int) extends Serializable {
 class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   OuterScopes.addOuterScope(this)
 
-  implicit def encoder[T : TypeTag]: ExpressionEncoder[T] = ExpressionEncoder()
+  implicit def encoder[T: TypeTag]: ExpressionEncoder[T] = ExpressionEncoder()
 
   // test flat encoders
   encodeDecodeTest(false, "primitive boolean")
@@ -148,7 +148,7 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       encoderFor(Encoders.javaSerialization[JavaSerializable]))
 
   // test product encoders
-  private def productTest[T <: Product : ExpressionEncoder](input: T): Unit = {
+  private def productTest[T <: Product: ExpressionEncoder](input: T): Unit = {
     encodeDecodeTest(input, input.getClass.getSimpleName)
   }
 
@@ -244,7 +244,7 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
   productTest(("UDT", new ExamplePoint(0.1, 0.2)))
 
   test("nullable of encoder schema") {
-    def checkNullable[T : ExpressionEncoder](nullable: Boolean*): Unit = {
+    def checkNullable[T: ExpressionEncoder](nullable: Boolean*): Unit = {
       assert(
           implicitly[ExpressionEncoder[T]].schema.map(_.nullable) === nullable.toSeq)
     }
@@ -280,7 +280,7 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
     }
   }
 
-  private def encodeDecodeTest[T : ExpressionEncoder](
+  private def encodeDecodeTest[T: ExpressionEncoder](
       input: T, testName: String): Unit = {
     test(s"encode/decode for $testName: $input") {
       val encoder = implicitly[ExpressionEncoder[T]]

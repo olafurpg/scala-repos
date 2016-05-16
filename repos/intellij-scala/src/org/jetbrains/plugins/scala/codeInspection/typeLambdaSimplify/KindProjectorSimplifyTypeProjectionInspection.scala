@@ -88,9 +88,10 @@ class KindProjectorSimplifyTypeProjectionInspection
             val newTypeArgs = paramType.typeArgs.map { ta =>
               currentTypeParam match {
                 case Some(tpt) if ta.presentableText == tpt.name =>
-                  currentTypeParam = if (typeParamIt.hasNext)
-                    Some(typeParamIt.next())
-                  else None
+                  currentTypeParam =
+                    if (typeParamIt.hasNext)
+                      Some(typeParamIt.next())
+                    else None
                   tpt.getText.replace(tpt.name, "?")
                 case _ => ta.presentableText
               }
@@ -152,10 +153,10 @@ class KindProjectorSimplifyTypeProjectionInspection
                                           }
                                           if (parameters.length > 1) {
                                             builder.append(
-                                                parameters.mkString(
-                                                    start = "(",
-                                                    sep = ",",
-                                                    end = ")"))
+                                                parameters.mkString(start =
+                                                                      "(",
+                                                                    sep = ",",
+                                                                    end = ")"))
                                           } else
                                             builder.append(
                                                 parameters.mkString(start = "",

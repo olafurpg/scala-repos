@@ -22,7 +22,7 @@ import org.specs2.matcher._
   * A matcher for two numeric Vecs that must be equal to within
   * a tolerance
   */
-class BeCloseToVec[T : Numeric : ClassManifest](v: Vec[T], delta: T)
+class BeCloseToVec[T: Numeric: ClassManifest](v: Vec[T], delta: T)
     extends Matcher[Vec[T]] {
   def apply[S <: Vec[T]](x: Expectable[S]) = {
     val num = implicitly[Numeric[T]]
@@ -40,6 +40,6 @@ class BeCloseToVec[T : Numeric : ClassManifest](v: Vec[T], delta: T)
 }
 
 object BeCloseToVec {
-  def apply[T : Numeric : ClassManifest](v: Vec[T], delta: T) =
+  def apply[T: Numeric: ClassManifest](v: Vec[T], delta: T) =
     new BeCloseToVec[T](v, delta)
 }

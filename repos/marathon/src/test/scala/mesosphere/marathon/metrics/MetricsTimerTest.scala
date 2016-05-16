@@ -8,7 +8,10 @@ import scala.concurrent.Promise
 import scala.util.Try
 
 class MetricsTimerTest
-    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures {
   test("time crashing call") {
     When("doing the call (but the future is delayed)")
     val metrics = new Metrics(new MetricRegistry)

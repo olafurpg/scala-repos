@@ -124,7 +124,7 @@ object Base64Long {
       builder.append(alphabet(0))
     } else {
       var bitPosition = StartingBitPosition
-      while ( (l >>> bitPosition) == 0) {
+      while ((l >>> bitPosition) == 0) {
         bitPosition -= DigitWidth
       }
       // Copy in the 6-bit segments, one at a time.

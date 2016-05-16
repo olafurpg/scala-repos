@@ -268,10 +268,9 @@ private[spark] object JsonProtocol {
       stageInfo.submissionTime.map(JInt(_)).getOrElse(JNothing)
     val completionTime =
       stageInfo.completionTime.map(JInt(_)).getOrElse(JNothing)
-    val failureReason = stageInfo.failureReason
-      .map(JString(_))
-      .getOrElse(JNothing)
-      ("Stage ID" -> stageInfo.stageId) ~
+    val failureReason =
+      stageInfo.failureReason.map(JString(_)).getOrElse(JNothing)
+    ("Stage ID" -> stageInfo.stageId) ~
     ("Stage Attempt ID" -> stageInfo.attemptId) ~
     ("Stage Name" -> stageInfo.name) ~
     ("Number of Tasks" -> stageInfo.numTasks) ~ ("RDD Info" -> rddInfo) ~
@@ -394,7 +393,7 @@ private[spark] object JsonProtocol {
         val blockManagerAddress = Option(fetchFailed.bmAddress)
           .map(blockManagerIdToJson)
           .getOrElse(JNothing)
-          ("Block Manager Address" -> blockManagerAddress) ~
+        ("Block Manager Address" -> blockManagerAddress) ~
         ("Shuffle ID" -> fetchFailed.shuffleId) ~
         ("Map ID" -> fetchFailed.mapId) ~ ("Reduce ID" -> fetchFailed.reduceId) ~
         ("Message" -> fetchFailed.message)
@@ -703,7 +702,7 @@ private[spark] object JsonProtocol {
         val updates = (json \ "Accumulator Updates")
           .extract[List[JValue]]
           .map(accumulableInfoFromJson)
-          (taskId, stageId, stageAttemptId, updates)
+        (taskId, stageId, stageAttemptId, updates)
     }
     SparkListenerExecutorMetricsUpdate(execInfo, accumUpdates)
   }
@@ -901,8 +900,7 @@ private[spark] object JsonProtocol {
 
     // Updated blocks
     Utils.jsonOption(json \ "Updated Blocks").foreach { blocksJson =>
-      metrics.setUpdatedBlockStatuses(
-          blocksJson
+      metrics.setUpdatedBlockStatuses(blocksJson
             .extract[List[JValue]]
             .map { blockJson =>
           val id = BlockId((blockJson \ "Block ID").extract[String])

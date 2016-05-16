@@ -104,7 +104,8 @@ final case class ScatterGatherFirstCompletedPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
     within: FiniteDuration,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
     extends Pool

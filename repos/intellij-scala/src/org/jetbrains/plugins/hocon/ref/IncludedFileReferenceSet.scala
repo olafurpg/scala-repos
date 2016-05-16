@@ -109,7 +109,7 @@ class IncludedFileReferenceSet(text: String,
           .toOption
           .map(_.getModuleRuntimeScope(false))
 
-        (orderEntryScope orElse moduleScope).map { scope =>
+      (orderEntryScope orElse moduleScope).map { scope =>
         // If there are any source roots with package prefix and that package is a subpackage of
         // including file's package, they will be omitted because `getDirectoriesByPackageName` doesn't find them.
         // I tried to fix this by manually searching for package-prefixed source dirs and representing them with

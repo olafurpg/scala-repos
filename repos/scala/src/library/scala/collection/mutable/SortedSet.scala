@@ -23,7 +23,8 @@ import generic._
   */
 trait SortedSet[A]
     extends scala.collection.SortedSet[A]
-    with scala.collection.SortedSetLike[A, SortedSet[A]] with mutable.Set[A]
+    with scala.collection.SortedSetLike[A, SortedSet[A]]
+    with mutable.Set[A]
     with mutable.SetLike[A, SortedSet[A]] {
 
   /** Needs to be overridden in subclasses. */
@@ -58,4 +59,5 @@ object SortedSet extends MutableSortedSetFactory[SortedSet] {
 
 /** Explicit instantiation of the `SortedSet` trait to reduce class file size in subclasses. */
 abstract class AbstractSortedSet[A]
-    extends scala.collection.mutable.AbstractSet[A] with SortedSet[A]
+    extends scala.collection.mutable.AbstractSet[A]
+    with SortedSet[A]

@@ -419,8 +419,8 @@ object DebuggerUtil {
 
   def getSourcePositions(
       elem: PsiElement,
-      lines: mutable.HashSet[SourcePosition] = new mutable.HashSet[
-            SourcePosition]): Set[SourcePosition] = {
+      lines: mutable.HashSet[SourcePosition] =
+        new mutable.HashSet[SourcePosition]): Set[SourcePosition] = {
     val node = elem.getNode
     val children: Array[ASTNode] =
       if (node != null) node.getChildren(null) else Array.empty[ASTNode]
@@ -470,10 +470,9 @@ object DebuggerUtil {
     case _ => value
   }
 
-  def localParamsForFunDef(
-      fun: ScFunctionDefinition,
-      visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
-    : Seq[ScTypedDefinition] = {
+  def localParamsForFunDef(fun: ScFunctionDefinition,
+                           visited: mutable.HashSet[PsiElement] =
+                             mutable.HashSet.empty): Seq[ScTypedDefinition] = {
     val container = ScalaEvaluatorBuilderUtil.getContextClass(fun)
     fun.body match {
       //to exclude references from default parameters
@@ -484,8 +483,8 @@ object DebuggerUtil {
 
   def localParamsForConstructor(
       cl: ScClass,
-      visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
-    : Seq[ScTypedDefinition] = {
+      visited: mutable.HashSet[PsiElement] =
+        mutable.HashSet.empty): Seq[ScTypedDefinition] = {
     val container = ScalaEvaluatorBuilderUtil.getContextClass(cl)
     val extendsBlock =
       cl.extendsBlock //to exclude references from default parameters
@@ -494,8 +493,8 @@ object DebuggerUtil {
 
   def localParamsForDefaultParam(
       param: ScParameter,
-      visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
-    : Seq[ScTypedDefinition] = {
+      visited: mutable.HashSet[PsiElement] =
+        mutable.HashSet.empty): Seq[ScTypedDefinition] = {
     val owner = param.owner
     val container = ScalaEvaluatorBuilderUtil.getContextClass {
       owner match {
@@ -512,8 +511,8 @@ object DebuggerUtil {
   def localParams(block: PsiElement,
                   excludeContext: PsiElement,
                   container: PsiElement,
-                  visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
-    : Seq[ScTypedDefinition] = {
+                  visited: mutable.HashSet[PsiElement] =
+                    mutable.HashSet.empty): Seq[ScTypedDefinition] = {
     def atRightPlace(elem: PsiElement): Boolean = {
       if (PsiTreeUtil.isContextAncestor(excludeContext, elem, false))
         return false
@@ -560,8 +559,8 @@ object DebuggerUtil {
         }
       }
     })
-    buf.toSeq.sortBy(
-        e => (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
+    buf.toSeq.sortBy(e =>
+          (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
   }
 
   def isLocalV(resolve: PsiElement): Boolean = {

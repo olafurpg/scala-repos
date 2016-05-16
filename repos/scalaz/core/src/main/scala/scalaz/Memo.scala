@@ -20,10 +20,10 @@ object Memo extends MemoInstances {
     def apply(z: K => V) = f(z)
   }
 
-  def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[
-      K, V] = memo[K, V](z => z)
+  def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]
+    : Memo[K, V] = memo[K, V](z => z)
 
-  private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
+  private class ArrayMemo[V >: Null: ClassTag](n: Int) extends Memo[Int, V] {
     override def apply(f: (Int) => V) = {
       lazy val a = new Array[V](n)
       k =>
@@ -61,7 +61,7 @@ object Memo extends MemoInstances {
   }
 
   /** Cache results in an `n`-long array. */
-  def arrayMemo[V >: Null : ClassTag](n: Int): Memo[Int, V] = new ArrayMemo(n)
+  def arrayMemo[V >: Null: ClassTag](n: Int): Memo[Int, V] = new ArrayMemo(n)
 
   /** As with `arrayMemo`, but memoizing double results !=
     * `sentinel`.
@@ -94,13 +94,12 @@ object Memo extends MemoInstances {
 
     memo[K, V](
         f =>
-          k =>
-            {
-          a get k getOrElse {
-            val v = f(k)
-            a = a updated (k, v)
-            v
-          }
+          k => {
+        a get k getOrElse {
+          val v = f(k)
+          a = a updated (k, v)
+          v
+        }
     })
   }
 
@@ -118,6 +117,6 @@ object Memo extends MemoInstances {
     immutableMapMemo(new immutable.ListMap[K, V])
 
   /** Cache results in a tree map. $immuMapNote */
-  def immutableTreeMapMemo[K : scala.Ordering, V]: Memo[K, V] =
+  def immutableTreeMapMemo[K: scala.Ordering, V]: Memo[K, V] =
     immutableMapMemo(new immutable.TreeMap[K, V])
 }

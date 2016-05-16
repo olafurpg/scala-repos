@@ -36,8 +36,8 @@ object ClusterSingletonProxySettings {
         singletonName = config.getString("singleton-name"),
         role = roleOption(config.getString("role")),
         singletonIdentificationInterval = config
-            .getDuration("singleton-identification-interval", MILLISECONDS)
-            .millis,
+          .getDuration("singleton-identification-interval", MILLISECONDS)
+          .millis,
         bufferSize = config.getInt("buffer-size"))
 
   /**
@@ -96,11 +96,12 @@ final class ClusterSingletonProxySettings(
   def withBufferSize(bufferSize: Int): ClusterSingletonProxySettings =
     copy(bufferSize = bufferSize)
 
-  private def copy(
-      singletonName: String = singletonName,
-      role: Option[String] = role,
-      singletonIdentificationInterval: FiniteDuration = singletonIdentificationInterval,
-      bufferSize: Int = bufferSize): ClusterSingletonProxySettings =
+  private def copy(singletonName: String = singletonName,
+                   role: Option[String] = role,
+                   singletonIdentificationInterval: FiniteDuration =
+                     singletonIdentificationInterval,
+                   bufferSize: Int =
+                     bufferSize): ClusterSingletonProxySettings =
     new ClusterSingletonProxySettings(
         singletonName, role, singletonIdentificationInterval, bufferSize)
 }
@@ -142,7 +143,8 @@ object ClusterSingletonProxy {
   */
 final class ClusterSingletonProxy(
     singletonManagerPath: String, settings: ClusterSingletonProxySettings)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import settings._
   val singletonPath =
     (singletonManagerPath + "/" + settings.singletonName).split("/")
@@ -184,9 +186,10 @@ final class ClusterSingletonProxy(
 
   def handleInitial(state: CurrentClusterState): Unit = {
     trackChange { () ⇒
-      membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members.collect {
-        case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
-      }
+      membersByAge =
+        immutable.SortedSet.empty(ageOrdering) union state.members.collect {
+          case m if m.status == MemberStatus.Up && matchingRole(m) ⇒ m
+        }
     }
   }
 

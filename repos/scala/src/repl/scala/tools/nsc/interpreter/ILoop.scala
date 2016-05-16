@@ -39,7 +39,8 @@ import scala.util.{Try, Success, Failure}
   *  @version 1.2
   */
 class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
-    extends AnyRef with LoopCommands {
+    extends AnyRef
+    with LoopCommands {
   def this(in0: BufferedReader, out: JPrintWriter) = this(Some(in0), out)
   def this() = this(None, new JPrintWriter(Console.out, true))
 
@@ -187,8 +188,8 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     val offset = history.index - history.size + 1
 
     for ((line, index) <- history.asStrings.zipWithIndex;
-                             if line.toLowerCase contains cmdline) echo(
-            "%d %s".format(index + offset, line))
+         if line.toLowerCase contains cmdline) echo(
+        "%d %s".format(index + offset, line))
   }
 
   /** Prompt to print when awaiting input */
@@ -476,9 +477,10 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     savingReader {
       savingReplayStack {
         file applyReader { reader =>
-          in = if (verbose)
-            new SimpleReader(reader, out, interactive = true) with EchoReader
-          else SimpleReader(reader, out, interactive = false)
+          in =
+            if (verbose)
+              new SimpleReader(reader, out, interactive = true) with EchoReader
+            else SimpleReader(reader, out, interactive = false)
           echo(s"Loading $file...")
           loop()
         }
@@ -520,7 +522,8 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
         replayCommandStack = Nil
       }
       if (intp.namedDefinedTerms.nonEmpty)
-        echo("Forgetting all expression results and named terms: " +
+        echo(
+            "Forgetting all expression results and named terms: " +
             intp.namedDefinedTerms.mkString(", "))
       if (intp.definedTypes.nonEmpty)
         echo("Forgetting defined types: " + intp.definedTypes.mkString(", "))
@@ -950,16 +953,15 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
       type ReaderMaker = Completer => InteractiveReader
 
       def instantiater(className: String): ReaderMaker =
-        completer =>
-          {
-            if (settings.debug)
-              Console.println(
-                  s"Trying to instantiate an InteractiveReader from $className")
-            Class
-              .forName(className)
-              .getConstructor(classOf[Completer])
-              .newInstance(completer)
-              .asInstanceOf[InteractiveReader]
+        completer => {
+          if (settings.debug)
+            Console.println(
+                s"Trying to instantiate an InteractiveReader from $className")
+          Class
+            .forName(className)
+            .getConstructor(classOf[Completer])
+            .newInstance(completer)
+            .asInstanceOf[InteractiveReader]
         }
 
       def mkReader(maker: ReaderMaker) = maker { () =>
@@ -999,7 +1001,8 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     intp.quietBind(
         NamedParam[IMain]("$intp", intp)(tagOfIMain, classTag[IMain]))
     // Auto-run code via some setting.
-    (replProps.replAutorunCode.option flatMap (f => io.File(f).safeSlurp()) foreach
+    (replProps.replAutorunCode.option flatMap (f =>
+              io.File(f).safeSlurp()) foreach
         (intp quietRun _))
     // classloader and power mode setup
     intp.setContextClassLoader()
@@ -1018,8 +1021,8 @@ class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
     createInterpreter()
 
     // sets in to some kind of reader depending on environmental cues
-    in = in0.fold(chooseReader(settings))(
-        r => SimpleReader(r, out, interactive = true))
+    in = in0.fold(chooseReader(settings))(r =>
+          SimpleReader(r, out, interactive = true))
     globalFuture = Future {
       intp.initializeSynchronous()
       loopPostInit()
@@ -1056,7 +1059,8 @@ object ILoop {
           // skip margin prefix for continuation lines, unless preserving session text for test
           // should test for repl.paste.ContinueString or replProps.continueText.contains(ch)
           override def write(str: String) =
-            if (!inSession && (str forall (ch => ch.isWhitespace || ch == '|')))
+            if (!inSession &&
+                (str forall (ch => ch.isWhitespace || ch == '|')))
               ()
             else super.write(str)
         }

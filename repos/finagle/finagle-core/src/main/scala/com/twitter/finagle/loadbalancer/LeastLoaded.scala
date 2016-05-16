@@ -17,7 +17,8 @@ private trait LeastLoaded[Req, Rep] { self: Balancer[Req, Rep] =>
   protected case class Node(factory: ServiceFactory[Req, Rep],
                             counter: AtomicInteger,
                             token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+      extends ServiceFactoryProxy[Req, Rep](factory)
+      with NodeT[Req, Rep] {
 
     type This = Node
 

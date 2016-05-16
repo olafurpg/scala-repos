@@ -37,7 +37,8 @@ import scalaz.{Validation, Success, Failure}
   * error.
   */
 case class VersionedSegmentFormat(formats: Map[Int, SegmentFormat])
-    extends SegmentFormat with Versioning {
+    extends SegmentFormat
+    with Versioning {
   val magic: Short = 0x0536.toShort
   val (version, format) = {
     val (ver, format) = formats.maxBy(_._1)

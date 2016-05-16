@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocTag, ScDocComment
   *         Date: 12.11.2015
   */
 class ScalaDocNewlinedPreFormatProcessor
-    extends ScalaRecursiveElementVisitor with PreFormatProcessor {
+    extends ScalaRecursiveElementVisitor
+    with PreFormatProcessor {
   override def process(element: ASTNode, range: TextRange): TextRange =
     Option(element.getPsi).map { psiElem =>
       val oldRange = psiElem.getTextRange
@@ -58,15 +59,16 @@ class ScalaDocNewlinedPreFormatProcessor
                 isParamTag(prevElement) && isParamTag(element) &&
                 scalaSettings.SD_BLANK_LINE_BETWEEN_PARAMETERS ||
                 !isParamTag(prevElement) && isParamTag(element) &&
-                scalaSettings.SD_BLANK_LINE_BEFORE_PARAMETERS) 2 else 1
+                scalaSettings.SD_BLANK_LINE_BEFORE_PARAMETERS) 2
+            else 1
           fixNewlinesBetweenElements(
               prevElement.getLastChild, newlinesNew, scalaSettings)
         case (false, true) =>
           var current = prevElement
           //do not insert newlines when there is no description
           while (current != null &&
-          (current.getNode.getElementType == ScalaDocTokenType.DOC_WHITESPACE ||
-              current.getNode.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)) {
+                 (current.getNode.getElementType == ScalaDocTokenType.DOC_WHITESPACE ||
+                     current.getNode.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)) {
             current = current.getPrevSibling
           }
           if (current != null &&
@@ -101,8 +103,8 @@ class ScalaDocNewlinedPreFormatProcessor
           element.replace(ScalaPsiElementFactory.createDocWhiteSpace(manager))
         else element
       if (!Set(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS,
-               ScalaDocTokenType.DOC_COMMENT_END)
-            .contains(nextElement.getNode.getElementType))
+               ScalaDocTokenType.DOC_COMMENT_END).contains(
+              nextElement.getNode.getElementType))
         parent.addAfter(
             ScalaPsiElementFactory.createLeadingAsterisk(manager), newElement)
     } else {
@@ -160,7 +162,7 @@ class ScalaDocNewlinedPreFormatProcessor
     import ScalaDocNewlinedPreFormatProcessor._
     var currentChild = element
     while (currentChild != null &&
-    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) {
+           currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) {
       currentChild = currentChild.getPrevSibling
     }
     if (currentChild == null) return None

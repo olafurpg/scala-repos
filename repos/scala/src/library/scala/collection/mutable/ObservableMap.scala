@@ -25,7 +25,8 @@ import script._
 @deprecated(
     "Observables are deprecated because scripting is deprecated.", "2.11.0")
 trait ObservableMap[A, B]
-    extends Map[A, B] with Publisher[Message[(A, B)] with Undoable] {
+    extends Map[A, B]
+    with Publisher[Message[(A, B)] with Undoable] {
 
   type Pub <: ObservableMap[A, B]
 

@@ -15,7 +15,7 @@ object LargeJsonTest extends TestSuite {
           io.Source
             .fromInputStream(getClass.getResourceAsStream("/test.json"))
             .mkString
-        )
+      )
       assert(value(200)("friends")(1)("name").value == "Susan White")
     }
   }

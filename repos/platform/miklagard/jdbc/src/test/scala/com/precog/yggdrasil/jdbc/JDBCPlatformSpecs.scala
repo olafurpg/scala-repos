@@ -150,7 +150,7 @@ object JDBCPlatformSpecEngine extends Logging {
                 // Two passes: first one constructs a schema for the table, second inserts data
                 val schema = rows.foldLeft(Set[(String, String)]()) {
                   case (acc, properties) =>
-                    acc ++(properties.map { case (p, (t, _)) => (p, t) }).toSet
+                    acc ++ (properties.map { case (p, (t, _)) => (p, t) }).toSet
                 }
 
                 val ddlCreate =
@@ -216,13 +216,18 @@ object JDBCPlatformSpecEngine extends Logging {
 }
 
 trait JDBCPlatformSpecs
-    extends ParseEvalStackSpecs[Future] with JDBCColumnarTableModule
-    with Logging with StringIdMemoryDatasetConsumer[Future] {
+    extends ParseEvalStackSpecs[Future]
+    with JDBCColumnarTableModule
+    with Logging
+    with StringIdMemoryDatasetConsumer[Future] {
   self =>
 
   class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
       with JDBCColumnarTableModuleConfig
 
   object yggConfig extends YggConfig

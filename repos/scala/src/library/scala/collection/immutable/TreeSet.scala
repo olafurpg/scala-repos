@@ -55,7 +55,9 @@ object TreeSet extends ImmutableSortedSetFactory[TreeSet] {
     "2.11.0")
 class TreeSet[A] private (
     tree: RB.Tree[A, Unit])(implicit val ordering: Ordering[A])
-    extends SortedSet[A] with SortedSetLike[A, TreeSet[A]] with Serializable {
+    extends SortedSet[A]
+    with SortedSetLike[A, TreeSet[A]]
+    with Serializable {
 
   if (ordering eq null)
     throw new NullPointerException("ordering must not be null")

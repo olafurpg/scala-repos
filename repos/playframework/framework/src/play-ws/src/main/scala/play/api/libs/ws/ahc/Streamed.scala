@@ -51,10 +51,9 @@ private[play] object Streamed {
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     promise.future.map {
       case (headers, publisher) =>
-        val enumerator = Streams
-          .publisherToEnumerator(publisher)
-          .map(_.getBodyPartBytes)
-          (headers, enumerator)
+        val enumerator =
+          Streams.publisherToEnumerator(publisher).map(_.getBodyPartBytes)
+        (headers, enumerator)
     }
   }
 

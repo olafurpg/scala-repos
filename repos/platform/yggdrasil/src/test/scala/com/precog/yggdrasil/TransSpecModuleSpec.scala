@@ -27,7 +27,9 @@ import com.precog.common._
 import org.specs2.mutable.Specification
 
 trait TransSpecModuleSpec
-    extends TransSpecModule with FNDummyModule with Specification {
+    extends TransSpecModule
+    with FNDummyModule
+    with Specification {
   import trans._
   import CPath._
 

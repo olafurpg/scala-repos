@@ -42,8 +42,8 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
             declared <- variable.declaredType
             expr <- variable.expr
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
@@ -52,8 +52,8 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
             declared <- value.declaredType
             expr <- value.expr
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
@@ -62,8 +62,8 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
             declared <- function.returnType
             expr <- function.body
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific.fun"))
         }
       }
@@ -85,8 +85,9 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
                  dynamicType: ScType,
                  context: PsiElement,
                  editor: Editor): Unit = {
-    val types = computeBaseTypes(declaredType, dynamicType).sortWith(
-        (t1, t2) => t1.conforms(t2))
+    val types =
+      computeBaseTypes(declaredType, dynamicType).sortWith((t1, t2) =>
+            t1.conforms(t2))
     if (types.size == 1) {
       val replaced = te.replace(
           ScalaPsiElementFactory.createTypeElementFromText(

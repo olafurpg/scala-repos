@@ -301,60 +301,58 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
   test("Complex field and type inferring") {
     val jsonDF = sqlContext.read.json(complexFieldAndType1)
 
-    val expectedSchema =
-      StructType(
-          StructField(
-              "arrayOfArray1",
-              ArrayType(ArrayType(StringType, true), true),
-              true) :: StructField(
-              "arrayOfArray2",
-              ArrayType(ArrayType(DoubleType, true), true),
-              true) :: StructField(
-              "arrayOfBigInteger",
-              ArrayType(DecimalType(21, 0), true),
-              true) :: StructField(
-              "arrayOfBoolean",
-              ArrayType(BooleanType, true),
-              true) :: StructField("arrayOfDouble",
-                                   ArrayType(DoubleType, true),
-                                   true) :: StructField(
-              "arrayOfInteger",
-              ArrayType(LongType, true),
-              true) :: StructField("arrayOfLong",
-                                   ArrayType(LongType, true),
-                                   true) :: StructField("arrayOfNull",
-                                                        ArrayType(
-                                                            StringType,
-                                                            true),
+    val expectedSchema = StructType(
+        StructField("arrayOfArray1",
+                    ArrayType(ArrayType(StringType, true), true),
+                    true) :: StructField(
+            "arrayOfArray2",
+            ArrayType(ArrayType(DoubleType, true), true),
+            true) :: StructField("arrayOfBigInteger",
+                                 ArrayType(DecimalType(21, 0), true),
+                                 true) :: StructField("arrayOfBoolean",
+                                                      ArrayType(BooleanType,
+                                                                true),
+                                                      true) :: StructField(
+            "arrayOfDouble",
+            ArrayType(DoubleType, true),
+            true) :: StructField("arrayOfInteger",
+                                 ArrayType(LongType, true),
+                                 true) :: StructField("arrayOfLong",
+                                                      ArrayType(LongType,
+                                                                true),
+                                                      true) :: StructField(
+            "arrayOfNull",
+            ArrayType(StringType,
+                      true),
+            true) :: StructField("arrayOfString",
+                                 ArrayType(StringType, true),
+                                 true) :: StructField(
+            "arrayOfStruct",
+            ArrayType(StructType(StructField("field1",
+                                             BooleanType,
+                                             true) :: StructField(
+                              "field2",
+                              StringType,
+                              true) :: StructField("field3",
+                                                   StringType,
+                                                   true) :: Nil),
+                      true),
+            true) :: StructField("struct",
+                                 StructType(StructField("field1",
+                                                        BooleanType,
                                                         true) :: StructField(
-              "arrayOfString",
-              ArrayType(StringType, true),
-              true) :: StructField("arrayOfStruct",
-                                   ArrayType(StructType(StructField(
-                                                     "field1",
-                                                     BooleanType,
-                                                     true) :: StructField(
-                                                     "field2",
-                                                     StringType,
-                                                     true) :: StructField(
-                                                     "field3",
-                                                     StringType,
-                                                     true) :: Nil),
-                                             true),
-                                   true) :: StructField(
-              "struct",
-              StructType(
-                  StructField("field1", BooleanType, true) :: StructField(
-                      "field2", DecimalType(20, 0), true) :: Nil),
-              true) :: StructField("structWithArrayFields",
-                                   StructType(StructField("field1",
-                                                          ArrayType(LongType,
-                                                                    true),
-                                                          true) :: StructField(
-                                           "field2",
-                                           ArrayType(StringType, true),
-                                           true) :: Nil),
-                                   true) :: Nil)
+                                         "field2",
+                                         DecimalType(20, 0),
+                                         true) :: Nil),
+                                 true) :: StructField(
+            "structWithArrayFields",
+            StructType(StructField("field1",
+                                   ArrayType(LongType, true),
+                                   true) :: StructField("field2",
+                                                        ArrayType(StringType,
+                                                                  true),
+                                                        true) :: Nil),
+            true) :: Nil)
 
     assert(expectedSchema === jsonDF.schema)
 
@@ -757,36 +755,42 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
             ArrayType(ArrayType(StringType, true), true),
             true) :: StructField("arrayOfBigInteger",
                                  ArrayType(StringType, true),
-                                 true) :: StructField("arrayOfBoolean",
+                                 true) :: StructField(
+            "arrayOfBoolean",
+            ArrayType(StringType, true),
+            true) :: StructField("arrayOfDouble",
+                                 ArrayType(StringType, true),
+                                 true) :: StructField("arrayOfInteger",
                                                       ArrayType(StringType,
                                                                 true),
                                                       true) :: StructField(
-            "arrayOfDouble", ArrayType(StringType, true), true) :: StructField(
-            "arrayOfInteger",
+            "arrayOfLong",
             ArrayType(StringType, true),
-            true) :: StructField("arrayOfLong",
+            true) :: StructField("arrayOfNull",
                                  ArrayType(StringType, true),
                                  true) :: StructField(
-            "arrayOfNull", ArrayType(StringType, true), true) :: StructField(
             "arrayOfString", ArrayType(StringType, true), true) :: StructField(
             "arrayOfStruct",
-            ArrayType(StructType(StructField("field1", StringType, true) :: StructField(
-                              "field2", StringType, true) :: StructField(
-                              "field3", StringType, true) :: Nil),
-                      true),
+            ArrayType(
+                StructType(
+                    StructField("field1", StringType, true) :: StructField(
+                        "field2", StringType, true) :: StructField("field3",
+                                                                   StringType,
+                                                                   true) :: Nil),
+                true),
             true) :: StructField(
             "struct",
             StructType(StructField("field1", StringType, true) :: StructField(
                     "field2", StringType, true) :: Nil),
-            true) :: StructField("structWithArrayFields",
-                                 StructType(StructField("field1",
+            true) :: StructField(
+            "structWithArrayFields",
+            StructType(StructField("field1",
+                                   ArrayType(StringType, true),
+                                   true) :: StructField("field2",
                                                         ArrayType(StringType,
                                                                   true),
-                                                        true) :: StructField(
-                                         "field2",
-                                         ArrayType(StringType, true),
-                                         true) :: Nil),
-                                 true) :: Nil)
+                                                        true) :: Nil),
+            true) :: Nil)
 
     assert(expectedSchema === jsonDF.schema)
 
@@ -1182,10 +1186,11 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
                               true),
                     true) :: StructField(
             "field2",
-            ArrayType(ArrayType(StructType(
-                                    StructField("Test", LongType, true) :: Nil),
-                                true),
-                      true),
+            ArrayType(
+                ArrayType(
+                    StructType(StructField("Test", LongType, true) :: Nil),
+                    true),
+                true),
             true) :: StructField(
             "field3",
             ArrayType(ArrayType(StructType(StructField(
@@ -1349,30 +1354,27 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
   }
 
   test("JSONRelation equality test") {
-    withTempPath(dir =>
-          {
-        val path = dir.getCanonicalFile.toURI.toString
-        sparkContext
-          .parallelize(1 to 100)
-          .map(i => s"""{"a": 1, "b": "str$i"}""")
-          .saveAsTextFile(path)
+    withTempPath(dir => {
+      val path = dir.getCanonicalFile.toURI.toString
+      sparkContext
+        .parallelize(1 to 100)
+        .map(i => s"""{"a": 1, "b": "str$i"}""")
+        .saveAsTextFile(path)
 
-        val d1 =
-          DataSource(sqlContext,
-                     userSpecifiedSchema = None,
-                     partitionColumns = Array.empty[String],
-                     bucketSpec = None,
-                     className = classOf[DefaultSource].getCanonicalName,
-                     options = Map("path" -> path)).resolveRelation()
+      val d1 = DataSource(sqlContext,
+                          userSpecifiedSchema = None,
+                          partitionColumns = Array.empty[String],
+                          bucketSpec = None,
+                          className = classOf[DefaultSource].getCanonicalName,
+                          options = Map("path" -> path)).resolveRelation()
 
-        val d2 =
-          DataSource(sqlContext,
-                     userSpecifiedSchema = None,
-                     partitionColumns = Array.empty[String],
-                     bucketSpec = None,
-                     className = classOf[DefaultSource].getCanonicalName,
-                     options = Map("path" -> path)).resolveRelation()
-        assert(d1 === d2)
+      val d2 = DataSource(sqlContext,
+                          userSpecifiedSchema = None,
+                          partitionColumns = Array.empty[String],
+                          bucketSpec = None,
+                          className = classOf[DefaultSource].getCanonicalName,
+                          options = Map("path" -> path)).resolveRelation()
+      assert(d1 === d2)
     })
   }
 
@@ -1417,37 +1419,36 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       p
     }
 
-    withTempPath(root =>
-          {
-        val d1 = new File(root, "d1=1")
-        // root/dt=1/col1=abc
-        val p1_col1 = makePartition(sparkContext
-                                      .parallelize(2 to 5)
-                                      .map(i => s"""{"a": 1, "b": "str$i"}"""),
-                                    d1,
-                                    "col1",
-                                    "abc")
+    withTempPath(root => {
+      val d1 = new File(root, "d1=1")
+      // root/dt=1/col1=abc
+      val p1_col1 = makePartition(sparkContext
+                                    .parallelize(2 to 5)
+                                    .map(i => s"""{"a": 1, "b": "str$i"}"""),
+                                  d1,
+                                  "col1",
+                                  "abc")
 
-        // root/dt=1/col1=abd
-        val p2 = makePartition(sparkContext
-                                 .parallelize(6 to 10)
-                                 .map(i => s"""{"a": 1, "b": "str$i"}"""),
-                               d1,
-                               "col1",
-                               "abd")
+      // root/dt=1/col1=abd
+      val p2 = makePartition(sparkContext
+                               .parallelize(6 to 10)
+                               .map(i => s"""{"a": 1, "b": "str$i"}"""),
+                             d1,
+                             "col1",
+                             "abd")
 
-        sqlContext.read
-          .json(root.getAbsolutePath)
-          .registerTempTable("test_myjson_with_part")
-        checkAnswer(
-            sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1 and col1='abc'"),
-            Row(4))
-        checkAnswer(
-            sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1 and col1='abd'"),
-            Row(5))
-        checkAnswer(
-            sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1"),
-            Row(9))
+      sqlContext.read
+        .json(root.getAbsolutePath)
+        .registerTempTable("test_myjson_with_part")
+      checkAnswer(
+          sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1 and col1='abc'"),
+          Row(4))
+      checkAnswer(
+          sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1 and col1='abd'"),
+          Row(5))
+      checkAnswer(
+          sql("SELECT count(a) FROM test_myjson_with_part where d1 = 1"),
+          Row(9))
     })
   }
 
@@ -1581,8 +1582,8 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+              hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -1713,8 +1714,8 @@ class JsonSuite extends QueryTest with SharedSQLContext with TestJsonData {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+              hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }

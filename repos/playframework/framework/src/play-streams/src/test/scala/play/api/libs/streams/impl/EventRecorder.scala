@@ -12,9 +12,9 @@ import scala.concurrent.duration.{FiniteDuration, SECONDS, MILLISECONDS}
   * stuff records an event, then the test can check that events occur in
   * the right order and at the right time.
   */
-class EventRecorder(nextTimeout: FiniteDuration = FiniteDuration(20, SECONDS),
-                    isEmptyDelay: FiniteDuration = FiniteDuration(
-                          200, MILLISECONDS)) {
+class EventRecorder(
+    nextTimeout: FiniteDuration = FiniteDuration(20, SECONDS),
+    isEmptyDelay: FiniteDuration = FiniteDuration(200, MILLISECONDS)) {
 
   private val events = new LinkedBlockingQueue[AnyRef]
 

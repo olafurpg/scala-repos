@@ -67,7 +67,8 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
                                    config: Map[String, String],
                                    initClassLoader: ClassLoader,
                                    val clientLoader: IsolatedClientLoader)
-    extends HiveClient with Logging {
+    extends HiveClient
+    with Logging {
 
   // Circular buffer to hold what hive prints to STDOUT and ERR.  Only printed when failures occur.
   private val outputBuffer = new CircularBuffer()
@@ -313,18 +314,22 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
               case HiveTableType.VIRTUAL_VIEW => CatalogTableType.VIRTUAL_VIEW
             },
             schema = h.getCols.asScala.map(fromHiveColumn),
-            partitionColumns = h.getPartCols.asScala.map(fromHiveColumn),
+            partitionColumns =
+              h.getPartCols.asScala.map(fromHiveColumn),
             sortColumns = Seq(),
             numBuckets = h.getNumBuckets,
             createTime = h.getTTable.getCreateTime.toLong * 1000,
-            lastAccessTime = h.getLastAccessTime.toLong * 1000,
+            lastAccessTime =
+              h.getLastAccessTime.toLong * 1000,
             storage = CatalogStorageFormat(
-                  locationUri = shim.getDataLocation(h),
-                  inputFormat = Option(h.getInputFormatClass).map(_.getName),
-                  outputFormat = Option(h.getOutputFormatClass).map(_.getName),
-                  serde = Option(h.getSerializationLib),
-                  serdeProperties = h.getTTable.getSd.getSerdeInfo.getParameters.asScala.toMap
-              ),
+                locationUri =
+                  shim.getDataLocation(h),
+                inputFormat = Option(h.getInputFormatClass).map(_.getName),
+                outputFormat = Option(h.getOutputFormatClass).map(_.getName),
+                serde = Option(h.getSerializationLib),
+                serdeProperties =
+                  h.getTTable.getSd.getSerdeInfo.getParameters.asScala.toMap
+            ),
             properties = h.getParameters.asScala.toMap,
             viewOriginalText = Option(h.getViewOriginalText),
             viewText = Option(h.getViewExpandedText))
@@ -721,11 +726,12 @@ private[hive] class HiveClientImpl(override val version: HiveVersion,
     CatalogTablePartition(
         spec = Option(hp.getSpec).map(_.asScala.toMap).getOrElse(Map.empty),
         storage = CatalogStorageFormat(
-              locationUri = Option(apiPartition.getSd.getLocation),
-              inputFormat = Option(apiPartition.getSd.getInputFormat),
-              outputFormat = Option(apiPartition.getSd.getOutputFormat),
-              serde = Option(
-                    apiPartition.getSd.getSerdeInfo.getSerializationLib),
-              serdeProperties = apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap))
+            locationUri = Option(apiPartition.getSd.getLocation),
+            inputFormat = Option(apiPartition.getSd.getInputFormat),
+            outputFormat = Option(apiPartition.getSd.getOutputFormat),
+            serde =
+              Option(apiPartition.getSd.getSerdeInfo.getSerializationLib),
+            serdeProperties =
+              apiPartition.getSd.getSerdeInfo.getParameters.asScala.toMap))
   }
 }

@@ -66,7 +66,8 @@ class VarsJBridge {
   * requesting a value to be returned from the container
   */
 abstract class SessionVar[T](dflt: => T)
-    extends AnyVar[T, SessionVar[T]](dflt) with LazyLoggable {
+    extends AnyVar[T, SessionVar[T]](dflt)
+    with LazyLoggable {
   override protected def findFunc(name: String): Box[T] = S.session match {
     case Full(s) => s.get(name)
     case _ =>
@@ -189,9 +190,10 @@ private[http] trait HasLogUnreadVal {
   * about only storing things that can be actually serialized.  Lift
   * provides a subset of these.
   */
-abstract class ContainerVar[T](dflt: => T)(
-    implicit containerSerializer: ContainerSerializer[T])
-    extends AnyVar[T, ContainerVar[T]](dflt) with LazyLoggable {
+abstract class ContainerVar[T](
+    dflt: => T)(implicit containerSerializer: ContainerSerializer[T])
+    extends AnyVar[T, ContainerVar[T]](dflt)
+    with LazyLoggable {
 
   override protected def findFunc(name: String): Box[T] = S.session match {
     case Full(session) => {
@@ -261,8 +263,7 @@ abstract class ContainerVar[T](dflt: => T)(
 
   override protected def wasInitialized(name: String, bn: String): Boolean = {
     val old: Boolean =
-      S.session.flatMap(
-          s =>
+      S.session.flatMap(s =>
             localGet(s, bn) match {
           case Full(b: Boolean) => Full(b)
           case _ => Empty
@@ -414,7 +415,8 @@ object RequestVar {
   * requesting a value to be returned from the container
   */
 abstract class RequestVar[T](dflt: => T)
-    extends AnyVar[T, RequestVar[T]](dflt) with HasLogUnreadVal {
+    extends AnyVar[T, RequestVar[T]](dflt)
+    with HasLogUnreadVal {
   type CleanUpParam = Box[LiftSession]
 
   /**
@@ -498,7 +500,8 @@ abstract class RequestVar[T](dflt: => T)
   * requesting a value to be returned from the container
   */
 abstract class TransientRequestVar[T](dflt: => T)
-    extends AnyVar[T, TransientRequestVar[T]](dflt) with HasLogUnreadVal {
+    extends AnyVar[T, TransientRequestVar[T]](dflt)
+    with HasLogUnreadVal {
   type CleanUpParam = Box[LiftSession]
 
   override protected def findFunc(name: String): Box[T] =
@@ -568,8 +571,8 @@ private[http] trait CoreRequestVarHandler {
 
   private val logger = Logger(classOf[CoreRequestVarHandler])
   // This maps from the RV name to (RV instance, value, set-but-not-read flag)
-  private val vals: ThreadGlobal[ConcurrentHashMap[
-          String, (MyType, Any, Boolean)]] = new ThreadGlobal
+  private val vals: ThreadGlobal[
+      ConcurrentHashMap[String, (MyType, Any, Boolean)]] = new ThreadGlobal
   private val cleanup: ThreadGlobal[ListBuffer[Box[LiftSession] => Unit]] =
     new ThreadGlobal
   private val isIn: ThreadGlobal[String] = new ThreadGlobal
@@ -590,8 +593,8 @@ private[http] trait CoreRequestVarHandler {
                 sessionThing.doWith(mySessionThing) {
                   val ret: T = f()
 
-                  cleanup.value.toList
-                    .foreach(clean => Helpers.tryo(clean(sessionThing.value)))
+                  cleanup.value.toList.foreach(clean =>
+                        Helpers.tryo(clean(sessionThing.value)))
 
                   ret
                 }
@@ -600,8 +603,8 @@ private[http] trait CoreRequestVarHandler {
       )
   }
 
-  protected def backingStore: Box[ConcurrentHashMap[
-          String, (MyType, Any, Boolean)]] =
+  protected def backingStore: Box[
+      ConcurrentHashMap[String, (MyType, Any, Boolean)]] =
     vals.value match {
       case null =>
         if (LiftRules.throwOnOutOfScopeVarAccess) {
@@ -655,13 +658,13 @@ private[http] trait CoreRequestVarHandler {
                 sessionThing.doWith(session) {
                   val ret: T = f
 
-                  cleanup.value.toList
-                    .foreach(clean => Helpers.tryo(clean(sessionThing.value)))
+                  cleanup.value.toList.foreach(clean =>
+                        Helpers.tryo(clean(sessionThing.value)))
 
                   if (Props.devMode && LiftRules.logUnreadRequestVars) {
                     vals.value.keys
-                      .filter(!_.startsWith(
-                              VarConstants.varPrefix + "net.liftweb"))
+                      .filter(!_.startsWith(VarConstants.varPrefix +
+                              "net.liftweb"))
                       .filter(!_.endsWith(VarConstants.initedSuffix))
                       .foreach(key =>
                             vals.value(key) match {

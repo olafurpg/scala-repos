@@ -31,7 +31,8 @@ class ReplicatorPruningSpecMultiJvmNode2 extends ReplicatorPruningSpec
 class ReplicatorPruningSpecMultiJvmNode3 extends ReplicatorPruningSpec
 
 class ReplicatorPruningSpec
-    extends MultiNodeSpec(ReplicatorPruningSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatorPruningSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatorPruningSpec._
   import Replicator._

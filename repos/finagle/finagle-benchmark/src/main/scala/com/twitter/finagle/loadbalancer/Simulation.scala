@@ -86,10 +86,9 @@ private[finagle] class LatencyProfile(stopWatch: () => Duration) {
     */
   def slowWithin(start: Duration, end: Duration, factor: Long)(
       next: () => Duration) =
-    () =>
-      {
-        val time = stopWatch()
-        if (time >= start && time <= end) next() * factor else next()
+    () => {
+      val time = stopWatch()
+      if (time >= start && time <= end) next() * factor else next()
     }
 
   /**
@@ -97,14 +96,13 @@ private[finagle] class LatencyProfile(stopWatch: () => Duration) {
     * within the window terminated at `end`.
     */
   def warmup(end: Duration, maxFactor: Double = 5.0)(next: () => Duration) =
-    () =>
-      {
-        val time = stopWatch()
-        val factor =
-          if (time < end) (1.0 / time.inNanoseconds) * (end.inNanoseconds)
-          else 1.0
-        Duration.fromNanoseconds(
-            (next().inNanoseconds * factor.min(maxFactor)).toLong)
+    () => {
+      val time = stopWatch()
+      val factor =
+        if (time < end) (1.0 / time.inNanoseconds) * (end.inNanoseconds)
+        else 1.0
+      Duration.fromNanoseconds(
+          (next().inNanoseconds * factor.min(maxFactor)).toLong)
     }
 }
 

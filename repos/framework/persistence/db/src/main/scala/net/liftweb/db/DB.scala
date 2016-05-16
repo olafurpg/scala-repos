@@ -74,34 +74,31 @@ trait DB extends Loggable {
     */
   private def jndiConnection(name: ConnectionIdentifier): Box[Connection] = {
     val toTry: List[() => Connection] = List(
-        () =>
-          {
-            logger.trace(
-                "Trying JNDI lookup on java:/comp/env followed by lookup on %s"
-                  .format(name.jndiName))
-            (new InitialContext)
-              .lookup("java:/comp/env")
-              .asInstanceOf[Context]
-              .lookup(name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
+        () => {
+          logger.trace(
+              "Trying JNDI lookup on java:/comp/env followed by lookup on %s"
+                .format(name.jndiName))
+          (new InitialContext)
+            .lookup("java:/comp/env")
+            .asInstanceOf[Context]
+            .lookup(name.jndiName)
+            .asInstanceOf[DataSource]
+            .getConnection
         },
-        () =>
-          {
-            logger.trace("Trying JNDI lookup on java:/comp/env/%s".format(
-                    name.jndiName))
-            (new InitialContext)
-              .lookup("java:/comp/env/" + name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
+        () => {
+          logger.trace(
+              "Trying JNDI lookup on java:/comp/env/%s".format(name.jndiName))
+          (new InitialContext)
+            .lookup("java:/comp/env/" + name.jndiName)
+            .asInstanceOf[DataSource]
+            .getConnection
         },
-        () =>
-          {
-            logger.trace("Trying JNDI lookup on %s".format(name.jndiName))
-            (new InitialContext)
-              .lookup(name.jndiName)
-              .asInstanceOf[DataSource]
-              .getConnection
+        () => {
+          logger.trace("Trying JNDI lookup on %s".format(name.jndiName))
+          (new InitialContext)
+            .lookup(name.jndiName)
+            .asInstanceOf[DataSource]
+            .getConnection
         }
     )
 
@@ -192,24 +189,20 @@ trait DB extends Loggable {
         .map(c => new SuperConnection(c, () => cm.releaseConnection(c)))
 
     def jndiSuperConnection: Box[SuperConnection] =
-      jndiConnection(name).map(c =>
-            {
-          val uniqueId =
-            if (logger.isDebugEnabled) Helpers.nextNum.toString else ""
+      jndiConnection(name).map(c => {
+        val uniqueId =
+          if (logger.isDebugEnabled) Helpers.nextNum.toString else ""
+        logger.debug("Connection ID " + uniqueId +
+            " for JNDI connection " + name.jndiName + " opened")
+        new SuperConnection(c, () => {
           logger.debug("Connection ID " + uniqueId +
-              " for JNDI connection " + name.jndiName + " opened")
-          new SuperConnection(c,
-                              () =>
-                                {
-                                  logger.debug("Connection ID " + uniqueId +
-                                      " for JNDI connection " +
-                                      name.jndiName + " closed"); c.close
-                              })
+              " for JNDI connection " + name.jndiName + " closed"); c.close
+        })
       })
 
     val cmConn = for {
       connectionManager <- threadLocalConnectionManagers.box.flatMap(
-          _.get(name)) or Box(connectionManagers.get(name))
+                              _.get(name)) or Box(connectionManagers.get(name))
       connection <- cmSuperConnection(connectionManager)
     } yield connection
 
@@ -584,8 +577,7 @@ trait DB extends Loggable {
                params: List[Any],
                connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[String]]) = {
-    use(connectionIdentifier)(
-        conn =>
+    use(connectionIdentifier)(conn =>
           prepareStatement(query, conn) { ps =>
         resultSetTo(setPreparedParams(ps, params).executeQuery)
     })
@@ -611,8 +603,7 @@ trait DB extends Loggable {
                    params: List[Any],
                    connectionIdentifier: ConnectionIdentifier)
     : (List[String], List[List[Any]]) = {
-    use(connectionIdentifier)(
-        conn =>
+    use(connectionIdentifier)(conn =>
           prepareStatement(query, conn) { ps =>
         resultSetToAny(setPreparedParams(ps, params).executeQuery)
     })
@@ -636,8 +627,7 @@ trait DB extends Loggable {
   def runUpdate(query: String,
                 params: List[Any],
                 connectionIdentifier: ConnectionIdentifier): Int = {
-    use(connectionIdentifier)(
-        conn =>
+    use(connectionIdentifier)(conn =>
           prepareStatement(query, conn) { ps =>
         setPreparedParams(ps, params).executeUpdate
     })

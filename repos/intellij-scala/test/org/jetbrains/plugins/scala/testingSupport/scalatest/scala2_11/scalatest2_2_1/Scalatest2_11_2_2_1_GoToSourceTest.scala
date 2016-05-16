@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTest2GoToSource
   * @since 22.01.2015
   */
 class Scalatest2_11_2_2_1_GoToSourceTest
-    extends Scalatest2_11_2_2_1_Base with ScalaTest2GoToSourceTest {}
+    extends Scalatest2_11_2_2_1_Base
+    with ScalaTest2GoToSourceTest {}

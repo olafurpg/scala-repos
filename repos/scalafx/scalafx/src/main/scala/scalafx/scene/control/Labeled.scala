@@ -45,7 +45,8 @@ object Labeled {
 }
 
 abstract class Labeled(override val delegate: jfxsc.Labeled)
-    extends Control(delegate) with AlignmentDelegate[jfxsc.Labeled]
+    extends Control(delegate)
+    with AlignmentDelegate[jfxsc.Labeled]
     with SFXDelegate[jfxsc.Labeled] {
 
   /**

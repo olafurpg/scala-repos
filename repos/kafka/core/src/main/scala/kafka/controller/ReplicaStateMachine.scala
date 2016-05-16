@@ -55,8 +55,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
   private val hasStarted = new AtomicBoolean(false)
   private val stateChangeLogger = KafkaController.stateChangeLogger
 
-  this.logIdent = "[Replica state machine on controller " +
-  controller.config.brokerId + "]: "
+  this.logIdent =
+    "[Replica state machine on controller " + controller.config.brokerId +
+    "]: "
 
   /**
     * Invoked on successful controller election. First registers a broker change listener since that triggers all
@@ -372,9 +373,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
             case None =>
               true
           }
-          if (leaderAndIsrIsEmpty &&
-              !controller.deleteTopicManager.isPartitionToBeDeleted(
-                  topicAndPartition))
+          if (leaderAndIsrIsEmpty && !controller.deleteTopicManager
+                .isPartitionToBeDeleted(topicAndPartition))
             throw new StateChangeFailedException(
                 "Failed to change state of replica %d for partition %s since the leader and isr path in zookeeper is empty"
                   .format(replicaId, topicAndPartition))
@@ -408,8 +408,8 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     val replicasForTopic = controller.controllerContext.replicasForTopic(topic)
     val replicaStatesForTopic =
       replicasForTopic.map(r => (r, replicaState(r))).toMap
-    replicaStatesForTopic.foldLeft(false)(
-        (deletionState, r) => deletionState || r._2 == ReplicaDeletionStarted)
+    replicaStatesForTopic.foldLeft(false)((deletionState, r) =>
+          deletionState || r._2 == ReplicaDeletionStarted)
   }
 
   def replicasInState(
@@ -487,8 +487,9 @@ class ReplicaStateMachine(controller: KafkaController) extends Logging {
     * This is the zookeeper listener that triggers all the state transitions for a replica
     */
   class BrokerChangeListener() extends IZkChildListener with Logging {
-    this.logIdent = "[BrokerChangeListener on Controller " +
-    controller.config.brokerId + "]: "
+    this.logIdent =
+      "[BrokerChangeListener on Controller " + controller.config.brokerId +
+      "]: "
     def handleChildChange(
         parentPath: String, currentBrokerList: java.util.List[String]) {
       info("Broker change listener fired for path %s with children %s".format(

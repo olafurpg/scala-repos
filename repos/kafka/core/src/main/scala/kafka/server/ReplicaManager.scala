@@ -78,8 +78,7 @@ case class LogReadResult(info: FetchDataInfo,
 
 object LogReadResult {
   val UnknownLogReadResult = LogReadResult(
-      FetchDataInfo(LogOffsetMetadata.UnknownOffsetMetadata,
-                    MessageSet.Empty),
+      FetchDataInfo(LogOffsetMetadata.UnknownOffsetMetadata, MessageSet.Empty),
       -1L,
       -1,
       false)
@@ -108,7 +107,8 @@ class ReplicaManager(val config: KafkaConfig,
                      val logManager: LogManager,
                      val isShuttingDown: AtomicBoolean,
                      threadNamePrefix: Option[String] = None)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
   /* epoch of the controller that last changed the leader */
   @volatile var controllerEpoch: Int =
     KafkaController.InitialControllerEpoch - 1
@@ -194,8 +194,7 @@ class ReplicaManager(val config: KafkaConfig,
   def maybePropagateIsrChanges() {
     val now = System.currentTimeMillis()
     isrChangeSet synchronized {
-      if (isrChangeSet.nonEmpty &&
-          (lastIsrChangeMs.get() +
+      if (isrChangeSet.nonEmpty && (lastIsrChangeMs.get() +
               ReplicaManager.IsrChangePropagationBlackOut < now ||
               lastIsrPropagationMs.get() +
               ReplicaManager.IsrChangePropagationInterval < now)) {
@@ -755,12 +754,12 @@ class ReplicaManager(val config: KafkaConfig,
     }
   }
 
-  def becomeLeaderOrFollower(
-      correlationId: Int,
-      leaderAndISRRequest: LeaderAndIsrRequest,
-      metadataCache: MetadataCache,
-      onLeadershipChange: (Iterable[Partition],
-      Iterable[Partition]) => Unit): BecomeLeaderOrFollowerResult = {
+  def becomeLeaderOrFollower(correlationId: Int,
+                             leaderAndISRRequest: LeaderAndIsrRequest,
+                             metadataCache: MetadataCache,
+                             onLeadershipChange: (Iterable[Partition],
+                                                  Iterable[Partition]) => Unit)
+    : BecomeLeaderOrFollowerResult = {
     leaderAndISRRequest.partitionStates.asScala.foreach {
       case (topicPartition, stateInfo) =>
         stateChangeLogger.trace(
@@ -1166,8 +1165,8 @@ class ReplicaManager(val config: KafkaConfig,
   private def maybeShrinkIsr(): Unit = {
     trace(
         "Evaluating ISR list of partitions to see which replicas can be removed from the ISR")
-    allPartitions.values.foreach(
-        partition => partition.maybeShrinkIsr(config.replicaLagTimeMaxMs))
+    allPartitions.values.foreach(partition =>
+          partition.maybeShrinkIsr(config.replicaLagTimeMaxMs))
   }
 
   private def updateFollowerLogReadResults(

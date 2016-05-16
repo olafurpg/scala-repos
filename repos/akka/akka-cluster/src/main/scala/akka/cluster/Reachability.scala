@@ -310,7 +310,7 @@ private[cluster] class Reachability private (
     val rows = for {
       observer ← versions.keys.toSeq.sorted
       rowsOption = observerRows(observer)
-          if rowsOption.isDefined // compilation err for subject <- rowsOption
+      if rowsOption.isDefined // compilation err for subject <- rowsOption
       rows = rowsOption.get
       subject ← rows.keys.toSeq.sorted
     } yield {

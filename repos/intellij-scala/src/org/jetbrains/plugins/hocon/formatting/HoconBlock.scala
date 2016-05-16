@@ -52,8 +52,8 @@ class HoconBlock(formatter: HoconFormatter,
 
   lazy val children: Seq[Block] = formatter
     .getChildren(node)
-    .filterNot(
-        n => n.getTextLength == 0 || n.getElementType == TokenType.WHITE_SPACE)
+    .filterNot(n =>
+          n.getTextLength == 0 || n.getElementType == TokenType.WHITE_SPACE)
     .map(createChildBlock)
     .toVector
 

@@ -63,7 +63,8 @@ trait SimpleInjector extends Injector {
     * the scope of the call.
     */
   abstract class Inject[T](_default: Vendor[T])(implicit man: Manifest[T])
-      extends StackableMaker[T] with Vendor[T] {
+      extends StackableMaker[T]
+      with Vendor[T] {
     registerInjection(this)(man)
 
     /**

@@ -10,7 +10,9 @@ import org.scalatest.{BeforeAndAfter, Matchers}
   * Common  tests for all persistent stores.
   */
 trait PersistentStoreTest
-    extends IntegrationFunSuite with Matchers with BeforeAndAfter {
+    extends IntegrationFunSuite
+    with Matchers
+    with BeforeAndAfter {
 
   //this parameter is used for futureValue timeouts
   implicit val patienceConfig = PatienceConfig(Span(10, Seconds))

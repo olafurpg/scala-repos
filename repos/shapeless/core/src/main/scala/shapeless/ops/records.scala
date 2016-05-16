@@ -216,7 +216,10 @@ package record {
   @annotation.implicitNotFound(
       msg = "No field ${F} with value of type ${A} in record ${L}")
   trait Modifier[L <: HList, F, A, B]
-      extends DepFn2[L, A => B] with Serializable { type Out <: HList }
+      extends DepFn2[L, A => B]
+      with Serializable {
+    type Out <: HList
+  }
 
   object Modifier {
     def apply[L <: HList, F, A, B](implicit modifier: Modifier[L, F, A, B])
@@ -226,8 +229,8 @@ package record {
       type Out = Out0
     }
 
-    implicit def hlistModify1[F, A, B, T <: HList]: Aux[
-        FieldType[F, A] :: T, F, A, B, FieldType[F, B] :: T] =
+    implicit def hlistModify1[F, A, B, T <: HList]
+      : Aux[FieldType[F, A] :: T, F, A, B, FieldType[F, B] :: T] =
       new Modifier[FieldType[F, A] :: T, F, A, B] {
         type Out = FieldType[F, B] :: T
         def apply(l: FieldType[F, A] :: T, f: A => B): Out =
@@ -268,8 +271,8 @@ package record {
     def apply[L <: HList, K](
         implicit remover: Remover[L, K]): Aux[L, K, remover.Out] = remover
 
-    implicit def hlistRemove1[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, K, (V, T)] =
+    implicit def hlistRemove1[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, K, (V, T)] =
       new Remover[FieldType[K, V] :: T, K] {
         type Out = (V, T)
         def apply(l: FieldType[K, V] :: T): Out = (l.head, l.tail)
@@ -309,8 +312,8 @@ package record {
     def apply[L <: HList, E](
         implicit remove: Remove[L, E]): Aux[L, E, remove.Out] = remove
 
-    implicit def removeHead[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, FieldType[K, V], (FieldType[K, V], T)] =
+    implicit def removeHead[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, FieldType[K, V], (FieldType[K, V], T)] =
       new Remove[FieldType[K, V] :: T, FieldType[K, V]] {
         type Out = (FieldType[K, V], T)
 
@@ -318,8 +321,8 @@ package record {
         def reinsert(out: Out): FieldType[K, V] :: T = out._1 :: out._2
       }
 
-    implicit def removeUnlabelledHead[K, V, T <: HList]: Aux[
-        FieldType[K, V] :: T, V, (V, T)] =
+    implicit def removeUnlabelledHead[K, V, T <: HList]
+      : Aux[FieldType[K, V] :: T, V, (V, T)] =
       new Remove[FieldType[K, V] :: T, V] {
         type Out = (V, T)
 
@@ -401,8 +404,8 @@ package record {
       type Out = Out0
     }
 
-    implicit def hlistRenamer1[T <: HList, K1, K2, V]: Aux[
-        FieldType[K1, V] :: T, K1, K2, FieldType[K2, V] :: T] =
+    implicit def hlistRenamer1[T <: HList, K1, K2, V]
+      : Aux[FieldType[K1, V] :: T, K1, K2, FieldType[K2, V] :: T] =
       new Renamer[FieldType[K1, V] :: T, K1, K2] {
         type Out = FieldType[K2, V] :: T
         def apply(l: FieldType[K1, V] :: T): Out =

@@ -68,12 +68,12 @@ object Serialization {
     * or protobuf "pair" structure that can safely store these pairs
     * over the long-term.
     */
-  implicit def kInjection[T : Codec]: Injection[(T, BatchID), Array[Byte]] = {
+  implicit def kInjection[T: Codec]: Injection[(T, BatchID), Array[Byte]] = {
     implicit val buf =
       Bufferable.viaInjection[(T, BatchID), (Array[Byte], Array[Byte])]
     Bufferable.injectionOf[(T, BatchID)]
   }
 
-  implicit def vInj[V : Codec]: Injection[(BatchID, V), Array[Byte]] =
+  implicit def vInj[V: Codec]: Injection[(BatchID, V), Array[Byte]] =
     Injection.connect[(BatchID, V), (V, BatchID), Array[Byte]]
 }

@@ -28,7 +28,8 @@ class DebugManager(
     broadcaster: ActorRef,
     config: EnsimeConfig
 )
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   // TODO this is built once on startup - probably makes sense for it to be done each time a debug vm is created
   private var sourceMap = new SourceMap(config)

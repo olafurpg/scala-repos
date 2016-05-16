@@ -28,7 +28,9 @@ import org.apache.spark.sql.sources._
 case class OrcData(intField: Int, stringField: String)
 
 abstract class OrcSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext._
 
   var orcTableDir: File = null
@@ -188,8 +190,7 @@ class OrcSourceSuite extends OrcSuite {
       """.stripMargin.trim
     ) {
       OrcFilters
-        .createFilter(
-            Array(
+        .createFilter(Array(
                 LessThan("a", 10),
                 Not(And(
                         GreaterThan("a", 1),

@@ -225,15 +225,14 @@ case class CatalogTable(name: TableIdentifier,
   def qualifiedName: String = name.unquotedString
 
   /** Syntactic sugar to update a field in `storage`. */
-  def withNewStorage(
-      locationUri: Option[String] = storage.locationUri,
-      inputFormat: Option[String] = storage.inputFormat,
-      outputFormat: Option[String] = storage.outputFormat,
-      serde: Option[String] = storage.serde,
-      serdeProperties: Map[String, String] = storage.serdeProperties)
-    : CatalogTable = {
+  def withNewStorage(locationUri: Option[String] = storage.locationUri,
+                     inputFormat: Option[String] = storage.inputFormat,
+                     outputFormat: Option[String] = storage.outputFormat,
+                     serde: Option[String] = storage.serde,
+                     serdeProperties: Map[String, String] =
+                       storage.serdeProperties): CatalogTable = {
     copy(storage = CatalogStorageFormat(
-              locationUri, inputFormat, outputFormat, serde, serdeProperties))
+            locationUri, inputFormat, outputFormat, serde, serdeProperties))
   }
 }
 

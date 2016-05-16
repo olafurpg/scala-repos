@@ -44,4 +44,5 @@ class ComboBoxTableCellSpec[S, T]
     extends SimpleSFXDelegateSpec[
         jfxscc.ComboBoxTableCell[S, T], ComboBoxTableCell[S, T]](
         classOf[jfxscc.ComboBoxTableCell[S, T]],
-        classOf[ComboBoxTableCell[S, T]]) with RunOnApplicationThread
+        classOf[ComboBoxTableCell[S, T]])
+    with RunOnApplicationThread

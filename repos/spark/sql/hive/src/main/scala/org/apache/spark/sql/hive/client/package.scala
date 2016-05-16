@@ -37,8 +37,8 @@ package object client {
     case object v14
         extends HiveVersion(
             "0.14.0",
-            extraDeps = Seq(
-                  "org.apache.calcite:calcite-core:1.3.0-incubating",
+            extraDeps =
+              Seq("org.apache.calcite:calcite-core:1.3.0-incubating",
                   "org.apache.calcite:calcite-avatica:1.3.0-incubating"),
             exclusions = Seq("org.pentaho:pentaho-aggdesigner-algorithm"))
 

@@ -20,7 +20,8 @@ class Indexer(
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
 )
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private def typeResult(hit: FqnSymbol) = TypeSearchResult(
       hit.fqn,

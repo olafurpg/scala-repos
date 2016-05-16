@@ -227,7 +227,8 @@ object ActorSelection {
                     emptyRef.tell(sel, sender)
                   else {
                     val m = sel.copy(elements = iter.toVector,
-                                     wildcardFanOut = sel.wildcardFanOut ||
+                                     wildcardFanOut =
+                                       sel.wildcardFanOut ||
                                        matchingChildren.size > 1)
                     matchingChildren.foreach(c ⇒
                           deliverSelection(
@@ -268,7 +269,8 @@ private[akka] final case class ActorSelectionMessage(
     msg: Any,
     elements: immutable.Iterable[SelectionPathElement],
     wildcardFanOut: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful {
+    extends AutoReceivedMessage
+    with PossiblyHarmful {
 
   def identifyRequest: Option[Identify] = msg match {
     case x: Identify ⇒ Some(x)

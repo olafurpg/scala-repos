@@ -73,7 +73,8 @@ import org.specs2.mutable.Specification
 import org.specs2.time.NoTimeConversions
 
 object ScalaTestingWebServiceClients
-    extends Specification with NoTimeConversions {
+    extends Specification
+    with NoTimeConversions {
 
   "webservice testing" should {
     "allow mocking a service" in {

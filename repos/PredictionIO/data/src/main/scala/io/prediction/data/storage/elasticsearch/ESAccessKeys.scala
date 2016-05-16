@@ -31,7 +31,8 @@ import scala.util.Random
 
 /** Elasticsearch implementation of AccessKeys. */
 class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
-    extends AccessKeys with Logging {
+    extends AccessKeys
+    with Logging {
   implicit val formats = DefaultFormats.lossless
   private val estype = "accesskeys"
 

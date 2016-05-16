@@ -79,9 +79,9 @@ object SimpleExpr extends ParserNode with ScalaTokenTypes {
             } else {
               var isTuple = false
               while (builder.getTokenType == ScalaTokenTypes.tCOMMA &&
-              !lookAhead(builder,
-                         ScalaTokenTypes.tCOMMA,
-                         ScalaTokenTypes.tRPARENTHESIS)) {
+                     !lookAhead(builder,
+                                ScalaTokenTypes.tCOMMA,
+                                ScalaTokenTypes.tRPARENTHESIS)) {
                 isTuple = true
                 builder.advanceLexer()
                 if (!Expr.parse(builder)) {

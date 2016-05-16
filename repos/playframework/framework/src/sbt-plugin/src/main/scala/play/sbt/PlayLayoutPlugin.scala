@@ -29,8 +29,10 @@ object PlayLayoutPlugin extends AutoPlugin {
       sourceDirectories in (Test, TwirlKeys.compileTemplates) :=
         Seq((sourceDirectory in Test).value),
       // sbt-web
-      sourceDirectory in Assets := (sourceDirectory in Compile).value / "assets",
-      sourceDirectory in TestAssets := (sourceDirectory in Test).value / "assets",
+      sourceDirectory in Assets :=
+        (sourceDirectory in Compile).value / "assets",
+      sourceDirectory in TestAssets :=
+        (sourceDirectory in Test).value / "assets",
       resourceDirectory in Assets := baseDirectory.value / "public",
       // Native packager
       sourceDirectory in Universal := baseDirectory.value / "dist"

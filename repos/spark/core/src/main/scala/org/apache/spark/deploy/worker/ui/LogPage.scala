@@ -28,7 +28,8 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.logging.RollingFileAppender
 
 private[ui] class LogPage(parent: WorkerWebUI)
-    extends WebUIPage("logPage") with Logging {
+    extends WebUIPage("logPage")
+    with Logging {
   private val worker = parent.worker
   private val workDir = new File(parent.workDir.toURI.normalize().getPath)
   private val supportedLogTypes = Set("stderr", "stdout")
@@ -144,11 +145,11 @@ private[ui] class LogPage(parent: WorkerWebUI)
   ): (String, Long, Long, Long) = {
 
     if (!supportedLogTypes.contains(logType)) {
-      return (
-          "Error: Log type must be one of " + supportedLogTypes.mkString(", "),
-          0,
-          0,
-          0)
+      return ("Error: Log type must be one of " + supportedLogTypes.mkString(
+                  ", "),
+              0,
+              0,
+              0)
     }
 
     // Verify that the normalized path of the log directory is in the working directory

@@ -33,9 +33,12 @@ import scala.annotation.tailrec
     "The implementation details of immutable hash sets make inheriting from them unwise.",
     "2.11.0")
 class HashSet[A]
-    extends AbstractSet[A] with Set[A]
-    with GenericSetTemplate[A, HashSet] with SetLike[A, HashSet[A]]
-    with CustomParallelizable[A, ParHashSet[A]] with Serializable {
+    extends AbstractSet[A]
+    with Set[A]
+    with GenericSetTemplate[A, HashSet]
+    with SetLike[A, HashSet[A]]
+    with CustomParallelizable[A, ParHashSet[A]]
+    with Serializable {
   import HashSet.{nullToEmpty, bufferSize, LeafHashSet}
 
   override def companion: GenericCompanion[HashSet] = HashSet
@@ -675,7 +678,7 @@ object HashSet extends ImmutableSetFactory[HashSet] {
         var rs = 0
 
         // loop as long as there are bits left in either abm or bbm
-        while ( (abm | bbm) != 0) {
+        while ((abm | bbm) != 0) {
           // lowest remaining bit in abm
           val alsb = abm ^ (abm & (abm - 1))
           // lowest remaining bit in bbm
@@ -765,7 +768,7 @@ object HashSet extends ImmutableSetFactory[HashSet] {
         var rbm = 0
 
         // loop as long as there are bits left that are set in both abm and bbm
-        while ( (abm & bbm) != 0) {
+        while ((abm & bbm) != 0) {
           // highest remaining bit in abm
           val alsb = abm ^ (abm & (abm - 1))
           // highest remaining bit in bbm

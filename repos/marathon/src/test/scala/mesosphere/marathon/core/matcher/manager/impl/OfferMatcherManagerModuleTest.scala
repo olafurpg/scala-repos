@@ -24,7 +24,9 @@ import scala.util.Random
 import scala.collection.JavaConverters._
 
 class OfferMatcherManagerModuleTest
-    extends FunSuite with BeforeAndAfter with MarathonShutdownHookSupport
+    extends FunSuite
+    with BeforeAndAfter
+    with MarathonShutdownHookSupport
     with Matchers {
 
   // FIXME: Missing Tests

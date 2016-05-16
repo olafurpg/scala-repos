@@ -283,8 +283,8 @@ class AlgebraicTest extends SpireProperties {
     def genDiv(depth: Int): Gen[RationalAlgebraic] =
       for {
         RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
-        RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1) if
-                                        (rhsQ.signum != 0)
+        RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+        if (rhsQ.signum != 0)
       } yield RationalAlgebraic(lhsA / rhsA, lhsQ / rhsQ)
 
     def genNeg(depth: Int): Gen[RationalAlgebraic] =

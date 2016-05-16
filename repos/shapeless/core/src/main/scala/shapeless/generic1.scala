@@ -68,8 +68,8 @@ trait IsHCons1[L[_], FH[_ [_]], FT[_ [_]]] extends Serializable {
 }
 
 object IsHCons1 extends IsHCons10 {
-  type Aux[L[_], FH[_ [_]], FT[_ [_]], H0[_], T0[_] <: HList] = IsHCons1[
-      L, FH, FT] { type H[t] = H0[t]; type T[t] = T0[t] }
+  type Aux[L[_], FH[_ [_]], FT[_ [_]], H0[_], T0[_] <: HList] =
+    IsHCons1[L, FH, FT] { type H[t] = H0[t]; type T[t] = T0[t] }
 
   implicit def apply[L[_], FH[_ [_]], FT[_ [_]]]: IsHCons1[L, FH, FT] = macro IsHCons1Macros
     .mkIsHCons1Impl[L, FH, FT]
@@ -108,8 +108,8 @@ trait IsCCons1[L[_], FH[_ [_]], FT[_ [_]]] extends Serializable {
 }
 
 object IsCCons1 extends IsCCons10 {
-  type Aux[L[_], FH[_ [_]], FT[_ [_]], H0[_], T0[_] <: Coproduct] = IsCCons1[
-      L, FH, FT] { type H[t] = H0[t]; type T[t] = T0[t] }
+  type Aux[L[_], FH[_ [_]], FT[_ [_]], H0[_], T0[_] <: Coproduct] =
+    IsCCons1[L, FH, FT] { type H[t] = H0[t]; type T[t] = T0[t] }
 
   implicit def apply[L[_], FH[_ [_]], FT[_ [_]]]: IsCCons1[L, FH, FT] = macro IsCCons1Macros
     .mkIsCCons1Impl[L, FH, FT]

@@ -37,8 +37,8 @@ final class StreamerList(
                        case s => sys error s"Invalid service name: $s"
                      },
                      streamerName = c getString "streamer_name",
-                     streamerNameForDisplay = Try(
-                           c getString "streamer_name_for_display").toOption,
+                     streamerNameForDisplay =
+                       Try(c getString "streamer_name_for_display").toOption,
                      lichessName = c getString "lichess_name",
                      featured = c.getBoolean("featured"),
                      chat = c.getBoolean("chat"))
@@ -47,10 +47,8 @@ final class StreamerList(
         .foldLeft(List.empty[Streamer] -> List.empty[Exception]) {
           case ((res, err), Success(r)) => (r :: res, err)
           case ((res, err), Failure(e: Exception)) =>
-            lila
-              .log("tv")
-              .warn("streamer", e)
-              (res, e :: err)
+            lila.log("tv").warn("streamer", e)
+            (res, e :: err)
           case (_, Failure(e)) => throw e
         }
     } match {

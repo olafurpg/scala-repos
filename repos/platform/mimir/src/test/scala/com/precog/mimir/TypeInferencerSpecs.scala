@@ -33,7 +33,8 @@ import blueeyes.json._
 import scalaz._
 
 trait TypeInferencerSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
 
   import dag._
@@ -527,37 +528,41 @@ trait TypeInferencerSpecs[M[+ _]]
 
       // clicks := //clicks forall 'user { user: 'user, age: clicks.age, num: count(clicks.user where clicks.user = 'user) }
       val input =
-        Split(Group(0,
-                    Join(DerefObject,
-                         Cross(None),
-                         clicks,
-                         Const(CString("user"))(line))(line),
-                    UnfixedSolution(1,
-                                    Join(DerefObject,
-                                         Cross(None),
-                                         clicks,
-                                         Const(CString("user"))(line))(line))),
-              Join(JoinObject,
-                   Cross(None),
-                   Join(JoinObject,
-                        Cross(None),
-                        Join(WrapObject,
-                             Cross(None),
-                             Const(CString("user"))(line),
-                             SplitParam(1, id)(line))(line),
-                        Join(WrapObject,
-                             Cross(None),
-                             Const(CString("num"))(line),
-                             Reduce(Count,
-                                    SplitGroup(0, clicks.identities, id)(
-                                        line))(line))(line))(line),
-                   Join(WrapObject,
-                        Cross(None),
-                        Const(CString("age"))(line),
-                        Join(DerefObject,
-                             Cross(None),
-                             clicks,
-                             Const(CString("age"))(line))(line))(line))(line),
+        Split(Group(
+                  0,
+                  Join(DerefObject,
+                       Cross(None),
+                       clicks,
+                       Const(CString("user"))(line))(line),
+                  UnfixedSolution(
+                      1,
+                      Join(DerefObject,
+                           Cross(None),
+                           clicks,
+                           Const(CString("user"))(line))(line))),
+              Join(
+                  JoinObject,
+                  Cross(None),
+                  Join(
+                      JoinObject,
+                      Cross(None),
+                      Join(WrapObject,
+                           Cross(None),
+                           Const(CString("user"))(line),
+                           SplitParam(1, id)(line))(line),
+                      Join(WrapObject,
+                           Cross(None),
+                           Const(CString("num"))(line),
+                           Reduce(Count,
+                                  SplitGroup(0, clicks.identities, id)(line))(
+                               line))(line))(line),
+                  Join(WrapObject,
+                       Cross(None),
+                       Const(CString("age"))(line),
+                       Join(DerefObject,
+                            Cross(None),
+                            clicks,
+                            Const(CString("age"))(line))(line))(line))(line),
               id)(line)
 
       val result = extractLoads(inferTypes(JType.JPrimitiveUnfixedT)(input))
@@ -662,4 +667,5 @@ trait TypeInferencerSpecs[M[+ _]]
 }
 
 object TypeInferencerSpecs
-    extends TypeInferencerSpecs[test.YId] with test.YIdInstances
+    extends TypeInferencerSpecs[test.YId]
+    with test.YIdInstances

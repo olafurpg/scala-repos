@@ -20,7 +20,8 @@ import akka.serialization.SerializerWithStringManifest
   * Protobuf serializer for [[akka.cluster.metrics.ClusterMetricsMessage]] types.
   */
 class MessageSerializer(val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
 
   private final val BufferSize = 4 * 1024
 
@@ -134,8 +135,8 @@ class MessageSerializer(val system: ExtendedActorSystem)
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
     val addressMapping = allAddresses.zipWithIndex.toMap
     val allMetricNames: Vector[String] = allNodeMetrics
-      .foldLeft(Set.empty[String])(
-          (s, n) ⇒ s ++ n.metrics.iterator.map(_.name))
+      .foldLeft(Set.empty[String])((s, n) ⇒
+            s ++ n.metrics.iterator.map(_.name))
       .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =

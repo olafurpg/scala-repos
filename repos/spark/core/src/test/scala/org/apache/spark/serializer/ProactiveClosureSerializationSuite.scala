@@ -28,7 +28,8 @@ class UnserializableClass {
 }
 
 class ProactiveClosureSerializationSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
 
   def fixture: (RDD[String], UnserializableClass) = {
     (sc.parallelize(0 until 1000).map(_.toString), new UnserializableClass)
@@ -47,11 +48,11 @@ class ProactiveClosureSerializationSuite
   // transformation on a given RDD, creating one test case for each
 
   for (transformation <- Map(
-      "map" -> xmap _,
-      "flatMap" -> xflatMap _,
-      "filter" -> xfilter _,
-      "mapPartitions" -> xmapPartitions _,
-      "mapPartitionsWithIndex" -> xmapPartitionsWithIndex _)) {
+                            "map" -> xmap _,
+                            "flatMap" -> xflatMap _,
+                            "filter" -> xfilter _,
+                            "mapPartitions" -> xmapPartitions _,
+                            "mapPartitionsWithIndex" -> xmapPartitionsWithIndex _)) {
     val (name, xf) = transformation
 
     test(s"$name transformations throw proactive serialization exceptions") {

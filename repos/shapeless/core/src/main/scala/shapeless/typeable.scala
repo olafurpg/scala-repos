@@ -125,7 +125,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && erased.isAssignableFrom(t.getClass))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = {
         // Workaround for https://issues.scala-lang.org/browse/SI-5425
@@ -160,7 +161,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && parents.forall(_.cast(t).isDefined))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = parents map (_.describe) mkString " with "
     }
@@ -378,7 +380,7 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
   import internal._
   import definitions.NothingClass
 
-  def dfltTypeableImpl[T : WeakTypeTag]: Tree = {
+  def dfltTypeableImpl[T: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
 
     val typeableTpe = typeOf[Typeable[_]].typeConstructor

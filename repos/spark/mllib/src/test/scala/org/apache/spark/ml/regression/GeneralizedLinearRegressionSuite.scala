@@ -33,7 +33,8 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions._
 
 class GeneralizedLinearRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   private val seed: Int = 42
@@ -79,12 +80,15 @@ class GeneralizedLinearRegressionSuite
                            link = "log"),
                        2))
 
-    datasetGaussianInverse = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 2.5,
-                           coefficients = Array(2.2, 0.6),
-                           xMean = Array(2.9, 10.5),
-                           xVariance = Array(0.7, 1.2),
+    datasetGaussianInverse =
+      sqlContext.createDataFrame(sc
+            .parallelize(
+              generateGeneralizedLinearRegressionInput(intercept = 2.5,
+                                                       coefficients =
+                                                         Array(2.2, 0.6),
+                                                       xMean =
+                                                         Array(2.9, 10.5),
+                                                       xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
                            seed,
                            noiseLevel = 0.01,
@@ -105,10 +109,13 @@ class GeneralizedLinearRegressionSuite
       sqlContext.createDataFrame(sc.parallelize(testData, 2))
     }
 
-    datasetPoissonLog = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 0.25,
-                           coefficients = Array(0.22, 0.06),
+    datasetPoissonLog =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(generateGeneralizedLinearRegressionInput(
+                             intercept = 0.25,
+                             coefficients =
+                               Array(0.22, 0.06),
                            xMean = Array(2.9, 10.5),
                            xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
@@ -118,12 +125,15 @@ class GeneralizedLinearRegressionSuite
                            link = "log"),
                        2))
 
-    datasetPoissonIdentity = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 2.5,
-                           coefficients = Array(2.2, 0.6),
-                           xMean = Array(2.9, 10.5),
-                           xVariance = Array(0.7, 1.2),
+    datasetPoissonIdentity =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(
+              generateGeneralizedLinearRegressionInput(
+                  intercept = 2.5,
+                  coefficients = Array(2.2, 0.6),
+                  xMean = Array(2.9, 10.5),
+                  xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
                            seed,
                            noiseLevel = 0.01,
@@ -131,12 +141,15 @@ class GeneralizedLinearRegressionSuite
                            link = "identity"),
                        2))
 
-    datasetPoissonSqrt = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 2.5,
-                           coefficients = Array(2.2, 0.6),
-                           xMean = Array(2.9, 10.5),
-                           xVariance = Array(0.7, 1.2),
+    datasetPoissonSqrt =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(
+              generateGeneralizedLinearRegressionInput(
+                  intercept = 2.5,
+                  coefficients = Array(2.2, 0.6),
+                  xMean = Array(2.9, 10.5),
+                  xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
                            seed,
                            noiseLevel = 0.01,
@@ -144,12 +157,15 @@ class GeneralizedLinearRegressionSuite
                            link = "sqrt"),
                        2))
 
-    datasetGammaInverse = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 2.5,
-                           coefficients = Array(2.2, 0.6),
-                           xMean = Array(2.9, 10.5),
-                           xVariance = Array(0.7, 1.2),
+    datasetGammaInverse =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(
+              generateGeneralizedLinearRegressionInput(
+                  intercept = 2.5,
+                  coefficients = Array(2.2, 0.6),
+                  xMean = Array(2.9, 10.5),
+                  xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
                            seed,
                            noiseLevel = 0.01,
@@ -157,12 +173,15 @@ class GeneralizedLinearRegressionSuite
                            link = "inverse"),
                        2))
 
-    datasetGammaIdentity = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 2.5,
-                           coefficients = Array(2.2, 0.6),
-                           xMean = Array(2.9, 10.5),
-                           xVariance = Array(0.7, 1.2),
+    datasetGammaIdentity =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(
+              generateGeneralizedLinearRegressionInput(
+                  intercept = 2.5,
+                  coefficients = Array(2.2, 0.6),
+                  xMean = Array(2.9, 10.5),
+                  xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
                            seed,
                            noiseLevel = 0.01,
@@ -170,10 +189,13 @@ class GeneralizedLinearRegressionSuite
                            link = "identity"),
                        2))
 
-    datasetGammaLog = sqlContext.createDataFrame(
-        sc.parallelize(generateGeneralizedLinearRegressionInput(
-                           intercept = 0.25,
-                           coefficients = Array(0.22, 0.06),
+    datasetGammaLog =
+      sqlContext
+        .createDataFrame(
+          sc.parallelize(generateGeneralizedLinearRegressionInput(
+                             intercept = 0.25,
+                             coefficients =
+                               Array(0.22, 0.06),
                            xMean = Array(2.9, 10.5),
                            xVariance = Array(0.7, 1.2),
                            nPoints = 10000,
@@ -397,7 +419,7 @@ class GeneralizedLinearRegressionSuite
 
     var idx = 0
     for (fitIntercept <- Seq(false, true);
-    regParam <- Seq(0.0, 0.1, 1.0)) {
+         regParam <- Seq(0.0, 0.1, 1.0)) {
       val trainer = new GeneralizedLinearRegression()
         .setFamily("gaussian")
         .setFitIntercept(fitIntercept)

@@ -67,7 +67,8 @@ class JavaActionAnnotations(
  * An action that's handling Java requests
  */
 abstract class JavaAction(components: JavaHandlerComponents)
-    extends Action[play.mvc.Http.RequestBody] with JavaHelpers {
+    extends Action[play.mvc.Http.RequestBody]
+    with JavaHelpers {
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 

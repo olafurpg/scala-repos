@@ -15,7 +15,7 @@ object Foo extends LowPriority {
 }
 
 object Macros {
-  def impl[T : c.WeakTypeTag](c: Context) = {
+  def impl[T: c.WeakTypeTag](c: Context) = {
     import c.universe._
     val tpe = weakTypeOf[T]
     if (tpe.members.exists(_.info =:= typeOf[Int]))

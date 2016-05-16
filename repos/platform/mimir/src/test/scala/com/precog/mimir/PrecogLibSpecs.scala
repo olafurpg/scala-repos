@@ -32,7 +32,8 @@ import com.precog.util.IdGen
 import com.precog.util.IOUtils
 
 trait PrecogLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -52,7 +53,7 @@ trait PrecogLibSpecs[M[+ _]]
   }
 
   private val line = Line(1, 1, "")
-  private def const[A : CValueType](a: A) = Const(CValueType[A](a))(line)
+  private def const[A: CValueType](a: A) = Const(CValueType[A](a))(line)
 
   val echo =
     Join(WrapObject, Cross(None), const("url"), const("http://echo"))(line)

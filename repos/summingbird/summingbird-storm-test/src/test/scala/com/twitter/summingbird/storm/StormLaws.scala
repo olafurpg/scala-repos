@@ -57,21 +57,20 @@ object StormLaws {
 
   implicit val storm = Storm.local(Map())
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   def genStore: (String, Storm#Store[Int, Int]) =
     TestStore.createStore[Int, Int]()
 
   def genSink: () => ((Int) => Future[Unit]) =
-    () =>
-      { x: Int =>
-        append(x)
-        Future.Unit
+    () => { x: Int =>
+      append(x)
+      Future.Unit
     }
 
   def memoryPlanWithoutSummer(original: List[Int])(
       mkJob: (Producer[Memory, Int],
-      Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
+              Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
     val memory = new Memory
     val outputList = ArrayBuffer[Int]()
     val sink: (Int) => Unit = { x: Int =>
@@ -93,7 +92,7 @@ object StormLaws {
 
   def runWithOutSummer(original: List[Int])(
       mkJob: (Producer[Storm, Int],
-      Storm#Sink[Int]) => TailProducer[Storm, Int]): List[Int] = {
+              Storm#Sink[Int]) => TailProducer[Storm, Int]): List[Int] = {
     val cluster = new LocalCluster()
 
     val job = mkJob(

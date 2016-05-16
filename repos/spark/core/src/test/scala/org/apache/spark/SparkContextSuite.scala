@@ -133,42 +133,41 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       val length1 = file1.length()
       val length2 = file2.length()
 
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
       sc.addFile(file1.getAbsolutePath)
       sc.addFile(relativePath)
       sc.parallelize(Array(1), 1)
-        .map(x =>
-              {
-            val gotten1 = new File(SparkFiles.get(file1.getName))
-            val gotten2 = new File(SparkFiles.get(file2.getName))
-            if (!gotten1.exists()) {
-              throw new SparkException("file doesn't exist : " + absolutePath1)
-            }
-            if (!gotten2.exists()) {
-              throw new SparkException("file doesn't exist : " + absolutePath2)
-            }
+        .map(x => {
+          val gotten1 = new File(SparkFiles.get(file1.getName))
+          val gotten2 = new File(SparkFiles.get(file2.getName))
+          if (!gotten1.exists()) {
+            throw new SparkException("file doesn't exist : " + absolutePath1)
+          }
+          if (!gotten2.exists()) {
+            throw new SparkException("file doesn't exist : " + absolutePath2)
+          }
 
-            if (length1 != gotten1.length()) {
-              throw new SparkException(
-                  s"file has different length $length1 than added file ${gotten1.length()} : " +
-                  absolutePath1)
-            }
-            if (length2 != gotten2.length()) {
-              throw new SparkException(
-                  s"file has different length $length2 than added file ${gotten2.length()} : " +
-                  absolutePath2)
-            }
+          if (length1 != gotten1.length()) {
+            throw new SparkException(
+                s"file has different length $length1 than added file ${gotten1.length()} : " +
+                absolutePath1)
+          }
+          if (length2 != gotten2.length()) {
+            throw new SparkException(
+                s"file has different length $length2 than added file ${gotten2.length()} : " +
+                absolutePath2)
+          }
 
-            if (absolutePath1 == gotten1.getAbsolutePath) {
-              throw new SparkException(
-                  "file should have been copied :" + absolutePath1)
-            }
-            if (absolutePath2 == gotten2.getAbsolutePath) {
-              throw new SparkException(
-                  "file should have been copied : " + absolutePath2)
-            }
-            x
+          if (absolutePath1 == gotten1.getAbsolutePath) {
+            throw new SparkException(
+                "file should have been copied :" + absolutePath1)
+          }
+          if (absolutePath2 == gotten2.getAbsolutePath) {
+            throw new SparkException(
+                "file should have been copied : " + absolutePath2)
+          }
+          x
         })
         .count()
     } finally {
@@ -184,27 +183,26 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     val alien2 = File.createTempFile("alien", "2", saturn)
 
     try {
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
       sc.addFile(neptune.getAbsolutePath, true)
       sc.parallelize(Array(1), 1)
-        .map(x =>
-              {
-            val sep = File.separator
-            if (!new File(SparkFiles.get(
-                        neptune.getName + sep + alien1.getName)).exists()) {
-              throw new SparkException(
-                  "can't access file under root added directory")
-            }
-            if (!new File(SparkFiles.get(neptune.getName + sep +
-                        saturn.getName + sep + alien2.getName)).exists()) {
-              throw new SparkException("can't access file in nested directory")
-            }
-            if (new File(SparkFiles.get(pluto.getName + sep + neptune.getName +
-                        sep + alien1.getName)).exists()) {
-              throw new SparkException("file exists that shouldn't")
-            }
-            x
+        .map(x => {
+          val sep = File.separator
+          if (!new File(SparkFiles.get(neptune.getName + sep + alien1.getName))
+                .exists()) {
+            throw new SparkException(
+                "can't access file under root added directory")
+          }
+          if (!new File(SparkFiles.get(neptune.getName + sep + saturn.getName +
+                      sep + alien2.getName)).exists()) {
+            throw new SparkException("can't access file in nested directory")
+          }
+          if (new File(SparkFiles.get(pluto.getName + sep + neptune.getName +
+                      sep + alien1.getName)).exists()) {
+            throw new SparkException("file exists that shouldn't")
+          }
+          x
         })
         .count()
     } finally {
@@ -216,8 +214,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     val dir = Utils.createTempDir()
 
     try {
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
       intercept[SparkException] {
         sc.addFile(dir.getAbsolutePath)
       }
@@ -229,8 +227,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
   test(
       "Cancelling job group should not cause SparkContext to shutdown (SPARK-6414)") {
     try {
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
       val future =
         sc.parallelize(Seq(0)).foreachAsync(_ => { Thread.sleep(1000L) })
       sc.cancelJobGroup("nonExistGroupId")
@@ -286,8 +284,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
                   file5,
                   StandardCharsets.UTF_8)
 
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
 
       // Test textFile, hadoopFile, and newAPIHadoopFile for file1 and file2
       assert(sc.textFile(filepath1 + "," + filepath2).count() == 5L)
@@ -329,8 +327,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test("Default path for file based RDDs is properly set (SPARK-12517)") {
-    sc = new SparkContext(
-        new SparkConf().setAppName("test").setMaster("local"))
+    sc =
+      new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
 
     // Test filetextFile, wholeTextFiles, binaryFiles, hadoopFile and
     // newAPIHadoopFile for setting the default path as the RDD name
@@ -356,8 +354,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
 
   test("calling multiple sc.stop() must not throw any exception") {
     noException should be thrownBy {
-      sc = new SparkContext(
-          new SparkConf().setAppName("test").setMaster("local"))
+      sc =
+        new SparkContext(new SparkConf().setAppName("test").setMaster("local"))
       val cnt = sc.parallelize(1 to 4).count()
       sc.cancelAllJobs()
       sc.stop()

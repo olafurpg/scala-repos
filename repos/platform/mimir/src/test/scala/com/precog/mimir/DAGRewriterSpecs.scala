@@ -31,7 +31,8 @@ import scalaz.std.option.optionFirst
 import scalaz.syntax.comonad._
 
 trait DAGRewriterSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification
+    with EvaluatorTestSupport[M] {
 
   import dag._
   import instructions._
@@ -106,4 +107,5 @@ trait DAGRewriterSpecs[M[+ _]]
 }
 
 object DAGRewriterSpecs
-    extends DAGRewriterSpecs[test.YId] with test.YIdInstances
+    extends DAGRewriterSpecs[test.YId]
+    with test.YIdInstances

@@ -41,7 +41,8 @@ class PageRank(args: Args) extends Job(args) {
      * We distinguish these two types with an id which nodes if this is a NODESET or an EDGE.
      * The first step is to append that value.  We also need to have a column for the degree.
      * It doesn't matter what the initial degree is, we recompute below
-     */.map(() -> ('rowtype, 'd_src)) { (u: Unit) =>
+     */
+    .map(() -> ('rowtype, 'd_src)) { (u: Unit) =>
       (NODESET, -1)
     }
     .thenDo(doPageRank(STEPS) _)
@@ -60,8 +61,8 @@ class PageRank(args: Args) extends Job(args) {
        * and output should be swapping.
        */
       val nextArgs =
-        args + ("input", Some(args("output"))) + ("temp", Some(args("output"))) +
-        ("output",
+        args + ("input", Some(args("output"))) +
+        ("temp", Some(args("output"))) + ("output",
             Some(args("temp"))) + ("jobCount", Some((JOB_COUNT + 1).toString))
       //Actually read the error:
       val error = TypedTsv[Double](args("errorOut")).toIterator.next;

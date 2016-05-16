@@ -27,8 +27,13 @@ import typer._
 import emitter._
 
 object PhasesSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with GroupSolver with RawErrors
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with GroupSolver
+    with RawErrors
     with RandomLibrarySpec {
 
   "full compiler" should {

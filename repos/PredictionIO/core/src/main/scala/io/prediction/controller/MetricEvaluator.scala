@@ -145,8 +145,8 @@ object MetricEvaluator {
            engineFactory = evaluation.getClass.getName,
            datasource = new NameParams(engineParams.dataSourceParams),
            preparator = new NameParams(engineParams.preparatorParams),
-           algorithms = engineParams.algorithmParamsList.map(
-                 np => new NameParams(np)),
+           algorithms =
+             engineParams.algorithmParamsList.map(np => new NameParams(np)),
            serving = new NameParams(engineParams.servingParams))
   }
 }
@@ -186,12 +186,12 @@ class MetricEvaluator[EI, Q, P, A, R](
         id = s"$evalClassName $now",
         description = "",
         engineFactory = evalClassName,
-        datasource = new MetricEvaluator.NameParams(
-              engineParams.dataSourceParams),
-        preparator = new MetricEvaluator.NameParams(
-              engineParams.preparatorParams),
-        algorithms = engineParams.algorithmParamsList.map(
-              np => new MetricEvaluator.NameParams(np)),
+        datasource =
+          new MetricEvaluator.NameParams(engineParams.dataSourceParams),
+        preparator =
+          new MetricEvaluator.NameParams(engineParams.preparatorParams),
+        algorithms = engineParams.algorithmParamsList.map(np =>
+              new MetricEvaluator.NameParams(np)),
         serving = new MetricEvaluator.NameParams(engineParams.servingParams))
 
     implicit lazy val formats = Utils.json4sDefaultFormats

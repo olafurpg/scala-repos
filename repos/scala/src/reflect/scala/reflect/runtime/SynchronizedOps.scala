@@ -4,7 +4,8 @@ package runtime
 
 // SI-6240: test thread-safety, make trees synchronized as well
 private[reflect] trait SynchronizedOps
-    extends internal.SymbolTable with SynchronizedSymbols
+    extends internal.SymbolTable
+    with SynchronizedSymbols
     with SynchronizedTypes {
   self: SymbolTable =>
 

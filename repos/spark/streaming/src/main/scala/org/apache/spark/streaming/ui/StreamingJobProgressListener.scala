@@ -28,7 +28,8 @@ import org.apache.spark.streaming.{StreamingContext, Time}
 import org.apache.spark.streaming.scheduler._
 
 private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
-    extends StreamingListener with SparkListener {
+    extends StreamingListener
+    with SparkListener {
 
   private val waitingBatchUIData = new HashMap[Time, BatchUIData]
   private val runningBatchUIData = new HashMap[Time, BatchUIData]
@@ -70,28 +71,31 @@ private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
   override def onReceiverStarted(
       receiverStarted: StreamingListenerReceiverStarted) {
     synchronized {
-      receiverInfos(receiverStarted.receiverInfo.streamId) = receiverStarted.receiverInfo
+      receiverInfos(receiverStarted.receiverInfo.streamId) =
+        receiverStarted.receiverInfo
     }
   }
 
   override def onReceiverError(receiverError: StreamingListenerReceiverError) {
     synchronized {
-      receiverInfos(receiverError.receiverInfo.streamId) = receiverError.receiverInfo
+      receiverInfos(receiverError.receiverInfo.streamId) =
+        receiverError.receiverInfo
     }
   }
 
   override def onReceiverStopped(
       receiverStopped: StreamingListenerReceiverStopped) {
     synchronized {
-      receiverInfos(receiverStopped.receiverInfo.streamId) = receiverStopped.receiverInfo
+      receiverInfos(receiverStopped.receiverInfo.streamId) =
+        receiverStopped.receiverInfo
     }
   }
 
   override def onBatchSubmitted(
       batchSubmitted: StreamingListenerBatchSubmitted): Unit = {
     synchronized {
-      waitingBatchUIData(batchSubmitted.batchInfo.batchTime) = BatchUIData(
-          batchSubmitted.batchInfo)
+      waitingBatchUIData(batchSubmitted.batchInfo.batchTime) =
+        BatchUIData(batchSubmitted.batchInfo)
     }
   }
 
@@ -144,8 +148,8 @@ private[streaming] class StreamingJobProgressListener(ssc: StreamingContext)
           var outputOpIdToSparkJobIds =
             batchTimeToOutputOpIdSparkJobIdPair.get(batchTime)
           if (outputOpIdToSparkJobIds == null) {
-            outputOpIdToSparkJobIds = new ConcurrentLinkedQueue[
-                OutputOpIdAndSparkJobId]()
+            outputOpIdToSparkJobIds =
+              new ConcurrentLinkedQueue[OutputOpIdAndSparkJobId]()
             batchTimeToOutputOpIdSparkJobIdPair.put(batchTime,
                                                     outputOpIdToSparkJobIds)
           }

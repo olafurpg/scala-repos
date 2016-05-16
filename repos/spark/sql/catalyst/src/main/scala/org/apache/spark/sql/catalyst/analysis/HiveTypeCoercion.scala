@@ -88,8 +88,7 @@ object HiveTypeCoercion {
   /** Similar to [[findTightestCommonType]], but can promote all the way to StringType. */
   private def findTightestCommonTypeToString(
       left: DataType, right: DataType): Option[DataType] = {
-    findTightestCommonTypeOfTwo(left, right).orElse(
-        (left, right) match {
+    findTightestCommonTypeOfTwo(left, right).orElse((left, right) match {
       case (StringType, t2: AtomicType)
           if t2 != BinaryType && t2 != BooleanType =>
         Some(StringType)
@@ -106,8 +105,7 @@ object HiveTypeCoercion {
     */
   private def findTightestCommonTypeAndPromoteToString(
       types: Seq[DataType]): Option[DataType] = {
-    types.foldLeft[Option[DataType]](Some(NullType))(
-        (r, c) =>
+    types.foldLeft[Option[DataType]](Some(NullType))((r, c) =>
           r match {
         case None => None
         case Some(d) =>
@@ -228,8 +226,8 @@ object HiveTypeCoercion {
         s.makeCopy(Array(newChildren.head, newChildren.last))
 
       case s: Union
-          if s.childrenResolved && s.children
-            .forall(_.output.length == s.children.head.output.length) &&
+          if s.childrenResolved && s.children.forall(
+              _.output.length == s.children.head.output.length) &&
           !s.resolved =>
         val newChildren: Seq[LogicalPlan] =
           buildNewChildrenWithWiderTypes(s.children)

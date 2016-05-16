@@ -21,7 +21,8 @@ import sbt.io.IO
   * Note: This should never hit somethign remote, as it just looks in the maven cache for things already resolved.
   */
 class MavenCacheRepositoryResolver(val repo: MavenCache, settings: IvySettings)
-    extends MavenRepositoryResolver(settings) with CustomMavenResolver {
+    extends MavenRepositoryResolver(settings)
+    with CustomMavenResolver {
   setName(repo.name)
   protected val system = MavenRepositorySystemFactory.newRepositorySystemImpl
   IO.createDirectory(repo.rootFile)

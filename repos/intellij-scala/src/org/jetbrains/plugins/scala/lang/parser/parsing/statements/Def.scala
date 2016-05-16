@@ -45,7 +45,7 @@ object Def {
         while (Modifier.parse(builder)) {}
       } else {
         while (builder.getTokenType == ScalaTokenTypes.kIMPLICIT ||
-        builder.getTokenType == ScalaTokenTypes.kLAZY) {
+               builder.getTokenType == ScalaTokenTypes.kLAZY) {
           builder.advanceLexer()
         }
       }

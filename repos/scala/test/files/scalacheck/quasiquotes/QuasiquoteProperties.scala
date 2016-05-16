@@ -5,7 +5,9 @@ import scala.reflect.runtime.universe._, Flag._,
 internal.reificationSupport.setSymbol
 
 class QuasiquoteProperties(name: String)
-    extends Properties(name) with ArbitraryTreesAndNames with Helpers
+    extends Properties(name)
+    with ArbitraryTreesAndNames
+    with Helpers
 
 trait Helpers {
 
@@ -29,7 +31,8 @@ trait Helpers {
           case FreshName(prefix) =>
             Some(
                 (if (name.isTermName)
-                   TermName(prefix) else TypeName(prefix)).asInstanceOf[T])
+                   TermName(prefix)
+                 else TypeName(prefix)).asInstanceOf[T])
         }
     }
 
@@ -67,7 +70,8 @@ trait Helpers {
 
   implicit class TestSimilarMods(mods: Modifiers) {
     def ≈(other: Modifiers) =
-      (mods.flags == other.flags) && (mods.privateWithin ≈ other.privateWithin) &&
+      (mods.flags == other.flags) &&
+      (mods.privateWithin ≈ other.privateWithin) &&
       (mods.annotations ≈ other.annotations)
   }
 

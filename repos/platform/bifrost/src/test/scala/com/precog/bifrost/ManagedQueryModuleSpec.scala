@@ -70,7 +70,8 @@ object ManagedQueryTestSupport {
 import ManagedQueryTestSupport._
 
 class ManagedQueryModuleSpec
-    extends TestManagedQueryModule with Specification {
+    extends TestManagedQueryModule
+    with Specification {
   val actorSystem = ActorSystem("managedQueryModuleSpec")
   val jobActorSystem = ActorSystem("managedQueryModuleSpecJobs")
   implicit val executionContext =
@@ -93,8 +94,8 @@ class ManagedQueryModuleSpec
                                AccountPlan.Free)
 
   def dropStreamToFuture =
-    implicitly[Hoist[StreamT]].hoist[TestFuture, Future](
-        new (TestFuture ~> Future) {
+    implicitly[Hoist[StreamT]]
+      .hoist[TestFuture, Future](new (TestFuture ~> Future) {
       def apply[A](fa: TestFuture[A]): Future[A] = fa.value
     })
 
@@ -105,17 +106,18 @@ class ManagedQueryModuleSpec
       _ <- waitFor(1)
       Some(job) <- jobManager.findJob(jobId)
       finalJob <- job.state match {
-        case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
-          waitForJobCompletion(jobId)
-        case _ =>
-          Future(job)
-      }
+                   case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
+                     waitForJobCompletion(jobId)
+                   case _ =>
+                     Future(job)
+                 }
     } yield finalJob
   }
 
   // Performs an incredibly intense compuation that requires numTicks ticks.
-  def execute(numTicks: Int, ticksToTimeout: Option[Int] = None)
-    : Future[(JobId, AtomicInteger, Future[Int])] = {
+  def execute(numTicks: Int,
+              ticksToTimeout: Option[Int] =
+                None): Future[(JobId, AtomicInteger, Future[Int])] = {
     val timeout =
       ticksToTimeout map { t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
@@ -126,13 +128,14 @@ class ManagedQueryModuleSpec
     val result = for {
       // TODO: No idea how to work with EitherT[TestFuture, so sys.error it is]
       executor <- executorFor(apiKey) valueOr { err =>
-        sys.error(err.toString)
-      }
+                   sys.error(err.toString)
+                 }
       result0 <- executor
-        .execute(numTicks.toString, ctx, QueryOptions(timeout = timeout))
-        .valueOr(err => sys.error(err.toString)) mapValue {
-        case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
-      }
+                  .execute(
+                      numTicks.toString, ctx, QueryOptions(timeout = timeout))
+                  .valueOr(err => sys.error(err.toString)) mapValue {
+                  case (w, s) => (w, (w: Option[(JobId, AtomicInteger)], s))
+                }
     } yield {
       val (Some((jobId, ticks)), result) = result0
 
@@ -271,7 +274,8 @@ class ManagedQueryModuleSpec
 
 trait TestManagedQueryModule
     extends Execution[TestFuture, StreamT[TestFuture, CharBuffer]]
-    with ManagedQueryModule with SchedulableFuturesModule {
+    with ManagedQueryModule
+    with SchedulableFuturesModule {
   self =>
 
   def actorSystem: ActorSystem

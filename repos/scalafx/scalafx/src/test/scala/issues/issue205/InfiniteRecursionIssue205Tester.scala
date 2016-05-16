@@ -96,22 +96,20 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
 
   val scrollToButton = new Button {
     text = "scrollTo(item) - #205"
-    onAction = (ae: ActionEvent) =>
-      {
-        // This line would cause infinite recursion before fix
-        tableView.scrollTo(extraRow)
+    onAction = (ae: ActionEvent) => {
+      // This line would cause infinite recursion before fix
+      tableView.scrollTo(extraRow)
     }
   }
 
   val snapshotButton = new Button {
     text = "snapshot  - #214"
-    onAction = (ae: ActionEvent) =>
-      {
-        def callback(result: SnapshotResult): Unit = {
-          println("callback(" + result + ")")
-        }
-        // This line would cause infinite recursion before fix (also issue #214)
-        tableView.snapshot(callback, null, null)
+    onAction = (ae: ActionEvent) => {
+      def callback(result: SnapshotResult): Unit = {
+        println("callback(" + result + ")")
+      }
+      // This line would cause infinite recursion before fix (also issue #214)
+      tableView.snapshot(callback, null, null)
     }
   }
 

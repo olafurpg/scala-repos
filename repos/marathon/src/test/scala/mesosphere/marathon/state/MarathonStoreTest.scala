@@ -29,10 +29,10 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
     val state = mock[PersistentStore]
     val variable = mock[PersistentEntity]
     val now = Timestamp.now()
-    val appDef =
-      AppDefinition(id = "testApp".toPath,
-                    args = Some(Seq("arg")),
-                    versionInfo = AppDefinition.VersionInfo.forNewConfig(now))
+    val appDef = AppDefinition(id = "testApp".toPath,
+                               args = Some(Seq("arg")),
+                               versionInfo =
+                                 AppDefinition.VersionInfo.forNewConfig(now))
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
@@ -71,10 +71,10 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
     val state = mock[PersistentStore]
     val variable = mock[PersistentEntity]
     val now = Timestamp.now()
-    val appDef =
-      AppDefinition(id = "testApp".toPath,
-                    args = Some(Seq("arg")),
-                    versionInfo = AppDefinition.VersionInfo.forNewConfig(now))
+    val appDef = AppDefinition(id = "testApp".toPath,
+                               args = Some(Seq("arg")),
+                               versionInfo =
+                                 AppDefinition.VersionInfo.forNewConfig(now))
 
     val newAppDef = appDef.copy(id = "newTestApp".toPath)
     val newVariable = mock[PersistentEntity]

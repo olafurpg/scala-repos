@@ -52,8 +52,8 @@ class EnsembleWebView extends EnsembleExample {
     }
     val webView = new WebView {
       // Update location field is page is redirected
-      engine.location.onChange(
-          (_, _, newValue) => locationField.setText(newValue))
+      engine.location.onChange((_, _, newValue) =>
+            locationField.setText(newValue))
       // Load default page
       engine.load(defaultURL)
     }

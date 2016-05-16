@@ -131,8 +131,7 @@ object MapParamMap {
     new MapParamMap(MapParamMap.tuplesToMultiMap(params))
 
   def apply(map: Map[String, String]): MapParamMap =
-    new MapParamMap(
-        map.mapValues { value =>
+    new MapParamMap(map.mapValues { value =>
       Seq(value)
     })
 

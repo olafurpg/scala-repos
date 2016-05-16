@@ -8,7 +8,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
 class FileUploadSupportTestServlet
-    extends ScalatraServlet with FileUploadSupport {
+    extends ScalatraServlet
+    with FileUploadSupport {
   post("""/multipart.*""".r) {
     multiParams.get("string") foreach { ps: Seq[String] =>
       response.setHeader("string", ps.mkString(";"))
@@ -83,8 +84,9 @@ class FileUploadSupportTest extends ScalatraFunSuite {
     val boundary = "---------------------------3924013385056820061124200860"
 
     post(path,
-         headers = Map("Content-Type" -> "multipart/form-data; boundary=%s"
-                 .format(boundary)),
+         headers =
+           Map("Content-Type" -> "multipart/form-data; boundary=%s".format(
+                   boundary)),
          body = reqBody) {
       response
     }

@@ -17,7 +17,8 @@ import AutoUpdate._
   * Update database schema and load plug-ins automatically in the context initializing.
   */
 class InitializeListener
-    extends ServletContextListener with SystemSettingsService {
+    extends ServletContextListener
+    with SystemSettingsService {
 
   private val logger = LoggerFactory.getLogger(classOf[InitializeListener])
 
@@ -79,7 +80,9 @@ class InitializeListener
 }
 
 class DeleteOldActivityActor
-    extends Actor with SystemSettingsService with ActivityService {
+    extends Actor
+    with SystemSettingsService
+    with ActivityService {
 
   private val logger = Logging(context.system, this)
 

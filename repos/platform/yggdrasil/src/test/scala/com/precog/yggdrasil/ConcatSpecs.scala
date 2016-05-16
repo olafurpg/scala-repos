@@ -27,7 +27,8 @@ import scalaz.syntax.comonad._
 import blueeyes.json._
 
 trait ConcatSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification {
+    extends ColumnarTableModuleTestSupport[M]
+    with Specification {
   def testConcat = {
     val json1 = """{ "a": 1, "b": "x", "c": null }"""
     val json2 = """[4, "foo", null, true]"""

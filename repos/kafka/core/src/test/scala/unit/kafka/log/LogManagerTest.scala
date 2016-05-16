@@ -269,16 +269,14 @@ class LogManagerTest {
   }
 
   private def verifyCheckpointRecovery(
-      topicAndPartitions: Seq[TopicAndPartition],
-      logManager: LogManager) {
+      topicAndPartitions: Seq[TopicAndPartition], logManager: LogManager) {
     val logs = topicAndPartitions.map(this.logManager.createLog(_, logConfig))
     logs.foreach(
-        log =>
-          {
-        for (i <- 0 until 50) log.append(
-            TestUtils.singleMessageSet("test".getBytes()))
+        log => {
+      for (i <- 0 until 50) log.append(
+          TestUtils.singleMessageSet("test".getBytes()))
 
-        log.flush()
+      log.flush()
     })
 
     logManager.checkpointRecoveryPointOffsets()

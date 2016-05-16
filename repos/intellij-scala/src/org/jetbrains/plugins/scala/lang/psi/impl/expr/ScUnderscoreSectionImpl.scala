@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScUnderscoreSectionImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScUnderscoreSection {
+    extends ScalaPsiElementImpl(node)
+    with ScUnderscoreSection {
   override def toString: String = "UnderscoreSection"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
@@ -94,7 +95,7 @@ class ScUnderscoreSectionImpl(node: ASTNode)
             var forEqualsParamLength: Boolean =
               false //this is for working completion
             for (tp <- expr.expectedTypes(fromUnderscore = false)
-                          if result != None) {
+                 if result != None) {
 
               def processFunctionType(params: Seq[ScType]) {
                 if (result != null) {

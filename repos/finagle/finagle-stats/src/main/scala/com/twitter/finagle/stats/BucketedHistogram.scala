@@ -30,7 +30,7 @@ private[twitter] object BucketedHistogram {
       .map(_.toInt + 1) // this ensures that the smallest value is 2 (below we prepend `1`)
       .distinct
       .force
-      (Seq(1) ++ values).toArray
+    (Seq(1) ++ values).toArray
   }
 
   // 0.5% error => 1797 buckets, 7188 bytes, max 11 compares on binary search

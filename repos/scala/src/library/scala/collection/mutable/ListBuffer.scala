@@ -43,9 +43,12 @@ import java.io.{ObjectOutputStream, ObjectInputStream}
 @SerialVersionUID(3419063961353022662L)
 final class ListBuffer[A]
     extends AbstractBuffer[A]
-    with Buffer[A] with GenericTraversableTemplate[A, ListBuffer]
+    with Buffer[A]
+    with GenericTraversableTemplate[A, ListBuffer]
     with BufferLike[A, ListBuffer[A]]
-    with ReusableBuilder[A, List[A]] with SeqForwarder[A] with Serializable {
+    with ReusableBuilder[A, List[A]]
+    with SeqForwarder[A]
+    with Serializable {
   override def companion: GenericCompanion[ListBuffer] = ListBuffer
 
   import scala.collection.Traversable

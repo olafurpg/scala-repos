@@ -70,8 +70,8 @@ class BlockingChannel(val host: String,
         val localPort = channel.socket.getLocalPort
         val remoteHost = channel.socket.getInetAddress.getHostAddress
         val remotePort = channel.socket.getPort
-        connectionId = localHost + ":" + localPort + "-" + remoteHost + ":" +
-        remotePort
+        connectionId =
+          localHost + ":" + localPort + "-" + remoteHost + ":" + remotePort
         // settings may not match what we requested above
         val msg =
           "Created socket with SO_TIMEOUT = %d (requested %d), SO_RCVBUF = %d (requested %d), SO_SNDBUF = %d (requested %d), connectTimeoutMs = %d."

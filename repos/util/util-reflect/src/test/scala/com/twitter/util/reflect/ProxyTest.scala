@@ -223,7 +223,7 @@ class ProxyTest extends WordSpec {
     }
   }
 
-  class ReferenceProxyFactory[I <: AnyRef : Manifest](
+  class ReferenceProxyFactory[I <: AnyRef: Manifest](
       f: (() => AnyRef) => AnyRef) {
     import java.lang.reflect
 

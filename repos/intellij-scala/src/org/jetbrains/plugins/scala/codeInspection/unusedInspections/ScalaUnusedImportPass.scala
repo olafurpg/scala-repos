@@ -46,7 +46,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
               s"File text range is null: ${file.getClass}")
         else file.getTextRange,
         true,
-        highlightInfoProcessor) with ScalaUnusedImportPassBase {
+        highlightInfoProcessor)
+    with ScalaUnusedImportPassBase {
   protected def getFixes: List[IntentionAction] =
     List(
         new ScalaOptimizeImportsFix, new ScalaEnableOptimizeImportsOnTheFlyFix)
@@ -70,8 +71,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
         (annotation => list add (HighlightInfo fromAnnotation annotation))
 
         if (ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY) {
-          myOptimizeImportsRunnable = new ScalaImportOptimizer()
-            .processFile(file, progress)
+          myOptimizeImportsRunnable =
+            new ScalaImportOptimizer().processFile(file, progress)
         }
 
         myHighlights = list

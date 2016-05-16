@@ -166,7 +166,8 @@ class ScalaGenerateDelegateHandler extends GenerateDelegateHandler {
       chooser.show()
       if (chooser.getExitCode != DialogWrapper.OK_EXIT_CODE) return null
       chooser.getSelectedElements.toBuffer.toArray
-    } else if (members.nonEmpty) Array(members.head) else Array()
+    } else if (members.nonEmpty) Array(members.head)
+    else Array()
   }
 
   private def toMethodMembers(candidates: Iterable[ScalaResolveResult],

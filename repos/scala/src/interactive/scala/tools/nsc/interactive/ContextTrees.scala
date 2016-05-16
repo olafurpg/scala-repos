@@ -138,8 +138,8 @@ trait ContextTrees { self: Global =>
             def insertAt(idx: Int): Boolean = {
               val oldpos = contexts(idx).pos
               if (oldpos sameRange cpos) {
-                contexts(idx) = new ContextTree(
-                    cpos, context, contexts(idx).children)
+                contexts(idx) =
+                  new ContextTree(cpos, context, contexts(idx).children)
                 true
               } else if (oldpos includes cpos) {
                 addContext(contexts(idx).children, context, cpos)
@@ -177,8 +177,9 @@ trait ContextTrees { self: Global =>
         case ex: Throwable =>
           println(ex)
           ex.printStackTrace()
-          println("failure inserting " + cpos + " into " +
-              contexts + "/" + contexts(contexts.length - 1).pos + "/" +
+          println(
+              "failure inserting " + cpos + " into " + contexts + "/" +
+              contexts(contexts.length - 1).pos + "/" +
               (contexts(contexts.length - 1).pos includes cpos))
           throw ex
       }

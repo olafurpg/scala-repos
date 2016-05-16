@@ -31,10 +31,13 @@ class ReplaceTypeCheckWithMatchIntention
       project: Project, editor: Editor, element: PsiElement): Boolean = {
     for {
       IsInstanceOfCall(iioCall) <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
+                                      PsiTreeUtil.getParentOfType(
+                                          element,
+                                          classOf[ScGenericCall],
+                                          false))
       ifStmt <- Option(PsiTreeUtil.getParentOfType(iioCall, classOf[ScIfStmt]))
-      condition <- ifStmt.condition if findIsInstanceOfCalls(
-                      condition, onlyFirst = false) contains iioCall
+      condition <- ifStmt.condition
+      if findIsInstanceOfCalls(condition, onlyFirst = false) contains iioCall
     } {
       val offset = editor.getCaretModel.getOffset
       if (offset >= iioCall.getTextRange.getStartOffset &&
@@ -46,10 +49,13 @@ class ReplaceTypeCheckWithMatchIntention
   def invoke(project: Project, editor: Editor, element: PsiElement) {
     for {
       IsInstanceOfCall(iioCall) <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
+                                      PsiTreeUtil.getParentOfType(
+                                          element,
+                                          classOf[ScGenericCall],
+                                          false))
       ifStmt <- Option(PsiTreeUtil.getParentOfType(iioCall, classOf[ScIfStmt]))
-      condition <- ifStmt.condition if findIsInstanceOfCalls(
-                      condition, onlyFirst = false) contains iioCall
+      condition <- ifStmt.condition
+      if findIsInstanceOfCalls(condition, onlyFirst = false) contains iioCall
     } {
       val (matchStmtOption, renameData) = buildMatchStmt(
           ifStmt, iioCall, onlyFirst = false)

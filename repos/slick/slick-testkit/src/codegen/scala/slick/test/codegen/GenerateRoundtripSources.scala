@@ -24,8 +24,7 @@ object GenerateRoundtripSources {
       posts.schema ++ categories.schema ++ typeTest.schema ++ large.schema ++ `null`.schema ++ X.schema ++ SingleNonOptionColumn.schema ++ SelfRef.schema
     val a1 = profile
       .createModel(ignoreInvalidDefaults = false)
-      .map(
-          m =>
+      .map(m =>
             new SourceCodeGenerator(m) {
           override def tableName = {
             case n if n.toLowerCase == "null" =>
@@ -87,8 +86,17 @@ class Tables(val profile: JdbcProfile) {
 
   /** Tests slick term name collision */
   class X(tag: Tag)
-      extends Table[(Int, Int, Option[Int], Int, Double, String, Option[Int], Option[
-              Int], Option[String], Option[String], Option[String])](tag, "X") {
+      extends Table[(Int,
+                     Int,
+                     Option[Int],
+                     Int,
+                     Double,
+                     String,
+                     Option[Int],
+                     Option[Int],
+                     Option[String],
+                     Option[String],
+                     Option[String])](tag, "X") {
     def pk = column[Int]("pk")
     def pk2 = column[Int]("pk2")
     def pkpk = primaryKey("", (pk, pk2)) // pk column collision
@@ -140,13 +148,36 @@ class Tables(val profile: JdbcProfile) {
 
   // Clob disabled because it fails in postgres and mysql, see https://github.com/slick/slick/issues/637
   class TypeTest(tag: Tag)
-      extends Table[
-          (String, Boolean, Byte, Short, Int, Long, Float, Double, String, java.sql.Date, java.sql.Time, java.sql.Timestamp, java.util.UUID, java.sql.Blob //,java.sql.Clob
-          , Option[Int], (Option[Boolean], Option[Byte], Option[Short], Option[
-              Int], Option[Long], Option[Float], Option[Double], Option[String], Option[
-              java.sql.Date], Option[java.sql.Time], Option[java.sql.Timestamp], Option[
-              java.util.UUID], Option[java.sql.Blob] //,Option[java.sql.Clob]
-          ))](tag, "TYPE_TEST") {
+      extends Table[(String,
+                     Boolean,
+                     Byte,
+                     Short,
+                     Int,
+                     Long,
+                     Float,
+                     Double,
+                     String,
+                     java.sql.Date,
+                     java.sql.Time,
+                     java.sql.Timestamp,
+                     java.util.UUID,
+                     java.sql.Blob //,java.sql.Clob
+                     ,
+                     Option[Int],
+                     (Option[Boolean],
+                      Option[Byte],
+                      Option[Short],
+                      Option[Int],
+                      Option[Long],
+                      Option[Float],
+                      Option[Double],
+                      Option[String],
+                      Option[java.sql.Date],
+                      Option[java.sql.Time],
+                      Option[java.sql.Timestamp],
+                      Option[java.util.UUID],
+                      Option[java.sql.Blob] //,Option[java.sql.Clob]
+                     ))](tag, "TYPE_TEST") {
     def `type` = column[String]("type") // <- test escaping of keywords
     def Boolean = column[Boolean]("Boolean", O.Default(true))
     def Byte = column[Byte]("Byte")

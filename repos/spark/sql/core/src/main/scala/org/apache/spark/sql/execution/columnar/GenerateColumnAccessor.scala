@@ -64,7 +64,8 @@ class MutableUnsafeRow(val writer: UnsafeRowWriter)
   * Generates bytecode for an [[ColumnarIterator]] for columnar cache.
   */
 object GenerateColumnAccessor
-    extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging {
+    extends CodeGenerator[Seq[DataType], ColumnarIterator]
+    with Logging {
 
   protected def canonicalize(in: Seq[DataType]): Seq[DataType] = in
   protected def bind(

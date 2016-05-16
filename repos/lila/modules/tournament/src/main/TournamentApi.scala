@@ -43,17 +43,16 @@ private[tournament] final class TournamentApi(
     var variant = chess.variant.Variant orDefault setup.variant
     val tour = Tournament.make(
         createdBy = me,
-        clock = TournamentClock(
-              (setup.clockTime * 60).toInt, setup.clockIncrement),
+        clock =
+          TournamentClock((setup.clockTime * 60).toInt, setup.clockIncrement),
         minutes = setup.minutes,
         waitMinutes = setup.waitMinutes,
         mode = setup.mode.fold(Mode.default)(Mode.orDefault),
         `private` = setup.`private`.isDefined,
         system = System.Arena,
         variant = variant,
-        position = StartingPosition
-            .byEco(setup.position)
-            .ifTrue(variant.standard) | StartingPosition.initial)
+        position =
+          StartingPosition.byEco(setup.position).ifTrue(variant.standard) | StartingPosition.initial)
     TournamentRepo.insert(tour) >>- join(tour.id, me) inject tour
   }
 
@@ -277,7 +276,7 @@ private[tournament] final class TournamentApi(
                     score = sheet.total,
                     fire = sheet.onFire,
                     ratingDiff = perf.fold(player.ratingDiff)(
-                          _.intRating - player.rating),
+                        _.intRating - player.rating),
                     provisional = perf.fold(player.provisional)(_.provisional)
                 )
                 .recomputeMagicScore

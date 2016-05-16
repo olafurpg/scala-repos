@@ -90,7 +90,8 @@ case class If(
   */
 case class CaseWhen(branches: Seq[(Expression, Expression)],
                     elseValue: Option[Expression] = None)
-    extends Expression with CodegenFallback {
+    extends Expression
+    with CodegenFallback {
 
   override def children: Seq[Expression] =
     branches.flatMap(b => b._1 :: b._2 :: Nil) ++ elseValue
@@ -294,14 +295,13 @@ case class Least(children: Seq[Expression]) extends Expression {
 
   override def eval(input: InternalRow): Any = {
     children.foldLeft[Any](null)(
-        (r, c) =>
-          {
-        val evalc = c.eval(input)
-        if (evalc != null) {
-          if (r == null || ordering.lt(evalc, r)) evalc else r
-        } else {
-          r
-        }
+        (r, c) => {
+      val evalc = c.eval(input)
+      if (evalc != null) {
+        if (r == null || ordering.lt(evalc, r)) evalc else r
+      } else {
+        r
+      }
     })
   }
 
@@ -356,14 +356,13 @@ case class Greatest(children: Seq[Expression]) extends Expression {
 
   override def eval(input: InternalRow): Any = {
     children.foldLeft[Any](null)(
-        (r, c) =>
-          {
-        val evalc = c.eval(input)
-        if (evalc != null) {
-          if (r == null || ordering.gt(evalc, r)) evalc else r
-        } else {
-          r
-        }
+        (r, c) => {
+      val evalc = c.eval(input)
+      if (evalc != null) {
+        if (r == null || ordering.gt(evalc, r)) evalc else r
+      } else {
+        r
+      }
     })
   }
 

@@ -39,7 +39,8 @@ object ReadOnlyLongProperty {
 }
 
 class ReadOnlyLongProperty(override val delegate: jfxbp.ReadOnlyLongProperty)
-    extends NumberExpression(delegate) with ReadOnlyProperty[Long, Number]
+    extends NumberExpression(delegate)
+    with ReadOnlyProperty[Long, Number]
     with SFXDelegate[jfxbp.ReadOnlyLongProperty] {
   def this(bean: Object, name: String, value: Long) =
     this(

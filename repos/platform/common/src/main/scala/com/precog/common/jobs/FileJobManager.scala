@@ -63,8 +63,11 @@ object FileJobManager {
 
 class FileJobManager[M[+ _]] private[FileJobManager](
     workDir: File, monadM: Monad[M])
-    extends JobManager[M] with JobStateManager[M] with JobResultManager[M]
-    with FileStorage[M] with Logging {
+    extends JobManager[M]
+    with JobStateManager[M]
+    with JobResultManager[M]
+    with FileStorage[M]
+    with Logging {
 
   import JobState._
 
@@ -173,8 +176,7 @@ class FileJobManager[M[+ _]] private[FileJobManager](
           val prior: List[Message] = messages.get(channel).getOrElse(Nil)
           val message = Message(jobId, prior.size, channel, value)
 
-          cache +=
-          (jobId -> js.copy(
+          cache += (jobId -> js.copy(
                   messages = (messages + (channel -> (message :: prior)))))
           message
 

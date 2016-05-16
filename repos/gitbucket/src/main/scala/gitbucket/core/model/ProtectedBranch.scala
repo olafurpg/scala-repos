@@ -27,7 +27,8 @@ trait ProtectedBranchComponent extends TemplateComponent { self: Profile =>
   lazy val ProtectedBranchContexts = TableQuery[ProtectedBranchContexts]
   class ProtectedBranchContexts(tag: Tag)
       extends Table[ProtectedBranchContext](
-          tag, "PROTECTED_BRANCH_REQUIRE_CONTEXT") with BranchTemplate {
+          tag, "PROTECTED_BRANCH_REQUIRE_CONTEXT")
+      with BranchTemplate {
     val context = column[String]("CONTEXT")
     def * =
       (userName, repositoryName, branch, context) <>

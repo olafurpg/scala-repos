@@ -19,7 +19,8 @@ class WebServerImpl(
     val mat: Materializer,
     val timeout: Timeout
 )
-    extends WebServer with DocJarReading {
+    extends WebServer
+    with DocJarReading {
   import system.dispatcher
 
   private def handleRpc(in: Any): Future[EnsimeServerMessage] = in match {

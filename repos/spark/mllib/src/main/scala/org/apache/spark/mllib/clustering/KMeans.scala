@@ -45,7 +45,8 @@ class KMeans private (private var k: Int,
                       private var initializationSteps: Int,
                       private var epsilon: Double,
                       private var seed: Long)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Constructs a KMeans instance with default parameters: {k: 2, maxIterations: 20, runs: 1,
@@ -437,25 +438,23 @@ class KMeans private (private var k: Int,
         }
         .persist(StorageLevel.MEMORY_AND_DISK)
       val sumCosts = costs.aggregate(new Array[Double](runs))(
-          seqOp = (s, v) =>
-              {
-              // s += v
-              var r = 0
-              while (r < runs) {
-                s(r) += v(r)
-                r += 1
-              }
-              s
+          seqOp = (s, v) => {
+            // s += v
+            var r = 0
+            while (r < runs) {
+              s(r) += v(r)
+              r += 1
+            }
+            s
           },
-          combOp = (s0, s1) =>
-              {
-              // s0 += s1
-              var r = 0
-              while (r < runs) {
-                s0(r) += s1(r)
-                r += 1
-              }
-              s0
+          combOp = (s0, s1) => {
+            // s0 += s1
+            var r = 0
+            while (r < runs) {
+              s0(r) += s1(r)
+              r += 1
+            }
+            s0
           }
       )
 

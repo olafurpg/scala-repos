@@ -33,7 +33,8 @@ private[launchqueue] object RateLimiterActor {
 private class RateLimiterActor private (rateLimiter: RateLimiter,
                                         appRepository: AppRepository,
                                         launchQueueRef: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var cleanup: Cancellable = _
 
   override def preStart(): Unit = {

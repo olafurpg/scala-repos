@@ -113,8 +113,8 @@ object ScalaIntroduceFieldHandlerBase {
 
   def canBeInitializedInDeclaration(
       expr: ScExpression, aClass: ScTemplateDefinition): Boolean = {
-    val stmtsAndMmbrs = ScalaRefactoringUtil.statementsAndMembersInClass(
-        aClass)
+    val stmtsAndMmbrs =
+      ScalaRefactoringUtil.statementsAndMembersInClass(aClass)
     (Iterator(expr) ++ expr.parents)
       .find(stmtsAndMmbrs.contains(_))
       .forall(ScalaRefactoringUtil.checkForwardReferences(expr, _))
@@ -129,8 +129,9 @@ object ScalaIntroduceFieldHandlerBase {
     val container = ScalaRefactoringUtil.container(parExpr, ifc.file)
     val stmtsAndMmbrs =
       ScalaRefactoringUtil.statementsAndMembersInClass(ifc.aClass)
-    val containerIsLocal = (Iterator(container) ++ new ParentsIterator(
-            container)).exists(stmtsAndMmbrs.contains(_))
+    val containerIsLocal =
+      (Iterator(container) ++ new ParentsIterator(container))
+        .exists(stmtsAndMmbrs.contains(_))
     if (!containerIsLocal) false
     else {
       ifc.element match {

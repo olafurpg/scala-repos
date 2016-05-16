@@ -435,7 +435,8 @@ private[spark] class ApplicationMaster(
                     allocator.getNumPendingLossReasonRequests > 0) {
                   val currentAllocationInterval =
                     math.min(heartbeatInterval, nextAllocationInterval)
-                  nextAllocationInterval = currentAllocationInterval * 2 // avoid overflow
+                  nextAllocationInterval =
+                    currentAllocationInterval * 2 // avoid overflow
                   currentAllocationInterval
                 } else {
                   nextAllocationInterval = initialAllocationInterval
@@ -491,7 +492,7 @@ private[spark] class ApplicationMaster(
       val deadline = System.currentTimeMillis() + totalWaitTime
 
       while (sparkContextRef.get() == null &&
-      System.currentTimeMillis < deadline && !finished) {
+             System.currentTimeMillis < deadline && !finished) {
         logInfo("Waiting for spark context initialization ... ")
         sparkContextRef.wait(10000L)
       }
@@ -634,7 +635,8 @@ private[spark] class ApplicationMaster(
   private class AMEndpoint(override val rpcEnv: RpcEnv,
                            driver: RpcEndpointRef,
                            isClusterMode: Boolean)
-      extends RpcEndpoint with Logging {
+      extends RpcEndpoint
+      with Logging {
 
     override def onStart(): Unit = {
       driver.send(RegisterClusterManager(self))

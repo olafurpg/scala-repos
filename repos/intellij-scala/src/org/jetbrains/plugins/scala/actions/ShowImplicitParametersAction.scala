@@ -179,13 +179,12 @@ class ShowImplicitParametersAction
             expressions,
             (elem: PsiElement) => chooseExpression(elem),
             "Expressions",
-            (expr: PsiElement) =>
-              {
-                expr match {
-                  case expr: ScExpression =>
-                    ScalaRefactoringUtil.getShortText(expr)
-                  case _ => expr.getText.slice(0, 20)
-                }
+            (expr: PsiElement) => {
+              expr match {
+                case expr: ScExpression =>
+                  ScalaRefactoringUtil.getShortText(expr)
+                case _ => expr.getText.slice(0, 20)
+              }
             })
       }
     }

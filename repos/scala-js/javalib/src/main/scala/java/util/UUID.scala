@@ -10,7 +10,9 @@ final class UUID private (private val i1: Int,
                           private val i4: Int,
                           private[this] var l1: JLong,
                           private[this] var l2: JLong)
-    extends AnyRef with java.io.Serializable with Comparable[UUID] {
+    extends AnyRef
+    with java.io.Serializable
+    with Comparable[UUID] {
 
   import UUID._
 

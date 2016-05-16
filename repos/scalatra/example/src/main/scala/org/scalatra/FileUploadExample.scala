@@ -5,7 +5,9 @@ import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintE
 import scala.xml.Node
 
 class FileUploadExample
-    extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
+    extends ScalatraServlet
+    with FileUploadSupport
+    with FlashMapSupport {
   configureMultipartHandling(
       MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 

@@ -156,8 +156,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            * now
            */
           case _
-              if
-              (!noOpNode(activeBolt) &&
+              if (!noOpNode(activeBolt) &&
                   dependsOnSummerProducer(currentProducer)) =>
             true
           /*
@@ -174,8 +173,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
            * then split now.
            */
           case _
-              if
-              ((!mergableWithSource(currentProducer)) &&
+              if ((!mergableWithSource(currentProducer)) &&
                   allTransDepsMergeableWithSource(dep)) =>
             true
           case _ => false

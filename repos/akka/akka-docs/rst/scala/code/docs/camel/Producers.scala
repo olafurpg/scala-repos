@@ -39,7 +39,8 @@ object Producers {
     }
 
     class Forwarder(uri: String, target: ActorRef)
-        extends Actor with Producer {
+        extends Actor
+        with Producer {
       def endpointUri = uri
 
       override def routeResponse(msg: Any) { target forward msg }

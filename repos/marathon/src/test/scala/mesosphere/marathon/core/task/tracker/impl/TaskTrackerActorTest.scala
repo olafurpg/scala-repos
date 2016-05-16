@@ -17,8 +17,11 @@ import scala.concurrent.Future
   * Most of the functionality is tested at a higher level in [[mesosphere.marathon.tasks.TaskTrackerImplTest]].
   */
 class TaskTrackerActorTest
-    extends MarathonActorSupport with FunSuiteLike with GivenWhenThen
-    with Mockito with Matchers {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("failures while loading the initial data are escalated") {
     val f = new Fixture

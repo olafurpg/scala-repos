@@ -417,8 +417,9 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
           frameHeader(Opcode.Ping, 6, fin = true) ++ ByteString("abcdef")
 
         pushInput(input)
-        expectMaskedFrameOnNetwork(
-            Opcode.Pong, ByteString("abcdef"), fin = true)
+        expectMaskedFrameOnNetwork(Opcode.Pong,
+                                   ByteString("abcdef"),
+                                   fin = true)
       }
       "respond to ping frames interleaved with data frames (without mixing frame data)" in new ServerTestSetup {
         // receive multi-frame message
@@ -613,10 +614,12 @@ class MessageSpec extends FreeSpec with Matchers with WithMaterializerSpec {
         netIn.expectCancellation()
       }
       "after receiving error close frame with close code and with reason" in new ServerTestSetup {
-        pushInput(closeFrame(
+        pushInput(
+            closeFrame(
                 Protocol.CloseCodes.UnexpectedCondition,
                 mask = true,
-                msg = "This alien landing came quite unexpected. Communication has been garbled."))
+                msg =
+                  "This alien landing came quite unexpected. Communication has been garbled."))
         val error =
           expectError(messageIn).asInstanceOf[PeerClosedConnectionException]
         error.closeCode shouldEqual Protocol.CloseCodes.UnexpectedCondition

@@ -58,11 +58,11 @@ object CumulativeSum {
       * single key to go through a single scan. Instead requires the sums of the
       * partitions for a single key to go through a single scan.
       */
-    def cumulativeSum[S](
-        partition: U => S)(implicit ordS: Ordering[S],
-                           sg: Semigroup[V],
-                           ordU: Ordering[U],
-                           ordK: Ordering[K]): TypedPipe[(K, (U, V))] = {
+    def cumulativeSum[S](partition: U => S)(
+        implicit ordS: Ordering[S],
+        sg: Semigroup[V],
+        ordU: Ordering[U],
+        ordK: Ordering[K]): TypedPipe[(K, (U, V))] = {
 
       val sumPerS = pipe.map { case (k, (u, v)) => (k, partition(u)) -> v }.sumByKey.map {
         case ((k, s), v) => (k, (s, v))
@@ -79,7 +79,9 @@ object CumulativeSum {
         .flatMap {
           case (k, maybeAcc) =>
             for (acc <- maybeAcc;
-            previousSum <- acc._1) yield { (k, acc._3) -> (None, previousSum) }
+                 previousSum <- acc._1) yield {
+              (k, acc._3) -> (None, previousSum)
+            }
         }
 
       val summands =

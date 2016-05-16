@@ -124,7 +124,7 @@ sealed abstract class ReducerInstances {
   /** Accumulate endomorphisms. */
   implicit def EndoReducer[A]: Reducer[A => A, Endo[A]] = unitReducer(Endo(_))
 
-  implicit def DualReducer[A : Monoid]: Reducer[A, A @@ Tags.Dual] =
+  implicit def DualReducer[A: Monoid]: Reducer[A, A @@ Tags.Dual] =
     unitReducer(Tags.Dual(_: A))(Dual.dualMonoid[A])
 
   import Tags.{Multiplication, First, Last}

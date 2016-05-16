@@ -55,9 +55,13 @@ import parallel.mutable.ParSet
   *  @define Coll mutable.Set
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends scala.collection.SetLike[A, This] with Scriptable[A]
-    with Builder[A, This] with Growable[A] with Shrinkable[A]
-    with Cloneable[mutable.Set[A]] with Parallelizable[A, ParSet[A]] {
+    extends scala.collection.SetLike[A, This]
+    with Scriptable[A]
+    with Builder[A, This]
+    with Growable[A]
+    with Shrinkable[A]
+    with Cloneable[mutable.Set[A]]
+    with Parallelizable[A, ParSet[A]] {
   self =>
 
   /** A common implementation of `newBuilder` for all mutable sets

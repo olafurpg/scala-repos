@@ -45,7 +45,7 @@ private[summingbird] case class KeyValueShards(get: Int) {
     math.abs(k.hashCode % get)
 }
 
-class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
+class FinalFlatMap[Event, Key, Value: Semigroup, S <: InputState[_], D, RC](
     @transient flatMapOp: FlatMapOperation[Event, (Key, Value)],
     summerBuilder: SummerBuilder,
     maxWaitingFutures: MaxWaitingFutures,
@@ -98,8 +98,8 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
     }
   }
 
-  override def tick: Future[TraversableOnce[
-          (Seq[S], Future[TraversableOnce[OutputElement]])]] =
+  override def tick: Future[
+      TraversableOnce[(Seq[S], Future[TraversableOnce[OutputElement]])]] =
     sCache.tick.map(formatResult(_))
 
   def cache(state: S, items: TraversableOnce[(Key, Value)]): Future[

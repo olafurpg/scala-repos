@@ -42,8 +42,11 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * This suite tests spark-submit with applications using HiveContext.
   */
 class HiveSparkSubmitSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with ResetSystemProperties
+    with Timeouts {
 
   // TODO: rewrite these or mark them as slow tests to be run sparingly
 

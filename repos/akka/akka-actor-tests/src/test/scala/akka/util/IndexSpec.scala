@@ -79,10 +79,9 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val index = indexWithValues
 
       var valueCount = 0
-      index.foreach((key, value) ⇒
-            {
-          valueCount = valueCount + 1
-          index.findValue(key)(_ == value) should ===(Some(value))
+      index.foreach((key, value) ⇒ {
+        valueCount = valueCount + 1
+        index.findValue(key)(_ == value) should ===(Some(value))
       })
       valueCount should ===(6)
     }

@@ -599,7 +599,7 @@ private[execution] final class OffsetWindowFunctionFrame(
     expressions: Array[Expression],
     inputSchema: Seq[Attribute],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => () => MutableProjection,
+                           Seq[Attribute]) => () => MutableProjection,
     offset: Int)
     extends WindowFunctionFrame {
 
@@ -719,7 +719,7 @@ private[execution] final class SlidingWindowFunctionFrame(
     // Add all rows to the buffer for which the input row value is equal to or less than
     // the output row upper bound.
     while (nextRow != null &&
-    ubound.compare(nextRow, inputHighIndex, current, index) <= 0) {
+           ubound.compare(nextRow, inputHighIndex, current, index) <= 0) {
       buffer.add(nextRow.copy())
       nextRow = input.next()
       inputHighIndex += 1
@@ -729,7 +729,7 @@ private[execution] final class SlidingWindowFunctionFrame(
     // Drop all rows from the buffer for which the input row value is smaller than
     // the output row lower bound.
     while (!buffer.isEmpty &&
-    lbound.compare(buffer.peek(), inputLowIndex, current, index) < 0) {
+           lbound.compare(buffer.peek(), inputLowIndex, current, index) < 0) {
       buffer.remove()
       inputLowIndex += 1
       bufferUpdated = true
@@ -826,7 +826,7 @@ private[execution] final class UnboundedPrecedingWindowFunctionFrame(
     // Add all rows to the aggregates for which the input row value is equal to or less than
     // the output row upper bound.
     while (nextRow != null &&
-    ubound.compare(nextRow, inputIndex, current, index) <= 0) {
+           ubound.compare(nextRow, inputIndex, current, index) <= 0) {
       processor.update(nextRow)
       nextRow = input.next()
       inputIndex += 1
@@ -887,7 +887,7 @@ private[execution] final class UnboundedFollowingWindowFunctionFrame(
     tmp.skip(inputIndex)
     var nextRow = tmp.next()
     while (nextRow != null &&
-    lbound.compare(nextRow, inputIndex, current, index) < 0) {
+           lbound.compare(nextRow, inputIndex, current, index) < 0) {
       nextRow = tmp.next()
       inputIndex += 1
       bufferUpdated = true
@@ -925,7 +925,8 @@ private[execution] object AggregateProcessor {
             ordinal: Int,
             inputAttributes: Seq[Attribute],
             newMutableProjection: (Seq[Expression],
-            Seq[Attribute]) => () => MutableProjection): AggregateProcessor = {
+                                   Seq[Attribute]) => () => MutableProjection)
+    : AggregateProcessor = {
     val aggBufferAttributes = mutable.Buffer.empty[AttributeReference]
     val initialValues = mutable.Buffer.empty[Expression]
     val updateExpressions = mutable.Buffer.empty[Expression]

@@ -145,7 +145,8 @@ abstract class ExternalJSEnv(
 
   protected class ExtRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AbstractExtRunner(libs, code) with JSRunner {
+      extends AbstractExtRunner(libs, code)
+      with JSRunner {
 
     def run(logger: Logger, console: JSConsole): Unit = {
       setupLoggerAndConsole(logger, console)
@@ -159,7 +160,8 @@ abstract class ExternalJSEnv(
 
   protected class AsyncExtRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AbstractExtRunner(libs, code) with AsyncJSRunner {
+      extends AbstractExtRunner(libs, code)
+      with AsyncJSRunner {
 
     private[this] var vmInst: Process = null
     private[this] var ioThreadEx: Throwable = null

@@ -17,7 +17,9 @@ import akka.http.impl.model.parser.CharacterClasses
 import akka.http.impl.util._
 
 class HttpHeaderParserSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll {
 
   val testConf: Config =
     ConfigFactory.parseString("""
@@ -216,8 +218,8 @@ class HttpHeaderParserSpec
 
     "continue parsing modelled headers even if the overall cache value capacity is reached" in new TestSetup() {
       val randomHostHeaders = Stream.continually {
-        Host(host = nextRandomString(nextRandomAlphaNumChar,
-                                     nextRandomInt(4, 8)),
+        Host(host =
+               nextRandomString(nextRandomAlphaNumChar, nextRandomInt(4, 8)),
              port = nextRandomInt(1000, 10000))
       }
       randomHostHeaders.take(300).foldLeft(0) {

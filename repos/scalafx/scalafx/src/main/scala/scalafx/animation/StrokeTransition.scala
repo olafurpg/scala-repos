@@ -69,7 +69,8 @@ object StrokeTransition extends AnimationStatics {
   */
 class StrokeTransition(
     override val delegate: jfxa.StrokeTransition = new jfxa.StrokeTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.StrokeTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.StrokeTransition] {
 
   // CONSTRUCTORS
 

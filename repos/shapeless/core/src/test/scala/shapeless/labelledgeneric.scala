@@ -64,11 +64,13 @@ object LabelledGenericTestsAux {
                       "Ralph Johnson",
                       "John Vlissides")) :: HNil
 
-  type BookRec = Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T
+  type BookRec =
+    Record.`'author -> String, 'title -> String, 'id -> Int, 'price -> Double`.T
   type BookKeys = Keys[BookRec]
   type BookValues = Values[BookRec]
 
-  type BookWithMultipleAuthorsRec = Record.`'title -> String, 'id -> Int, 'authors -> Seq[String]`.T
+  type BookWithMultipleAuthorsRec =
+    Record.`'title -> String, 'id -> Int, 'authors -> Seq[String]`.T
 
   sealed trait Tree
   case class Node(left: Tree, right: Tree) extends Tree

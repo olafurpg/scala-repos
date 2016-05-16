@@ -101,11 +101,10 @@ object TopicData {
     val topic = readShortString(buffer)
     val partitionCount = buffer.getInt
     val topicPartitionDataPairs = (1 to partitionCount).map(
-        _ =>
-          {
-        val partitionId = buffer.getInt
-        val partitionData = FetchResponsePartitionData.readFrom(buffer)
-        (partitionId, partitionData)
+        _ => {
+      val partitionId = buffer.getInt
+      val partitionData = FetchResponsePartitionData.readFrom(buffer)
+      (partitionId, partitionData)
     })
     TopicData(topic, Map(topicPartitionDataPairs: _*))
   }
@@ -144,8 +143,8 @@ class TopicDataSend(val dest: String, val topicData: TopicData) extends Send {
 
   private val sends = new MultiSend(
       dest,
-      JavaConversions.seqAsJavaList(topicData.partitionData.toList
-            .map(d => new PartitionDataSend(d._1, d._2))))
+      JavaConversions.seqAsJavaList(topicData.partitionData.toList.map(d =>
+                new PartitionDataSend(d._1, d._2))))
 
   override def writeTo(channel: GatheringByteChannel): Long = {
     if (completed)
@@ -175,13 +174,12 @@ object FetchResponse {
     val throttleTime = if (requestVersion > 0) buffer.getInt else 0
     val topicCount = buffer.getInt
     val pairs = (1 to topicCount).flatMap(
-        _ =>
-          {
-        val topicData = TopicData.readFrom(buffer)
-        topicData.partitionData.map {
-          case (partitionId, partitionData) =>
-            (TopicAndPartition(topicData.topic, partitionId), partitionData)
-        }
+        _ => {
+      val topicData = TopicData.readFrom(buffer)
+      topicData.partitionData.map {
+        case (partitionId, partitionData) =>
+          (TopicAndPartition(topicData.topic, partitionId), partitionData)
+      }
     })
     FetchResponse(correlationId, Map(pairs: _*), requestVersion, throttleTime)
   }

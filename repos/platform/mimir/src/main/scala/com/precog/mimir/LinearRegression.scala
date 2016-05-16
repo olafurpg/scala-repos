@@ -42,11 +42,14 @@ import scalaz.std.set._
 import scalaz.syntax.traverse._
 
 trait LinearRegressionLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ReductionLibModule[M]
+    extends ColumnarTableLibModule[M]
+    with ReductionLibModule[M]
     with PredictionLibModule[M] {
 
   trait LinearRegressionLib
-      extends ColumnarTableLib with RegressionSupport with PredictionSupport
+      extends ColumnarTableLib
+      with RegressionSupport
+      with PredictionSupport
       with ReductionLib {
 
     import trans._

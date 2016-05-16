@@ -40,7 +40,8 @@ object StartupWithOneThreadSpec {
 }
 
 class StartupWithOneThreadSpec(startTime: Long)
-    extends AkkaSpec(StartupWithOneThreadSpec.config) with ImplicitSender {
+    extends AkkaSpec(StartupWithOneThreadSpec.config)
+    with ImplicitSender {
   import StartupWithOneThreadSpec._
 
   def this() = this(System.nanoTime())

@@ -75,17 +75,16 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             val dbGame = Game
               .make(
                   game = replay.state,
-                  whitePlayer = Player.white withName name(_.White,
-                                                           _.WhiteElo),
-                  blackPlayer = Player.black withName name(_.Black,
-                                                           _.BlackElo),
+                  whitePlayer =
+                    Player.white withName name(_.White, _.WhiteElo),
+                  blackPlayer =
+                    Player.black withName name(_.Black, _.BlackElo),
                   mode = Mode.Casual,
                   variant = variant,
                   source = Source.Import,
-                  pgnImport = PgnImport
-                      .make(user = user, date = date, pgn = pgn)
-                      .some
-                )
+                  pgnImport =
+                    PgnImport.make(user = user, date = date, pgn = pgn).some
+              )
               .copy(
                   binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
               )

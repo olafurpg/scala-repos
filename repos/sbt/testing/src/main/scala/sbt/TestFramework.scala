@@ -132,8 +132,8 @@ object TestFramework {
         sys.error("Could not call 'fingerprints' on framework " + framework)
     }
 
-  private[sbt] def safeForeach[T](
-      it: Iterable[T], log: Logger)(f: T => Unit): Unit =
+  private[sbt] def safeForeach[T](it: Iterable[T], log: Logger)(
+      f: T => Unit): Unit =
     it.foreach(
         i =>
           try f(i) catch {
@@ -162,13 +162,15 @@ object TestFramework {
       case _ => f.toString
     }
 
-  def testTasks(frameworks: Map[TestFramework, Framework],
-                runners: Map[TestFramework, Runner],
-                testLoader: ClassLoader,
-                tests: Seq[TestDefinition],
-                log: Logger,
-                listeners: Seq[TestReportListener]): (() => Unit,
-  Seq[(String, TestFunction)], TestResult.Value => () => Unit) = {
+  def testTasks(
+      frameworks: Map[TestFramework, Framework],
+      runners: Map[TestFramework, Runner],
+      testLoader: ClassLoader,
+      tests: Seq[TestDefinition],
+      log: Logger,
+      listeners: Seq[TestReportListener]): (() => Unit,
+                                            Seq[(String, TestFunction)],
+                                            TestResult.Value => () => Unit) = {
     val mappedTests = testMap(frameworks.values.toSeq, tests)
     if (mappedTests.isEmpty) (() => (), Nil, _ => () => ())
     else
@@ -274,10 +276,10 @@ object TestFramework {
     }
 }
 
-abstract class TestFunction(val taskDef: TaskDef,
-                            val runner: TestRunner,
-                            fun: (TestRunner) => (SuiteResult,
-                            Seq[TestTask])) {
+abstract class TestFunction(
+    val taskDef: TaskDef,
+    val runner: TestRunner,
+    fun: (TestRunner) => (SuiteResult, Seq[TestTask])) {
 
   def apply(): (SuiteResult, Seq[TestTask]) = fun(runner)
 

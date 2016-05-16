@@ -72,7 +72,8 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
     extends CustomHttpService[
         ByteChunk,
         (APIKey, AccountDetails, Path, String,
-        QueryOptions) => Future[HttpResponse[QueryResult]]] with Logging {
+         QueryOptions) => Future[HttpResponse[QueryResult]]]
+    with Logging {
 
   def execution: Execution[Future, A]
   def extractResponse(request: HttpRequest[_],
@@ -102,7 +103,8 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
 
     opts.output match {
       case FileContent.TextCSV =>
-        response.copy(headers = response.headers + `Content-Type`(text / csv) +
+        response.copy(headers =
+              response.headers + `Content-Type`(text / csv) +
               `Content-Disposition`(attachment(Some("results.csv"))))
       case _ =>
         response.copy(
@@ -110,26 +112,25 @@ abstract class QueryServiceHandler[A](implicit M: Monad[Future])
     }
   }
 
-  val service = (request: HttpRequest[ByteChunk]) =>
-    {
-      success {
-        (apiKey: APIKey, account: AccountDetails, path: Path, query: String,
-        opts: QueryOptions) =>
-          val responseEither = for {
-            executor <- execution.executorFor(apiKey) leftMap {
-              EvaluationError.invalidState
-            }
-            ctx = EvaluationContext(
-                apiKey, account, path, Path.Root, new DateTime) //CLOCK!!!!!!
-            result <- executor.execute(query, ctx, opts)
-            httpResponse <- EitherT.right(
-                extractResponse(request, result, opts.output))
-          } yield {
-            appendHeaders(opts) { httpResponse }
-          }
+  val service = (request: HttpRequest[ByteChunk]) => {
+    success {
+      (apiKey: APIKey, account: AccountDetails, path: Path, query: String,
+       opts: QueryOptions) =>
+        val responseEither = for {
+          executor <- execution.executorFor(apiKey) leftMap {
+                       EvaluationError.invalidState
+                     }
+          ctx = EvaluationContext(
+              apiKey, account, path, Path.Root, new DateTime) //CLOCK!!!!!!
+          result <- executor.execute(query, ctx, opts)
+          httpResponse <- EitherT.right(
+                             extractResponse(request, result, opts.output))
+        } yield {
+          appendHeaders(opts) { httpResponse }
+        }
 
-          responseEither valueOr { handleErrors(query, _) }
-      }
+        responseEither valueOr { handleErrors(query, _) }
+    }
   }
 
   def metadata =
@@ -143,52 +144,55 @@ class AnalysisServiceHandler(
     clock: Clock)(implicit M: Monad[Future])
     extends CustomHttpService[ByteChunk,
                               ((APIKey, AccountDetails),
-                              Path) => Future[HttpResponse[QueryResult]]]
+                               Path) => Future[HttpResponse[QueryResult]]]
     with Logging {
   import blueeyes.core.http.HttpHeaders._
 
-  val service = (request: HttpRequest[ByteChunk]) =>
-    {
-      ShardServiceCombinators.queryOpts(request) map { queryOptions =>
-        { (details: (APIKey, AccountDetails), path: Path) =>
-          val (apiKey, accountDetails) = details
-          // The context needs to use the prefix of the requested script, not th script path
-          val context = EvaluationContext(apiKey,
-                                          accountDetails,
-                                          Path.Root,
-                                          path.prefix getOrElse Path.Root,
-                                          clock.now())
-          val cacheDirectives =
-            request.headers.header[`Cache-Control`].toSeq.flatMap(_.directives)
-          logger.debug("Received analysis request with cache directives: " +
-              cacheDirectives)
+  val service = (request: HttpRequest[ByteChunk]) => {
+    ShardServiceCombinators.queryOpts(request) map { queryOptions =>
+      { (details: (APIKey, AccountDetails), path: Path) =>
+        val (apiKey, accountDetails) = details
+        // The context needs to use the prefix of the requested script, not th script path
+        val context = EvaluationContext(apiKey,
+                                        accountDetails,
+                                        Path.Root,
+                                        path.prefix getOrElse Path.Root,
+                                        clock.now())
+        val cacheDirectives =
+          request.headers.header[`Cache-Control`].toSeq.flatMap(_.directives)
+        logger.debug("Received analysis request with cache directives: " +
+            cacheDirectives)
 
-          val cacheControl0 =
-            CacheControl.fromCacheDirectives(cacheDirectives: _*)
-          // Internally maxAge/maxStale are compared against ms times
-          platform.vfs.executeStoredQuery(
-              platform,
-              scheduler,
-              context,
-              path,
-              queryOptions.copy(cacheControl = cacheControl0)) map { sqr =>
-            HttpResponse(OK,
-                         headers = HttpHeaders(sqr.cachedAt.toSeq map { lmod =>
-                           `Last-Modified`(
-                               HttpDateTimes.StandardDateTime(lmod.toDateTime))
-                         }: _*),
-                         content = Some(Right(ColumnarTableModule
-                                     .toCharBuffers(queryOptions.output,
-                                                    sqr.data.map(_.deref(
-                                                            TransSpecModule.paths.Value))))))
-          } valueOr { evaluationError =>
-            logger.error(
-                "Evaluation errors prevented returning results from stored query: " +
-                evaluationError)
-            HttpResponse(InternalServerError)
-          }
+        val cacheControl0 =
+          CacheControl.fromCacheDirectives(cacheDirectives: _*)
+        // Internally maxAge/maxStale are compared against ms times
+        platform.vfs.executeStoredQuery(
+            platform,
+            scheduler,
+            context,
+            path,
+            queryOptions.copy(cacheControl = cacheControl0)) map { sqr =>
+          HttpResponse(
+              OK,
+              headers =
+                HttpHeaders(sqr.cachedAt.toSeq map { lmod =>
+                  `Last-Modified`(
+                      HttpDateTimes.StandardDateTime(lmod.toDateTime))
+                }: _*),
+              content = Some(
+                  Right(
+                      ColumnarTableModule.toCharBuffers(
+                          queryOptions.output,
+                          sqr.data.map(
+                              _.deref(TransSpecModule.paths.Value))))))
+        } valueOr { evaluationError =>
+          logger.error(
+              "Evaluation errors prevented returning results from stored query: " +
+              evaluationError)
+          HttpResponse(InternalServerError)
         }
       }
+    }
   }
 
   def metadata =

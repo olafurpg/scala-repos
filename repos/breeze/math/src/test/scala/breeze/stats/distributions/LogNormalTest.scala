@@ -24,17 +24,20 @@ import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
 class LogNormalTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with ExpFamTest[LogNormal, Double]
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with ExpFamTest[LogNormal, Double]
     with HasCdfTestBase {
   import Arbitrary.arbitrary
   val expFam = LogNormal
 
   def arbParameter = Arbitrary {
     for (mean <- arbitrary[Double].map { _ % 10.0 };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + .1
-    }) yield (mean, std)
+         std <- arbitrary[Double].map { x =>
+                 math.abs(x) % 8.0 + .1
+               }) yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -49,11 +52,11 @@ class LogNormalTest
 
   implicit def arbDistr = Arbitrary {
     for (mean <- arbitrary[Double].map { x =>
-      math.abs(x) % 10.0
-    };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 1.0 + .1
-    }) yield new LogNormal(mean, std)
+                  math.abs(x) % 10.0
+                };
+         std <- arbitrary[Double].map { x =>
+                 math.abs(x) % 1.0 + .1
+               }) yield new LogNormal(mean, std)
   }
 
   def asDouble(x: Double) = x

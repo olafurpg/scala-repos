@@ -60,7 +60,7 @@ private[streaming] abstract class StateMap[K, S] extends Serializable {
 private[streaming] object StateMap {
   def empty[K, S]: StateMap[K, S] = new EmptyStateMap[K, S]
 
-  def create[K : ClassTag, S : ClassTag](conf: SparkConf): StateMap[K, S] = {
+  def create[K: ClassTag, S: ClassTag](conf: SparkConf): StateMap[K, S] = {
     val deltaChainThreshold = conf.getInt(
         "spark.streaming.sessionByKey.deltaChainThreshold",
         DELTA_CHAIN_LENGTH_THRESHOLD)
@@ -90,7 +90,9 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
     private var deltaChainThreshold: Int = DELTA_CHAIN_LENGTH_THRESHOLD
 )(implicit private var keyClassTag: ClassTag[K],
   private var stateClassTag: ClassTag[S])
-    extends StateMap[K, S] with KryoSerializable { self =>
+    extends StateMap[K, S]
+    with KryoSerializable {
+  self =>
 
   def this(initialCapacity: Int, deltaChainThreshold: Int)(
       implicit keyClassTag: ClassTag[K], stateClassTag: ClassTag[S]) =
@@ -287,11 +289,12 @@ private[streaming] class OpenHashMapBasedStateMap[K, S](
   private def readObjectInternal(inputStream: ObjectInput): Unit = {
     // Read the data of the delta
     val deltaMapSize = inputStream.readInt()
-    deltaMap = if (deltaMapSize != 0) {
-      new OpenHashMap[K, StateInfo[S]](deltaMapSize)
-    } else {
-      new OpenHashMap[K, StateInfo[S]](initialCapacity)
-    }
+    deltaMap =
+      if (deltaMapSize != 0) {
+        new OpenHashMap[K, StateInfo[S]](deltaMapSize)
+      } else {
+        new OpenHashMap[K, StateInfo[S]](initialCapacity)
+      }
     var deltaMapCount = 0
     while (deltaMapCount < deltaMapSize) {
       val key = inputStream.readObject().asInstanceOf[K]

@@ -14,8 +14,7 @@ object Test extends DirectTest {
       val const2 = Constant(c2)
       val equal = const1 == const2
       def show(a: Any) =
-        "" + a +
-        (a match {
+        "" + a + (a match {
               case _: Byte => ".toByte"
               case _: Short => ".toShort"
               case _: Long => "L"

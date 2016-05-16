@@ -89,12 +89,11 @@ class RegressionStrategy(params: RegressionStrategyParams)
     // For each active ticker, pass in trained series into regress
     val tickerModelMap = tickers
       .filter(ticker => (active.firstCol(ticker).findOne(_ == false) == -1))
-      .map(ticker =>
-            {
-          val model = regress(calcIndicator(price.firstCol(ticker))
-                                .map(_.slice(firstIdx, lastIdx)),
-                              retF1d.firstCol(ticker).slice(firstIdx, lastIdx))
-          (ticker, model)
+      .map(ticker => {
+        val model = regress(calcIndicator(price.firstCol(ticker))
+                              .map(_.slice(firstIdx, lastIdx)),
+                            retF1d.firstCol(ticker).slice(firstIdx, lastIdx))
+        (ticker, model)
       })
       .toMap
 

@@ -37,9 +37,8 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     val classType = generator(tokens.last)
     val firstPackage = Ident(termNames.ROOTPKG)
     val others = (packages :+ classType)
-    others.foldLeft[Tree](firstPackage)((prev, elem) =>
-          {
-        Select(prev, elem)
+    others.foldLeft[Tree](firstPackage)((prev, elem) => {
+      Select(prev, elem)
     })
   }
 

@@ -53,7 +53,7 @@ abstract class LineMarkerTestBase extends LightCodeInsightFixtureTestCase {
     val separators = for {
       each <- DaemonCodeAnalyzerImpl.getLineMarkers(
                  editor.getDocument, project)
-                 if each.separatorPlacement == SeparatorPlacement.TOP
+      if each.separatorPlacement == SeparatorPlacement.TOP
       index = editor.getDocument.getLineNumber(
           each.getElement.getTextRange.getStartOffset)
     } yield index + 1

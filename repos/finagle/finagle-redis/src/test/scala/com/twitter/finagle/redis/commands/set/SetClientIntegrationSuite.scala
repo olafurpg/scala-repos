@@ -126,10 +126,9 @@ final class SetClientIntegrationSuite extends RedisClientTest {
       val empty = Await.result(client.sRandMember(key))
       assert(empty.size == 0, "The empty set was not empty!")
 
-      allMembers.foreach(m =>
-            {
-          assert(Await.result(client.sAdd(key, List(m))) == oneElemAdded,
-                 oneElemAddErrorMessage)
+      allMembers.foreach(m => {
+        assert(Await.result(client.sAdd(key, List(m))) == oneElemAdded,
+               oneElemAddErrorMessage)
       })
 
       val oneMember = Await.result(client.sRandMember(key))

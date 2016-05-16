@@ -44,7 +44,7 @@ final case class Binding[T](key: BindingKey[T],
   /**
     * Configure the scope for this binding.
     */
-  def in[A <: Annotation : ClassTag]: Binding[T] =
+  def in[A <: Annotation: ClassTag]: Binding[T] =
     in(implicitly[ClassTag[A]].runtimeClass.asInstanceOf[Class[A]])
 
   /**
@@ -145,7 +145,7 @@ final case class BindingKey[T](
     *
     * In the above example, the controller will get the cached `Foo` service.
     */
-  def qualifiedWith[A <: Annotation : ClassTag]: BindingKey[T] =
+  def qualifiedWith[A <: Annotation: ClassTag]: BindingKey[T] =
     qualifiedWith(implicitly[ClassTag[A]].runtimeClass.asInstanceOf[Class[A]])
 
   /**
@@ -187,7 +187,7 @@ final case class BindingKey[T](
     *
     * This class will be instantiated and injected by the injection framework.
     */
-  def to[C <: T : ClassTag]: Binding[T] =
+  def to[C <: T: ClassTag]: Binding[T] =
     to(implicitly[ClassTag[C]].runtimeClass.asInstanceOf[Class[C]])
 
   /**

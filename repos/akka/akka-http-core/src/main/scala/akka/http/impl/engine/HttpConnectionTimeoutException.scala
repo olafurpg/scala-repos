@@ -7,4 +7,5 @@ package akka.http.impl.engine
 import scala.util.control.NoStackTrace
 
 class HttpConnectionTimeoutException(msg: String)
-    extends RuntimeException(msg) with NoStackTrace
+    extends RuntimeException(msg)
+    with NoStackTrace

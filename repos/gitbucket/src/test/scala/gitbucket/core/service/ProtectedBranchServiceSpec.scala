@@ -9,7 +9,9 @@ import scalaz._, Scalaz._
 import org.scalatest.FunSpec
 
 class ProtectedBranchServiceSpec
-    extends FunSpec with ServiceSpecBase with ProtectedBranchService
+    extends FunSpec
+    with ServiceSpecBase
+    with ProtectedBranchService
     with CommitStatusService {
 
   val receiveHook = new ProtectedBranchReceiveHook()

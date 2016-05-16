@@ -33,7 +33,7 @@ object JavaStreamEnrichmentsProperties
   def output = new ByteArrayOutputStream
 
   // The default Array[Equiv] is reference. WAT!?
-  implicit def aeq[T : Equiv]: Equiv[Array[T]] = new Equiv[Array[T]] {
+  implicit def aeq[T: Equiv]: Equiv[Array[T]] = new Equiv[Array[T]] {
     def equiv(a: Array[T], b: Array[T]): Boolean = {
       val teq = Equiv[T]
       @annotation.tailrec
@@ -46,21 +46,21 @@ object JavaStreamEnrichmentsProperties
       (a.length == b.length) && go(0)
     }
   }
-  implicit def teq[T1 : Equiv, T2 : Equiv]: Equiv[(T1, T2)] =
+  implicit def teq[T1: Equiv, T2: Equiv]: Equiv[(T1, T2)] =
     new Equiv[(T1, T2)] {
       def equiv(a: (T1, T2), b: (T1, T2)) = {
         Equiv[T1].equiv(a._1, b._1) && Equiv[T2].equiv(a._2, b._2)
       }
     }
 
-  def writeRead[T : Equiv](
+  def writeRead[T: Equiv](
       g: Gen[T], w: (T, OutputStream) => Unit, r: InputStream => T): Prop =
     forAll(g) { t =>
       val test = output
       w(t, test)
       Equiv[T].equiv(r(test.toInputStream), t)
     }
-  def writeRead[T : Equiv : Arbitrary](
+  def writeRead[T: Equiv: Arbitrary](
       w: (T, OutputStream) => Unit, r: InputStream => T): Prop =
     writeRead(implicitly[Arbitrary[T]].arbitrary, w, r)
 

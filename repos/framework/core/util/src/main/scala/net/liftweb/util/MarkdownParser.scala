@@ -37,10 +37,10 @@ object MarkdownParser {
       res = Html5.parse("<html><head><title>I eat yaks</title></head><body>" +
           str + "</body></html>")
       info <- res.map { res =>
-        (res \ "body").collect {
-          case e: Elem => e
-        }.flatMap(_.child)
-      }
+               (res \ "body").collect {
+                 case e: Elem => e
+               }.flatMap(_.child)
+             }
     } yield info
   }
 }

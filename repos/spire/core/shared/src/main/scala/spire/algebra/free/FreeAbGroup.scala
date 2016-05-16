@@ -87,8 +87,8 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal {
     * positive terms on the right. If either side has no terms at all, then that
     * side is `None`.
     */
-  def splitSemigroup[B](f: A => B)(
-      implicit B: CSemigroup[B]): (Option[B], Option[B]) =
+  def splitSemigroup[B](
+      f: A => B)(implicit B: CSemigroup[B]): (Option[B], Option[B]) =
     split[Option[B]] { a =>
       Some(f(a))
     }

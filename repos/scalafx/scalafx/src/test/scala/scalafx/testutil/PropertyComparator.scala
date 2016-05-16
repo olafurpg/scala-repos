@@ -38,9 +38,9 @@ trait PropertyComparator extends AbstractComparator {
     javaMethod.getName
 
   protected def isSpecialMethodName(name: String) =
-    super.isImplementation(name) || (name == "applyTo") || (name == "create") ||
-    (name == "build") || name.endsWith("Property") || name.startsWith("get") ||
-    name.startsWith("set") || name.startsWith("is")
+    super.isImplementation(name) || (name == "applyTo") ||
+    (name == "create") || (name == "build") || name.endsWith("Property") ||
+    name.startsWith("get") || name.startsWith("set") || name.startsWith("is")
 
   private def assertProperties(javaFxProperties: Set[String],
                                scalaFxClass: Class[_],

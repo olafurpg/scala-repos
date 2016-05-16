@@ -36,8 +36,11 @@ import org.apache.spark.rdd.RDD
 @Since("0.8.0")
 class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
                                @Since("0.8.0") override val intercept: Double)
-    extends GeneralizedLinearModel(weights, intercept) with ClassificationModel
-    with Serializable with Saveable with PMMLExportable {
+    extends GeneralizedLinearModel(weights, intercept)
+    with ClassificationModel
+    with Serializable
+    with Saveable
+    with PMMLExportable {
 
   private var threshold: Option[Double] = Some(0.0)
 
@@ -141,7 +144,8 @@ class SVMWithSGD private (private var stepSize: Double,
                           private var numIterations: Int,
                           private var regParam: Double,
                           private var miniBatchFraction: Double)
-    extends GeneralizedLinearAlgorithm[SVMModel] with Serializable {
+    extends GeneralizedLinearAlgorithm[SVMModel]
+    with Serializable {
 
   private val gradient = new HingeGradient()
   private val updater = new SquaredL2Updater()

@@ -169,8 +169,8 @@ object Player {
                      proposeTakebackAt = r intD proposeTakebackAt,
                      userId = userId,
                      rating = r intO rating flatMap ratingRange(userId),
-                     ratingDiff = r intO ratingDiff flatMap ratingDiffRange(
-                           userId),
+                     ratingDiff =
+                       r intO ratingDiff flatMap ratingDiffRange(userId),
                      provisional = r boolD provisional,
                      blurs = r intD blurs,
                      holdAlert = r.getO[HoldAlert](holdAlert),

@@ -98,7 +98,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
     }
 
     abstract class Morphism1(val namespace: Vector[String], val name: String)
-        extends Morphism1Like with Morph1Apply {
+        extends Morphism1Like
+        with Morph1Apply {
       val opcode: Int = defaultMorphism1Opcode.getAndIncrement
       val rowLevel: Boolean = false
     }
@@ -118,7 +119,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
     }
 
     abstract class Op1(namespace: Vector[String], name: String)
-        extends Morphism1(namespace, name) with Op1Like {
+        extends Morphism1(namespace, name)
+        with Op1Like {
       def spec[A <: SourceType](ctx: MorphContext)(
           source: TransSpec[A]): TransSpec[A]
 
@@ -141,7 +143,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
     }
 
     abstract class Op2(namespace: Vector[String], name: String)
-        extends Morphism2(namespace, name) with Op2Like {
+        extends Morphism2(namespace, name)
+        with Op2Like {
       val alignment = MorphismAlignment.Match(
           M.point {
         new Morph1Apply {
@@ -183,9 +186,10 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
       override def fold[A](op2: Op2 => A, op2F2: Op2F2 => A): A = op2F2(this)
     }
 
-    abstract class Reduction(val namespace: Vector[String], val name: String)(
-        implicit M: Monad[M])
-        extends ReductionLike with Morph1Apply {
+    abstract class Reduction(
+        val namespace: Vector[String], val name: String)(implicit M: Monad[M])
+        extends ReductionLike
+        with Morph1Apply {
       val opcode: Int = defaultReductionOpcode.getAndIncrement
       val rowLevel: Boolean = false
 
@@ -206,7 +210,8 @@ trait TableLibModule[M[+ _]] extends TableModule[M] with TransSpecModule {
 }
 
 trait ColumnarTableLibModule[M[+ _]]
-    extends TableLibModule[M] with ColumnarTableModule[M] {
+    extends TableLibModule[M]
+    with ColumnarTableModule[M] {
   trait ColumnarTableLib extends TableLib {
     class WrapArrayTableReduction(
         val r: Reduction, val jtypef: Option[JType => JType])
@@ -302,21 +307,43 @@ trait ColumnarTableLibModule[M[+ _]]
 }
 
 trait StdLibModule[M[+ _]]
-    extends InfixLibModule[M] with UnaryLibModule[M] with ArrayLibModule[M]
-    with TimeLibModule[M] with MathLibModule[M] with TypeLibModule[M]
-    with StringLibModule[M] with StatsLibModule[M] with SummaryLibModule[M]
-    with NormalizationLibModule[M] with ClusteringLibModule[M]
-    with RandomForestLibModule[M] with LogisticRegressionLibModule[M]
-    with LinearRegressionLibModule[M] with FSLibModule[M]
-    with RandomLibModule[M] with PrecogLibModule[M] {
+    extends InfixLibModule[M]
+    with UnaryLibModule[M]
+    with ArrayLibModule[M]
+    with TimeLibModule[M]
+    with MathLibModule[M]
+    with TypeLibModule[M]
+    with StringLibModule[M]
+    with StatsLibModule[M]
+    with SummaryLibModule[M]
+    with NormalizationLibModule[M]
+    with ClusteringLibModule[M]
+    with RandomForestLibModule[M]
+    with LogisticRegressionLibModule[M]
+    with LinearRegressionLibModule[M]
+    with FSLibModule[M]
+    with RandomLibModule[M]
+    with PrecogLibModule[M] {
   type Lib <: StdLib
 
   trait StdLib
-      extends InfixLib with UnaryLib with ArrayLib with TimeLib with MathLib
-      with TypeLib with StringLib with StatsLib with SummaryLib
-      with NormalizationLib with ClusteringLib with RandomForestLib
-      with LogisticRegressionLib with LinearRegressionLib with FSLib
-      with RandomLib with PrecogLib
+      extends InfixLib
+      with UnaryLib
+      with ArrayLib
+      with TimeLib
+      with MathLib
+      with TypeLib
+      with StringLib
+      with StatsLib
+      with SummaryLib
+      with NormalizationLib
+      with ClusteringLib
+      with RandomForestLib
+      with LogisticRegressionLib
+      with LinearRegressionLib
+      with FSLib
+      with RandomLib
+      with PrecogLib
 }
 
 object StdLib {
@@ -326,7 +353,8 @@ object StdLib {
 
   object StrFrom {
     class L(c: LongColumn, defined: Long => Boolean, f: Long => String)
-        extends Map1Column(c) with StrColumn {
+        extends Map1Column(c)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -335,7 +363,8 @@ object StdLib {
     }
 
     class D(c: DoubleColumn, defined: Double => Boolean, f: Double => String)
-        extends Map1Column(c) with StrColumn {
+        extends Map1Column(c)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -345,7 +374,8 @@ object StdLib {
 
     class N(
         c: NumColumn, defined: BigDecimal => Boolean, f: BigDecimal => String)
-        extends Map1Column(c) with StrColumn {
+        extends Map1Column(c)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -354,7 +384,8 @@ object StdLib {
     }
 
     class S(c: StrColumn, defined: String => Boolean, f: String => String)
-        extends Map1Column(c) with StrColumn {
+        extends Map1Column(c)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -364,7 +395,8 @@ object StdLib {
 
     class Dt(
         c: DateColumn, defined: DateTime => Boolean, f: DateTime => String)
-        extends Map1Column(c) with StrColumn {
+        extends Map1Column(c)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -376,7 +408,8 @@ object StdLib {
              c2: StrColumn,
              defined: (String, String) => Boolean,
              f: (String, String) => String)
-        extends Map2Column(c1, c2) with StrColumn {
+        extends Map2Column(c1, c2)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -388,7 +421,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (String, Double) => Boolean,
              f: (String, Double) => String)
-        extends Map2Column(c1, c2) with StrColumn {
+        extends Map2Column(c1, c2)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && c1(row) != null &&
@@ -401,7 +435,8 @@ object StdLib {
              c2: LongColumn,
              defined: (String, Long) => Boolean,
              f: (String, Long) => String)
-        extends Map2Column(c1, c2) with StrColumn {
+        extends Map2Column(c1, c2)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && c1(row) != null && defined(c1(row), c2(row))
@@ -413,7 +448,8 @@ object StdLib {
              c2: NumColumn,
              defined: (String, BigDecimal) => Boolean,
              f: (String, BigDecimal) => String)
-        extends Map2Column(c1, c2) with StrColumn {
+        extends Map2Column(c1, c2)
+        with StrColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && c1(row) != null && defined(c1(row), c2(row))
@@ -424,7 +460,8 @@ object StdLib {
 
   object LongFrom {
     class L(c: LongColumn, defined: Long => Boolean, f: Long => Long)
-        extends Map1Column(c) with LongColumn {
+        extends Map1Column(c)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -433,7 +470,8 @@ object StdLib {
     }
 
     class S(c: StrColumn, defined: String => Boolean, f: String => Long)
-        extends Map1Column(c) with LongColumn {
+        extends Map1Column(c)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -442,7 +480,8 @@ object StdLib {
     }
 
     class Dt(c: DateColumn, defined: DateTime => Boolean, f: DateTime => Long)
-        extends Map1Column(c) with LongColumn {
+        extends Map1Column(c)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -454,7 +493,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Long, Long) => Boolean,
              f: (Long, Long) => Long)
-        extends Map2Column(c1, c2) with LongColumn {
+        extends Map2Column(c1, c2)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -466,7 +506,8 @@ object StdLib {
              c2: StrColumn,
              defined: (String, String) => Boolean,
              f: (String, String) => Long)
-        extends Map2Column(c1, c2) with LongColumn {
+        extends Map2Column(c1, c2)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -478,7 +519,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (String, Double) => Boolean,
              f: (String, Double) => Long)
-        extends Map2Column(c1, c2) with LongColumn {
+        extends Map2Column(c1, c2)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -490,7 +532,8 @@ object StdLib {
              c2: LongColumn,
              defined: (String, Long) => Boolean,
              f: (String, Long) => Long)
-        extends Map2Column(c1, c2) with LongColumn {
+        extends Map2Column(c1, c2)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -502,7 +545,8 @@ object StdLib {
              c2: NumColumn,
              defined: (String, BigDecimal) => Boolean,
              f: (String, BigDecimal) => Long)
-        extends Map2Column(c1, c2) with LongColumn {
+        extends Map2Column(c1, c2)
+        with LongColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -513,7 +557,8 @@ object StdLib {
 
   object DoubleFrom {
     class D(c: DoubleColumn, defined: Double => Boolean, f: Double => Double)
-        extends Map1Column(c) with DoubleColumn {
+        extends Map1Column(c)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row)) &&
@@ -523,7 +568,8 @@ object StdLib {
     }
 
     class L(c: LongColumn, defined: Double => Boolean, f: Double => Double)
-        extends Map1Column(c) with DoubleColumn {
+        extends Map1Column(c)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row).toDouble) &&
@@ -533,7 +579,8 @@ object StdLib {
     }
 
     class N(c: NumColumn, defined: Double => Boolean, f: Double => Double)
-        extends Map1Column(c) with DoubleColumn {
+        extends Map1Column(c)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row).toDouble) &&
@@ -546,7 +593,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row)) &&
@@ -559,7 +607,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row).toDouble) &&
@@ -572,7 +621,8 @@ object StdLib {
              c2: NumColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row).toDouble) &&
@@ -585,7 +635,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row).toDouble, c2(row)) &&
@@ -598,7 +649,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -612,7 +664,8 @@ object StdLib {
              c2: NumColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -626,7 +679,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row).toDouble, c2(row)) &&
@@ -639,7 +693,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -653,7 +708,8 @@ object StdLib {
              c2: NumColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Double)
-        extends Map2Column(c1, c2) with DoubleColumn {
+        extends Map2Column(c1, c2)
+        with DoubleColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -668,7 +724,8 @@ object StdLib {
     class N(c: NumColumn,
             defined: BigDecimal => Boolean,
             f: BigDecimal => BigDecimal)
-        extends Map1Column(c) with NumColumn {
+        extends Map1Column(c)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -680,7 +737,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -693,7 +751,8 @@ object StdLib {
              c2: LongColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -706,7 +765,8 @@ object StdLib {
              c2: NumColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(BigDecimal(c1(row)), c2(row))
@@ -718,7 +778,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -731,7 +792,8 @@ object StdLib {
              c2: LongColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) &&
@@ -745,7 +807,8 @@ object StdLib {
              c2: NumColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(BigDecimal(c1(row)), c2(row))
@@ -757,7 +820,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), BigDecimal(c2(row)))
@@ -769,7 +833,8 @@ object StdLib {
              c2: LongColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), BigDecimal(c2(row)))
@@ -781,7 +846,8 @@ object StdLib {
              c2: NumColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => BigDecimal)
-        extends Map2Column(c1, c2) with NumColumn {
+        extends Map2Column(c1, c2)
+        with NumColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -792,19 +858,22 @@ object StdLib {
 
   object BoolFrom {
     class B(c: BoolColumn, f: Boolean => Boolean)
-        extends Map1Column(c) with BoolColumn {
+        extends Map1Column(c)
+        with BoolColumn {
 
       def apply(row: Int) = f(c(row))
     }
 
     class BB(c1: BoolColumn, c2: BoolColumn, f: (Boolean, Boolean) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       def apply(row: Int) = f(c1(row), c2(row))
     }
 
     class S(c: StrColumn, defined: String => Boolean, f: String => Boolean)
-        extends Map1Column(c) with BoolColumn {
+        extends Map1Column(c)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -816,7 +885,8 @@ object StdLib {
              c2: StrColumn,
              defined: (String, String) => Boolean,
              f: (String, String) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -828,7 +898,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (Double, Double) => Boolean,
              f: (Double, Double) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -840,7 +911,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Double, Long) => Boolean,
              f: (Double, Long) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -852,7 +924,8 @@ object StdLib {
              c2: NumColumn,
              defined: (Double, BigDecimal) => Boolean,
              f: (Double, BigDecimal) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -864,7 +937,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (Long, Double) => Boolean,
              f: (Long, Double) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -876,7 +950,8 @@ object StdLib {
              c2: LongColumn,
              defined: (Long, Long) => Boolean,
              f: (Long, Long) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -888,7 +963,8 @@ object StdLib {
              c2: NumColumn,
              defined: (Long, BigDecimal) => Boolean,
              f: (Long, BigDecimal) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -900,7 +976,8 @@ object StdLib {
              c2: DoubleColumn,
              defined: (BigDecimal, Double) => Boolean,
              f: (BigDecimal, Double) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -912,7 +989,8 @@ object StdLib {
              c2: LongColumn,
              defined: (BigDecimal, Long) => Boolean,
              f: (BigDecimal, Long) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -924,7 +1002,8 @@ object StdLib {
              c2: NumColumn,
              defined: (BigDecimal, BigDecimal) => Boolean,
              f: (BigDecimal, BigDecimal) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))
@@ -934,7 +1013,8 @@ object StdLib {
 
     class Dt(
         c: DateColumn, defined: DateTime => Boolean, f: DateTime => Boolean)
-        extends Map1Column(c) with BoolColumn {
+        extends Map1Column(c)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c(row))
@@ -946,7 +1026,8 @@ object StdLib {
                c2: DateColumn,
                defined: (DateTime, DateTime) => Boolean,
                f: (DateTime, DateTime) => Boolean)
-        extends Map2Column(c1, c2) with BoolColumn {
+        extends Map2Column(c1, c2)
+        with BoolColumn {
 
       override def isDefinedAt(row: Int) =
         super.isDefinedAt(row) && defined(c1(row), c2(row))

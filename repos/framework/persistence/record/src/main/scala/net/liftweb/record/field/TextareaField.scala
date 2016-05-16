@@ -52,8 +52,10 @@ trait TextareaTypedField extends StringTypedField {
 
 class TextareaField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, maxLength: Int)
-    extends StringField(rec, maxLength) with TextareaTypedField
+    extends StringField(rec, maxLength)
+    with TextareaTypedField
 
 class OptionalTextareaField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, maxLength: Int)
-    extends OptionalStringField(rec, maxLength) with TextareaTypedField
+    extends OptionalStringField(rec, maxLength)
+    with TextareaTypedField

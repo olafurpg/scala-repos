@@ -72,7 +72,8 @@ private[parquet] trait HasParentContainerUpdater {
   */
 private[parquet] abstract class CatalystGroupConverter(
     val updater: ParentContainerUpdater)
-    extends GroupConverter with HasParentContainerUpdater
+    extends GroupConverter
+    with HasParentContainerUpdater
 
 /**
   * Parquet converter for Parquet primitive types.  Note that not all Spark SQL atomic types
@@ -81,7 +82,8 @@ private[parquet] abstract class CatalystGroupConverter(
   */
 private[parquet] class CatalystPrimitiveConverter(
     val updater: ParentContainerUpdater)
-    extends PrimitiveConverter with HasParentContainerUpdater {
+    extends PrimitiveConverter
+    with HasParentContainerUpdater {
 
   override def addBoolean(value: Boolean): Unit = updater.setBoolean(value)
   override def addInt(value: Int): Unit = updater.setInt(value)
@@ -123,7 +125,8 @@ private[parquet] class CatalystPrimitiveConverter(
 private[parquet] class CatalystRowConverter(parquetType: GroupType,
                                             catalystType: StructType,
                                             updater: ParentContainerUpdater)
-    extends CatalystGroupConverter(updater) with Logging {
+    extends CatalystGroupConverter(updater)
+    with Logging {
 
   assert(
       parquetType.getFieldCount == catalystType.length,
@@ -630,7 +633,8 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
       parquetType: Type,
       catalystType: DataType,
       parentUpdater: ParentContainerUpdater)
-      extends PrimitiveConverter with RepeatedConverter
+      extends PrimitiveConverter
+      with RepeatedConverter
       with HasParentContainerUpdater {
 
     val updater: ParentContainerUpdater = newArrayUpdater(parentUpdater)
@@ -665,7 +669,8 @@ private[parquet] class CatalystRowConverter(parquetType: GroupType,
       parquetType: Type,
       catalystType: DataType,
       parentUpdater: ParentContainerUpdater)
-      extends GroupConverter with HasParentContainerUpdater
+      extends GroupConverter
+      with HasParentContainerUpdater
       with RepeatedConverter {
 
     val updater: ParentContainerUpdater = newArrayUpdater(parentUpdater)

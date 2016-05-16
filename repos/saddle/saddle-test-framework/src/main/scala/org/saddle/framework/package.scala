@@ -14,22 +14,21 @@ package object framework {
     Arbitrary(Gen.listOfN(100, boundedDouble))
 
   /** Yield an arbitrary 100 x 100 Matrix. */
-  implicit def arbMatrix[S : ClassManifest : Gen]: Arbitrary[Mat[S]] =
+  implicit def arbMatrix[S: ClassManifest: Gen]: Arbitrary[Mat[S]] =
     arbMatrixOfN[S](100, 100)
 
   /** Yield an arbitrary Vector of 100 values. */
-  implicit def arbVector[S : ClassManifest : Gen]: Arbitrary[Vec[S]] =
+  implicit def arbVector[S: ClassManifest: Gen]: Arbitrary[Vec[S]] =
     arbVectorOfN[S](100)
 
   /** Yield an arbitrary Series of 100 values. */
   implicit def arbSeries[
-      X : Gen : Ordering : ClassManifest, S : ClassManifest : Gen]: Arbitrary[
-      Series[X, S]] = arbSeriesOfN[X, S](100)
+      X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen]
+    : Arbitrary[Series[X, S]] = arbSeriesOfN[X, S](100)
 
   /** Yield an arbitrary 10 x 100 Frame. */
-  implicit def arbFrame[
-      X : Gen : Ordering : ClassManifest, S : ClassManifest : Gen]: Arbitrary[
-      Frame[X, Int, S]] = arbFrameOfN[X, S](10, 100)
+  implicit def arbFrame[X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen]
+    : Arbitrary[Frame[X, Int, S]] = arbFrameOfN[X, S](10, 100)
 
   /** A generator for doubles with bounds at .5 the size of the min/max valyes. */
   def boundedDouble: Gen[Double] = Gen.choose(-1000000d, 1000000d)
@@ -41,15 +40,15 @@ package object framework {
   def dateTimeEpochToNow: Gen[DateTime] = longEpochToNow map (new DateTime(_))
 
   /** A generator for Vectors of an arbitrary size. */
-  def genVectorOfN[S : Gen : ScalarTag](size: Int): Gen[Vec[S]] =
+  def genVectorOfN[S: Gen: ScalarTag](size: Int): Gen[Vec[S]] =
     Gen.listOfN(size, implicitly[Gen[S]]).map(l => Vec(l: _*))
 
   /** A generator for MatS of an arbitrary size. */
-  def genMatrixOfN[S : Gen : ScalarTag](cols: Int, rows: Int): Gen[Mat[S]] =
+  def genMatrixOfN[S: Gen: ScalarTag](cols: Int, rows: Int): Gen[Mat[S]] =
     Gen.listOfN(cols, genVectorOfN[S](rows)).map(v => Mat(v: _*))
 
   /** A generator for Series of an arbitrary size. */
-  def genSeriesOfN[X : Gen : Ordering : ScalarTag, S : Gen : ScalarTag](
+  def genSeriesOfN[X: Gen: Ordering: ScalarTag, S: Gen: ScalarTag](
       size: Int): Gen[Series[X, S]] =
     for {
       dateTime <- Gen.listOfN(size, implicitly[Gen[X]])
@@ -57,26 +56,25 @@ package object framework {
     } yield Series(dateTime.zip(value): _*)
 
   /** A generator for FrameS of an arbitrary size. */
-  def genFrameOfN[X : Gen : Ordering : ScalarTag, S : Gen : ScalarTag](
+  def genFrameOfN[X: Gen: Ordering: ScalarTag, S: Gen: ScalarTag](
       dsize: Int, ssize: Int): Gen[Frame[X, Int, S]] =
     Gen.listOfN(dsize, genSeriesOfN[X, S](ssize)).map(ss => Frame(ss: _*))
 
   /** Yield an arbitrary 100 x 100 Matrix. */
-  def arbMatrixOfN[S : ClassManifest : Gen](
+  def arbMatrixOfN[S: ClassManifest: Gen](
       cols: Int, rows: Int): Arbitrary[Mat[S]] =
     Arbitrary(genMatrixOfN[S](cols, rows))
 
   /** Yield an arbitrary Vector of 100 values. */
-  def arbVectorOfN[S : ClassManifest : Gen](size: Int): Arbitrary[Vec[S]] =
+  def arbVectorOfN[S: ClassManifest: Gen](size: Int): Arbitrary[Vec[S]] =
     Arbitrary(genVectorOfN[S](size))
 
   /** Yield an arbitrary Series of 100 values. */
-  def arbSeriesOfN[
-      X : Gen : Ordering : ClassManifest, S : ClassManifest : Gen](
+  def arbSeriesOfN[X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen](
       size: Int): Arbitrary[Series[X, S]] = Arbitrary(genSeriesOfN[X, S](size))
 
   /** Yield an arbitrary 100 x 100 Series. */
-  def arbFrameOfN[X : Gen : Ordering : ClassManifest, S : ClassManifest : Gen](
+  def arbFrameOfN[X: Gen: Ordering: ClassManifest, S: ClassManifest: Gen](
       cols: Int, rows: Int): Arbitrary[Frame[X, Int, S]] =
     Arbitrary(genFrameOfN[X, S](cols, rows))
 }

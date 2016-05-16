@@ -107,8 +107,8 @@ object Menu extends DispatchSnippet {
     val expandAny: Boolean =
       S.attr("expand").map(Helpers.toBoolean) openOr true
 
-    val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield
-      i
+    val level: Box[Int] =
+      for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield i
 
     val toRender: Seq[MenuItem] = (S.attr("item"), S.attr("group")) match {
       case (Full(item), _) =>
@@ -159,7 +159,8 @@ object Menu extends DispatchSnippet {
                        // Is a placeholder useful if we don't display the kids? I say no (DCB, 20101108)
                        <xml:group> <span>{text}</span>{buildUlLine(kids)}</xml:group>) %
                   (if (m.path)
-                     S.prefixedAttrsToMetaData("li_path", liMap) else Null) %
+                     S.prefixedAttrsToMetaData("li_path", liMap)
+                   else Null) %
                   (if (m.current) S.prefixedAttrsToMetaData("li_item", liMap)
                    else Null))
 
@@ -313,7 +314,7 @@ object Menu extends DispatchSnippet {
     */
   def title(text: NodeSeq): NodeSeq = {
     val r = for (request <- S.request;
-    loc <- request.location) yield loc.title
+                 loc <- request.location) yield loc.title
 
     text match {
       case TitleText(attrs, str) => {

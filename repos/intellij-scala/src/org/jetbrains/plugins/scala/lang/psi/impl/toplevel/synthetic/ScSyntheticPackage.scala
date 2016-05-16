@@ -103,9 +103,8 @@ object ScSyntheticPackage {
                      GlobalSearchScope.allScope(project),
                      classOf[PsiClass])
         .toSeq
-        .find(pc =>
-              {
-            pc.qualifiedName == fqn
+        .find(pc => {
+          pc.qualifiedName == fqn
         }) match {
         case Some(obj) =>
           val pname = if (i < 0) "" else fqn.substring(0, i)
@@ -129,10 +128,8 @@ object ScSyntheticPackage {
         case None => null
       }
     } else {
-      val pkgs = packages.filter(
-          pc =>
-            {
-          pc.fqn.startsWith(fqn) && fqn.startsWith(pc.prefix)
+      val pkgs = packages.filter(pc => {
+        pc.fqn.startsWith(fqn) && fqn.startsWith(pc.prefix)
       })
 
       if (pkgs.isEmpty) null

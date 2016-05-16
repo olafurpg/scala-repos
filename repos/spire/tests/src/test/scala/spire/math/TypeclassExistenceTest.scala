@@ -91,7 +91,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Numeric is ConvertableTo") {
-    def check[A : Numeric : ClassTag]: Unit = {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasConvertableTo[A]
     }
 
@@ -99,7 +99,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Numeric is ConvertableFrom") {
-    def check[A : Numeric : ClassTag]: Unit = {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasConvertableFrom[A]
     }
 
@@ -107,7 +107,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Rings are Rigs") {
-    def check[A : Ring : ClassTag]: Unit = {
+    def check[A: Ring: ClassTag]: Unit = {
       hasRig[A]
     }
 
@@ -115,7 +115,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("EuclideanRings are Rings") {
-    def check[A : EuclideanRing : ClassTag]: Unit = {
+    def check[A: EuclideanRing: ClassTag]: Unit = {
       hasRing[A]
     }
 
@@ -123,7 +123,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Fields are EuclideanRings") {
-    def check[A : Field : ClassTag]: Unit = {
+    def check[A: Field: ClassTag]: Unit = {
       hasEuclideanRing[A]
     }
 
@@ -131,7 +131,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Numerics have Order, NRoot, and are Rigs") {
-    def check[A : Numeric : ClassTag]: Unit = {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasRig[A]
       hasOrder[A]
       hasNRoot[A]
@@ -141,7 +141,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Fractional have Order, NRoot and are Fields") {
-    def check[A : Fractional : ClassTag]: Unit = {
+    def check[A: Fractional: ClassTag]: Unit = {
       hasOrder[A]
       hasEuclideanRing[A]
       hasField[A]

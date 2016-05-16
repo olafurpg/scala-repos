@@ -41,7 +41,7 @@ object StreamTest extends SpecLite {
     (a: Stream[Int], b: Int) =>
       val isEven = (_: Int) % 2 == 0
       a.intersperse(b).zipWithIndex.filter(p => isEven(p._2)).map(_._1) must_===
-      (a)
+        (a)
   }
 
   "intercalate is same as intersperse(s).flatten" ! forAll {
@@ -67,13 +67,13 @@ object StreamTest extends SpecLite {
   "foldl is foldLeft" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldLeft(List[Int]())(_ ++ _) must_===
-        (F.foldLeft(rnge, List[Int]())(_ ++ _)))
+          (F.foldLeft(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldr is foldRight" ! forAll { (rnge: Stream[List[Int]]) =>
     val F = Foldable[Stream]
     (rnge.foldRight(List[Int]())(_ ++ _) must_===
-        (F.foldRight(rnge, List[Int]())(_ ++ _)))
+          (F.foldRight(rnge, List[Int]())(_ ++ _)))
   }
 
   "foldMap evaluates lazily" in {
@@ -83,7 +83,7 @@ object StreamTest extends SpecLite {
 
   "foldRight evaluates lazily" in {
     Foldable[Stream].foldRight(Stream.continually(true), true)(_ || _) must_===
-    (true)
+      (true)
   }
 
   "zipL" in {
@@ -93,8 +93,7 @@ object StreamTest extends SpecLite {
     val F = Traverse[Stream]
     F.zipL(infinite, infinite)
     F.zipL(finite, infinite).length must_=== (size)
-    F.zipL(finite, infinite) must_===
-    ((finite zip infinite).map { x =>
+    F.zipL(finite, infinite) must_=== ((finite zip infinite).map { x =>
           (x._1, Option(x._2))
         })
     F.zipL(infinite, finite).take(1000).length must_=== (1000)
@@ -106,8 +105,8 @@ object StreamTest extends SpecLite {
   }
 
   object instances {
-    def equal[A : Equal] = Equal[Stream[A]]
-    def order[A : Order] = Order[Stream[A]]
+    def equal[A: Equal] = Equal[Stream[A]]
+    def order[A: Order] = Order[Stream[A]]
     def monoid[A] = Monoid[Stream[A]]
     def bindRec = BindRec[Stream]
     def monadPlus = MonadPlus[Stream]

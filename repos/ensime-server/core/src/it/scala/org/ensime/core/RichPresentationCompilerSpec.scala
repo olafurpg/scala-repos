@@ -17,7 +17,8 @@ import scala.tools.nsc.reporters.ConsoleReporter
 import scala.util.Properties
 
 class RichPresentationCompilerThatNeedsJavaLibsSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -45,7 +46,8 @@ class RichPresentationCompilerThatNeedsJavaLibsSpec
 }
 
 class RichPresentationCompilerSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -799,7 +801,7 @@ object ReallyRichPresentationCompilerFixture
   def runForPositionInCompiledSource(
       config: EnsimeConfig, cc: RichPresentationCompiler, lines: String*)(
       testCode: (OffsetPosition, String,
-      RichPresentationCompiler) => Any): Any = {
+                 RichPresentationCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0
     var points = Queue.empty[(Int, String)]

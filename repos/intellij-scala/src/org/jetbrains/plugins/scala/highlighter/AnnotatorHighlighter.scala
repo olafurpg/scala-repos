@@ -89,15 +89,13 @@ object AnnotatorHighlighter {
       UsageTrigger.trigger("scala.collection.pack.highlighting")
 
       def conformsByNames(tp: ScType, qn: List[String]): Boolean = {
-        qn.exists(
-            textName =>
-              {
-            val cachedClass = ScalaPsiManager
-              .instance(refElement.getProject)
-              .getCachedClass(
-                  textName, refElement.getResolveScope, ClassCategory.TYPE)
-            if (cachedClass == null) false
-            else tp.conforms(ScType.designator(cachedClass))
+        qn.exists(textName => {
+          val cachedClass = ScalaPsiManager
+            .instance(refElement.getProject)
+            .getCachedClass(
+                textName, refElement.getResolveScope, ClassCategory.TYPE)
+          if (cachedClass == null) false
+          else tp.conforms(ScType.designator(cachedClass))
         })
       }
 
@@ -213,8 +211,7 @@ object AnnotatorHighlighter {
         val parent = x.nameContext
         parent match {
           case r @ (_: ScValue | _: ScVariable) =>
-            Option(x.containingClass).foreach(
-                a =>
+            Option(x.containingClass).foreach(a =>
                   if (SCALA_PREDEFINED_OBJECTS.contains(a.qualifiedName)) {
                 x.getType(TypingContext.empty)
                   .foreach(annotateCollectionByType)

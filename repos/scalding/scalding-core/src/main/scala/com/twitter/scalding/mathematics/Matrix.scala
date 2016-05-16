@@ -51,23 +51,23 @@ import scala.annotation.tailrec
 // Implicit coversions
 // Add methods we want to add to pipes here:
 class MatrixPipeExtensions(pipe: Pipe) {
-  def toMatrix[RowT, ColT, ValT](fields: Fields)(
-      implicit conv: TupleConverter[(RowT, ColT, ValT)],
-      setter: TupleSetter[(RowT, ColT, ValT)]) = {
+  def toMatrix[RowT, ColT, ValT](
+      fields: Fields)(implicit conv: TupleConverter[(RowT, ColT, ValT)],
+                      setter: TupleSetter[(RowT, ColT, ValT)]) = {
     val matPipe = RichPipe(pipe).mapTo(fields -> ('row, 'col, 'val))(
         (tup: (RowT, ColT, ValT)) => tup)(conv, setter)
     new Matrix[RowT, ColT, ValT]('row, 'col, 'val, matPipe)
   }
-  def mapToMatrix[T, RowT, ColT, ValT](
-      fields: Fields)(mapfn: T => (RowT, ColT, ValT))(
+  def mapToMatrix[T, RowT, ColT, ValT](fields: Fields)(
+      mapfn: T => (RowT, ColT, ValT))(
       implicit conv: TupleConverter[T],
       setter: TupleSetter[(RowT, ColT, ValT)]) = {
     val matPipe =
       RichPipe(pipe).mapTo(fields -> ('row, 'col, 'val))(mapfn)(conv, setter)
     new Matrix[RowT, ColT, ValT]('row, 'col, 'val, matPipe)
   }
-  def flatMapToMatrix[T, RowT, ColT, ValT](
-      fields: Fields)(flatMapfn: T => Iterable[(RowT, ColT, ValT)])(
+  def flatMapToMatrix[T, RowT, ColT, ValT](fields: Fields)(
+      flatMapfn: T => Iterable[(RowT, ColT, ValT)])(
       implicit conv: TupleConverter[T],
       setter: TupleSetter[(RowT, ColT, ValT)]) = {
     val matPipe = RichPipe(pipe).flatMapTo(fields -> ('row, 'col, 'val))(
@@ -288,7 +288,8 @@ class Matrix[RowT, ColT, ValT](val rowSym: Symbol,
                                val valSym: Symbol,
                                inPipe: Pipe,
                                val sizeHint: SizeHint = NoClue)
-    extends WrappedPipe with java.io.Serializable {
+    extends WrappedPipe
+    with java.io.Serializable {
   import Matrix._
   import MatrixProduct._
   import Dsl.ensureUniqueFields
@@ -934,7 +935,8 @@ class LiteralScalar[ValT](val value: ValT) extends java.io.Serializable {
 }
 
 class Scalar[ValT](val valSym: Symbol, inPipe: Pipe)
-    extends WrappedPipe with java.io.Serializable {
+    extends WrappedPipe
+    with java.io.Serializable {
   def pipe = inPipe
   def fields = valSym
   def *[That, Res](that: That)(
@@ -957,7 +959,8 @@ class DiagonalMatrix[IdxT, ValT](val idxSym: Symbol,
                                  val valSym: Symbol,
                                  inPipe: Pipe,
                                  val sizeHint: SizeHint = FiniteHint(1L, -1L))
-    extends WrappedPipe with java.io.Serializable {
+    extends WrappedPipe
+    with java.io.Serializable {
 
   def *[That, Res](that: That)(
       implicit prod: MatrixProduct[DiagonalMatrix[IdxT, ValT], That, Res])
@@ -1013,7 +1016,8 @@ class RowVector[ColT, ValT](val colS: Symbol,
                             val valS: Symbol,
                             inPipe: Pipe,
                             val sizeH: SizeHint = FiniteHint(1L, -1L))
-    extends java.io.Serializable with WrappedPipe {
+    extends java.io.Serializable
+    with WrappedPipe {
 
   def pipe = inPipe.project(colS, valS)
   def fields = (colS, valS)
@@ -1121,8 +1125,8 @@ class RowVector[ColT, ValT](val colS: Symbol,
       implicit ord: Ordering[ValT]): RowVector[ColT, ValT] = {
     val topSym = Symbol(colS.name + "_topK")
     val newPipe = pipe.groupAll {
-      _.sortWithTake((colS, valS) -> 'top_vals, k)((t0: (ColT, ValT),
-          t1: (ColT, ValT)) => ord.gt(t0._2, t1._2))
+      _.sortWithTake((colS, valS) -> 'top_vals, k)(
+          (t0: (ColT, ValT), t1: (ColT, ValT)) => ord.gt(t0._2, t1._2))
     }.flatMap('top_vals -> (topSym, valS)) { imp: List[(ColT, ValT)] =>
       imp
     }
@@ -1163,7 +1167,8 @@ class ColVector[RowT, ValT](val rowS: Symbol,
                             val valS: Symbol,
                             inPipe: Pipe,
                             val sizeH: SizeHint = FiniteHint(-1L, 1L))
-    extends java.io.Serializable with WrappedPipe {
+    extends java.io.Serializable
+    with WrappedPipe {
 
   def pipe = inPipe.project(rowS, valS)
   def fields = (rowS, valS)
@@ -1250,8 +1255,8 @@ class ColVector[RowT, ValT](val rowS: Symbol,
       implicit ord: Ordering[ValT]): ColVector[RowT, ValT] = {
     val topSym = Symbol(rowS.name + "_topK")
     val newPipe = pipe.groupAll {
-      _.sortWithTake((rowS, valS) -> 'top_vals, k)((t0: (RowT, ValT),
-          t1: (RowT, ValT)) => ord.gt(t0._2, t1._2))
+      _.sortWithTake((rowS, valS) -> 'top_vals, k)(
+          (t0: (RowT, ValT), t1: (RowT, ValT)) => ord.gt(t0._2, t1._2))
     }.flatMap('top_vals -> (topSym, valS)) { imp: List[(RowT, ValT)] =>
       imp
     }

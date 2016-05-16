@@ -74,7 +74,8 @@ object Spinner {
   */
 class Spinner[T](
     override val delegate: jfxsc.Spinner[T] = new jfxsc.Spinner[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.Spinner[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Spinner[T]] {
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance

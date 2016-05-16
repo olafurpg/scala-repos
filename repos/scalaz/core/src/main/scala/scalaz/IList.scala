@@ -546,9 +546,9 @@ sealed abstract class IListInstances extends IListInstance0 {
 
   implicit val instances: Traverse[IList] with MonadPlus[IList] with BindRec[
       IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[
-      IList] with Cobind[IList] = new Traverse[IList]
-  with MonadPlus[IList] with BindRec[IList] with Zip[IList] with Unzip[IList]
-  with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+      IList] with Cobind[IList] = new Traverse[IList] with MonadPlus[IList]
+  with BindRec[IList] with Zip[IList] with Unzip[IList] with Align[IList]
+  with IsEmpty[IList] with Cobind[IList] {
     override def findLeft[A](fa: IList[A])(f: A => Boolean) =
       fa.find(f)
 
@@ -593,10 +593,10 @@ sealed abstract class IListInstances extends IListInstance0 {
     override def cojoin[A](a: IList[A]) =
       a.uncons(empty, (_, t) => a :: cojoin(t))
 
-    def traverseImpl[F[_], A, B](fa: IList[A])(f: A => F[B])(
-        implicit F: Applicative[F]): F[IList[B]] =
-      fa.foldRight(F.point(IList.empty[B]))(
-          (a, fbs) => F.apply2(f(a), fbs)(_ :: _))
+    def traverseImpl[F[_], A, B](
+        fa: IList[A])(f: A => F[B])(implicit F: Applicative[F]): F[IList[B]] =
+      fa.foldRight(F.point(IList.empty[B]))((a, fbs) =>
+            F.apply2(f(a), fbs)(_ :: _))
 
     def unzip[A, B](a: IList[(A, B)]): (IList[A], IList[B]) =
       a.unzip
@@ -630,15 +630,15 @@ sealed abstract class IListInstances extends IListInstance0 {
         implicit M: Monoid[B]) =
       fa.foldLeft(M.zero)((b, a) => M.append(b, f(a)))
 
-    override def foldMap1Opt[A, B](
-        fa: IList[A])(f: A => B)(implicit M: Semigroup[B]) =
+    override def foldMap1Opt[A, B](fa: IList[A])(f: A => B)(
+        implicit M: Semigroup[B]) =
       fa match {
         case ICons(h, t) => Some(t.foldLeft(f(h))((b, a) => M.append(b, f(a))))
         case INil() => None
       }
 
-    override def foldMapLeft1Opt[A, B](
-        fa: IList[A])(z: A => B)(f: (B, A) => B) =
+    override def foldMapLeft1Opt[A, B](fa: IList[A])(z: A => B)(
+        f: (B, A) => B) =
       fa match {
         case ICons(h, t) => Some(t.foldLeft(z(h))(f))
         case INil() => None

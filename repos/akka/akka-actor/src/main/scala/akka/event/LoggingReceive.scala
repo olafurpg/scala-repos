@@ -43,7 +43,8 @@ object LoggingReceive {
     case _: LoggingReceive ⇒ r
     case _ ⇒
       if (context.system.settings.AddLoggingReceive)
-        new LoggingReceive(None, r, Option(label)) else r
+        new LoggingReceive(None, r, Option(label))
+      else r
   }
 }
 
@@ -66,8 +67,7 @@ class LoggingReceive(
           Debug(str,
                 clazz,
                 "received " + (if (handled) "handled" else "unhandled") +
-                " message " + o + " from " + context.sender() +
-                (label match {
+                " message " + o + " from " + context.sender() + (label match {
                   case Some(l) ⇒ " in state " + l
                   case _ ⇒ ""
                 })))

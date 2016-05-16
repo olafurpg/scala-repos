@@ -221,7 +221,8 @@ object TreeItem {
   */
 class TreeItem[T](
     override val delegate: jfxsc.TreeItem[T] = new jfxsc.TreeItem[T])
-    extends EventHandlerDelegate with SFXDelegate[jfxsc.TreeItem[T]] {
+    extends EventHandlerDelegate
+    with SFXDelegate[jfxsc.TreeItem[T]] {
 
   /**
     * Creates a TreeItem with the value property set to the provided object.

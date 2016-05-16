@@ -28,7 +28,9 @@ import Helpers._
   * Systems under specification for Lift Schedule.
   */
 object ScheduleSpec
-    extends Specification with PendingUntilFixed with PingedService
+    extends Specification
+    with PendingUntilFixed
+    with PingedService
     with BeforeExample {
   "Schedule Specification".title
 

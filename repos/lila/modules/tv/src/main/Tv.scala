@@ -53,15 +53,15 @@ object Tv {
                         icon = "C",
                         filters = Seq(rated, standard, freshBlitz))
     case object Bullet
-        extends Channel(
-            name = S.Bullet.name,
-            icon = P.Bullet.iconChar.toString,
-            filters = Seq(rated, standard, speed(S.Bullet), fresh(15)))
+        extends Channel(name = S.Bullet.name,
+                        icon = P.Bullet.iconChar.toString,
+                        filters =
+                          Seq(rated, standard, speed(S.Bullet), fresh(15)))
     case object Blitz
-        extends Channel(
-            name = S.Blitz.name,
-            icon = P.Blitz.iconChar.toString,
-            filters = Seq(rated, standard, speed(S.Blitz), freshBlitz))
+        extends Channel(name = S.Blitz.name,
+                        icon = P.Blitz.iconChar.toString,
+                        filters =
+                          Seq(rated, standard, speed(S.Blitz), freshBlitz))
     case object Classical
         extends Channel(
             name = S.Classical.name,
@@ -127,11 +127,10 @@ object Tv {
     (g: Game) => g.variant == variant
   private val standard = variant(V.Standard)
   private def fresh(seconds: Int) =
-    (g: Game) =>
-      {
-        g.isBeingPlayed && !g.olderThan(seconds)
-      } || {
-        g.finished && !g.olderThan(7)
+    (g: Game) => {
+      g.isBeingPlayed && !g.olderThan(seconds)
+    } || {
+      g.finished && !g.olderThan(7)
     } // rematch time
   private val freshBlitz = fresh(40)
   private def computerFromInitialPosition =

@@ -29,8 +29,13 @@ import com.codecommit.gll.LineStream
 import typer._
 
 object GroupSolverSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with GroupSolver with ProvenanceChecker with RawErrors
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with GroupSolver
+    with ProvenanceChecker
+    with RawErrors
     with StaticLibrarySpec {
 
   import ast._

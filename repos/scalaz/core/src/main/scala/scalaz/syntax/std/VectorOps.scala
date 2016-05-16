@@ -13,7 +13,7 @@ final class VectorOps[A](val self: Vector[A]) extends AnyVal {
 
   final def zipperEnd: Option[Zipper[A]] = v.zipperEnd(self)
 
-  final def <^>[B : Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
+  final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
 
   final def takeWhileM[M[_]: Monad](p: A => M[Boolean]): M[Vector[A]] =
     v.takeWhileM(self)(p)

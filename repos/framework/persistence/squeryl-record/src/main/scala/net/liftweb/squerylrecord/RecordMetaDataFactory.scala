@@ -68,8 +68,10 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
   /** Build a Squeryl FieldMetaData for a particular field in a Record */
   def build(parentMetaData: PosoMetaData[_],
             name: String,
-            property: (Option[Field], Option[Method], Option[Method],
-            Set[Annotation]),
+            property: (Option[Field],
+                       Option[Method],
+                       Option[Method],
+                       Set[Annotation]),
             sampleInstance4OptionTypeDeduction: AnyRef,
             isOptimisticCounter: Boolean): FieldMetaData = {
     if (!isRecord(parentMetaData.clasz) || isOptimisticCounter) {
@@ -237,8 +239,8 @@ class RecordMetaDataFactory extends FieldMetaDataFactory {
       .get(null)
       .asInstanceOf[MetaRecord[_]]
 
-      () =>
-        metaRecord.createRecord.asInstanceOf[AnyRef]
+    () =>
+      metaRecord.createRecord.asInstanceOf[AnyRef]
   }
 
   /**

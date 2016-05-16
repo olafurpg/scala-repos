@@ -17,7 +17,8 @@ package scalaguide.i18n.scalai18n {
     import javax.inject.Inject
     import play.api.i18n.I18nSupport
     class MyController @Inject()(val messagesApi: MessagesApi)
-        extends Controller with I18nSupport {
+        extends Controller
+        with I18nSupport {
       // ...
 //#i18n-support
 

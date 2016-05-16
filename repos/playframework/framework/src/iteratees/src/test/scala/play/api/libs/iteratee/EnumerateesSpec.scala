@@ -10,7 +10,8 @@ import scala.concurrent.duration.Duration
 import org.specs2.mutable._
 
 object EnumerateesSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Enumeratee.zip" should {
@@ -49,8 +50,8 @@ object EnumerateesSpec
 
     "transform each input element into a sequence of inputs" in {
       mustExecute(2) { mapEC =>
-        mustTransformTo(1, 2)(1, 1, 2, 2)(Enumeratee.mapConcatInput[Int](
-                x => List(Input.El(x), Input.Empty, Input.El(x)))(mapEC))
+        mustTransformTo(1, 2)(1, 1, 2, 2)(Enumeratee.mapConcatInput[Int](x =>
+                  List(Input.El(x), Input.Empty, Input.El(x)))(mapEC))
       }
     }
   }
@@ -93,8 +94,9 @@ object EnumerateesSpec
 
     "transform each input" in {
       mustExecute(2) { mapEC =>
-        mustTransformTo(1, 2)(2, 4)(Enumeratee.mapInputM[Int](
-                (i: Input[Int]) => Future.successful(i.map(_ * 2)))(mapEC))
+        mustTransformTo(1, 2)(2, 4)(
+            Enumeratee.mapInputM[Int]((i: Input[Int]) =>
+                  Future.successful(i.map(_ * 2)))(mapEC))
       }
     }
   }
@@ -148,8 +150,8 @@ object EnumerateesSpec
     "passes along what's left of chunks after taking 3" in {
       mustExecute(1) { flatMapEC =>
         val take3AndConsume =
-          (Enumeratee.take[String](3) &>> Iteratee.consume())
-            .flatMap(_ => Iteratee.consume())(flatMapEC)
+          (Enumeratee.take[String](3) &>> Iteratee.consume()).flatMap(_ =>
+                Iteratee.consume())(flatMapEC)
         val enumerator = Enumerator(Range(1, 20).map(_.toString): _*)
         Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
             Range(4, 20).map(_.toString).mkString)
@@ -250,8 +252,8 @@ object EnumerateesSpec
     "pass along what's left after taking 3 elements" in {
       mustExecute(1) { consumeFlatMapEC =>
         val take3AndConsume =
-          (Traversable.take[String](3) &>> Iteratee.consume())
-            .flatMap(_ => Iteratee.consume())(consumeFlatMapEC)
+          (Traversable.take[String](3) &>> Iteratee.consume()).flatMap(_ =>
+                Iteratee.consume())(consumeFlatMapEC)
         val enumerator = Enumerator("he", "ybbb", "bbb")
         Await.result(enumerator |>>> take3AndConsume, Duration.Inf) must equalTo(
             "bbbbbb")
@@ -275,8 +277,8 @@ object EnumerateesSpec
     "infer its types correctly from previous enumeratee" in {
       mustExecute(0, 0) { (map1EC, map2EC) =>
         val add1AndConsume =
-          Enumeratee.map[Int](i => i + 1)(map1EC) ><> Enumeratee.map[Int](
-              i => List(i))(map2EC) &>> Iteratee.consume[List[Int]]()
+          Enumeratee.map[Int](i => i + 1)(map1EC) ><> Enumeratee.map[Int](i =>
+                List(i))(map2EC) &>> Iteratee.consume[List[Int]]()
         val check: Iteratee[Int, List[Int]] = add1AndConsume
         true //this test is about compilation and if it compiles it means we got it right
       }

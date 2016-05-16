@@ -235,7 +235,8 @@ object ClientUtils extends Logging {
             info("Error while connecting to %s.".format(connectString))
             if (offsetManagerChannel != null) offsetManagerChannel.disconnect()
             Thread.sleep(retryBackOffMs)
-            offsetManagerChannelOpt = None // just in case someone decides to change shutdownChannel to not swallow exceptions
+            offsetManagerChannelOpt =
+              None // just in case someone decides to change shutdownChannel to not swallow exceptions
         }
       }
     }

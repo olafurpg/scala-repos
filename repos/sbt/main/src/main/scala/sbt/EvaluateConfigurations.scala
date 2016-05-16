@@ -147,7 +147,7 @@ object EvaluateConfigurations {
           definitions
             .values(loader)
             .map(p => resolveBase(file.getParentFile, p.asInstanceOf[Project]))
-          (imp, DefinedSbtValues(definitions))
+        (imp, DefinedSbtValues(definitions))
       }
     val allImports = importDefs.map(s => (s, -1)) ++ parsed.imports
     val dslEntries =
@@ -242,15 +242,10 @@ object EvaluateConfigurations {
         throw new MessageOnlyException(e.getMessage)
     }
     // TODO - keep track of configuration classes defined.
-    TrackedEvalResult(result.generated,
-                      loader =>
-                        {
-                          val pos = RangePosition(name, range shift 1)
-                          result
-                            .getValue(loader)
-                            .asInstanceOf[internals.DslEntry]
-                            .withPos(pos)
-                      })
+    TrackedEvalResult(result.generated, loader => {
+      val pos = RangePosition(name, range shift 1)
+      result.getValue(loader).asInstanceOf[internals.DslEntry].withPos(pos)
+    })
   }
 
   /**
@@ -375,7 +370,9 @@ object Index {
     // AttributeEntry + the checked type test 'value: Task[_]' ensures that the cast is correct.
     //  (scalac couldn't determine that 'key' is of type AttributeKey[Task[_]] on its own and a type match still required the cast)
     val pairs = for (scope <- data.scopes;
-    AttributeEntry(key, value: Task[_]) <- data.data(scope).entries) yield
+                     AttributeEntry(key, value: Task[_]) <- data
+                                                             .data(scope)
+                                                             .entries) yield
       (value, ScopedKey(scope, key.asInstanceOf[AttributeKey[Task[_]]])) // unclear why this cast is needed even with a type test in the above filter
     pairs.toMap[Task[_], ScopedKey[Task[_]]]
   }
@@ -407,13 +404,13 @@ object Index {
           ("Some keys were defined with the same name but different types: ",
               ", ", ""))
   }
-  private[this] type TriggerMap = collection.mutable.HashMap[
-      Task[_], Seq[Task[_]]]
+  private[this] type TriggerMap =
+    collection.mutable.HashMap[Task[_], Seq[Task[_]]]
   def triggers(ss: Settings[Scope]): Triggers[Task] = {
     val runBefore = new TriggerMap
     val triggeredBy = new TriggerMap
     for ((_, amap) <- ss.data;
-    AttributeEntry(_, value: Task[_]) <- amap.entries) {
+         AttributeEntry(_, value: Task[_]) <- amap.entries) {
       val as = value.info.attributes
       update(runBefore, value, as get Keys.runBefore)
       update(triggeredBy, value, as get Keys.triggeredBy)
@@ -426,6 +423,6 @@ object Index {
   }
   private[this] def update(
       map: TriggerMap, base: Task[_], tasksOpt: Option[Seq[Task[_]]]): Unit =
-    for (tasks <- tasksOpt; task <- tasks) map(task) = base +: map.getOrElse(
-        task, Nil)
+    for (tasks <- tasksOpt; task <- tasks) map(task) =
+      base +: map.getOrElse(task, Nil)
 }

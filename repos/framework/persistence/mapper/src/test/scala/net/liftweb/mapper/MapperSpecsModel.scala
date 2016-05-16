@@ -70,9 +70,8 @@ object MapperSpecsModel {
 
   def cleanup() {
     // Snake connection doesn't create FK constraints (put this here to be absolutely sure it gets set before Schemify)
-    MapperRules.createForeignKeys_? = c =>
-      {
-        c.jndiName != "snake"
+    MapperRules.createForeignKeys_? = c => {
+      c.jndiName != "snake"
     }
 
     Schemifier.destroyTables_!!(
@@ -118,7 +117,7 @@ object SampleTag extends SampleTag with LongKeyedMetaMapper[SampleTag] {
     val tags = List(
         "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
-    m <- samp) SampleTag.create.tag(t).model(m).save
+         m <- samp) SampleTag.create.tag(t).model(m).save
   }
 }
 
@@ -140,7 +139,8 @@ object SampleStatus extends Enumeration {
 }
 
 object SampleModel
-    extends SampleModel with KeyedMetaMapper[Long, SampleModel] {
+    extends SampleModel
+    with KeyedMetaMapper[Long, SampleModel] {
   override def dbAddTable = Full(populate _)
 
   def encodeAsJson(in: SampleModel): JsonAST.JObject = encodeAsJSON_!(in)
@@ -178,7 +178,8 @@ class SampleModel extends KeyedMapper[Long, SampleModel] {
 }
 
 object SampleTagSnake
-    extends SampleTagSnake with LongKeyedMetaMapper[SampleTagSnake] {
+    extends SampleTagSnake
+    with LongKeyedMetaMapper[SampleTagSnake] {
   override def dbAddTable = Full(populate _)
 
   private def populate {
@@ -186,7 +187,7 @@ object SampleTagSnake
     val tags = List(
         "Hello", "Moose", "Frog", "WooHoo", "Sloth", "Meow", "Moof")
     for (t <- tags;
-    m <- samp) SampleTagSnake.create.tag(t).model(m).save
+         m <- samp) SampleTagSnake.create.tag(t).model(m).save
   }
 
   override def dbDefaultConnectionIdentifier =
@@ -208,7 +209,8 @@ class SampleTagSnake extends LongKeyedMapper[SampleTagSnake] with IdPK {
 }
 
 object SampleModelSnake
-    extends SampleModelSnake with KeyedMetaMapper[Long, SampleModelSnake] {
+    extends SampleModelSnake
+    with KeyedMetaMapper[Long, SampleModelSnake] {
   override def dbAddTable = Full(populate _)
 
   def encodeAsJson(in: SampleModelSnake): JsonAST.JObject = encodeAsJSON_!(in)
@@ -347,9 +349,8 @@ object Thing extends Thing with KeyedMetaMapper[String, Thing] {
   import java.util.UUID
   override def beforeCreate =
     List(
-        (thing: Thing) =>
-          {
-        thing.thing_id(UUID.randomUUID().toString())
+        (thing: Thing) => {
+      thing.thing_id(UUID.randomUUID().toString())
     })
 }
 

@@ -23,7 +23,8 @@ trait PriorityTree extends BaseList {
 trait PrecedenceParser extends LinkedList with PriorityTree {
   type Node <: NodeImpl;
   trait NodeImpl
-      extends super [LinkedList].NodeImpl with super [PriorityTree].NodeImpl;
+      extends super [LinkedList].NodeImpl
+      with super [PriorityTree].NodeImpl;
 }
 
 trait Matcher extends PrecedenceParser {
@@ -42,7 +43,8 @@ trait Matcher extends PrecedenceParser {
 class Test1 extends OffsetList with Matcher {
   type Node = NodeImpl;
   trait NodeImpl
-      extends super [OffsetList].NodeImpl with super [Matcher].NodeImpl;
+      extends super [OffsetList].NodeImpl
+      with super [Matcher].NodeImpl;
   class MatchableImpl extends super.MatchableImpl with NodeImpl;
   type Matchable = MatchableImpl;
 }

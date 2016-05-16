@@ -24,10 +24,10 @@ final case class StartApplication(app: AppDefinition, scaleTo: Int)
     extends DeploymentAction
 
 // application is started, but the instance count should be changed
-final case class ScaleApplication(
-    app: AppDefinition,
-    scaleTo: Int,
-    sentencedToDeath: Option[Iterable[Task]] = None)
+final case class ScaleApplication(app: AppDefinition,
+                                  scaleTo: Int,
+                                  sentencedToDeath: Option[Iterable[Task]] =
+                                    None)
     extends DeploymentAction
 
 // application is started, but shall be completely stopped
@@ -94,8 +94,8 @@ final case class DeploymentPlan(id: String,
     affectedApplicationIds.intersect(other.affectedApplicationIds).nonEmpty
 
   def createdOrUpdatedApps: Seq[AppDefinition] = {
-    target.transitiveApps.toIndexedSeq
-      .filter(app => affectedApplicationIds(app.id))
+    target.transitiveApps.toIndexedSeq.filter(app =>
+          affectedApplicationIds(app.id))
   }
 
   override def toString: String = {

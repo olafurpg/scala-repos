@@ -184,20 +184,22 @@ package object scalaz {
   type Traced[A, B] = TracedT[Id, A, B]
   def Traced[A, B](f: A => B): Traced[A, B] = TracedT[Id, A, B](f)
 
-  type ReaderWriterStateT[F[_], -R, W, S, A] = IndexedReaderWriterStateT[
-      F, R, W, S, S, A]
+  type ReaderWriterStateT[F[_], -R, W, S, A] =
+    IndexedReaderWriterStateT[F, R, W, S, S, A]
   object ReaderWriterStateT
-      extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
+      extends ReaderWriterStateTInstances
+      with ReaderWriterStateTFunctions {
     def apply[F[_], R, W, S, A](
         f: (R, S) => F[(W, A, S)]): ReaderWriterStateT[F, R, W, S, A] =
       IndexedReaderWriterStateT[F, R, W, S, S, A] { (r: R, s: S) =>
         f(r, s)
       }
   }
-  type IndexedReaderWriterState[-R, W, -S1, S2, A] = IndexedReaderWriterStateT[
-      Id, R, W, S1, S2, A]
+  type IndexedReaderWriterState[-R, W, -S1, S2, A] =
+    IndexedReaderWriterStateT[Id, R, W, S1, S2, A]
   object IndexedReaderWriterState
-      extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
+      extends ReaderWriterStateTInstances
+      with ReaderWriterStateTFunctions {
     def apply[R, W, S1, S2, A](
         f: (R, S1) => (W, A, S2)): IndexedReaderWriterState[R, W, S1, S2, A] =
       IndexedReaderWriterStateT[Id, R, W, S1, S2, A] { (r: R, s: S1) =>
@@ -206,15 +208,16 @@ package object scalaz {
   }
   type ReaderWriterState[-R, W, S, A] = ReaderWriterStateT[Id, R, W, S, A]
   object ReaderWriterState
-      extends ReaderWriterStateTInstances with ReaderWriterStateTFunctions {
+      extends ReaderWriterStateTInstances
+      with ReaderWriterStateTFunctions {
     def apply[R, W, S, A](
         f: (R, S) => (W, A, S)): ReaderWriterState[R, W, S, A] =
       IndexedReaderWriterStateT[Id, R, W, S, S, A] { (r: R, s: S) =>
         f(r, s)
       }
   }
-  type IRWST[F[_], -R, W, -S1, S2, A] = IndexedReaderWriterStateT[
-      F, R, W, S1, S2, A]
+  type IRWST[F[_], -R, W, -S1, S2, A] =
+    IndexedReaderWriterStateT[F, R, W, S1, S2, A]
   val IRWST: IndexedReaderWriterStateT.type = IndexedReaderWriterStateT
   type IRWS[-R, W, -S1, S2, A] = IndexedReaderWriterState[R, W, S1, S2, A]
   val IRWS: IndexedReaderWriterState.type = IndexedReaderWriterState
@@ -299,20 +302,23 @@ package object scalaz {
 
   type IndexedConts[W[_], R, O, A] = IndexedContsT[W, Id, R, O, A]
   object IndexedConts
-      extends IndexedContsTInstances with IndexedContsTFunctions {
+      extends IndexedContsTInstances
+      with IndexedContsTFunctions {
     def apply[W[_], R, O, A](f: W[A => O] => R): IndexedConts[W, R, O, A] =
       IndexedContsT[W, Id, R, O, A](f)
   }
   type IndexedContT[M[_], R, O, A] = IndexedContsT[Id, M, R, O, A]
   object IndexedContT
-      extends IndexedContsTInstances with IndexedContsTFunctions {
+      extends IndexedContsTInstances
+      with IndexedContsTFunctions {
     def apply[M[_], R, O, A](
         f: (A => M[O]) => M[R]): IndexedContT[M, R, O, A] =
       IndexedContsT[Id, M, R, O, A](f)
   }
   type IndexedCont[R, O, A] = IndexedContT[Id, R, O, A]
   object IndexedCont
-      extends IndexedContsTInstances with IndexedContsTFunctions {
+      extends IndexedContsTInstances
+      with IndexedContsTFunctions {
     def apply[R, O, A](f: (A => O) => R): IndexedCont[R, O, A] =
       IndexedContsT[Id, Id, R, O, A](f)
   }

@@ -40,8 +40,9 @@ abstract class AggregationIterator(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => (() => MutableProjection))
-    extends Iterator[UnsafeRow] with Logging {
+                           Seq[Attribute]) => (() => MutableProjection))
+    extends Iterator[UnsafeRow]
+    with Logging {
 
   ///////////////////////////////////////////////////////////////////////////
   // Initializing functions.
@@ -207,7 +208,7 @@ abstract class AggregationIterator(
   }
 
   protected val processRow: (MutableRow,
-  InternalRow) => Unit = generateProcessRow(
+                             InternalRow) => Unit = generateProcessRow(
       aggregateExpressions, aggregateFunctions, inputAttributes)
 
   protected val groupingProjection: UnsafeProjection =

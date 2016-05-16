@@ -98,8 +98,8 @@ object Checkpoint {
         LOG.info(
             s"""Checkpoint "${checkpointName}": reading ${format} input from "${name}"""")
         getSource(format, name).read
-          .mapTo(List.range(0, resultFields.size) -> resultFields)(
-            (x: A) => x)(conv, setter)
+          .mapTo(List.range(0, resultFields.size) -> resultFields)((x: A) =>
+              x)(conv, setter)
       // We don't have checkpoint input; execute the flow and project to the
       // requested fields.
       case Some(name) =>

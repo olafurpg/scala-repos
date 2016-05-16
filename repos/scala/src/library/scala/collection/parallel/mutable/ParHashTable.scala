@@ -29,7 +29,8 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
       private val until: Int,
       private val totalsize: Int,
       private var es: Entry)
-      extends IterableSplitter[T] with SizeMapUtils {
+      extends IterableSplitter[T]
+      with SizeMapUtils {
     private val itertable = table
     private var traversed = 0
     scan()

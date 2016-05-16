@@ -199,8 +199,8 @@ object EventJson4sSupport {
     */
   @DeveloperApi
   class DBSerializer
-      extends CustomSerializer[Event](
-          format => (deserializeFromJValue, serializeToJValue))
+      extends CustomSerializer[Event](format =>
+            (deserializeFromJValue, serializeToJValue))
 
   /** :: DeveloperApi ::
     * Custom JSON4S serializer for [[Event]] intended to be used by the Event
@@ -230,6 +230,6 @@ object BatchEventsJson4sSupport {
 
   @DeveloperApi
   class APISerializer
-      extends CustomSerializer[Seq[Try[Event]]](
-          format => (readJson, Map.empty))
+      extends CustomSerializer[Seq[Try[Event]]](format =>
+            (readJson, Map.empty))
 }

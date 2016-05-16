@@ -78,7 +78,8 @@ object TypeDescriptorProviderImpl {
           // we have no evidentColumn, but we need to compute the next index
           (go(innerTpe, offset)._1, None)
         case tpe
-            if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
+            if (tpe.typeSymbol.isClass &&
+                tpe.typeSymbol.asClass.isCaseClass) =>
           val flattened =
             flattenOnce(tpe).scanLeft((offset, Option.empty[Int])) {
               case ((off, _), t) => go(t, off)

@@ -87,16 +87,17 @@ class ScaladocCommandLineState(env: ExecutionEnvironment, project: Project)
     handler
   }
 
-  private def visitAll(file: VirtualFile,
-                       scope: AnalysisScope,
-                       acc: mutable.MutableList[VirtualFile] = mutable
-                           .MutableList[VirtualFile]()): List[VirtualFile] = {
+  private def visitAll(
+      file: VirtualFile,
+      scope: AnalysisScope,
+      acc: mutable.MutableList[VirtualFile] =
+        mutable.MutableList[VirtualFile]()): List[VirtualFile] = {
 
     def visitInner(
         file: VirtualFile,
         scope: AnalysisScope,
         acc: mutable.MutableList[VirtualFile] = mutable
-            .MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
+          .MutableList[VirtualFile]()): mutable.MutableList[VirtualFile] = {
       if (file == null) return acc
       if (file.isDirectory) {
         for (c <- file.getChildren) {

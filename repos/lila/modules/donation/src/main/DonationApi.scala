@@ -55,8 +55,8 @@ final class DonationApi(coll: Coll,
     else donorCache(userId)
 
   def create(donation: Donation) = {
-    coll insert donation recover lila.db.recoverDuplicateKey(
-        e => println(e.getMessage)) void
+    coll insert donation recover lila.db.recoverDuplicateKey(e =>
+          println(e.getMessage)) void
   } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
     bus.publish(lila.hub.actorApi.DonationEvent(
                     userId = donation.userId,

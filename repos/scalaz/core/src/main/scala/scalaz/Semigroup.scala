@@ -119,7 +119,7 @@ object Semigroup {
         Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
+  @inline implicit def minTaggedSemigroup[A: Order] = minSemigroup[A]
 
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] =
     new Semigroup[A @@ Tags.MaxVal] {
@@ -127,7 +127,7 @@ object Semigroup {
         Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
+  @inline implicit def maxTaggedSemigroup[A: Order] = maxSemigroup[A]
 
   private[scalaz] trait ApplySemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Apply[F]

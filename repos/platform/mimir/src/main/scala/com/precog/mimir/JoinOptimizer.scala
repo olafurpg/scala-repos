@@ -29,7 +29,8 @@ import com.precog.util.Timing
 import com.precog.common._
 
 trait JoinOptimizerModule[M[+ _]]
-    extends DAGTransform with TransSpecableModule[M] {
+    extends DAGTransform
+    with TransSpecableModule[M] {
 
   trait JoinOptimizer extends TransSpecable {
     import dag._

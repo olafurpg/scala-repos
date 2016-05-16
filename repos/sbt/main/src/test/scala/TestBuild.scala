@@ -78,9 +78,10 @@ object TestBuild {
 
       // task axis of Scope is set to Global and the value of the second map is the original task axis
       val taskAxesMappings = for ((scope, keys) <- data.data.toIterable;
-      key <- keys.keys) yield
+                                  key <- keys.keys) yield
         (ScopedKey(scope.copy(task = Global), key), scope.task): (ScopedKey[_],
-        ScopeAxis[AttributeKey[_]])
+                                                                  ScopeAxis[AttributeKey[
+                                                                          _]])
 
       val taskAxes = Relation.empty ++ taskAxesMappings
       val global = new HashSet[ScopedKey[_]]
@@ -135,8 +136,8 @@ object TestBuild {
     )
     lazy val allFullScopes: Seq[Scope] = for {
       (ref, p) <- (Global, root.root) +: allProjects.map {
-        case (ref, p) => (Select(ref), p)
-      }
+                   case (ref, p) => (Select(ref), p)
+                 }
       t <- Global +: tasks.map(t => Select(t.key))
       c <- Global +: p.configurations.map(c => Select(ConfigKey(c.name)))
     } yield Scope(project = ref, config = c, task = t, extra = Global)
@@ -180,8 +181,10 @@ object TestBuild {
 
   implicit lazy val arbKeys: Arbitrary[Keys] = Arbitrary(keysGen)
   lazy val keysGen: Gen[Keys] = for (env <- mkEnv;
-  keyCount <- chooseShrinkable(1, KeysPerEnv);
-  keys <- listOfN(keyCount, scope(env))) yield new Keys(env, keys)
+                                     keyCount <- chooseShrinkable(
+                                                    1, KeysPerEnv);
+                                     keys <- listOfN(keyCount, scope(env))) yield
+    new Keys(env, keys)
 
   def scope(env: Env): Gen[Scope] =
     for {
@@ -190,8 +193,8 @@ object TestBuild {
       cAxis <- oneOrGlobal(project.configurations map toConfigKey)
       tAxis <- oneOrGlobal(env.tasks map getKey)
       pAxis <- orGlobal(
-          frequency((1, BuildRef(build.uri)),
-                    (3, ProjectRef(build.uri, project.id))))
+                  frequency((1, BuildRef(build.uri)),
+                            (3, ProjectRef(build.uri, project.id))))
     } yield Scope(pAxis, cAxis, tAxis, Global)
 
   def orGlobal[T](gen: Gen[T]): Gen[ScopeAxis[T]] =
@@ -239,12 +242,14 @@ object TestBuild {
       ScopeMask(project = p, config = c, task = t, extra = x)
   }
 
-  implicit lazy val idGen: Gen[String] = for (size <- chooseShrinkable(
-      1, MaxIDSize); cs <- listOfN(size, alphaChar)) yield cs.mkString
+  implicit lazy val idGen: Gen[String] =
+    for (size <- chooseShrinkable(1, MaxIDSize); cs <- listOfN(size, alphaChar)) yield
+      cs.mkString
   implicit lazy val optIDGen: Gen[Option[String]] = frequency(
       (1, idGen map some.fn), (1, None))
   implicit lazy val uriGen: Gen[URI] = for (sch <- idGen; ssp <- idGen;
-  frag <- optIDGen) yield new URI(sch, ssp, frag.orNull)
+                                            frag <- optIDGen) yield
+    new URI(sch, ssp, frag.orNull)
 
   implicit def envGen(
       implicit bGen: Gen[Build], tasks: Gen[Seq[Taskk]]): Gen[Env] =
@@ -274,13 +279,13 @@ object TestBuild {
   def genConfigs(implicit genName: Gen[String],
                  maxDeps: Gen[Int],
                  count: Gen[Int]): Gen[Seq[Config]] =
-    genAcyclicDirect[Config, String](maxDeps, genName, count)(
-        (key, deps) => new Config(key, deps))
+    genAcyclicDirect[Config, String](maxDeps, genName, count)((key, deps) =>
+          new Config(key, deps))
   def genTasks(implicit genName: Gen[String],
                maxDeps: Gen[Int],
                count: Gen[Int]): Gen[Seq[Taskk]] =
-    genAcyclicDirect[Taskk, String](maxDeps, genName, count)(
-        (key, deps) => new Taskk(AttributeKey[String](key), deps))
+    genAcyclicDirect[Taskk, String](maxDeps, genName, count)((key, deps) =>
+          new Taskk(AttributeKey[String](key), deps))
 
   def genAcyclicDirect[A, T](maxDeps: Gen[Int], keyGen: Gen[T], max: Gen[Int])(
       make: (T, Seq[A]) => A): Gen[Seq[A]] =
@@ -321,7 +326,8 @@ object TestBuild {
       case Nil => sequence(acc)
       case x :: xs =>
         val next = for (depCount <- maxDeps;
-        d <- pick(depCount min xs.size, xs)) yield (x, d.toList)
+                        d <- pick(depCount min xs.size, xs)) yield
+          (x, d.toList)
         genAcyclic(maxDeps, xs, next :: acc)
     }
   def sequence[T](gs: Seq[Gen[T]]): Gen[Seq[T]] = Gen.parameterized { prms =>

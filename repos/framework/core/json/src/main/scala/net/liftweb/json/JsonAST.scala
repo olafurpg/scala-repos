@@ -393,8 +393,7 @@ object JsonAST {
     def map(f: JValue => JValue): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          f(
-              JObject(l.map { field =>
+          f(JObject(l.map { field =>
             field.copy(value = rec(field.value))
           }))
         case JArray(l) => f(JArray(l.map(rec)))
@@ -421,8 +420,7 @@ object JsonAST {
     def mapField(f: JField => JField): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          JObject(
-              l.map { field =>
+          JObject(l.map { field =>
             f(field.copy(value = rec(field.value)))
           })
         case JArray(l) => JArray(l.map(rec))
@@ -1123,8 +1121,7 @@ trait Implicits {
 object JsonDSL extends JsonDSL
 trait JsonDSL extends Implicits {
   implicit def seq2jvalue[A <% JValue](s: Traversable[A]) =
-    JArray(
-        s.toList.map { a =>
+    JArray(s.toList.map { a =>
       val v: JValue = a; v
     })
 

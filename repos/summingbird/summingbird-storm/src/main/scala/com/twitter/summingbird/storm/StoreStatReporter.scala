@@ -62,7 +62,8 @@ class MergeableStatReporter[K, V](
 }
 
 class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
-    extends StoreProxy[K, V] with StoreReporter[Store[K, V], K, V] {
+    extends StoreProxy[K, V]
+    with StoreReporter[Store[K, V], K, V] {
   private def buildMetric(s: String) =
     context.registerMetric("store/%s".format(s), new CountMetric, 10)
   val putMetric = buildMetric("put")

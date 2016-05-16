@@ -78,7 +78,8 @@ object MySqlClientTracingFilter {
   * }}}
   */
 object Mysql
-    extends com.twitter.finagle.Client[Request, Result] with MysqlRichClient {
+    extends com.twitter.finagle.Client[Request, Result]
+    with MysqlRichClient {
 
   /**
     * Implements a mysql client in terms of a
@@ -91,16 +92,17 @@ object Mysql
     */
   case class Client(
       stack: Stack[ServiceFactory[Request, Result]] = StackClient.newStack
-          .replace(
-            ClientTracingFilter.role, MySqlClientTracingFilter.Stackable),
-      params: Stack.Params = StackClient.defaultParams + DefaultPool.Param(
+        .replace(ClientTracingFilter.role, MySqlClientTracingFilter.Stackable),
+      params: Stack.Params =
+        StackClient.defaultParams + DefaultPool.Param(
             low = 0,
             high = 1,
             bufferSize = 0,
             idleTime = Duration.Top,
             maxWaiters = Int.MaxValue) + ProtocolLibrary("mysql"))
       extends StdStackClient[Request, Result, Client]
-      with WithSessionPool[Client] with WithDefaultLoadBalancer[Client]
+      with WithSessionPool[Client]
+      with WithDefaultLoadBalancer[Client]
       with MysqlRichClient {
 
     protected def copy1(
@@ -208,6 +210,6 @@ object Mysql
     * A client configured with parameter p.
     */
   @deprecated("Use client.configured", "6.22.0")
-  def configured[P : Stack.Param](p: P): Client =
+  def configured[P: Stack.Param](p: P): Client =
     client.configured(p)
 }

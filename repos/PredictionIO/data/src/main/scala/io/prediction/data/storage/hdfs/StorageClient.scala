@@ -22,7 +22,8 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
   override val prefix = "HDFS"
   val conf = new Configuration
   val fs = FileSystem.get(conf)

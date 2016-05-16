@@ -43,7 +43,7 @@ object LabelPropagation {
     *
     * @return a graph with vertex attributes containing the label of community affiliation
     */
-  def run[VD, ED : ClassTag](
+  def run[VD, ED: ClassTag](
       graph: Graph[VD, ED], maxSteps: Int): Graph[VertexId, ED] = {
     require(maxSteps > 0,
             s"Maximum of steps must be greater than 0, but got ${maxSteps}")

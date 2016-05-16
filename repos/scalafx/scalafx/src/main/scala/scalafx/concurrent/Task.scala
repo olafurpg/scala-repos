@@ -51,7 +51,9 @@ object Task {
   * Class.
   */
 abstract class Task[T](override val delegate: jfxc.Task[T])
-    extends Worker[T] with jfxe.EventTarget with EventHandlerDelegate
+    extends Worker[T]
+    with jfxe.EventTarget
+    with EventHandlerDelegate
     with SFXDelegate[jfxc.Task[T]] {
 
   def eventHandlerDelegate = delegate.asInstanceOf[EventHandled]

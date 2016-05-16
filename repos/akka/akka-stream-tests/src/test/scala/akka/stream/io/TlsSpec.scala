@@ -419,12 +419,11 @@ class TlsSpec
       // under error conditions, and has the bonus of matching most actual SSL deployments.
       val (server, serverErr) = Tcp()
         .bind("localhost", 0)
-        .map(c ⇒
-              {
-            c.flow
-              .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
-                      Keep.right))(Keep.right)
-              .run()
+        .map(c ⇒ {
+          c.flow
+            .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
+                    Keep.right))(Keep.right)
+            .run()
         })
         .toMat(Sink.head)(Keep.both)
         .run()
@@ -444,10 +443,9 @@ class TlsSpec
     "reliably cancel subscriptions when TransportIn fails early" in assertAllStagesStopped {
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
+        .fromGraph(GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
+                                   Sink.head[ByteString],
+                                   Sink.head[SslTlsInbound])((_, _, _)) {
           implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             s ~> tls.in1; tls.out1 ~> o1
@@ -466,10 +464,9 @@ class TlsSpec
     "reliably cancel subscriptions when UserIn fails early" in assertAllStagesStopped {
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Source.asSubscriber[ByteString],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
+        .fromGraph(GraphDSL.create(Source.asSubscriber[ByteString],
+                                   Sink.head[ByteString],
+                                   Sink.head[SslTlsInbound])((_, _, _)) {
           implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             Source.failed[SslTlsOutbound](ex) ~> tls.in1; tls.out1 ~> o1

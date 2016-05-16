@@ -337,8 +337,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
         else taskTable.dataSource.slicedTaskIds
 
       // Excludes tasks which failed and have incomplete metrics
-      val validTasks = tasks.filter(
-          t => t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
+      val validTasks = tasks.filter(t =>
+            t.taskInfo.status == "SUCCESS" && t.taskMetrics.isDefined)
 
       val summaryTable: Option[Seq[Node]] =
         if (validTasks.size == 0) {
@@ -352,8 +352,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
             }
           }
           def getFormattedSizeQuantiles(data: Seq[Double]): Seq[Elem] = {
-            getDistributionQuantiles(data).map(
-                d => <td>{Utils.bytesToString(d.toLong)}</td>)
+            getDistributionQuantiles(data).map(d =>
+                  <td>{Utils.bytesToString(d.toLong)}</td>)
           }
 
           val deserializationTimes = validTasks.map {
@@ -593,11 +593,14 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                 Nil
               },
               if (stageData.hasShuffleWrite)
-                <tr>{shuffleWriteQuantiles}</tr> else Nil,
+                <tr>{shuffleWriteQuantiles}</tr>
+              else Nil,
               if (stageData.hasBytesSpilled)
-                <tr>{memoryBytesSpilledQuantiles}</tr> else Nil,
+                <tr>{memoryBytesSpilledQuantiles}</tr>
+              else Nil,
               if (stageData.hasBytesSpilled)
-                <tr>{diskBytesSpilledQuantiles}</tr> else Nil)
+                <tr>{diskBytesSpilledQuantiles}</tr>
+              else Nil)
 
           val quantileHeaders = Seq("Metric",
                                     "Min",
@@ -625,8 +628,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
       val content =
         summary ++ dagViz ++ showAdditionalMetrics ++ makeTimeline(
             // Only show the tasks in the table
-            stageData.taskData.values.toSeq
-              .filter(t => taskIdsInPage.contains(t.taskInfo.taskId)),
+            stageData.taskData.values.toSeq.filter(t =>
+                  taskIdsInPage.contains(t.taskInfo.taskId)),
             currentTime) ++ <h4>Summary Metrics for {numCompleted} Completed Tasks</h4> ++ <div>{summaryTable.getOrElse("No tasks have reported metrics yet.")}</div> ++ <h4>Aggregated Metrics by Executor</h4> ++ executorTable.toNodeSeq ++ maybeAccumulableTable ++ <h4 id="tasks-section">Tasks</h4> ++ taskTableHTML ++ jsForScrollingDownToTaskTable
       UIUtils.headerSparkPage(
           stageHeader, content, parent, showVisualization = true)
@@ -749,8 +752,8 @@ private[ui] class StagePage(parent: StagesTab) extends WebUIPage("stage") {
                |'content': '<div class="task-assignment-timeline-content"
                  |data-toggle="tooltip" data-placement="top"
                  |data-html="true" data-container="body"
-                 |data-title="${s"Task " + index + " (attempt " + attempt +
-                                ")"}<br>
+                 |data-title="${s"Task " + index + " (attempt " +
+                                attempt + ")"}<br>
                  |Status: ${taskInfo.status}<br>
                  |Launch Time: ${UIUtils.formatDate(new Date(launchTime))}
                  |${if (!taskInfo.running) {
@@ -1088,31 +1091,31 @@ private[ui] class TaskDataSource(tasks: Seq[TaskUIData],
         None
       }
 
-    new TaskTableRowData(
-        info.index,
-        info.taskId,
-        info.attemptNumber,
-        info.speculative,
-        info.status,
-        info.taskLocality.toString,
-        s"${info.executorId} / ${info.host}",
-        info.launchTime,
-        duration,
-        formatDuration,
-        schedulerDelay,
-        taskDeserializationTime,
-        gcTime,
-        serializationTime,
-        gettingResultTime,
-        peakExecutionMemoryUsed,
-        if (hasAccumulators)
-          Some(externalAccumulableReadable.mkString("<br/>")) else None,
-        input,
-        output,
-        shuffleRead,
-        shuffleWrite,
-        bytesSpilled,
-        errorMessage.getOrElse(""))
+    new TaskTableRowData(info.index,
+                         info.taskId,
+                         info.attemptNumber,
+                         info.speculative,
+                         info.status,
+                         info.taskLocality.toString,
+                         s"${info.executorId} / ${info.host}",
+                         info.launchTime,
+                         duration,
+                         formatDuration,
+                         schedulerDelay,
+                         taskDeserializationTime,
+                         gcTime,
+                         serializationTime,
+                         gettingResultTime,
+                         peakExecutionMemoryUsed,
+                         if (hasAccumulators)
+                           Some(externalAccumulableReadable.mkString("<br/>"))
+                         else None,
+                         input,
+                         output,
+                         shuffleRead,
+                         shuffleWrite,
+                         bytesSpilled,
+                         errorMessage.getOrElse(""))
   }
 
   /**

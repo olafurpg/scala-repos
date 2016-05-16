@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class CountVectorizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -189,7 +190,8 @@ class CountVectorizerSuite
 
   test("CountVectorizerModel with binary") {
     val df = sqlContext
-      .createDataFrame(Seq(
+      .createDataFrame(
+          Seq(
               (0,
                split("a a a b b c"),
                Vectors.sparse(4, Seq((0, 1.0), (1, 1.0), (2, 1.0)))),

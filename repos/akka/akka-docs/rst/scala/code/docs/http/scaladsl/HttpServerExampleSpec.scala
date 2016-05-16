@@ -20,7 +20,9 @@ import scala.language.postfixOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class HttpServerExampleSpec
-    extends WordSpec with Matchers with CompileOnlySpec {
+    extends WordSpec
+    with Matchers
+    with CompileOnlySpec {
 
   // never actually called
   val log: LoggingAdapter = null

@@ -66,5 +66,6 @@ object ExampleAst {
       extends CompressedToken
 
   case class QualifierToken(text: String, field: DatabaseField)
-      extends ContextualToken with Term
+      extends ContextualToken
+      with Term
 }

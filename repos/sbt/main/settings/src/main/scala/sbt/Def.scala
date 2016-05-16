@@ -31,10 +31,10 @@ object Def extends Init[Scope] with TaskMacroExtra {
       def apply(key: ScopedKey[_]) = displayFull(key, keyNameColor)
     }
 
-  def showRelativeKey(
-      current: ProjectRef,
-      multi: Boolean,
-      keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
+  def showRelativeKey(current: ProjectRef,
+                      multi: Boolean,
+                      keyNameColor: Option[String] =
+                        None): Show[ScopedKey[_]] =
     new Show[ScopedKey[_]] {
       def apply(key: ScopedKey[_]) =
         Scope.display(key.scope,
@@ -144,7 +144,7 @@ object Def extends Init[Scope] with TaskMacroExtra {
   def inputKey[T](description: String): InputKey[T] = macro std.KeyMacro
     .inputKeyImpl[T]
 
-  private[sbt] def dummy[T : Manifest](
+  private[sbt] def dummy[T: Manifest](
       name: String, description: String): (TaskKey[T], Task[T]) =
     (TaskKey[T](name, description, DTask), dummyTask(name))
   private[sbt] def dummyTask[T](name: String): Task[T] = {

@@ -121,7 +121,8 @@ private[sql] class LineCsvReader(params: CSVOptions)
   */
 private[sql] class BulkCsvReader(
     iter: Iterator[String], params: CSVOptions, headers: Seq[String])
-    extends CsvReader(params, headers) with Iterator[Array[String]] {
+    extends CsvReader(params, headers)
+    with Iterator[Array[String]] {
 
   private val reader = new StringIteratorReader(iter)
   parser.beginParsing(reader)
@@ -204,7 +205,8 @@ private class StringIteratorReader(val iter: Iterator[String])
         // end of input
         n = -1
       } else {
-        n = Math.min(length - next, len).toInt // lesser of amount of input available or buf size
+        n =
+          Math.min(length - next, len).toInt // lesser of amount of input available or buf size
         if (n == length - next) {
           str.getChars(
               (next - start).toInt, (next - start + n - 1).toInt, cbuf, off)

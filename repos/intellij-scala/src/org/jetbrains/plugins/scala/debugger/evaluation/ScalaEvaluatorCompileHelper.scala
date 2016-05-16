@@ -24,7 +24,8 @@ import scala.collection.mutable.ListBuffer
   * 2014-10-07
   */
 class ScalaEvaluatorCompileHelper(project: Project)
-    extends AbstractProjectComponent(project) with EvaluatorCompileHelper {
+    extends AbstractProjectComponent(project)
+    with EvaluatorCompileHelper {
 
   private val tempFiles = mutable.Set[File]()
 
@@ -155,8 +156,9 @@ private class ServerConnector(
     var result: Either[Array[(File, String)], Seq[String]] = Right(
         Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors)
-      else Left(classfiles(outputDir))
+      result =
+        if (errors.nonEmpty) Right(errors)
+        else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

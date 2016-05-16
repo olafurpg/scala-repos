@@ -11,7 +11,7 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
 object RingLaws {
-  def apply[A : Eq : Arbitrary](implicit _pred: Predicate[A]) =
+  def apply[A: Eq: Arbitrary](implicit _pred: Predicate[A]) =
     new RingLaws[A] {
       def Arb = implicitly[Arbitrary[A]]
       def pred = _pred
@@ -46,8 +46,7 @@ trait RingLaws[A] extends GroupLaws[A] {
         parent = None,
         "prodn(a, 1) === a" → forAll((a: A) => A.prodn(a, 1) === a),
         "prodn(a, 2) === a * a" → forAll((a: A) => A.prodn(a, 2) === (a * a)),
-        "prodOption" → forAll(
-            (a: A) =>
+        "prodOption" → forAll((a: A) =>
               (A.prodOption(Seq.empty[A]) === Option.empty[A]) &&
               (A.prodOption(Seq(a)) === Option(a)) &&
               (A.prodOption(Seq(a, a)) === Option(a * a)) &&
@@ -79,18 +78,19 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   // rings
 
-  def semiring(implicit A: Semiring[A]) = new RingProperties(
-      name = "semiring",
-      al = additiveSemigroup,
-      ml = multiplicativeSemigroup,
-      parents = Seq.empty,
-      "distributive" → forAll((x: A, y: A, z: A) =>
-            (x * (y + z) === (x * y + x * z)) &&
-            (((x + y) * z) === (x * z + y * z))),
-      "pow" → forAll((x: A) =>
-            ((x pow 1) === x) && ((x pow 2) === x * x) &&
-            ((x pow 3) === x * x * x))
-  )
+  def semiring(implicit A: Semiring[A]) =
+    new RingProperties(
+        name = "semiring",
+        al = additiveSemigroup,
+        ml = multiplicativeSemigroup,
+        parents = Seq.empty,
+        "distributive" → forAll((x: A, y: A, z: A) =>
+              (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z +
+                      y * z))),
+        "pow" → forAll((x: A) =>
+              ((x pow 1) === x) && ((x pow 2) === x * x) &&
+              ((x pow 3) === x * x * x))
+    )
 
   def rng(implicit A: Rng[A]) = new RingProperties(
       name = "rng",
@@ -147,7 +147,8 @@ trait RingLaws[A] extends GroupLaws[A] {
       val parent: Option[MultiplicativeProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet with HasOneParent {
+      extends RuleSet
+      with HasOneParent {
     private val _base = base(RingLaws.this)
 
     val name = _base.name

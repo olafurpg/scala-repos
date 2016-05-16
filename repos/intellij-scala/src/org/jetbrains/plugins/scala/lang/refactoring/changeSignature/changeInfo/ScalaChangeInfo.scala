@@ -25,7 +25,8 @@ case class ScalaChangeInfo(newVisibility: String,
                            newParams: Seq[Seq[ScalaParameterInfo]],
                            isAddDefaultArgs: Boolean)
     extends ScalaChangeInfoBase(newParams.flatten.toArray)
-    with UnsupportedJavaInfo with VisibilityChangeInfo
+    with UnsupportedJavaInfo
+    with VisibilityChangeInfo
     with ParametersChangeInfo {
 
   val project = function.getProject

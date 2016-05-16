@@ -118,7 +118,9 @@ trait FloatOrder extends Order[Float] {
 }
 
 trait FloatIsReal
-    extends IsRational[Float] with FloatOrder with FloatIsSigned {
+    extends IsRational[Float]
+    with FloatOrder
+    with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a: Float): Float = Math.ceil(a).toFloat
   def floor(a: Float): Float = Math.floor(a).toFloat
@@ -129,7 +131,10 @@ trait FloatIsReal
 
 @SerialVersionUID(0L)
 class FloatAlgebra
-    extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal
+    extends FloatIsField
+    with FloatIsNRoot
+    with FloatIsTrig
+    with FloatIsReal
     with Serializable
 
 trait FloatInstances {

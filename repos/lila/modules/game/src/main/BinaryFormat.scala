@@ -189,16 +189,17 @@ object BinaryFormat {
     private def doRead(
         b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Option[Int]) =
       CastleLastMoveTime(
-          castles = Castles(
-                b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
+          castles =
+            Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
           lastMove = for {
             from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
             to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
           } yield from -> to,
           lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
-          check = b6 flatMap { x =>
-            posAt(x >> 3, x & 7)
-          })
+          check =
+            b6 flatMap { x =>
+              posAt(x >> 3, x & 7)
+            })
   }
 
   object piece {

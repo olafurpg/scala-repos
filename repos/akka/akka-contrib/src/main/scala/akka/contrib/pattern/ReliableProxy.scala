@@ -56,7 +56,8 @@ object ReliableProxy {
   }
 
   class Receiver(target: ActorRef, initialSerial: Int)
-      extends Actor with ReliableProxyDebugLogging {
+      extends Actor
+      with ReliableProxyDebugLogging {
     var lastSerial = initialSerial
 
     context.watch(target)
@@ -240,7 +241,8 @@ class ReliableProxy(targetPath: ActorPath,
                     retryAfter: FiniteDuration,
                     reconnectAfter: Option[FiniteDuration],
                     maxConnectAttempts: Option[Int])
-    extends Actor with LoggingFSM[State, Vector[Message]]
+    extends Actor
+    with LoggingFSM[State, Vector[Message]]
     with ReliableProxyDebugLogging {
 
   var tunnel: ActorRef = _
@@ -271,8 +273,8 @@ class ReliableProxy(targetPath: ActorPath,
   def createTunnel(target: ActorRef): Unit = {
     logDebug("Creating new tunnel for {}", target)
     tunnel = context.actorOf(
-        receiver(target, lastAckSerial).withDeploy(
-            Deploy(scope = RemoteScope(target.path.address))),
+        receiver(target, lastAckSerial)
+          .withDeploy(Deploy(scope = RemoteScope(target.path.address))),
         "tunnel")
 
     context.watch(tunnel)

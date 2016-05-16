@@ -14,7 +14,8 @@ import scala.concurrent.{Promise, Future, Await}
 import scala.concurrent.duration.Duration
 
 object EnumeratorsSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Enumerator's interleave" should {
@@ -55,8 +56,8 @@ object EnumeratorsSpec
         val e2 = Enumerator(List(2), List(4), List(6), List(8))
         val e = e1 interleave e2
         val kk =
-          e |>>> Enumeratee.take(7) &>> Iteratee.fold(List.empty[Int])((r,
-              e: List[Int]) => r ++ e)(foldEC)
+          e |>>> Enumeratee.take(7) &>> Iteratee.fold(List.empty[Int])(
+              (r, e: List[Int]) => r ++ e)(foldEC)
         val result = Await.result(kk, Duration.Inf)
         result.length must equalTo(7)
       }
@@ -184,8 +185,8 @@ object EnumeratorsSpec
 
     "be transformed to another Enumerator using flatMap" in {
       mustExecute(3, 30) { (flatMapEC, foldEC) =>
-        val e = Enumerator(10, 20, 30).flatMap(
-            i => Enumerator((i until i + 10): _*))(flatMapEC)
+        val e = Enumerator(10, 20, 30).flatMap(i =>
+              Enumerator((i until i + 10): _*))(flatMapEC)
         val it = Iteratee.fold[Int, Int](0)((sum, x) => sum + x)(foldEC)
         Await.result(e |>>> it, Duration.Inf) must equalTo((10 until 40).sum)
       }
@@ -241,8 +242,8 @@ object EnumeratorsSpec
     }
 
     "Call onError on future failure" in {
-      val it1 = Iteratee.fold1[String, String](Future.successful(""))(
-          (_, _) => Future.failed(new RuntimeException()))
+      val it1 = Iteratee.fold1[String, String](Future.successful(""))((_, _) =>
+            Future.failed(new RuntimeException()))
       val it2 =
         Iteratee.fold1[String, String](Future.failed(new RuntimeException()))(
             (_, _) => Future.failed(new RuntimeException()))
@@ -269,10 +270,9 @@ object EnumeratorsSpec
         val errorCount = new AtomicInteger(0)
         val enumerator = Enumerator.fromCallback1(
             b => Future(if (it.hasNext) Some((b, it.next())) else None),
-            () =>
-              {
-                completeCount.incrementAndGet()
-                completeDone.countDown()
+            () => {
+              completeCount.incrementAndGet()
+              completeDone.countDown()
             },
             (_: String, _: Input[(Boolean, Int)]) =>
               errorCount.incrementAndGet())(callbackEC)
@@ -379,8 +379,8 @@ object EnumeratorsSpec
   "Enumerator.unfold" should {
     "unfolds a value into input for an enumerator" in {
       mustExecute(5) { unfoldEC =>
-        val enumerator = Enumerator.unfold[Int, Int](0)(
-            s => if (s > 3) None else Some((s + 1, s)))(unfoldEC)
+        val enumerator = Enumerator.unfold[Int, Int](0)(s =>
+              if (s > 3) None else Some((s + 1, s)))(unfoldEC)
         mustEnumerateTo(0, 1, 2, 3)(enumerator)
       }
     }

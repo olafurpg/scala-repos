@@ -24,10 +24,9 @@ trait Align[F[_]] extends Functor[F] { self =>
 
   def padWith[A, B, C](f: (Option[A], Option[B]) => C): (F[A], F[B]) => F[C] =
     alignWith(
-        t =>
-          {
-        val (a, b) = t.pad
-        f(a, b)
+        t => {
+      val (a, b) = t.pad
+      f(a, b)
     })
 
   def pad[A, B]: (F[A], F[B]) => F[(Option[A], Option[B])] =

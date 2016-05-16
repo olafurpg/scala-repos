@@ -9,7 +9,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class DeadlineTest
-    extends FunSuite with AssertionsForJUnit
+    extends FunSuite
+    with AssertionsForJUnit
     with GeneratorDrivenPropertyChecks {
 
   val time = for (t <- Gen.choose(0L, Long.MaxValue)) yield

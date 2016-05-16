@@ -19,8 +19,8 @@ private[exception] class TestServiceException(
     time: Option[Time] = None,
     traceId: Option[Long] = None,
     clientAddress: Option[String] = None,
-    sourceAddress: Option[String] = Some(
-          InetAddress.getLoopbackAddress.getHostName),
+    sourceAddress: Option[String] =
+      Some(InetAddress.getLoopbackAddress.getHostName),
     cardinality: Option[Int] = None) {
 
   private val ste = new javaSTE("badclass", "badmethod", "badfile", 42)
@@ -135,8 +135,8 @@ private[exception] class TestServiceException(
           }
         case "peer" =>
           assert(jsonValue.isTextual)
-          hasClient = verifyOption(
-              jsonValue.textValue, clientAddress, "peer", hasClient)
+          hasClient =
+            verifyOption(jsonValue.textValue, clientAddress, "peer", hasClient)
         case "sourceAddress" =>
           assert(jsonValue.isTextual)
           hasSource = verifyOption(

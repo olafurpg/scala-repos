@@ -147,11 +147,10 @@ class CoordinateMatrix @Since("1.0.0")(
       case ((blockRowIndex, blockColIndex), entry) =>
         val effRows =
           math.min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock).toInt
-        val effCols = math
-          .min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock)
-          .toInt
-          ((blockRowIndex, blockColIndex),
-           SparseMatrix.fromCOO(effRows, effCols, entry))
+        val effCols =
+          math.min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock).toInt
+        ((blockRowIndex, blockColIndex),
+         SparseMatrix.fromCOO(effRows, effCols, entry))
     }
     new BlockMatrix(blocks, rowsPerBlock, colsPerBlock, m, n)
   }

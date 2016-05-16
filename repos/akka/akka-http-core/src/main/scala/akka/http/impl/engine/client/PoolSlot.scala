@@ -98,7 +98,8 @@ private object PoolSlot {
       slotIx: Int,
       connectionFlow: Flow[HttpRequest, HttpResponse, Any],
       settings: ConnectionPoolSettings)(implicit fm: Materializer)
-      extends ActorSubscriber with ActorPublisher[List[ProcessorOut]]
+      extends ActorSubscriber
+      with ActorPublisher[List[ProcessorOut]]
       with ActorLogging {
     var exposedPublisher: akka.stream.impl.ActorPublisher[Any] = _
     var inflightRequests = immutable.Queue.empty[RequestContext]
@@ -264,7 +265,8 @@ private object PoolSlot {
       extends NoSerializationVerificationNeeded
 
   private class FlowInportActor(slotProcessor: ActorRef)
-      extends ActorPublisher[HttpRequest] with ActorLogging {
+      extends ActorPublisher[HttpRequest]
+      with ActorLogging {
     def receive: Receive = {
       case ev: Request ⇒ slotProcessor ! FromConnection(ev)
       case OnNext(r: HttpRequest) ⇒ onNext(r)
@@ -277,7 +279,8 @@ private object PoolSlot {
   }
 
   private class FlowOutportActor(slotProcessor: ActorRef)
-      extends ActorSubscriber with ActorLogging {
+      extends ActorSubscriber
+      with ActorLogging {
     def requestStrategy = ZeroRequestStrategy
     def receive: Receive = {
       case Request(n) ⇒ request(n)

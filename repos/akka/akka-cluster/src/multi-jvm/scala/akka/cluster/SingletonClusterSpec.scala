@@ -41,7 +41,8 @@ class SingletonClusterWithAccrualFailureDetectorMultiJvmNode2
 
 abstract class SingletonClusterSpec(
     multiNodeConfig: SingletonClusterMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(SingletonClusterMultiNodeConfig(failureDetectorPuppet))

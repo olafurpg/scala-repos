@@ -32,7 +32,8 @@ object StopWordsRemoverSuite extends SparkFunSuite {
 }
 
 class StopWordsRemoverSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import StopWordsRemoverSuite._

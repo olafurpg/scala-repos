@@ -35,7 +35,10 @@ trait BaseMapper extends FieldContainer {
 }
 
 trait Mapper[A <: Mapper[A]]
-    extends BaseMapper with Serializable with SourceInfo { self: A =>
+    extends BaseMapper
+    with Serializable
+    with SourceInfo {
+  self: A =>
   type MapperType = A
 
   private var was_deleted_? = false
@@ -183,16 +186,18 @@ trait Mapper[A <: Mapper[A]]
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm[T](func: (NodeSeq, Box[NodeSeq],
-      NodeSeq) => scala.collection.Seq[T]): List[T] =
+  def flatMapFieldTitleForm[T](
+      func: (NodeSeq, Box[NodeSeq],
+             NodeSeq) => scala.collection.Seq[T]): List[T] =
     getSingleton.flatMapFieldTitleForm(this, func)
 
   /**
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm2[T](func: (NodeSeq, MappedField[_, A],
-      NodeSeq) => scala.collection.Seq[T]): List[T] =
+  def flatMapFieldTitleForm2[T](
+      func: (NodeSeq, MappedField[_, A],
+             NodeSeq) => scala.collection.Seq[T]): List[T] =
     getSingleton.flatMapFieldTitleForm2(this, func)
 
   /**
@@ -204,14 +209,12 @@ trait Mapper[A <: Mapper[A]]
     * @return the form
     */
   def toForm(button: Box[String], onSuccess: String): NodeSeq =
-    toForm(button,
-           (what: A) =>
-             {
-               what.validate match {
-                 case Nil => what.save; S.redirectTo(onSuccess)
-                 case xs => S.error(xs)
-               }
-           })
+    toForm(button, (what: A) => {
+      what.validate match {
+        case Nil => what.save; S.redirectTo(onSuccess)
+        case xs => S.error(xs)
+      }
+    })
 
   /**
     * Present the model as a HTML using the same formatting as toForm
@@ -252,8 +255,8 @@ trait Mapper[A <: Mapper[A]]
     }
 
     getSingleton.toForm(this) ++ S.fmapFunc(
-        (ignore: List[String]) => doSubmit())(
-        name => <input type='hidden' name={name} value="n/a" />) ++
+        (ignore: List[String]) => doSubmit())(name =>
+          <input type='hidden' name={name} value="n/a" />) ++
     (button.map(b =>
               getSingleton.formatFormElement(
                   <xml:group>&nbsp;</xml:group>,
@@ -348,7 +351,8 @@ trait Mapper[A <: Mapper[A]]
 }
 
 trait LongKeyedMapper[OwnerType <: LongKeyedMapper[OwnerType]]
-    extends KeyedMapper[Long, OwnerType] with BaseLongKeyedMapper {
+    extends KeyedMapper[Long, OwnerType]
+    with BaseLongKeyedMapper {
   self: OwnerType =>
 }
 
@@ -446,7 +450,9 @@ trait CreatedUpdated extends CreatedTrait with UpdatedTrait {
 }
 
 trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
-    extends Mapper[OwnerType] with BaseKeyedMapper { self: OwnerType =>
+    extends Mapper[OwnerType]
+    with BaseKeyedMapper {
+  self: OwnerType =>
 
   type TheKeyType = KeyType
   type KeyedMapperType = OwnerType

@@ -32,13 +32,26 @@ trait ProfileProvider { self: Profile =>
 }
 
 trait CoreProfile
-    extends ProfileProvider with Profile with AccessTokenComponent
-    with AccountComponent with ActivityComponent with CollaboratorComponent
-    with CommitCommentComponent with CommitStatusComponent
-    with GroupMemberComponent with IssueComponent with IssueCommentComponent
-    with IssueLabelComponent with LabelComponent with MilestoneComponent
-    with PullRequestComponent with RepositoryComponent with SshKeyComponent
-    with WebHookComponent with WebHookEventComponent with PluginComponent
+    extends ProfileProvider
+    with Profile
+    with AccessTokenComponent
+    with AccountComponent
+    with ActivityComponent
+    with CollaboratorComponent
+    with CommitCommentComponent
+    with CommitStatusComponent
+    with GroupMemberComponent
+    with IssueComponent
+    with IssueCommentComponent
+    with IssueLabelComponent
+    with LabelComponent
+    with MilestoneComponent
+    with PullRequestComponent
+    with RepositoryComponent
+    with SshKeyComponent
+    with WebHookComponent
+    with WebHookEventComponent
+    with PluginComponent
     with ProtectedBranchComponent
 
 object Profile extends CoreProfile

@@ -90,8 +90,8 @@ private[ui] class RDDOperationGraphListener(conf: SparkConf)
         val stageId = stageInfo.stageId
         stageIds += stageId
         stageIdToJobId(stageId) = jobId
-        stageIdToGraph(stageId) = RDDOperationGraph.makeOperationGraph(
-            stageInfo)
+        stageIdToGraph(stageId) =
+          RDDOperationGraph.makeOperationGraph(stageInfo)
         trimStagesIfNecessary()
       }
 

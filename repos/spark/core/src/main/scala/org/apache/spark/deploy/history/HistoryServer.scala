@@ -51,7 +51,9 @@ class HistoryServer(conf: SparkConf,
     extends WebUI(securityManager,
                   securityManager.getSSLOptions("historyServer"),
                   port,
-                  conf) with Logging with UIRoot
+                  conf)
+    with Logging
+    with UIRoot
     with ApplicationCacheOperations {
 
   // How many applications to retain

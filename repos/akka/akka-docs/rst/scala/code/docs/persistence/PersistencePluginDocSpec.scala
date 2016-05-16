@@ -188,7 +188,7 @@ object PersistenceTCKDoc {
     //#journal-tck-scala
     class MyJournalSpec
         extends JournalSpec(config = ConfigFactory.parseString(
-                  """akka.persistence.journal.plugin = "my.journal.plugin"""")) {
+                """akka.persistence.journal.plugin = "my.journal.plugin"""")) {
 
       override def supportsRejectingNonSerializableObjects: CapabilityFlag =
         false // or CapabilityFlag.off

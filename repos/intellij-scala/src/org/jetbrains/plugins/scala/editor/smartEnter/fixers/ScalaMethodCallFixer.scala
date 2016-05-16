@@ -41,9 +41,9 @@ class ScalaMethodCallFixer extends ScalaFixer {
                 var currentPsi = psiElement.getContainingFile.findElementAt(
                     editor.getCaretModel.getOffset)
 
-                while (currentPsi != null &&
-                methodCall.getTextRange.contains(currentPsi.getTextRange) &&
-                !currentPsi.isInstanceOf[ScArgumentExprList]) {
+                while (currentPsi != null && methodCall.getTextRange.contains(
+                           currentPsi.getTextRange) &&
+                       !currentPsi.isInstanceOf[ScArgumentExprList]) {
                   currentPsi = currentPsi.getParent
                 }
 
@@ -105,8 +105,9 @@ class ScalaMethodCallFixer extends ScalaFixer {
         startLine(editor, args) != startLine(editor, params.head))
       endOffset = args.getTextRange.getStartOffset + 1
 
-    endOffset = CharArrayUtil.shiftBackward(
-        editor.getDocument.getCharsSequence, endOffset - 1, " \t\n") + 1
+    endOffset =
+      CharArrayUtil.shiftBackward(
+          editor.getDocument.getCharsSequence, endOffset - 1, " \t\n") + 1
     editor.getDocument.insertString(endOffset, ")")
 
     WithReformat(1)

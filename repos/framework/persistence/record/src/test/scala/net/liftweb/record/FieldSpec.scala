@@ -289,12 +289,12 @@ object FieldSpec extends Specification {
             case Full(fprime) =>
               val f = ("* [name]" #> ".*" & "select *" #>
                   (((ns: NodeSeq) =>
-                        ns.filter {
-                          case e: Elem =>
-                            e.attribute("selected").map(_.text) == Some(
-                                "selected")
-                          case _ => false
-                        }) andThen "* [value]" #> ".*"))(fprime)
+                      ns.filter {
+                        case e: Elem =>
+                          e.attribute("selected").map(_.text) == Some(
+                              "selected")
+                        case _ => false
+                      }) andThen "* [value]" #> ".*"))(fprime)
               val ret: Boolean = Helpers.compareXml(f, fp)
               ret must_== true
           }
@@ -590,7 +590,7 @@ object FieldSpec extends Specification {
       val rec = PasswordTestRecord.createRecord.password("")
 
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "correctly validate the unencrypted value" in S.initIfUninitted(session) {
@@ -599,7 +599,7 @@ object FieldSpec extends Specification {
 
       rec.password("1234")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
 
     "match with encrypted value" in {
@@ -678,8 +678,7 @@ object FieldSpec extends Specification {
     "honor validators configured in the usual way" in {
       val rec = StringTestRecord.createRecord
 
-      rec.validate must_==
-      (FieldError(
+      rec.validate must_== (FieldError(
               rec.string,
               Text("String field name must be at least 3 characters.")) :: Nil)
     }
@@ -695,8 +694,8 @@ object FieldSpec extends Specification {
 
       "which always fail" in {
         val fieldError = FieldError(field, Text("failed"))
-        field.validationHarness = s =>
-          FieldError(rec.stringFieldWithValidation, Text("failed")) :: Nil
+        field.validationHarness =
+          s => FieldError(rec.stringFieldWithValidation, Text("failed")) :: Nil
         rec.validate must_== (fieldError :: Nil)
       }
 

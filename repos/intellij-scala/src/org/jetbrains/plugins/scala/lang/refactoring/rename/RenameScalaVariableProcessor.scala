@@ -30,7 +30,8 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * Date: 21.11.2008
   */
 class RenameScalaVariableProcessor
-    extends RenameJavaMemberProcessor with ScalaRenameProcessor {
+    extends RenameJavaMemberProcessor
+    with ScalaRenameProcessor {
   override def canProcessElement(element: PsiElement): Boolean =
     element match {
       case c: ScNamedElement =>
@@ -65,17 +66,16 @@ class RenameScalaVariableProcessor
           t.nameContext match {
             case member: ScMember if member.containingClass != null =>
               Seq(GETTER, SETTER, IS_GETTER).foreach(
-                  r =>
-                    {
-                      val wrapper = t.getTypedDefinitionWrapper(
-                          isStatic = false, isInterface = false, r, None)
-                      val name = wrapper.getName
-                      val is = name.startsWith("is")
-                      val prefix = if (is) "is" else name.substring(0, 3)
-                      val newBeanName =
-                        prefix + StringUtil.capitalize(
-                            ScalaNamesUtil.toJavaName(newName))
-                      allRenames.put(wrapper, newBeanName)
+                  r => {
+                    val wrapper = t.getTypedDefinitionWrapper(
+                        isStatic = false, isInterface = false, r, None)
+                    val name = wrapper.getName
+                    val is = name.startsWith("is")
+                    val prefix = if (is) "is" else name.substring(0, 3)
+                    val newBeanName =
+                      prefix +
+                      StringUtil.capitalize(ScalaNamesUtil.toJavaName(newName))
+                    allRenames.put(wrapper, newBeanName)
                   }
               )
             case _ =>
@@ -87,7 +87,7 @@ class RenameScalaVariableProcessor
     addBeanMethods(element, newName)
 
     for (elem <- ScalaOverridingMemberSearcher.search(
-        namedElement, deep = true)) {
+                    namedElement, deep = true)) {
       val overriderName = elem.name
       val baseName = namedElement.name
       val newOverriderName = RefactoringUtil.suggestNewOverriderName(

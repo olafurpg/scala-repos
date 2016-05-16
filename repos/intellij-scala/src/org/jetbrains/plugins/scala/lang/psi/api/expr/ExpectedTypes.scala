@@ -37,8 +37,9 @@ private[expr] object ExpectedTypes {
       expr: ScExpression, fromUnderscore: Boolean = true): Option[ScType] =
     smartExpectedTypeEx(expr, fromUnderscore).map(_._1)
 
-  def smartExpectedTypeEx(expr: ScExpression, fromUnderscore: Boolean = true)
-    : Option[(ScType, Option[ScTypeElement])] = {
+  def smartExpectedTypeEx(expr: ScExpression,
+                          fromUnderscore: Boolean =
+                            true): Option[(ScType, Option[ScTypeElement])] = {
     val types = expectedExprTypes(
         expr, withResolvedFunction = true, fromUnderscore = fromUnderscore)
     types.length match {
@@ -47,8 +48,9 @@ private[expr] object ExpectedTypes {
     }
   }
 
-  def expectedExprType(expr: ScExpression, fromUnderscore: Boolean = true)
-    : Option[(ScType, Option[ScTypeElement])] = {
+  def expectedExprType(expr: ScExpression,
+                       fromUnderscore: Boolean =
+                         true): Option[(ScType, Option[ScTypeElement])] = {
     val types = expr.expectedTypesEx(fromUnderscore)
     types.length match {
       case 1 => Some(types(0))
@@ -61,11 +63,11 @@ private[expr] object ExpectedTypes {
     */
   def expectedExprTypes(expr: ScExpression,
                         withResolvedFunction: Boolean = false,
-                        fromUnderscore: Boolean = true)
-    : Array[(ScType, Option[ScTypeElement])] = {
+                        fromUnderscore: Boolean =
+                          true): Array[(ScType, Option[ScTypeElement])] = {
     @tailrec
-    def fromFunction(tp: (ScType,
-        Option[ScTypeElement])): Array[(ScType, Option[ScTypeElement])] = {
+    def fromFunction(tp: (ScType, Option[ScTypeElement]))
+      : Array[(ScType, Option[ScTypeElement])] = {
       tp._1 match {
         case ScFunctionType(retType, _) =>
           Array[(ScType, Option[ScTypeElement])]((retType, None))
@@ -171,8 +173,7 @@ private[expr] object ExpectedTypes {
             if a.getRExpression.getOrElse(null: ScExpression) == expr.getSameElementInContext =>
           a.getLExpression match {
             case ref: ScReferenceExpression
-                if
-                (!a.getContext.isInstanceOf[ScArgumentExprList] &&
+                if (!a.getContext.isInstanceOf[ScArgumentExprList] &&
                     !(a.getContext.isInstanceOf[ScInfixArgumentExpression] &&
                         a.getContext
                           .asInstanceOf[ScInfixArgumentExpression]
@@ -269,8 +270,7 @@ private[expr] object ExpectedTypes {
           }
           buffer.toArray
         case infix: ScInfixExpr
-            if
-            ((infix.isLeftAssoc &&
+            if ((infix.isLeftAssoc &&
                     infix.lOp == expr.getSameElementInContext) ||
                 (!infix.isLeftAssoc &&
                     infix.rOp == expr.getSameElementInContext)) &&
@@ -381,8 +381,7 @@ private[expr] object ExpectedTypes {
               case call: MethodInvocation => Some(call)
               case _ => None
             }
-            callOption.foreach(
-                call =>
+            callOption.foreach(call =>
                   tps = tps.map {
                 case (r, isDynamicNamed) =>
                   (call.updateAccordingToExpectedType(r), isDynamicNamed)
@@ -477,8 +476,7 @@ private[expr] object ExpectedTypes {
           if (isDynamicNamed) {
             p match {
               case (ScTupleType(comps), te) if comps.length == 2 =>
-                res +=
-                ((comps(1), te.map {
+                res += ((comps(1), te.map {
                       case t: ScTupleTypeElement if t.components.length == 2 =>
                         t.components(1)
                       case t => t
@@ -492,9 +490,8 @@ private[expr] object ExpectedTypes {
                 val name = ref.refName
                 params.find(_.name == name) match {
                   case Some(param) =>
-                    res +=
-                    ((param.paramType,
-                      param.paramInCode.flatMap(_.typeElement)))
+                    res += ((param.paramType,
+                             param.paramInCode.flatMap(_.typeElement)))
                   case _ => res += p
                 }
               case _ => res += p

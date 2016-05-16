@@ -33,7 +33,9 @@ import org.apache.spark.util.StatCounter
  * TODO update tests to use TestingUtils for floating point comparison after PR 1367 is merged
  */
 class RandomRDDsSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Serializable {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Serializable {
 
   def testGeneratedRDD(rdd: RDD[Double],
                        expectedSize: Long,
@@ -80,8 +82,8 @@ class RandomRDDsSuite
       assert(rdd.partitions.size === numPartitions)
 
       // check that partition sizes are balanced
-      val partSizes = rdd.partitions.map(
-          p => p.asInstanceOf[RandomRDDPartition[Double]].size.toDouble)
+      val partSizes = rdd.partitions.map(p =>
+            p.asInstanceOf[RandomRDDPartition[Double]].size.toDouble)
 
       val partStats = new StatCounter(partSizes)
       assert(partStats.max - partStats.min <= 1)

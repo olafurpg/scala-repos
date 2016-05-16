@@ -50,7 +50,7 @@ private[spark] object JettyUtils extends Logging {
   class ServletParams[T <% AnyRef](val responder: Responder[T],
                                    val contentType: String,
                                    val extractFn: T => String = (in: Any) =>
-                                       in.toString) {}
+                                     in.toString) {}
 
   // Conversions from various types of Responder's to appropriate servlet parameters
   implicit def jsonResponderToServlet(
@@ -120,12 +120,12 @@ private[spark] object JettyUtils extends Logging {
   }
 
   /** Create a context handler that responds to a request with the given path prefix */
-  def createServletHandler[T <% AnyRef](
-      path: String,
-      servletParams: ServletParams[T],
-      securityMgr: SecurityManager,
-      conf: SparkConf,
-      basePath: String = ""): ServletContextHandler = {
+  def createServletHandler[T <% AnyRef](path: String,
+                                        servletParams: ServletParams[T],
+                                        securityMgr: SecurityManager,
+                                        conf: SparkConf,
+                                        basePath: String =
+                                          ""): ServletContextHandler = {
     createServletHandler(
         path, createServlet(servletParams, securityMgr, conf), basePath)
   }

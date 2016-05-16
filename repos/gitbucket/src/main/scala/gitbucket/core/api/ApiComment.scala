@@ -30,6 +30,6 @@ object ApiComment {
                user = user,
                body = comment.content,
                created_at = comment.registeredDate,
-               updated_at = comment.updatedDate)(
-        repositoryName, issueId, isPullRequest)
+               updated_at =
+                 comment.updatedDate)(repositoryName, issueId, isPullRequest)
 }

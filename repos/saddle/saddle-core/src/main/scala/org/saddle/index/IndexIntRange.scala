@@ -75,8 +75,8 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
 
   // take values of index at certain locations
   def take(locs: Array[Int]) =
-    Index(new VecInt(locs).map(
-            i => if (i == -1) IndexImpl.sentinelErr else guardLoc(i) + from))
+    Index(new VecInt(locs).map(i =>
+              if (i == -1) IndexImpl.sentinelErr else guardLoc(i) + from))
 
   def without(locs: Array[Int]): Index[Int] =
     array.remove(asArr, locs)
@@ -116,7 +116,7 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   def join(other: Index[Int], how: JoinType = LeftJoin): ReIndexer[Int] =
     JoinerImpl.join(this, other, how)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: (Int) => B): Index[B] =
     genIdx map f
 

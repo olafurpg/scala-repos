@@ -28,7 +28,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.functions.col
 
 class InteractionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
   test("params") {
     ParamsSuite.checkParams(new Interaction())
@@ -39,12 +40,10 @@ class InteractionSuite
       var indices = ArrayBuilder.make[Int]
       var values = ArrayBuilder.make[Double]
       val encoder = new FeatureEncoder(cardinalities)
-      encoder.foreachNonzeroOutput(value,
-                                   (i, v) =>
-                                     {
-                                       indices += i
-                                       values += v
-                                   })
+      encoder.foreachNonzeroOutput(value, (i, v) => {
+        indices += i
+        values += v
+      })
       Vectors
         .sparse(encoder.outputSize, indices.result(), values.result())
         .compressed

@@ -63,8 +63,8 @@ class ConcurrentHashMapFactory extends ConcurrentMapFactory {
   def implementationName: String =
     "java.util.concurrent.ConcurrentHashMap"
 
-  override def empty[
-      K : ClassTag, V : ClassTag]: ju.concurrent.ConcurrentHashMap[K, V] =
+  override def empty[K: ClassTag, V: ClassTag]
+    : ju.concurrent.ConcurrentHashMap[K, V] =
     new ju.concurrent.ConcurrentHashMap[K, V]
 
   def allowsNullKeys: Boolean = false

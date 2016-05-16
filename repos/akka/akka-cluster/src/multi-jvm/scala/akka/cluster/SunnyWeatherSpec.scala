@@ -39,7 +39,8 @@ class SunnyWeatherMultiJvmNode4 extends SunnyWeatherSpec
 class SunnyWeatherMultiJvmNode5 extends SunnyWeatherSpec
 
 abstract class SunnyWeatherSpec
-    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import SunnyWeatherMultiJvmSpec._
   import ClusterEvent._

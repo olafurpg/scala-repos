@@ -58,7 +58,7 @@ object StringOrderedSerialization {
     val ints = toCheck / 4
     var counter = ints
     var ic = 0
-    while ( (counter > 0) && (ic == 0)) {
+    while ((counter > 0) && (ic == 0)) {
       // Unsigned compare of ints is cheaper than longs, because we can do it
       // by upcasting to Long
       ic = UnsignedComparisons.unsignedIntCompare(

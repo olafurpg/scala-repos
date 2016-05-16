@@ -46,7 +46,8 @@ class GitRepositoryServlet extends GitServlet with SystemSettingsService {
       req: HttpServletRequest, res: HttpServletResponse): Unit = {
     val agent = req.getHeader("USER-AGENT")
     val index = req.getRequestURI.indexOf(".git")
-    if (index >= 0 && (agent == null || agent.toLowerCase.indexOf("git/") < 0)) {
+    if (index >= 0 &&
+        (agent == null || agent.toLowerCase.indexOf("git/") < 0)) {
       // redirect for browsers
       val paths = req.getRequestURI.substring(0, index).split("/")
       res.sendRedirect(
@@ -80,7 +81,8 @@ class GitBucketRepositoryResolver(parent: FileResolver[HttpServletRequest])
 }
 
 class GitBucketReceivePackFactory
-    extends ReceivePackFactory[HttpServletRequest] with SystemSettingsService {
+    extends ReceivePackFactory[HttpServletRequest]
+    with SystemSettingsService {
 
   private val logger =
     LoggerFactory.getLogger(classOf[GitBucketReceivePackFactory])
@@ -123,9 +125,15 @@ import scala.collection.JavaConverters._
 class CommitLogHook(
     owner: String, repository: String, pusher: String, baseUrl: String)(
     implicit session: Session)
-    extends PostReceiveHook with PreReceiveHook with RepositoryService
-    with AccountService with IssuesService with ActivityService
-    with PullRequestService with WebHookService with WebHookPullRequestService
+    extends PostReceiveHook
+    with PreReceiveHook
+    with RepositoryService
+    with AccountService
+    with IssuesService
+    with ActivityService
+    with PullRequestService
+    with WebHookService
+    with WebHookPullRequestService
     with ProtectedBranchService {
 
   private val logger = LoggerFactory.getLogger(classOf[CommitLogHook])
@@ -254,7 +262,7 @@ class CommitLogHook(
           // call web hook
           callWebHookOf(owner, repository, WebHook.Push) {
             for (pusherAccount <- getAccountByUserName(pusher);
-            ownerAccount <- getAccountByUserName(owner)) yield {
+                 ownerAccount <- getAccountByUserName(owner)) yield {
               WebHookPushPayload(git,
                                  pusherAccount,
                                  command.getRefName,

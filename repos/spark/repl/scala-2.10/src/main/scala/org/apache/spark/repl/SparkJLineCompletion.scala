@@ -28,7 +28,9 @@ import org.apache.spark.internal.Logging
   */
 @DeveloperApi
 class SparkJLineCompletion(val intp: SparkIMain)
-    extends Completion with CompletionOutput with Logging {
+    extends Completion
+    with CompletionOutput
+    with Logging {
   // NOTE: Exposed in package as used in quite a few classes
   // NOTE: Must be public to override the global found in CompletionOutput
   val global: intp.global.type = intp.global
@@ -79,8 +81,7 @@ class SparkJLineCompletion(val intp: SparkIMain)
     // XXX we'd like to say "filterNot (_.isDeprecated)" but this causes the
     // compiler to crash for reasons not yet known.
     def members =
-      afterTyper(
-          (effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
+      afterTyper((effectiveTp.nonPrivateMembers.toList ++ anyMembers) filter
           (_.isPublic))
     def methods = members.toList filter (_.isMethod)
     def packages = members.toList filter (_.isPackage)
@@ -137,7 +138,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
   }
 
   class TypeMemberCompletion(val tp: Type)
-      extends CompletionAware with CompilerCompletion {
+      extends CompletionAware
+      with CompilerCompletion {
     def excludeEndsWith: List[String] = Nil
     def excludeStartsWith: List[String] =
       List("<") // <byname>, <repeated>, etc.
@@ -148,10 +150,10 @@ class SparkJLineCompletion(val intp: SparkIMain)
       IMain stripString afterTyper(new MethodSymbolOutput(sym).methodString())
     }
 
-    def exclude(name: String): Boolean = ((name contains "$") ||
-        (excludeNames contains name) ||
-        (excludeEndsWith exists (name endsWith _)) ||
-        (excludeStartsWith exists (name startsWith _)))
+    def exclude(name: String): Boolean =
+      ((name contains "$") || (excludeNames contains name) ||
+          (excludeEndsWith exists (name endsWith _)) ||
+          (excludeStartsWith exists (name startsWith _)))
     def filtered(xs: List[String]) = xs filterNot exclude distinct
 
     def completions(verbosity: Int) =
@@ -165,7 +167,8 @@ class SparkJLineCompletion(val intp: SparkIMain)
     override def alternativesFor(id: String): List[String] =
       debugging(id + " alternatives ==> ") {
         val alts =
-          members filter (x => x.isMethod && tos(x) == id) map methodSignatureString
+          members filter (x =>
+                x.isMethod && tos(x) == id) map methodSignatureString
 
         if (alts.nonEmpty) "" :: alts else Nil
       }
@@ -398,8 +401,9 @@ class SparkJLineCompletion(val intp: SparkIMain)
         if (!looksLikeInvocation(buf)) None
         else tryCompletion(Parsed.dotted(buf drop 1, cursor), lastResultFor)
 
-      def tryAll = (lastResultCompletion orElse tryCompletion(
-              mkDotted, topLevelFor) getOrElse Candidates(cursor, Nil))
+      def tryAll =
+        (lastResultCompletion orElse tryCompletion(mkDotted, topLevelFor) getOrElse Candidates(
+                cursor, Nil))
 
       /**
         *  This is the kickoff point for all manner of theoretically

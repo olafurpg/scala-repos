@@ -93,8 +93,8 @@ case class ShuffleExchange(var newPartitioning: Partitioning,
     */
   private[sql] def preparePostShuffleRDD(
       shuffleDependency: ShuffleDependency[Int, InternalRow, InternalRow],
-      specifiedPartitionStartIndices: Option[Array[Int]] = None)
-    : ShuffledRowRDD = {
+      specifiedPartitionStartIndices: Option[Array[Int]] =
+        None): ShuffledRowRDD = {
     // If an array of partition start indices is provided, we need to use this array
     // to create the ShuffledRowRDD. Also, we need to update newPartitioning to
     // update the number of post-shuffle partitions.

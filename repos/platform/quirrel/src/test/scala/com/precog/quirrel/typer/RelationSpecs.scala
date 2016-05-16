@@ -28,8 +28,12 @@ import java.io.File
 import scala.io.Source
 
 object RelationSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with StaticLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with StaticLibrarySpec {
 
   import ast._
 
@@ -943,20 +947,20 @@ object RelationSpecs
           _,
           _,
           _,
-          Let(
-          _,
-          _,
-          _,
-          _,
-          Relate(_,
-                 _,
-                 _,
-                 Relate(_,
-                        _,
-                        _,
-                        body @ Mul(_,
-                                   left @ Sub(_, minLeft, minRight),
-                                   right @ Div(_, divLeft, divRight))))))) =
+          Let(_,
+              _,
+              _,
+              _,
+              Relate(_,
+                     _,
+                     _,
+                     Relate(
+                     _,
+                     _,
+                     _,
+                     body @ Mul(_,
+                                left @ Sub(_, minLeft, minRight),
+                                right @ Div(_, divLeft, divRight))))))) =
         compileSingle(input)
 
       body.relations mustEqual Map(

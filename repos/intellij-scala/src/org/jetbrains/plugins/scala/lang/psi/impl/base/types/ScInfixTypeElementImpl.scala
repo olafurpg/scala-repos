@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScInfixTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScInfixTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScInfixTypeElement {
   override def toString: String = "InfixType: " + getText
 
   def rOp = findChildrenByClass(classOf[ScTypeElement]) match {

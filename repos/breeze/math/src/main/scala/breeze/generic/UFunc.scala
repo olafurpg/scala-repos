@@ -297,8 +297,8 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
     }
   }
 
-  implicit def simpleApply2[A1, A2, R]: Impl3[
-      WrappedUFunc2[A1, A2, R], A1, A2, R] = {
+  implicit def simpleApply2[A1, A2, R]
+    : Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] = {
     new Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] {
       override def apply(v: WrappedUFunc2[A1, A2, R], v2: A1, v3: A2): R =
         v.f(v2, v3)

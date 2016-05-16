@@ -192,7 +192,7 @@ object Validation {
     else Failure(Set(RuleViolation(seq, errorMessage, None)))
   }
 
-  def theOnlyDefinedOptionIn[A <: Product : ClassTag, B](
+  def theOnlyDefinedOptionIn[A <: Product: ClassTag, B](
       product: A): Validator[Option[B]] =
     new Validator[Option[B]] {
       def apply(option: Option[B]) = {

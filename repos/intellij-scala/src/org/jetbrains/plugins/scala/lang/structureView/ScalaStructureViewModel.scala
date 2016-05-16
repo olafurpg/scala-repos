@@ -80,8 +80,8 @@ class ScalaStructureViewModel(private val myRootElement: ScalaFile,
     res
   }
 
-  override def getNodeProviders: util.Collection[
-      NodeProvider[_ <: TreeElement]] = ScalaStructureViewModel.NODE_PROVIDERS
+  override def getNodeProviders: util.Collection[NodeProvider[
+          _ <: TreeElement]] = ScalaStructureViewModel.NODE_PROVIDERS
 
   override def isSuitable(element: PsiElement): Boolean = element match {
     case t: ScTypeDefinition =>

@@ -14,7 +14,8 @@ import scala.tools.refactoring.common.{CompilerAccess, EnrichedTrees}
 import org.ensime.api._
 
 class SemanticHighlighting(val global: RichPresentationCompiler)
-    extends CompilerAccess with EnrichedTrees {
+    extends CompilerAccess
+    with EnrichedTrees {
 
   import global._
 

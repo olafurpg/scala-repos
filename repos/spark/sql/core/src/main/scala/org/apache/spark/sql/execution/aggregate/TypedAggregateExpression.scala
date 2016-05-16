@@ -29,7 +29,7 @@ import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.types._
 
 object TypedAggregateExpression {
-  def apply[A, B : Encoder, C : Encoder](
+  def apply[A, B: Encoder, C: Encoder](
       aggregator: Aggregator[A, B, C]): TypedAggregateExpression = {
     new TypedAggregateExpression(
         aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
@@ -55,7 +55,8 @@ case class TypedAggregateExpression(
     children: Seq[Attribute],
     mutableAggBufferOffset: Int,
     inputAggBufferOffset: Int)
-    extends ImperativeAggregate with Logging {
+    extends ImperativeAggregate
+    with Logging {
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =

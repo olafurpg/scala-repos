@@ -426,7 +426,8 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractLoggingFSM[S, D]
-    extends AbstractFSM[S, D] with LoggingFSM[S, D]
+    extends AbstractFSM[S, D]
+    with LoggingFSM[S, D]
 
 /**
   * Java API: compatible with lambda expressions

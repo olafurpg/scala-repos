@@ -11,7 +11,8 @@ private final class SlackClient(url: String, defaultChannel: String) {
   def apply(msg: SlackMessage): Funit =
     url.nonEmpty ?? WS
       .url(url)
-      .post(Json
+      .post(
+          Json
             .obj(
                 "username" -> msg.username,
                 "text" -> msg.text,

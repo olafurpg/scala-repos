@@ -43,7 +43,8 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
 class BoxBlurSpec
     extends SimpleSFXDelegateSpec[jfxse.BoxBlur, BoxBlur](
         classOf[jfxse.BoxBlur], classOf[BoxBlur])
-    with DimensionDelegateSpec[BoxBlur] with InputDelegateSpec[BoxBlur] {
+    with DimensionDelegateSpec[BoxBlur]
+    with InputDelegateSpec[BoxBlur] {
 
   val dimensionDelegate = getScalaClassInstance
 

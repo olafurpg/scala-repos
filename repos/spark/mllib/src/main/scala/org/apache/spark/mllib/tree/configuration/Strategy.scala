@@ -72,9 +72,10 @@ class Strategy @Since("1.3.0")(
     @Since("1.0.0") @BeanProperty var maxDepth: Int,
     @Since("1.2.0") @BeanProperty var numClasses: Int = 2,
     @Since("1.0.0") @BeanProperty var maxBins: Int = 32,
-    @Since("1.0.0") @BeanProperty var quantileCalculationStrategy: QuantileStrategy = Sort,
-    @Since("1.0.0") @BeanProperty var categoricalFeaturesInfo: Map[Int, Int] = Map[
-          Int, Int](),
+    @Since("1.0.0") @BeanProperty var quantileCalculationStrategy: QuantileStrategy =
+      Sort,
+    @Since("1.0.0") @BeanProperty var categoricalFeaturesInfo: Map[Int, Int] =
+      Map[Int, Int](),
     @Since("1.2.0") @BeanProperty var minInstancesPerNode: Int = 1,
     @Since("1.2.0") @BeanProperty var minInfoGain: Double = 0.0,
     @Since("1.0.0") @BeanProperty var maxMemoryInMB: Int = 256,

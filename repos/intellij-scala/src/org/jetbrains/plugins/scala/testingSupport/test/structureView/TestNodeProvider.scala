@@ -301,11 +301,10 @@ object TestNodeProvider {
         case funDef: ScFunctionDefinition => Some(funDef)
         case _ => None
       })
-      .exists(funDef =>
-            {
-          funDef.getName == funName && paramNames
-            .map(checkClauses(funDef.getParameterList.clauses, _: _*))
-            .getOrElse(true)
+      .exists(funDef => {
+        funDef.getName == funName && paramNames
+          .map(checkClauses(funDef.getParameterList.clauses, _: _*))
+          .getOrElse(true)
       })
   }
 
@@ -331,8 +330,7 @@ object TestNodeProvider {
       expr: ScInfixExpr,
       entry: ExtractEntry,
       project: Project): Option[TestStructureViewElement] = {
-    if (entry.canIgnore &&
-        (checkScInfixExpr(expr, "ignore", List("void")) ||
+    if (entry.canIgnore && (checkScInfixExpr(expr, "ignore", List("void")) ||
             checkIgnoreExpr(expr))) {
       Some(ignoredScalaTestElement(
               expr, getInfixExprTestName(expr), entry.children(())))
@@ -542,10 +540,13 @@ object TestNodeProvider {
                                                        _ => children,
                                                        List("void")),
                                           project))
-      .orElse(extractScalaTestScInfixExpr(
-              expr,
-              ExtractEntry("which", false, false, _ => children, List("void")),
-              project))
+      .orElse(extractScalaTestScInfixExpr(expr,
+                                          ExtractEntry("which",
+                                                       false,
+                                                       false,
+                                                       _ => children,
+                                                       List("void")),
+                                          project))
   }
 
   private def extractFunSpec(
@@ -655,8 +656,8 @@ object TestNodeProvider {
       expr.args.findFirstChildByType(ScalaElementTypes.BLOCK_EXPR) match {
         case blockExpr: ScBlockExpr =>
           (for (methodExpr <- blockExpr.children
-                                 if methodExpr.isInstanceOf[ScInfixExpr] ||
-                             methodExpr.isInstanceOf[ScMethodCall]) yield
+                if methodExpr.isInstanceOf[ScInfixExpr] ||
+                methodExpr.isInstanceOf[ScMethodCall]) yield
             extractUTestInner(methodExpr, project))
             .filter(_.isDefined)
             .map(_.get)

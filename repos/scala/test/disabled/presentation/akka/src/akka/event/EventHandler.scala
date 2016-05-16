@@ -117,7 +117,7 @@ object EventHandler extends ListenerManagement {
     } else notifyListeners(event)
   }
 
-  def notify[T <: Event : ClassTag](event: => T) {
+  def notify[T <: Event: ClassTag](event: => T) {
     if (level >= levelFor(classTag[T].erasure.asInstanceOf[Class[_ <: Event]]))
       notifyListeners(event)
   }

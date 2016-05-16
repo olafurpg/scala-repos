@@ -137,13 +137,13 @@ private trait LazyOptionTFunctor[F[_]] extends Functor[LazyOptionT[F, ?]] {
 }
 
 private trait LazyOptionTMonad[F[_]]
-    extends MonadPlus[LazyOptionT[F, ?]] with LazyOptionTFunctor[F] {
+    extends MonadPlus[LazyOptionT[F, ?]]
+    with LazyOptionTFunctor[F] {
   implicit def F: Monad[F]
 
   override def ap[A, B](fa: => LazyOptionT[F, A])(
       f: => LazyOptionT[F, A => B]): LazyOptionT[F, B] =
-    LazyOptionT(
-        F.bind(f.run)(_ fold
+    LazyOptionT(F.bind(f.run)(_ fold
             (ff => F.map(fa.run)(_ map ((ff: A => B)(_))), F.point(LazyOption.lazyNone))))
 
   def point[A](a: => A): LazyOptionT[F, A] =
@@ -161,7 +161,8 @@ private trait LazyOptionTMonad[F[_]]
 }
 
 private trait LazyOptionTBindRec[F[_]]
-    extends BindRec[LazyOptionT[F, ?]] with LazyOptionTMonad[F] {
+    extends BindRec[LazyOptionT[F, ?]]
+    with LazyOptionTMonad[F] {
   implicit def B: BindRec[F]
 
   final def tailrecM[A, B](f: A => LazyOptionT[F, A \/ B])(

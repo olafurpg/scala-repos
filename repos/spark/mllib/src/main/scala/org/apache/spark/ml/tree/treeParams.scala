@@ -32,7 +32,9 @@ import org.apache.spark.sql.types.{DataType, DoubleType, StructType}
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
 private[ml] trait DecisionTreeParams
-    extends PredictorParams with HasCheckpointInterval with HasSeed {
+    extends PredictorParams
+    with HasCheckpointInterval
+    with HasSeed {
 
   /**
     * Maximum depth of the tree (>= 0).
@@ -246,7 +248,8 @@ private[ml] object TreeClassifierParams {
 }
 
 private[ml] trait DecisionTreeClassifierParams
-    extends DecisionTreeParams with TreeClassifierParams
+    extends DecisionTreeParams
+    with TreeClassifierParams
 
 /**
   * Parameters for Decision Tree-based regression algorithms.
@@ -295,7 +298,9 @@ private[ml] object TreeRegressorParams {
 }
 
 private[ml] trait DecisionTreeRegressorParams
-    extends DecisionTreeParams with TreeRegressorParams with HasVarianceCol {
+    extends DecisionTreeParams
+    with TreeRegressorParams
+    with HasVarianceCol {
 
   override protected def validateAndTransformSchema(
       schema: StructType,
@@ -438,7 +443,9 @@ private[ml] object RandomForestParams {
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
 private[ml] trait GBTParams
-    extends TreeEnsembleParams with HasMaxIter with HasStepSize {
+    extends TreeEnsembleParams
+    with HasMaxIter
+    with HasStepSize {
 
   /* TODO: Add this doc when we add this param.  SPARK-7132
    * Threshold for stopping early when runWithValidation is used.

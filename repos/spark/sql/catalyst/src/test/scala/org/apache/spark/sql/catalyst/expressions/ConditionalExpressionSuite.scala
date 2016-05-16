@@ -25,7 +25,8 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types._
 
 class ConditionalExpressionSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite
+    with ExpressionEvalHelper {
 
   test("if") {
     val testcases = Seq[(java.lang.Boolean, Integer, Integer, Integer)](

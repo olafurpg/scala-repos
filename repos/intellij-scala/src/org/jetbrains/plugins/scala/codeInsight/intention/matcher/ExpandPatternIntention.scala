@@ -61,8 +61,8 @@ class ExpandPatternIntention extends PsiElementBaseIntentionAction {
               (refPattern, "%s @ %s".format(refPattern.getText, patText)))
       case wildcardPattern: ScWildcardPattern =>
         val expectedType = wildcardPattern.expectedType
-        nestedPatternText(expectedType).map(
-            patText => (wildcardPattern, patText))
+        nestedPatternText(expectedType).map(patText =>
+              (wildcardPattern, patText))
       case _ => None
     }
   }

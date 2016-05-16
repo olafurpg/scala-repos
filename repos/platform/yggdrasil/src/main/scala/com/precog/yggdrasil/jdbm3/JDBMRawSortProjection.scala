@@ -51,7 +51,8 @@ class JDBMRawSortProjection[M[+ _]] private[yggdrasil](
     sortOrder: DesiredSortOrder,
     sliceSize: Int,
     val length: Long)
-    extends ProjectionLike[M, Slice] with Logging {
+    extends ProjectionLike[M, Slice]
+    with Logging {
   import JDBMProjection._
   type Key = Array[Byte]
 
@@ -99,13 +100,12 @@ class JDBMRawSortProjection[M[+ _]] private[yggdrasil](
       val constrainedMap = id.map { idKey =>
         index.tailMap(idKey)
       }.getOrElse(index)
-      val iteratorSetup = () =>
-        {
-          val rawIterator = constrainedMap.entrySet.iterator.asScala
-          // Since our key to retrieve after was the last key we retrieved, we know it exists,
-          // so we can safely discard it
-          if (id.isDefined && rawIterator.hasNext) rawIterator.next();
-          rawIterator
+      val iteratorSetup = () => {
+        val rawIterator = constrainedMap.entrySet.iterator.asScala
+        // Since our key to retrieve after was the last key we retrieved, we know it exists,
+        // so we can safely discard it
+        if (id.isDefined && rawIterator.hasNext) rawIterator.next();
+        rawIterator
       }
 
       // FIXME: this is brokenness in JDBM somewhere      

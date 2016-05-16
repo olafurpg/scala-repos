@@ -75,17 +75,15 @@ object CanvasDoodleTest extends JFXApp {
   reset(Color.Blue)
 
   // Clear away portions as the user drags the mouse
-  canvas.onMouseDragged = (e: MouseEvent) =>
-    {
-      gc.clearRect(e.x - 2, e.y - 2, 5, 5)
+  canvas.onMouseDragged = (e: MouseEvent) => {
+    gc.clearRect(e.x - 2, e.y - 2, 5, 5)
   }
 
   // Fill the Canvas with a Blue rectangle when the user double-clicks
-  canvas.onMouseClicked = (e: MouseEvent) =>
-    {
-      if (e.clickCount > 1) {
-        reset(Color.Blue)
-      }
+  canvas.onMouseClicked = (e: MouseEvent) => {
+    if (e.clickCount > 1) {
+      reset(Color.Blue)
+    }
   }
 
   /**

@@ -34,7 +34,9 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.util.ContinuousQueryListener.{QueryProgress, QueryStarted, QueryTerminated}
 
 class ContinuousQueryListenerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
 
   import testImplicits._
 

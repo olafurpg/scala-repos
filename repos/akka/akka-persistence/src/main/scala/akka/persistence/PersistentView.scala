@@ -83,8 +83,13 @@ private[akka] object PersistentView {
   */
 @deprecated("use Persistence Query instead", "2.4")
 trait PersistentView
-    extends Actor with Snapshotter with Stash with StashFactory
-    with PersistenceIdentity with PersistenceRecovery with ActorLogging {
+    extends Actor
+    with Snapshotter
+    with Stash
+    with StashFactory
+    with PersistenceIdentity
+    with PersistenceRecovery
+    with ActorLogging {
   import PersistentView._
   import JournalProtocol._
   import SnapshotProtocol.LoadSnapshotResult

@@ -56,10 +56,10 @@ private[finagle] class TTwitterServerFilter(
           val iter = header.contexts.iterator()
           while (iter.hasNext) {
             val c = iter.next()
-            env = Contexts.broadcast.Translucent(
-                env,
-                Buf.ByteArray.Owned(c.getKey()),
-                Buf.ByteArray.Owned(c.getValue()))
+            env =
+              Contexts.broadcast.Translucent(env,
+                                             Buf.ByteArray.Owned(c.getKey()),
+                                             Buf.ByteArray.Owned(c.getValue()))
           }
         }
 

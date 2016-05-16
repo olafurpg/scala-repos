@@ -203,30 +203,28 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
                 lookup.addLookupStrings(o.name + "." + function.name)
                 applyVariant(lookup)
               case v: ScValue =>
-                v.declaredElements.foreach(td =>
-                      {
-                    val lookup = LookupElementManager
-                      .getLookupElement(new ScalaResolveResult(td),
-                                        isClassName = true,
-                                        isOverloadedForClassName = false,
-                                        shouldImport = true,
-                                        isInStableCodeReference = false)
-                      .head
-                    lookup.addLookupStrings(o.name + "." + td.name)
-                    applyVariant(lookup)
+                v.declaredElements.foreach(td => {
+                  val lookup = LookupElementManager
+                    .getLookupElement(new ScalaResolveResult(td),
+                                      isClassName = true,
+                                      isOverloadedForClassName = false,
+                                      shouldImport = true,
+                                      isInStableCodeReference = false)
+                    .head
+                  lookup.addLookupStrings(o.name + "." + td.name)
+                  applyVariant(lookup)
                 })
               case v: ScVariable =>
-                v.declaredElements.foreach(td =>
-                      {
-                    val lookup = LookupElementManager
-                      .getLookupElement(new ScalaResolveResult(td),
-                                        isClassName = true,
-                                        isOverloadedForClassName = false,
-                                        shouldImport = true,
-                                        isInStableCodeReference = false)
-                      .head
-                    lookup.addLookupStrings(o.name + "." + td.name)
-                    applyVariant(lookup)
+                v.declaredElements.foreach(td => {
+                  val lookup = LookupElementManager
+                    .getLookupElement(new ScalaResolveResult(td),
+                                      isClassName = true,
+                                      isOverloadedForClassName = false,
+                                      shouldImport = true,
+                                      isInStableCodeReference = false)
+                    .head
+                  lookup.addLookupStrings(o.name + "." + td.name)
+                  applyVariant(lookup)
                 })
               case obj: ScObject =>
                 val lookup = LookupElementManager
@@ -280,35 +278,33 @@ class ScalaSmartCompletionContributor extends ScalaCompletionContributor {
               case Some(p: PsiClass)
                   if ResolveUtils.isAccessible(
                       p, place, forCompletion = true) =>
-                p.getAllMethods.foreach(method =>
-                      {
-                    if (method.hasModifierProperty("static") && ResolveUtils
-                          .isAccessible(method, place, forCompletion = true)) {
-                      val lookup = LookupElementManager
-                        .getLookupElement(new ScalaResolveResult(method),
-                                          isClassName = true,
-                                          isOverloadedForClassName = false,
-                                          shouldImport = true,
-                                          isInStableCodeReference = false)
-                        .head
-                      lookup.addLookupStrings(p.getName + "." + method.getName)
-                      applyVariant(lookup)
-                    }
+                p.getAllMethods.foreach(method => {
+                  if (method.hasModifierProperty("static") && ResolveUtils
+                        .isAccessible(method, place, forCompletion = true)) {
+                    val lookup = LookupElementManager
+                      .getLookupElement(new ScalaResolveResult(method),
+                                        isClassName = true,
+                                        isOverloadedForClassName = false,
+                                        shouldImport = true,
+                                        isInStableCodeReference = false)
+                      .head
+                    lookup.addLookupStrings(p.getName + "." + method.getName)
+                    applyVariant(lookup)
+                  }
                 })
-                p.getFields.foreach(field =>
-                      {
-                    if (field.hasModifierProperty("static") && ResolveUtils
-                          .isAccessible(field, place, forCompletion = true)) {
-                      val lookup = LookupElementManager
-                        .getLookupElement(new ScalaResolveResult(field),
-                                          isClassName = true,
-                                          isOverloadedForClassName = false,
-                                          shouldImport = true,
-                                          isInStableCodeReference = false)
-                        .head
-                      lookup.addLookupStrings(p.getName + "." + field.getName)
-                      applyVariant(lookup)
-                    }
+                p.getFields.foreach(field => {
+                  if (field.hasModifierProperty("static") && ResolveUtils
+                        .isAccessible(field, place, forCompletion = true)) {
+                    val lookup = LookupElementManager
+                      .getLookupElement(new ScalaResolveResult(field),
+                                        isClassName = true,
+                                        isOverloadedForClassName = false,
+                                        shouldImport = true,
+                                        isInStableCodeReference = false)
+                      .head
+                    lookup.addLookupStrings(p.getName + "." + field.getName)
+                    applyVariant(lookup)
+                  }
                 })
               case _ => checkTypeProjection(tp)
             }

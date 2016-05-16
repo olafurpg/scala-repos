@@ -75,13 +75,12 @@ class JobGeneratorSuite extends TestSuiteBase {
         val inputStream = ssc.receiverStream(new TestReceiver)
 
         inputStream.foreachRDD(
-            (rdd: RDD[Int], time: Time) =>
-              {
-            if (time.milliseconds == longBatchTime) {
-              while (waitLatch.getCount() > 0) {
-                waitLatch.await()
-              }
+            (rdd: RDD[Int], time: Time) => {
+          if (time.milliseconds == longBatchTime) {
+            while (waitLatch.getCount() > 0) {
+              waitLatch.await()
             }
+          }
         })
 
         val batchCounter = new BatchCounter(ssc)

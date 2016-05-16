@@ -24,7 +24,8 @@ import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.CalendarInterval
 
 case class UnaryMinus(child: Expression)
-    extends UnaryExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with ExpectsInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] =
     Seq(TypeCollection.NumericAndInterval)
@@ -40,18 +41,15 @@ case class UnaryMinus(child: Expression)
       case dt: DecimalType =>
         defineCodeGen(ctx, ev, c => s"$c.unary_$$minus()")
       case dt: NumericType =>
-        nullSafeCodeGen(ctx,
-                        ev,
-                        eval =>
-                          {
-                            val originValue = ctx.freshName("origin")
-                            // codegen would fail to compile if we just write (-($c))
-                            // for example, we could not write --9223372036854775808L in code
-                            s"""
+        nullSafeCodeGen(ctx, ev, eval => {
+          val originValue = ctx.freshName("origin")
+          // codegen would fail to compile if we just write (-($c))
+          // for example, we could not write --9223372036854775808L in code
+          s"""
         ${ctx.javaType(dt)} $originValue = (${ctx.javaType(dt)})($eval);
         ${ev.value} = (${ctx.javaType(dt)})(-($originValue));
       """
-                        })
+        })
       case dt: CalendarIntervalType =>
         defineCodeGen(ctx, ev, c => s"$c.negate()")
     }
@@ -68,7 +66,8 @@ case class UnaryMinus(child: Expression)
 }
 
 case class UnaryPositive(child: Expression)
-    extends UnaryExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with ExpectsInputTypes {
   override def prettyName: String = "positive"
 
   override def inputTypes: Seq[AbstractDataType] =
@@ -91,7 +90,8 @@ case class UnaryPositive(child: Expression)
     usage = "_FUNC_(expr) - Returns the absolute value of the numeric value",
     extended = "> SELECT _FUNC_('-1');\n1")
 case class Abs(child: Expression)
-    extends UnaryExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with ExpectsInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] = Seq(NumericType)
 
@@ -358,7 +358,8 @@ case class Remainder(left: Expression, right: Expression)
 }
 
 case class MaxOf(left: Expression, right: Expression)
-    extends BinaryArithmetic with NonSQLExpression {
+    extends BinaryArithmetic
+    with NonSQLExpression {
 
   // TODO: Remove MaxOf and MinOf, and replace its usage with Greatest and Least.
 
@@ -414,7 +415,8 @@ case class MaxOf(left: Expression, right: Expression)
 }
 
 case class MinOf(left: Expression, right: Expression)
-    extends BinaryArithmetic with NonSQLExpression {
+    extends BinaryArithmetic
+    with NonSQLExpression {
 
   // TODO: Remove MaxOf and MinOf, and replace its usage with Greatest and Least.
 
@@ -496,14 +498,11 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
     }
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2) =>
-                      {
-                        dataType match {
-                          case dt: DecimalType =>
-                            val decimalAdd = "$plus"
-                            s"""
+    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+      dataType match {
+        case dt: DecimalType =>
+          val decimalAdd = "$plus"
+          s"""
             ${ctx.javaType(dataType)} r = $eval1.remainder($eval2);
             if (r.compare(new org.apache.spark.sql.types.Decimal().set(0)) < 0) {
               ${ev.value} = (r.$decimalAdd($eval2)).remainder($eval2);
@@ -511,9 +510,9 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-                          // byte and short are casted into int when add, minus, times or divide
-                          case ByteType | ShortType =>
-                            s"""
+        // byte and short are casted into int when add, minus, times or divide
+        case ByteType | ShortType =>
+          s"""
             ${ctx.javaType(dataType)} r = (${ctx.javaType(dataType)})($eval1 % $eval2);
             if (r < 0) {
               ${ev.value} = (${ctx.javaType(dataType)})((r + $eval2) % $eval2);
@@ -521,8 +520,8 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-                          case _ =>
-                            s"""
+        case _ =>
+          s"""
             ${ctx.javaType(dataType)} r = $eval1 % $eval2;
             if (r < 0) {
               ${ev.value} = (r + $eval2) % $eval2;
@@ -530,8 +529,8 @@ case class Pmod(left: Expression, right: Expression) extends BinaryArithmetic {
               ${ev.value} = r;
             }
           """
-                        }
-                    })
+      }
+    })
   }
 
   private def pmod(a: Int, n: Int): Int = {

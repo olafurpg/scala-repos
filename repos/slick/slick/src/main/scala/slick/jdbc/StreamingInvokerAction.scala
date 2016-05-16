@@ -36,7 +36,7 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
     var count = 0L
     try {
       while (if (bufferNext) it.hasNext && count < limit
-      else count < limit && it.hasNext) {
+             else count < limit && it.hasNext) {
         count += 1
         ctx.emit(it.next())
       }

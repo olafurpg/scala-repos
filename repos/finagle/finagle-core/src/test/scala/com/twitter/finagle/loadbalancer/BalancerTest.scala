@@ -13,11 +13,14 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 private class BalancerTest
-    extends FunSuite with Conductors with IntegrationPatience
+    extends FunSuite
+    with Conductors
+    with IntegrationPatience
     with GeneratorDrivenPropertyChecks {
 
   private class TestBalancer(
-      protected val statsReceiver: InMemoryStatsReceiver = new InMemoryStatsReceiver)
+      protected val statsReceiver: InMemoryStatsReceiver =
+        new InMemoryStatsReceiver)
       extends Balancer[Unit, Unit] {
     def maxEffort: Int = 5
     def emptyException: Throwable = ???

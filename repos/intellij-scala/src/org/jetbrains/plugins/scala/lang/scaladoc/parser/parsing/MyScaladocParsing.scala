@@ -98,8 +98,7 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     }
 
     def canClose(element: IElementType): Boolean = {
-      element != null &&
-      (element == tokenType ||
+      element != null && (element == tokenType ||
           ((tokenType == DOC_LINK_TAG) || (tokenType == DOC_HTTP_LINK_TAG)) &&
           element == DOC_LINK_CLOSE_TAG)
     }
@@ -186,9 +185,8 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
             marker.done(DOC_LINK_TAG)
             return true
           }
-          if (!hasClosingElementsInWikiSyntax &&
-              (builder.getTokenText.indexOf("\n") == builder.getTokenText
-                    .lastIndexOf("\n"))) {
+          if (!hasClosingElementsInWikiSyntax && (builder.getTokenText.indexOf(
+                      "\n") == builder.getTokenText.lastIndexOf("\n"))) {
             //check is it single nl
             hasClosingElementsInWikiSyntax = true
             builder.advanceLexer()
@@ -222,7 +220,7 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     builder.advanceLexer()
 
     while (!isEndOfComment &&
-    builder.getTokenType != DOC_INNER_CLOSE_CODE_TAG) {
+           builder.getTokenType != DOC_INNER_CLOSE_CODE_TAG) {
       builder.advanceLexer()
     }
     if (isEndOfComment) {

@@ -25,7 +25,8 @@ trait ReificationSupport { self: SymbolTable =>
         mirrorThatLoaded(owner).missingHook(owner, name) orElse {
           throw new ScalaReflectionException(
               "%s %s in %s not found".format(if (name.isTermName)
-                                               "term" else "type",
+                                               "term"
+                                             else "type",
                                              name,
                                              owner.fullName))
         }
@@ -356,9 +357,12 @@ trait ReificationSupport { self: SymbolTable =>
 
     // undo gen.mkTemplate
     protected object UnMkTemplate {
-      def unapply(
-          templ: Template): Option[(List[Tree], ValDef, Modifiers, List[List[
-                  ValDef]], List[Tree], List[Tree])] = {
+      def unapply(templ: Template): Option[(List[Tree],
+                                            ValDef,
+                                            Modifiers,
+                                            List[List[ValDef]],
+                                            List[Tree],
+                                            List[Tree])] = {
         val Template(parents, selfType, _) = templ
         val tbody = treeInfo.untypecheckedTemplBody(templ)
 
@@ -456,9 +460,15 @@ trait ReificationSupport { self: SymbolTable =>
         gen.mkClassDef(mods, name, tparams0, templ)
       }
 
-      def unapply(tree: Tree)
-        : Option[(Modifiers, TypeName, List[TypeDef], Modifiers, List[
-                List[ValDef]], List[Tree], List[Tree], ValDef, List[Tree])] =
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TypeName,
+                                       List[TypeDef],
+                                       Modifiers,
+                                       List[List[ValDef]],
+                                       List[Tree],
+                                       List[Tree],
+                                       ValDef,
+                                       List[Tree])] =
         tree match {
           case ClassDef(
               mods,
@@ -499,8 +509,13 @@ trait ReificationSupport { self: SymbolTable =>
         gen.mkClassDef(mods0, name, mkTparams(tparams), templ)
       }
 
-      def unapply(tree: Tree): Option[(Modifiers, TypeName, List[TypeDef], List[
-              Tree], List[Tree], ValDef, List[Tree])] = tree match {
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TypeName,
+                                       List[TypeDef],
+                                       List[Tree],
+                                       List[Tree],
+                                       ValDef,
+                                       List[Tree])] = tree match {
         case ClassDef(mods,
                       name,
                       tparams,
@@ -527,16 +542,17 @@ trait ReificationSupport { self: SymbolTable =>
                                  Nil,
                                  earlyDefs ::: body))
 
-      def unapply(tree: Tree): Option[(Modifiers, TermName, List[Tree], List[
-              Tree], ValDef, List[Tree])] = tree match {
-        case ModuleDef(mods,
-                       name,
-                       UnMkTemplate(
-                       parents, selfType, _, _, earlyDefs, body)) =>
-          Some((mods, name, earlyDefs, parents, selfType, body))
-        case _ =>
-          None
-      }
+      def unapply(tree: Tree): Option[
+          (Modifiers, TermName, List[Tree], List[Tree], ValDef, List[Tree])] =
+        tree match {
+          case ModuleDef(mods,
+                         name,
+                         UnMkTemplate(
+                         parents, selfType, _, _, earlyDefs, body)) =>
+            Some((mods, name, earlyDefs, parents, selfType, body))
+          case _ =>
+            None
+        }
     }
 
     object SyntacticPackageObjectDef
@@ -767,9 +783,12 @@ trait ReificationSupport { self: SymbolTable =>
         DefDef(mods, name, tparams0, vparamss0, tpt, rhs0)
       }
 
-      def unapply(
-          tree: Tree): Option[(Modifiers, TermName, List[TypeDef], List[List[
-                  ValDef]], Tree, Tree)] = tree match {
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TermName,
+                                       List[TypeDef],
+                                       List[List[ValDef]],
+                                       Tree,
+                                       Tree)] = tree match {
         case DefDef(mods,
                     nme.CONSTRUCTOR,
                     tparams,
@@ -1175,28 +1194,31 @@ trait ReificationSupport { self: SymbolTable =>
       def unapply(tree: Tree): Option[List[CaseDef]] = tree match {
         case Match(EmptyTree, cases) => Some(cases)
         case Typed(
-            Block(
-            List(
-            ClassDef(clsMods,
-                     tpnme.ANON_FUN_NAME,
-                     Nil,
-                     Template(List(abspf: TypeTree, ser: TypeTree),
-                              noSelfType,
-                              List(
-                              DefDef(_, nme.CONSTRUCTOR, _, _, _, _),
-                              DefDef(_,
-                                     nme.applyOrElse,
-                                     _,
-                                     _,
-                                     _,
-                                     Match(
-                                     _,
-                                     cases :+ CaseDef(
-                                     Bind(nme.DEFAULT_CASE, Ident(nme.WILDCARD)), _, _))),
-                              DefDef(_, nme.isDefinedAt, _, _, _, _))))),
-            Apply(
-            Select(New(Ident(tpnme.ANON_FUN_NAME)), termNames.CONSTRUCTOR),
-            List())),
+            Block(List(
+                  ClassDef(clsMods,
+                           tpnme.ANON_FUN_NAME,
+                           Nil,
+                           Template(
+                           List(abspf: TypeTree, ser: TypeTree),
+                           noSelfType,
+                           List(DefDef(_, nme.CONSTRUCTOR, _, _, _, _),
+                                DefDef(_,
+                                       nme.applyOrElse,
+                                       _,
+                                       _,
+                                       _,
+                                       Match(
+                                       _,
+                                       cases :+ CaseDef(Bind(nme.DEFAULT_CASE,
+                                                             Ident(
+                                                             nme.WILDCARD)),
+                                                        _,
+                                                        _))),
+                                DefDef(_, nme.isDefinedAt, _, _, _, _))))),
+                  Apply(
+                  Select(
+                  New(Ident(tpnme.ANON_FUN_NAME)), termNames.CONSTRUCTOR),
+                  List())),
             pf: TypeTree)
             if pf.tpe != null && pf.tpe.typeSymbol.eq(PartialFunctionClass) &&
             abspf.tpe != null &&

@@ -10,12 +10,15 @@ import play.api.mvc._
 import play.api.test._
 
 object NettyExpect100ContinueSpec
-    extends Expect100ContinueSpec with NettyIntegrationSpecification
+    extends Expect100ContinueSpec
+    with NettyIntegrationSpecification
 object AkkaHttpExpect100ContinueSpec
-    extends Expect100ContinueSpec with AkkaHttpIntegrationSpecification
+    extends Expect100ContinueSpec
+    with AkkaHttpIntegrationSpecification
 
 trait Expect100ContinueSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   "Play" should {
 

@@ -72,8 +72,8 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
 
   def isCaseClassObject(o: ObjectSymbol): Boolean = {
     val TypeRefType(_, classSymbol: ClassSymbol, _) = o.infoType
-    o.isFinal &&
-    (classSymbol.children.find(x => x.isCase && x.isInstanceOf[MethodSymbol]) match {
+    o.isFinal && (classSymbol.children.find(x =>
+              x.isCase && x.isInstanceOf[MethodSymbol]) match {
           case Some(_) => true
           case None => false
         })
@@ -346,8 +346,7 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
       case SingleType(typeRef, symbol) =>
         sep + processName(symbol.path) + ".type"
       case ConstantType(constant) =>
-        sep +
-        (constant match {
+        sep + (constant match {
               case null => "scala.Null"
               case _: Unit => "scala.Unit"
               case _: Boolean => "scala.Boolean"
@@ -364,8 +363,7 @@ class ScalaSigPrinter(stream: PrintStream, printPrivates: Boolean) {
                 c.getComponentType.getCanonicalName.replace("$", ".") + "]"
             })
       case TypeRefType(prefix, symbol, typeArgs) =>
-        sep +
-        (symbol.path match {
+        sep + (symbol.path match {
               case "scala.<repeated>" =>
                 flags match {
                   case TypeFlags(true) => toString(typeArgs.head) + "*"

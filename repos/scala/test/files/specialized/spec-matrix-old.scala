@@ -1,7 +1,7 @@
 /** Test matrix multiplication with specialization.
   */
 @deprecated("Suppress warnings", since = "2.11")
-class Matrix[@specialized A : ClassManifest](val rows: Int, val cols: Int) {
+class Matrix[@specialized A: ClassManifest](val rows: Int, val cols: Int) {
   private val arr: Array[Array[A]] = Array.ofDim[A](rows, cols)
 
   def apply(i: Int, j: Int): A = {

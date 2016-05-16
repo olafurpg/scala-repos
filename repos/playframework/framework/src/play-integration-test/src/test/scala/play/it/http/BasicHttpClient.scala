@@ -25,8 +25,8 @@ object BasicHttpClient {
     */
   def makeRequests(port: Int,
                    checkClosed: Boolean = false,
-                   trickleFeed: Option[Long] = None)(
-      requests: BasicRequest*): Seq[BasicResponse] = {
+                   trickleFeed: Option[Long] =
+                     None)(requests: BasicRequest*): Seq[BasicResponse] = {
     val client = new BasicHttpClient(port)
     try {
       var requestNo = 0

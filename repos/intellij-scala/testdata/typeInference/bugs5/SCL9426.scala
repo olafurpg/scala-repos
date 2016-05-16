@@ -2,7 +2,7 @@ object SCL9426 {
   trait TC[A]
 
   object E {
-    implicit def e[X : TC, Y : TC]: TC[Either[X, Y]] = ???
+    implicit def e[X: TC, Y: TC]: TC[Either[X, Y]] = ???
   }
 
   object Demo {

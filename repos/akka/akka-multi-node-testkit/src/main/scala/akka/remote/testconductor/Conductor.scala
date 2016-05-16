@@ -327,7 +327,8 @@ private[akka] object ServerFSM {
   * INTERNAL API.
   */
 private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
-    extends Actor with LoggingFSM[ServerFSM.State, Option[ActorRef]] {
+    extends Actor
+    with LoggingFSM[ServerFSM.State, Option[ActorRef]] {
   import ServerFSM._
   import Controller._
 
@@ -403,7 +404,8 @@ private[akka] object Controller {
   final case class ClientDisconnected(name: RoleName)
       extends DeadLetterSuppression
   class ClientDisconnectedException(msg: String)
-      extends AkkaException(msg) with NoStackTrace
+      extends AkkaException(msg)
+      with NoStackTrace
   case object GetNodes
   case object GetSockAddr
   final case class CreateServerFSM(channel: Channel)
@@ -559,25 +561,33 @@ private[akka] object BarrierCoordinator {
   final case class BarrierTimeout(data: Data)
       extends RuntimeException(
           "timeout while waiting for barrier '" + data.barrier + "'")
-      with NoStackTrace with Printer
+      with NoStackTrace
+      with Printer
   final case class FailedBarrier(data: Data)
       extends RuntimeException("failing barrier '" + data.barrier + "'")
-      with NoStackTrace with Printer
+      with NoStackTrace
+      with Printer
   final case class DuplicateNode(data: Data, node: Controller.NodeInfo)
-      extends RuntimeException(node.toString) with NoStackTrace with Printer
+      extends RuntimeException(node.toString)
+      with NoStackTrace
+      with Printer
   final case class WrongBarrier(barrier: String, client: ActorRef, data: Data)
       extends RuntimeException(
           data.clients
             .find(_.fsm == client)
             .map(_.name.toString)
-            .getOrElse(client.toString) + " tried to enter '" +
-          barrier + "' while we were waiting for '" + data.barrier + "'")
-      with NoStackTrace with Printer
+            .getOrElse(client.toString) + " tried to enter '" + barrier +
+          "' while we were waiting for '" + data.barrier + "'")
+      with NoStackTrace
+      with Printer
   final case class BarrierEmpty(data: Data, msg: String)
-      extends RuntimeException(msg) with NoStackTrace with Printer
+      extends RuntimeException(msg)
+      with NoStackTrace
+      with Printer
   final case class ClientLost(data: Data, client: RoleName)
       extends RuntimeException("unannounced disconnect of " + client)
-      with NoStackTrace with Printer
+      with NoStackTrace
+      with Printer
 }
 
 /**

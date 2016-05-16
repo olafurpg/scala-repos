@@ -113,8 +113,8 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     // create brokers
     val allServers =
       brokerConfigs.map(b => TestUtils.createServer(KafkaConfig.fromProps(b)))
-    val servers = allServers.filter(
-        s => expectedReplicaAssignment(0).contains(s.config.brokerId))
+    val servers = allServers.filter(s =>
+          expectedReplicaAssignment(0).contains(s.config.brokerId))
     // create the topic
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
         zkUtils, topic, expectedReplicaAssignment)
@@ -142,19 +142,16 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     assertTrue("Partition reassignment should fail for [test,0]",
                reassignPartitionsCommand.reassignPartitions())
     // wait until reassignment is completed
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            val partitionsBeingReassigned =
-              zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas);
-            ReassignPartitionsCommand.checkIfPartitionReassignmentSucceeded(
-                zkUtils,
-                topicAndPartition,
-                newReplicas,
-                Map(topicAndPartition -> newReplicas),
-                partitionsBeingReassigned) == ReassignmentFailed;
-        },
-        "Partition reassignment shouldn't complete.")
+    TestUtils.waitUntilTrue(() => {
+      val partitionsBeingReassigned =
+        zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas);
+      ReassignPartitionsCommand.checkIfPartitionReassignmentSucceeded(
+          zkUtils,
+          topicAndPartition,
+          newReplicas,
+          Map(topicAndPartition -> newReplicas),
+          partitionsBeingReassigned) == ReassignmentFailed;
+    }, "Partition reassignment shouldn't complete.")
     val controllerId = zkUtils.getController()
     val controller =
       servers.filter(s => s.config.brokerId == controllerId).head

@@ -55,10 +55,13 @@ trait ReductionHelper {
 }
 
 trait LogisticRegressionLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ReductionLibModule[M]
+    extends ColumnarTableLibModule[M]
+    with ReductionLibModule[M]
     with PredictionLibModule[M] {
   trait LogisticRegressionLib
-      extends ColumnarTableLib with ReductionLib with PredictionSupport
+      extends ColumnarTableLib
+      with ReductionLib
+      with PredictionSupport
       with RegressionSupport {
     import trans._
 
@@ -143,8 +146,8 @@ trait LogisticRegressionLibModule[M[+ _]]
                 assert(xs.length == theta.length)
 
                 val result = (0 until xs.length).map { i =>
-                  theta(i) - alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(
-                      i)
+                  theta(i) -
+                  alpha * (y - sigmoid(dotProduct(theta, xs))) * xs(i)
                 }.map(checkValue)
 
                 result.toArray

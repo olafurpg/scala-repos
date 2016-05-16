@@ -113,10 +113,10 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
       val application = evolutions.reverse
       val database = databaseEvolutions()
 
-      val (nonConflictingDowns, dRest) = database.span(
-          e => !application.headOption.exists(e.revision <= _.revision))
-      val (nonConflictingUps, uRest) = application.span(
-          e => !database.headOption.exists(_.revision >= e.revision))
+      val (nonConflictingDowns, dRest) = database.span(e =>
+            !application.headOption.exists(e.revision <= _.revision))
+      val (nonConflictingUps, uRest) = application.span(e =>
+            !database.headOption.exists(_.revision >= e.revision))
 
       val (conflictingDowns, conflictingUps) =
         Evolutions.conflictings(dRest, uRest)
@@ -311,8 +311,8 @@ class DatabaseEvolutions(database: Database, schema: String = "") {
         logger.error(error)
 
         val humanScript =
-          "# --- Rev:" + revision + "," +
-          (if (state == "applying_up") "Ups" else "Downs") + " - " + hash +
+          "# --- Rev:" + revision + "," + (if (state == "applying_up") "Ups"
+                                           else "Downs") + " - " + hash +
           "\n\n" + script
 
         throw InconsistentDatabase(
@@ -538,7 +538,8 @@ class EnvironmentEvolutionsReader @Inject()(environment: Environment)
   *               evolutions in different environments to work with different databases.
   */
 class ClassLoaderEvolutionsReader(
-    classLoader: ClassLoader = classOf[ClassLoaderEvolutionsReader].getClassLoader,
+    classLoader: ClassLoader =
+      classOf[ClassLoaderEvolutionsReader].getClassLoader,
     prefix: String = "")
     extends ResourceEvolutionsReader {
   def loadResource(db: String, revision: Int) = {

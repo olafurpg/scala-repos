@@ -13,8 +13,7 @@ object Client extends App {
   val response: Future[http.Response] = client(request)
   //#dispatch
   //#callback
-  Await.result(
-      response.onSuccess { rep: http.Response =>
+  Await.result(response.onSuccess { rep: http.Response =>
     println("GET success: " + rep)
   })
 

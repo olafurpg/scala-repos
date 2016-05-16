@@ -52,7 +52,8 @@ private[stream] final case class GraphModule(assembly: GraphAssembly,
   */
 private[stream] object ActorGraphInterpreter {
   trait BoundaryEvent
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded {
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded {
     def shell: GraphInterpreterShell
   }
 
@@ -175,8 +176,8 @@ private[stream] object ActorGraphInterpreter {
       if (!upstreamCompleted) {
         if (inputBufferElements == size)
           throw new IllegalStateException("Input buffer overrun")
-        inputBuffer((nextInputElementCursor + inputBufferElements) & IndexMask) = elem
-          .asInstanceOf[AnyRef]
+        inputBuffer((nextInputElementCursor + inputBufferElements) & IndexMask) =
+          elem.asInstanceOf[AnyRef]
         inputBufferElements += 1
         if (isAvailable(out)) push(out, dequeue())
       }
@@ -326,7 +327,8 @@ private[stream] object ActorGraphInterpreter {
       } else {
         downstreamDemand += elements
         if (downstreamDemand < 0)
-          downstreamDemand = Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
+          downstreamDemand =
+            Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
         if (!hasBeenPulled(in) && !isClosed(in)) pull(in)
       }
     }
@@ -370,13 +372,12 @@ private[stream] final class GraphInterpreterShell(
       inHandlers,
       outHandlers,
       logics,
-      (logic, event, handler) ⇒
-        {
-          val asyncInput = AsyncInput(this, logic, event, handler)
-          val currentInterpreter = GraphInterpreter.currentInterpreterOrNull
-          if (currentInterpreter == null ||
-              (currentInterpreter.context ne self)) self ! asyncInput
-          else enqueueToShortCircuit(asyncInput)
+      (logic, event, handler) ⇒ {
+        val asyncInput = AsyncInput(this, logic, event, handler)
+        val currentInterpreter = GraphInterpreter.currentInterpreterOrNull
+        if (currentInterpreter == null || (currentInterpreter.context ne self))
+          self ! asyncInput
+        else enqueueToShortCircuit(asyncInput)
       },
       settings.fuzzingMode,
       self)
@@ -584,7 +585,8 @@ private[stream] final class GraphInterpreterShell(
   * INTERNAL API
   */
 private[stream] class ActorGraphInterpreter(_initial: GraphInterpreterShell)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ActorGraphInterpreter._
 
   var activeInterpreters = Set.empty[GraphInterpreterShell]
@@ -656,7 +658,7 @@ private[stream] class ActorGraphInterpreter(_initial: GraphInterpreterShell)
 
   private def shortCircuitBatch(): Unit = {
     while (!shortCircuitBuffer.isEmpty && currentLimit > 0 &&
-    activeInterpreters.nonEmpty) shortCircuitBuffer.poll() match {
+           activeInterpreters.nonEmpty) shortCircuitBuffer.poll() match {
       case b: BoundaryEvent ⇒ processEvent(b)
       case Resume ⇒ finishShellRegistration()
     }

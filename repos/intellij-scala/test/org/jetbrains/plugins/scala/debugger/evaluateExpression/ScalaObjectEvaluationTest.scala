@@ -7,9 +7,11 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * Date: 15.10.11
   */
 class ScalaObjectEvaluationTest
-    extends ScalaObjectEvaluationTestBase with ScalaVersion_2_11
+    extends ScalaObjectEvaluationTestBase
+    with ScalaVersion_2_11
 class ScalaObjectEvaluationTest_212
-    extends ScalaObjectEvaluationTestBase with ScalaVersion_2_12
+    extends ScalaObjectEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
   addFileWithBreakpoints("SimpleObject.scala",

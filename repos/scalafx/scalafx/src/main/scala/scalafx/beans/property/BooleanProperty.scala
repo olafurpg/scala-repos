@@ -47,7 +47,8 @@ object BooleanProperty {
 }
 
 class BooleanProperty(
-    override val delegate: jfxbp.BooleanProperty = new jfxbp.SimpleBooleanProperty)
+    override val delegate: jfxbp.BooleanProperty =
+      new jfxbp.SimpleBooleanProperty)
     extends ReadOnlyBooleanProperty(delegate)
     with Property[Boolean, java.lang.Boolean]
     with SFXDelegate[jfxbp.BooleanProperty] {

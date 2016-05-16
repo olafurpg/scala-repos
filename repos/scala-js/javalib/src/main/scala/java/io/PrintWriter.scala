@@ -53,8 +53,7 @@ class PrintWriter(protected[io] var out: Writer, autoFlush: Boolean)
        * checkError() result. This is not clearly specified by the JavaDoc,
        * but, experimentally, the JDK seems to behave that way.
        */
-      errorFlag ||
-      (out match {
+      errorFlag || (out match {
             case out: PrintWriter => out.checkError()
             case _ => false
           })

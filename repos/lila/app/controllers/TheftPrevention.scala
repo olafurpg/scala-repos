@@ -11,8 +11,8 @@ import views._
 
 private[controllers] trait TheftPrevention { self: LilaController =>
 
-  protected def PreventTheft(pov: Pov)(
-      ok: => Fu[Result])(implicit ctx: Context): Fu[Result] =
+  protected def PreventTheft(pov: Pov)(ok: => Fu[Result])(
+      implicit ctx: Context): Fu[Result] =
     isTheft(pov).fold(
         fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.color.name))),
         ok)

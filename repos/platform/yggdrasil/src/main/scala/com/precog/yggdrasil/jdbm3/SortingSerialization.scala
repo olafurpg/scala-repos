@@ -34,7 +34,8 @@ object SortingKeyComparator {
 
 class SortingKeyComparator private[SortingKeyComparator](
     rowFormat: RowFormat, ascending: Boolean)
-    extends Comparator[Array[Byte]] with Serializable {
+    extends Comparator[Array[Byte]]
+    with Serializable {
 
   def compare(a: Array[Byte], b: Array[Byte]) = {
     val ret = rowFormat.compare(a, b)

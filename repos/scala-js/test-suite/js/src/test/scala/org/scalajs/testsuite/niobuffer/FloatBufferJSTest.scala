@@ -25,7 +25,8 @@ class WrappedTypedArrayFloatBufferJSTest extends FloatBufferTest {
   val factory: FloatBufferFactory = new WrappedTypedArrayFloatBufferJSFactory
 
   class WrappedTypedArrayFloatBufferJSFactory
-      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedTypedArrayBufferFactory {
     def baseWrap(array: Array[Float]): FloatBuffer =
       TypedArrayBuffer.wrap(new Float32Array(array.toJSArray))
   }

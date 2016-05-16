@@ -5,7 +5,9 @@ import mesosphere.marathon.core.appinfo.{GroupInfo, AppInfo}
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class InfoEmbedResolverTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   val prefixes = Seq("", "app.", "apps.")
 

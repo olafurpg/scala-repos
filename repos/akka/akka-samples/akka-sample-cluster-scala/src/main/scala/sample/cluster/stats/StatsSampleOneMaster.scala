@@ -31,20 +31,22 @@ object StatsSampleOneMaster {
       val system = ActorSystem("ClusterSystem", config)
 
       //#create-singleton-manager
-      system.actorOf(ClusterSingletonManager.props(
-                         singletonProps = Props[StatsService],
-                         terminationMessage = PoisonPill,
-                         settings = ClusterSingletonManagerSettings(system)
-                             .withRole("compute")),
-                     name = "statsService")
+      system.actorOf(
+          ClusterSingletonManager.props(
+              singletonProps = Props[StatsService],
+              terminationMessage = PoisonPill,
+              settings =
+                ClusterSingletonManagerSettings(system).withRole("compute")),
+          name = "statsService")
       //#create-singleton-manager
 
       //#singleton-proxy
-      system.actorOf(ClusterSingletonProxy.props(
-                         singletonManagerPath = "/user/statsService",
-                         settings = ClusterSingletonProxySettings(system)
-                             .withRole("compute")),
-                     name = "statsServiceProxy")
+      system.actorOf(
+          ClusterSingletonProxy.props(
+              singletonManagerPath = "/user/statsService",
+              settings =
+                ClusterSingletonProxySettings(system).withRole("compute")),
+          name = "statsServiceProxy")
       //#singleton-proxy
     }
   }

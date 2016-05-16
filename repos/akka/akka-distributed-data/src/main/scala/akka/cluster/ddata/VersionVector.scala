@@ -98,7 +98,8 @@ object VersionVector {
   */
 @SerialVersionUID(1L)
 sealed abstract class VersionVector
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = VersionVector

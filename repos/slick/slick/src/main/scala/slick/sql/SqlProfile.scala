@@ -12,8 +12,11 @@ import slick.util.DumpInfo
 
 /** Abstract profile for SQL-based databases. */
 trait SqlProfile
-    extends RelationalProfile with SqlTableComponent with SqlActionComponent
-    /* internal: */ with SqlUtilsComponent {
+    extends RelationalProfile
+    with SqlTableComponent
+    with SqlActionComponent
+    /* internal: */
+    with SqlUtilsComponent {
 
   @deprecated(
       "Use the Profile object directly instead of calling `.profile` on it",
@@ -180,7 +183,8 @@ trait SqlAction[+R, +S <: NoStream, -E <: Effect]
 }
 
 trait SqlStreamingAction[+R, +T, -E <: Effect]
-    extends BasicStreamingAction[R, T, E] with SqlAction[R, Streaming[T], E]
+    extends BasicStreamingAction[R, T, E]
+    with SqlAction[R, Streaming[T], E]
 
 trait FixedSqlAction[+R, +S <: NoStream, -E <: Effect]
     extends SqlAction[R, S, E] {
@@ -188,4 +192,5 @@ trait FixedSqlAction[+R, +S <: NoStream, -E <: Effect]
 }
 
 trait FixedSqlStreamingAction[+R, +T, -E <: Effect]
-    extends SqlStreamingAction[R, T, E] with FixedSqlAction[R, Streaming[T], E]
+    extends SqlStreamingAction[R, T, E]
+    with FixedSqlAction[R, Streaming[T], E]

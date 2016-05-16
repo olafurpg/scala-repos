@@ -37,9 +37,10 @@ class FilteredScanSource extends RelationProvider {
   }
 }
 
-case class SimpleFilteredScan(from: Int, to: Int)(
-    @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedFilteredScan {
+case class SimpleFilteredScan(
+    from: Int, to: Int)(@transient val sqlContext: SQLContext)
+    extends BaseRelation
+    with PrunedFilteredScan {
 
   override def schema: StructType =
     StructType(
@@ -148,7 +149,8 @@ case class SimpleFilteredScan(from: Int, to: Int)(
 
     def eval(a: Int) = {
       val c =
-        (a - 1 + 'a').toChar.toString * 5 + (a - 1 + 'a').toChar.toString.toUpperCase * 5
+        (a - 1 + 'a').toChar.toString * 5 +
+        (a - 1 + 'a').toChar.toString.toUpperCase * 5
       filters.forall(translateFilterOnA(_)(a)) &&
       filters.forall(translateFilterOnC(_)(c))
     }
@@ -175,7 +177,9 @@ object ColumnsRequired {
 }
 
 class FilteredScanSuite
-    extends DataSourceTest with SharedSQLContext with PredicateHelper {
+    extends DataSourceTest
+    with SharedSQLContext
+    with PredicateHelper {
   protected override lazy val sql = caseInsensitiveContext.sql _
 
   override def beforeAll(): Unit = {
@@ -190,15 +194,14 @@ class FilteredScanSuite
       """.stripMargin)
   }
 
-  sqlTest(
-      "SELECT * FROM oneToTenFiltered",
-      (1 to 10)
-        .map(i =>
-              Row(i,
-                  i * 2,
-                  (i - 1 +
-                      'a').toChar.toString * 5 + (i - 1 + 'a').toChar.toString.toUpperCase * 5))
-        .toSeq)
+  sqlTest("SELECT * FROM oneToTenFiltered",
+          (1 to 10)
+            .map(i =>
+                  Row(i,
+                      i * 2,
+                      (i - 1 + 'a').toChar.toString * 5 +
+                      (i - 1 + 'a').toChar.toString.toUpperCase * 5))
+            .toSeq)
 
   sqlTest("SELECT a, b FROM oneToTenFiltered",
           (1 to 10).map(i => Row(i, i * 2)).toSeq)

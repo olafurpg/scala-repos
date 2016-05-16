@@ -29,7 +29,9 @@ trait PossiblyHarmful
 trait NoSerializationVerificationNeeded
 
 abstract class PoisonPill
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 /**
   * A message all Actors will understand, that when processed will terminate the Actor permanently.
@@ -101,7 +103,9 @@ final case class ActorIdentity(correlationId: Any, ref: Option[ActorRef]) {
 final case class Terminated private[akka](@BeanProperty actor: ActorRef)(
     @BeanProperty val existenceConfirmed: Boolean,
     @BeanProperty val addressTerminated: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 /**
   * INTERNAL API
@@ -114,7 +118,9 @@ final case class Terminated private[akka](@BeanProperty actor: ActorRef)(
   */
 @SerialVersionUID(1L)
 private[akka] final case class AddressTerminated(address: Address)
-    extends AutoReceivedMessage with PossiblyHarmful with DeadLetterSuppression
+    extends AutoReceivedMessage
+    with PossiblyHarmful
+    with DeadLetterSuppression
 
 abstract class ReceiveTimeout extends PossiblyHarmful
 
@@ -149,7 +155,8 @@ final case class IllegalActorStateException private[akka](message: String)
   */
 @SerialVersionUID(1L)
 final case class ActorKilledException private[akka](message: String)
-    extends AkkaException(message) with NoStackTrace
+    extends AkkaException(message)
+    with NoStackTrace
 
 /**
   * An InvalidActorNameException is thrown when you try to convert something, usually a String, to an Actor name
@@ -177,10 +184,10 @@ class ActorInitializationException protected (
   def getActor: ActorRef = actor
 }
 object ActorInitializationException {
-  private[akka] def apply(
-      actor: ActorRef,
-      message: String,
-      cause: Throwable = null): ActorInitializationException =
+  private[akka] def apply(actor: ActorRef,
+                          message: String,
+                          cause: Throwable =
+                            null): ActorInitializationException =
     new ActorInitializationException(actor, message, cause)
   private[akka] def apply(message: String): ActorInitializationException =
     new ActorInitializationException(null, message, null)
@@ -207,10 +214,10 @@ final case class PreRestartException private[akka](actor: ActorRef,
                                                    messageOption: Option[Any])
     extends ActorInitializationException(
         actor,
-        "exception in preRestart(" +
-        (if (originalCause == null)
-           "null" else originalCause.getClass) + ", " +
-        (messageOption match {
+        "exception in preRestart(" + (if (originalCause == null)
+                                        "null"
+                                      else originalCause.getClass) +
+        ", " + (messageOption match {
               case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
             }) + ")",
         cause)
@@ -228,8 +235,8 @@ final case class PostRestartException private[akka](
     actor: ActorRef, cause: Throwable, originalCause: Throwable)
     extends ActorInitializationException(
         actor,
-        "exception post restart (" +
-        (if (originalCause == null) "null" else originalCause.getClass) + ")",
+        "exception post restart (" + (if (originalCause == null) "null"
+                                      else originalCause.getClass) + ")",
         cause)
 
 /**

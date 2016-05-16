@@ -73,8 +73,8 @@ object ScalaAfterNewCompletionUtil {
       if (clazz.getTypeParameters.length == 1) {
         ScParameterizedType(
             ScDesignatorType(clazz),
-            clazz.getTypeParameters.map(
-                ptp => new ScTypeParameterType(ptp, ScSubstitutor.empty)))
+            clazz.getTypeParameters.map(ptp =>
+                  new ScTypeParameterType(ptp, ScSubstitutor.empty)))
       } else ScDesignatorType(clazz)
 
     val iterator = expectedTypes.iterator
@@ -129,8 +129,7 @@ object ScalaAfterNewCompletionUtil {
       }
       var tailText: String = ""
       val itemText: String =
-        psiClass.name +
-        (tp match {
+        psiClass.name + (tp match {
               case ScParameterizedType(_, tps) =>
                 tps
                   .map(tp => ScType.presentableText(subst.subst(tp)))
@@ -158,7 +157,7 @@ object ScalaAfterNewCompletionUtil {
       psiClass: PsiClass,
       subst: ScSubstitutor,
       renderer: (ScType, PsiClass,
-      ScSubstitutor) => LookupElementRenderer[LookupElement],
+                 ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : ScalaLookupItem = {
@@ -204,7 +203,7 @@ object ScalaAfterNewCompletionUtil {
       place: PsiElement,
       addedClasses: mutable.HashSet[String],
       renderer: (ScType, PsiClass,
-      ScSubstitutor) => LookupElementRenderer[LookupElement],
+                 ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)])
     : ScalaLookupItem = {
@@ -238,7 +237,7 @@ object ScalaAfterNewCompletionUtil {
       addedClasses: mutable.HashSet[String],
       result: CompletionResultSet,
       renderer: (ScType, PsiClass,
-      ScSubstitutor) => LookupElementRenderer[LookupElement],
+                 ScSubstitutor) => LookupElementRenderer[LookupElement],
       insertHandler: InsertHandler[LookupElement],
       renamesMap: mutable.HashMap[String, (String, PsiNamedElement)]) {
     ScType.extractClassType(typez, Some(place.getProject)) match {

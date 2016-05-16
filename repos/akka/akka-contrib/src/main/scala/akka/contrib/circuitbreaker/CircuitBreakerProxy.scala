@@ -129,7 +129,8 @@ final class CircuitBreakerProxy(target: ActorRef,
                                 circuitEventListener: Option[ActorRef],
                                 failureDetector: Any ⇒ Boolean,
                                 failureMap: CircuitOpenFailure ⇒ Any)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with FSM[CircuitBreakerState, CircuitBreakerStateData] {
 
   import CircuitBreakerInternalEvents._

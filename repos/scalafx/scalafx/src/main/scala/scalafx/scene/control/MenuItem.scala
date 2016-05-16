@@ -44,8 +44,11 @@ object MenuItem {
 }
 
 class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
-    extends jfxe.EventTarget with Styleable with EventHandlerDelegate
-    with FireDelegate[jfxsc.MenuItem] with SFXDelegate[jfxsc.MenuItem] {
+    extends jfxe.EventTarget
+    with Styleable
+    with EventHandlerDelegate
+    with FireDelegate[jfxsc.MenuItem]
+    with SFXDelegate[jfxsc.MenuItem] {
 
   /**
     * Constructs a MenuItem and sets the display text with the specified text

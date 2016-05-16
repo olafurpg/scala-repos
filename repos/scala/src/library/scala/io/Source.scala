@@ -183,9 +183,8 @@ object Source {
     *  @return              the buffered source
     */
   def fromResource(resource: String,
-                   classLoader: ClassLoader = Thread
-                       .currentThread()
-                       .getContextClassLoader())(
+                   classLoader: ClassLoader =
+                     Thread.currentThread().getContextClassLoader())(
       implicit codec: Codec): BufferedSource =
     fromInputStream(classLoader.getResourceAsStream(resource))
 }

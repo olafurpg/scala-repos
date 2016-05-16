@@ -33,8 +33,8 @@ object AttrValue {
         builder.advanceLexer()
         var patched = false
         while (VALID_ATTRIBUTE_TOKENS.contains(builder.getTokenType) || {
-          patched = patcher parse builder; patched
-        }) {
+                 patched = patcher parse builder; patched
+               }) {
           if (!patched) builder.advanceLexer() else patched = false
         }
         builder.getTokenType match {

@@ -370,8 +370,7 @@ object Schema {
     * in the case of homogeneous arrays when only need a few elements).
     */
   def requiredBy(jtpe: JType, path: CPath, ctpe: CType): Boolean =
-    includes(jtpe, path, ctpe) ||
-    ((jtpe, path, ctpe) match {
+    includes(jtpe, path, ctpe) || ((jtpe, path, ctpe) match {
           case (JArrayFixedT(elements),
                 CPath(CPathArray, tail @ _ *),
                 CArrayType(elemType)) =>

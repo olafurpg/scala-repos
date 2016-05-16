@@ -14,7 +14,8 @@ import scala.annotation.tailrec
   * 2014-06-26
   */
 class ScalaMethodCallArgUnwrapper
-    extends ScalaUnwrapper with ShortTextDescription {
+    extends ScalaUnwrapper
+    with ShortTextDescription {
 
   override def getDescription(e: PsiElement) = super.getDescription(e)
 

@@ -33,9 +33,9 @@ object Multipart {
     * @param maxMemoryBufferSize The maximum amount of data to parse into memory.
     * @param partHandler The accumulator to handle the parts.
     */
-  def partParser[A](maxMemoryBufferSize: Int)(partHandler: Accumulator[
-                                                  Part[Source[ByteString, _]],
-                                                  Either[Result, A]])(
+  def partParser[A](maxMemoryBufferSize: Int)(
+      partHandler: Accumulator[
+          Part[Source[ByteString, _]], Either[Result, A]])(
       implicit mat: Materializer): BodyParser[A] = BodyParser { request =>
     val maybeBoundary = for {
       mt <- request.mediaType
@@ -129,8 +129,8 @@ object Multipart {
   def handleFilePartAsTemporaryFile: FilePartHandler[TemporaryFile] = {
     case FileInfo(partName, filename, contentType) =>
       val tempFile = TemporaryFile("multipartBody", "asTemporaryFile")
-      Accumulator(StreamConverters.fromOutputStream(
-              () => new java.io.FileOutputStream(tempFile.file))).map { _ =>
+      Accumulator(StreamConverters.fromOutputStream(() =>
+                new java.io.FileOutputStream(tempFile.file))).map { _ =>
         FilePart(partName, filename, contentType, tempFile)
       }
   }
@@ -187,17 +187,17 @@ object Multipart {
 
       for {
         values <- headers
-          .get("content-disposition")
-          .map(
-              split(_)
-                .map(_.trim)
-                .map {
-              // unescape escaped quotes
-              case KeyValue(key, v) =>
-                (key.trim, v.trim.replaceAll("""\\"""", "\""))
-              case key => (key.trim, "")
-            }
-                .toMap)
+                   .get("content-disposition")
+                   .map(
+                       split(_)
+                         .map(_.trim)
+                         .map {
+                       // unescape escaped quotes
+                       case KeyValue(key, v) =>
+                         (key.trim, v.trim.replaceAll("""\\"""", "\""))
+                       case key => (key.trim, "")
+                     }
+                         .toMap)
 
         _ <- values.get("form-data")
         partName <- values.get("name")
@@ -214,22 +214,24 @@ object Multipart {
 
       for {
         values <- headers
-          .get("content-disposition")
-          .map(_.split(";")
-                .map(_.trim)
-                .map {
-              case KeyValue(key, v) => (key.trim, v.trim)
-              case key => (key.trim, "")
-            }
-                .toMap)
+                   .get("content-disposition")
+                   .map(_.split(";")
+                         .map(_.trim)
+                         .map {
+                       case KeyValue(key, v) => (key.trim, v.trim)
+                       case key => (key.trim, "")
+                     }
+                         .toMap)
         _ <- values.get("form-data")
         partName <- values.get("name")
       } yield partName
     }
   }
 
-  private def createBadResult[A](msg: String, status: Int = BAD_REQUEST)
-    : RequestHeader => Future[Either[Result, A]] = { request =>
+  private def createBadResult[A](
+      msg: String,
+      status: Int =
+        BAD_REQUEST): RequestHeader => Future[Either[Result, A]] = { request =>
     Play.privateMaybeApplication
       .fold(Future.successful(Left(Results.Status(status): Result)))(
         _.errorHandler.onClientError(request, status, msg).map(Left(_)))
@@ -359,19 +361,17 @@ object Multipart {
         case headerEnd =>
           val headerString = input.slice(headerStart, headerEnd).utf8String
           val headers = headerString.lines.map { header =>
-            val key :: value = header.trim
-              .split(":")
-              .toList
-              (key.trim.toLowerCase(java.util.Locale.ENGLISH),
-               value.mkString(":").trim)
+            val key :: value = header.trim.split(":").toList
+            (key.trim.toLowerCase(java.util.Locale.ENGLISH),
+             value.mkString(":").trim)
           }.toMap
 
           val partStart = headerEnd + 4
 
           // The amount of memory taken by the headers
           def headersSize =
-            headers.foldLeft(0)(
-                (total, value) => total + value._1.length + value._2.length)
+            headers.foldLeft(0)((total, value) =>
+                  total + value._1.length + value._2.length)
 
           headers match {
             case FileInfoMatcher(partName, fileName, contentType) =>
@@ -458,7 +458,8 @@ object Multipart {
         }
       } catch {
         case NotEnoughDataException =>
-          if (memoryBufferSize + (input.length - partStart - needle.length) > maxMemoryBufferSize) {
+          if (memoryBufferSize + (input.length - partStart -
+                  needle.length) > maxMemoryBufferSize) {
             bufferExceeded("Memory buffer full on part " + partName)
           }
           continue(input, partStart)(
@@ -542,7 +543,8 @@ object Multipart {
 
     @tailrec def boundary(input: ByteString, offset: Int, ix: Int = 2)
       : Boolean =
-      (ix == needle.length) || (byteAt(input, offset + ix - 2) == needle(ix)) &&
+      (ix == needle.length) ||
+      (byteAt(input, offset + ix - 2) == needle(ix)) &&
       boundary(input, offset, ix + 1)
 
     def crlf(input: ByteString, offset: Int): Boolean =
@@ -589,7 +591,8 @@ object Multipart {
 
       @tailrec def suffixLength(i: Int, j: Int, result: Int): Int =
         if (i >= 0 && needle(i) == needle(j))
-          suffixLength(i - 1, j - 1, result + 1) else result
+          suffixLength(i - 1, j - 1, result + 1)
+        else result
       @tailrec def loop2(i: Int): Unit =
         if (i < nl1) {
           val sl = suffixLength(i, nl1, 0)

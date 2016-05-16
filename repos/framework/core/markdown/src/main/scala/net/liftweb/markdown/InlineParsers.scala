@@ -249,8 +249,7 @@ trait InlineParsers extends BaseParsers {
     */
   def linkInline(ctx: InlineContext): Parser[String] =
     //( (not(']') ~> oneInline(ctx.addTag("a")))* ) ^^ {_.mkString}
-    (
-    (markdownText(specialLinkInlineChars, true) | elementParsers(ctx) |
+    ((markdownText(specialLinkInlineChars, true) | elementParsers(ctx) |
         ((not(']') ~> aChar))) *) ^^ { _.mkString }
 
   /** We parse everything as a link/img url until we hit whitespace or a closing brace.

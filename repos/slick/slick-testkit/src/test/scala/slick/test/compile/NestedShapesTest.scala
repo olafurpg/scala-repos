@@ -52,7 +52,7 @@ class NestedShapesTest {
                      _]] // 2
     implicitly[Shape[NestedShapeLevel,
                      (Rep[Int],
-                     Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
+                      Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
                      _,
                      _]] // 3
     implicitly[Shape[NestedShapeLevel,
@@ -69,17 +69,17 @@ class NestedShapesTest {
                      Query[(Rep[Int], Rep[String]), (Int, String), Seq],
                      Seq[(Int, String)],
                      Query[(Rep[Int], Rep[String]), (Int, String), Seq]]] // 6
-    implicitly[Shape[NestedShapeLevel,
-                     (Rep[Int],
-                     Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
-                     (Int, Seq[(Int, String)]),
-                     (Rep[Int],
-                     Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 7
-    implicitly[Shape[NestedShapeLevel,
-                     (Int, Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
-                     (Int, Seq[(Int, String)]),
-                     (ConstColumn[Int],
-                     Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 8
+    implicitly[
+        Shape[NestedShapeLevel,
+              (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
+              (Int, Seq[(Int, String)]),
+              (Rep[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 7
+    implicitly[
+        Shape[NestedShapeLevel,
+              (Int, Query[(Rep[Int], Rep[String]), (Int, String), Seq]),
+              (Int, Seq[(Int, String)]),
+              (ConstColumn[Int],
+               Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 8
   }
 
   def illegal1 =

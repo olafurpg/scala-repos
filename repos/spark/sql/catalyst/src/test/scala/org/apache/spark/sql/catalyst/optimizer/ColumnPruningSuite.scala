@@ -332,7 +332,7 @@ class ColumnPruningSuite extends PlanTest {
     comparePlans(optimized, expected)
   }
 
-  implicit private def productEncoder[T <: Product : TypeTag] =
+  implicit private def productEncoder[T <: Product: TypeTag] =
     ExpressionEncoder[T]()
   private val func = identity[Iterator[OtherTuple]] _
 

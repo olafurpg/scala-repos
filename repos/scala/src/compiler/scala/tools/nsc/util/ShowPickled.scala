@@ -116,7 +116,7 @@ object ShowPickled extends Names {
       b = data(idx).toLong
       idx += 1
       result = (result << 7) + (b & 0x7f)
-    } while ( (b & 0x80) != 0L)
+    } while ((b & 0x80) != 0L)
 
     result.toInt
   }
@@ -271,7 +271,7 @@ object ShowPickled extends Names {
                 buf.bytes
                   .slice(index(i), (end max buf.readIndex))
                   .mkString(", ")
-              ))
+            ))
       }
     }
 

@@ -135,13 +135,11 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       val msg = expectMsgType[Failed]
       msg match {
         case Failed(barrier, thr: ClientLost)
-            if
-            (thr == ClientLost(
+            if (thr == ClientLost(
                     Data(Set(nodeA), "bar6", a.ref :: Nil, thr.data.deadline),
                     B)) ⇒
         case x ⇒
-          fail(
-              "Expected " +
+          fail("Expected " +
               Failed(barrier,
                      ClientLost(Data(Set(nodeA), "bar6", a.ref :: Nil, null),
                                 B)) + " but got " + x)
@@ -164,12 +162,11 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       val msg = expectMsgType[Failed]
       msg match {
         case Failed(barrier, thr: ClientLost)
-            if
-            (thr == ClientLost(Data(Set(nodeA, nodeC),
-                                    "bar7",
-                                    a.ref :: Nil,
-                                    thr.data.deadline),
-                               B)) ⇒
+            if (thr == ClientLost(Data(Set(nodeA, nodeC),
+                                       "bar7",
+                                       a.ref :: Nil,
+                                       thr.data.deadline),
+                                  B)) ⇒
         case x ⇒
           fail(
               "Expected " + Failed(barrier,
@@ -195,13 +192,12 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       val msg = expectMsgType[Failed]
       msg match {
         case Failed(barrier, thr: WrongBarrier)
-            if
-            (thr == WrongBarrier("foo",
-                                 b.ref,
-                                 Data(Set(nodeA, nodeB),
-                                      "bar8",
-                                      a.ref :: Nil,
-                                      thr.data.deadline))) ⇒
+            if (thr == WrongBarrier("foo",
+                                    b.ref,
+                                    Data(Set(nodeA, nodeB),
+                                         "bar8",
+                                         a.ref :: Nil,
+                                         thr.data.deadline))) ⇒
         case x ⇒
           fail(
               "Expected " + Failed(barrier,
@@ -223,8 +219,7 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       val msg = expectMsgType[Failed]
       msg match {
         case Failed(barrier, thr: BarrierEmpty)
-            if
-            (thr == BarrierEmpty(
+            if (thr == BarrierEmpty(
                     Data(Set(), "", Nil, thr.data.deadline),
                     "cannot remove RoleName(a): no client to remove")) ⇒
         case x ⇒
@@ -253,11 +248,10 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
         val msg = expectMsgType[Failed](7 seconds)
         msg match {
           case Failed(barrier, thr: BarrierTimeout)
-              if
-              (thr == BarrierTimeout(Data(Set(nodeA, nodeB),
-                                          "bar10",
-                                          a.ref :: Nil,
-                                          thr.data.deadline))) ⇒
+              if (thr == BarrierTimeout(Data(Set(nodeA, nodeB),
+                                             "bar10",
+                                             a.ref :: Nil,
+                                             thr.data.deadline))) ⇒
           case x ⇒
             fail(
                 "Expected " + Failed(
@@ -281,9 +275,9 @@ class BarrierSpec extends AkkaSpec(BarrierSpec.config) with ImplicitSender {
       val msg = expectMsgType[Failed]
       msg match {
         case Failed(barrier, thr: DuplicateNode)
-            if
-            (thr == DuplicateNode(Data(Set(nodeA), "", Nil, thr.data.deadline),
-                                  nodeB)) ⇒
+            if (thr == DuplicateNode(
+                    Data(Set(nodeA), "", Nil, thr.data.deadline),
+                    nodeB)) ⇒
         case x ⇒
           fail(
               "Expected " +

@@ -29,7 +29,7 @@ private[lobby] object Biter {
       userOption ← lobbyUserOption.map(_.id) ?? UserRepo.byId
       ownerOption ← hook.userId ?? UserRepo.byId
       creatorColor <- assignCreatorColor(
-          ownerOption, userOption, hook.realColor)
+                         ownerOption, userOption, hook.realColor)
       game = blame(
           !creatorColor,
           userOption,
@@ -70,7 +70,7 @@ private[lobby] object Biter {
   private def makeGame(hook: Hook) =
     Game.make(
         game = ChessGame(
-              board = Board init hook.realVariant, clock = hook.clock.some),
+            board = Board init hook.realVariant, clock = hook.clock.some),
         whitePlayer = Player.white,
         blackPlayer = Player.black,
         mode = hook.realMode,

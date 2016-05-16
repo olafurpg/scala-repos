@@ -35,11 +35,14 @@ class TypedStaticQueryTest {
         tsql"select 1, '2', 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23"
 
       Await.result(
-          dc.db.run(
-              DBIO.seq(
+          dc.db.run(DBIO.seq(
                   s1.map { list1 =>
-                val typedList1: Vector[
-                    (Int, String, String, String, String, String)] = list1
+                val typedList1: Vector[(Int,
+                                        String,
+                                        String,
+                                        String,
+                                        String,
+                                        String)] = list1
                 assertEquals(Vector((150,
                                      "The High Ground",
                                      "100 Coffee Lane",
@@ -95,8 +98,7 @@ class TypedStaticQueryTest {
       val s4 = tsql"select CITY from SUPPLIERS"
 
       Await.result(
-          dc.db.run(
-              DBIO.seq(
+          dc.db.run(DBIO.seq(
                   s1.map { o1 =>
                 val t1: Vector[(Int, String, String, String, String, String)] =
                   o1

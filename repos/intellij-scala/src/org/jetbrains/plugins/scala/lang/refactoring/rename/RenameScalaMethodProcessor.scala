@@ -33,7 +33,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 21.11.2008
   */
 class RenameScalaMethodProcessor
-    extends RenameJavaMethodProcessor with ScalaRenameProcessor {
+    extends RenameJavaMethodProcessor
+    with ScalaRenameProcessor {
   override def canProcessElement(element: PsiElement): Boolean =
     RenameScalaMethodProcessor.canProcessElement(element)
 

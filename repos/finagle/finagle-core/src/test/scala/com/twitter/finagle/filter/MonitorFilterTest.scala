@@ -16,7 +16,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MonitorFilterTest
-    extends FunSuite with MockitoSugar with IntegrationBase {
+    extends FunSuite
+    with MockitoSugar
+    with IntegrationBase {
 
   class MockMonitor extends Monitor {
     def handle(cause: Throwable) = false
@@ -56,7 +58,8 @@ class MonitorFilterTest
   }
 
   class MockSourcedException(underlying: Throwable, name: String)
-      extends RuntimeException(underlying) with SourcedException {
+      extends RuntimeException(underlying)
+      with SourcedException {
     def this(name: String) = this(null, name)
     serviceName = name
   }

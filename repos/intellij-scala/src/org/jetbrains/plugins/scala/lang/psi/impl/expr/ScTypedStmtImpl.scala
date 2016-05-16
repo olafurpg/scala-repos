@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, T
   * Date: 06.03.2008
   */
 class ScTypedStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypedStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScTypedStmt {
   override def toString: String = "TypedStatement"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {

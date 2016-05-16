@@ -10,7 +10,7 @@ import Prop._
 trait MonadTests[F[_]] extends ApplicativeTests[F] with FlatMapTests[F] {
   def laws: MonadLaws[F]
 
-  def monad[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def monad[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

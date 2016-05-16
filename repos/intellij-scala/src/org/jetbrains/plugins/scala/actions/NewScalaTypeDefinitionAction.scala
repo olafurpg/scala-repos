@@ -32,7 +32,8 @@ class NewScalaTypeDefinitionAction
         ScalaBundle.message("newclass.menu.action.text"),
         ScalaBundle.message("newclass.menu.action.description"),
         Icons.CLASS,
-        JavaModuleSourceRootTypes.SOURCES) with DumbAware {
+        JavaModuleSourceRootTypes.SOURCES)
+    with DumbAware {
   protected def buildDialog(project: Project,
                             directory: PsiDirectory,
                             builder: CreateFileFromTemplateDialog.Builder) {

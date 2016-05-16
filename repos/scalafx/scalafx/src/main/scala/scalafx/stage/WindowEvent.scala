@@ -73,7 +73,8 @@ object WindowEvent {
 }
 
 class WindowEvent(override val delegate: jfxs.WindowEvent)
-    extends Event(delegate) with SFXDelegate[jfxs.WindowEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxs.WindowEvent] {
 
   /**
     * Construct a new Event with the specified event source, target and type.

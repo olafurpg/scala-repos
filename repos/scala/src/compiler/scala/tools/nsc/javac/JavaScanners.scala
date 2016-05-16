@@ -217,7 +217,9 @@ trait JavaScanners extends ast.parser.ScannersCommon {
     *  @author     Martin Odersky
     */
   abstract class JavaScanner
-      extends AbstractJavaScanner with JavaTokenData with Cloneable
+      extends AbstractJavaScanner
+      with JavaTokenData
+      with Cloneable
       with ScannerCommon {
     override def intVal = super.intVal // todo: needed?
     override def floatVal = super.floatVal
@@ -308,7 +310,8 @@ trait JavaScanners extends ast.parser.ScannersCommon {
               case '\"' =>
                 in.next()
                 while (in.ch != '\"' &&
-                (in.isUnicode || in.ch != CR && in.ch != LF && in.ch != SU)) {
+                       (in.isUnicode || in.ch != CR && in.ch != LF &&
+                           in.ch != SU)) {
                   getlitch()
                 }
                 if (in.ch == '\"') {

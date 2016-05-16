@@ -141,9 +141,9 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
                 apply(variant)
               case typed: ScTypedDefinition
                   if typed.getType().getOrAny.conforms(expectedType) =>
-                variant.isLocalVariable = (typed.isVar || typed.isVal) &&
-                (typed.containingFile exists
-                    (_.getName == parameters.getOriginalFile.getName))
+                variant.isLocalVariable =
+                  (typed.isVar || typed.isVal) && (typed.containingFile exists
+                      (_.getName == parameters.getOriginalFile.getName))
                 apply(variant)
               case _ => // do nothing
             }
@@ -160,20 +160,19 @@ class SbtCompletionContributor extends ScalaCompletionContributor {
               }
               ScalaPsiUtil.getCompanionModule(clazz) foreach collectAndApplyVariants
             case Some(p: PsiClass) if isAccessible(p) =>
-              p.getFields.foreach(field =>
-                    {
-                  if (field.hasModifierProperty("static") &&
-                      isAccessible(field)) {
-                    val lookup = LookupElementManager
-                      .getLookupElement(new ScalaResolveResult(field),
-                                        isClassName = true,
-                                        isOverloadedForClassName = false,
-                                        shouldImport = true,
-                                        isInStableCodeReference = false)
-                      .head
-                    lookup.addLookupStrings(p.getName + "." + field.getName)
-                    applyVariant(lookup)
-                  }
+              p.getFields.foreach(field => {
+                if (field.hasModifierProperty("static") &&
+                    isAccessible(field)) {
+                  val lookup = LookupElementManager
+                    .getLookupElement(new ScalaResolveResult(field),
+                                      isClassName = true,
+                                      isOverloadedForClassName = false,
+                                      shouldImport = true,
+                                      isInStableCodeReference = false)
+                    .head
+                  lookup.addLookupStrings(p.getName + "." + field.getName)
+                  applyVariant(lookup)
+                }
               })
             case _ => // do nothing
           }

@@ -211,7 +211,8 @@ class HoconFormatter(settings: CodeStyleSettings) {
   class AlignmentCache {
     val objectEntryAlignment =
       if (customSettings.OBJECTS_ALIGN_WHEN_MULTILINE)
-        Alignment.createAlignment else null
+        Alignment.createAlignment
+      else null
 
     val arrayValueAlignment =
       if (customSettings.LISTS_ALIGN_WHEN_MULTILINE) Alignment.createAlignment

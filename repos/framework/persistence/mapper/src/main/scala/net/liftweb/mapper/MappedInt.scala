@@ -229,7 +229,8 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
 }
 
 abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
-    extends MappedInt[T](owner) with IndexedField[Int] {
+    extends MappedInt[T](owner)
+    with IndexedField[Int] {
 
   override def writePermission_? = false // not writable
 

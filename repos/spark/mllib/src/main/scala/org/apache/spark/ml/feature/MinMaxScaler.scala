@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[MinMaxScaler]] and [[MinMaxScalerModel]].
   */
 private[feature] trait MinMaxScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * lower bound after transformation, shared by all features
@@ -88,7 +90,8 @@ private[feature] trait MinMaxScalerParams
   */
 @Experimental
 class MinMaxScaler(override val uid: String)
-    extends Estimator[MinMaxScalerModel] with MinMaxScalerParams
+    extends Estimator[MinMaxScalerModel]
+    with MinMaxScalerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("minMaxScal"))
@@ -143,7 +146,9 @@ object MinMaxScaler extends DefaultParamsReadable[MinMaxScaler] {
 class MinMaxScalerModel private[ml](override val uid: String,
                                     val originalMin: Vector,
                                     val originalMax: Vector)
-    extends Model[MinMaxScalerModel] with MinMaxScalerParams with MLWritable {
+    extends Model[MinMaxScalerModel]
+    with MinMaxScalerParams
+    with MLWritable {
 
   import MinMaxScalerModel._
 
@@ -173,7 +178,8 @@ class MinMaxScalerModel private[ml](override val uid: String,
       while (i < size) {
         val raw =
           if (originalRange(i) != 0)
-            (values(i) - minArray(i)) / originalRange(i) else 0.5
+            (values(i) - minArray(i)) / originalRange(i)
+          else 0.5
         values(i) = raw * scale + $(min)
         i += 1
       }

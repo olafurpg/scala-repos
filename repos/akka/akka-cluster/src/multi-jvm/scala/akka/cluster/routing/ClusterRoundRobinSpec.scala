@@ -101,7 +101,9 @@ class ClusterRoundRobinMultiJvmNode4 extends ClusterRoundRobinSpec
 
 abstract class ClusterRoundRobinSpec
     extends MultiNodeSpec(ClusterRoundRobinMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import ClusterRoundRobinMultiJvmSpec._
 
   lazy val router1 =

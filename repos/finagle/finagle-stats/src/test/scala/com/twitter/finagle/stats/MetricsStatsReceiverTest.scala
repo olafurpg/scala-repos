@@ -11,7 +11,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class MetricsStatsReceiverTest
-    extends FunSuite with GeneratorDrivenPropertyChecks {
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks {
   import MetricsStatsReceiverTest._
 
   private[this] val rootReceiver = new MetricsStatsReceiver()

@@ -27,7 +27,8 @@ object MetricsEnabledSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsCollectorSpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with ImplicitSender
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with ImplicitSender
     with MetricsCollectorFactory {
 
   val collector = createMetricsCollector

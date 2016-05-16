@@ -8,7 +8,7 @@ import org.scalacheck.Prop.forAll
 trait ReducibleTests[F[_]] extends FoldableTests[F] {
   def laws: ReducibleLaws[F]
 
-  def reducible[A : Arbitrary, B : Arbitrary](
+  def reducible[A: Arbitrary, B: Arbitrary](
       implicit ArbFA: Arbitrary[F[A]], B: Monoid[B], EqB: Eq[B]): RuleSet =
     new DefaultRuleSet(
         name = "reducible",

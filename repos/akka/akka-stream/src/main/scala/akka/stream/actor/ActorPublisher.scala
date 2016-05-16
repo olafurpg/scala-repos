@@ -26,7 +26,8 @@ object ActorPublisher {
     */
   private[akka] object Internal {
     final case class Subscribe(subscriber: Subscriber[Any])
-        extends DeadLetterSuppression with NoSerializationVerificationNeeded
+        extends DeadLetterSuppression
+        with NoSerializationVerificationNeeded
 
     sealed trait LifecycleState
     case object PreSubscriber extends LifecycleState
@@ -49,14 +50,16 @@ object ActorPublisherMessage {
     * @param n number of requested elements
     */
   final case class Request(n: Long)
-      extends ActorPublisherMessage with NoSerializationVerificationNeeded
+      extends ActorPublisherMessage
+      with NoSerializationVerificationNeeded
 
   /**
     * This message is delivered to the [[ActorPublisher]] actor when the stream subscriber cancels the
     * subscription.
     */
   final case object Cancel
-      extends Cancel with NoSerializationVerificationNeeded
+      extends Cancel
+      with NoSerializationVerificationNeeded
   sealed abstract class Cancel extends ActorPublisherMessage
 
   /**
@@ -281,7 +284,8 @@ trait ActorPublisher[T] extends Actor {
       } else {
         demand += n
         if (demand < 0)
-          demand = Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
+          demand =
+            Long.MaxValue // Long overflow, Reactive Streams Spec 3:17: effectively unbounded
         super.aroundReceive(receive, msg)
       }
 
@@ -414,7 +418,8 @@ private[akka] class ActorPublisherSubscription[T](ref: ActorRef)
   * Some state must survive restarts.
   */
 private[akka] object ActorPublisherState
-    extends ExtensionId[ActorPublisherState] with ExtensionIdProvider {
+    extends ExtensionId[ActorPublisherState]
+    with ExtensionIdProvider {
   import ActorPublisher.Internal.LifecycleState
 
   override def get(system: ActorSystem): ActorPublisherState =
@@ -463,7 +468,8 @@ object UntypedActorPublisher {
   * @see [[akka.stream.actor.ActorPublisher]]
   */
 abstract class UntypedActorPublisher[T]
-    extends UntypedActor with ActorPublisher[T]
+    extends UntypedActor
+    with ActorPublisher[T]
 
 /**
   * Java API compatible with lambda expressions
@@ -483,4 +489,5 @@ object AbstractActorPublisher {
   * @see [[akka.stream.actor.ActorPublisher]]
   */
 abstract class AbstractActorPublisher[T]
-    extends AbstractActor with ActorPublisher[T]
+    extends AbstractActor
+    with ActorPublisher[T]

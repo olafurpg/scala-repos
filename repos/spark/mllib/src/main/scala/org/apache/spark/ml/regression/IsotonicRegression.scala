@@ -39,8 +39,12 @@ import org.apache.spark.storage.StorageLevel
   * Params for isotonic regression.
   */
 private[regression] trait IsotonicRegressionBase
-    extends Params with HasFeaturesCol with HasLabelCol with HasPredictionCol
-    with HasWeightCol with Logging {
+    extends Params
+    with HasFeaturesCol
+    with HasLabelCol
+    with HasPredictionCol
+    with HasWeightCol
+    with Logging {
 
   /**
     * Param for whether the output sequence should be isotonic/increasing (true) or
@@ -140,7 +144,8 @@ private[regression] trait IsotonicRegressionBase
 @Experimental
 class IsotonicRegression @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
-    extends Estimator[IsotonicRegressionModel] with IsotonicRegressionBase
+    extends Estimator[IsotonicRegressionModel]
+    with IsotonicRegressionBase
     with DefaultParamsWritable {
 
   @Since("1.5.0")
@@ -216,7 +221,8 @@ object IsotonicRegression extends DefaultParamsReadable[IsotonicRegression] {
 class IsotonicRegressionModel private[ml](
     override val uid: String,
     private val oldModel: MLlibIsotonicRegressionModel)
-    extends Model[IsotonicRegressionModel] with IsotonicRegressionBase
+    extends Model[IsotonicRegressionModel]
+    with IsotonicRegressionBase
     with MLWritable {
 
   /** @group setParam */
@@ -288,7 +294,8 @@ object IsotonicRegressionModel extends MLReadable[IsotonicRegressionModel] {
   private[IsotonicRegressionModel] class IsotonicRegressionModelWriter(
       instance: IsotonicRegressionModel
   )
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(boundaries: Array[Double],
                             predictions: Array[Double],

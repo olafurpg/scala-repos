@@ -45,8 +45,12 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
    *   - `jumpDest` , `cleanups` , `labelDefsAtOrUnder`
    */
   abstract class PlainSkelBuilder(cunit: CompilationUnit)
-      extends BCClassGen with BCAnnotGen with BCInnerClassGen
-      with JAndroidBuilder with BCForwardersGen with BCPickles
+      extends BCClassGen
+      with BCAnnotGen
+      with BCInnerClassGen
+      with JAndroidBuilder
+      with BCForwardersGen
+      with BCPickles
       with BCJGenSigGen {
 
     // Strangely I can't find this in the asm code 255, but reserving 1 for "this"
@@ -206,7 +210,7 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
           "L" + thisName + ";",
           null, // no java-generic-signature
           null // no initial value
-          )
+      )
 
       fv.visitEnd()
     }
@@ -599,7 +603,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
           if (isAbstractMethod) asm.Opcodes.ACC_ABSTRACT else 0,
           if (methSymbol.isStrictFP) asm.Opcodes.ACC_STRICT else 0,
           if (isNative)
-            asm.Opcodes.ACC_NATIVE else 0 // native methods of objects are generated in mirror classes
+            asm.Opcodes.ACC_NATIVE
+          else 0 // native methods of objects are generated in mirror classes
       )
 
       initJMethod(flags, params.map(_.symbol))
@@ -615,8 +620,8 @@ abstract class BCodeSkelBuilder extends BCodeHelpers {
        * but the same vars (given by the LabelDef's params) can be reused,
        * because no LabelDef ends up nested within itself after such duplication.
        */
-      for (ld <- labelDefsAtOrUnder(dd.rhs); ldp <- ld.params; if !locals
-                                                     .contains(ldp.symbol)) {
+      for (ld <- labelDefsAtOrUnder(dd.rhs); ldp <- ld.params;
+           if !locals.contains(ldp.symbol)) {
         // the tail-calls xform results in symbols shared btw method-params and labelDef-params, thus the guard above.
         locals.makeLocal(ldp.symbol)
       }

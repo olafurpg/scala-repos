@@ -247,7 +247,8 @@ private class ScriptTransformationWriterThread(
     taskContext: TaskContext,
     conf: Configuration
 )
-    extends Thread("Thread-ScriptTransformation-Feed") with Logging {
+    extends Thread("Thread-ScriptTransformation-Feed")
+    with Logging {
 
   setDaemon(true)
 
@@ -338,7 +339,8 @@ private[hive] case class HiveScriptIOSchema(
     recordReaderClass: Option[String],
     recordWriterClass: Option[String],
     schemaLess: Boolean)
-    extends ScriptInputOutputSchema with HiveInspectors {
+    extends ScriptInputOutputSchema
+    with HiveInspectors {
 
   private val defaultFormat = Map(
       ("TOK_TABLEROWFORMATFIELD", "\t"),
@@ -360,7 +362,7 @@ private[hive] case class HiveScriptIOSchema(
         .getStandardStructObjectInspector(
             columns.asJava, fieldObjectInspectors.asJava)
         .asInstanceOf[ObjectInspector]
-        (serde, objectInspector)
+      (serde, objectInspector)
     }
   }
 
@@ -369,10 +371,9 @@ private[hive] case class HiveScriptIOSchema(
     outputSerdeClass.map { serdeClass =>
       val (columns, columnTypes) = parseAttrs(output)
       val serde = initSerDe(serdeClass, columns, columnTypes, outputSerdeProps)
-      val structObjectInspector = serde
-        .getObjectInspector()
-        .asInstanceOf[StructObjectInspector]
-        (serde, structObjectInspector)
+      val structObjectInspector =
+        serde.getObjectInspector().asInstanceOf[StructObjectInspector]
+      (serde, structObjectInspector)
     }
   }
 
@@ -398,8 +399,8 @@ private[hive] case class HiveScriptIOSchema(
 
     var propsMap =
       serdeProps.toMap + (serdeConstants.LIST_COLUMNS -> columns.mkString(","))
-    propsMap = propsMap +
-    (serdeConstants.LIST_COLUMN_TYPES -> columnTypesNames)
+    propsMap =
+      propsMap + (serdeConstants.LIST_COLUMN_TYPES -> columnTypesNames)
 
     val properties = new Properties()
     properties.putAll(propsMap.asJava)

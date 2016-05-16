@@ -11,9 +11,14 @@ import org.scalatest.finders.Selection
   * @since 10.02.2015.
   */
 trait FindersApiTest
-    extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
-    with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator
-    with PropSpecGenerator with WordSpecGenerator {
+    extends FeatureSpecGenerator
+    with FlatSpecGenerator
+    with FreeSpecGenerator
+    with FreeSpecPathGenerator
+    with FunSpecGenerator
+    with FunSuiteGenerator
+    with PropSpecGenerator
+    with WordSpecGenerator {
   def checkSelection(lineNumber: Int,
                      offset: Int,
                      fileName: String,

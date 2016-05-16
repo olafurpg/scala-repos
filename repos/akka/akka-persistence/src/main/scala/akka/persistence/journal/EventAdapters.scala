@@ -144,7 +144,7 @@ private[akka] object EventAdapters {
     * Tries to load the specified Serializer by the fully-qualified name; the actual
     * loading is performed by the system’s [[akka.actor.DynamicAccess]].
     */
-  private def instantiate[T : ClassTag](
+  private def instantiate[T: ClassTag](
       fqn: FQN, system: ExtendedActorSystem): Try[T] =
     system.dynamicAccess.createInstanceFor[T](
         fqn, List(classOf[ExtendedActorSystem] -> system)) recoverWith {

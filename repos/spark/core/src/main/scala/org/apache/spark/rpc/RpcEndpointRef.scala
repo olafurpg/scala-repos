@@ -28,7 +28,8 @@ import org.apache.spark.util.RpcUtils
   * A reference for a remote [[RpcEndpoint]]. [[RpcEndpointRef]] is thread-safe.
   */
 private[spark] abstract class RpcEndpointRef(conf: SparkConf)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   private[this] val maxRetries = RpcUtils.numRetries(conf)
   private[this] val retryWaitMs = RpcUtils.retryWaitMs(conf)
@@ -52,7 +53,7 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
     *
     * This method only sends the message once and never retries.
     */
-  def ask[T : ClassTag](message: Any, timeout: RpcTimeout): Future[T]
+  def ask[T: ClassTag](message: Any, timeout: RpcTimeout): Future[T]
 
   /**
     * Send a message to the corresponding [[RpcEndpoint.receiveAndReply)]] and return a [[Future]] to
@@ -60,7 +61,7 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
     *
     * This method only sends the message once and never retries.
     */
-  def ask[T : ClassTag](message: Any): Future[T] =
+  def ask[T: ClassTag](message: Any): Future[T] =
     ask(message, defaultAskTimeout)
 
   /**
@@ -76,7 +77,7 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
     * @tparam T type of the reply message
     * @return the reply message from the corresponding [[RpcEndpoint]]
     */
-  def askWithRetry[T : ClassTag](message: Any): T =
+  def askWithRetry[T: ClassTag](message: Any): T =
     askWithRetry(message, defaultAskTimeout)
 
   /**
@@ -93,7 +94,7 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
     * @tparam T type of the reply message
     * @return the reply message from the corresponding [[RpcEndpoint]]
     */
-  def askWithRetry[T : ClassTag](message: Any, timeout: RpcTimeout): T = {
+  def askWithRetry[T: ClassTag](message: Any, timeout: RpcTimeout): T = {
     // TODO: Consider removing multiple attempts
     var attempts = 0
     var lastException: Exception = null

@@ -12,7 +12,9 @@ private[pickling] object PicklingMacros {
     .genPicklerUnpickler_impl[T]
 }
 private[pickling] trait PicklingMacros
-    extends Macro with SourceGenerator with TypeAnalysis {
+    extends Macro
+    with SourceGenerator
+    with TypeAnalysis {
   import c.universe._
   val symbols = new IrScalaSymbols[c.universe.type, c.type](c.universe, tools)
   // TODO - We should have more customization than this
@@ -22,16 +24,16 @@ private[pickling] trait PicklingMacros
     if (isStaticOnly) {
       // TODO - should we consider externalizable "safe" or "static only" since we know it's externalizable at compile time?
       PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(
-                  allowReflection = false,
-                  careAboutSubclasses = handleCaseClassSubclasses),
+          Seq(new CaseClassPickling(allowReflection = false,
+                                    careAboutSubclasses =
+                                      handleCaseClassSubclasses),
               AdtPickling,
               ScalaSingleton))
     } else {
       PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(
-                  allowReflection = true,
-                  careAboutSubclasses = handleCaseClassSubclasses),
+          Seq(new CaseClassPickling(allowReflection = true,
+                                    careAboutSubclasses =
+                                      handleCaseClassSubclasses),
               AdtPickling,
               ScalaSingleton,
               new ExternalizablePickling,
@@ -67,7 +69,7 @@ private[pickling] trait PicklingMacros
     }
   }
 
-  def genPickler[T : c.WeakTypeTag]: c.Tree = preferringAlternativeImplicits {
+  def genPickler[T: c.WeakTypeTag]: c.Tree = preferringAlternativeImplicits {
     val tpe = computeType[T]
     checkClassType(tpe)
     val sym = symbols.newClass(tpe)
@@ -86,7 +88,7 @@ private[pickling] trait PicklingMacros
         tree
     }
   }
-  def genUnPickler[T : c.WeakTypeTag]: c.Tree =
+  def genUnPickler[T: c.WeakTypeTag]: c.Tree =
     preferringAlternativeImplicits {
       val tpe = computeType[T]
       checkClassType(tpe)
@@ -107,7 +109,7 @@ private[pickling] trait PicklingMacros
           tree
       }
     }
-  def genPicklerUnpickler[T : c.WeakTypeTag]: c.Tree =
+  def genPicklerUnpickler[T: c.WeakTypeTag]: c.Tree =
     preferringAlternativeImplicits {
       val tpe = computeType[T]
       checkClassType(tpe)

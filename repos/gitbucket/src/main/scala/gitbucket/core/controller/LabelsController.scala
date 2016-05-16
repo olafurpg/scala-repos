@@ -9,8 +9,12 @@ import org.scalatra.i18n.Messages
 import org.scalatra.Ok
 
 class LabelsController
-    extends LabelsControllerBase with LabelsService with IssuesService
-    with RepositoryService with AccountService with ReferrerAuthenticator
+    extends LabelsControllerBase
+    with LabelsService
+    with IssuesService
+    with RepositoryService
+    with AccountService
+    with ReferrerAuthenticator
     with CollaboratorsAuthenticator
 
 trait LabelsControllerBase extends ControllerBase {
@@ -115,8 +119,8 @@ trait LabelsControllerBase extends ControllerBase {
                           messages: Messages): Option[String] = {
       val owner = params("owner")
       val repository = params("repository")
-      getLabel(owner, repository, value).map(
-          _ => "Name has already been taken.")
+      getLabel(owner, repository, value).map(_ =>
+            "Name has already been taken.")
     }
   }
 }

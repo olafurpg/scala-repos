@@ -44,7 +44,8 @@ object ReplicatedMetrics {
 
 class ReplicatedMetrics(
     measureInterval: FiniteDuration, cleanupInterval: FiniteDuration)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import akka.cluster.ddata.Replicator._
   import ReplicatedMetrics._
 

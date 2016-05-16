@@ -24,8 +24,7 @@ package kafka.producer
     "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerRecord instead.",
     "0.10.0.0")
-case class KeyedMessage[
-    K, V](topic: String, key: K, partKey: Any, message: V) {
+case class KeyedMessage[K, V](topic: String, key: K, partKey: Any, message: V) {
   if (topic == null)
     throw new IllegalArgumentException("Topic cannot be null.")
 

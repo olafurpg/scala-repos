@@ -418,7 +418,7 @@ final class BaseLinker(
                                      methodName: String,
                                      getTree: TreeProvider,
                                      p: Analysis.MethodInfo => Boolean = _ =>
-                                         true): MethodDef = {
+                                       true): MethodDef = {
     @tailrec
     def loop(ancestorInfo: Analysis.ClassInfo): MethodDef = {
       assert(

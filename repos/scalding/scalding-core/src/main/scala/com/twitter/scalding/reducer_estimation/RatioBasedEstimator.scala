@@ -64,7 +64,7 @@ abstract class RatioBasedEstimator extends ReducerEstimator {
         } else {
           val ratios = for {
             h <- history if acceptableInputRatio(
-                    inputBytes, h.hdfsBytesRead, threshold)
+                inputBytes, h.hdfsBytesRead, threshold)
           } yield h.reduceFileBytesRead / h.hdfsBytesRead.toDouble
 
           if (ratios.isEmpty) {

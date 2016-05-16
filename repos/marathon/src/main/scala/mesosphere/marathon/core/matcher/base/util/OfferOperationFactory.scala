@@ -56,7 +56,7 @@ class OfferOperationFactory(private val principalOpt: Option[String],
               .setPrincipal(principal)
               .setLabels(
                   TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
-          )
+        )
         .build()
     }
 

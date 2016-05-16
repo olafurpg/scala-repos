@@ -105,24 +105,22 @@ class APIKeyRequiredService[A, B](
     extends DelegatingService[
         A, Future[B], A, Validation[String, APIKey] => Future[B]]
     with Logging {
-  val service = (request: HttpRequest[A]) =>
-    {
-      request.parameters.get('apiKey).toSuccess[NotServed] {
-        DispatchError(
-            BadRequest,
-            "An apiKey query parameter is required to access this URL")
-      } flatMap { apiKey =>
-        delegate.service(request) map { (f: Validation[String, APIKey] => Future[
-            B]) =>
-          keyFinder(apiKey) flatMap { maybeApiKey =>
-            logger.info("Found API key: " + maybeApiKey)
-            f(maybeApiKey.toSuccess[String] {
-              logger.warn("Could not locate API key " + apiKey)
-              "The specified API key does not exist: " + apiKey
-            })
-          }
+  val service = (request: HttpRequest[A]) => {
+    request.parameters.get('apiKey).toSuccess[NotServed] {
+      DispatchError(BadRequest,
+                    "An apiKey query parameter is required to access this URL")
+    } flatMap { apiKey =>
+      delegate.service(request) map { (f: Validation[String, APIKey] => Future[
+          B]) =>
+        keyFinder(apiKey) flatMap { maybeApiKey =>
+          logger.info("Found API key: " + maybeApiKey)
+          f(maybeApiKey.toSuccess[String] {
+            logger.warn("Could not locate API key " + apiKey)
+            "The specified API key does not exist: " + apiKey
+          })
         }
       }
+    }
   }
 
   val metadata = AboutMetadata(

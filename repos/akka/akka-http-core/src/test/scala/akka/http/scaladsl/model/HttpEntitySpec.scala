@@ -20,7 +20,9 @@ import akka.http.impl.util.StreamUtils
 import scala.util.Random
 
 class HttpEntitySpec
-    extends FreeSpec with MustMatchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with MustMatchers
+    with BeforeAndAfterAll {
   val tpe: ContentType = ContentTypes.`application/octet-stream`
   val abc = ByteString("abc")
   val de = ByteString("de")
@@ -252,8 +254,8 @@ class HttpEntitySpec
     }
 
   def duplicateBytesTransformer(): Flow[ByteString, ByteString, NotUsed] =
-    Flow[ByteString].transform(
-        () ⇒ StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
+    Flow[ByteString].transform(() ⇒
+          StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
 
   def trailer: ByteString = ByteString("--dup")
   def doubleChars(bs: ByteString): ByteString =

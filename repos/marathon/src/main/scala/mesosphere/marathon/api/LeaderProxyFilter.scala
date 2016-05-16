@@ -230,15 +230,15 @@ class JavaUrlConnectionRequestForwarder @Inject()(
       val names = Option(request.getHeaderNames).map(_.asScala).getOrElse(Nil)
       for {
         name <- names
-               // Reverse proxies commonly filter these headers: connection, host.
-               //
-               // The connection header is removed since it may make sense to persist the connection
-               // for further requests even if this single client will stop using it.
-               //
-               // The host header is used to choose the correct virtual host and should be set to the hostname
-               // of the URL for HTTP 1.1. Thus we do not preserve it, even though Marathon does not care.
-               if !name.equalsIgnoreCase("host") &&
-               !name.equalsIgnoreCase("connection")
+        // Reverse proxies commonly filter these headers: connection, host.
+        //
+        // The connection header is removed since it may make sense to persist the connection
+        // for further requests even if this single client will stop using it.
+        //
+        // The host header is used to choose the correct virtual host and should be set to the hostname
+        // of the URL for HTTP 1.1. Thus we do not preserve it, even though Marathon does not care.
+        if !name.equalsIgnoreCase("host") &&
+        !name.equalsIgnoreCase("connection")
         headerValues <- Option(request.getHeaders(name))
         headerValue <- headerValues.asScala
       } {

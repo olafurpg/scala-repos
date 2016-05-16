@@ -57,8 +57,8 @@ object DIMSUMModel
     new DIMSUMModel(
         similarities = sc.get.objectFile(s"/tmp/${id}/similarities"),
         itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+          .first,
         items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
   }
 }
@@ -130,8 +130,8 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
     val reversedEntries: RDD[MatrixEntry] =
       scores.entries.map(e => new MatrixEntry(e.j, e.i, e.value))
     val combined = new CoordinateMatrix(scores.entries.union(reversedEntries))
-    val similarities = combined.toIndexedRowMatrix.rows
-      .map(row => (row.index.toInt, row.vector.asInstanceOf[SparseVector]))
+    val similarities = combined.toIndexedRowMatrix.rows.map(row =>
+          (row.index.toInt, row.vector.asInstanceOf[SparseVector]))
 
     new DIMSUMModel(
         similarities = similarities,
@@ -142,10 +142,10 @@ class DIMSUMAlgorithm(val ap: DIMSUMAlgorithmParams)
 
   def predict(model: DIMSUMModel, query: Query): PredictedResult = {
     // convert the white and black list items to Int index
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
 
     val queryList: Set[Int] =
       query.items.map(model.itemStringIntMap.get(_)).flatten.toSet

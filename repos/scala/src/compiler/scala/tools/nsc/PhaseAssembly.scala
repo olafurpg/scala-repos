@@ -309,6 +309,6 @@ trait PhaseAssembly { self: Global =>
     sbuf.append("}\n")
     import reflect.io._
     for (d <- settings.outputDirs.getSingleOutput
-                 if !d.isVirtual) Path(d.file) / File(filename) writeAll sbuf.toString
+         if !d.isVirtual) Path(d.file) / File(filename) writeAll sbuf.toString
   }
 }

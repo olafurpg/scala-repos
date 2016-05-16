@@ -359,7 +359,7 @@ object MarathonFacade {
       app: RestResult[AppDefinition]): scala.collection.Seq[String] = {
     try {
       for (deployment <- (app.entityJson \ "deployments").as[JsArray].value) yield
-      (deployment \ "id").as[String]
+        (deployment \ "id").as[String]
     } catch {
       case NonFatal(e) =>
         throw new RuntimeException(

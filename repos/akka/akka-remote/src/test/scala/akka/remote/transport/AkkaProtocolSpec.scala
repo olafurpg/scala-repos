@@ -261,8 +261,7 @@ class AkkaProtocolSpec
     "ignore incoming associations with wrong cookie" in {
       val (failureDetector, registry, _, handle) = collaborators
 
-      val reader = system.actorOf(
-          ProtocolStateActor.inboundProps(
+      val reader = system.actorOf(ProtocolStateActor.inboundProps(
               HandshakeInfo(
                   origin = localAddress, uid = 42, cookie = Some("abcde")),
               handle,
@@ -284,8 +283,7 @@ class AkkaProtocolSpec
     "accept incoming associations with correct cookie" in {
       val (failureDetector, registry, _, handle) = collaborators
 
-      val reader = system.actorOf(
-          ProtocolStateActor.inboundProps(
+      val reader = system.actorOf(ProtocolStateActor.inboundProps(
               HandshakeInfo(
                   origin = localAddress, uid = 42, cookie = Some("abcde")),
               handle,

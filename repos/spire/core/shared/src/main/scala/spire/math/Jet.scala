@@ -200,7 +200,10 @@ object Jet extends JetInstances {
 
 @SerialVersionUID(0L)
 final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
-    extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable {
+  lhs =>
 
   import spire.syntax.order._
 
@@ -592,7 +595,7 @@ trait JetInstances {
     new JetAlgebra[T]
   }
 
-  implicit def JetEq[T : Eq]: Eq[Jet[T]] = new JetEq[T]
+  implicit def JetEq[T: Eq]: Eq[Jet[T]] = new JetEq[T]
 }
 
 private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
@@ -616,7 +619,8 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
 }
 
 private[math] trait JetIsEuclideanRing[@sp(Float, Double) T]
-    extends JetIsRing[T] with EuclideanRing[Jet[T]] {
+    extends JetIsRing[T]
+    with EuclideanRing[Jet[T]] {
 
   def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
   def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
@@ -629,7 +633,8 @@ private[math] trait JetIsEuclideanRing[@sp(Float, Double) T]
 }
 
 private[math] trait JetIsField[@sp(Float, Double) T]
-    extends JetIsEuclideanRing[T] with Field[Jet[T]] {
+    extends JetIsEuclideanRing[T]
+    with Field[Jet[T]] {
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
   def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
   def ceil(a: Jet[T]): Jet[T] = a.ceil
@@ -687,7 +692,7 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
 }
 
 @SerialVersionUID(0L)
-private[math] class JetEq[T : Eq] extends Eq[Jet[T]] with Serializable {
+private[math] class JetEq[T: Eq] extends Eq[Jet[T]] with Serializable {
   def eqv(x: Jet[T], y: Jet[T]): Boolean = x eqv y
   override def neqv(x: Jet[T], y: Jet[T]): Boolean = x neqv y
 }
@@ -712,9 +717,13 @@ private[math] class JetAlgebra[@sp(Float, Double) T](
     val t: Trig[T],
     val r: IsReal[T],
     val v: VectorSpace[Array[T], T])
-    extends JetIsField[T] with JetIsTrig[T] with JetIsNRoot[T]
-    with JetIsSigned[T] with VectorSpace[Jet[T], T]
-    with FieldAlgebra[Jet[T], T] with Serializable {
+    extends JetIsField[T]
+    with JetIsTrig[T]
+    with JetIsNRoot[T]
+    with JetIsSigned[T]
+    with VectorSpace[Jet[T], T]
+    with FieldAlgebra[Jet[T], T]
+    with Serializable {
   def scalar: Field[T] = f
   def nroot: NRoot[T] = n
   def timesl(a: T, w: Jet[T]): Jet[T] = Jet(a) * w

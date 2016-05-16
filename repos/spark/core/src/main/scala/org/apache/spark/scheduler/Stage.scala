@@ -123,9 +123,9 @@ private[scheduler] abstract class Stage(val id: Int,
   }
 
   /** Creates a new attempt for this stage by creating a new StageInfo with a new attempt ID. */
-  def makeNewStageAttempt(
-      numPartitionsToCompute: Int,
-      taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty): Unit = {
+  def makeNewStageAttempt(numPartitionsToCompute: Int,
+                          taskLocalityPreferences: Seq[Seq[TaskLocation]] =
+                            Seq.empty): Unit = {
     _latestInfo = StageInfo.fromStage(this,
                                       nextAttemptId,
                                       Some(numPartitionsToCompute),

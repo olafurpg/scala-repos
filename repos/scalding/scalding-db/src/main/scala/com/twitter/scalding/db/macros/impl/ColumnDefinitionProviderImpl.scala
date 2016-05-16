@@ -121,7 +121,8 @@ object ColumnDefinitionProviderImpl {
 
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == false =>
           if (defaultValOpt.isDefined)
-            Failure(new Exception(
+            Failure(
+                new Exception(
                     s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
           else {
             matchField(accessorTree,
@@ -172,9 +173,8 @@ object ColumnDefinitionProviderImpl {
         val fieldName = m.name.toTermName.toString.trim
         val defaultVal = defaultArgs.get(fieldName)
 
-        val annotationInfo: List[(Type, Option[Int])] = annotationData
-          .getOrElse(m.name.toString.trim, Nil)
-          .collect {
+        val annotationInfo: List[(Type, Option[Int])] =
+          annotationData.getOrElse(m.name.toString.trim, Nil).collect {
             case (tpe, List(Literal(Constant(siz: Int))))
                 if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
               (tpe, Some(siz))
@@ -187,7 +187,7 @@ object ColumnDefinitionProviderImpl {
                     com.twitter.scalding.db.macros.ScaldingDBAnnotation] =>
               (tpe, None)
           }
-          (m, fieldName, defaultVal, annotationInfo)
+        (m, fieldName, defaultVal, annotationInfo)
       }.map {
         case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
           matchField(outerAccessorTree :+ accessorMethod,

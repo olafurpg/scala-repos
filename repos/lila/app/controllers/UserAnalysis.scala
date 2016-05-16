@@ -85,20 +85,17 @@ object UserAnalysis extends LilaController with TheftPrevention {
           data =>
             Env.importer.importer
               .inMemory(data)
-              .fold(err => BadRequest(jsonError(err.shows)).fuccess,
-                    game =>
-                      {
-                        val pov = Pov(game, chess.Color(true))
-                        Env.api.roundApi.userAnalysisJson(pov,
-                                                          ctx.pref,
-                                                          initialFen = none,
-                                                          pov.color,
-                                                          owner = false) map {
-                          data =>
-                            Ok(data)
-                        }
-                    })
-        )
+              .fold(err => BadRequest(jsonError(err.shows)).fuccess, game => {
+                val pov = Pov(game, chess.Color(true))
+                Env.api.roundApi.userAnalysisJson(pov,
+                                                  ctx.pref,
+                                                  initialFen = none,
+                                                  pov.color,
+                                                  owner = false) map { data =>
+                  Ok(data)
+                }
+              })
+      )
       .map(_ as JSON)
   }
 
@@ -132,13 +129,12 @@ object UserAnalysis extends LilaController with TheftPrevention {
             .validate[Forecast.Steps]
             .fold(
                 err => BadRequest(err.toString).fuccess,
-                forecasts =>
-                  {
-                    def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
-                    Env.round.forecastApi.playAndSave(pov, uci, forecasts) >> Env.current.scheduler
-                      .after(wait.millis) {
-                      Ok(Json.obj("reload" -> true))
-                    }
+                forecasts => {
+                  def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
+                  Env.round.forecastApi.playAndSave(pov, uci, forecasts) >> Env.current.scheduler
+                    .after(wait.millis) {
+                    Ok(Json.obj("reload" -> true))
+                  }
                 }
             )
         }

@@ -108,8 +108,8 @@ trait Contexts { self: Analyzer =>
                   tree: Tree = EmptyTree,
                   throwing: Boolean = false,
                   checking: Boolean = false): Context = {
-    val rootImportsContext = (startContext /: rootImports(unit))(
-        (c, sym) => c.make(gen.mkWildcardImport(sym)))
+    val rootImportsContext = (startContext /: rootImports(unit))((c, sym) =>
+          c.make(gen.mkWildcardImport(sym)))
 
     // there must be a scala.xml package when xml literals were parsed in this unit
     if (unit.hasXml && ScalaXmlPackage == NoSymbol)
@@ -509,7 +509,8 @@ trait Contexts { self: Analyzer =>
       c.variance = variance
       c.diagUsedDefaults = diagUsedDefaults
       c.openImplicits = openImplicits
-      c.contextMode = contextMode // note: ConstructorSuffix, a bit within `mode`, is conditionally overwritten below.
+      c.contextMode =
+        contextMode // note: ConstructorSuffix, a bit within `mode`, is conditionally overwritten below.
 
       // Fields that may take on a different value in the child
       c.prefix = prefixInChild
@@ -529,9 +530,10 @@ trait Contexts { self: Analyzer =>
     /** Use reporter (possibly buffered) for errors/warnings and enable implicit conversion **/
     def initRootContext(
         throwing: Boolean = false, checking: Boolean = false): Unit = {
-      _reporter = if (checking) new CheckingReporter
-      else if (throwing) new ThrowingReporter
-      else new ImmediateReporter
+      _reporter =
+        if (checking) new CheckingReporter
+        else if (throwing) new ThrowingReporter
+        else new ImmediateReporter
 
       setAmbiguousErrors(!throwing)
       this(EnrichmentEnabled | ImplicitsEnabled) = !throwing
@@ -681,7 +683,8 @@ trait Contexts { self: Analyzer =>
       tree.toString.replaceAll("\\s+", " ").lines.mkString("\\n").take(70)
     private def treeIdString =
       if (settings.uniqid.value)
-        "#" + System.identityHashCode(tree).toString.takeRight(3) else ""
+        "#" + System.identityHashCode(tree).toString.takeRight(3)
+      else ""
     private def treeString = tree match {
       case x: Import => "" + x
       case Template(parents, `noSelfType`, body) =>
@@ -716,8 +719,8 @@ trait Contexts { self: Analyzer =>
       */
     def enclosingSubClassContext(clazz: Symbol): Context = {
       var c = this.enclClass
-      while (c != NoContext &&
-      !isSubClassOrCompanion(c.owner, clazz)) c = c.outer.enclClass
+      while (c != NoContext && !isSubClassOrCompanion(c.owner, clazz)) c =
+        c.outer.enclClass
       c
     }
 
@@ -746,8 +749,7 @@ trait Contexts { self: Analyzer =>
           // is `o` or one of its transitive owners equal to `ab`?
           // stops at first package, since further owners can only be surrounding packages
           @tailrec def abEnclosesStopAtPkg(o: Symbol): Boolean =
-            (o eq ab) ||
-            (!o.isPackageClass && (o ne NoSymbol) &&
+            (o eq ab) || (!o.isPackageClass && (o ne NoSymbol) &&
                 abEnclosesStopAtPkg(o.owner))
           abEnclosesStopAtPkg(owner)
         } else (owner hasTransOwner ab)
@@ -762,11 +764,12 @@ trait Contexts { self: Analyzer =>
       def isProtectedAccessOK(target: Symbol) = {
         val c = enclosingSubClassContext(sym.owner)
         if (c == NoContext)
-          lastAccessCheckDetails = "\n Access to protected " + target +
-          " not permitted because" + "\n " + "enclosing " +
-          this.enclClass.owner + this.enclClass.owner.locationString +
-          " is not a subclass of " + "\n " + sym.owner +
-          sym.owner.locationString + " where target is defined"
+          lastAccessCheckDetails =
+            "\n Access to protected " + target + " not permitted because" +
+            "\n " + "enclosing " + this.enclClass.owner +
+            this.enclClass.owner.locationString + " is not a subclass of " +
+            "\n " + sym.owner + sym.owner.locationString +
+            " where target is defined"
         c != NoContext && {
           target.isType || {
             // allow accesses to types from arbitrary subclasses fixes #4737
@@ -776,10 +779,11 @@ trait Contexts { self: Analyzer =>
               isSubClassOrCompanion(pre.widen.typeSymbol,
                                     c.owner.linkedClassOfClass)
             if (!res)
-              lastAccessCheckDetails = "\n Access to protected " + target +
-              " not permitted because" + "\n prefix type " + pre.widen +
-              " does not conform to" + "\n " + c.owner +
-              c.owner.locationString + " where the access take place"
+              lastAccessCheckDetails =
+                "\n Access to protected " + target + " not permitted because" +
+                "\n prefix type " + pre.widen + " does not conform to" +
+                "\n " + c.owner + c.owner.locationString +
+                " where the access take place"
             res
           }
         }
@@ -788,11 +792,10 @@ trait Contexts { self: Analyzer =>
       (pre == NoPrefix) || {
         val ab = sym.accessBoundary(sym.owner)
 
-        ((ab.isTerm || ab == rootMirror.RootClass) ||
-            (accessWithin(ab) || accessWithinLinked(ab)) &&
-            (!sym.isLocalToThis || sym.isProtected &&
-                isSubThisType(pre, sym.owner) || pre =:= sym.owner.thisType) ||
-            sym.isProtected &&
+        ((ab.isTerm || ab == rootMirror.RootClass) || (accessWithin(ab) ||
+                accessWithinLinked(ab)) && (!sym.isLocalToThis ||
+                sym.isProtected && isSubThisType(pre, sym.owner) ||
+                pre =:= sym.owner.thisType) || sym.isProtected &&
             (superAccess || pre.isInstanceOf[ThisType] || phase.erasedTypes ||
                 (sym.overrideChain exists isProtectedAccessOK)
                 // that last condition makes protected access via self types work.
@@ -889,15 +892,15 @@ trait Contexts { self: Analyzer =>
                                         name,
                                         requireExplicit = false,
                                         record = false).alternatives
-                  if isQualifyingImplicit(name, sym, pre, imported = true)
+        if isQualifyingImplicit(name, sym, pre, imported = true)
       } f(sym)
 
-    private def collectImplicits(
-        syms: Scope,
-        pre: Type,
-        imported: Boolean = false): List[ImplicitInfo] =
-      for (sym <- syms.toList if isQualifyingImplicit(
-                     sym.name, sym, pre, imported)) yield
+    private def collectImplicits(syms: Scope,
+                                 pre: Type,
+                                 imported: Boolean =
+                                   false): List[ImplicitInfo] =
+      for (sym <- syms.toList
+           if isQualifyingImplicit(sym.name, sym, pre, imported)) yield
         new ImplicitInfo(sym.name, pre, sym)
 
     private def collectImplicitImports(imp: ImportInfo): List[ImplicitInfo] = {
@@ -1065,9 +1068,9 @@ trait Contexts { self: Analyzer =>
       imp.importedSymbol(name, requireExplicit, record) filter
       (s => isAccessible(s, imp.qual.tpe, superAccess = false))
 
-    private def requiresQualifier(s: Symbol): Boolean = (s.owner.isClass &&
-        !s.owner.isPackageClass && !s.isTypeParameterOrSkolem &&
-        !s.isExistentiallyBound)
+    private def requiresQualifier(s: Symbol): Boolean =
+      (s.owner.isClass && !s.owner.isPackageClass &&
+          !s.isTypeParameterOrSkolem && !s.isExistentiallyBound)
 
     /** Must `sym` defined in package object of package `pkg`, if
       *  it selected from a prefix with `pkg` as its type symbol?
@@ -1107,9 +1110,9 @@ trait Contexts { self: Analyzer =>
           finish(gen.mkAttributedQualifier(pre0), sym)
         else finish(EmptyTree, sym)
 
-      def isPackageOwnedInDifferentUnit(s: Symbol) = (s.isDefinedInPackage &&
-          (!currentRun.compiles(s) || unit.exists &&
-              s.sourceFile != unit.source.file))
+      def isPackageOwnedInDifferentUnit(s: Symbol) =
+        (s.isDefinedInPackage && (!currentRun.compiles(s) || unit.exists &&
+                s.sourceFile != unit.source.file))
       def lookupInPrefix(name: Name) = pre member name filter qualifies
       def accessibleInPrefix(s: Symbol) =
         isAccessible(s, pre, superAccess = false)
@@ -1126,7 +1129,8 @@ trait Contexts { self: Analyzer =>
       }
 
       def lookupInScope(scope: Scope) =
-        (scope lookupUnshadowedEntries name filter (e => qualifies(e.sym))).toList
+        (scope lookupUnshadowedEntries name filter (e =>
+                  qualifies(e.sym))).toList
 
       def newOverloaded(owner: Symbol, pre: Type, entries: List[ScopeEntry]) =
         logResult(s"overloaded symbol in $pre")(
@@ -1186,9 +1190,9 @@ trait Contexts { self: Analyzer =>
       //     package clause in the same compilation unit where the definition occurs have
       //     highest precedence.
       //  2) Explicit imports have next highest precedence.
-      def depthOk(imp: ImportInfo) = (imp.depth > symbolDepth ||
-          (unit.isJava && imp.isExplicitImport(name) &&
-              imp.depth == symbolDepth))
+      def depthOk(imp: ImportInfo) =
+        (imp.depth > symbolDepth || (unit.isJava &&
+                imp.isExplicitImport(name) && imp.depth == symbolDepth))
 
       while (!impSym.exists && imports.nonEmpty && depthOk(imports.head)) {
         impSym = lookupImport(imp1, requireExplicit = false)
@@ -1214,8 +1218,9 @@ trait Contexts { self: Analyzer =>
         // And at least one of the following is true:
         //   - imp1 and imp2 are at the same depth
         //   - imp1 is a wildcard import, so all explicit imports from outer scopes must be checked
-        def keepLooking = (lookupError == null && imports.tail.nonEmpty &&
-            (sameDepth || !imp1Explicit))
+        def keepLooking =
+          (lookupError == null && imports.tail.nonEmpty &&
+              (sameDepth || !imp1Explicit))
         // If we find a competitor imp2 which imports the same name, possible outcomes are:
         //
         //  - same depth, imp1 wild, imp2 explicit:        imp2 wins, drop imp1
@@ -1303,9 +1308,10 @@ trait Contexts { self: Analyzer =>
     *  To handle nested contexts, reporters share buffers. TODO: only buffer in BufferingReporter, emit immediately in ImmediateReporter
     */
   abstract class ContextReporter(
-      private[this] var _errorBuffer: mutable.LinkedHashSet[AbsTypeError] = null,
-      private[this] var _warningBuffer: mutable.LinkedHashSet[
-          (Position, String)] = null)
+      private[this] var _errorBuffer: mutable.LinkedHashSet[AbsTypeError] =
+        null,
+      private[this] var _warningBuffer: mutable.LinkedHashSet[(Position,
+                                                               String)] = null)
       extends Reporter {
     type Error = AbsTypeError
     type Warning = (Position, String)
@@ -1539,7 +1545,7 @@ trait Contexts { self: Analyzer =>
       var renamed = false
       var selectors = tree.selectors
       def current = selectors.head
-      while ( (selectors ne Nil) && result == NoSymbol) {
+      while ((selectors ne Nil) && result == NoSymbol) {
         if (current.rename == name.toTermName)
           result = qual.tpe
             .nonLocalMember( // new to address #2733: consider only non-local members for imports

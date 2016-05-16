@@ -41,7 +41,8 @@ package enumnamefieldspecs {
   object JsonObj extends JsonObjectMeta[JsonObj]
 
   class EnumNameRec
-      extends MongoRecord[EnumNameRec] with ObjectIdPk[EnumNameRec] {
+      extends MongoRecord[EnumNameRec]
+      with ObjectIdPk[EnumNameRec] {
     def meta = EnumNameRec
 
     object dow extends EnumNameField(this, WeekDay)

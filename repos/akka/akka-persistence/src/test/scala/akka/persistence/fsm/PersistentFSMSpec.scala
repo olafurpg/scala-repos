@@ -15,7 +15,8 @@ import scala.reflect.ClassTag
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class PersistentFSMSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentFSMSpec._
 
   //Dummy report actor, for tests that don't need it

@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, Typi
   * Date: 28.02.2008
   */
 class ScInfixPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScInfixPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScInfixPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

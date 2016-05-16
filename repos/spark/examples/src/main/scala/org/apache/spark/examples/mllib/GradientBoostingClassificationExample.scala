@@ -41,7 +41,8 @@ object GradientBoostingClassificationExample {
     // Train a GradientBoostedTrees model.
     // The defaultParams for Classification use LogLoss by default.
     val boostingStrategy = BoostingStrategy.defaultParams("Classification")
-    boostingStrategy.numIterations = 3 // Note: Use more iterations in practice.
+    boostingStrategy.numIterations =
+      3 // Note: Use more iterations in practice.
     boostingStrategy.treeStrategy.numClasses = 2
     boostingStrategy.treeStrategy.maxDepth = 5
     // Empty categoricalFeaturesInfo indicates all features are continuous.

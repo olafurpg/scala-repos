@@ -38,7 +38,9 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 import org.apache.spark.util.collection.BitSet
 
 class FileSourceStrategySuite
-    extends QueryTest with SharedSQLContext with PredicateHelper {
+    extends QueryTest
+    with SharedSQLContext
+    with PredicateHelper {
   import testImplicits._
 
   test("unpartitioned table, single partition") {
@@ -248,10 +250,10 @@ class FileSourceStrategySuite
       val bucketed =
         df.queryExecution.analyzed transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
-            l.copy(relation = r.copy(bucketSpec = Some(
-                            BucketSpec(numBuckets = buckets,
-                                       "c1" :: Nil,
-                                       Nil))))
+            l.copy(relation =
+                  r.copy(bucketSpec = Some(BucketSpec(numBuckets = buckets,
+                                                      "c1" :: Nil,
+                                                      Nil))))
         }
       Dataset.newDataFrame(sqlContext, bucketed)
     } else {

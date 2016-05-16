@@ -79,10 +79,9 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
 
     //#authorized-single-WebSocket-request
     val (upgradeResponse, _) = Http().singleWebSocketRequest(
-        WebSocketRequest(
-            "ws://example.com:8080/some/path",
-            extraHeaders = Seq(Authorization(BasicHttpCredentials(
-                          "johan", "correcthorsebatterystaple")))),
+        WebSocketRequest("ws://example.com:8080/some/path",
+                         extraHeaders = Seq(Authorization(BasicHttpCredentials(
+                                     "johan", "correcthorsebatterystaple")))),
         flow)
     //#authorized-single-WebSocket-request
   }

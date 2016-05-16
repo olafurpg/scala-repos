@@ -141,9 +141,9 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
   }
 
   /** Request the status of a submission from the server. */
-  def requestSubmissionStatus(
-      submissionId: String,
-      quiet: Boolean = false): SubmitRestProtocolResponse = {
+  def requestSubmissionStatus(submissionId: String,
+                              quiet: Boolean =
+                                false): SubmitRestProtocolResponse = {
     logInfo(
         s"Submitting a request for the status of submission $submissionId in $master.")
 

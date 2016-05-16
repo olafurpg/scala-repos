@@ -99,10 +99,10 @@ object ScTupleType {
 
 object ScSynteticSugarClassesUtil {
   @tailrec
-  def extractForPrefix(
-      tp: ScType,
-      prefix: String,
-      depth: Int = 100): Option[(ScTypeDefinition, Seq[ScType])] = {
+  def extractForPrefix(tp: ScType,
+                       prefix: String,
+                       depth: Int =
+                         100): Option[(ScTypeDefinition, Seq[ScType])] = {
     if (depth == 0)
       return None //hack for http://youtrack.jetbrains.com/issue/SCL-6880 to avoid infinite loop.
     tp.isAliasType match {

@@ -148,8 +148,8 @@ object ScalaBuilder {
     JavaBuilderUtil.isCompileJavaIncrementally(context) && {
       for {
         chunk <- context.getProjectDescriptor.getBuildTargetIndex
-          .getSortedTargetChunks(context)
-          .asScala
+                  .getSortedTargetChunks(context)
+                  .asScala
         target <- chunk.getTargets.asScala
       } {
         if (!context.getScope.isAffected(target)) return false

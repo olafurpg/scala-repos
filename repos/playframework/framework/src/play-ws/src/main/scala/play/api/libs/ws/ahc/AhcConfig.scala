@@ -68,7 +68,7 @@ class AhcWSClientConfigParser @Inject()(wsClientConfig: WSClientConfig,
   def parse(): AhcWSClientConfig = {
 
     val playConfig = PlayConfig(configuration)
-    def get[A : ConfigLoader](name: String): A =
+    def get[A: ConfigLoader](name: String): A =
       playConfig.getDeprecated[A](s"play.ws.ahc.$name", s"play.ws.ning.$name")
 
     val maximumConnectionsPerHost = get[Int]("maxConnectionsPerHost")

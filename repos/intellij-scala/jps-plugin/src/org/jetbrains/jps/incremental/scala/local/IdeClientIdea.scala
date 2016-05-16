@@ -123,7 +123,7 @@ class IdeClientIdea(compilerName: String,
       typeName <- baseTypes.map(_.replace('/', '.'))
       packObjectBaseClass = PackageObjectBaseClass(
           source, packageName, typeName)
-          if !packageObjectsBaseClasses.contains(packObjectBaseClass)
+      if !packageObjectsBaseClasses.contains(packObjectBaseClass)
     } yield {
       packObjectBaseClass
     }
@@ -133,9 +133,9 @@ class IdeClientIdea(compilerName: String,
     val compiledClasses = consumer.getCompiledClasses
 
     for (item <- packageObjectsBaseClasses;
-    cc <- Option(compiledClasses.get(item.baseClassName));
-    className <- Option(cc.getClassName)
-                    if className.startsWith(item.packageName)) {
+         cc <- Option(compiledClasses.get(item.baseClassName));
+         className <- Option(cc.getClassName)
+         if className.startsWith(item.packageName)) {
 
       packageObjectsData.add(cc.getSourceFile, item.packObjectSrc)
     }

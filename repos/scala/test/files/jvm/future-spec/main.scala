@@ -61,7 +61,7 @@ trait MinimalScalaTest extends Output with Features {
     def mustEqual(other: Any) = mustBe(other)
   }
 
-  def intercept[T <: Throwable : Manifest](body: => Any): T = {
+  def intercept[T <: Throwable: Manifest](body: => Any): T = {
     try {
       body
       throw new Exception(
@@ -73,7 +73,7 @@ trait MinimalScalaTest extends Output with Features {
     }
   }
 
-  def checkType[T : Manifest, S](
+  def checkType[T: Manifest, S](
       in: Future[T], refmanifest: Manifest[S]): Boolean =
     manifest[T] == refmanifest
 }

@@ -44,10 +44,10 @@ trait HeaderDefaults {
   * The Resource was created. We then return the resource, post-processing, to
   * the client. Usually used with HTTP PUT.
   */
-case class CreatedResponse(
-    xml: Node,
-    mime: String,
-    addlHeaders: List[(String, String)] = XmlResponse.addlHeaders)
+case class CreatedResponse(xml: Node,
+                           mime: String,
+                           addlHeaders: List[(String, String)] =
+                             XmlResponse.addlHeaders)
     extends XmlNodeResponse {
   def docType = Empty
 
@@ -112,7 +112,8 @@ case class ResetContentResponse() extends LiftResponse with HeaderDefaults {
   * with the request, if that does not leak important information.
   */
 case class BadRequestResponse(message: String = "")
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse =
     InMemoryResponse(message.getBytes("UTF-8"), headers, cookies, 400)
 }
@@ -184,7 +185,8 @@ object ForbiddenResponse {
   * Authorization will not help and the request SHOULD NOT be repeated.
   */
 case class ForbiddenResponse(message: String)
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse =
     InMemoryResponse(message.getBytes("UTF-8"),
                      "Content-Type" -> "text/plain; charset=utf-8" :: headers,
@@ -202,7 +204,8 @@ object NotFoundResponse {
   * The server has not found anything matching the Request-URI.
   */
 case class NotFoundResponse(message: String)
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse =
     InMemoryResponse(message.getBytes("UTF-8"),
                      "Content-Type" -> "text/plain; charset=utf-8" :: headers,
@@ -217,7 +220,8 @@ case class NotFoundResponse(message: String)
   * understand the method no matter the circumstances.
   */
 case class MethodNotAllowedResponse()
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse = InMemoryResponse(Array(), headers, cookies, 405)
 }
 
@@ -228,7 +232,8 @@ case class MethodNotAllowedResponse()
   * understand the method no matter the circumstances.
   */
 case class NotAcceptableResponse(msg: String)
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse =
     InMemoryResponse(msg.getBytes("UTF-8"), headers, cookies, 406)
 }
@@ -252,7 +257,8 @@ case class GoneResponse() extends LiftResponse with HeaderDefaults {
   * The requested Resource used to exist but no longer does.
   */
 case class UnsupportedMediaTypeResponse()
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse = InMemoryResponse(Array(), headers, cookies, 415)
 }
 
@@ -263,7 +269,8 @@ case class UnsupportedMediaTypeResponse()
   * it from fulfilling the request.
   */
 case class InternalServerErrorResponse()
-    extends LiftResponse with HeaderDefaults {
+    extends LiftResponse
+    with HeaderDefaults {
   def toResponse = InMemoryResponse(Array(), headers, cookies, 500)
 }
 
@@ -318,12 +325,12 @@ case class JavaScriptResponse(js: JsCmd,
     extends LiftResponse {
   def toResponse = {
     val bytes = js.toJsCmd.getBytes("UTF-8")
-    InMemoryResponse(bytes,
-                     ("Content-Length", bytes.length.toString) :: (
-                         "Content-Type",
-                         "application/javascript; charset=utf-8") :: headers,
-                     cookies,
-                     code)
+    InMemoryResponse(
+        bytes,
+        ("Content-Length", bytes.length.toString) :: ("Content-Type",
+                                                      "application/javascript; charset=utf-8") :: headers,
+        cookies,
+        code)
   }
 }
 
@@ -366,8 +373,8 @@ case class JsonResponse(json: JsExp,
     val bytes = json.toJsCmd.getBytes("UTF-8")
     InMemoryResponse(
         bytes,
-        ("Content-Length", bytes.length.toString) :: (
-            "Content-Type", "application/json; charset=utf-8") :: headers,
+        ("Content-Length", bytes.length.toString) :: ("Content-Type",
+                                                      "application/json; charset=utf-8") :: headers,
         cookies,
         code)
   }
@@ -625,8 +632,8 @@ case class PlainTextResponse(
     val bytes = text.getBytes("UTF-8")
     InMemoryResponse(
         bytes,
-        ("Content-Length", bytes.length.toString) :: (
-            "Content-Type", "text/plain; charset=utf-8") :: headers,
+        ("Content-Length", bytes.length.toString) :: ("Content-Type",
+                                                      "text/plain; charset=utf-8") :: headers,
         Nil,
         code)
   }
@@ -644,11 +651,12 @@ case class CSSResponse(
     extends LiftResponse {
   def toResponse = {
     val bytes = text.getBytes("UTF-8")
-    InMemoryResponse(bytes,
-                     ("Content-Length", bytes.length.toString) :: (
-                         "Content-Type", "text/css; charset=utf-8") :: headers,
-                     Nil,
-                     code)
+    InMemoryResponse(
+        bytes,
+        ("Content-Length", bytes.length.toString) :: ("Content-Type",
+                                                      "text/css; charset=utf-8") :: headers,
+        Nil,
+        code)
   }
 }
 
@@ -738,17 +746,16 @@ trait XmlNodeResponse extends LiftResponse {
     writeDocType(writer)
 
     def htmlWriter: (Node, Writer) => Unit =
-      (n: Node, w: Writer) =>
-        {
-          val sb = new StringBuilder(64000)
-          AltXML.toXML(n,
-                       scala.xml.TopScope,
-                       sb,
-                       false,
-                       !LiftRules.convertToEntity.vend,
-                       false)
-          w.append(sb)
-          w.flush()
+      (n: Node, w: Writer) => {
+        val sb = new StringBuilder(64000)
+        AltXML.toXML(n,
+                     scala.xml.TopScope,
+                     sb,
+                     false,
+                     !LiftRules.convertToEntity.vend,
+                     false)
+        w.append(sb)
+        w.flush()
       }
 
     htmlWriter(out, writer)
@@ -801,10 +808,10 @@ case class XhtmlResponse(out: Node,
   * Allows you to create custom 200 responses for clients using different
   * Content-Types.
   */
-case class XmlMimeResponse(
-    xml: Node,
-    mime: String,
-    addlHeaders: List[(String, String)] = XmlResponse.addlHeaders)
+case class XmlMimeResponse(xml: Node,
+                           mime: String,
+                           addlHeaders: List[(String, String)] =
+                             XmlResponse.addlHeaders)
     extends XmlNodeResponse {
   def docType = Empty
 
@@ -818,12 +825,12 @@ case class XmlMimeResponse(
   def out = xml
 }
 
-class XmlResponse(
-    val xml: Node,
-    val code: Int,
-    val mime: String,
-    val cookies: List[HTTPCookie],
-    val addlHeaders: List[(String, String)] = XmlResponse.addlHeaders)
+class XmlResponse(val xml: Node,
+                  val code: Int,
+                  val mime: String,
+                  val cookies: List[HTTPCookie],
+                  val addlHeaders: List[(String, String)] =
+                    XmlResponse.addlHeaders)
     extends XmlNodeResponse {
   def docType = Empty
 

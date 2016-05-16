@@ -198,10 +198,10 @@ private[akka] trait DeathWatch {
     // immediate creation of child with same name.
     for (a ← watching; if a.path.address == address) {
       self.sendSystemMessage(
-          DeathWatchNotification(
-              a,
-              existenceConfirmed = childrenRefs.getByRef(a).isDefined,
-              addressTerminated = true))
+          DeathWatchNotification(a,
+                                 existenceConfirmed =
+                                   childrenRefs.getByRef(a).isDefined,
+                                 addressTerminated = true))
     }
   }
 

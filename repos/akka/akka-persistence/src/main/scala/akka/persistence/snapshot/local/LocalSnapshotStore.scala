@@ -24,7 +24,8 @@ import scala.util._
   * Local filesystem backed snapshot store.
   */
 private[persistence] class LocalSnapshotStore
-    extends SnapshotStore with ActorLogging {
+    extends SnapshotStore
+    with ActorLogging {
   private val FilenamePattern = """^snapshot-(.+)-(\d+)-(\d+)""".r
 
   import akka.util.Helpers._
@@ -141,10 +142,10 @@ private[persistence] class LocalSnapshotStore
 
   /** Only by persistenceId and sequenceNr, timestamp is informational - accomodates for 2.13.x series files */
   private def snapshotFileForWrite(
-      metadata: SnapshotMetadata, extension: String = ""): File =
+      metadata: SnapshotMetadata,
+      extension: String = ""): File =
     new File(snapshotDir, s"snapshot-${URLEncoder.encode(
-        metadata.persistenceId,
-        UTF_8)}-${metadata.sequenceNr}-${metadata.timestamp}${extension}")
+        metadata.persistenceId, UTF_8)}-${metadata.sequenceNr}-${metadata.timestamp}${extension}")
 
   private def snapshotMetadatas(
       persistenceId: String,

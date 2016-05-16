@@ -78,39 +78,37 @@ trait OverridingAnnotator {
 
   def checkOverrideVals(
       v: ScValue, holder: AnnotationHolder, isInSources: Boolean) {
-    v.declaredElements.foreach(td =>
-          {
-        val valsSignaturesWithSelfType: Seq[Signature] =
-          ScalaPsiUtil.superValsSignatures(td, withSelfType = true)
-        val valsSignatures: Seq[Signature] =
-          ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
-        checkStructural(v, valsSignatures, isInSources)
-        checkOverrideMembers(td,
-                             v,
-                             valsSignaturesWithSelfType,
-                             valsSignatures,
-                             isConcrete,
-                             "Value",
-                             holder)
+    v.declaredElements.foreach(td => {
+      val valsSignaturesWithSelfType: Seq[Signature] =
+        ScalaPsiUtil.superValsSignatures(td, withSelfType = true)
+      val valsSignatures: Seq[Signature] =
+        ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
+      checkStructural(v, valsSignatures, isInSources)
+      checkOverrideMembers(td,
+                           v,
+                           valsSignaturesWithSelfType,
+                           valsSignatures,
+                           isConcrete,
+                           "Value",
+                           holder)
     })
   }
 
   def checkOverrideVars(
       v: ScVariable, holder: AnnotationHolder, isInSources: Boolean) {
-    v.declaredElements.foreach(td =>
-          {
-        val valsSignaturesWithSelfType: Seq[Signature] =
-          ScalaPsiUtil.superValsSignatures(td, withSelfType = true)
-        val valsSignatures: Seq[Signature] =
-          ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
-        checkStructural(v, valsSignatures, isInSources)
-        checkOverrideMembers(td,
-                             v,
-                             valsSignaturesWithSelfType,
-                             valsSignatures,
-                             isConcrete,
-                             "Variable",
-                             holder)
+    v.declaredElements.foreach(td => {
+      val valsSignaturesWithSelfType: Seq[Signature] =
+        ScalaPsiUtil.superValsSignatures(td, withSelfType = true)
+      val valsSignatures: Seq[Signature] =
+        ScalaPsiUtil.superValsSignatures(td, withSelfType = false)
+      checkStructural(v, valsSignatures, isInSources)
+      checkOverrideMembers(td,
+                           v,
+                           valsSignaturesWithSelfType,
+                           valsSignatures,
+                           isConcrete,
+                           "Variable",
+                           holder)
     })
   }
 
@@ -160,7 +158,7 @@ trait OverridingAnnotator {
     } else if (isConcreteElement(ScalaPsiUtil.nameContext(member))) {
       var isConcretes = false
       for (signature <- superSignatures if !isConcretes &&
-                       isConcrete(signature)) isConcretes = true
+           isConcrete(signature)) isConcretes = true
       if (isConcretes && !owner.hasModifierProperty("override")) {
         val annotation: Annotation = holder.createErrorAnnotation(
             member.nameId,

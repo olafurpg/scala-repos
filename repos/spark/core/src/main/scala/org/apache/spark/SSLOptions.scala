@@ -45,18 +45,18 @@ import org.apache.spark.internal.Logging
   * @param protocol            SSL protocol (remember that SSLv3 was compromised) supported by Java
   * @param enabledAlgorithms   a set of encryption algorithms that may be used
   */
-private[spark] case class SSLOptions(
-    enabled: Boolean = false,
-    keyStore: Option[File] = None,
-    keyStorePassword: Option[String] = None,
-    keyPassword: Option[String] = None,
-    keyStoreType: Option[String] = None,
-    needClientAuth: Boolean = false,
-    trustStore: Option[File] = None,
-    trustStorePassword: Option[String] = None,
-    trustStoreType: Option[String] = None,
-    protocol: Option[String] = None,
-    enabledAlgorithms: Set[String] = Set.empty)
+private[spark] case class SSLOptions(enabled: Boolean = false,
+                                     keyStore: Option[File] = None,
+                                     keyStorePassword: Option[String] = None,
+                                     keyPassword: Option[String] = None,
+                                     keyStoreType: Option[String] = None,
+                                     needClientAuth: Boolean = false,
+                                     trustStore: Option[File] = None,
+                                     trustStorePassword: Option[String] = None,
+                                     trustStoreType: Option[String] = None,
+                                     protocol: Option[String] = None,
+                                     enabledAlgorithms: Set[String] =
+                                       Set.empty)
     extends Logging {
 
   /**
@@ -66,14 +66,14 @@ private[spark] case class SSLOptions(
     if (enabled) {
       val sslContextFactory = new SslContextFactory()
 
-      keyStore.foreach(
-          file => sslContextFactory.setKeyStorePath(file.getAbsolutePath))
+      keyStore.foreach(file =>
+            sslContextFactory.setKeyStorePath(file.getAbsolutePath))
       keyStorePassword.foreach(sslContextFactory.setKeyStorePassword)
       keyPassword.foreach(sslContextFactory.setKeyManagerPassword)
       keyStoreType.foreach(sslContextFactory.setKeyStoreType)
       if (needClientAuth) {
-        trustStore.foreach(
-            file => sslContextFactory.setTrustStore(file.getAbsolutePath))
+        trustStore.foreach(file =>
+              sslContextFactory.setTrustStore(file.getAbsolutePath))
         trustStorePassword.foreach(sslContextFactory.setTrustStorePassword)
         trustStoreType.foreach(sslContextFactory.setTrustStoreType)
       }
@@ -187,9 +187,9 @@ private[spark] object SSLOptions extends Logging {
       .getOption(s"$ns.keyStoreType")
       .orElse(defaults.flatMap(_.keyStoreType))
 
-    val needClientAuth = conf.getBoolean(
-        s"$ns.needClientAuth",
-        defaultValue = defaults.exists(_.needClientAuth))
+    val needClientAuth = conf.getBoolean(s"$ns.needClientAuth",
+                                         defaultValue =
+                                           defaults.exists(_.needClientAuth))
 
     val trustStore = conf
       .getOption(s"$ns.trustStore")

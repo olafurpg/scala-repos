@@ -33,15 +33,15 @@ object ScalaI18nUtil {
       new PropertyStubImpl(null, null), PropertiesElementTypes.PROPERTY)
   private final val FOLD_MAX_LENGTH: Int = 50
   private final val CACHE: Key[IProperty] = Key.create("i18n.property.cache")
-  private final val TOP_LEVEL_EXPRESSION: Key[ParameterizedCachedValue[
-          ScExpression, (Project, ScExpression)]] =
+  private final val TOP_LEVEL_EXPRESSION: Key[
+      ParameterizedCachedValue[ScExpression, (Project, ScExpression)]] =
     Key.create("TOP_LEVEL_EXPRESSION")
   private final val TOP_LEVEL_PROVIDER: ParameterizedCachedValueProvider[
       ScExpression,
       (Project, ScExpression)] = new ParameterizedCachedValueProvider[
       ScExpression, (Project, ScExpression)] {
-    def compute(pair: (Project,
-        ScExpression)): CachedValueProvider.Result[ScExpression] = {
+    def compute(pair: (Project, ScExpression))
+      : CachedValueProvider.Result[ScExpression] = {
       val param: ScExpression = pair._2
       val project: Project = pair._1
       val topLevel: ScExpression = getTopLevel(project, param)
@@ -433,7 +433,8 @@ object ScalaI18nUtil {
             text = text.replace("''", "'")
           }
           return if (text.length > FOLD_MAX_LENGTH)
-            text.substring(0, FOLD_MAX_LENGTH - 3) + "...\"" else text
+            text.substring(0, FOLD_MAX_LENGTH - 3) + "...\""
+          else text
         }
       }
     }

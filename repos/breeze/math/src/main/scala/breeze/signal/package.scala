@@ -64,17 +64,17 @@ package object signal {
     val shiftedFreq =
       if (isEven(windowLength)) {
         DenseVector.vertcat(
-            DenseVector.tabulate(0 to windowLength / 2 - 1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-windowLength / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+            DenseVector.tabulate(0 to windowLength / 2 - 1)((i: Int) =>
+                  i.toDouble * realFs / windowLength.toDouble),
+            DenseVector.tabulate(-windowLength / 2 to -1)((i: Int) =>
+                  i.toDouble * realFs / windowLength.toDouble)
         )
       } else {
         DenseVector.vertcat(
-            DenseVector.tabulate(0 to (windowLength - 1) / 2)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-(windowLength - 1) / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+            DenseVector.tabulate(0 to (windowLength - 1) / 2)((i: Int) =>
+                  i.toDouble * realFs / windowLength.toDouble),
+            DenseVector.tabulate(-(windowLength - 1) / 2 to -1)((i: Int) =>
+                  i.toDouble * realFs / windowLength.toDouble)
         )
       }
     if (shifted) fourierShift(shiftedFreq) else shiftedFreq
@@ -130,11 +130,11 @@ package object signal {
     * @param canFilter  (implicit delegate to perform filtering on specific Input data types)
     * @return
     */
-  def filter[Input, Kernel, Output](
-      data: Input,
-      kernel: Kernel,
-      overhang: OptOverhang = OptOverhang.PreserveLength,
-      padding: OptPadding = OptPadding.Zero)(
+  def filter[Input, Kernel, Output](data: Input,
+                                    kernel: Kernel,
+                                    overhang: OptOverhang =
+                                      OptOverhang.PreserveLength,
+                                    padding: OptPadding = OptPadding.Zero)(
       implicit canFilter: CanFilter[Input, Kernel, Output]): Output =
     canFilter(data, kernel, overhang, padding)
 
@@ -299,14 +299,14 @@ package object signal {
     *              or (B) at nyquist if the first passband ends at nyquist, or (C) the center of the first passband. Default is true.
     * @param nyquist The nyquist frequency, default is 1.
     */
-  def designFilterFirwin[Output](
-      taps: Int,
-      omegas: DenseVector[Double],
-      nyquist: Double = 1d,
-      zeroPass: Boolean = true,
-      scale: Boolean = true,
-      multiplier: Double = 1d,
-      optWindow: OptWindowFunction = OptWindowFunction.Hamming())(
+  def designFilterFirwin[Output](taps: Int,
+                                 omegas: DenseVector[Double],
+                                 nyquist: Double = 1d,
+                                 zeroPass: Boolean = true,
+                                 scale: Boolean = true,
+                                 multiplier: Double = 1d,
+                                 optWindow: OptWindowFunction =
+                                   OptWindowFunction.Hamming())(
       implicit canFirwin: CanFirwin[Output]): FIRKernel1D[Output] =
     canFirwin(taps, omegas, nyquist, zeroPass, scale, multiplier, optWindow)
 

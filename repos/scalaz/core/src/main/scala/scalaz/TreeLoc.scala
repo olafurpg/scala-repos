@@ -265,12 +265,14 @@ sealed abstract class TreeLocInstances {
 
       override def foldMapLeft1[A, B](fa: TreeLoc[A])(z: A => B)(
           f: (B, A) => B) =
-        ParentsT.foldLeft(
+        ParentsT
+          .foldLeft(
             fa.parents,
-            ForestT.foldLeft(fa.rights,
-                             ForestT.foldLeft(fa.lefts,
-                                              Foldable1[Tree].foldMapLeft1(
-                                                  fa.tree)(z)(f))(f))(f))(f)
+            ForestT.foldLeft(
+                fa.rights,
+                ForestT.foldLeft(
+                    fa.lefts,
+                    Foldable1[Tree].foldMapLeft1(fa.tree)(z)(f))(f))(f))(f)
 
       override def traverse1Impl[G[_], A, B](fa: TreeLoc[A])(f: A => G[B])(
           implicit G: Apply[G]) = fa.lefts match {
@@ -372,14 +374,14 @@ sealed abstract class TreeLocInstances {
                       )
                   )
                 case Empty =>
-                  G.map(fa.tree.traverse1(f))(
-                      t => TreeLoc(t, Empty, Empty, Empty))
+                  G.map(fa.tree.traverse1(f))(t =>
+                        TreeLoc(t, Empty, Empty, Empty))
               }
           }
       }
 
-      override def foldMapRight1[A, B](
-          fa: TreeLoc[A])(z: A => B)(f: (A, => B) => B) =
+      override def foldMapRight1[A, B](fa: TreeLoc[A])(
+          z: A => B)(f: (A, => B) => B) =
         ParentsT.foldMapRight1Opt(fa.parents)(z)(f) match {
           case Some(p) =>
             fa.tree.foldRight(
@@ -419,13 +421,13 @@ sealed abstract class TreeLocInstances {
           override def foldLeft[A, B](fa: Parent[A], z: B)(f: (B, A) => B) =
             ForestT.foldLeft(fa._3, f(ForestT.foldLeft(fa._1, z)(f), fa._2))(f)
 
-          override def foldMap[A, B](fa: Parent[A])(f: A => B)(
-              implicit B: Monoid[B]) =
+          override def foldMap[A, B](
+              fa: Parent[A])(f: A => B)(implicit B: Monoid[B]) =
             B.append(B.append(ForestT.foldMap(fa._1)(f), f(fa._2)),
                      ForestT.foldMap(fa._3)(f))
 
-          override def traverse1Impl[G[_], A, B](fa: Parent[A])(f: A => G[B])(
-              implicit G: Apply[G]): G[Parent[B]] = {
+          override def traverse1Impl[G[_], A, B](fa: Parent[A])(
+              f: A => G[B])(implicit G: Apply[G]): G[Parent[B]] = {
             (fa._1, fa._3) match {
               case (x #:: xs, y #:: ys) =>
                 G.apply3(ForestT1.traverse1(OneAnd(x, xs))(f),
@@ -449,8 +451,8 @@ sealed abstract class TreeLocInstances {
             }
           }
 
-          override def foldMapRight1[A, B](
-              fa: Parent[A])(z: A => B)(f: (A, => B) => B): B =
+          override def foldMapRight1[A, B](fa: Parent[A])(
+              z: A => B)(f: (A, => B) => B): B =
             ForestT.foldMapRight1Opt(fa._3)(z)(f) match {
               case Some(r) =>
                 ForestT.foldRight(fa._1, f(fa._2, r))(f)
@@ -462,8 +464,8 @@ sealed abstract class TreeLocInstances {
       private[this] val ParentsT: Traverse[Parents] =
         Traverse[Stream].compose[Parent]
 
-      private[this] val ParentsT1: Traverse1[Lambda[a => OneAnd[
-                  Stream, Parent[a]]]] =
+      private[this] val ParentsT1: Traverse1[
+          Lambda[a => OneAnd[Stream, Parent[a]]]] =
         Traverse1[Lambda[a => OneAnd[Stream, a]]].compose[Parent]
     }
 

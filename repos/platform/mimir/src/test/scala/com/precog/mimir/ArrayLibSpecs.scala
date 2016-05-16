@@ -29,7 +29,8 @@ import scalaz.std.list._
 import com.precog.util.IdGen
 
 trait ArrayLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -140,23 +141,21 @@ trait ArrayLibSpecs[M[+ _]]
     "flattened set is related to original set" in {
       val line = Line(1, 1, "")
 
-      val input =
-        dag.Join(
-            JoinObject,
-            IdentitySort,
-            dag.Join(WrapObject,
-                     Cross(None),
-                     Const(CString("arr"))(line),
-                     dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(
-                         line))(line),
-            dag.Join(
-                WrapObject,
-                Cross(None),
-                Const(CString("val"))(line),
-                dag.Morph1(Flatten,
-                           dag.AbsoluteLoad(
-                               Const(CString("/het/arrays"))(line))(line))(line))(
-                line))(line)
+      val input = dag.Join(
+          JoinObject,
+          IdentitySort,
+          dag.Join(WrapObject,
+                   Cross(None),
+                   Const(CString("arr"))(line),
+                   dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(
+                       line))(line),
+          dag.Join(
+              WrapObject,
+              Cross(None),
+              Const(CString("val"))(line),
+              dag.Morph1(Flatten,
+                         dag.AbsoluteLoad(Const(CString("/het/arrays"))(line))(
+                             line))(line))(line))(line)
 
       val result = testEval(input)
       result must haveSize(26)

@@ -12,7 +12,9 @@ import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 
 @RunWith(classOf[JUnitRunner])
 class ThresholdFailureDetectorTest
-    extends FunSuite with AssertionsForJUnit with Eventually
+    extends FunSuite
+    with AssertionsForJUnit
+    with Eventually
     with IntegrationPatience {
   def testt(desc: String)(f: TimeControl => Unit): Unit =
     test(desc) {

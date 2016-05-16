@@ -78,7 +78,7 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     * NOTE: This takes into consideration that the last batch processed before
     * master failure will be re-processed after restart/recovery.
     */
-  protected def testCheckpointedOperation[U : ClassTag, V : ClassTag](
+  protected def testCheckpointedOperation[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       expectedOutput: Seq[Seq[V]],
@@ -149,14 +149,14 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
   /**
     * Get the first TestOutputStreamWithPartitions, does not check the provided generic type.
     */
-  protected def getTestOutputStream[V : ClassTag](
+  protected def getTestOutputStream[V: ClassTag](
       streams: Array[DStream[_]]): TestOutputStreamWithPartitions[V] = {
     streams.collect {
       case ds: TestOutputStreamWithPartitions[V @unchecked] => ds
     }.head
   }
 
-  protected def generateOutput[V : ClassTag](
+  protected def generateOutput[V: ClassTag](
       ssc: StreamingContext,
       targetBatchTime: Time,
       checkpointDir: String,
@@ -195,9 +195,9 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
     }
   }
 
-  private def assertOutput[V : ClassTag](output: Seq[Seq[V]],
-                                         expectedOutput: Seq[Seq[V]],
-                                         beforeRestart: Boolean): Unit = {
+  private def assertOutput[V: ClassTag](output: Seq[Seq[V]],
+                                        expectedOutput: Seq[Seq[V]],
+                                        beforeRestart: Boolean): Unit = {
     val expectedPartialOutput =
       if (beforeRestart) {
         expectedOutput.take(output.size)
@@ -221,7 +221,8 @@ trait DStreamCheckpointTester { self: SparkFunSuite =>
   * the whole DStream graph.
   */
 class CheckpointSuite
-    extends TestSuiteBase with DStreamCheckpointTester
+    extends TestSuiteBase
+    with DStreamCheckpointTester
     with ResetSystemProperties {
 
   var ssc: StreamingContext = null
@@ -258,16 +259,14 @@ class CheckpointSuite
 
     // Setup the streams
     val input = (1 to 10).map(_ => Seq("a")).toSeq
-    val operation = (st: DStream[String]) =>
-      {
-        val updateFunc = (values: Seq[Int], state: Option[Int]) =>
-          {
-            Some(values.sum + state.getOrElse(0))
-        }
-        st.map(x => (x, 1))
-          .updateStateByKey(updateFunc)
-          .checkpoint(stateStreamCheckpointInterval)
-          .map(t => (t._1, t._2))
+    val operation = (st: DStream[String]) => {
+      val updateFunc = (values: Seq[Int], state: Option[Int]) => {
+        Some(values.sum + state.getOrElse(0))
+      }
+      st.map(x => (x, 1))
+        .updateStateByKey(updateFunc)
+        .checkpoint(stateStreamCheckpointInterval)
+        .map(t => (t._1, t._2))
     }
     var ssc = setupStreams(input, operation)
     var stateStream =
@@ -291,8 +290,9 @@ class CheckpointSuite
 
     // Run till a further time such that previous checkpoint files in the stream would be deleted
     // and check whether the earlier checkpoint files are deleted
-    val checkpointFiles = stateStream.checkpointData.currentCheckpointFiles
-      .map(x => new File(x._2))
+    val checkpointFiles =
+      stateStream.checkpointData.currentCheckpointFiles.map(x =>
+            new File(x._2))
     advanceTimeWithRealDelay(ssc, secondNumBatches)
     checkpointFiles.foreach(file =>
           assert(!file.exists,
@@ -302,13 +302,8 @@ class CheckpointSuite
     // Restart stream computation using the checkpoint file and check whether
     // checkpointed RDDs have been restored or not
     ssc = new StreamingContext(checkpointDir)
-    stateStream = ssc.graph
-      .getOutputStreams()
-      .head
-      .dependencies
-      .head
-      .dependencies
-      .head
+    stateStream =
+      ssc.graph.getOutputStreams().head.dependencies.head.dependencies.head
     logInfo("Restored data of state stream = \n[" +
         stateStream.generatedRDDs.mkString("\n") + "]")
     assert(
@@ -333,13 +328,8 @@ class CheckpointSuite
     // Restart stream computation from the new checkpoint file to see whether that file has
     // correct checkpoint data
     ssc = new StreamingContext(checkpointDir)
-    stateStream = ssc.graph
-      .getOutputStreams()
-      .head
-      .dependencies
-      .head
-      .dependencies
-      .head
+    stateStream =
+      ssc.graph.getOutputStreams().head.dependencies.head.dependencies.head
     logInfo("Restored data of state stream = \n[" +
         stateStream.generatedRDDs.mkString("\n") + "]")
     assert(
@@ -484,11 +474,10 @@ class CheckpointSuite
     val output =
       Seq(Seq(("a", 1)), Seq(("a", 2)), Seq(("a", 3))) ++ (1 to (n - w + 1))
         .map(x => Seq(("a", 4)))
-    val operation = (st: DStream[String]) =>
-      {
-        st.map(x => (x, 1))
-          .reduceByKeyAndWindow(_ + _, _ - _, batchDuration * w, batchDuration)
-          .checkpoint(batchDuration * 2)
+    val operation = (st: DStream[String]) => {
+      st.map(x => (x, 1))
+        .reduceByKeyAndWindow(_ + _, _ - _, batchDuration * w, batchDuration)
+        .checkpoint(batchDuration * 2)
     }
     testCheckpointedOperation(input, operation, output, 7)
   }
@@ -503,16 +492,15 @@ class CheckpointSuite
               Seq("a", "a", "b"),
               Seq("", ""),
               Seq()),
-          (s: DStream[String]) =>
-            {
-              val output = s.map(x => (x, 1)).reduceByKey(_ + _)
-              output.saveAsHadoopFiles(
-                  tempDir.toURI.toString,
-                  "result",
-                  classOf[Text],
-                  classOf[IntWritable],
-                  classOf[TextOutputFormat[Text, IntWritable]])
-              output
+          (s: DStream[String]) => {
+            val output = s.map(x => (x, 1)).reduceByKey(_ + _)
+            output.saveAsHadoopFiles(
+                tempDir.toURI.toString,
+                "result",
+                classOf[Text],
+                classOf[IntWritable],
+                classOf[TextOutputFormat[Text, IntWritable]])
+            output
           },
           Seq(Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
@@ -537,16 +525,15 @@ class CheckpointSuite
               Seq("a", "a", "b"),
               Seq("", ""),
               Seq()),
-          (s: DStream[String]) =>
-            {
-              val output = s.map(x => (x, 1)).reduceByKey(_ + _)
-              output.saveAsNewAPIHadoopFiles(
-                  tempDir.toURI.toString,
-                  "result",
-                  classOf[Text],
-                  classOf[IntWritable],
-                  classOf[NewTextOutputFormat[Text, IntWritable]])
-              output
+          (s: DStream[String]) => {
+            val output = s.map(x => (x, 1)).reduceByKey(_ + _)
+            output.saveAsNewAPIHadoopFiles(
+                tempDir.toURI.toString,
+                "result",
+                classOf[Text],
+                classOf[IntWritable],
+                classOf[NewTextOutputFormat[Text, IntWritable]])
+            output
           },
           Seq(Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
@@ -586,22 +573,18 @@ class CheckpointSuite
               Seq("a", "a", "b"),
               Seq("", ""),
               Seq()),
-          (s: DStream[String]) =>
-            {
-              s.transform {
-                (rdd, time) =>
-                  val output = rdd.map(x => (x, 1)).reduceByKey(_ + _)
-                  output
-                    .saveAsHadoopFile(new File(
-                                          tempDir,
-                                          "result-" +
-                                          time.milliseconds).getAbsolutePath,
-                                      classOf[Text],
-                                      classOf[IntWritable],
-                                      classOf[TextOutputFormat[Text,
-                                                               IntWritable]])
-                  output
-              }
+          (s: DStream[String]) => {
+            s.transform {
+              (rdd, time) =>
+                val output = rdd.map(x => (x, 1)).reduceByKey(_ + _)
+                output.saveAsHadoopFile(
+                    new File(tempDir,
+                             "result-" + time.milliseconds).getAbsolutePath,
+                    classOf[Text],
+                    classOf[IntWritable],
+                    classOf[TextOutputFormat[Text, IntWritable]])
+                output
+            }
           },
           Seq(Seq(("a", 2), ("b", 1)),
               Seq(("", 2)),
@@ -622,16 +605,14 @@ class CheckpointSuite
   test("recovery with updateStateByKey operation") {
     val input = (1 to 10).map(_ => Seq("a")).toSeq
     val output = (1 to 10).map(x => Seq(("a", x))).toSeq
-    val operation = (st: DStream[String]) =>
-      {
-        val updateFunc = (values: Seq[Int], state: Option[Int]) =>
-          {
-            Some((values.sum + state.getOrElse(0)))
-        }
-        st.map(x => (x, 1))
-          .updateStateByKey(updateFunc)
-          .checkpoint(batchDuration * 2)
-          .map(t => (t._1, t._2))
+    val operation = (st: DStream[String]) => {
+      val updateFunc = (values: Seq[Int], state: Option[Int]) => {
+        Some((values.sum + state.getOrElse(0)))
+      }
+      st.map(x => (x, 1))
+        .updateStateByKey(updateFunc)
+        .checkpoint(batchDuration * 2)
+        .map(t => (t._1, t._2))
     }
     testCheckpointedOperation(input, operation, output, 7)
   }
@@ -718,15 +699,14 @@ class CheckpointSuite
         // shuts down in the middle of processing the 3rd batch
         CheckpointSuite.batchThreeShouldBlockIndefinitely = true
         val mappedStream = fileStream.map(
-            s =>
-              {
-            val i = s.toInt
-            if (i == 3) {
-              while (CheckpointSuite.batchThreeShouldBlockIndefinitely) {
-                Thread.sleep(Long.MaxValue)
-              }
+            s => {
+          val i = s.toInt
+          if (i == 3) {
+            while (CheckpointSuite.batchThreeShouldBlockIndefinitely) {
+              Thread.sleep(Long.MaxValue)
             }
-            i
+          }
+          i
         })
 
         // Reducing over a large window to ensure that recovery from driver failure
@@ -962,9 +942,8 @@ class CheckpointSuite
     val batchCounter = new BatchCounter(ssc)
     ssc.checkpoint(checkpointDir)
     val inputDStream = new CheckpointInputDStream(ssc)
-    val updateFunc = (values: Seq[Int], state: Option[Int]) =>
-      {
-        Some(values.sum + state.getOrElse(0))
+    val updateFunc = (values: Seq[Int], state: Option[Int]) => {
+      Some(values.sum + state.getOrElse(0))
     }
     @volatile var shouldCheckpointAllMarkedRDDs = false
     @volatile var rddsCheckpointed = false
@@ -996,8 +975,8 @@ class CheckpointSuite
         val stateRDDs = findAllMarkedRDDs(rdd)
         rdd.count()
         // Check the two state RDDs are both checkpointed
-        rddsCheckpointed = stateRDDs.size == 2 &&
-        stateRDDs.forall(_.isCheckpointed)
+        rddsCheckpointed =
+          stateRDDs.size == 2 && stateRDDs.forall(_.isCheckpointed)
       }
     ssc.start()
     batchCounter.waitUntilBatchesCompleted(1, 10000)
@@ -1009,7 +988,7 @@ class CheckpointSuite
     * Advances the manual clock on the streaming scheduler by given number of batches.
     * It also waits for the expected amount of time for each batch.
     */
-  def advanceTimeWithRealDelay[V : ClassTag](
+  def advanceTimeWithRealDelay[V: ClassTag](
       ssc: StreamingContext, numBatches: Long): Iterable[Seq[V]] = {
     val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
     logInfo("Manual clock before advancing = " + clock.getTimeMillis())

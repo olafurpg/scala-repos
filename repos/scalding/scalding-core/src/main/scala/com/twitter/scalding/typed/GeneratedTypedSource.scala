@@ -162,81 +162,82 @@ trait TypedSource21[
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     extends TypedSource[Tuple21[
             A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
-  def converter[
-      Z >: Tuple21[
+  def converter[Z >: Tuple21[
           A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] =
-    TupleConverter.asSuperConverter(TupleConverter.of[Tuple21[A,
-                                                              B,
-                                                              C,
-                                                              D,
-                                                              E,
-                                                              F,
-                                                              G,
-                                                              H,
-                                                              I,
-                                                              J,
-                                                              K,
-                                                              L,
-                                                              M,
-                                                              N,
-                                                              O,
-                                                              P,
-                                                              Q,
-                                                              R,
-                                                              S,
-                                                              T,
-                                                              U]])
+    TupleConverter.asSuperConverter(
+        TupleConverter.of[Tuple21[A,
+                                  B,
+                                  C,
+                                  D,
+                                  E,
+                                  F,
+                                  G,
+                                  H,
+                                  I,
+                                  J,
+                                  K,
+                                  L,
+                                  M,
+                                  N,
+                                  O,
+                                  P,
+                                  Q,
+                                  R,
+                                  S,
+                                  T,
+                                  U]])
 }
 
 trait TypedSource22[
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
-    extends TypedSource[Tuple22[A,
-                                B,
-                                C,
-                                D,
-                                E,
-                                F,
-                                G,
-                                H,
-                                I,
-                                J,
-                                K,
-                                L,
-                                M,
-                                N,
-                                O,
-                                P,
-                                Q,
-                                R,
-                                S,
-                                T,
-                                U,
-                                V]] {
-  def converter[
-      Z >: Tuple22[
+    extends TypedSource[
+        Tuple22[A,
+                B,
+                C,
+                D,
+                E,
+                F,
+                G,
+                H,
+                I,
+                J,
+                K,
+                L,
+                M,
+                N,
+                O,
+                P,
+                Q,
+                R,
+                S,
+                T,
+                U,
+                V]] {
+  def converter[Z >: Tuple22[
           A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]] =
-    TupleConverter.asSuperConverter(TupleConverter.of[Tuple22[A,
-                                                              B,
-                                                              C,
-                                                              D,
-                                                              E,
-                                                              F,
-                                                              G,
-                                                              H,
-                                                              I,
-                                                              J,
-                                                              K,
-                                                              L,
-                                                              M,
-                                                              N,
-                                                              O,
-                                                              P,
-                                                              Q,
-                                                              R,
-                                                              S,
-                                                              T,
-                                                              U,
-                                                              V]])
+    TupleConverter.asSuperConverter(
+        TupleConverter.of[Tuple22[A,
+                                  B,
+                                  C,
+                                  D,
+                                  E,
+                                  F,
+                                  G,
+                                  H,
+                                  I,
+                                  J,
+                                  K,
+                                  L,
+                                  M,
+                                  N,
+                                  O,
+                                  P,
+                                  Q,
+                                  R,
+                                  S,
+                                  T,
+                                  U,
+                                  V]])
 }
 
 trait TypedSink1[A] extends TypedSink[Tuple1[A]] {
@@ -396,8 +397,7 @@ trait TypedSink21[
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
     extends TypedSink[Tuple21[
             A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
-  final def setter[
-      Z <: Tuple21[
+  final def setter[Z <: Tuple21[
           A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] =
     TupleSetter.asSubSetter(
         TupleSetter.of[Tuple21[A,
@@ -425,30 +425,30 @@ trait TypedSink21[
 
 trait TypedSink22[
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
-    extends TypedSink[Tuple22[A,
-                              B,
-                              C,
-                              D,
-                              E,
-                              F,
-                              G,
-                              H,
-                              I,
-                              J,
-                              K,
-                              L,
-                              M,
-                              N,
-                              O,
-                              P,
-                              Q,
-                              R,
-                              S,
-                              T,
-                              U,
-                              V]] {
-  final def setter[
-      Z <: Tuple22[
+    extends TypedSink[
+        Tuple22[A,
+                B,
+                C,
+                D,
+                E,
+                F,
+                G,
+                H,
+                I,
+                J,
+                K,
+                L,
+                M,
+                N,
+                O,
+                P,
+                Q,
+                R,
+                S,
+                T,
+                U,
+                V]] {
+  final def setter[Z <: Tuple22[
           A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]] =
     TupleSetter.asSubSetter(
         TupleSetter.of[Tuple22[A,

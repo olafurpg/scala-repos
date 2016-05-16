@@ -65,7 +65,8 @@ import scalaz.syntax.std.option._
 import scala.collection.JavaConverters._
 
 class JDBCQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with JDBCColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig
+    with JDBCColumnarTableModuleConfig {
   val logPrefix = "jdbc"
 
   val dbMap = config.detach("databases").data
@@ -85,7 +86,9 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                         val jobManager: JobManager[Future],
                         val jobActorSystem: ActorSystem)(
     implicit val executionContext: ExecutionContext, val M: Monad[Future])
-    extends StandaloneQueryExecutor with JDBCColumnarTableModule with Logging {
+    extends StandaloneQueryExecutor
+    with JDBCColumnarTableModule
+    with Logging {
   platform =>
   type YggConfig = JDBCQueryExecutorConfig
 
@@ -200,7 +203,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
     def structure(userUID: String,
                   path: Path,
-                  cpath: CPath): Future[Validation[String, JObject]] =
+                  cpath: CPath)
+      : Future[Validation[String, JObject]] =
       Promise.successful(
           Success(
               JObject(Map("children" -> JArray.empty,

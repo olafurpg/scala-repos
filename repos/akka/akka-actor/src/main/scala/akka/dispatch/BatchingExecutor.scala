@@ -49,7 +49,8 @@ private[akka] trait BatchingExecutor extends Executor {
   private[this] val _tasksLocal = new ThreadLocal[AbstractBatch]()
 
   private[this] abstract class AbstractBatch
-      extends ArrayDeque[Runnable](4) with Runnable {
+      extends ArrayDeque[Runnable](4)
+      with Runnable {
     @tailrec final def processBatch(batch: AbstractBatch): Unit =
       if ((batch eq this) && !batch.isEmpty) {
         batch.poll().run()
@@ -82,7 +83,8 @@ private[akka] trait BatchingExecutor extends Executor {
   private[this] val _blockContext = new ThreadLocal[BlockContext]()
 
   private[this] final class BlockableBatch
-      extends AbstractBatch with BlockContext {
+      extends AbstractBatch
+      with BlockContext {
     // this method runs in the delegate ExecutionContext's thread
     override final def run(): Unit = {
       require(_tasksLocal.get eq null)

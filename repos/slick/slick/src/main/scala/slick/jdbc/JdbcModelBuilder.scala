@@ -329,7 +329,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         .getOrElse {
           default.map(
               d =>
-                RelationalProfile.ColumnOption.Default(
+                RelationalProfile.ColumnOption
+                  .Default(
                     if (nullable) d
                     else
                       d.getOrElse(throw new SlickException(
@@ -359,11 +360,13 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
           table = tableBuilder.namer.qualifiedName,
           tpe = tpe,
           nullable = nullable,
-          options = Set() ++ dbType.map(SqlProfile.ColumnOption.SqlType) ++
+          options =
+            Set() ++ dbType.map(SqlProfile.ColumnOption.SqlType) ++
             (if (autoInc) Some(ColumnOption.AutoInc) else None) ++
             (if (createPrimaryKeyColumnOption) Some(ColumnOption.PrimaryKey)
-             else None) ++ length.map(RelationalProfile.ColumnOption.Length
-                  .apply(_, varying = varying)) ++
+             else
+               None) ++ length.map(RelationalProfile.ColumnOption.Length.apply(
+                    _, varying = varying)) ++
             (if (!autoInc) convenientDefault else None))
   }
 
@@ -426,16 +429,18 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       * - indices matching primary key
       * - non-unique indices matching foreign keys referencing columns
       * - indices matching foreign keys referenced columns */
-    def enabled = (idx.indexType != DatabaseMetaData.tableIndexStatistic &&
-        (tableBuilder.mPrimaryKeys.isEmpty ||
-            tableBuilder.mPrimaryKeys.map(_.column).toSet != columns.toSet) &&
-        // preserve additional uniqueness constraints on (usually not unique) fk columns
-        (unique || tableBuilder.mForeignKeys.forall(
-                _.map(_.fkColumn).toSet != columns.toSet)) &&
-        // postgres may refer to column oid, skipping index for now. Maybe we should generate a column and include it
-        // instead. And maybe this should be moved into PostgresModelBuilder.
-        // TODO: This needs a test case!
-        columns.forall(tableBuilder.columnsByName.isDefinedAt))
+    def enabled =
+      (idx.indexType != DatabaseMetaData.tableIndexStatistic &&
+          (tableBuilder.mPrimaryKeys.isEmpty || tableBuilder.mPrimaryKeys
+                .map(_.column)
+                .toSet != columns.toSet) &&
+          // preserve additional uniqueness constraints on (usually not unique) fk columns
+          (unique || tableBuilder.mForeignKeys
+                .forall(_.map(_.fkColumn).toSet != columns.toSet)) &&
+          // postgres may refer to column oid, skipping index for now. Maybe we should generate a column and include it
+          // instead. And maybe this should be moved into PostgresModelBuilder.
+          // TODO: This needs a test case!
+          columns.forall(tableBuilder.columnsByName.isDefinedAt))
 
     def unique = !idx.nonUnique
     def columns = meta.flatMap(_.column)

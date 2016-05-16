@@ -28,7 +28,9 @@ import org.apache.spark.scheduler._
 import org.apache.spark.util.Utils
 
 class JobProgressListenerSuite
-    extends SparkFunSuite with LocalSparkContext with Matchers {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Matchers {
 
   val jobSubmissionTime = 1421191042750L
   val jobCompletionTime = 1421191296660L
@@ -48,10 +50,10 @@ class JobProgressListenerSuite
     SparkListenerStageCompleted(stageInfo)
   }
 
-  private def createJobStartEvent(
-      jobId: Int,
-      stageIds: Seq[Int],
-      jobGroup: Option[String] = None): SparkListenerJobStart = {
+  private def createJobStartEvent(jobId: Int,
+                                  stageIds: Seq[Int],
+                                  jobGroup: Option[String] =
+                                    None): SparkListenerJobStart = {
     val stageInfos = stageIds.map { stageId =>
       new StageInfo(stageId, 0, stageId.toString, 0, null, null, "")
     }

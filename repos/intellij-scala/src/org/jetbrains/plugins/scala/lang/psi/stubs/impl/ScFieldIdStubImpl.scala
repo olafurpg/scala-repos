@@ -17,7 +17,8 @@ class ScFieldIdStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScFieldId](parent, elemType) with ScFieldIdStub {
+    extends StubBaseWrapper[ScFieldId](parent, elemType)
+    with ScFieldIdStub {
   private var name: StringRef = _
 
   def this(parent: StubElement[ParentPsi],

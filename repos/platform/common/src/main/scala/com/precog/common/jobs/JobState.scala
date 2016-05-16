@@ -116,7 +116,7 @@ trait JobStateSerialization {
           success[Error, JobState](NotStarted)
 
         case "started" =>
-          extractBase(obj) map(Started(_, _)).tupled
+          extractBase(obj) map (Started(_, _)).tupled
 
         case "cancelled" =>
           ((obj \ "reason").validated[String] |@| extractBase(obj)) {
@@ -131,7 +131,7 @@ trait JobStateSerialization {
           }
 
         case "expired" =>
-          extractBase(obj) map(Expired(_, _)).tupled
+          extractBase(obj) map (Expired(_, _)).tupled
 
         case "finished" =>
           extractBase(obj) flatMap {

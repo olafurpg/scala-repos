@@ -39,7 +39,9 @@ import org.streum.configrity.Configuration
 import scalaz._
 
 object MongoAccountServer
-    extends BlueEyesServer with AccountService with AkkaDefaults {
+    extends BlueEyesServer
+    with AccountService
+    with AkkaDefaults {
   val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
 

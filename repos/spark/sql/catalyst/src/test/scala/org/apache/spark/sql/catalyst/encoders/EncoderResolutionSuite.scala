@@ -175,7 +175,7 @@ class EncoderResolutionSuite extends PlanTest {
   castFail[java.math.BigDecimal, Int]
   castFail[String, Long]
 
-  private def castSuccess[T : TypeTag, U : TypeTag]: Unit = {
+  private def castSuccess[T: TypeTag, U: TypeTag]: Unit = {
     val from = ExpressionEncoder[T]
     val to = ExpressionEncoder[U]
     val catalystType = from.schema.head.dataType.simpleString
@@ -185,7 +185,7 @@ class EncoderResolutionSuite extends PlanTest {
     }
   }
 
-  private def castFail[T : TypeTag, U : TypeTag]: Unit = {
+  private def castFail[T: TypeTag, U: TypeTag]: Unit = {
     val from = ExpressionEncoder[T]
     val to = ExpressionEncoder[U]
     val catalystType = from.schema.head.dataType.simpleString

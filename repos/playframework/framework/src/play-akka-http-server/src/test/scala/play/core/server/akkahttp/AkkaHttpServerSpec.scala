@@ -20,8 +20,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
 
   sequential
 
-  def requestFromServer[T](path: String)(
-      exec: WSRequest => Future[WSResponse])(
+  def requestFromServer[T](
+      path: String)(exec: WSRequest => Future[WSResponse])(
       routes: PartialFunction[(String, String), Handler])(
       check: WSResponse => T)(implicit awaitTimeout: Timeout): T = {
     val app = GuiceApplicationBuilder().routes(routes).build()
@@ -212,10 +212,10 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
           val app = GuiceApplicationBuilder().routes {
             case ("GET", "/") => Action(Ok(resultString))
           }.build()
-          val server =
-            TestServer(testServerPort,
-                       app,
-                       serverProvider = Some(AkkaHttpServer.provider))
+          val server = TestServer(testServerPort,
+                                  app,
+                                  serverProvider =
+                                    Some(AkkaHttpServer.provider))
           server.start()
           try {
             val response = await(wsUrl("/")(testServerPort).get())

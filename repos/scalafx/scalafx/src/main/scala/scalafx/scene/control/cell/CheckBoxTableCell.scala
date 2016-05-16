@@ -82,7 +82,8 @@ object CheckBoxTableCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean])",
+      message =
+        "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean])",
       since = "1.0")
   def forTableColumn[S, T](getSelectedProperty: jfxu.Callback[
           java.lang.Integer, jfxbv.ObservableValue[java.lang.Boolean]]) =
@@ -106,7 +107,8 @@ object CheckBoxTableCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean], Boolean)",
+      message =
+        "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean], Boolean)",
       since = "1.0")
   def forTableColumn[S, T](
       getSelectedProperty: jfxu.Callback[
@@ -132,7 +134,8 @@ object CheckBoxTableCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean], StringConverter[T])",
+      message =
+        "Use forTableView[S, T](Int => ObservableValue[Boolean, java.lang.Boolean], StringConverter[T])",
       since = "1.0")
   def forTableColumn[S, T](
       getSelectedProperty: jfxu.Callback[
@@ -174,8 +177,9 @@ object CheckBoxTableCell {
   * @define CBTC `CheckBoxTableCell`
   * @define SP Function that will return an ObservableValue given an index from the TableColumn.
   */
-class CheckBoxTableCell[S, T](override val delegate: jfxscc.CheckBoxTableCell[
-        S, T] = new jfxscc.CheckBoxTableCell[S, T])
+class CheckBoxTableCell[S, T](
+    override val delegate: jfxscc.CheckBoxTableCell[S, T] =
+      new jfxscc.CheckBoxTableCell[S, T])
     extends TableCell[S, T](delegate)
     with ConvertableCell[jfxscc.CheckBoxTableCell[S, T], T, T]
     with StateSelectableCell[

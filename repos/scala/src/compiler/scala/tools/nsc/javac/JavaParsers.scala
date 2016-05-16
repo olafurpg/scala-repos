@@ -654,8 +654,8 @@ trait JavaParsers extends ast.parser.ParsersCommon with JavaScanners {
       val cdefNew =
         if (statics.isEmpty) cdef
         else
-          deriveClassDef(cdef)(
-              _ => implWithImport(importCompanionObject(cdef)))
+          deriveClassDef(cdef)(_ =>
+                implWithImport(importCompanionObject(cdef)))
 
       List(makeCompanionObject(cdefNew, statics), cdefNew)
     }

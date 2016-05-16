@@ -650,15 +650,14 @@ class ObservableBufferSpec[T]
     var actualFrom = -1
     var actualTo = -1
     var changed = false
-    items.onChange((obs, changes) =>
-          {
-        changed = true
-        for (change <- changes) change match {
-          case ObservableBuffer.Update(from, to) =>
-            actualFrom = from
-            actualTo = to
-          case _ @otherChange => fail("Wrong change: " + otherChange.toString)
-        }
+    items.onChange((obs, changes) => {
+      changed = true
+      for (change <- changes) change match {
+        case ObservableBuffer.Update(from, to) =>
+          actualFrom = from
+          actualTo = to
+        case _ @otherChange => fail("Wrong change: " + otherChange.toString)
+      }
     })
 
     items(0) += "update"

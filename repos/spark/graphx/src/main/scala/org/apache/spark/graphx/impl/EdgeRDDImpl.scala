@@ -24,9 +24,9 @@ import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 
-class EdgeRDDImpl[ED : ClassTag, VD : ClassTag] private[graphx](
-    @transient override val partitionsRDD: RDD[
-        (PartitionID, EdgePartition[ED, VD])],
+class EdgeRDDImpl[ED: ClassTag, VD: ClassTag] private[graphx](
+    @transient override val partitionsRDD: RDD[(PartitionID,
+                                                EdgePartition[ED, VD])],
     val targetStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
     extends EdgeRDD[ED](
         partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
@@ -90,7 +90,7 @@ class EdgeRDDImpl[ED : ClassTag, VD : ClassTag] private[graphx](
     partitionsRDD.map(_._2.size.toLong).reduce(_ + _)
   }
 
-  override def mapValues[ED2 : ClassTag](
+  override def mapValues[ED2: ClassTag](
       f: Edge[ED] => ED2): EdgeRDDImpl[ED2, VD] =
     mapEdgePartitions((pid, part) => part.map(f))
 
@@ -102,20 +102,19 @@ class EdgeRDDImpl[ED : ClassTag, VD : ClassTag] private[graphx](
     mapEdgePartitions((pid, part) => part.filter(epred, vpred))
   }
 
-  override def innerJoin[ED2 : ClassTag, ED3 : ClassTag](other: EdgeRDD[ED2])(
+  override def innerJoin[ED2: ClassTag, ED3: ClassTag](other: EdgeRDD[ED2])(
       f: (VertexId, VertexId, ED, ED2) => ED3): EdgeRDDImpl[ED3, VD] = {
     val ed2Tag = classTag[ED2]
     val ed3Tag = classTag[ED3]
-    this.withPartitionsRDD[ED3, VD](
-        partitionsRDD
-          .zipPartitions(other.partitionsRDD, true) { (thisIter, otherIter) =>
+    this.withPartitionsRDD[ED3, VD](partitionsRDD.zipPartitions(
+            other.partitionsRDD, true) { (thisIter, otherIter) =>
       val (pid, thisEPart) = thisIter.next()
       val (_, otherEPart) = otherIter.next()
       Iterator(Tuple2(pid, thisEPart.innerJoin(otherEPart)(f)(ed2Tag, ed3Tag)))
     })
   }
 
-  def mapEdgePartitions[ED2 : ClassTag, VD2 : ClassTag](
+  def mapEdgePartitions[ED2: ClassTag, VD2: ClassTag](
       f: (PartitionID, EdgePartition[ED, VD]) => EdgePartition[ED2, VD2])
     : EdgeRDDImpl[ED2, VD2] = {
     this.withPartitionsRDD[ED2, VD2](
@@ -129,7 +128,7 @@ class EdgeRDDImpl[ED : ClassTag, VD : ClassTag] private[graphx](
     }, preservesPartitioning = true))
   }
 
-  private[graphx] def withPartitionsRDD[ED2 : ClassTag, VD2 : ClassTag](
+  private[graphx] def withPartitionsRDD[ED2: ClassTag, VD2: ClassTag](
       partitionsRDD: RDD[(PartitionID, EdgePartition[ED2, VD2])])
     : EdgeRDDImpl[ED2, VD2] = {
     new EdgeRDDImpl(partitionsRDD, this.targetStorageLevel)

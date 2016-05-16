@@ -46,13 +46,14 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       val sink = new DownstreamProbe[Int]("sink")
 
       // Constructing an assembly by hand and resolving ambiguities
-      val assembly = new GraphAssembly(
-          stages = Array(identity, identity),
-          originalAttributes = Array(Attributes.none, Attributes.none),
-          ins = Array(identity.in, identity.in, null),
-          inOwners = Array(0, 1, -1),
-          outs = Array(null, identity.out, identity.out),
-          outOwners = Array(-1, 0, 1))
+      val assembly =
+        new GraphAssembly(stages = Array(identity, identity),
+                          originalAttributes =
+                            Array(Attributes.none, Attributes.none),
+                          ins = Array(identity.in, identity.in, null),
+                          inOwners = Array(0, 1, -1),
+                          outs = Array(null, identity.out, identity.out),
+                          outOwners = Array(-1, 0, 1))
 
       manualInit(assembly)
       interpreter.attachDownstreamBoundary(2, sink)

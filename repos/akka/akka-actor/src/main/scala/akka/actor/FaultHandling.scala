@@ -255,7 +255,8 @@ object SupervisorStrategy extends SupervisorStrategyLowPriorityImplicits {
   private[akka] def withinTimeRangeOption(
       withinTimeRange: Duration): Option[Duration] =
     if (withinTimeRange.isFinite && withinTimeRange >= Duration.Zero)
-      Some(withinTimeRange) else None
+      Some(withinTimeRange)
+    else None
 
   private[akka] def maxNrOfRetriesOption(maxNrOfRetries: Int): Option[Int] =
     if (maxNrOfRetries < 0) None else Some(maxNrOfRetries)

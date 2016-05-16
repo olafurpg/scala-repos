@@ -378,8 +378,8 @@ object Act {
     keyValues(Project extract state)(keys)
   def keyValues[T](extracted: Extracted)(keys: Seq[ScopedKey[T]]): Values[T] =
     keyValues(extracted.structure)(keys)
-  def keyValues[T](structure: BuildStructure)(
-      keys: Seq[ScopedKey[T]]): Values[T] =
+  def keyValues[T](
+      structure: BuildStructure)(keys: Seq[ScopedKey[T]]): Values[T] =
     keys.flatMap { key =>
       getValue(structure.data, key.scope, key.key) map { value =>
         KeyValue(key, value)
@@ -396,7 +396,8 @@ object Act {
   private[this] def getValue[T](
       data: Settings[Scope], scope: Scope, key: AttributeKey[T]): Option[T] =
     if (java.lang.Boolean.getBoolean("sbt.cli.nodelegation"))
-      data.getDirect(scope, key) else data.get(scope, key)
+      data.getDirect(scope, key)
+    else data.get(scope, key)
 
   def requireSession[T](s: State, p: => Parser[T]): Parser[T] =
     if (s get sessionSettings isEmpty) failure("No project loaded") else p

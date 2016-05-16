@@ -77,7 +77,8 @@ object RDDConversions {
 /** Logical plan node for scanning data from an RDD. */
 private[sql] case class LogicalRDD(
     output: Seq[Attribute], rdd: RDD[InternalRow])(sqlContext: SQLContext)
-    extends LogicalPlan with MultiInstanceRelation {
+    extends LogicalPlan
+    with MultiInstanceRelation {
 
   override def children: Seq[LogicalPlan] = Nil
 
@@ -133,7 +134,8 @@ private[sql] case class DataSourceScan(
     rdd: RDD[InternalRow],
     @transient relation: BaseRelation,
     override val metadata: Map[String, String] = Map.empty)
-    extends LeafNode with CodegenSupport {
+    extends LeafNode
+    with CodegenSupport {
 
   override val nodeName: String = relation.toString
 
@@ -226,8 +228,8 @@ private[sql] case class DataSourceScan(
     ctx.addMutableState(columnarBatchClz, batch, s"$batch = null;")
     ctx.addMutableState("int", idx, s"$idx = 0;")
 
-    val exprs = output.zipWithIndex.map(
-        x => new BoundReference(x._2, x._1.dataType, true))
+    val exprs = output.zipWithIndex.map(x =>
+          new BoundReference(x._2, x._1.dataType, true))
     val row = ctx.freshName("row")
     val numOutputRows = metricTerm(ctx, "numOutputRows")
 

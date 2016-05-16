@@ -50,7 +50,8 @@ import scala.util.Try
   * @author ilyas
   */
 class ScalaPositionManager(val debugProcess: DebugProcess)
-    extends PositionManager with MultiRequestPositionManager
+    extends PositionManager
+    with MultiRequestPositionManager
     with LocationLineManager {
 
   protected[debugger] val caches = new ScalaPositionManagerCaches(debugProcess)
@@ -65,7 +66,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
     val position = for {
       loc <- location.toOption
       psiFile <- getPsiFileByReferenceType(
-          debugProcess.getProject, loc.declaringType).toOption
+                    debugProcess.getProject, loc.declaringType).toOption
       lineNumber = exactLineNumber(location) if lineNumber >= 0
     } yield {
       calcPosition(psiFile, location, lineNumber).getOrElse {
@@ -116,8 +117,8 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
         if (isCompiledWithIndyLambdas(file)) {
           val nonStrictParents =
             Iterator(onTheLine.head) ++ onTheLine.head.parentsInFile
-          nonStrictParents.find(
-              p => ScalaEvaluatorBuilderUtil.isGenerateNonAnonfunClass(p))
+          nonStrictParents.find(p =>
+                ScalaEvaluatorBuilderUtil.isGenerateNonAnonfunClass(p))
         } else None
 
       val sourceImages = onTheLine ++ nonLambdaParent
@@ -264,7 +265,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
     import scala.collection.JavaConverters._
     for {
       refType <- debugProcess.getVirtualMachineProxy.allClasses.asScala
-                    if isAppropriate(refType)
+      if isAppropriate(refType)
     } yield {
       refType
     }
@@ -577,8 +578,8 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
         .map(_.signature())
       if (applySignature.isEmpty) candidates
       else {
-        candidates.filter(
-            l => applySignature == DebuggerUtil.lambdaJVMSignature(l))
+        candidates.filter(l =>
+              applySignature == DebuggerUtil.lambdaJVMSignature(l))
       }
     }
 
@@ -599,8 +600,8 @@ class ScalaPositionManager(val debugProcess: DebugProcess)
     if (filteredWithSignature.size == 1)
       return filteredWithSignature.headOption
 
-    val byContainingClasses = filteredWithSignature.groupBy(
-        c => findGeneratingClassOrMethodParent(c.getParent))
+    val byContainingClasses = filteredWithSignature.groupBy(c =>
+          findGeneratingClassOrMethodParent(c.getParent))
     if (byContainingClasses.size > 1) {
       findContainingClass(refType) match {
         case Some(e) => return byContainingClasses.get(e).flatMap(_.headOption)
@@ -875,8 +876,8 @@ object ScalaPositionManager {
     }
 
     val all = refType.methods().asScala.filter(isIndyLambda)
-    val onLine = all.filter(
-        m => Try(!m.locationsOfLine(lineNumber + 1).isEmpty).getOrElse(false))
+    val onLine = all.filter(m =>
+          Try(!m.locationsOfLine(lineNumber + 1).isEmpty).getOrElse(false))
     onLine.sortBy(ordinal)
   }
 

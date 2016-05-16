@@ -168,11 +168,8 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
       sql(s"ALTER TABLE partitioned_parquet_with_complextypes ADD PARTITION (p=$p)")
     }
 
+    (1 to 10).map(i => (i, s"str$i")).toDF("a", "b").registerTempTable("jt")
     (1 to 10)
-      .map(i => (i, s"str$i"))
-      .toDF("a", "b")
-      .registerTempTable("jt")
-      (1 to 10)
       .map(i => Tuple1(Seq(new Integer(i), null)))
       .toDF("a")
       .registerTempTable("jt_array")
@@ -261,8 +258,8 @@ class ParquetMetastoreSuite extends ParquetPartitioningTest {
     sql("insert into table test_insert_parquet select a, b from jt")
     checkAnswer(
         sql(s"SELECT intField, stringField FROM test_insert_parquet"),
-        (1 to 10).map(i => Row(i, s"str$i")) ++ (1 to 4).map(
-            i => Row(i, s"str$i"))
+        (1 to 10).map(i => Row(i, s"str$i")) ++ (1 to 4).map(i =>
+              Row(i, s"str$i"))
     )
     dropTables("test_insert_parquet")
   }
@@ -701,7 +698,9 @@ class ParquetSourceSuite extends ParquetPartitioningTest {
   * A collection of tests for parquet data with various forms of partitioning.
   */
 abstract class ParquetPartitioningTest
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   var partitionedTableDir: File = null

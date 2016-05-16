@@ -10,7 +10,8 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class SourcePositionSpec
-    extends EnsimeSpec with SharedEnsimeConfigFixture
+    extends EnsimeSpec
+    with SharedEnsimeConfigFixture
     with SharedEnsimeVFSFixture {
 
   val original = EnsimeConfigFixture.SimpleTestProject.copy(

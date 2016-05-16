@@ -39,8 +39,14 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * Params for Generalized Linear Regression.
   */
 private[regression] trait GeneralizedLinearRegressionBase
-    extends PredictorParams with HasFitIntercept with HasMaxIter with HasTol
-    with HasRegParam with HasWeightCol with HasSolver with Logging {
+    extends PredictorParams
+    with HasFitIntercept
+    with HasMaxIter
+    with HasTol
+    with HasRegParam
+    with HasWeightCol
+    with HasSolver
+    with Logging {
 
   /**
     * Param for the name of family which is a description of the error distribution
@@ -124,7 +130,8 @@ class GeneralizedLinearRegression @Since("2.0.0")(
     @Since("2.0.0") override val uid: String)
     extends Regressor[
         Vector, GeneralizedLinearRegression, GeneralizedLinearRegressionModel]
-    with GeneralizedLinearRegressionBase with DefaultParamsWritable
+    with GeneralizedLinearRegressionBase
+    with DefaultParamsWritable
     with Logging {
 
   import GeneralizedLinearRegression._
@@ -349,11 +356,11 @@ object GeneralizedLinearRegression
         Instance(eta, instance.weight, instance.features)
       }
       // TODO: Make standardizeFeatures and standardizeLabel configurable.
-      val initialModel =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam,
-                                 standardizeFeatures = true,
-                                 standardizeLabel = true).fit(newInstances)
+      val initialModel = new WeightedLeastSquares(fitIntercept,
+                                                  regParam,
+                                                  standardizeFeatures = true,
+                                                  standardizeLabel =
+                                                    true).fit(newInstances)
       initialModel
     }
 
@@ -361,17 +368,18 @@ object GeneralizedLinearRegression
       * The reweight function used to update offsets and weights
       * at each iteration of [[IterativelyReweightedLeastSquares]].
       */
-    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double,
-    Double) = { (instance: Instance, model: WeightedLeastSquaresModel) =>
-      {
-        val eta = model.predict(instance.features)
-        val mu = fitted(eta)
-        val offset = eta + (instance.label - mu) * link.deriv(mu)
-        val weight =
-          instance.weight /
-          (math.pow(this.link.deriv(mu), 2.0) * family.variance(mu))
-        (offset, weight)
-      }
+    val reweightFunc: (Instance,
+                       WeightedLeastSquaresModel) => (Double, Double) = {
+      (instance: Instance, model: WeightedLeastSquaresModel) =>
+        {
+          val eta = model.predict(instance.features)
+          val mu = fitted(eta)
+          val offset = eta + (instance.label - mu) * link.deriv(mu)
+          val weight =
+            instance.weight /
+            (math.pow(this.link.deriv(mu), 2.0) * family.variance(mu))
+          (offset, weight)
+        }
     }
   }
 
@@ -446,8 +454,8 @@ object GeneralizedLinearRegression
                      numInstances: Double,
                      weightSum: Double): Double = {
       val wt = predictions.map(x => math.log(x._3)).sum()
-      numInstances * (math.log(deviance / numInstances * 2.0 * math.Pi) + 1.0) +
-      2.0 - wt
+      numInstances * (math.log(deviance / numInstances * 2.0 * math.Pi) +
+          1.0) + 2.0 - wt
     }
 
     override def project(mu: Double): Double = {
@@ -710,7 +718,8 @@ class GeneralizedLinearRegressionModel private[ml](
     @Since("2.0.0") val coefficients: Vector,
     @Since("2.0.0") val intercept: Double)
     extends RegressionModel[Vector, GeneralizedLinearRegressionModel]
-    with GeneralizedLinearRegressionBase with MLWritable {
+    with GeneralizedLinearRegressionBase
+    with MLWritable {
 
   import GeneralizedLinearRegression._
 
@@ -792,7 +801,8 @@ object GeneralizedLinearRegressionModel
   /** [[MLWriter]] instance for [[GeneralizedLinearRegressionModel]] */
   private[GeneralizedLinearRegressionModel] class GeneralizedLinearRegressionModelWriter(
       instance: GeneralizedLinearRegressionModel)
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(intercept: Double, coefficients: Vector)
 

@@ -51,8 +51,8 @@ object TimePathSourceLaws extends Properties("Time path source") {
 
   def genEmbiggen(embiggen: Long): (DateRange => DateRange) = {
     ((dr: DateRange) =>
-      DateRange(RichDate(dr.start.timestamp - embiggen),
-                RichDate(dr.end.timestamp + embiggen)))
+       DateRange(RichDate(dr.start.timestamp - embiggen),
+                 RichDate(dr.end.timestamp + embiggen)))
   }
 
   def genVertractor(
@@ -74,8 +74,8 @@ object TimePathSourceLaws extends Properties("Time path source") {
     dr.end.timestamp - dr.start.timestamp + 1
 
   property(
-      "if the reqRange + embiggen is inside the avail range, return should == requested") = forAll {
-    (data: TestData) =>
+      "if the reqRange + embiggen is inside the avail range, return should == requested") =
+    forAll { (data: TestData) =>
       val retData = BTimePathedSource.minify(
           genEmbiggen(data.embiggen),
           genVertractor(data.availableRange))(data.requestedRange)
@@ -83,11 +83,11 @@ object TimePathSourceLaws extends Properties("Time path source") {
               data.requestedRange, data.embiggen, data.availableRange)) {
         retData == Some(data.requestedRange)
       } else true // not tested here
-  }
+    }
 
   property(
-      "If not a complete subset, but overlapping we can imply a few prerequisites") = forAll {
-    (data: TestData) =>
+      "If not a complete subset, but overlapping we can imply a few prerequisites") =
+    forAll { (data: TestData) =>
       val retData = BTimePathedSource.minify(
           genEmbiggen(data.embiggen),
           genVertractor(data.availableRange))(data.requestedRange)
@@ -97,11 +97,11 @@ object TimePathSourceLaws extends Properties("Time path source") {
           (data.availableRange.contains(range) &&
               data.requestedRange.contains(range) && rangeLength(range) > 0)
       }
-  }
+    }
 
   property(
-      "If the return is none, then the ranges should be disjoint or one is None") = forAll {
-    (data: TestData) =>
+      "If the return is none, then the ranges should be disjoint or one is None") =
+    forAll { (data: TestData) =>
       val retData = BTimePathedSource.minify(
           genEmbiggen(data.embiggen),
           genVertractor(data.availableRange))(data.requestedRange)
@@ -114,5 +114,5 @@ object TimePathSourceLaws extends Properties("Time path source") {
               )
         case Some(_) => true // Not in this test
       }
-  }
+    }
 }

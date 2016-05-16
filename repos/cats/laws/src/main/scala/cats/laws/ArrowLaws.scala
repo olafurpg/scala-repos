@@ -11,7 +11,9 @@ import cats.syntax.strong._
   * Laws that must be obeyed by any `cats.arrow.Arrow`.
   */
 trait ArrowLaws[F[_, _]]
-    extends CategoryLaws[F] with SplitLaws[F] with StrongLaws[F] {
+    extends CategoryLaws[F]
+    with SplitLaws[F]
+    with StrongLaws[F] {
   implicit override def F: Arrow[F]
 
   def arrowIdentity[A]: IsEq[F[A, A]] =

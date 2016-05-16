@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{ArrayType, StructType}
   */
 @Experimental
 class HashingTF(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("hashingTF"))

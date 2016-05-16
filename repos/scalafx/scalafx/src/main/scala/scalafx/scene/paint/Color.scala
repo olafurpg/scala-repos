@@ -765,7 +765,8 @@ object Color {
 }
 
 class Color(override val delegate: jfxsp.Color)
-    extends Paint(delegate) with SFXDelegate[jfxsp.Color] {
+    extends Paint(delegate)
+    with SFXDelegate[jfxsp.Color] {
 
   /**
     * The red component of the Color, in the range 0.0-1.0.

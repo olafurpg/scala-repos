@@ -46,7 +46,8 @@ import org.apache.spark.util.{CompletionIterator, ManualClock, ThreadUtils, Util
 abstract class CommonWriteAheadLogTests(allowBatching: Boolean,
                                         closeFileAfterWrite: Boolean,
                                         testTag: String = "")
-    extends SparkFunSuite with BeforeAndAfter {
+    extends SparkFunSuite
+    with BeforeAndAfter {
 
   import WriteAheadLogSuite._
 
@@ -447,8 +448,11 @@ class FileBasedWriteAheadLogWithFileCloseAfterWriteSuite
 class BatchedWriteAheadLogSuite
     extends CommonWriteAheadLogTests(allowBatching = true,
                                      closeFileAfterWrite = false,
-                                     "BatchedWriteAheadLog") with MockitoSugar
-    with BeforeAndAfterEach with Eventually with PrivateMethodTester {
+                                     "BatchedWriteAheadLog")
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with Eventually
+    with PrivateMethodTester {
 
   import BatchedWriteAheadLog._
   import WriteAheadLogSuite._
@@ -465,10 +469,10 @@ class BatchedWriteAheadLogSuite
     super.beforeEach()
     wal = mock[WriteAheadLog]
     walHandle = mock[WriteAheadLogRecordHandle]
-    walBatchingThreadPool = ThreadUtils.newDaemonFixedThreadPool(
-        8, "wal-test-thread-pool")
-    walBatchingExecutionContext = ExecutionContext.fromExecutorService(
-        walBatchingThreadPool)
+    walBatchingThreadPool =
+      ThreadUtils.newDaemonFixedThreadPool(8, "wal-test-thread-pool")
+    walBatchingExecutionContext =
+      ExecutionContext.fromExecutorService(walBatchingThreadPool)
   }
 
   override def afterEach(): Unit = {

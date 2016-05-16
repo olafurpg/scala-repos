@@ -40,7 +40,8 @@ private[finagle] class ClockedDrainer(
     statsReceiver: StatsReceiver = NullStatsReceiver,
     verbose: Boolean = false
 )
-    extends Thread("GcDrainer") with Lessor {
+    extends Thread("GcDrainer")
+    with Lessor {
 
   private[this] val lessees =
     Collections.newSetFromMap(new ConcurrentHashMap[Lessee, java.lang.Boolean])

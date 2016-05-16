@@ -10,7 +10,8 @@ import com.intellij.openapi.util.TextRange
   * Pavel Fatin
   */
 case class Associations(associations: Seq[Association])
-    extends TextBlockTransferableData with Cloneable {
+    extends TextBlockTransferableData
+    with Cloneable {
   def setOffsets(offsets: Array[Int], _index: Int) = {
     var index = _index
     for (association <- associations) {

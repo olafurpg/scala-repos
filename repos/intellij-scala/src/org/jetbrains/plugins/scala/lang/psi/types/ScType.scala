@@ -83,23 +83,20 @@ trait ScType {
 
   def removeVarianceAbstracts(variance: Int): ScType = {
     var index = 0
-    recursiveVarianceUpdate(
-        (tp: ScType, i: Int) =>
-          {
-            tp match {
-              case ScAbstractType(_, lower, upper) =>
-                i match {
-                  case -1 => (true, lower)
-                  case 1 => (true, upper)
-                  case 0 =>
-                    (true,
-                     ScSkolemizedType(
-                         s"_$$${ index += 1; index }", Nil, lower, upper))
-                }
-              case _ => (false, tp)
-            }
-        },
-        variance).unpackedType
+    recursiveVarianceUpdate((tp: ScType, i: Int) => {
+      tp match {
+        case ScAbstractType(_, lower, upper) =>
+          i match {
+            case -1 => (true, lower)
+            case 1 => (true, upper)
+            case 0 =>
+              (true,
+               ScSkolemizedType(
+                   s"_$$${ index += 1; index }", Nil, lower, upper))
+          }
+        case _ => (false, tp)
+      }
+    }, variance).unpackedType
   }
 
   def removeUndefines(): ScType = {
@@ -137,20 +134,16 @@ trait ScType {
 
   def recursiveVarianceUpdate(update: (ScType, Int) => (Boolean, ScType),
                               variance: Int = 1): ScType = {
-    recursiveVarianceUpdateModifiable[Unit](
-        (),
-        (tp, v, T) =>
-          {
-            val (newTp, newV) = update(tp, v)
-            (newTp, newV, ())
-        },
-        variance)
+    recursiveVarianceUpdateModifiable[Unit]((), (tp, v, T) => {
+      val (newTp, newV) = update(tp, v)
+      (newTp, newV, ())
+    }, variance)
   }
 
-  def recursiveVarianceUpdateModifiable[T](
-      data: T,
-      update: (ScType, Int, T) => (Boolean, ScType, T),
-      variance: Int = 1): ScType = {
+  def recursiveVarianceUpdateModifiable[T](data: T,
+                                           update: (ScType, Int,
+                                                    T) => (Boolean, ScType, T),
+                                           variance: Int = 1): ScType = {
     val res = update(this, variance, data)
     if (res._1) res._2
     else this
@@ -161,13 +154,12 @@ trait ScType {
       new mutable.HashSet[ScAbstractType]
 
     recursiveUpdate(
-        tp =>
-          {
-        tp match {
-          case a: ScAbstractType => set += a
-          case _ =>
-        }
-        (false, tp)
+        tp => {
+      tp match {
+        case a: ScAbstractType => set += a
+        case _ =>
+      }
+      (false, tp)
     })
 
     set.toSeq
@@ -252,8 +244,8 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
 
   def extractClassType(t: ScType,
                        project: Option[Project] = None,
-                       visitedAlias: HashSet[ScTypeAlias] = HashSet.empty)
-    : Option[(PsiClass, ScSubstitutor)] = {
+                       visitedAlias: HashSet[ScTypeAlias] =
+                         HashSet.empty): Option[(PsiClass, ScSubstitutor)] = {
     t match {
       case n: NonValueType =>
         extractClassType(n.inferValueType, project, visitedAlias)
@@ -413,17 +405,17 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
   // TODO perhaps we need to choose the lower bound if we are in a contravariant position. We get away
   //      with this as we currently only rely on this method to determine covariant types: the parameter
   //      types of FunctionN, or the elements of TupleN
-  def expandAliases(
-      tp: ScType,
-      visited: HashSet[ScType] = HashSet.empty): TypeResult[ScType] = {
+  def expandAliases(tp: ScType,
+                    visited: HashSet[ScType] =
+                      HashSet.empty): TypeResult[ScType] = {
     if (visited contains tp) return Success(tp, None)
     tp match {
       case proj @ ScProjectionType(p, elem, _) =>
         proj.actualElement match {
           case t: ScTypeAliasDefinition if t.typeParameters.isEmpty =>
             t.aliasedType(TypingContext.empty)
-              .flatMap(
-                  t => expandAliases(proj.actualSubst.subst(t), visited + tp))
+              .flatMap(t =>
+                    expandAliases(proj.actualSubst.subst(t), visited + tp))
           case t: ScTypeAliasDeclaration if t.typeParameters.isEmpty =>
             t.upperBound.flatMap(upper =>
                   expandAliases(proj.actualSubst.subst(upper), visited + tp))
@@ -517,9 +509,9 @@ object ScType extends ScTypePresentation with ScTypePsiTypeBridge {
     }
   }
 
-  def ofNamedElement(
-      named: PsiElement,
-      s: ScSubstitutor = ScSubstitutor.empty): Option[ScType] = {
+  def ofNamedElement(named: PsiElement,
+                     s: ScSubstitutor =
+                       ScSubstitutor.empty): Option[ScType] = {
     val baseType = named match {
       case p: ScPrimaryConstructor => None
       case e: ScFunction if e.isConstructor => None

@@ -134,8 +134,7 @@ private[akka] class InputStreamAdapter(
     require(begin + length <= a.length,
             "begin + length must be smaller or equal to the array length")
 
-    executeIfNotClosed(
-        () ⇒
+    executeIfNotClosed(() ⇒
           if (isStageAlive) {
         detachedChunk match {
           case None ⇒
@@ -176,11 +175,10 @@ private[akka] class InputStreamAdapter(
   @scala.throws(classOf[IOException])
   override def close(): Unit = {
     executeIfNotClosed(
-        () ⇒
-          {
-        // at this point Subscriber may be already terminated
-        if (isStageAlive) sendToStage(Close)
-        isActive = false
+        () ⇒ {
+      // at this point Subscriber may be already terminated
+      if (isStageAlive) sendToStage(Close)
+      isActive = false
     })
   }
 

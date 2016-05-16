@@ -36,23 +36,22 @@ import scalafx.scene.shape.Rectangle
 class EnsembleRectangle extends EnsembleExample {
   def getContent = {
     // function literal to get Rectangle object
-    val rectObj = (rect: Rectangle) =>
-      { rect.setStroke(Color.Burlywood); rect }
-    val rectArcObj = (height: Int, width: Int) =>
-      {
-        val rect = Rectangle(100, 100, Color.White)
-        rect.setStroke(Color.Green)
-        rect.setArcWidth(width)
-        rect.setArcHeight(height)
-        rect
+    val rectObj = (rect: Rectangle) => {
+      rect.setStroke(Color.Burlywood); rect
     }
-    val fillArc = (height: Int, width: Int, color: Paint) =>
-      {
-        val rect = Rectangle(100, 100, color)
-        rect.setStroke(Color.Black)
-        rect.setArcWidth(width)
-        rect.setArcHeight(height)
-        rect
+    val rectArcObj = (height: Int, width: Int) => {
+      val rect = Rectangle(100, 100, Color.White)
+      rect.setStroke(Color.Green)
+      rect.setArcWidth(width)
+      rect.setArcHeight(height)
+      rect
+    }
+    val fillArc = (height: Int, width: Int, color: Paint) => {
+      val rect = Rectangle(100, 100, color)
+      rect.setStroke(Color.Black)
+      rect.setArcWidth(width)
+      rect.setArcHeight(height)
+      rect
     }
 
     new HBox {

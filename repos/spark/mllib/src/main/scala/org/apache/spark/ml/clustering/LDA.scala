@@ -33,7 +33,10 @@ import org.apache.spark.sql.functions.{col, monotonicallyIncreasingId, udf}
 import org.apache.spark.sql.types.StructType
 
 private[clustering] trait LDAParams
-    extends Params with HasFeaturesCol with HasMaxIter with HasSeed
+    extends Params
+    with HasFeaturesCol
+    with HasMaxIter
+    with HasSeed
     with HasCheckpointInterval {
 
   /**
@@ -350,7 +353,10 @@ sealed abstract class LDAModel private[ml](
     @Since("1.6.0") override val uid: String,
     @Since("1.6.0") val vocabSize: Int,
     @Since("1.6.0") @transient protected val sqlContext: SQLContext)
-    extends Model[LDAModel] with LDAParams with Logging with MLWritable {
+    extends Model[LDAModel]
+    with LDAParams
+    with Logging
+    with MLWritable {
 
   // NOTE to developers:
   //  This abstraction should contain all important functionality for basic LDA usage.
@@ -733,7 +739,9 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
 @Since("1.6.0")
 @Experimental
 class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
-    extends Estimator[LDAModel] with LDAParams with DefaultParamsWritable {
+    extends Estimator[LDAModel]
+    with LDAParams
+    with DefaultParamsWritable {
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("lda"))

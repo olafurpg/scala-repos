@@ -18,7 +18,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class SchedulerActionsTest
-    extends MarathonActorSupport with MarathonSpec with Matchers with Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with Mockito {
   import system.dispatcher
 
   test("Reset rate limiter if application is stopped") {

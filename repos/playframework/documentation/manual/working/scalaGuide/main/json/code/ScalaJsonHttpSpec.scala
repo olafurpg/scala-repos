@@ -68,17 +68,15 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
         request.body.asJson.map { json =>
           val placeResult = json.validate[Place]
           placeResult.fold(
-              errors =>
-                {
-                  BadRequest(Json.obj("status" -> "KO",
-                                      "message" -> JsError.toJson(errors)))
+              errors => {
+                BadRequest(Json.obj("status" -> "KO",
+                                    "message" -> JsError.toJson(errors)))
               },
-              place =>
-                {
-                  Place.save(place)
-                  Ok(Json.obj("status" -> "OK",
-                              "message" ->
-                              ("Place '" + place.name + "' saved.")))
+              place => {
+                Place.save(place)
+                Ok(Json.obj("status" -> "OK",
+                            "message" ->
+                            ("Place '" + place.name + "' saved.")))
               }
           )
         }.getOrElse {
@@ -123,17 +121,14 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
       def savePlace = Action(BodyParsers.parse.json) { request =>
         val placeResult = request.body.validate[Place]
         placeResult.fold(
-            errors =>
-              {
-                BadRequest(Json.obj("status" -> "KO",
-                                    "message" -> JsError.toJson(errors)))
+            errors => {
+              BadRequest(Json.obj("status" -> "KO",
+                                  "message" -> JsError.toJson(errors)))
             },
-            place =>
-              {
-                Place.save(place)
-                Ok(Json.obj(
-                        "status" -> "OK",
-                        "message" -> ("Place '" + place.name + "' saved.")))
+            place => {
+              Place.save(place)
+              Ok(Json.obj("status" -> "OK",
+                          "message" -> ("Place '" + place.name + "' saved.")))
             }
         )
       }

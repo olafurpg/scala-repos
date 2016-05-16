@@ -261,8 +261,8 @@ class DeleteConsumerGroupTest extends KafkaServerTestHarness {
   private def produceEvents(producer: KafkaProducer[Array[Byte], Array[Byte]],
                             topic: String,
                             messages: List[String]) {
-    messages.foreach(
-        message => producer.send(new ProducerRecord(topic, message.getBytes)))
+    messages.foreach(message =>
+          producer.send(new ProducerRecord(topic, message.getBytes)))
   }
 
   private def consumeEvents(

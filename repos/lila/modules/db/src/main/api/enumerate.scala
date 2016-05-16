@@ -12,14 +12,14 @@ import lila.db.Implicits._
 
 object $enumerate {
 
-  def apply[A : BSONDocumentReader](
+  def apply[A: BSONDocumentReader](
       query: QueryBuilder, limit: Int = Int.MaxValue)(op: A => Any): Funit =
     query.cursor[A]().enumerate(limit) run {
       Iteratee.foreach((obj: A) => op(obj))
     }
 
-  def over[A : TubeInColl](
-      query: QueryBuilder, limit: Int = Int.MaxValue)(op: A => Funit): Funit =
+  def over[A: TubeInColl](query: QueryBuilder, limit: Int = Int.MaxValue)(
+      op: A => Funit): Funit =
     query.cursor[Option[A]]().enumerate(limit, stopOnError = false) run {
       Iteratee.foldM(()) {
         case (_, Some(obj)) => op(obj)
@@ -27,7 +27,7 @@ object $enumerate {
       }
     }
 
-  def bulk[A : BSONDocumentReader](
+  def bulk[A: BSONDocumentReader](
       query: QueryBuilder, size: Int, limit: Int = Int.MaxValue)(
       op: List[A] => Funit): Funit =
     query.batch(size).cursor[A]().enumerateBulks(limit) run {
@@ -36,11 +36,11 @@ object $enumerate {
       }
     }
 
-  def fold[A : BSONDocumentReader, B](query: QueryBuilder)(zero: B)(
+  def fold[A: BSONDocumentReader, B](query: QueryBuilder)(zero: B)(
       f: (B, A) => B): Fu[B] =
     query.cursor[A]().enumerate() |>>> Iteratee.fold(zero)(f)
 
-  def foldMonoid[A : BSONDocumentReader, B : Monoid](query: QueryBuilder)(
+  def foldMonoid[A: BSONDocumentReader, B: Monoid](query: QueryBuilder)(
       f: A => B): Fu[B] =
     fold[A, B](query)(Monoid[B].zero) { case (b, a) => f(a) |+| b }
 }

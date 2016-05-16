@@ -25,7 +25,8 @@ import scala.collection.JavaConverters._
   * @since 6/4/15.
   */
 class ScalaGradleDataServiceTest
-    extends ProjectDataServiceTestCase with UsefulTestCaseHelper {
+    extends ProjectDataServiceTestCase
+    with UsefulTestCaseHelper {
 
   private def generateProject(scalaVersion: Option[String],
                               scalaCompilerClasspath: Set[File],

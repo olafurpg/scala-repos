@@ -208,7 +208,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     /**
       * Folds over the table to produce a single value (stored in a singleton table).
       */
-    def reduce[A : Monoid](reducer: Reducer[A]): M[A]
+    def reduce[A: Monoid](reducer: Reducer[A]): M[A]
 
     /**
       * Removes all rows in the table for which definedness is satisfied
@@ -333,7 +333,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def sorted: M[GroupingSource] =
       for {
         t <- table.sort(trans.DerefObjectStatic(
-                trans.Leaf(trans.Source), CPathField("key")))
+                    trans.Leaf(trans.Source), CPathField("key")))
       } yield {
         GroupingSource(t, idTrans, targetTrans, groupId, groupKeySpec)
       }

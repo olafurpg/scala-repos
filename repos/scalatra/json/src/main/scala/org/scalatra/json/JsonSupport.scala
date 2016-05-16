@@ -26,8 +26,8 @@ trait JsonSupport[T] extends JsonOutput[T] {
 
   private[this] val _defaultCacheRequestBody = true
   protected def cacheRequestBodyAsString: Boolean = _defaultCacheRequestBody
-  protected def parseRequestBody(format: String)(
-      implicit request: HttpServletRequest) =
+  protected def parseRequestBody(
+      format: String)(implicit request: HttpServletRequest) =
     try {
       val ct = request.contentType getOrElse ""
       if (format == "json") {

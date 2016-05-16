@@ -49,7 +49,7 @@ object ScroogeBinaryConverter {
           .getField("MODULE$")
           .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
 
-  def apply[T <: ThriftStruct : ClassTag]: BinaryConverter[T] = {
+  def apply[T <: ThriftStruct: ClassTag]: BinaryConverter[T] = {
     val ct = implicitly[ClassTag[T]]
     new BinaryConverter[T] {
       val serializer = BinaryThriftStructSerializer[T] {

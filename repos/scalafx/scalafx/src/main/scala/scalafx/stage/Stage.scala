@@ -52,7 +52,8 @@ object Stage {
   * Any further stage would be simply instantiated by the no-arg constructor.
   */
 class Stage(override val delegate: jfxs.Stage = new jfxs.Stage)
-    extends Window(delegate) with SFXDelegate[jfxs.Stage] {
+    extends Window(delegate)
+    with SFXDelegate[jfxs.Stage] {
 
   /**
     * Creates a new instance of Stage.

@@ -179,8 +179,12 @@ object TypedActorSpec {
   }
 
   class LifeCyclesImpl(val latch: CountDownLatch)
-      extends PreStart with PostStop with PreRestart with PostRestart
-      with LifeCycles with Receiver {
+      extends PreStart
+      with PostStop
+      with PreRestart
+      with PostRestart
+      with LifeCycles
+      with Receiver {
 
     private def ensureContextAvailable[T](f: ⇒ T): T =
       TypedActor.context match {
@@ -219,8 +223,10 @@ object TypedActorSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 
@@ -567,8 +573,10 @@ class TypedActorSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorRouterSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 

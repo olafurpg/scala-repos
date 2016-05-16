@@ -37,7 +37,8 @@ class ServiceRegistrySpecMultiJvmNode2 extends ServiceRegistrySpec
 class ServiceRegistrySpecMultiJvmNode3 extends ServiceRegistrySpec
 
 class ServiceRegistrySpec
-    extends MultiNodeSpec(ServiceRegistrySpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ServiceRegistrySpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ServiceRegistrySpec._
   import ServiceRegistry._

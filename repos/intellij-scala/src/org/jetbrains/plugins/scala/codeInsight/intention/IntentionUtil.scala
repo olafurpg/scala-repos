@@ -9,9 +9,9 @@ import com.intellij.psi.{PsiComment, PsiDocumentManager, PsiElement, PsiWhiteSpa
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 
 object IntentionUtil {
-  def collectComments(
-      element: PsiElement,
-      onElementLine: Boolean = false): CommentsAroundElement = {
+  def collectComments(element: PsiElement,
+                      onElementLine: Boolean =
+                        false): CommentsAroundElement = {
     def hasLineBreaks(whiteSpace: PsiElement): Boolean = {
       if (!onElementLine) false
       else StringUtil.containsLineBreak(whiteSpace.getText)

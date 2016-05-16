@@ -29,7 +29,8 @@ import org.apache.spark.internal.Logging
   */
 private[fpm] class LocalPrefixSpan(
     val minCount: Long, val maxPatternLength: Int)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   import PrefixSpan.Postfix
   import LocalPrefixSpan.ReversedPrefix
 

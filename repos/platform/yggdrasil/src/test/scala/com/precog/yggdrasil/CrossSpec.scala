@@ -26,7 +26,9 @@ import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
 trait CrossSpec[M[+ _]]
-    extends TableModuleTestSupport[M] with Specification with ScalaCheck {
+    extends TableModuleTestSupport[M]
+    with Specification
+    with ScalaCheck {
   import SampleData._
   import trans._
   import trans.constants._
@@ -42,8 +44,7 @@ trait CrossSpec[M[+ _]]
           case JField(s, v) if v != JUndefined => JField(s, removeUndefined(v))
         })
       case JArray(jvs) =>
-        JArray(
-            jvs map { jv =>
+        JArray(jvs map { jv =>
           removeUndefined(jv)
         })
       case v => v

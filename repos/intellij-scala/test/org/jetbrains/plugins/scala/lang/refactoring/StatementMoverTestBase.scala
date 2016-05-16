@@ -37,7 +37,8 @@ abstract class StatementMoverTestBase extends SimpleTestCase {
 
       val (i1, i2) =
         if (info.toMove.startLine < info.toMove2.startLine)
-          (info.toMove, info.toMove2) else (info.toMove2, info.toMove)
+          (info.toMove, info.toMove2)
+        else (info.toMove2, info.toMove)
 
       val a = it.take(i1.startLine).toList
       val source = it.take(i1.endLine - i1.startLine).toList

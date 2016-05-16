@@ -32,7 +32,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeExtractionSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -1112,4 +1113,5 @@ trait TimeExtractionSpecs[M[+ _]]
 }
 
 object TimeExtractionSpecs
-    extends TimeExtractionSpecs[test.YId] with test.YIdInstances
+    extends TimeExtractionSpecs[test.YId]
+    with test.YIdInstances

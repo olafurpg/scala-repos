@@ -120,8 +120,8 @@ object ConfigCommand {
         configsToBeAdded.forall(config => config.length == 2),
         "Invalid entity config: all configs to be added must be in the format \"key=val\".")
     val props = new Properties
-    configsToBeAdded.foreach(
-        pair => props.setProperty(pair(0).trim, pair(1).trim))
+    configsToBeAdded.foreach(pair =>
+          props.setProperty(pair(0).trim, pair(1).trim))
     if (props.containsKey(LogConfig.MessageFormatVersionProp)) {
       println(
           s"WARNING: The configuration ${LogConfig.MessageFormatVersionProp}=${props

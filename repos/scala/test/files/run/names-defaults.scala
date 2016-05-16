@@ -414,8 +414,8 @@ object Test extends App {
 }
 
 class Base {
-  def test1[T1, T2](a: Int = 100, b: T1)(c: T2, d: String = a + ": " + b)(
-      e: T2 = c, f: Int) =
+  def test1[T1, T2](a: Int = 100, b: T1)(
+      c: T2, d: String = a + ": " + b)(e: T2 = c, f: Int) =
     println(a + ": " + d + ", " + b + ", " + c + ", " + e + ", " + f)
 }
 

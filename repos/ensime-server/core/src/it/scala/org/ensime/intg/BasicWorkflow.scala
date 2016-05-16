@@ -9,8 +9,10 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class BasicWorkflow
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.SimpleTestProject
 
@@ -218,21 +220,22 @@ class BasicWorkflow
                               List(),
                               List(),
                               None),
-                List(ParamSectionInfo(List(("bar",
-                                            BasicTypeInfo("String",
-                                                          DeclaredAs.Class,
-                                                          "java.lang.String",
-                                                          List(),
-                                                          List(),
-                                                          None)),
-                                           ("baz",
-                                            BasicTypeInfo("Int",
-                                                          DeclaredAs.Class,
-                                                          "scala.Int",
-                                                          List(),
-                                                          List(),
-                                                          None))),
-                                      false))),
+                List(
+                ParamSectionInfo(List(("bar",
+                                       BasicTypeInfo("String",
+                                                     DeclaredAs.Class,
+                                                     "java.lang.String",
+                                                     List(),
+                                                     List(),
+                                                     None)),
+                                      ("baz",
+                                       BasicTypeInfo("Int",
+                                                     DeclaredAs.Class,
+                                                     "scala.Int",
+                                                     List(),
+                                                     List(),
+                                                     None))),
+                                 false))),
                 true) =>
           }
 
@@ -250,21 +253,22 @@ class BasicWorkflow
                               List(),
                               List(),
                               None),
-                List(ParamSectionInfo(List(("bar",
-                                            BasicTypeInfo("String",
-                                                          DeclaredAs.Class,
-                                                          "java.lang.String",
-                                                          List(),
-                                                          List(),
-                                                          None)),
-                                           ("baz",
-                                            BasicTypeInfo("Int",
-                                                          DeclaredAs.Class,
-                                                          "scala.Int",
-                                                          List(),
-                                                          List(),
-                                                          None))),
-                                      false))),
+                List(
+                ParamSectionInfo(List(("bar",
+                                       BasicTypeInfo("String",
+                                                     DeclaredAs.Class,
+                                                     "java.lang.String",
+                                                     List(),
+                                                     List(),
+                                                     None)),
+                                      ("baz",
+                                       BasicTypeInfo("Int",
+                                                     DeclaredAs.Class,
+                                                     "scala.Int",
+                                                     List(),
+                                                     List(),
+                                                     None))),
+                                 false))),
                 true) =>
           }
 

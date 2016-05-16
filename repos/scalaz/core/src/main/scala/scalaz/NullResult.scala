@@ -202,8 +202,8 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       }
   }
 
-  implicit def nullResultMonadPlus[
-      X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
+  implicit def nullResultMonadPlus[X]
+    : MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
     new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
       override def tailrecM[A, B](f: A => NullResult[X, A \/ B])(a: A) =
@@ -238,7 +238,8 @@ private trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
 }
 
 private trait NullResultMonoid[A, B]
-    extends Monoid[NullResult[A, B]] with NullResultSemigroup[A, B] {
+    extends Monoid[NullResult[A, B]]
+    with NullResultSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

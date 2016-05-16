@@ -17,7 +17,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ThriftClientFinagleServerTest
-    extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+    extends FunSuite
+    with BeforeAndAfter
+    with OneInstancePerTest {
 
   val somewayPromise = new Promise[Unit]
   val processor = new B.ServiceIface {

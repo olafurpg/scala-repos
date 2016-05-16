@@ -33,7 +33,8 @@ import scalaz.std.list._
 import com.precog.util.IdGen
 
 trait ReductionLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -598,4 +599,5 @@ trait ReductionLibSpecs[M[+ _]]
 }
 
 object ReductionLibSpecs
-    extends ReductionLibSpecs[test.YId] with test.YIdInstances
+    extends ReductionLibSpecs[test.YId]
+    with test.YIdInstances

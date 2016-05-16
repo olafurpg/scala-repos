@@ -133,8 +133,8 @@ object ParameterDirectives extends ParameterDirectives {
       extractParameter[NameReceptacle[T], T] { nr ⇒
         filter(nr.name, fsu)
       }
-    implicit def forNUR[T]: ParamDefAux[
-        NameUnmarshallerReceptacle[T], Directive1[T]] =
+    implicit def forNUR[T]
+      : ParamDefAux[NameUnmarshallerReceptacle[T], Directive1[T]] =
       extractParameter[NameUnmarshallerReceptacle[T], T] { nr ⇒
         filter(nr.name, nr.um)
       }
@@ -153,8 +153,8 @@ object ParameterDirectives extends ParameterDirectives {
       extractParameter[NameOptionUnmarshallerReceptacle[T], Option[T]] { nr ⇒
         filter(nr.name, nr.um: FSOU[T])
       }
-    implicit def forNDUR[T]: ParamDefAux[
-        NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
+    implicit def forNDUR[T]
+      : ParamDefAux[NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
       extractParameter[NameDefaultUnmarshallerReceptacle[T], T] { nr ⇒
         filter[T](nr.name, (nr.um: FSOU[T]) withDefaultValue nr.default)
       }
@@ -176,8 +176,8 @@ object ParameterDirectives extends ParameterDirectives {
       paramDef[RequiredValueReceptacle[T], Directive0] { rvr ⇒
         requiredFilter(rvr.name, fsu, rvr.requiredValue)
       }
-    implicit def forRVDR[T]: ParamDefAux[
-        RequiredValueUnmarshallerReceptacle[T], Directive0] =
+    implicit def forRVDR[T]
+      : ParamDefAux[RequiredValueUnmarshallerReceptacle[T], Directive0] =
       paramDef[RequiredValueUnmarshallerReceptacle[T], Directive0] { rvr ⇒
         requiredFilter(rvr.name, rvr.um, rvr.requiredValue)
       }
@@ -211,8 +211,7 @@ object ParameterDirectives extends ParameterDirectives {
     import akka.http.scaladsl.server.util.TupleOps._
     import akka.http.scaladsl.server.util.BinaryPolyFunc
 
-    implicit def forTuple[T](
-        implicit fold: FoldLeft[
+    implicit def forTuple[T](implicit fold: FoldLeft[
             Directive0, T, ConvertParamDefAndConcatenate.type])
       : ParamDefAux[T, fold.Out] =
       paramDef[T, fold.Out](fold(BasicDirectives.pass, _))

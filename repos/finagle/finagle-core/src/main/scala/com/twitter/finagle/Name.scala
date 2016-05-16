@@ -58,7 +58,8 @@ object Name {
       val id: Any,
       val path: com.twitter.finagle.Path
   )
-      extends Name with Proxy {
+      extends Name
+      with Proxy {
     def self = id
 
     // Workaround for https://issues.scala-lang.org/browse/SI-4807

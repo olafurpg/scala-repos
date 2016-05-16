@@ -71,7 +71,8 @@ class ClusterClientMultiJvmNode4 extends ClusterClientSpec
 class ClusterClientMultiJvmNode5 extends ClusterClientSpec
 
 class ClusterClientSpec
-    extends MultiNodeSpec(ClusterClientSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterClientSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ClusterClientSpec._
 

@@ -41,9 +41,9 @@ trait Internals extends api.Internals { self: SymbolTable =>
       tree.substituteThis(clazz, to)
     def attachments(tree: Tree): Attachments { type Pos = Position } =
       tree.attachments
-    def updateAttachment[T : ClassTag](tree: Tree, attachment: T): tree.type =
+    def updateAttachment[T: ClassTag](tree: Tree, attachment: T): tree.type =
       tree.updateAttachment(attachment)
-    def removeAttachment[T : ClassTag](tree: Tree): tree.type =
+    def removeAttachment[T: ClassTag](tree: Tree): tree.type =
       tree.removeAttachment[T]
     def setPos(tree: Tree, newpos: Position): tree.type = tree.setPos(newpos)
     def setType(tree: Tree, tp: Type): tree.type = tree.setType(tp)
@@ -137,10 +137,10 @@ trait Internals extends api.Internals { self: SymbolTable =>
     def flags(symbol: Symbol): FlagSet = symbol.flags
     def attachments(symbol: Symbol): Attachments { type Pos = Position } =
       symbol.attachments
-    def updateAttachment[T : ClassTag](
+    def updateAttachment[T: ClassTag](
         symbol: Symbol, attachment: T): symbol.type =
       symbol.updateAttachment(attachment)
-    def removeAttachment[T : ClassTag](symbol: Symbol): symbol.type =
+    def removeAttachment[T: ClassTag](symbol: Symbol): symbol.type =
       symbol.removeAttachment[T]
     def setOwner(symbol: Symbol, newowner: Symbol): symbol.type = {
       symbol.owner = newowner; symbol
@@ -214,8 +214,8 @@ trait Internals extends api.Internals { self: SymbolTable =>
       override type TreeDecorator[T <: Tree] = MacroTreeDecoratorApi[T]
       override implicit def treeDecorator[T <: Tree](
           tree: T): TreeDecorator[T] = new MacroTreeDecoratorApi[T](tree)
-      override type TypeTreeDecorator[T <: TypeTree] = MacroTypeTreeDecoratorApi[
-          T]
+      override type TypeTreeDecorator[T <: TypeTree] =
+        MacroTypeTreeDecoratorApi[T]
       override implicit def typeTreeDecorator[T <: TypeTree](
           tt: T): TypeTreeDecorator[T] = new MacroTypeTreeDecoratorApi[T](tt)
       override type SymbolDecorator[T <: Symbol] = MacroSymbolDecoratorApi[T]

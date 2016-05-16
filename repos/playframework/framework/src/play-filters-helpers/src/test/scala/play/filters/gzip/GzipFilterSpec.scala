@@ -113,8 +113,8 @@ object GzipFilterSpec extends PlaySpecification with DataTables {
         Ok("hello").withHeaders(VARY -> "original")) { implicit mat =>
       val result = makeGzipRequest
       checkGzipped(result)
-      header(VARY, result) must beSome.which(
-          header => header contains "original,")
+      header(VARY, result) must beSome.which(header =>
+            header contains "original,")
     }
 
     "preserve original Vary header values and not duplicate case-insensitive ACCEPT-ENCODING" in withApplication(

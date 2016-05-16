@@ -13,7 +13,8 @@ import akka.http.scaladsl.model.Uri
 import akka.http.impl.util.JavaMapping.Implicits._
 
 abstract class HttpOriginRange
-    extends jm.headers.HttpOriginRange with ValueRenderable {
+    extends jm.headers.HttpOriginRange
+    with ValueRenderable {
   def matches(origin: HttpOrigin): Boolean
 
   /** Java API */
@@ -36,7 +37,8 @@ object HttpOriginRange {
 }
 
 final case class HttpOrigin(scheme: String, host: Host)
-    extends jm.headers.HttpOrigin with ValueRenderable {
+    extends jm.headers.HttpOrigin
+    with ValueRenderable {
   def render[R <: Rendering](r: R): r.type =
     host.renderValue(r ~~ scheme ~~ "://")
 }

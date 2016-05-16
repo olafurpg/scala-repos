@@ -7,8 +7,11 @@ import gitbucket.core.util.Implicits._
 import io.github.gitbucket.scalatra.forms._
 
 class MilestonesController
-    extends MilestonesControllerBase with MilestonesService
-    with RepositoryService with AccountService with ReferrerAuthenticator
+    extends MilestonesControllerBase
+    with MilestonesService
+    with RepositoryService
+    with AccountService
+    with ReferrerAuthenticator
     with CollaboratorsAuthenticator
 
 trait MilestonesControllerBase extends ControllerBase {
@@ -71,25 +74,27 @@ trait MilestonesControllerBase extends ControllerBase {
 
   get("/:owner/:repository/issues/milestones/:milestoneId/close")(
       collaboratorsOnly { repository =>
-    params("milestoneId").toIntOpt.flatMap { milestoneId =>
-      getMilestone(repository.owner, repository.name, milestoneId).map {
-        milestone =>
-          closeMilestone(milestone)
-          redirect(
-              s"/${repository.owner}/${repository.name}/issues/milestones")
-      }
+    params("milestoneId").toIntOpt.flatMap {
+      milestoneId =>
+        getMilestone(repository.owner, repository.name, milestoneId).map {
+          milestone =>
+            closeMilestone(milestone)
+            redirect(
+                s"/${repository.owner}/${repository.name}/issues/milestones")
+        }
     } getOrElse NotFound
   })
 
   get("/:owner/:repository/issues/milestones/:milestoneId/open")(
       collaboratorsOnly { repository =>
-    params("milestoneId").toIntOpt.flatMap { milestoneId =>
-      getMilestone(repository.owner, repository.name, milestoneId).map {
-        milestone =>
-          openMilestone(milestone)
-          redirect(
-              s"/${repository.owner}/${repository.name}/issues/milestones")
-      }
+    params("milestoneId").toIntOpt.flatMap {
+      milestoneId =>
+        getMilestone(repository.owner, repository.name, milestoneId).map {
+          milestone =>
+            openMilestone(milestone)
+            redirect(
+                s"/${repository.owner}/${repository.name}/issues/milestones")
+        }
     } getOrElse NotFound
   })
 

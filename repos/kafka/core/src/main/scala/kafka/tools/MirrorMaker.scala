@@ -208,9 +208,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
       }
 
       abortOnSendFailure = options.valueOf(abortOnSendFailureOpt).toBoolean
-      offsetCommitIntervalMs = options
-        .valueOf(offsetCommitIntervalMsOpt)
-        .intValue()
+      offsetCommitIntervalMs =
+        options.valueOf(offsetCommitIntervalMsOpt).intValue()
       val numStreams = options.valueOf(numStreamsOpt).intValue()
 
       Runtime.getRuntime.addShutdownHook(
@@ -306,8 +305,9 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
         }
 
       // Create mirror maker threads.
-      mirrorMakerThreads = (0 until numStreams) map
-      (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
+      mirrorMakerThreads =
+        (0 until numStreams) map
+        (i => new MirrorMakerThread(mirrorMakerConsumers(i), i))
 
       // Create and initialize message handler
       val customMessageHandlerClass = options.valueOf(messageHandlerOpt)
@@ -451,7 +451,9 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
 
   class MirrorMakerThread(mirrorMakerConsumer: MirrorMakerBaseConsumer,
                           val threadId: Int)
-      extends Thread with Logging with KafkaMetricsGroup {
+      extends Thread
+      with Logging
+      with KafkaMetricsGroup {
     private val threadName = "mirrormaker-thread-" + threadId
     private val shutdownLatch: CountDownLatch = new CountDownLatch(1)
     private var lastOffsetCommitMs = System.currentTimeMillis()
@@ -470,7 +472,7 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
         while (!exitingOnSendFailure && !shuttingDown) {
           try {
             while (!exitingOnSendFailure && !shuttingDown &&
-            mirrorMakerConsumer.hasData) {
+                   mirrorMakerConsumer.hasData) {
               val data = mirrorMakerConsumer.receive()
               trace("Sending message with value size %d and offset %d".format(
                       data.value.length, data.offset))
@@ -593,8 +595,8 @@ object MirrorMaker extends Logging with KafkaMetricsGroup {
       extends MirrorMakerBaseConsumer {
     val regex = whitelistOpt.getOrElse(throw new IllegalArgumentException(
             "New consumer only supports whitelist."))
-    var recordIter: java.util.Iterator[
-        ConsumerRecord[Array[Byte], Array[Byte]]] = null
+    var recordIter: java.util.Iterator[ConsumerRecord[
+            Array[Byte], Array[Byte]]] = null
 
     // TODO: we need to manually maintain the consumed offsets for new consumer
     // since its internal consumed position is updated in batch rather than one

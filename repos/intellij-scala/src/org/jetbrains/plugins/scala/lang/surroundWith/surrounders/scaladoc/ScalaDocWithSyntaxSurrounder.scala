@@ -36,7 +36,7 @@ trait ScalaDocWithSyntaxSurrounder extends Surrounder {
         getNewExprText(surroundedText.toString()), elements(0).getManager)
 
     while (newExpr != null &&
-    newExpr.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
+           newExpr.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
       elements(0).getParent.addBefore(newExpr, elements(0))
       newExpr = newExpr.getNextSibling
     }

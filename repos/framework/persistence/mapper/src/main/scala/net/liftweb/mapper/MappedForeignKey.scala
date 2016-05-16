@@ -60,8 +60,9 @@ trait BaseForeignKey extends BaseMappedField {
 }
 
 object MappedForeignKey {
-  implicit def getObj[KeyType, MyOwner <: Mapper[MyOwner], Other <: KeyedMapper[
-          KeyType, Other]](
+  implicit def getObj[KeyType,
+                      MyOwner <: Mapper[MyOwner],
+                      Other <: KeyedMapper[KeyType, Other]](
       in: MappedForeignKey[KeyType, MyOwner, Other]): Box[Other] = in.obj
 }
 
@@ -70,7 +71,8 @@ object MappedForeignKey {
   */
 trait MappedForeignKey[
     KeyType, MyOwner <: Mapper[MyOwner], Other <: KeyedMapper[KeyType, Other]]
-    extends MappedField[KeyType, MyOwner] with LifecycleCallbacks {
+    extends MappedField[KeyType, MyOwner]
+    with LifecycleCallbacks {
   type FieldType <: KeyType
   // type ForeignType <: KeyedMapper[KeyType, Other]
 
@@ -120,8 +122,7 @@ trait MappedForeignKey[
   override protected def dirty_?(b: Boolean) = synchronized {
     // issue 165
     // invalidate if the primary key has changed Issue 370
-    if (_obj.isEmpty ||
-        (_calcedObj && _obj.isDefined && _obj
+    if (_obj.isEmpty || (_calcedObj && _obj.isDefined && _obj
               .openOrThrowException("_obj was just checked as full.")
               .primaryKeyField
               .get != this.i_is_!)) {
@@ -206,7 +207,8 @@ trait MappedForeignKey[
 
 abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
     theOwner: T, _foreignMeta: => KeyedMetaMapper[Long, O])
-    extends MappedLong[T](theOwner) with MappedForeignKey[Long, T, O]
+    extends MappedLong[T](theOwner)
+    with MappedForeignKey[Long, T, O]
     with BaseForeignKey {
   def defined_? = i_is_! > 0L
 
@@ -276,7 +278,8 @@ abstract class MappedStringForeignKey[
     foreign: => KeyedMetaMapper[String, O],
     override val maxLen: Int)
     extends MappedString[T](fieldOwner, maxLen)
-    with MappedForeignKey[String, T, O] with BaseForeignKey {
+    with MappedForeignKey[String, T, O]
+    with BaseForeignKey {
   def defined_? = i_is_! ne null
 
   type KeyType = String

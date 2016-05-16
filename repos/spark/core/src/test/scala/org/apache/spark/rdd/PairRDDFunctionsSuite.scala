@@ -779,8 +779,8 @@ class PairRDDFunctionsSuite extends SparkFunSuite with SharedSparkContext {
           }
         }
       }
-      takeSample.foreach(
-          x => assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
+      takeSample.foreach(x =>
+            assert(1 <= x._2 && x._2 <= n, s"elements not in [1, $n]"))
     }
   }
 }

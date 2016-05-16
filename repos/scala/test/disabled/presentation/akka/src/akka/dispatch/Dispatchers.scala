@@ -208,9 +208,9 @@ object Dispatchers {
     * Utility function that tries to load the specified dispatcher config from the akka.conf
     * or else use the supplied default dispatcher
     */
-  def fromConfig(
-      key: String, default: => MessageDispatcher = defaultGlobalDispatcher)
-    : MessageDispatcher =
+  def fromConfig(key: String,
+                 default: => MessageDispatcher =
+                   defaultGlobalDispatcher): MessageDispatcher =
     config getSection key flatMap from getOrElse default
 
   /*

@@ -32,7 +32,8 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
                                                  sc: SparkContext,
                                                  masters: Array[String])
     extends CoarseGrainedSchedulerBackend(scheduler, sc.env.rpcEnv)
-    with AppClientListener with Logging {
+    with AppClientListener
+    with Logging {
 
   private var client: AppClient = null
   private var stopping = false

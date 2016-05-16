@@ -55,8 +55,8 @@ private[spark] class MesosDriverDescription(
            schedulerProperties: Map[String, String] = schedulerProperties,
            submissionId: String = submissionId,
            submissionDate: Date = submissionDate,
-           retryState: Option[MesosClusterRetryState] = retryState)
-    : MesosDriverDescription = {
+           retryState: Option[MesosClusterRetryState] =
+             retryState): MesosDriverDescription = {
     new MesosDriverDescription(name,
                                jarUrl,
                                mem,

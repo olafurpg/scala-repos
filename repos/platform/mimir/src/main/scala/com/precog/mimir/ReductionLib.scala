@@ -659,8 +659,8 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val StdDevMonoid = implicitly[Monoid[StdDev.Result]]
     object StdDev extends Reduction(ReductionNamespace, "stdDev") {
       type Result = Option[InitialResult]
-      type InitialResult = (Long, BigDecimal,
-      BigDecimal) // (count, sum, sumsq)
+      type InitialResult =
+        (Long, BigDecimal, BigDecimal) // (count, sum, sumsq)
 
       implicit val monoid = StdDevMonoid
 

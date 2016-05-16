@@ -42,7 +42,8 @@ private[spark] object FixedLengthBinaryInputFormat {
 }
 
 private[spark] class FixedLengthBinaryInputFormat
-    extends FileInputFormat[LongWritable, BytesWritable] with Logging {
+    extends FileInputFormat[LongWritable, BytesWritable]
+    with Logging {
 
   private var recordLength = -1
 

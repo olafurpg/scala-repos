@@ -36,8 +36,10 @@ object TypeCheckerWithExplicitTypes_Monadic {
                        "if required bool in test position, but got: " + t)
           lt <- typeCheck(texp, env)
           rt <- typeCheck(fexp, env)
-          res <- compare(
-              lt, rt, lt, "if branches not the same type, got: " + (lt, rt))
+          res <- compare(lt,
+                         rt,
+                         lt,
+                         "if branches not the same type, got: " + (lt, rt))
         } yield res
       case Fun(arg, argType, body) =>
         for {
@@ -50,16 +52,17 @@ object TypeCheckerWithExplicitTypes_Monadic {
           operatorType <- typeCheck(operator, env)
           operandType <- typeCheck(operand, env)
           res <- operatorType match {
-            case TyLam(argType, resultType) =>
-              compare(argType,
-                      operandType,
-                      resultType,
-                      "function expected arg of type: " + argType +
-                      ", but got: " + operandType)
-            case _ =>
-              typeError("function application expected function, but got: " +
-                  operatorType)
-          }
+                  case TyLam(argType, resultType) =>
+                    compare(argType,
+                            operandType,
+                            resultType,
+                            "function expected arg of type: " + argType +
+                            ", but got: " + operandType)
+                  case _ =>
+                    typeError(
+                        "function application expected function, but got: " +
+                        operatorType)
+                }
         } yield res
     }
 }

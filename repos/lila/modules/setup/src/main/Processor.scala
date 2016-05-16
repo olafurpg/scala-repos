@@ -67,6 +67,6 @@ private[setup] final class Processor(lobby: ActorSelection,
 
   private def saveConfig(map: UserConfig => UserConfig)(
       implicit ctx: UserContext): Funit =
-    ctx.me.fold(AnonConfigRepo.update(ctx.req) _)(
-        user => UserConfigRepo.update(user) _)(map)
+    ctx.me.fold(AnonConfigRepo.update(ctx.req) _)(user =>
+          UserConfigRepo.update(user) _)(map)
 }

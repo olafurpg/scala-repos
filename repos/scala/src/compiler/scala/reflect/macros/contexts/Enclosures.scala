@@ -12,9 +12,9 @@ trait Enclosures { self: Context =>
   private lazy val enclPoses =
     enclosingMacros map (_.macroApplication.pos) filterNot (_ eq NoPosition)
 
-  private def lenientEnclosure[T <: Tree : ClassTag]: Tree =
+  private def lenientEnclosure[T <: Tree: ClassTag]: Tree =
     enclTrees collectFirst { case x: T => x } getOrElse EmptyTree
-  private def strictEnclosure[T <: Tree : ClassTag]: T =
+  private def strictEnclosure[T <: Tree: ClassTag]: T =
     enclTrees collectFirst { case x: T => x } getOrElse
     (throw new EnclosureException(classTag[T].runtimeClass, enclTrees))
 

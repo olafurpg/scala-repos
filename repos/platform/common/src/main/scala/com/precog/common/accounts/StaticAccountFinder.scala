@@ -36,7 +36,8 @@ class StaticAccountFinder[M[+ _]: Monad](accountId: AccountId,
                                          apiKey: APIKey,
                                          rootPath: Option[String] = None,
                                          email: String = "static@precog.com")
-    extends AccountFinder[M] with Logging {
+    extends AccountFinder[M]
+    with Logging {
   private[this] val details = Some(
       AccountDetails(accountId,
                      email,

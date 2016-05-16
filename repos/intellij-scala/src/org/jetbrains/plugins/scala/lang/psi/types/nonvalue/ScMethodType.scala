@@ -160,8 +160,11 @@ object TypeParameter {
     new TypeParameter(name, typeParams, lowerType, upperType, ptp)
   }
 
-  def unapply(t: TypeParameter): Option[
-      (String, Seq[TypeParameter], () => ScType, () => ScType, PsiTypeParameter)] = {
+  def unapply(t: TypeParameter): Option[(String,
+                                         Seq[TypeParameter],
+                                         () => ScType,
+                                         () => ScType,
+                                         PsiTypeParameter)] = {
     Some(t.name, t.typeParams, t.lowerType, t.upperType, t.ptp)
   }
 
@@ -185,21 +188,19 @@ case class ScMethodType(
   override def typeDepth: Int = returnType.typeDepth
 
   def inferValueType: ValueType = {
-    ScFunctionType(returnType.inferValueType,
-                   params.map(p =>
-                         {
-                       val inferredParamType = p.paramType.inferValueType
-                       if (!p.isRepeated) inferredParamType
-                       else {
-                         val seqClass = ScalaPsiManager
-                           .instance(project)
-                           .getCachedClass(scope, "scala.collection.Seq")
-                         seqClass.fold(inferredParamType) { inferred =>
-                           ScParameterizedType(ScDesignatorType(inferred),
-                                               Seq(inferredParamType))
-                         }
-                       }
-                   }))(project, scope)
+    ScFunctionType(returnType.inferValueType, params.map(p => {
+      val inferredParamType = p.paramType.inferValueType
+      if (!p.isRepeated) inferredParamType
+      else {
+        val seqClass = ScalaPsiManager
+          .instance(project)
+          .getCachedClass(scope, "scala.collection.Seq")
+        seqClass.fold(inferredParamType) { inferred =>
+          ScParameterizedType(ScDesignatorType(inferred),
+                              Seq(inferredParamType))
+        }
+      }
+    }))(project, scope)
   }
 
   override def removeAbstracts =
@@ -240,10 +241,11 @@ case class ScMethodType(
             returnType.recursiveVarianceUpdateModifiable(
                 newData, update, variance),
             params.map(p =>
-                  p.copy(paramType = p.paramType
-                          .recursiveVarianceUpdateModifiable(newData,
-                                                             update,
-                                                             -variance))),
+                  p.copy(paramType =
+                        p.paramType.recursiveVarianceUpdateModifiable(
+                            newData,
+                            update,
+                            -variance))),
             isImplicit)(project, scope)
     }
   }
@@ -292,40 +294,37 @@ case class ScTypePolymorphicType(
 
   def polymorphicTypeSubstitutor(inferValueType: Boolean): ScSubstitutor =
     new ScSubstitutor(
-        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
-            var contraVariant = 0
-            var coOrInVariant = 0
-            internalType.recursiveVarianceUpdate {
-              case (typez: ScType, i: Int) =>
-                val pair = typez match {
-                  case tp: ScTypeParameterType =>
-                    (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
-                  case ScUndefinedType(tp) =>
-                    (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
-                  case ScAbstractType(tp, _, _) =>
-                    (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
-                  case _ => null
-                }
-                if (pair != null) {
-                  val (tpName, id) = pair
-                  if (tp.name == tpName &&
-                      id == ScalaPsiUtil.getPsiElementId(tp.ptp)) {
-                    if (i == -1) contraVariant += 1
-                    else coOrInVariant += 1
-                  }
-                }
-                (false, typez)
+        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp => {
+      var contraVariant = 0
+      var coOrInVariant = 0
+      internalType.recursiveVarianceUpdate {
+        case (typez: ScType, i: Int) =>
+          val pair = typez match {
+            case tp: ScTypeParameterType =>
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
+            case ScUndefinedType(tp) =>
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
+            case ScAbstractType(tp, _, _) =>
+              (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
+            case _ => null
+          }
+          if (pair != null) {
+            val (tpName, id) = pair
+            if (tp.name == tpName &&
+                id == ScalaPsiUtil.getPsiElementId(tp.ptp)) {
+              if (i == -1) contraVariant += 1
+              else coOrInVariant += 1
             }
-            if (coOrInVariant == 0 && contraVariant != 0)
-              ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-               tp.upperType().inferValueType)
-            else
-              ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-               tp.lowerType().inferValueType)
-        }),
-        Map.empty,
-        None)
+          }
+          (false, typez)
+      }
+      if (coOrInVariant == 0 && contraVariant != 0)
+        ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+         tp.upperType().inferValueType)
+      else
+        ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+         tp.lowerType().inferValueType)
+    }), Map.empty, None)
 
   def abstractTypeSubstitutor: ScSubstitutor = {
     def hasRecursiveTypeParameters(typez: ScType): Boolean = {
@@ -345,22 +344,19 @@ case class ScTypePolymorphicType(
       hasRecursiveTypeParameters
     }
     new ScSubstitutor(
-        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
-            val lowerType: ScType =
-              if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
-              else tp.lowerType()
-            val upperType: ScType =
-              if (hasRecursiveTypeParameters(tp.upperType())) Any
-              else tp.upperType()
-            ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-             new ScAbstractType(new ScTypeParameterType(tp.ptp,
-                                                        ScSubstitutor.empty),
-                                lowerType,
-                                upperType))
-        }),
-        Map.empty,
-        None)
+        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp => {
+      val lowerType: ScType =
+        if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
+        else tp.lowerType()
+      val upperType: ScType =
+        if (hasRecursiveTypeParameters(tp.upperType())) Any
+        else tp.upperType()
+      ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+       new ScAbstractType(new ScTypeParameterType(tp.ptp,
+                                                  ScSubstitutor.empty),
+                          lowerType,
+                          upperType))
+    }), Map.empty, None)
   }
 
   def abstractOrLowerTypeSubstitutor: ScSubstitutor = {
@@ -381,24 +377,21 @@ case class ScTypePolymorphicType(
       hasRecursiveTypeParameters
     }
     new ScSubstitutor(
-        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
-            val lowerType: ScType =
-              if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
-              else tp.lowerType()
-            val upperType: ScType =
-              if (hasRecursiveTypeParameters(tp.upperType())) Any
-              else tp.upperType()
-            ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-             if (lowerType.equiv(Nothing))
-               new ScAbstractType(new ScTypeParameterType(tp.ptp,
-                                                          ScSubstitutor.empty),
-                                  lowerType,
-                                  upperType)
-             else lowerType)
-        }),
-        Map.empty,
-        None)
+        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp => {
+      val lowerType: ScType =
+        if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
+        else tp.lowerType()
+      val upperType: ScType =
+        if (hasRecursiveTypeParameters(tp.upperType())) Any
+        else tp.upperType()
+      ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+       if (lowerType.equiv(Nothing))
+         new ScAbstractType(new ScTypeParameterType(tp.ptp,
+                                                    ScSubstitutor.empty),
+                            lowerType,
+                            upperType)
+       else lowerType)
+    }), Map.empty, None)
   }
 
   def typeParameterTypeSubstitutor: ScSubstitutor =
@@ -416,16 +409,13 @@ case class ScTypePolymorphicType(
 
   override def removeAbstracts =
     ScTypePolymorphicType(
-        internalType.removeAbstracts,
-        typeParameters.map(
-            tp =>
-              {
-            TypeParameter(tp.name,
-                          tp.typeParams /* todo: ? */,
-                          () => tp.lowerType().removeAbstracts,
-                          () => tp.upperType().removeAbstracts,
-                          tp.ptp)
-        }))
+        internalType.removeAbstracts, typeParameters.map(tp => {
+      TypeParameter(tp.name,
+                    tp.typeParams /* todo: ? */,
+                    () => tp.lowerType().removeAbstracts,
+                    () => tp.upperType().removeAbstracts,
+                    tp.ptp)
+    }))
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
                                visited: HashSet[ScType]): ScType = {
@@ -441,21 +431,16 @@ case class ScTypePolymorphicType(
       case _ =>
         ScTypePolymorphicType(
             internalType.recursiveUpdate(update, newVisited),
-            typeParameters.map(tp =>
-                  {
-                TypeParameter(tp.name, tp.typeParams /* todo: ? */, {
-                  val res = tp
-                    .lowerType()
-                    .recursiveUpdate(update, newVisited)
-                    () =>
-                      res
-                }, {
-                  val res = tp
-                    .upperType()
-                    .recursiveUpdate(update, newVisited)
-                    () =>
-                      res
-                }, tp.ptp)
+            typeParameters.map(tp => {
+              TypeParameter(tp.name, tp.typeParams /* todo: ? */, {
+                val res = tp.lowerType().recursiveUpdate(update, newVisited)
+                () =>
+                  res
+              }, {
+                val res = tp.upperType().recursiveUpdate(update, newVisited)
+                () =>
+                  res
+              }, tp.ptp)
             }))
     }
   }
@@ -470,19 +455,18 @@ case class ScTypePolymorphicType(
         ScTypePolymorphicType(
             internalType.recursiveVarianceUpdateModifiable(
                 newData, update, variance),
-            typeParameters.map(tp =>
-                  {
-                TypeParameter(tp.name,
-                              tp.typeParams /* todo: ? */,
-                              () =>
-                                tp.lowerType()
-                                  .recursiveVarianceUpdateModifiable(
-                                      newData, update, -variance),
-                              () =>
-                                tp.upperType()
-                                  .recursiveVarianceUpdateModifiable(
-                                      newData, update, variance),
-                              tp.ptp)
+            typeParameters.map(tp => {
+              TypeParameter(tp.name,
+                            tp.typeParams /* todo: ? */,
+                            () =>
+                              tp.lowerType()
+                                .recursiveVarianceUpdateModifiable(
+                                    newData, update, -variance),
+                            () =>
+                              tp.upperType()
+                                .recursiveVarianceUpdateModifiable(
+                                    newData, update, variance),
+                            tp.ptp)
             }))
     }
   }

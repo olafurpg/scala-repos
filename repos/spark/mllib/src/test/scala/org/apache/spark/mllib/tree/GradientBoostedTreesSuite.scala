@@ -32,7 +32,9 @@ import org.apache.spark.util.Utils
   * Test suite for [[GradientBoostedTrees]].
   */
 class GradientBoostedTreesSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Logging {
 
   test("Regression with continuous features: SquaredError") {
     GradientBoostedTreesSuite.testCombinations.foreach {
@@ -148,8 +150,10 @@ class GradientBoostedTreesSuite
 
   test(
       "SPARK-5496: BoostingStrategy.defaultParams should recognize Classification") {
-    for (algo <- Seq(
-        "classification", "Classification", "regression", "Regression")) {
+    for (algo <- Seq("classification",
+                     "Classification",
+                     "regression",
+                     "Regression")) {
       BoostingStrategy.defaultParams(algo)
     }
   }
@@ -207,8 +211,8 @@ class GradientBoostedTreesSuite
         val gbt = new GradientBoostedTrees(boostingStrategy).run(trainRdd)
         val (errorWithoutValidation, errorWithValidation) = {
           if (algo == Classification) {
-            val remappedRdd = validateRdd.map(
-                x => new LabeledPoint(2 * x.label - 1, x.features))
+            val remappedRdd = validateRdd.map(x =>
+                  new LabeledPoint(2 * x.label - 1, x.features))
             (loss.computeError(gbt, remappedRdd),
              loss.computeError(gbtValidate, remappedRdd))
           } else {

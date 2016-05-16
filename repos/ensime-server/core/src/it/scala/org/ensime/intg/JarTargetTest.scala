@@ -12,8 +12,10 @@ import scala.concurrent.duration._
   * Tests a project that uses jars instead of classfiles in the target.
   */
 class JarTargetTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.SimpleJarTestProject
 
@@ -59,8 +61,10 @@ class JarTargetTest
   * Variant of JarTargetTest with jars missing on startup.
   */
 class MissingJarTargetTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.SimpleJarTestProject
 

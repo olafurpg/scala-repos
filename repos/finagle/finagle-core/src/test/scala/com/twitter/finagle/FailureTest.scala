@@ -9,7 +9,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class FailureTest
-    extends FunSuite with AssertionsForJUnit
+    extends FunSuite
+    with AssertionsForJUnit
     with GeneratorDrivenPropertyChecks {
   val exc =
     Gen.oneOf[Throwable](null, new Exception("first"), new Exception("second"))

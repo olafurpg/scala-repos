@@ -46,7 +46,8 @@ object ToolBar {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ToolBar.html]].
   */
 class ToolBar(override val delegate: jfxsc.ToolBar = new jfxsc.ToolBar)
-    extends Control(delegate) with SFXDelegate[jfxsc.ToolBar] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ToolBar] {
 
   /**
     * The items contained in the ToolBar.

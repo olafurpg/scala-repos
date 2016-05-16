@@ -41,4 +41,5 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class WebViewSpec
     extends SimpleSFXDelegateSpec[jfxsw.WebView, WebView](
-        classOf[jfxsw.WebView], classOf[WebView]) with RunOnApplicationThread
+        classOf[jfxsw.WebView], classOf[WebView])
+    with RunOnApplicationThread

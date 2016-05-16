@@ -172,7 +172,7 @@ object CompilationData {
       module = target.getModule
       output = target.getOutputDir
       sourceRoot <- module.getSourceRoots.asScala.map(_.getFile)
-                       if sourceRoot.exists
+      if sourceRoot.exists
     } yield (sourceRoot, output)
   }
 

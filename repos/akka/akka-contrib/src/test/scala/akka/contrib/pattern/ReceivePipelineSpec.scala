@@ -190,7 +190,8 @@ object PersistentReceivePipelineSpec {
   }
 }
 class PersistentReceivePipelineSpec(config: Config)
-    extends AkkaSpec(config) with ImplicitSender {
+    extends AkkaSpec(config)
+    with ImplicitSender {
   import ReceivePipelineSpec._
   import PersistentReceivePipelineSpec._
 
@@ -444,7 +445,9 @@ object MixinSample extends App {
 
   //#mixin-actor
   class PrinterActor
-      extends Actor with ReceivePipeline with I18nInterceptor
+      extends Actor
+      with ReceivePipeline
+      with I18nInterceptor
       with AuditInterceptor {
 
     override def receive: Receive = {

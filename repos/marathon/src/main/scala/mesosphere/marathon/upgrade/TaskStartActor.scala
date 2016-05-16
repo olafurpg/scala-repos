@@ -18,7 +18,9 @@ class TaskStartActor(val driver: SchedulerDriver,
                      val app: AppDefinition,
                      val scaleTo: Int,
                      promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+    extends Actor
+    with ActorLogging
+    with StartingBehavior {
 
   val nrToStart: Int =
     scaleTo - taskQueue

@@ -26,14 +26,15 @@ private[scalajs] object UseAsMacros {
   import scala.reflect.macros._
   import blackbox.Context
 
-  def as_impl[A : c.WeakTypeTag, B <: js.Any : c.WeakTypeTag](
+  def as_impl[A: c.WeakTypeTag, B <: js.Any: c.WeakTypeTag](
       c: Context { type PrefixType = js.Using[_] }): c.Expr[B] = {
     (new Macros[c.type](c)).as[A, B]
   }
 
   private class Macros[C <: Context { type PrefixType = js.Using[_] }](
       val c: C)
-      extends JSMembers with Compat210Component {
+      extends JSMembers
+      with Compat210Component {
 
     import c.universe._
 
@@ -53,7 +54,7 @@ private[scalajs] object UseAsMacros {
 
     type JSMemberSet = Map[JSMemberSelection, List[JSMember]]
 
-    def as[A : WeakTypeTag, B <: js.Any : WeakTypeTag]: Expr[B] = {
+    def as[A: WeakTypeTag, B <: js.Any: WeakTypeTag]: Expr[B] = {
       val trgTpe = verifyTargetType(weakTypeOf[B])
       val srcTpe = weakTypeOf[A]
 

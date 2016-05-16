@@ -71,11 +71,10 @@ object SerializerPropertiesSuite extends Assertions {
         () => rand.nextBoolean(),
         () => (rand.nextInt(), rand.nextString(rand.nextInt(10))),
         () => MyCaseClass(rand.nextInt(), rand.nextString(rand.nextInt(10))),
-        () =>
-          {
-            val x =
-              MyCaseClass(rand.nextInt(), rand.nextString(rand.nextInt(10)))
-            (x, x)
+        () => {
+          val x =
+            MyCaseClass(rand.nextInt(), rand.nextString(rand.nextInt(10)))
+          (x, x)
         }
     )
     randomFunctions(rand.nextInt(randomFunctions.size)).apply()

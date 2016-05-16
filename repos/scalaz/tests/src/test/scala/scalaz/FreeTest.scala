@@ -29,8 +29,7 @@ object FreeList extends FreeListInstances {
       FreeList(Monad[Free[List, ?]].point(a))
 
     def bind[A, B](fa: FreeList[A])(f: A => FreeList[B]): FreeList[B] =
-      FreeList(
-          Monad[Free[List, ?]].bind(fa.f) { a =>
+      FreeList(Monad[Free[List, ?]].bind(fa.f) { a =>
         f(a).f
       })
 
@@ -46,7 +45,7 @@ object FreeList extends FreeListInstances {
               Gen
                 .choose(0, 2)
                 .flatMap(Gen.listOfN(_, freeListArb[A].arbitrary.map(_.f)))
-            )
+          )
           .map(FreeList.apply))
 
   implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] =
@@ -55,7 +54,7 @@ object FreeList extends FreeListInstances {
         Equal[List[A]].equal(a.f.runM(identity), b.f.runM(identity))
     }
 
-  implicit def freeListMonoid[A : Monoid]: Monoid[FreeList[A]] =
+  implicit def freeListMonoid[A: Monoid]: Monoid[FreeList[A]] =
     new Monoid[FreeList[A]] {
       def zero = FreeList(Monoid[Free[List, A]].zero)
 
@@ -63,7 +62,7 @@ object FreeList extends FreeListInstances {
         FreeList(Monoid[Free[List, A]].append(f1.f, f2.f))
     }
 
-  implicit def freeListSemigroup[A : Semigroup]: Semigroup[FreeList[A]] =
+  implicit def freeListSemigroup[A: Semigroup]: Semigroup[FreeList[A]] =
     new Semigroup[FreeList[A]] {
       def append(f1: FreeList[A], f2: => FreeList[A]) =
         FreeList(Semigroup[Free[List, A]].append(f1.f, f2.f))
@@ -79,14 +78,12 @@ object FreeOption {
         FreeOption(Functor[Free[Option, ?]].map(fa.f)(f))
 
       def tailrecM[A, B](f: A => FreeOption[A \/ B])(a: A): FreeOption[B] =
-        FreeOption(
-            BindRec[Free[Option, ?]].tailrecM[A, B] { a =>
+        FreeOption(BindRec[Free[Option, ?]].tailrecM[A, B] { a =>
           f(a).f
         }(a))
 
       def bind[A, B](fa: FreeOption[A])(f: A => FreeOption[B]): FreeOption[B] =
-        FreeOption(
-            Bind[Free[Option, ?]].bind(fa.f) { a =>
+        FreeOption(Bind[Free[Option, ?]].bind(fa.f) { a =>
           f(a).f
         })
     }
@@ -101,7 +98,7 @@ object FreeOption {
                 .flatMap(Gen
                       .listOfN(_, freeOptionArb[A].arbitrary.map(_.f))
                       .map(_.headOption))
-              )
+          )
           .map(FreeOption.apply))
 
   implicit def freeOptionEq[A](implicit A: Equal[A]): Equal[FreeOption[A]] =
@@ -112,8 +109,8 @@ object FreeOption {
 }
 
 object FreeTest extends SpecLite {
-  def freeGen[F[_], A](
-      g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
+  def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(
+      implicit A: Arbitrary[A]): Gen[Free[F, A]] =
     Gen.frequency(
         (1, Functor[Arbitrary].map(A)(Free.pure[F, A](_)).arbitrary),
         (1, Functor[Arbitrary].map(Arbitrary(g))(Free[F, A](_)).arbitrary)
@@ -165,18 +162,18 @@ object FreeTest extends SpecLite {
   object instances {
     def bindRec[F[_]] = BindRec[Free[F, ?]]
     def monad[F[_]] = Monad[Free[F, ?]]
-    def foldable[F[_]: Foldable : Functor] = Foldable[Free[F, ?]]
-    def foldable1[F[_]: Foldable1 : Functor] = Foldable1[Free[F, ?]]
+    def foldable[F[_]: Foldable: Functor] = Foldable[Free[F, ?]]
+    def foldable1[F[_]: Foldable1: Functor] = Foldable1[Free[F, ?]]
     def traverse[F[_]: Traverse] = Traverse[Free[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[Free[F, ?]]
-    def monoid[F[_], A : Monoid] = Monoid[Free[F, A]]
-    def semigroup[F[_], A : Semigroup] = Semigroup[Free[F, A]]
+    def monoid[F[_], A: Monoid] = Monoid[Free[F, A]]
+    def semigroup[F[_], A: Semigroup] = Semigroup[Free[F, A]]
 
     // checking absence of ambiguity
     def functor[F[_]: Traverse1] = Functor[Free[F, ?]]
     def foldable[F[_]: Traverse1] = Foldable[Free[F, ?]]
     def foldable1[F[_]: Traverse1] = Foldable1[Free[F, ?]]
     def traverse[F[_]: Traverse1] = Traverse[Free[F, ?]]
-    def semigroup[F[_], A : Monoid] = Semigroup[Free[F, A]]
+    def semigroup[F[_], A: Monoid] = Semigroup[Free[F, A]]
   }
 }

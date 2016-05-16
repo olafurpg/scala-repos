@@ -94,8 +94,8 @@ trait HashJoinable[K, +V] extends CoGroupable[K, V] with KeyedPipe[K] {
       case eachPipe: Each =>
         if (canSkipEachOperation(eachPipe.getOperation, mode)) {
           //need to recurse down to see if parent pipe is ok
-          getPreviousPipe(eachPipe).exists(
-              prevPipe => isSafeToSkipForceToDisk(prevPipe, mode))
+          getPreviousPipe(eachPipe).exists(prevPipe =>
+                isSafeToSkipForceToDisk(prevPipe, mode))
         } else false
       case _: Checkpoint => true
       case _: GroupBy => true

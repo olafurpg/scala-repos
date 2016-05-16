@@ -47,7 +47,8 @@ trait PressAndHoldable[+This <: View] {
   def basis: This
 
   class PressAndHoldListener(interval: Int, onPressed: () => Unit)
-      extends View.OnTouchListener with View.OnLongClickListener {
+      extends View.OnTouchListener
+      with View.OnLongClickListener {
     var autoIncrementing: Boolean = false
     private val repeatUpdateHandler = new android.os.Handler()
 
@@ -98,7 +99,8 @@ class RichView[This <: android.view.View](val basis: This)
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/View.html android.view.View]]`. This contains several property accessors.
   */
 trait TraitView[This <: android.view.View]
-    extends ConstantsSupport with PressAndHoldable[This] {
+    extends ConstantsSupport
+    with PressAndHoldable[This] {
 
   def basis: This
 
@@ -189,7 +191,7 @@ trait TraitView[This <: android.view.View]
   // TODO: Make the return type as Option[TraitViewGroup[_]]
   protected def parentViewGroupIfExists[LP <: ViewGroupLayoutParams[_, _]](
       implicit defaultLayoutParam: This => LP = (v: This) =>
-          null): TraitViewGroup[_] = {
+        null): TraitViewGroup[_] = {
     val lp = defaultLayoutParam(basis)
     if (lp == null) null else lp.parent
   }
@@ -1895,8 +1897,9 @@ trait TraitView[This <: android.view.View]
   }
 
   @inline
-  def onCreateContextMenu[U](f: (android.view.ContextMenu, android.view.View,
-      android.view.ContextMenu.ContextMenuInfo) => U): This = {
+  def onCreateContextMenu[U](
+      f: (android.view.ContextMenu, android.view.View,
+          android.view.ContextMenu.ContextMenuInfo) => U): This = {
     basis.setOnCreateContextMenuListener(
         new android.view.View.OnCreateContextMenuListener {
       def onCreateContextMenu(p1: android.view.ContextMenu,
@@ -2023,19 +2026,20 @@ trait TraitView[This <: android.view.View]
   @inline
   def onLayoutChange[U](
       f: (android.view.View, Int, Int, Int, Int, Int, Int, Int,
-      Int) => U): This = {
+          Int) => U): This = {
     basis.addOnLayoutChangeListener(
         new android.view.View.OnLayoutChangeListener {
-      def onLayoutChange(
-          p1: android.view.View,
-          p2: Int,
-          p3: Int,
-          p4: Int,
-          p5: Int,
-          p6: Int,
-          p7: Int,
-          p8: Int,
-          p9: Int): Unit = { f(p1, p2, p3, p4, p5, p6, p7, p8, p9) }
+      def onLayoutChange(p1: android.view.View,
+                         p2: Int,
+                         p3: Int,
+                         p4: Int,
+                         p5: Int,
+                         p6: Int,
+                         p7: Int,
+                         p8: Int,
+                         p9: Int): Unit = {
+        f(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+      }
     })
     basis
   }
@@ -2150,7 +2154,8 @@ trait TraitView[This <: android.view.View]
   */
 class SView()(implicit context: android.content.Context,
               parentVGroup: TraitViewGroup[_] = null)
-    extends android.view.View(context) with TraitView[SView] {
+    extends android.view.View(context)
+    with TraitView[SView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -2610,7 +2615,8 @@ trait ViewGroupLayoutParams[+This <: ViewGroupLayoutParams[_, _], V <: View]
 
 trait ViewGroupMarginLayoutParams[
     +This <: ViewGroupMarginLayoutParams[_, _], V <: View]
-    extends ViewGroup.MarginLayoutParams with ViewGroupLayoutParams[This, V] {
+    extends ViewGroup.MarginLayoutParams
+    with ViewGroupLayoutParams[This, V] {
 
   def marginBottom(size: Int) = {
     bottomMargin = size

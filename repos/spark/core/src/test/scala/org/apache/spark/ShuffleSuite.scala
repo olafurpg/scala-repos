@@ -31,7 +31,9 @@ import org.apache.spark.storage.{ShuffleBlockId, ShuffleDataBlockId}
 import org.apache.spark.util.MutablePair
 
 abstract class ShuffleSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   val conf = new SparkConf(loadDefaults = false)
 
@@ -74,8 +76,8 @@ abstract class ShuffleSuite
     (0 until NUM_BLOCKS).foreach { id =>
       val statuses =
         SparkEnv.get.mapOutputTracker.getMapSizesByExecutorId(shuffleId, id)
-      assert(statuses.forall(
-              _._2.forall(blockIdSizePair => blockIdSizePair._2 > 0)))
+      assert(statuses.forall(_._2.forall(blockIdSizePair =>
+                    blockIdSizePair._2 > 0)))
     }
   }
 
@@ -257,7 +259,7 @@ abstract class ShuffleSuite
 
   test("shuffle with different compression settings (SPARK-3426)") {
     for (shuffleSpillCompress <- Set(true, false);
-    shuffleCompress <- Set(true, false)) {
+         shuffleCompress <- Set(true, false)) {
       val myConf = conf
         .clone()
         .setAppName("test")

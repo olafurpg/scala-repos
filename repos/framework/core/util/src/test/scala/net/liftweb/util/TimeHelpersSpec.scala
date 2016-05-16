@@ -34,7 +34,9 @@ import org.specs2.time.NoTimeConversions
   * Systems under specification for TimeHelpers.
   */
 object TimeHelpersSpec
-    extends Specification with ScalaCheck with TimeAmountsGen
+    extends Specification
+    with ScalaCheck
+    with TimeAmountsGen
     with NoTimeConversions {
   "TimeHelpers Specification".title
 
@@ -107,24 +109,22 @@ object TimeHelpersSpec
       3.seconds.ago.getMillis must beCloseTo(expectedTime, 1000L)
     }
     "have a toString method returning the relevant number of weeks, days, hours, minutes, seconds, millis" in forAllTimeZones {
-      val conversionIsOk = forAll(timeAmounts)(
-          (t: TimeAmounts) =>
-            {
-          val (timeSpanToString, timeSpanAmounts) = t
-          timeSpanAmounts forall {
-            case (amount, unit) =>
-              amount >= 1 && timeSpanToString.contains(amount.toString) || true
-          }
+      val conversionIsOk = forAll(timeAmounts)((t: TimeAmounts) => {
+        val (timeSpanToString, timeSpanAmounts) = t
+        timeSpanAmounts forall {
+          case (amount, unit) =>
+            amount >= 1 && timeSpanToString.contains(amount.toString) || true
+        }
       })
-      val timeSpanStringIsPluralized = forAll(timeAmounts)((t: TimeAmounts) =>
-            {
-          val (timeSpanToString, timeSpanAmounts) = t
-          timeSpanAmounts forall {
-            case (amount, unit) =>
-              amount > 1 && timeSpanToString.contains(unit + "s") ||
-              amount == 1 && timeSpanToString.contains(unit) ||
-              amount == 0 && !timeSpanToString.contains(unit)
-          }
+      val timeSpanStringIsPluralized = forAll(timeAmounts)(
+          (t: TimeAmounts) => {
+        val (timeSpanToString, timeSpanAmounts) = t
+        timeSpanAmounts forall {
+          case (amount, unit) =>
+            amount > 1 && timeSpanToString.contains(unit + "s") ||
+            amount == 1 && timeSpanToString.contains(unit) || amount == 0 &&
+            !timeSpanToString.contains(unit)
+        }
       })
       conversionIsOk && timeSpanStringIsPluralized
     }
@@ -254,7 +254,7 @@ object TimeHelpersSpec
 object forAllTimeZones extends Around {
   import MatchersImplicits._
 
-  override def around[T : AsResult](f: => T) = synchronized {
+  override def around[T: AsResult](f: => T) = synchronized {
     // setDefault is on static context so tests should be sequenced
     import collection.convert.wrapAsScala._
     // some timezones for java (used in formatters) and for Joda (other computations) has other offset
@@ -294,7 +294,8 @@ trait TimeAmountsGen {
   } yield
     (
         TimeSpan(weeks(w) + days(d) + hours(h) + minutes(m) + seconds(s) + ml).toString,
-        (w, "week") :: (d, "day") :: (h, "hour") :: (m, "minute") :: (
-            s, "second") :: (ml, "milli") :: Nil
+        (w, "week") :: (d, "day") :: (h, "hour") :: (m, "minute") :: (s,
+                                                                      "second") :: (ml,
+                                                                                    "milli") :: Nil
     )
 }

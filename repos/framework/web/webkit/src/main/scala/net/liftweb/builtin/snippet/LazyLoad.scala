@@ -62,24 +62,22 @@ object LazyLoad extends DispatchSnippet {
     val placeholderId = Helpers.nextFuncName
 
     handleMarkupBox(
-        AsyncRenderComet
-          .asyncRender(() => renderer(placeholderId))
-          .map { _ =>
-            ("^ [id]" #> placeholderId).apply(
-                placeholderTemplate or {
-                  for {
-                    templatePath <- S.attr("template")
-                    renderedTemplate <- S.eval(
-                        <lift:embed what={templatePath} />)
-                  } yield {
-                    renderedTemplate
-                  }
-                } openOr {
-                  <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
+        AsyncRenderComet.asyncRender(() => renderer(placeholderId)).map { _ =>
+          ("^ [id]" #> placeholderId).apply(
+              placeholderTemplate or {
+                for {
+                  templatePath <- S.attr("template")
+                  renderedTemplate <- S.eval(
+                                         <lift:embed what={templatePath} />)
+                } yield {
+                  renderedTemplate
                 }
-            )
-          }
-      )
+              } openOr {
+                <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
+              }
+          )
+        }
+    )
   }
 
   /**

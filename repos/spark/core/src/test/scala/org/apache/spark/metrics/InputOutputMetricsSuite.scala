@@ -38,7 +38,9 @@ import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskEnd}
 import org.apache.spark.util.Utils
 
 class InputOutputMetricsSuite
-    extends SparkFunSuite with SharedSparkContext with BeforeAndAfter {
+    extends SparkFunSuite
+    with SharedSparkContext
+    with BeforeAndAfter {
 
   @transient var tmpDir: File = _
   @transient var tmpFile: File = _

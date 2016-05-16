@@ -9,7 +9,9 @@ import prop._
 import scala.util.Try
 
 class NaturalTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   import spire.std.bigInt._
   import ArbitrarySupport._

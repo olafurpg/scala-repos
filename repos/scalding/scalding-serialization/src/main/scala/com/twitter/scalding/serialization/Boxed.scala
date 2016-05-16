@@ -1355,8 +1355,9 @@ object Boxed {
         new Boxed250(t)
       }, classOf[Boxed250[Any]]))
 
-  private[this] val boxes: AtomicReference[List[(Any => Boxed[Any], Class[
-              _ <: Boxed[Any]])]] = new AtomicReference(allBoxes)
+  private[this] val boxes: AtomicReference[
+      List[(Any => Boxed[Any], Class[_ <: Boxed[Any]])]] = new AtomicReference(
+      allBoxes)
 
   def allClasses: Seq[Class[_ <: Boxed[_]]] = allBoxes.map(_._2)
 

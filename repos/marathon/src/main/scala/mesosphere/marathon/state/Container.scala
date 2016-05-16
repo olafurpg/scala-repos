@@ -39,13 +39,13 @@ object Container {
       * @param labels        This can be used to decorate the message with metadata to be
       *                      interpreted by external applications such as firewalls.
       */
-    case class PortMapping(
-        containerPort: Int = 0,
-        hostPort: Int = 0,
-        servicePort: Int = 0,
-        protocol: String = "tcp",
-        name: Option[String] = None,
-        labels: Map[String, String] = Map.empty[String, String]) {
+    case class PortMapping(containerPort: Int = 0,
+                           hostPort: Int = 0,
+                           servicePort: Int = 0,
+                           protocol: String = "tcp",
+                           name: Option[String] = None,
+                           labels: Map[String, String] =
+                             Map.empty[String, String]) {
 
       require(protocol == "tcp" || protocol == "udp",
               "protocol can only be 'tcp' or 'udp'")

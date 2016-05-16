@@ -6,8 +6,11 @@ import mesosphere.marathon.integration.setup._
 import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 
 class MarathonStartupIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
   test("Marathon should fail during start, if the HTTP port is already bound") {
     Given(
         s"a Marathon process already running on port ${config.marathonBasePort}")

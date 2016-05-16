@@ -128,7 +128,9 @@ class LongProductSum extends UserDefinedAggregateFunction {
 }
 
 abstract class AggregationQuerySuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   override def beforeAll(): Unit = {

@@ -92,7 +92,8 @@ private[akka] class RemoteWatcher(
     heartbeatInterval: FiniteDuration,
     unreachableReaperInterval: FiniteDuration,
     heartbeatExpectedResponseAfter: FiniteDuration)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import RemoteWatcher._
@@ -156,9 +157,9 @@ private[akka] class RemoteWatcher(
             wee → wer
           }
       }.toSet[(ActorRef, ActorRef)]
-      sender() ! Stats(
-          watching = watchSet.size,
-          watchingNodes = watchingNodes.size)(watchSet, watchingNodes.toSet)
+      sender() ! Stats(watching = watchSet.size,
+                       watchingNodes =
+                         watchingNodes.size)(watchSet, watchingNodes.toSet)
   }
 
   def receiveHeartbeat(): Unit =

@@ -91,7 +91,9 @@ private[kinesis] class KinesisReceiver[T](
     storageLevel: StorageLevel,
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials])
-    extends Receiver[T](storageLevel) with Logging { receiver =>
+    extends Receiver[T](storageLevel)
+    with Logging {
+  receiver =>
 
   /*
    * =================================================================================

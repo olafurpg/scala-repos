@@ -78,12 +78,12 @@ private[spark] object StratifiedSamplingUtils extends Logging {
   /**
     * Returns the function used by aggregate to collect sampling statistics for each partition.
     */
-  def getSeqOp[K, V](
-      withReplacement: Boolean,
-      fractions: Map[K, Double],
-      rng: RandomDataGenerator,
-      counts: Option[Map[K, Long]]): (mutable.Map[K, AcceptanceResult], (K,
-  V)) => mutable.Map[K, AcceptanceResult] = {
+  def getSeqOp[K, V](withReplacement: Boolean,
+                     fractions: Map[K, Double],
+                     rng: RandomDataGenerator,
+                     counts: Option[Map[K, Long]])
+    : (mutable.Map[K, AcceptanceResult],
+       (K, V)) => mutable.Map[K, AcceptanceResult] = {
     val delta = 5e-5
     (result: mutable.Map[K, AcceptanceResult], item: (K, V)) =>
       {
@@ -142,9 +142,10 @@ private[spark] object StratifiedSamplingUtils extends Logging {
     * Returns the function used combine results returned by seqOp from different partitions.
     */
   def getCombOp[K]: (mutable.Map[K, AcceptanceResult],
-  mutable.Map[K, AcceptanceResult]) => mutable.Map[K, AcceptanceResult] = {
+                     mutable.Map[K, AcceptanceResult]) => mutable.Map[
+      K, AcceptanceResult] = {
     (result1: mutable.Map[K, AcceptanceResult],
-    result2: mutable.Map[K, AcceptanceResult]) =>
+     result2: mutable.Map[K, AcceptanceResult]) =>
       {
         // take union of both key sets in case one partition doesn't contain all keys
         result1.keySet.union(result2.keySet).foreach { key =>
@@ -190,7 +191,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
           thresholdByKey += (key -> acceptResult.waitListBound)
         } else {
           thresholdByKey +=
-          (key -> acceptResult.waitList.sorted.apply(numWaitListAccepted))
+            (key -> acceptResult.waitList.sorted.apply(numWaitListAccepted))
         }
       }
     }
@@ -236,7 +237,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
     *
     * The sampling function has a unique seed per partition.
     */
-  def getPoissonSamplingFunction[K : ClassTag, V : ClassTag](
+  def getPoissonSamplingFunction[K: ClassTag, V: ClassTag](
       rdd: RDD[(K, V)],
       fractions: Map[K, Double],
       exact: Boolean,
@@ -261,8 +262,8 @@ private[spark] object StratifiedSamplingUtils extends Logging {
             val copiesWaitlisted =
               rng.nextPoisson(finalResult(key).waitListBound)
             val copiesInSample =
-              copiesAccepted + (0 until copiesWaitlisted).count(
-                  i => rng.nextUniform() < thresholdByKey(key))
+              copiesAccepted + (0 until copiesWaitlisted).count(i =>
+                    rng.nextUniform() < thresholdByKey(key))
             if (copiesInSample > 0) {
               Iterator.fill(copiesInSample.toInt)(item)
             } else {

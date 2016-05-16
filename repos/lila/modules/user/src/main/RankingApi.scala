@@ -41,8 +41,7 @@ final class RankingApi(coll: lila.db.Types.Coll,
   def remove(userId: User.ID): Funit = UserRepo byId userId flatMap {
     _ ?? { user =>
       coll
-        .remove(
-            BSONDocument(
+        .remove(BSONDocument(
                 "_id" -> BSONDocument(
                     "$in" -> PerfType.leaderboardable.filter { pt =>
               user.perfs(pt).nonEmpty

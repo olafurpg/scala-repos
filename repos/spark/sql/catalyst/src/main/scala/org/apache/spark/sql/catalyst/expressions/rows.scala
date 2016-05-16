@@ -242,7 +242,8 @@ class GenericInternalRow(private[sql] val values: Array[Any])
 }
 
 class GenericMutableRow(values: Array[Any])
-    extends MutableRow with BaseGenericInternalRow {
+    extends MutableRow
+    with BaseGenericInternalRow {
 
   /** No-arg constructor for serialization. */
   protected def this() = this(null)

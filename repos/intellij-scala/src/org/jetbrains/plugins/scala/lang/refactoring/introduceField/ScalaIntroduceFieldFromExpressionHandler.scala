@@ -182,8 +182,8 @@ class ScalaIntroduceFieldFromExpressionHandler
     anchor match {
       case (tp: ScTemplateParents) childOf (extBl: ScExtendsBlock) =>
         val earlyDef = extBl.addEarlyDefinitions()
-        createdDeclaration = earlyDef.addAfter(
-            createdDeclaration, earlyDef.getFirstChild)
+        createdDeclaration =
+          earlyDef.addAfter(createdDeclaration, earlyDef.getFirstChild)
       case _ childOf (ed: ScEarlyDefinitions)
           if onOneLine(document, ed.getTextRange) =>
         def isBlockStmtOrMember(elem: PsiElement) =

@@ -417,8 +417,9 @@ final case class MultiReaderConfig[Req, Rep] private[kestrel](
     private val _queueName: String,
     private val _clientId: Option[ClientId] = None,
     private val _txnAbortTimeout: Duration = Duration.Top,
-    private val _clientBuilder: Option[ClientBuilder[
-            Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]] = None,
+    private val _clientBuilder: Option[
+        ClientBuilder[Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]] =
+      None,
     private val _timer: Option[Timer] = None,
     private val _retryBackoffs: Option[() => Stream[Duration]] = None,
     private val _trackOutstandingRequests: Boolean = false,
@@ -474,8 +475,8 @@ final case class ClusterMultiReaderConfig private[kestrel](
   */
 abstract class MultiReaderBuilder[Req, Rep, Builder] private[kestrel](
     config: MultiReaderConfig[Req, Rep]) {
-  type ClientBuilderBase = ClientBuilder[
-      Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]
+  type ClientBuilderBase =
+    ClientBuilder[Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]
 
   private[this] val logger = DefaultLogger
 

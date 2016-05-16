@@ -54,7 +54,8 @@ import org.apache.spark.util.{ThreadUtils, Utils}
 private[spark] class TaskSchedulerImpl(val sc: SparkContext,
                                        val maxTaskFailures: Int,
                                        isLocal: Boolean = false)
-    extends TaskScheduler with Logging {
+    extends TaskScheduler
+    with Logging {
   def this(sc: SparkContext) =
     this(sc, sc.conf.getInt("spark.task.maxFailures", 4))
 

@@ -14,7 +14,8 @@ abstract class Employee {
 
 case class Firefighter(
     val name: String, val age: Int, val salary: Int, val since: Int)
-    extends Employee with Person
+    extends Employee
+    with Person
 
 class Inheritance3Test extends FunSuite {
   test("main") {

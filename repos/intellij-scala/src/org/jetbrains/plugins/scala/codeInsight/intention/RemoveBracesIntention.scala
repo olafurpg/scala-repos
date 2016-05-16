@@ -73,12 +73,10 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
         (lBrace, rBrace) match {
           case (Array(lBraceNode), Array(rBraceNode))
               if tryBlock.statements.length == 1 =>
-            val action = () =>
-              {
-                Seq(lBraceNode, rBraceNode).foreach(
-                    tryBlock.getNode.removeChild)
-                CodeEditUtil.markToReformat(tryBlock.getParent.getNode, true)
-                // TODO clean up excess newlines.
+            val action = () => {
+              Seq(lBraceNode, rBraceNode).foreach(tryBlock.getNode.removeChild)
+              CodeEditUtil.markToReformat(tryBlock.getParent.getNode, true)
+              // TODO clean up excess newlines.
             }
             return Some(action)
           case _ => None
@@ -93,20 +91,19 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
         caseClause.expr match {
           case Some(x: ScBlockExpr) if isAncestorOfElement(x) =>
             // special handling for case clauses, which never _need_ braces.
-            val action = () =>
-              {
-                val Regex = """(?ms)\{(.+)\}""".r
-                x.getText match {
-                  case Regex(code) =>
-                    val replacement = ScalaPsiElementFactory
-                      .createBlockExpressionWithoutBracesFromText(
-                        code, element.getManager)
-                    CodeEditUtil.replaceChild(
-                        x.getParent.getNode, x.getNode, replacement.getNode)
-                    CodeEditUtil.markToReformat(caseClause.getNode, true)
-                  case _ =>
-                    ()
-                }
+            val action = () => {
+              val Regex = """(?ms)\{(.+)\}""".r
+              x.getText match {
+                case Regex(code) =>
+                  val replacement = ScalaPsiElementFactory
+                    .createBlockExpressionWithoutBracesFromText(
+                      code, element.getManager)
+                  CodeEditUtil.replaceChild(
+                      x.getParent.getNode, x.getNode, replacement.getNode)
+                  CodeEditUtil.markToReformat(caseClause.getNode, true)
+                case _ =>
+                  ()
+              }
             }
             return Some(action)
           case _ =>
@@ -118,8 +115,9 @@ class RemoveBracesIntention extends PsiElementBaseIntentionAction {
     // Everything other than case clauses is treated uniformly.
 
     // Is the expression a block containing a single expression?
-    val oneLinerBlock: Option[
-        (ScBlockExpr, ScExpression, CommentsAroundElement)] = expr.flatMap {
+    val oneLinerBlock: Option[(ScBlockExpr,
+                               ScExpression,
+                               CommentsAroundElement)] = expr.flatMap {
       case blk: ScBlockExpr =>
         blk.statements match {
           case Seq(x: ScExpression) =>

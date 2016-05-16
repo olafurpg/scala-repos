@@ -43,7 +43,8 @@ object SubScene {
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/SubScene.html]]. */
 class SubScene(override val delegate: jfxs.SubScene)
-    extends Node(delegate) with SFXDelegate[jfxs.SubScene] {
+    extends Node(delegate)
+    with SFXDelegate[jfxs.SubScene] {
 
   // TODO Combine common features with Scene in a trait used by both.
 

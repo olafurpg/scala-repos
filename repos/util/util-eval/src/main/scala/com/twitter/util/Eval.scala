@@ -348,9 +348,9 @@ class Eval(target: Option[File]) {
    * This is probably fragile.
    */
   lazy val impliedClassPath: List[String] = {
-    def getClassPath(
-        cl: ClassLoader,
-        acc: List[List[String]] = List.empty): List[List[String]] = {
+    def getClassPath(cl: ClassLoader,
+                     acc: List[List[String]] =
+                       List.empty): List[List[String]] = {
       val cp = cl match {
         case urlClassLoader: URLClassLoader =>
           urlClassLoader.getURLs
@@ -483,8 +483,8 @@ class Eval(target: Option[File]) {
     outputDirs.setSingleOutput(compilerOutputDir)
     private[this] val pathList = compilerPath ::: libPath
     bootclasspath.value = pathList.mkString(File.pathSeparator)
-    classpath.value = (pathList ::: impliedClassPath).mkString(
-        File.pathSeparator)
+    classpath.value =
+      (pathList ::: impliedClassPath).mkString(File.pathSeparator)
   }
 
   /**

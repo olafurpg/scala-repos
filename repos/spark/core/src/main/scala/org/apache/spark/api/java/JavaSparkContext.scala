@@ -44,7 +44,8 @@ import org.apache.spark.rdd.{EmptyRDD, HadoopRDD, NewHadoopRDD, RDD}
   * creating a new one.  This limitation may eventually be removed; see SPARK-2243 for more details.
   */
 class JavaSparkContext(val sc: SparkContext)
-    extends JavaSparkContextVarargsWorkaround with Closeable {
+    extends JavaSparkContextVarargsWorkaround
+    with Closeable {
 
   /**
     * Create a JavaSparkContext that loads settings from system properties (for instance, when

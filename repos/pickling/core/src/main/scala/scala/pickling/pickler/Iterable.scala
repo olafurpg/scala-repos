@@ -6,7 +6,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.language.higherKinds
 
 trait IterablePicklers {
-  implicit def iterablePickler[T : FastTypeTag](
+  implicit def iterablePickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[Iterable[T]],
@@ -15,7 +15,7 @@ trait IterablePicklers {
     TravPickler[T, Iterable[T]]
 
   // TODO - Add all known collection types so we don't hit odd runtime perfomrance issues with deserializing full structure.
-  implicit def listPickler[T : FastTypeTag](
+  implicit def listPickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       colTag: FastTypeTag[List[T]],
@@ -159,7 +159,7 @@ object TravPickler {
 }
 
 object SeqSetPickler {
-  def apply[T : FastTypeTag, Coll[_] <: Traversable[_]](
+  def apply[T: FastTypeTag, Coll[_] <: Traversable[_]](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       cbf: CanBuildFrom[Coll[T], T, Coll[T]],
@@ -169,7 +169,7 @@ object SeqSetPickler {
 }
 
 object MapPickler {
-  def apply[K : FastTypeTag, V : FastTypeTag, M[_, _] <: collection.Map[_, _]](
+  def apply[K: FastTypeTag, V: FastTypeTag, M[_, _] <: collection.Map[_, _]](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
       cbf: CanBuildFrom[M[K, V], (K, V), M[K, V]],

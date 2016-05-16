@@ -14,7 +14,7 @@ import scalaz.syntax.validation._
     "2.2.1")
 trait CommandHandler {
   @transient private[this] val commandLogger: Logger = Logger[this.type]
-  def execute[S : Manifest](cmd: ModelCommand[S]): ModelValidation[S] = {
+  def execute[S: Manifest](cmd: ModelCommand[S]): ModelValidation[S] = {
     commandLogger.debug(
         "Executing [%s].\n%s" format (cmd.getClass.getName, cmd))
     if (cmd.isValid) {

@@ -45,7 +45,8 @@ import org.apache.spark.sql.{Row, SQLContext}
 class GaussianMixtureModel @Since("1.3.0")(
     @Since("1.3.0") val weights: Array[Double],
     @Since("1.3.0") val gaussians: Array[MultivariateGaussian])
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
   require(weights.length == gaussians.length,
           "Length of weight and Gaussian arrays must match")

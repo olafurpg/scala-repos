@@ -12,18 +12,18 @@ import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.S
 /**
   * @author Nikolay.Tropin
   */
-case class ScalaIntroduceParameterData(
-    methodLike: ScMethodLike,
-    methodToSearchFor: ScMethodLike,
-    elems: Seq[PsiElement],
-    paramName: String,
-    possibleTypes: Array[ScType],
-    tp: ScType,
-    occurrences: Array[TextRange],
-    mainOcc: TextRange,
-    replaceAll: Boolean,
-    defaultArg: String,
-    functionalArgParams: Option[String] = None)
+case class ScalaIntroduceParameterData(methodLike: ScMethodLike,
+                                       methodToSearchFor: ScMethodLike,
+                                       elems: Seq[PsiElement],
+                                       paramName: String,
+                                       possibleTypes: Array[ScType],
+                                       tp: ScType,
+                                       occurrences: Array[TextRange],
+                                       mainOcc: TextRange,
+                                       replaceAll: Boolean,
+                                       defaultArg: String,
+                                       functionalArgParams: Option[String] =
+                                         None)
     extends IntroduceParameterData {
 
   def getParametersToRemove: TIntArrayList = new TIntArrayList()
@@ -46,7 +46,7 @@ case class ScalaIntroduceParameterData(
         JavaPsiFacade
           .getElementFactory(methodLike.getProject)
           .createExpressionFromText(getParameterName, elems.head.getContext)
-      )
+    )
 
   def getMethodToSearchFor: PsiMethod = methodToSearchFor
 

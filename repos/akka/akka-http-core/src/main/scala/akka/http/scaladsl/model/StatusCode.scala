@@ -9,7 +9,8 @@ import akka.http.javadsl.{model ⇒ jm}
 
 /** The result status code of an HTTP response. */
 sealed abstract class StatusCode
-    extends jm.StatusCode with LazyValueBytesRenderable {
+    extends jm.StatusCode
+    with LazyValueBytesRenderable {
   def intValue: Int
   def value: String = intValue.toString + ' ' + reason
   def reason: String

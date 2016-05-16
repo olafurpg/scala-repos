@@ -33,7 +33,9 @@ import org.apache.xerces.impl.Constants
 import common._
 
 object SecurityHelpers
-    extends StringHelpers with IoHelpers with SecurityHelpers
+    extends StringHelpers
+    with IoHelpers
+    with SecurityHelpers
 
 /**
   * The SecurityHelpers trait provides functions to:<ul>

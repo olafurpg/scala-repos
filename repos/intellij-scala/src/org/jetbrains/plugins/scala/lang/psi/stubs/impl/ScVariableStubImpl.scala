@@ -22,7 +22,8 @@ class ScVariableStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScVariable](parent, elemType) with ScVariableStub {
+    extends StubBaseWrapper[ScVariable](parent, elemType)
+    with ScVariableStub {
   private var names: Array[StringRef] = _
   private var declaration: Boolean = false
   private var typeText: StringRef = _

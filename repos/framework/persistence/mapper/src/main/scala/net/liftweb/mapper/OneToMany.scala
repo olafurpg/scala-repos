@@ -86,17 +86,16 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
                                         foreign: MappedForeignKey[K, O, T],
                                         qp: QueryParam[O]*)
       extends MappedOneToManyBase[O](
-          () =>
-            {
-              val ret =
-                meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
-              for (child <- ret) {
-                foreign
-                  .actualField(child)
-                  .asInstanceOf[MappedForeignKey[K, O, T]]
-                  .primeObj(net.liftweb.common.Full(OneToMany.this: T))
-              }
-              ret
+          () => {
+            val ret =
+              meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
+            for (child <- ret) {
+              foreign
+                .actualField(child)
+                .asInstanceOf[MappedForeignKey[K, O, T]]
+                .primeObj(net.liftweb.common.Full(OneToMany.this: T))
+            }
+            ret
           },
           foreign
       )

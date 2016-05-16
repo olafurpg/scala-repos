@@ -19,9 +19,11 @@ case class HookConfig(variant: chess.variant.Variant,
 
   def fixColor =
     copy(
-        color = if (mode == Mode.Rated &&
-                    lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
-                    color != Color.Random) Color.Random else color)
+        color =
+          if (mode == Mode.Rated &&
+              lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
+              color != Color.Random) Color.Random
+          else color)
 
   // allowAnons -> membersOnly
   def >> =
@@ -105,8 +107,8 @@ object HookConfig extends BaseHumanConfig {
         mode = realMode,
         allowAnon = !membersOnly, // membersOnly
         ratingRange = e
-            .filter(_ => useRatingRange)
-            .fold(RatingRange.default)(RatingRange.orDefault),
+          .filter(_ => useRatingRange)
+          .fold(RatingRange.default)(RatingRange.orDefault),
         color = Color(c) err "Invalid color " + c)
   }
 
@@ -135,7 +137,8 @@ object HookConfig extends BaseHumanConfig {
           mode = Mode orDefault (r int "m"),
           allowAnon = r bool "a",
           color = Color.Random,
-          ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
+          ratingRange =
+            r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
 
     def writes(w: BSON.Writer, o: HookConfig) =
       BSONDocument("v" -> o.variant.id,

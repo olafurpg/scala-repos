@@ -53,7 +53,8 @@ trait AssetHelper { self: I18nHelper =>
   }
 
   val momentjsTag = cdnOrLocal(
-      cdn = "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js",
+      cdn =
+        "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js",
       test = "window.moment",
       local = staticUrl("vendor/moment/min/moment.min.js"))
 
@@ -73,12 +74,14 @@ trait AssetHelper { self: I18nHelper =>
     }
 
   val tagmanagerTag = cdnOrLocal(
-      cdn = "http://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.0/tagmanager.js",
+      cdn =
+        "http://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.0/tagmanager.js",
       test = "$.tagsManager",
       local = staticUrl("vendor/tagmanager/tagmanager.js"))
 
   val typeaheadTag = cdnOrLocal(
-      cdn = "http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js",
+      cdn =
+        "http://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js",
       test = "$.typeahead",
       local = staticUrl("javascripts/vendor/typeahead.bundle.min.js"))
 

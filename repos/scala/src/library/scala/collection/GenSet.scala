@@ -19,7 +19,8 @@ import generic._
   *  @since 2.9
   */
 trait GenSet[A]
-    extends GenSetLike[A, GenSet[A]] with GenIterable[A]
+    extends GenSetLike[A, GenSet[A]]
+    with GenIterable[A]
     with GenericSetTemplate[A, GenSet] {
   override def companion: GenericCompanion[GenSet] = GenSet
   def seq: Set[A]

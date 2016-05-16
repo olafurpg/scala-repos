@@ -50,8 +50,10 @@ import scala.reflect.ClassTag
   */
 @SerialVersionUID(1L)
 class ParArray[T] private[mutable](val arrayseq: ArraySeq[T])
-    extends ParSeq[T] with GenericParTemplate[T, ParArray]
-    with ParSeqLike[T, ParArray[T], ArraySeq[T]] with Serializable {
+    extends ParSeq[T]
+    with GenericParTemplate[T, ParArray]
+    with ParSeqLike[T, ParArray[T], ArraySeq[T]]
+    with Serializable {
   self =>
 
   @transient private var array: Array[Any] =
@@ -782,7 +784,7 @@ object ParArray extends ParFactory[ParArray] {
               scala.runtime.ScalaRunTime.toObjectArray(arr), sz))
   }
 
-  def createFromCopy[T <: AnyRef : ClassTag](arr: Array[T]): ParArray[T] = {
+  def createFromCopy[T <: AnyRef: ClassTag](arr: Array[T]): ParArray[T] = {
     val newarr = new Array[T](arr.length)
     Array.copy(arr, 0, newarr, 0, arr.length)
     handoff(newarr)

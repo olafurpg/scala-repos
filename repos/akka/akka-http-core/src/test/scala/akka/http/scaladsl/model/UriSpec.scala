@@ -437,8 +437,9 @@ class UriSpec extends WordSpec with Matchers {
       // illegal paths
       Uri("foo/another@url/[]and{}") shouldEqual Uri.from(
           path = "foo/another@url/%5B%5Dand%7B%7D")
-      a[IllegalUriException] should be thrownBy Uri(
-          "foo/another@url/[]and{}", mode = Uri.ParsingMode.Strict)
+      a[IllegalUriException] should be thrownBy Uri("foo/another@url/[]and{}",
+                                                    mode =
+                                                      Uri.ParsingMode.Strict)
 
       // handle query parameters with more than percent-encoded character
       Uri("?%7Ba%7D=$%7B%7D", UTF8, Uri.ParsingMode.Strict).query() shouldEqual Query

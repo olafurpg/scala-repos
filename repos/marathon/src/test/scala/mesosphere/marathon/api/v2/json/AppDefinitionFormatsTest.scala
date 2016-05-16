@@ -12,8 +12,11 @@ import play.api.libs.json._
 import scala.collection.immutable.Seq
 
 class AppDefinitionFormatsTest
-    extends MarathonSpec with AppAndGroupFormats with HealthCheckFormats
-    with Matchers with FetchUriFormats {
+    extends MarathonSpec
+    with AppAndGroupFormats
+    with HealthCheckFormats
+    with Matchers
+    with FetchUriFormats {
 
   import Formats.PathIdFormat
 
@@ -80,10 +83,10 @@ class AppDefinitionFormatsTest
 
     val r1 = Json.toJson(
         a1.copy(versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
-                  version = Timestamp(3),
-                  lastScalingAt = Timestamp(2),
-                  lastConfigChangeAt = Timestamp(1)
-              )))
+                version = Timestamp(3),
+                lastScalingAt = Timestamp(2),
+                lastConfigChangeAt = Timestamp(1)
+            )))
     (r1 \ "version").as[String] should equal("1970-01-01T00:00:00.003Z")
     (r1 \ "versionInfo" \ "lastScalingAt").as[String] should equal(
         "1970-01-01T00:00:00.002Z")
@@ -238,9 +241,12 @@ class AppDefinitionFormatsTest
   test("ToJson should serialize residency") {
     import Fixture._
 
-    val json = Json.toJson(a1.copy(residency = Some(Residency(
-                      7200,
-                      Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER))))
+    val json = Json
+      .toJson(
+        a1.copy(residency = Some(
+                Residency(
+                    7200,
+                    Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER))))
     (json \ "residency" \ "relaunchEscalationTimeoutSeconds").as[Long] should equal(
         7200)
     (json \ "residency" \ "taskLostBehavior").as[String] should equal(

@@ -20,8 +20,8 @@ case class Arguments(sbtData: SbtData,
 
     val (sourceRoots, outputDirs) = compilationData.outputGroups.unzip
 
-    val compilerJarPaths = compilerData.compilerJars.map(
-        jars => filesToPaths(jars.library +: jars.compiler +: jars.extra))
+    val compilerJarPaths = compilerData.compilerJars.map(jars =>
+          filesToPaths(jars.library +: jars.compiler +: jars.extra))
 
     val javaHomePath = compilerData.javaHome.map(fileToPath)
 

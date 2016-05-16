@@ -37,6 +37,7 @@ object StringBinding {
 }
 
 class StringBinding(override val delegate: jfxbb.StringBinding)
-    extends StringExpression(delegate) with ObservableValue[String, String] {
+    extends StringExpression(delegate)
+    with ObservableValue[String, String] {
   def value = delegate.get
 }

@@ -10,7 +10,8 @@ class WeakHashSetTest {
 
   // a class guaranteed to provide hash collisions
   case class Collider(x: String)
-      extends Comparable[Collider] with Serializable {
+      extends Comparable[Collider]
+      with Serializable {
     override def hashCode = 0
     def compareTo(y: Collider) = this.x compareTo y.x
   }

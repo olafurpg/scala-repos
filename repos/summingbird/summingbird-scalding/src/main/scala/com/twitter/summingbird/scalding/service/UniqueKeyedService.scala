@@ -73,14 +73,14 @@ trait SourceUniqueKeyedService[S <: SSource, K, V]
 
 object UniqueKeyedService extends java.io.Serializable {
 
-  def from[K : Ordering, V](
+  def from[K: Ordering, V](
       fn: DateRange => Mappable[(K, V)],
       reducers: Option[Int] = None,
       requireFullySatisfiable: Boolean = false): UniqueKeyedService[K, V] =
     fromAndThen[(K, V), K, V](fn, identity, reducers, requireFullySatisfiable)
 
   /** The Mappable is the subclass of Source that knows about the file system. */
-  def fromAndThen[T, K : Ordering, V](
+  def fromAndThen[T, K: Ordering, V](
       fn: DateRange => Mappable[T],
       andThen: TypedPipe[T] => TypedPipe[(K, V)],
       inputReducers: Option[Int] = None,

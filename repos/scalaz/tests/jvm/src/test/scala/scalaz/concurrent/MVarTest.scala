@@ -16,11 +16,11 @@ object MVarTest extends SpecLite {
         for {
           in <- newEmptyMVar[String]
           _ <- forkIO {
-            for {
-              _ <- in.put("one")
-              _ <- in.put("two")
-            } yield ()
-          }
+                for {
+                  _ <- in.put("one")
+                  _ <- in.put("two")
+                } yield ()
+              }
           a <- in.take
           b <- in.take
         } yield (a, b)

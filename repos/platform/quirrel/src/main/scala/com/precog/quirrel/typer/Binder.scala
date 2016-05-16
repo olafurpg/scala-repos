@@ -92,8 +92,7 @@ trait Binder extends parser.AST {
                   case (Identifier(ns, name), b) => {
                       if (ns.length >= prefix.length) {
                         if (ns zip prefix forall { case (a, b) => a == b })
-                          Some(
-                              Identifier(ns drop (prefix.length - 1), name) -> b)
+                          Some(Identifier(ns drop (prefix.length - 1), name) -> b)
                         else None
                       } else if (ns.length == prefix.length - 1) {
                         if (ns zip prefix forall { case (a, b) => a == b }) {

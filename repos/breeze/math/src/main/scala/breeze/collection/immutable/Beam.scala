@@ -27,7 +27,9 @@ import scala.collection.generic._
   * @author dlwh
   */
 class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
-    extends Iterable[T] with IterableLike[T, Beam[T]] { outer =>
+    extends Iterable[T]
+    with IterableLike[T, Beam[T]] {
+  outer =>
   assert(maxSize >= 0)
   val heap = trim(BinomialHeap(xs: _*))
 
@@ -75,10 +77,10 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
 }
 
 object Beam {
-  def apply[T : Ordering](maxSize: Int)(items: T*): Beam[T] =
+  def apply[T: Ordering](maxSize: Int)(items: T*): Beam[T] =
     new Beam(maxSize, items: _*)
 
-  implicit def canBuildFrom[T : Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
+  implicit def canBuildFrom[T: Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
     new CanBuildFrom[Beam[T], T, Beam[T]] {
       def apply() = sys.error("Sorry, need a max size")
 

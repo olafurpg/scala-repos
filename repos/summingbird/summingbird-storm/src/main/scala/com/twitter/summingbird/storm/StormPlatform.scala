@@ -142,13 +142,13 @@ abstract class Storm(options: Map[String, Options],
 
   private type Prod[T] = Producer[Storm, T]
 
-  private[storm] def get[T <: AnyRef : ClassTag](
+  private[storm] def get[T <: AnyRef: ClassTag](
       dag: Dag[Storm], node: StormNode): Option[(String, T)] = {
     val producer = node.members.last
     Options.getFirst[T](options, dag.producerToPriorityNames(producer))
   }
 
-  private[storm] def getOrElse[T <: AnyRef : ClassTag](
+  private[storm] def getOrElse[T <: AnyRef: ClassTag](
       dag: Dag[Storm], node: StormNode, default: T): T =
     get[T](dag, node) match {
       case None =>
@@ -299,8 +299,8 @@ abstract class Storm(options: Map[String, Options],
     }
 
     val flatmapOp: FlatMapOperation[(ExecutorKeyType,
-                                    (Option[ExecutorValueType],
-                                    ExecutorValueType)),
+                                     (Option[ExecutorValueType],
+                                      ExecutorValueType)),
                                     ExecutorOutputType] =
       FlatMapOperation.apply(storeBaseFMOp)
 

@@ -35,13 +35,11 @@ object Packaging {
               }
               builder.advanceLexer() //Ate '{'
               builder.enableNewlines
-              ParserUtils.parseLoopUntilRBrace(builder,
-                                               () =>
-                                                 {
-                                                   //parse packaging body
-                                                   TopStatSeq parse
-                                                   (builder, true)
-                                               })
+              ParserUtils.parseLoopUntilRBrace(builder, () => {
+                //parse packaging body
+                TopStatSeq parse
+                (builder, true)
+              })
               builder.restoreNewlinesState
               packMarker.done(ScalaElementTypes.PACKAGING)
               true

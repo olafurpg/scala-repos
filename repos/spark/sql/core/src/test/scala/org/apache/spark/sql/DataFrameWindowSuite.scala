@@ -90,8 +90,8 @@ class DataFrameWindowSuite extends QueryTest with SharedSQLContext {
                  (1, "1"),
                  (2, "2")).toDF("key", "value")
     df.registerTempTable("window_table")
-    checkAnswer(df.select(lag("value", 2, "n/a")
-                      .over(Window.partitionBy($"key").orderBy($"value"))),
+    checkAnswer(df.select(lag("value", 2, "n/a").over(
+                        Window.partitionBy($"key").orderBy($"value"))),
                 Seq(Row("n/a"),
                     Row("n/a"),
                     Row("1"),
@@ -218,7 +218,7 @@ class DataFrameWindowSuite extends QueryTest with SharedSQLContext {
                             .orderBy("key")
                             .rangeBetween(-1, 0))
                       .as("avg_key3")
-                  ),
+                ),
                 Seq(Row(3, null, 3.0d, 4.0d, 3.0d),
                     Row(5, false, 4.0d, 5.0d, 5.0d),
                     Row(2, null, 2.0d, 17.0d / 4.0d, 2.0d),

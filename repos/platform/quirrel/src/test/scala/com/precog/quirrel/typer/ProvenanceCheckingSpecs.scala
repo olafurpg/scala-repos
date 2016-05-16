@@ -28,8 +28,12 @@ import java.io.File
 import scala.io.Source
 
 object ProvenanceCheckingSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with RandomLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with RandomLibrarySpec {
 
   import ast._
 
@@ -755,11 +759,11 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
-                                                   StaticProvenance("/bar")),
-                                 ProductProvenance(StaticProvenance("/bar"),
-                                                   StaticProvenance(
-                                                   "/baz"))) =>
+        case CoproductProvenance(
+            ProductProvenance(StaticProvenance("/foo"),
+                              StaticProvenance("/bar")),
+            ProductProvenance(StaticProvenance("/bar"),
+                              StaticProvenance("/baz"))) =>
           ok
       }
 
@@ -1037,11 +1041,11 @@ object ProvenanceCheckingSpecs
       val tree = compileSingle(input)
 
       tree.provenance must beLike {
-        case CoproductProvenance(ProductProvenance(StaticProvenance("/foo"),
-                                                   StaticProvenance("/bar")),
-                                 ProductProvenance(StaticProvenance("/bar"),
-                                                   StaticProvenance(
-                                                   "/baz"))) =>
+        case CoproductProvenance(
+            ProductProvenance(StaticProvenance("/foo"),
+                              StaticProvenance("/bar")),
+            ProductProvenance(StaticProvenance("/bar"),
+                              StaticProvenance("/baz"))) =>
           ok
       }
 

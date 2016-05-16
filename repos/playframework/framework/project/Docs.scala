@@ -206,8 +206,8 @@ object Docs {
               _.map { resources =>
             (for {
               conf <- resources.filter(resource =>
-                    resource.name == "reference.conf" ||
-                    resource.name.endsWith(".xml"))
+                           resource.name == "reference.conf" ||
+                           resource.name.endsWith(".xml"))
               id <- projectId.toSeq
             } yield id -> conf).distinct
           })
@@ -283,7 +283,7 @@ object Docs {
   // Generate documentation but avoid caching the inputs because of https://github.com/sbt/sbt/issues/1614
   object DocNoCache {
     type GenerateDoc = (Seq[File], Seq[File], File, Seq[String], Int,
-    Logger) => Unit
+                        Logger) => Unit
 
     def scaladoc(
         label: String, compile: compiler.AnalyzingCompiler): GenerateDoc =

@@ -54,7 +54,8 @@ import scalafx.delegate.SFXDelegate
 abstract class SFXDelegateSpec[J <: Object, S <: SFXDelegate[J]] protected (
     javaClass: Class[J], scalaClass: Class[S])(
     implicit jfx2sfx: J => S = null, sfx2jfx: S => J = null)
-    extends FlatSpec with AbstractComparator {
+    extends FlatSpec
+    with AbstractComparator {
 
   /////////////////////////////
   // PROTECTED METHODS - BEGIN 

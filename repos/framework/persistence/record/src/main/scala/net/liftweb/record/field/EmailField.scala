@@ -48,8 +48,10 @@ trait EmailTypedField extends TypedField[String] {
 
 class EmailField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, maxLength: Int)
-    extends StringField[OwnerType](rec, maxLength) with EmailTypedField
+    extends StringField[OwnerType](rec, maxLength)
+    with EmailTypedField
 
 class OptionalEmailField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, maxLength: Int)
-    extends OptionalStringField[OwnerType](rec, maxLength) with EmailTypedField
+    extends OptionalStringField[OwnerType](rec, maxLength)
+    with EmailTypedField

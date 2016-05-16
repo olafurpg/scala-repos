@@ -70,8 +70,8 @@ package scalaguide.http.scalaresults {
 
       "Changing the charset for text based HTTP responses" in {
         val index = new scalaguide.http.scalaresults.full.Application().index
-        assertAction(index)(
-            res => testContentType(await(res), "charset=iso-8859-1"))
+        assertAction(index)(res =>
+              testContentType(await(res), "charset=iso-8859-1"))
       }
 
       "HTML method works" in {
@@ -99,9 +99,9 @@ package scalaguide.http.scalaresults {
       }
     }
 
-    def assertAction[A, T : AsResult](action: Action[A],
-                                      expectedResponse: Int = OK,
-                                      request: Request[A] = FakeRequest())(
+    def assertAction[A, T: AsResult](action: Action[A],
+                                     expectedResponse: Int = OK,
+                                     request: Request[A] = FakeRequest())(
         assertions: Future[Result] => T) = {
       running() { app =>
         val result = action(request)

@@ -546,12 +546,12 @@ object StackTrace {
 
   object JSStackTraceElem {
     @inline
-    def apply(
-        declaringClass: String,
-        methodName: String,
-        fileName: String,
-        lineNumber: Int,
-        columnNumber: js.UndefOr[Int] = js.undefined): JSStackTraceElem = {
+    def apply(declaringClass: String,
+              methodName: String,
+              fileName: String,
+              lineNumber: Int,
+              columnNumber: js.UndefOr[Int] =
+                js.undefined): JSStackTraceElem = {
       js.Dynamic
         .literal(
             declaringClass = declaringClass,

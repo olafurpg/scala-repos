@@ -37,7 +37,8 @@ import org.apache.spark.util.Utils
   * Only streaming (openStream) is supported.
   */
 private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
-    extends StreamManager with RpcEnvFileServer {
+    extends StreamManager
+    with RpcEnvFileServer {
 
   private val files = new ConcurrentHashMap[String, File]()
   private val jars = new ConcurrentHashMap[String, File]()

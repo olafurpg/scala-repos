@@ -25,14 +25,14 @@ abstract class DynamicAccess {
     * val obj = DynamicAccess.createInstanceFor(clazz, Seq(classOf[Config] -> config, classOf[String] -> name))
     * }}}
     */
-  def createInstanceFor[T : ClassTag](
+  def createInstanceFor[T: ClassTag](
       clazz: Class[_], args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
 
   /**
     * Obtain a `Class[_]` object loaded with the right class loader (i.e. the one
     * returned by `classLoader`).
     */
-  def getClassFor[T : ClassTag](fqcn: String): Try[Class[_ <: T]]
+  def getClassFor[T: ClassTag](fqcn: String): Try[Class[_ <: T]]
 
   /**
     * Obtain an object conforming to the type T, which is expected to be
@@ -41,13 +41,13 @@ abstract class DynamicAccess {
     * `args` argument. The exact usage of args depends on which type is requested,
     * see the relevant requesting code for details.
     */
-  def createInstanceFor[T : ClassTag](
+  def createInstanceFor[T: ClassTag](
       fqcn: String, args: immutable.Seq[(Class[_], AnyRef)]): Try[T]
 
   /**
     * Obtain the Scala “object” instance for the given fully-qualified class name, if there is one.
     */
-  def getObjectFor[T : ClassTag](fqcn: String): Try[T]
+  def getObjectFor[T: ClassTag](fqcn: String): Try[T]
 
   /**
     * This is the class loader to be used in those special cases where the

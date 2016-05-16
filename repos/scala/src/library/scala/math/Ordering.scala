@@ -67,7 +67,10 @@ import scala.language.{implicitConversions, higherKinds}
   */
 @annotation.implicitNotFound(msg = "No implicit Ordering defined for ${T}.")
 trait Ordering[T]
-    extends Comparator[T] with PartialOrdering[T] with Serializable { outer =>
+    extends Comparator[T]
+    with PartialOrdering[T]
+    with Serializable {
+  outer =>
 
   /** Returns whether a comparison between `x` and `y` is defined, and if so
     * the result of `compare(x, y)`.

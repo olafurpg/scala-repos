@@ -16,7 +16,8 @@ import akka.cluster.client.protobuf.msg.{ClusterClientMessages ⇒ cm}
   */
 private[akka] class ClusterClientMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
   import ClusterReceptionist.Internal._
 
   private lazy val serialization = SerializationExtension(system)

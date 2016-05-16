@@ -149,20 +149,18 @@ object BuildLoader {
   }
 
   def componentLoader: Loader =
-    (info: LoadInfo) =>
-      {
-        import info.{components, config, staging, state, uri}
-        val cs = info.components
-        for {
-          resolve <- cs.resolver(new ResolveInfo(uri, staging, config, state))
-          base = resolve()
-          build <- cs.builder(new BuildInfo(uri, base, config, state))
-        } yield
-          () =>
-            {
-              val unit = build()
-              cs.transformer(new TransformInfo(uri, base, unit, config, state))
-          }
+    (info: LoadInfo) => {
+      import info.{components, config, staging, state, uri}
+      val cs = info.components
+      for {
+        resolve <- cs.resolver(new ResolveInfo(uri, staging, config, state))
+        base = resolve()
+        build <- cs.builder(new BuildInfo(uri, base, config, state))
+      } yield
+        () => {
+          val unit = build()
+          cs.transformer(new TransformInfo(uri, base, unit, config, state))
+        }
     }
 }
 

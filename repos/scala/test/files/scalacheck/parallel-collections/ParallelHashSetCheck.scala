@@ -44,7 +44,9 @@ abstract class ParallelHashSetCheck[T](tp: String)
 }
 
 class IntParallelHashSetCheck(val tasksupport: TaskSupport)
-    extends ParallelHashSetCheck[Int]("Int") with IntOperators with IntValues {
+    extends ParallelHashSetCheck[Int]("Int")
+    with IntOperators
+    with IntValues {
   override def printDataStructureDebugInfo(ds: AnyRef) = ds match {
     case pm: ParHashSet[t] =>
       println("Mutable parallel hash set")

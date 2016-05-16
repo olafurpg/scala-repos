@@ -40,17 +40,17 @@ object SerializationTestUtils {
   private val leader2 = 0
   private val isr2 = List(0, 2, 3)
   private val partitionDataFetchResponse0 = new FetchResponsePartitionData(
-      messages = new ByteBufferMessageSet(
-            new Message("first message".getBytes)))
+      messages =
+        new ByteBufferMessageSet(new Message("first message".getBytes)))
   private val partitionDataFetchResponse1 = new FetchResponsePartitionData(
-      messages = new ByteBufferMessageSet(
-            new Message("second message".getBytes)))
+      messages =
+        new ByteBufferMessageSet(new Message("second message".getBytes)))
   private val partitionDataFetchResponse2 = new FetchResponsePartitionData(
-      messages = new ByteBufferMessageSet(
-            new Message("third message".getBytes)))
+      messages =
+        new ByteBufferMessageSet(new Message("third message".getBytes)))
   private val partitionDataFetchResponse3 = new FetchResponsePartitionData(
-      messages = new ByteBufferMessageSet(
-            new Message("fourth message".getBytes)))
+      messages =
+        new ByteBufferMessageSet(new Message("fourth message".getBytes)))
   private val partitionDataFetchResponseMap = Map(
       (0, partitionDataFetchResponse0),
       (1, partitionDataFetchResponse1),
@@ -79,8 +79,7 @@ object SerializationTestUtils {
                                                         partitionDataMessage3)
 
   val topicDataProducerRequest = {
-    val groupedData = Array(topic1, topic2).flatMap(
-        topic =>
+    val groupedData = Array(topic1, topic2).flatMap(topic =>
           partitionDataProducerRequestArray.zipWithIndex.map {
         case (partitionDataMessage, partition) =>
           (TopicAndPartition(topic, partition), partitionDataMessage)
@@ -222,11 +221,11 @@ object SerializationTestUtils {
         groupId = "group 1",
         retentionMs = SystemTime.milliseconds,
         requestInfo = collection.immutable.Map(
-              TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
-                  42L, "some metadata"),
-              TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
-                  100L, OffsetMetadata.NoMetadata)
-          ))
+            TopicAndPartition(topic1, 0) -> OffsetAndMetadata(42L,
+                                                              "some metadata"),
+            TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
+                100L, OffsetMetadata.NoMetadata)
+        ))
   }
 
   def createTestOffsetCommitRequestV1: OffsetCommitRequest = {
@@ -234,11 +233,11 @@ object SerializationTestUtils {
         versionId = 1,
         groupId = "group 1",
         requestInfo = collection.immutable.Map(
-              TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
-                  42L, "some metadata", SystemTime.milliseconds),
-              TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
-                  100L, OffsetMetadata.NoMetadata, SystemTime.milliseconds)
-          ))
+            TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
+                42L, "some metadata", SystemTime.milliseconds),
+            TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
+                100L, OffsetMetadata.NoMetadata, SystemTime.milliseconds)
+        ))
   }
 
   def createTestOffsetCommitRequestV0: OffsetCommitRequest = {
@@ -246,11 +245,11 @@ object SerializationTestUtils {
         versionId = 0,
         groupId = "group 1",
         requestInfo = collection.immutable.Map(
-              TopicAndPartition(topic1, 0) -> OffsetAndMetadata(
-                  42L, "some metadata"),
-              TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
-                  100L, OffsetMetadata.NoMetadata)
-          ))
+            TopicAndPartition(topic1, 0) -> OffsetAndMetadata(42L,
+                                                              "some metadata"),
+            TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
+                100L, OffsetMetadata.NoMetadata)
+        ))
   }
 
   def createTestOffsetCommitResponse: OffsetCommitResponse = {
@@ -395,7 +394,7 @@ class RequestResponseSerializationTest extends JUnitSuite {
         Map(
             TopicAndPartition("t1", 0) -> new FetchResponsePartitionData(
                 messages = new ByteBufferMessageSet(
-                      new Message("first message".getBytes)))
+                    new Message("first message".getBytes)))
         ),
         0)
 
@@ -404,7 +403,7 @@ class RequestResponseSerializationTest extends JUnitSuite {
         Map(
             TopicAndPartition("t1", 0) -> new FetchResponsePartitionData(
                 messages = new ByteBufferMessageSet(
-                      new Message("first message".getBytes)))
+                    new Message("first message".getBytes)))
         ),
         1,
         100)

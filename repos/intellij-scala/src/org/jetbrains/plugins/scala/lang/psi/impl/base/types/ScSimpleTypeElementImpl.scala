@@ -36,7 +36,8 @@ import scala.collection.immutable.HashMap
   * Date: 22.02.2008
   */
 class ScSimpleTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScSimpleTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScSimpleTypeElement {
   override def toString: String = "SimpleTypeElement: " + getText
 
   def singleton = getNode.findChildByType(ScalaTokenTypes.kTYPE) != null
@@ -63,13 +64,13 @@ class ScSimpleTypeElementImpl(node: ASTNode)
       this,
       Failure("Recursive non value type of type element", Some(this)),
       ModCount.getBlockModificationCount)
-  override def getNonValueType(
-      ctx: TypingContext,
-      withUnnecessaryImplicitsUpdate: Boolean = false): TypeResult[ScType] =
-    innerNonValueType(
-        ctx,
-        inferValueType = false,
-        withUnnecessaryImplicitsUpdate = withUnnecessaryImplicitsUpdate)
+  override def getNonValueType(ctx: TypingContext,
+                               withUnnecessaryImplicitsUpdate: Boolean =
+                                 false): TypeResult[ScType] =
+    innerNonValueType(ctx,
+                      inferValueType = false,
+                      withUnnecessaryImplicitsUpdate =
+                        withUnnecessaryImplicitsUpdate)
 
   private def innerNonValueType(
       ctx: TypingContext,
@@ -271,14 +272,14 @@ class ScSimpleTypeElementImpl(node: ASTNode)
                       nonValueType.internalType,
                       Seq(new Parameter(
                               "", None, expected, false, false, false, 0)),
-                      Seq(
-                          new Expression(InferUtil
+                      Seq(new Expression(InferUtil
                                 .undefineSubstitutor(
                                     nonValueType.typeParameters)
                                 .subst(res.inferValueType))),
                       nonValueType.typeParameters,
                       shouldUndefineParameters = false,
-                      filterTypeParams = false) //here should work in different way:
+                      filterTypeParams =
+                        false) //here should work in different way:
                 }
                 val fromUnderscore = c.newTemplate match {
                   case Some(n) =>
@@ -440,8 +441,7 @@ class ScSimpleTypeElementImpl(node: ASTNode)
             updateImplicitsWithoutLocalTypeInference(result, ss)
           case _ => //resolve constructor with local type inference
             ref.bind() match {
-              case Some(
-                  r @ ScalaResolveResult(
+              case Some(r @ ScalaResolveResult(
                   method: PsiMethod, subst: ScSubstitutor))
                   if !noConstructor =>
                 Success(

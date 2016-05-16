@@ -40,7 +40,9 @@ import spire.syntax.std.seq._
   */
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
-    extends ScalaNumber with ScalaNumericConversions with Serializable {
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable {
   import Algebraic.{Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact, BFMSS, LiYap}
 
   /**
@@ -423,7 +425,7 @@ final class Algebraic private (val expr: Algebraic.Expr)
     *
     * TODO: Eq/ClassTag come from poly.map - would love to get rid of them.
     */
-  def evaluateWith[A : Field : NRoot : RootFinder : Eq : ClassTag](
+  def evaluateWith[A: Field: NRoot: RootFinder: Eq: ClassTag](
       implicit conv: ConvertableTo[A]): A = {
     import spire.syntax.field._
     import spire.syntax.nroot._
@@ -1591,7 +1593,8 @@ trait AlgebraicInstances {
 }
 
 private[math] trait AlgebraicIsFieldWithNRoot
-    extends Field[Algebraic] with NRoot[Algebraic] {
+    extends Field[Algebraic]
+    with NRoot[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1630,4 +1633,6 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
 
 @SerialVersionUID(1L)
 class AlgebraicAlgebra
-    extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable
+    extends AlgebraicIsFieldWithNRoot
+    with AlgebraicIsReal
+    with Serializable

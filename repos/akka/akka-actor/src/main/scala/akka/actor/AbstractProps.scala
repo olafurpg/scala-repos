@@ -42,7 +42,8 @@ private[akka] trait AbstractProps {
     */
   def create[T <: Actor](creator: Creator[T]): Props = {
     val cc = creator.getClass
-    if ((cc.getEnclosingClass ne null) && (cc.getModifiers & Modifier.STATIC) == 0)
+    if ((cc.getEnclosingClass ne null) &&
+        (cc.getModifiers & Modifier.STATIC) == 0)
       throw new IllegalArgumentException(
           "cannot use non-static local Creator to create actors; make it static (e.g. local to a static method) or top-level")
     val ac = classOf[Actor]

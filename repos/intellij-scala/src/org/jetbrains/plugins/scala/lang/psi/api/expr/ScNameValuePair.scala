@@ -14,7 +14,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * Date: 07.03.2008
   */
 trait ScNameValuePair
-    extends ScalaPsiElement with ScNamedElement with PsiNameValuePair {
+    extends ScalaPsiElement
+    with ScNamedElement
+    with PsiNameValuePair {
   override def getName: String = {
     if (nameId == null) ""
     else super.getName

@@ -17,7 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
   * Date: 06.03.2008
   */
 trait ScReferenceExpression
-    extends ScalaPsiElement with ScExpression with ScReferenceElement {
+    extends ScalaPsiElement
+    with ScExpression
+    with ScReferenceElement {
   def isQualified = qualifier.isDefined
 
   def qualifier: Option[ScExpression] = getFirstChild match {

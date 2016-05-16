@@ -196,8 +196,7 @@ class NonStrictCollectionsRenderer extends NodeRendererImpl {
       case obj: ObjectReference =>
         val tpe = obj.referenceType()
         val sizeString =
-          " size = " +
-          (tryToGetSize(obj, context) match {
+          " size = " + (tryToGetSize(obj, context) match {
                 case Success(value: Int) => value
                 case _ => "?"
               })

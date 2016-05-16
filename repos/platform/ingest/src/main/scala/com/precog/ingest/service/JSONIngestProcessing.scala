@@ -52,7 +52,8 @@ final class JSONIngestProcessing(
     recordStyle: JSONRecordStyle,
     maxFields: Int,
     storage: IngestStore)(implicit M: Monad[Future])
-    extends IngestProcessing with Logging {
+    extends IngestProcessing
+    with Logging {
 
   def forRequest(
       request: HttpRequest[_]): ValidationNel[String, IngestProcessor] = {
@@ -231,12 +232,11 @@ final class JSONIngestProcessing(
                   storeFailure =>
                     sys.error(
                         "Do something useful with %s" format storeFailure.message),
-                  _ =>
-                    {
-                      val errors =
-                        parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
-                          .map(i => (i, overLargeMsg))
-                      continue(state.update(updatedParser, ingestSize, errors))
+                  _ => {
+                    val errors =
+                      parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
+                        .map(i => (i, overLargeMsg))
+                    continue(state.update(updatedParser, ingestSize, errors))
                   }
               )
             }
@@ -273,14 +273,13 @@ final class JSONIngestProcessing(
                     storeFailure =>
                       sys.error(
                           "Do something useful with%s" format storeFailure.message),
-                    _ =>
-                      {
-                        val errors =
-                          parsed.errors.map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
-                            .option(state.report.ingested +
-                              toIngest.size -> overLargeMsg)
+                    _ => {
+                      val errors =
+                        parsed.errors.map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
+                          .option(state.report.ingested +
+                            toIngest.size -> overLargeMsg)
 
-                        state.update(updatedParser, ingestSize, errors)
+                      state.update(updatedParser, ingestSize, errors)
                     }
                 )
               }

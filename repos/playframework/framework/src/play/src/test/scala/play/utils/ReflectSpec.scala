@@ -62,7 +62,7 @@ object ReflectSpec extends Specification {
         defaultClassName)
   }
 
-  def bindings[Default : ClassTag](configured: String): Seq[Binding[_]] = {
+  def bindings[Default: ClassTag](configured: String): Seq[Binding[_]] = {
     bindings(configured, implicitly[ClassTag[Default]].runtimeClass.getName)
   }
 

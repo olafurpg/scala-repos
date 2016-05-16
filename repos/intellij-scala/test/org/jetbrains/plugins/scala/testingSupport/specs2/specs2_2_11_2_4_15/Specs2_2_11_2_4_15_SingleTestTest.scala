@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.specs2.Specs2SingleTestTest
   * @since 11.01.2015.
   */
 class Specs2_2_11_2_4_15_SingleTestTest
-    extends Specs2SingleTestTest with Specs2_2_11_2_4_15_Base {}
+    extends Specs2SingleTestTest
+    with Specs2_2_11_2_4_15_Base {}

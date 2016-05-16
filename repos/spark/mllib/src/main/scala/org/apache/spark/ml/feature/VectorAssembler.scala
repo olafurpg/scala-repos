@@ -37,7 +37,9 @@ import org.apache.spark.sql.types._
   */
 @Experimental
 class VectorAssembler(override val uid: String)
-    extends Transformer with HasInputCols with HasOutputCol
+    extends Transformer
+    with HasInputCols
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vecAssembler"))
@@ -85,8 +87,8 @@ class VectorAssembler(override val uid: String)
             // from metadata, check the first row.
             val numAttrs =
               group.numAttributes.getOrElse(first.getAs[Vector](index).size)
-            Array.tabulate(numAttrs)(
-                i => NumericAttribute.defaultAttr.withName(c + "_" + i))
+            Array.tabulate(numAttrs)(i =>
+                  NumericAttribute.defaultAttr.withName(c + "_" + i))
           }
         case otherType =>
           throw new SparkException(

@@ -47,7 +47,8 @@ object MediaErrorEvent {
 }
 
 class MediaErrorEvent(override val delegate: jfxsm.MediaErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsm.MediaErrorEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsm.MediaErrorEvent] {
 
   /**
     * Retrieve the error associated with this event.

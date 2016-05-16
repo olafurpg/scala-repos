@@ -103,9 +103,8 @@ class BsonRecordListField[OwnerType <: BsonRecord[OwnerType],
 
   override def setFromDBObject(dbo: DBObject): Box[List[SubRecordType]] =
     setBox(
-        Full(dbo.keySet.toList.map(k =>
-                  {
-        valueMeta.fromDBObject(dbo.get(k.toString).asInstanceOf[DBObject])
+        Full(dbo.keySet.toList.map(k => {
+      valueMeta.fromDBObject(dbo.get(k.toString).asInstanceOf[DBObject])
     })))
 
   override def asJValue: JValue = JArray(value.map(_.asJValue))
@@ -114,9 +113,8 @@ class BsonRecordListField[OwnerType <: BsonRecord[OwnerType],
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(arr) =>
       setBox(
-          Full(arr.map(jv =>
-                    {
-          valueMeta.fromJValue(jv) openOr valueMeta.createRecord
+          Full(arr.map(jv => {
+        valueMeta.fromJValue(jv) openOr valueMeta.createRecord
       })))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
   }

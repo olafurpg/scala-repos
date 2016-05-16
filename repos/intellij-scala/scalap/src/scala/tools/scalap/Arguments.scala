@@ -91,7 +91,7 @@ object Arguments {
         } else {
           var iter = prefixes.iterator
           val j = i
-          while ( (i == j) && iter.hasNext) {
+          while ((i == j) && iter.hasNext) {
             val prefix = iter.next
             if (args(i) startsWith prefix) {
               res.addPrefixed(
@@ -101,7 +101,7 @@ object Arguments {
           }
           if (i == j) {
             val iter = prefixedBindings.keysIterator;
-            while ( (i == j) && iter.hasNext) {
+            while ((i == j) && iter.hasNext) {
               val prefix = iter.next
               if (args(i) startsWith prefix) {
                 val arg = args(i).substring(prefix.length()).trim()

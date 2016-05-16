@@ -76,13 +76,16 @@ object WebJobManager {
 case class RealWebJobManager(
     protocol: String, host: String, port: Int, path: String)(
     implicit val executionContext: ExecutionContext)
-    extends WebClient(protocol, host, port, path) with WebJobManager {
+    extends WebClient(protocol, host, port, path)
+    with WebJobManager {
 
   val M = new blueeyes.bkka.FutureMonad(executionContext)
 }
 
 trait WebJobManager
-    extends JobManager[Response] with JobStateManager[Response] with BaseClient
+    extends JobManager[Response]
+    with JobStateManager[Response]
+    with BaseClient
     with Logging {
   import scalaz.syntax.monad._
   import EitherT.{left => leftT, right => rightT, _}
@@ -121,9 +124,10 @@ trait WebJobManager
           initJob <- job0
           result <- start(initJob.id, timestamp)
           job <- result.fold({ error: String =>
-            BadResponse(
-                "Server failed to return job that had been created: " + error)
-          }, _.point[Response])
+                  BadResponse(
+                      "Server failed to return job that had been created: " +
+                      error)
+                }, _.point[Response])
         } yield job
       } getOrElse job0
     }
@@ -303,8 +307,8 @@ trait WebJobManager
     }
   }
 
-  def getResult(jobId: JobId): Response[Either[
-          String, (Option[MimeType], StreamT[Response, Array[Byte]])]] = {
+  def getResult(jobId: JobId): Response[
+      Either[String, (Option[MimeType], StreamT[Response, Array[Byte]])]] = {
     def contentType(headers: HttpHeaders): Option[MimeType] =
       headers.header[`Content-Type`] flatMap (_.mimeTypes.headOption)
 

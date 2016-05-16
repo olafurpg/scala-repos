@@ -32,7 +32,9 @@ import com.precog.yggdrasil.TableModule.paths
 import scalaz.std.map._
 
 trait EvaluatorMethodsModule[M[+ _]]
-    extends DAG with TableModule[M] with TableLibModule[M]
+    extends DAG
+    with TableModule[M]
+    with TableLibModule[M]
     with OpFinderModule[M] {
   import dag._
   import instructions._
@@ -61,8 +63,7 @@ trait EvaluatorMethodsModule[M[+ _]]
               trans.WrapArray(transRValue(element, target))
             }: _*)
           case RObject(fields) =>
-            InnerObjectConcat(
-                fields.toSeq map {
+            InnerObjectConcat(fields.toSeq map {
               case (key, value) =>
                 trans.WrapObject(transRValue(value, target), key)
             }: _*)

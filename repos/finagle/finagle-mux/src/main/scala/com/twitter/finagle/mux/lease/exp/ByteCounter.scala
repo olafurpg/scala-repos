@@ -37,7 +37,9 @@ private[lease] class WindowedByteCounter private[lease](
     val info: JvmInfo,
     ctx: Context
 )
-    extends Thread("WindowedByteClock") with ByteCounter with Closable {
+    extends Thread("WindowedByteClock")
+    with ByteCounter
+    with Closable {
 
   import WindowedByteCounter._
 

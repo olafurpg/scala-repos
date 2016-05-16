@@ -61,9 +61,9 @@ final private[stream] class OutputStreamSourceStage(
           case Failure(ex) ⇒ failStage(ex)
         }
 
-      private val upstreamCallback: AsyncCallback[
-          (AdapterToStageMessage, Promise[Unit])] = getAsyncCallback(
-          onAsyncMessage)
+      private val upstreamCallback: AsyncCallback[(AdapterToStageMessage,
+                                                   Promise[Unit])] =
+        getAsyncCallback(onAsyncMessage)
 
       override def wakeUp(msg: AdapterToStageMessage): Future[Unit] = {
         val p = Promise[Unit]()
@@ -155,23 +155,20 @@ private[akka] class OutputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   private[this] def sendData(data: ByteString): Unit =
-    send(
-        () ⇒
-          {
-        try {
-          dataQueue.put(data)
-        } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
-        if (downstreamStatus.get() == Canceled) {
-          isPublisherAlive = false
-          throw publisherClosedException
-        }
+    send(() ⇒ {
+      try {
+        dataQueue.put(data)
+      } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
+      if (downstreamStatus.get() == Canceled) {
+        isPublisherAlive = false
+        throw publisherClosedException
+      }
     })
 
   @scala.throws(classOf[IOException])
   private[this] def sendMessage(
       message: AdapterToStageMessage, handleCancelled: Boolean = true) =
-    send(
-        () ⇒
+    send(() ⇒
           try {
         Await.ready(sendToStage(message), writeTimeout)
         if (downstreamStatus.get() == Canceled && handleCancelled) {

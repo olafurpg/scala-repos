@@ -30,7 +30,8 @@ private[spark] class SortShuffleWriter[K, V, C](
     handle: BaseShuffleHandle[K, V, C],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V]
+    with Logging {
 
   private val dep = handle.dependency
 
@@ -50,24 +51,25 @@ private[spark] class SortShuffleWriter[K, V, C](
 
   /** Write a bunch of records to this task's output */
   override def write(records: Iterator[Product2[K, V]]): Unit = {
-    sorter = if (dep.mapSideCombine) {
-      require(dep.aggregator.isDefined,
-              "Map-side combine without Aggregator specified!")
-      new ExternalSorter[K, V, C](context,
-                                  dep.aggregator,
-                                  Some(dep.partitioner),
-                                  dep.keyOrdering,
-                                  dep.serializer)
-    } else {
-      // In this case we pass neither an aggregator nor an ordering to the sorter, because we don't
-      // care whether the keys get sorted in each partition; that will be done on the reduce side
-      // if the operation being run is sortByKey.
-      new ExternalSorter[K, V, V](context,
-                                  aggregator = None,
-                                  Some(dep.partitioner),
-                                  ordering = None,
-                                  dep.serializer)
-    }
+    sorter =
+      if (dep.mapSideCombine) {
+        require(dep.aggregator.isDefined,
+                "Map-side combine without Aggregator specified!")
+        new ExternalSorter[K, V, C](context,
+                                    dep.aggregator,
+                                    Some(dep.partitioner),
+                                    dep.keyOrdering,
+                                    dep.serializer)
+      } else {
+        // In this case we pass neither an aggregator nor an ordering to the sorter, because we don't
+        // care whether the keys get sorted in each partition; that will be done on the reduce side
+        // if the operation being run is sortByKey.
+        new ExternalSorter[K, V, V](context,
+                                    aggregator = None,
+                                    Some(dep.partitioner),
+                                    ordering = None,
+                                    dep.serializer)
+      }
     sorter.insertAll(records)
 
     // Don't bother including the time to open the merged output file in the shuffle write time,

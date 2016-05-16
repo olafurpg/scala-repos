@@ -33,8 +33,12 @@ private object TestContext {
 }
 
 private[mux] class ClientServerTest(canDispatch: Boolean)
-    extends FunSuite with OneInstancePerTest with MockitoSugar
-    with AssertionsForJUnit with Eventually with IntegrationPatience {
+    extends FunSuite
+    with OneInstancePerTest
+    with MockitoSugar
+    with AssertionsForJUnit
+    with Eventually
+    with IntegrationPatience {
   val tracer = new BufferingTracer
 
   class Ctx(config: FailureDetector.Config = FailureDetector.NullConfig) {

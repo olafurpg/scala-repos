@@ -51,7 +51,8 @@ trait LongTypedField extends NumericTypedField[Long] {
 }
 
 class LongField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Long, OwnerType] with MandatoryTypedField[Long]
+    extends Field[Long, OwnerType]
+    with MandatoryTypedField[Long]
     with LongTypedField {
 
   def this(rec: OwnerType, value: Long) = {
@@ -63,7 +64,8 @@ class LongField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalLongField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Long, OwnerType] with OptionalTypedField[Long]
+    extends Field[Long, OwnerType]
+    with OptionalTypedField[Long]
     with LongTypedField {
 
   def this(rec: OwnerType, value: Box[Long]) = {

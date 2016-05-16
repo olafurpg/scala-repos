@@ -96,15 +96,16 @@ object PersistenceQueryDocSpec {
       with akka.persistence.query.javadsl.AllPersistenceIdsQuery
       with akka.persistence.query.javadsl.CurrentPersistenceIdsQuery {
 
-    override def eventsByTag(
-        tag: String,
-        offset: Long = 0L): javadsl.Source[EventEnvelope, NotUsed] =
+    override def eventsByTag(tag: String,
+                             offset: Long =
+                               0L): javadsl.Source[EventEnvelope, NotUsed] =
       scaladslReadJournal.eventsByTag(tag, offset).asJava
 
-    override def eventsByPersistenceId(persistenceId: String,
-                                       fromSequenceNr: Long = 0L,
-                                       toSequenceNr: Long = Long.MaxValue)
-      : javadsl.Source[EventEnvelope, NotUsed] =
+    override def eventsByPersistenceId(
+        persistenceId: String,
+        fromSequenceNr: Long = 0L,
+        toSequenceNr: Long =
+          Long.MaxValue): javadsl.Source[EventEnvelope, NotUsed] =
       scaladslReadJournal
         .eventsByPersistenceId(persistenceId, fromSequenceNr, toSequenceNr)
         .asJava

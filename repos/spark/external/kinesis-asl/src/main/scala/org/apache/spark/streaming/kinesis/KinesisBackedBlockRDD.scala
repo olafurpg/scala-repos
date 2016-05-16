@@ -68,7 +68,7 @@ private[kinesis] class KinesisBackedBlockRDDPartition(
   * A BlockRDD where the block data is backed by Kinesis, which can accessed using the
   * sequence numbers of the corresponding blocks.
   */
-private[kinesis] class KinesisBackedBlockRDD[T : ClassTag](
+private[kinesis] class KinesisBackedBlockRDD[T: ClassTag](
     sc: SparkContext,
     val regionName: String,
     val endpointUrl: String,
@@ -137,7 +137,8 @@ private[kinesis] class KinesisSequenceRangeIterator(
     regionId: String,
     range: SequenceNumberRange,
     retryTimeoutMs: Int)
-    extends NextIterator[Record] with Logging {
+    extends NextIterator[Record]
+    with Logging {
 
   private val client = new AmazonKinesisClient(credentials)
   private val streamName = range.streamName

@@ -109,9 +109,10 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
       .map(_._2)
       .getOrElse(DebuggingInfoLevel.Vars)
 
-    plugins = options collect {
-      case PluginOptionPattern(path) => path
-    }
+    plugins =
+      options collect {
+        case PluginOptionPattern(path) => path
+      }
 
     additionalCompilerOptions = options.filterNot { option =>
       optionToSetter.keySet.contains(option) ||

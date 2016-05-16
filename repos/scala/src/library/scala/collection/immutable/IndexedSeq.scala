@@ -18,7 +18,8 @@ import mutable.{ArrayBuffer, Builder}
   *  $indexedSeqInfo
   */
 trait IndexedSeq[+A]
-    extends Seq[A] with scala.collection.IndexedSeq[A]
+    extends Seq[A]
+    with scala.collection.IndexedSeq[A]
     with GenericTraversableTemplate[A, IndexedSeq]
     with IndexedSeqLike[A, IndexedSeq[A]] {
   override def companion: GenericCompanion[IndexedSeq] = IndexedSeq
@@ -41,7 +42,9 @@ trait IndexedSeq[+A]
   */
 object IndexedSeq extends IndexedSeqFactory[IndexedSeq] {
   class Impl[A](buf: ArrayBuffer[A])
-      extends AbstractSeq[A] with IndexedSeq[A] with Serializable {
+      extends AbstractSeq[A]
+      with IndexedSeq[A]
+      with Serializable {
     def length = buf.length
     def apply(idx: Int) = buf.apply(idx)
   }

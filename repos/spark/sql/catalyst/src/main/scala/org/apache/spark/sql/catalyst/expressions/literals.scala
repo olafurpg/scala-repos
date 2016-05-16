@@ -170,7 +170,8 @@ object DecimalLiteral {
   * In order to do type checking, use Literal.create() instead of constructor
   */
 case class Literal protected (value: Any, dataType: DataType)
-    extends LeafExpression with CodegenFallback {
+    extends LeafExpression
+    with CodegenFallback {
 
   override def foldable: Boolean = true
   override def nullable: Boolean = value == null
@@ -179,9 +180,8 @@ case class Literal protected (value: Any, dataType: DataType)
 
   override def equals(other: Any): Boolean = other match {
     case o: Literal =>
-      dataType.equals(o.dataType) &&
-      (value == null && null == o.value || value != null &&
-          value.equals(o.value))
+      dataType.equals(o.dataType) && (value == null && null == o.value ||
+          value != null && value.equals(o.value))
     case _ => false
   }
 

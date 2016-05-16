@@ -161,13 +161,11 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
         .right
         .toOption
         .orElse(
-            kc.getEarliestLeaderOffsets(topicPartitions)
-              .right
-              .toOption
-              .map { offs =>
+            kc.getEarliestLeaderOffsets(topicPartitions).right.toOption.map {
+              offs =>
                 offs.map(kv => kv._1 -> kv._2.offset)
-              }
-          )
+            }
+        )
     }
     kc.getPartitions(topics).right.toOption.flatMap { topicPartitions =>
       consumerOffsets(topicPartitions).flatMap { from =>

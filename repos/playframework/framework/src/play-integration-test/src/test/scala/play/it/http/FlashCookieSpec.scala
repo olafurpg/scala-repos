@@ -12,12 +12,15 @@ import play.core.server.Server
 import play.it._
 
 object NettyFlashCookieSpec
-    extends FlashCookieSpec with NettyIntegrationSpecification
+    extends FlashCookieSpec
+    with NettyIntegrationSpecification
 object AkkaHttpFlashCookieSpec
-    extends FlashCookieSpec with AkkaHttpIntegrationSpecification
+    extends FlashCookieSpec
+    with AkkaHttpIntegrationSpecification
 
 trait FlashCookieSpec
-    extends PlaySpecification with ServerIntegrationSpecification
+    extends PlaySpecification
+    with ServerIntegrationSpecification
     with WsTestClient {
 
   sequential

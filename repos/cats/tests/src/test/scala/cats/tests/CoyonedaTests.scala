@@ -8,7 +8,7 @@ import cats.laws.discipline.{FunctorTests, SerializableTests}
 import org.scalacheck.Arbitrary
 
 class CoyonedaTests extends CatsSuite {
-  implicit def coyonedaArbitrary[F[_]: Functor, A : Arbitrary](
+  implicit def coyonedaArbitrary[F[_]: Functor, A: Arbitrary](
       implicit F: Arbitrary[F[A]]): Arbitrary[Coyoneda[F, A]] =
     Arbitrary(F.arbitrary.map(Coyoneda.lift))
 

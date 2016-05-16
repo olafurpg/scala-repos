@@ -39,7 +39,9 @@ package immutable
 abstract class NumericRange[T](
     val start: T, val end: T, val step: T, val isInclusive: Boolean)(
     implicit num: Integral[T])
-    extends AbstractSeq[T] with IndexedSeq[T] with Serializable {
+    extends AbstractSeq[T]
+    with IndexedSeq[T]
+    with Serializable {
 
   /** Note that NumericRange must be invariant so that constructs
     *  such as "1L to 10 by 5" do not infer the range type as AnyVal.
@@ -82,8 +84,7 @@ abstract class NumericRange[T](
   // Tests whether a number is within the endpoints, without testing
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: T) =
-    !isEmpty &&
-    ((step > zero && start <= elem && elem <= last) ||
+    !isEmpty && ((step > zero && start <= elem && elem <= last) ||
         (step < zero && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.
@@ -216,9 +217,11 @@ abstract class NumericRange[T](
         val two = num fromInt 2
         val nre = num fromInt numRangeElements
         if (a > 1e38 || b > 1e38)
-          nre * ((head / two) + (last / two)) // Compute in parts to avoid Infinity if possible
+          nre * ((head / two) +
+              (last / two)) // Compute in parts to avoid Infinity if possible
         else
-          (nre / two) * (head + last) // Don't need to worry about infinity; this will be more accurate and avoid underflow
+          (nre / two) * (head +
+              last) // Don't need to worry about infinity; this will be more accurate and avoid underflow
       } else if ((num eq scala.math.Numeric.BigIntIsIntegral) ||
                  (num eq scala.math.Numeric.BigDecimalIsFractional)) {
         // No overflow, so we can use arithmetic series formula directly

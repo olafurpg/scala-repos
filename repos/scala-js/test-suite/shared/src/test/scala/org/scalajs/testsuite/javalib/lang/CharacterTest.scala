@@ -16,9 +16,8 @@ import org.scalajs.testsuite.utils.Platform._
 class CharacterTest {
 
   @Test def isISOControl(): Unit = {
-    val isoControlChars = (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F'))
-      .map(_.toInt)
-      .toSet
+    val isoControlChars =
+      (('\u0000' to '\u001F') ++ ('\u007F' to '\u009F')).map(_.toInt).toSet
     isoControlChars foreach { c =>
       assertEquals(true, Character.isISOControl(c))
     }

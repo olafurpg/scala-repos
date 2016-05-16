@@ -49,8 +49,8 @@ trait TypeComparers { self: SymbolTable =>
   }
 
   private def isSubPre(pre1: Type, pre2: Type, sym: Symbol) =
-    if ((pre1 ne pre2) && (pre1 ne NoPrefix) && (pre2 ne NoPrefix) &&
-        pre1 <:< pre2) {
+    if ((pre1 ne pre2) && (pre1 ne NoPrefix) &&
+        (pre2 ne NoPrefix) && pre1 <:< pre2) {
       if (settings.debug) println(s"new isSubPre $sym: $pre1 <:< $pre2")
       true
     } else false
@@ -126,8 +126,9 @@ trait TypeComparers { self: SymbolTable =>
       case _ => isSameType2(tp1, tp2)
     }
 
-  private def isSameHKTypes(tp1: Type, tp2: Type) = (tp1.isHigherKinded &&
-      tp2.isHigherKinded && (tp1.normalize =:= tp2.normalize))
+  private def isSameHKTypes(tp1: Type, tp2: Type) =
+    (tp1.isHigherKinded && tp2.isHigherKinded &&
+        (tp1.normalize =:= tp2.normalize))
   private def isSameTypeRef(tr1: TypeRef, tr2: TypeRef) =
     (equalSymsAndPrefixes(tr1.sym, tr1.pre, tr2.sym, tr2.pre) &&
         (isSameHKTypes(tr1, tr2) || isSameTypes(tr1.args, tr2.args)))
@@ -162,8 +163,8 @@ trait TypeComparers { self: SymbolTable =>
     def subst(info: Type) = info.substSym(tparams2, tparams1)
     // corresponds does not check length of two sequences before checking the predicate,
     // but SubstMap assumes it has been checked (SI-2956)
-    (sameLength(tparams1, tparams2) && (tparams1 corresponds tparams2)(
-            (p1, p2) =>
+    (sameLength(tparams1, tparams2) &&
+        (tparams1 corresponds tparams2)((p1, p2) =>
               methodHigherOrderTypeParamsSameVariance(p1, p2) &&
               p1.info =:= subst(p2.info)) && (res1 =:= subst(res2)))
   }
@@ -338,15 +339,17 @@ trait TypeComparers { self: SymbolTable =>
     *  will have to figure things out.
     */
   private def typeRelationPreCheck(tp1: Type, tp2: Type): TriState = {
-    def isTrue = ((tp1 eq tp2) || isErrorOrWildcard(tp1) ||
-        isErrorOrWildcard(tp2) || (tp1 eq NoPrefix) &&
-        tp2.typeSymbol.isPackageClass // !! I do not see how this would be warranted by the spec
-        || (tp2 eq NoPrefix) &&
-        tp1.typeSymbol.isPackageClass // !! I do not see how this would be warranted by the spec
-        )
+    def isTrue =
+      ((tp1 eq tp2) || isErrorOrWildcard(tp1) || isErrorOrWildcard(tp2) ||
+          (tp1 eq NoPrefix) &&
+          tp2.typeSymbol.isPackageClass // !! I do not see how this would be warranted by the spec
+          || (tp2 eq NoPrefix) &&
+          tp1.typeSymbol.isPackageClass // !! I do not see how this would be warranted by the spec
+          )
     // isFalse, assuming !isTrue
-    def isFalse = ((tp1 eq NoType) || (tp2 eq NoType) || (tp1 eq NoPrefix) ||
-        (tp2 eq NoPrefix))
+    def isFalse =
+      ((tp1 eq NoType) || (tp2 eq NoType) || (tp1 eq NoPrefix) ||
+          (tp2 eq NoPrefix))
 
     if (isTrue) TriState.True
     else if (isFalse) TriState.False
@@ -415,7 +418,8 @@ trait TypeComparers { self: SymbolTable =>
       }
 
     ((tp1.typeSymbol eq NothingClass) // @M Nothing is subtype of every well-kinded type
-        || (tp2.typeSymbol eq AnyClass) // @M Any is supertype of every well-kinded type (@PP: is it? What about continuations plugin?)
+        ||
+        (tp2.typeSymbol eq AnyClass) // @M Any is supertype of every well-kinded type (@PP: is it? What about continuations plugin?)
         || isSub(tp1.normalize, tp2.normalize) &&
         annotationsConform(tp1, tp2) // @M! normalize reduces higher-kinded case to PolyType's
         )
@@ -452,12 +456,11 @@ trait TypeComparers { self: SymbolTable =>
             val pre1 = tr1.pre
             val pre2 = tr2.pre
             (((if (sym1 eq sym2)
-                 phase.erasedTypes ||
-                 sym1.owner.hasPackageFlag || isSubType(pre1, pre2, depth)
+                 phase.erasedTypes || sym1.owner.hasPackageFlag ||
+                 isSubType(pre1, pre2, depth)
                else
                  (sym1.name == sym2.name && !sym1.isModuleClass &&
-                     !sym2.isModuleClass &&
-                     (isUnifiable(pre1, pre2) ||
+                     !sym2.isModuleClass && (isUnifiable(pre1, pre2) ||
                          isSameSpecializedSkolem(sym1, sym2, pre1, pre2) ||
                          sym2.isAbstractType &&
                          isSubPre(pre1, pre2, sym2)))) &&
@@ -517,10 +520,11 @@ trait TypeComparers { self: SymbolTable =>
       def retry(lhs: Type, rhs: Type) = isSubType(lhs, rhs, depth)
       def abstractTypeOnRight(lo: Type) =
         isDifferentTypeConstructor(tp2, lo) && retry(tp1, lo)
-      def classOnRight = (if (isRawType(tp2)) retry(tp1, rawToExistential(tp2))
-                          else if (sym2.isRefinementClass)
-                            retry(tp1, sym2.info)
-                          else fourthTry)
+      def classOnRight =
+        (if (isRawType(tp2)) retry(tp1, rawToExistential(tp2))
+         else if (sym2.isRefinementClass)
+           retry(tp1, sym2.info)
+         else fourthTry)
       sym2 match {
         case SingletonClass => tp1.isStable || fourthTry
         case _: ClassSymbol => classOnRight

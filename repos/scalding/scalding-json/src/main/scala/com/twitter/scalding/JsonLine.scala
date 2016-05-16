@@ -41,7 +41,8 @@ case class JsonLine(p: String,
                     override val sinkMode: SinkMode = SinkMode.REPLACE,
                     override val transformInTest: Boolean = false,
                     failOnEmptyLines: Boolean = true)
-    extends FixedPathSource(p) with TextLineScheme {
+    extends FixedPathSource(p)
+    with TextLineScheme {
 
   import Dsl._
   import JsonLine._
@@ -88,12 +89,13 @@ case class JsonLine(p: String,
   */
 object JsonLine
     extends scala.runtime.AbstractFunction5[
-        String, Fields, SinkMode, Boolean, Boolean, JsonLine] with Serializable
+        String, Fields, SinkMode, Boolean, Boolean, JsonLine]
+    with Serializable
     with scala.Serializable {
 
   val mapTypeReference = typeReference[Map[String, AnyRef]]
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 

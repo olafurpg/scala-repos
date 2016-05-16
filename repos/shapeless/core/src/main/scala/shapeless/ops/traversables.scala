@@ -81,10 +81,10 @@ object traversable {
     import ops.nat._
     import ops.sized._
 
-    type Aux[CC[T] <: GenTraversable[T], A, N <: Nat, Out0] = ToSizedHList[
-        CC, A, N] {
-      type Out = Out0
-    }
+    type Aux[CC[T] <: GenTraversable[T], A, N <: Nat, Out0] =
+      ToSizedHList[CC, A, N] {
+        type Out = Out0
+      }
 
     implicit def instance[CC[T] <: GenTraversable[T], A, N <: Nat](
         implicit gt: CC[A] => GenTraversableLike[A, CC[A]],

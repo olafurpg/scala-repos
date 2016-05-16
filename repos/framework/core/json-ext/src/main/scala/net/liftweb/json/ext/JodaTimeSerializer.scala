@@ -135,7 +135,7 @@ private[ext] trait ClassType[A, B] {
   def wrap(a: A)(implicit format: Formats): B
 }
 
-case class ClassSerializer[A : Manifest, B : Manifest](t: ClassType[A, B])
+case class ClassSerializer[A: Manifest, B: Manifest](t: ClassType[A, B])
     extends Serializer[A] {
   private val Class = implicitly[Manifest[A]].runtimeClass
 

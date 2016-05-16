@@ -258,8 +258,8 @@ object Sink {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Sink(
-        scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(
-            num ⇒ strategy.apply(num)))
+        scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(num ⇒
+              strategy.apply(num)))
   }
 
   /**

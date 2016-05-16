@@ -257,8 +257,8 @@ class IntroduceExplicitParameterIntention
               val name: String = template.getSegmentName(i)
               var attributes: TextAttributes = null
               if (name == params.get(index).get) {
-                attributes = colorsManager.getGlobalScheme.getAttributes(
-                    EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
+                attributes = colorsManager.getGlobalScheme
+                  .getAttributes(EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
               } else if (name == depends.get(index).get) {
                 attributes = colorsManager.getGlobalScheme.getAttributes(
                     EditorColors.SEARCH_RESULT_ATTRIBUTES)

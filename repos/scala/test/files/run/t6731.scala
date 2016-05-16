@@ -33,9 +33,9 @@ object Mono extends MonoDynamic {
 }
 
 object Poly extends Dynamic {
-  def selectDynamic[T : ClassTag](name: String): String =
+  def selectDynamic[T: ClassTag](name: String): String =
     show(s"$this.$name[${classTag[T]}]")
-  def applyDynamic[T : ClassTag](name: String)(args: Any*): String =
+  def applyDynamic[T: ClassTag](name: String)(args: Any*): String =
     show(args.mkString(s"$this.$name[${classTag[T]}](", ", ", ")"))
 
   def f(s: String): String = s
@@ -100,8 +100,8 @@ object Named2 extends Dynamic {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }
-  def applyDynamicNamed(name: String)(
-      a: (String, Any))(b: (String, Any), c: (String, Any)): Named2.type = {
+  def applyDynamicNamed(name: String)(a: (String, Any))(
+      b: (String, Any), c: (String, Any)): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }

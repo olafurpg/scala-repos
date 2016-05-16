@@ -60,8 +60,7 @@ trait BsonRecord[MyType <: BsonRecord[MyType]] extends Record[MyType] {
     other match {
       case that: BsonRecord[MyType] =>
         that.fields.corresponds(this.fields) { (a, b) =>
-          (a.name == b.name) &&
-          ((a.valueBox, b.valueBox) match {
+          (a.name == b.name) && ((a.valueBox, b.valueBox) match {
                 case (Full(ap: Pattern), Full(bp: Pattern)) =>
                   ap.pattern == bp.pattern && ap.flags == bp.flags
                 case _ => a.valueBox == b.valueBox
@@ -74,7 +73,9 @@ trait BsonRecord[MyType <: BsonRecord[MyType]] extends Record[MyType] {
 
 /** Specialized MetaRecord that deals with BsonRecords */
 trait BsonMetaRecord[BaseRecord <: BsonRecord[BaseRecord]]
-    extends MetaRecord[BaseRecord] with JsonFormats { self: BaseRecord =>
+    extends MetaRecord[BaseRecord]
+    with JsonFormats {
+  self: BaseRecord =>
 
   /**
     * Create a BasicDBObject from the field names and values.

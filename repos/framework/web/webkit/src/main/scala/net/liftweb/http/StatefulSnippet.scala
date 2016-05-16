@@ -168,7 +168,9 @@ trait RenderFuncDispatch {
   * This is the common use of stateful snippets and makes things easier.
   */
 trait SimpleStateful
-    extends StatefulSnippet with Whence with RenderFuncDispatch
+    extends StatefulSnippet
+    with Whence
+    with RenderFuncDispatch
 
 trait DispatchSnippet {
   type DispatchIt = PartialFunction[String, NodeSeq => NodeSeq]

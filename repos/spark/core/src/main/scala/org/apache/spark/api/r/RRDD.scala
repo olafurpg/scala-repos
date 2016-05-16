@@ -33,7 +33,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.Utils
 
-private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
+private abstract class BaseRRDD[T: ClassTag, U: ClassTag](
     parent: RDD[T],
     numPartitions: Int,
     func: Array[Byte],
@@ -41,7 +41,8 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     serializer: String,
     packageNames: Array[Byte],
     broadcastVars: Array[Broadcast[Object]])
-    extends RDD[U](parent) with Logging {
+    extends RDD[U](parent)
+    with Logging {
   protected var dataStream: DataInputStream = _
   private var bootTime: Double = _
   override def getPartitions: Array[Partition] = parent.partitions
@@ -234,12 +235,12 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
   * Form an RDD[(Int, Array[Byte])] from key-value pairs returned from R.
   * This is used by SparkR's shuffle operations.
   */
-private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
-                                         numPartitions: Int,
-                                         hashFunc: Array[Byte],
-                                         deserializer: String,
-                                         packageNames: Array[Byte],
-                                         broadcastVars: Array[Object])
+private class PairwiseRRDD[T: ClassTag](parent: RDD[T],
+                                        numPartitions: Int,
+                                        hashFunc: Array[Byte],
+                                        deserializer: String,
+                                        packageNames: Array[Byte],
+                                        broadcastVars: Array[Object])
     extends BaseRRDD[T, (Int, Array[Byte])](
         parent,
         numPartitions,
@@ -268,12 +269,12 @@ private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
 /**
   * An RDD that stores serialized R objects as Array[Byte].
   */
-private class RRDD[T : ClassTag](parent: RDD[T],
-                                 func: Array[Byte],
-                                 deserializer: String,
-                                 serializer: String,
-                                 packageNames: Array[Byte],
-                                 broadcastVars: Array[Object])
+private class RRDD[T: ClassTag](parent: RDD[T],
+                                func: Array[Byte],
+                                deserializer: String,
+                                serializer: String,
+                                packageNames: Array[Byte],
+                                broadcastVars: Array[Object])
     extends BaseRRDD[T, Array[Byte]](
         parent,
         -1,
@@ -299,11 +300,11 @@ private class RRDD[T : ClassTag](parent: RDD[T],
 /**
   * An RDD that stores R objects as Array[String].
   */
-private class StringRRDD[T : ClassTag](parent: RDD[T],
-                                       func: Array[Byte],
-                                       deserializer: String,
-                                       packageNames: Array[Byte],
-                                       broadcastVars: Array[Object])
+private class StringRRDD[T: ClassTag](parent: RDD[T],
+                                      func: Array[Byte],
+                                      deserializer: String,
+                                      packageNames: Array[Byte],
+                                      broadcastVars: Array[Object])
     extends BaseRRDD[T, String](
         parent,
         -1,
@@ -330,7 +331,8 @@ private object SpecialLengths {
 
 private[r] class BufferedStreamThread(
     in: InputStream, name: String, errBufferSize: Int)
-    extends Thread(name) with Logging {
+    extends Thread(name)
+    with Logging {
   val lines = new Array[String](errBufferSize)
   var lineIdx = 0
   override def run() {

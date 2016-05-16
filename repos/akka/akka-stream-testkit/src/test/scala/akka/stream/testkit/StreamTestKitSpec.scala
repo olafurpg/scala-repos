@@ -24,8 +24,7 @@ class StreamTestKitSpec extends AkkaSpec {
     "#toStrict with failing source" in {
       val error = intercept[AssertionError] {
         Source
-          .fromIterator(
-              () ⇒
+          .fromIterator(() ⇒
                 new Iterator[Int] {
               var i = 0
               override def hasNext: Boolean = true

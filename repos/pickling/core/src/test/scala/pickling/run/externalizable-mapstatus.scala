@@ -153,7 +153,7 @@ class MapStatus(var location: BlockManagerId, var compressedSizes: Array[Byte])
 }
 
 class MapStatusTest extends FunSuite {
-  def register[T : ClassTag : Pickler : Unpickler : FastTypeTag](): Unit = {
+  def register[T: ClassTag: Pickler: Unpickler: FastTypeTag](): Unit = {
     val clazz = classTag[T].runtimeClass
     val p = implicitly[Pickler[T]]
     val up = implicitly[Unpickler[T]]

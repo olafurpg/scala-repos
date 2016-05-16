@@ -8,7 +8,7 @@ import scala.reflect.ClassTag
 object HoconPsiElementFactory {
   private val Dummy = "dummy."
 
-  private def createElement[T <: HoconPsiElement : ClassTag](
+  private def createElement[T <: HoconPsiElement: ClassTag](
       manager: PsiManager, text: String, offset: Int): T = {
     val element = PsiFileFactory
       .getInstance(manager.getProject)

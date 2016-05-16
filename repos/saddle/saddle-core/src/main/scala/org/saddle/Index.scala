@@ -456,7 +456,7 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * @param f Function to map with
     * @tparam B Type of resulting elements
     */
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](f: T => B): Index[B]
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](f: T => B): Index[B]
 
   /**
     * Convert Index elements to an IndexedSeq.
@@ -540,7 +540,7 @@ object Index {
     * @param values Vec
     * @tparam C Type of elements in Vec
     */
-  def apply[C : ST : ORD](values: Vec[C]): Index[C] =
+  def apply[C: ST: ORD](values: Vec[C]): Index[C] =
     implicitly[ST[C]].makeIndex(values)
 
   /**
@@ -548,7 +548,7 @@ object Index {
     * @param arr Array
     * @tparam C Type of elements in array
     */
-  def apply[C : ST : ORD](arr: Array[C]): Index[C] = apply(Vec(arr))
+  def apply[C: ST: ORD](arr: Array[C]): Index[C] = apply(Vec(arr))
 
   /**
     * Factory method to create an index from a sequence of elements, eg
@@ -561,7 +561,7 @@ object Index {
     * @param values Seq[C]
     * @tparam C Type of elements in Seq
     */
-  def apply[C : ST : ORD](values: C*): Index[C] = apply(values.toArray)
+  def apply[C: ST: ORD](values: C*): Index[C] = apply(values.toArray)
 
   /**
     * Factory method to create an Index; the basic use case is to construct
@@ -604,7 +604,7 @@ object Index {
     * Factor method to create an empty Index
     * @tparam C type of Index
     */
-  def empty[C : ST : ORD]: Index[C] = Index(Array.empty[C])
+  def empty[C: ST: ORD]: Index[C] = Index(Array.empty[C])
 
   // (safe) conversions
 
@@ -613,14 +613,14 @@ object Index {
     * @param arr Array
     * @tparam C Type of elements in array
     */
-  implicit def arrayToIndex[C : ST : ORD](arr: Array[C]) = Index(arr)
+  implicit def arrayToIndex[C: ST: ORD](arr: Array[C]) = Index(arr)
 
   /**
     * A Vec may be implicitly converted to an Index
     * @param s Vec
     * @tparam C Type of elements in Vec
     */
-  implicit def vecToIndex[C : ST : ORD](s: Vec[C]) = Index(s.toArray)
+  implicit def vecToIndex[C: ST: ORD](s: Vec[C]) = Index(s.toArray)
 
   /**
     * Provides an index-specific exception

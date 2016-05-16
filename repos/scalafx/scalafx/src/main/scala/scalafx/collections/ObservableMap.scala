@@ -151,8 +151,10 @@ object ObservableMap extends MutableMapFactory[ObservableMap] {
   * @define MAP `Map`
   */
 trait ObservableMap[K, V]
-    extends Map[K, V] with MapLike[K, V, ObservableMap[K, V]]
-    with Builder[(K, V), ObservableMap[K, V]] with Observable
+    extends Map[K, V]
+    with MapLike[K, V, ObservableMap[K, V]]
+    with Builder[(K, V), ObservableMap[K, V]]
+    with Observable
     with SFXDelegate[jfxc.ObservableMap[K, V]] {
 
   /**
@@ -284,6 +286,6 @@ trait ObservableMap[K, V]
   *                 [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/FXCollections.html `FXCollections`]].
   */
 class ObservableHashMap[K, V](
-    override val delegate: jfxc.ObservableMap[K, V] = jfxc.FXCollections
-        .observableMap(new ju.HashMap[K, V]))
+    override val delegate: jfxc.ObservableMap[K, V] =
+      jfxc.FXCollections.observableMap(new ju.HashMap[K, V]))
     extends ObservableMap[K, V]

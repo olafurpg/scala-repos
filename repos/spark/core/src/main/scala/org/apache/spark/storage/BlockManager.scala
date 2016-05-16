@@ -65,7 +65,8 @@ private[spark] class BlockManager(executorId: String,
                                   blockTransferService: BlockTransferService,
                                   securityManager: SecurityManager,
                                   numUsableCores: Int)
-    extends BlockDataManager with Logging {
+    extends BlockDataManager
+    with Logging {
 
   private[spark] val externalShuffleServiceEnabled =
     conf.getBoolean("spark.shuffle.service.enabled", false)
@@ -182,14 +183,15 @@ private[spark] class BlockManager(executorId: String,
     blockManagerId = BlockManagerId(
         executorId, blockTransferService.hostName, blockTransferService.port)
 
-    shuffleServerId = if (externalShuffleServiceEnabled) {
-      logInfo(s"external shuffle service port = $externalShuffleServicePort")
-      BlockManagerId(executorId,
-                     blockTransferService.hostName,
-                     externalShuffleServicePort)
-    } else {
-      blockManagerId
-    }
+    shuffleServerId =
+      if (externalShuffleServiceEnabled) {
+        logInfo(s"external shuffle service port = $externalShuffleServicePort")
+        BlockManagerId(executorId,
+                       blockTransferService.hostName,
+                       externalShuffleServicePort)
+      } else {
+        blockManagerId
+      }
 
     master.registerBlockManager(blockManagerId, maxMemory, slaveEndpoint)
 
@@ -1015,16 +1017,14 @@ private[spark] class BlockManager(executorId: String,
           diskBytes.dispose()
           memoryStore.getBytes(blockId).get
         } else {
-          val putSucceeded = memoryStore.putBytes(blockId,
-                                                  diskBytes.size,
-                                                  () =>
-                                                    {
-                                                      // https://issues.apache.org/jira/browse/SPARK-6076
-                                                      // If the file size is bigger than the free memory, OOM will happen. So if we
-                                                      // cannot put it into MemoryStore, copyForMemory should not be created. That's why
-                                                      // this action is put into a `() => ChunkedByteBuffer` and created lazily.
-                                                      diskBytes.copy()
-                                                  })
+          val putSucceeded =
+            memoryStore.putBytes(blockId, diskBytes.size, () => {
+              // https://issues.apache.org/jira/browse/SPARK-6076
+              // If the file size is bigger than the free memory, OOM will happen. So if we
+              // cannot put it into MemoryStore, copyForMemory should not be created. That's why
+              // this action is put into a `() => ChunkedByteBuffer` and created lazily.
+              diskBytes.copy()
+            })
           if (putSucceeded) {
             diskBytes.dispose()
             memoryStore.getBytes(blockId).get
@@ -1431,8 +1431,8 @@ private[spark] object BlockManager {
 
   def blockIdsToHosts(blockIds: Array[BlockId],
                       env: SparkEnv,
-                      blockManagerMaster: BlockManagerMaster = null)
-    : Map[BlockId, Seq[String]] = {
+                      blockManagerMaster: BlockManagerMaster =
+                        null): Map[BlockId, Seq[String]] = {
 
     // blockManagerMaster != null is used in tests
     assert(env != null || blockManagerMaster != null)

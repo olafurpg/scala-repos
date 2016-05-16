@@ -85,7 +85,8 @@ class TestActor(queue: BlockingDeque[TestActor.Message]) extends Actor {
         case other ⇒ other
       }
       val observe =
-        ignore map (ignoreFunc ⇒ !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
+        ignore map (ignoreFunc ⇒
+              !ignoreFunc.applyOrElse(x, FALSE)) getOrElse true
       if (observe) queue.offerLast(RealMessage(x, sender()))
   }
 
@@ -562,7 +563,8 @@ trait TestKitBase {
                                         unexpectedMessage: String): Unit = {
     assert(missing.isEmpty && unexpected.isEmpty,
            (if (missing.isEmpty)
-              "" else missing.mkString(missingMessage + " [", ", ", "] ")) +
+              ""
+            else missing.mkString(missingMessage + " [", ", ", "] ")) +
            (if (unexpected.isEmpty) ""
             else unexpected.mkString(unexpectedMessage + " [", ", ", "]")))
   }

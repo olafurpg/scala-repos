@@ -238,7 +238,7 @@ class FramingSpec extends AkkaSpec {
         fieldOffset ← fieldOffsets
         fieldLength ← fieldLengths
         frameLength ← frameLengths if frameLength < (1 << (fieldLength * 8)) &&
-                     (frameLength != 0)
+        (frameLength != 0)
       } {
 
         val fullFrame = encode(referenceChunk.take(frameLength),

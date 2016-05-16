@@ -8,8 +8,12 @@ import akka.testkit.{TimingTest, TestProbe, TestKit}
 import akka.camel.internal.ActivationProtocol._
 
 class ActivationTrackerTest
-    extends TestKit(ActorSystem("test")) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen {
+    extends TestKit(ActorSystem("test"))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with GivenWhenThen {
 
   override protected def afterAll() { shutdown() }
 

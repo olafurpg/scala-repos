@@ -102,10 +102,9 @@ trait Node extends Dumpable {
         val n =
           if (cln.endsWith("$")) cln.substring(0, cln.length - 1)
           else cln.replaceFirst(".*\\$", "")
-        val args = p.productIterator
-          .filterNot(_.isInstanceOf[Node])
-          .mkString(", ")
-          (n, args)
+        val args =
+          p.productIterator.filterNot(_.isInstanceOf[Node]).mkString(", ")
+        (n, args)
       case _ => (super.toString, "")
     }
     val t = peekType
@@ -166,7 +165,8 @@ final case class ProductNode(children: ConstArray[Node])
 /** An expression that represents a structure, i.e. a conjunction where the
   * individual components have Symbols associated with them. */
 final case class StructNode(elements: ConstArray[(TermSymbol, Node)])
-    extends SimplyTypedNode with DefNode {
+    extends SimplyTypedNode
+    with DefNode {
   type Self = StructNode
   override def getDumpInfo =
     super.getDumpInfo.copy(name = "StructNode", mainInfo = "")
@@ -197,7 +197,8 @@ final case class StructNode(elements: ConstArray[(TermSymbol, Node)])
   *                     volatile constants into bind variables. */
 class LiteralNode(
     val buildType: Type, val value: Any, val volatileHint: Boolean = false)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = LiteralNode
   override def getDumpInfo =
     super.getDumpInfo.copy(name = "LiteralNode",
@@ -205,8 +206,8 @@ class LiteralNode(
   protected[this] def rebuild = new LiteralNode(buildType, value, volatileHint)
 
   override def hashCode =
-    buildType.hashCode() +
-    (if (value == null) 0 else value.asInstanceOf[AnyRef].hashCode)
+    buildType.hashCode() + (if (value == null) 0
+                            else value.asInstanceOf[AnyRef].hashCode)
   override def equals(o: Any) = o match {
     case l: LiteralNode => buildType == l.buildType && value == l.value
     case _ => false
@@ -279,7 +280,9 @@ trait NullaryNode extends Node {
 
 /** An expression that represents a plain value lifted into a Query. */
 final case class Pure(value: Node, identity: TypeSymbol = new AnonTypeSymbol)
-    extends UnaryNode with SimplyTypedNode with TypeGenerator {
+    extends UnaryNode
+    with SimplyTypedNode
+    with TypeGenerator {
   type Self = Pure
   def child = value
   override def childNames = Seq("value")
@@ -290,7 +293,8 @@ final case class Pure(value: Node, identity: TypeSymbol = new AnonTypeSymbol)
 }
 
 final case class CollectionCast(child: Node, cons: CollectionTypeConstructor)
-    extends UnaryNode with SimplyTypedNode {
+    extends UnaryNode
+    with SimplyTypedNode {
   type Self = CollectionCast
   protected[this] def rebuild(child: Node) = copy(child = child)
   protected def buildType =
@@ -303,7 +307,8 @@ final case class CollectionCast(child: Node, cons: CollectionTypeConstructor)
   * collection-valued operations that would otherwise be fused, and the subquery condition
   * is true. */
 final case class Subquery(child: Node, condition: Subquery.Condition)
-    extends UnaryNode with SimplyTypedNode {
+    extends UnaryNode
+    with SimplyTypedNode {
   type Self = Subquery
   protected[this] def rebuild(child: Node) = copy(child = child)
   protected def buildType = child.nodeType
@@ -362,7 +367,8 @@ abstract class ComplexFilteredQuery extends FilteredQuery with DefNode {
 
 /** A .filter call of type (CollectionType(c, t), Boolean) => CollectionType(c, t). */
 final case class Filter(generator: TermSymbol, from: Node, where: Node)
-    extends ComplexFilteredQuery with BinaryNode {
+    extends ComplexFilteredQuery
+    with BinaryNode {
   type Self = Filter
   def left = from
   def right = where
@@ -397,9 +403,9 @@ final case class SortBy(
     super.getDumpInfo.copy(mainInfo = by.map(_._2).mkString(", "))
 }
 
-final case class Ordering(
-    direction: Ordering.Direction = Ordering.Asc,
-    nulls: Ordering.NullOrdering = Ordering.NullsDefault) {
+final case class Ordering(direction: Ordering.Direction = Ordering.Asc,
+                          nulls: Ordering.NullOrdering =
+                            Ordering.NullsDefault) {
   def asc = copy(direction = Ordering.Asc)
   def desc = copy(direction = Ordering.Desc)
   def reverse = copy(direction = direction.reverse)
@@ -424,7 +430,9 @@ final case class GroupBy(fromGen: TermSymbol,
                          from: Node,
                          by: Node,
                          identity: TypeSymbol = new AnonTypeSymbol)
-    extends BinaryNode with DefNode with TypeGenerator {
+    extends BinaryNode
+    with DefNode
+    with TypeGenerator {
   type Self = GroupBy
   def left = from
   def right = by
@@ -458,7 +466,8 @@ final case class GroupBy(fromGen: TermSymbol,
 
 /** A .take call. */
 final case class Take(from: Node, count: Node)
-    extends SimpleFilteredQuery with BinaryNode {
+    extends SimpleFilteredQuery
+    with BinaryNode {
   type Self = Take
   def left = from
   def right = count
@@ -469,7 +478,8 @@ final case class Take(from: Node, count: Node)
 
 /** A .drop call. */
 final case class Drop(from: Node, count: Node)
-    extends SimpleFilteredQuery with BinaryNode {
+    extends SimpleFilteredQuery
+    with BinaryNode {
   type Self = Drop
   def left = from
   def right = count
@@ -480,7 +490,8 @@ final case class Drop(from: Node, count: Node)
 
 /** A .distinct call of type (CollectionType(c, t), _) => CollectionType(c, t). */
 final case class Distinct(generator: TermSymbol, from: Node, on: Node)
-    extends ComplexFilteredQuery with BinaryNode {
+    extends ComplexFilteredQuery
+    with BinaryNode {
   type Self = Distinct
   def left = from
   def right = on
@@ -543,7 +554,8 @@ final case class Join(leftGen: TermSymbol,
 /** A union of type
   * (CollectionType(c, t), CollectionType(_, t)) => CollectionType(c, t). */
 final case class Union(left: Node, right: Node, all: Boolean)
-    extends BinaryNode with SimplyTypedNode {
+    extends BinaryNode
+    with SimplyTypedNode {
   type Self = Union
   protected[this] def rebuild(left: Node, right: Node) =
     copy(left = left, right = right)
@@ -556,7 +568,8 @@ final case class Union(left: Node, right: Node, all: Boolean)
 /** A .flatMap call of type
   * (CollectionType(c, _), CollectionType(_, u)) => CollectionType(c, u). */
 final case class Bind(generator: TermSymbol, from: Node, select: Node)
-    extends BinaryNode with DefNode {
+    extends BinaryNode
+    with DefNode {
   type Self = Bind
   def left = from
   def right = select
@@ -587,7 +600,8 @@ final case class Bind(generator: TermSymbol, from: Node, select: Node)
   * projection contains a mapping function application. The return type is an aggregated
   * scalar value though, not a collection. */
 final case class Aggregate(sym: TermSymbol, from: Node, select: Node)
-    extends BinaryNode with DefNode {
+    extends BinaryNode
+    with DefNode {
   type Self = Aggregate
   def left = from
   def right = select
@@ -611,7 +625,8 @@ final case class Aggregate(sym: TermSymbol, from: Node, select: Node)
 /** A table together with its expansion into columns. */
 final case class TableExpansion(
     generator: TermSymbol, table: Node, columns: Node)
-    extends BinaryNode with DefNode {
+    extends BinaryNode
+    with DefNode {
   type Self = TableExpansion
   def left = table
   def right = columns
@@ -642,7 +657,9 @@ trait PathElement extends Node {
 
 /** An expression that selects a field in another expression. */
 final case class Select(in: Node, field: TermSymbol)
-    extends PathElement with UnaryNode with SimplyTypedNode {
+    extends PathElement
+    with UnaryNode
+    with SimplyTypedNode {
   def sym = field
   type Self = Select
   def child = in
@@ -748,26 +765,29 @@ object FwdPath {
 }
 
 /** A Node representing a database table. */
-final case class TableNode(
-    schemaName: Option[String],
-    tableName: String,
-    identity: TableIdentitySymbol,
-    baseIdentity: TableIdentitySymbol)(val profileTable: Any)
-    extends NullaryNode with SimplyTypedNode with TypeGenerator {
+final case class TableNode(schemaName: Option[String],
+                           tableName: String,
+                           identity: TableIdentitySymbol,
+                           baseIdentity: TableIdentitySymbol)(
+    val profileTable: Any)
+    extends NullaryNode
+    with SimplyTypedNode
+    with TypeGenerator {
   type Self = TableNode
   def buildType =
     CollectionType(TypedCollectionTypeConstructor.seq,
                    NominalType(identity, UnassignedType))
   def rebuild = copy()(profileTable)
   override def getDumpInfo =
-    super.getDumpInfo.copy(
-        name = "Table",
-        mainInfo = schemaName.map(_ + ".").getOrElse("") + tableName)
+    super.getDumpInfo.copy(name = "Table",
+                           mainInfo =
+                             schemaName.map(_ + ".").getOrElse("") + tableName)
 }
 
 /** A node that represents an SQL sequence. */
 final case class SequenceNode(name: String)(val increment: Long)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = SequenceNode
   def buildType = ScalaBaseType.longType
   def rebuild = copy()(increment)
@@ -778,7 +798,8 @@ final case class SequenceNode(name: String)(val increment: Long)
   * zipWithIndex. It is not exposed directly in the query language because it
   * cannot be represented in SQL outside of a 'zip' operation. */
 final case class RangeFrom(start: Long = 1L)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = RangeFrom
   def buildType =
     CollectionType(TypedCollectionTypeConstructor.seq, ScalaBaseType.longType)
@@ -838,7 +859,8 @@ final case class IfThenElse(clauses: ConstArray[Node])
 
 /** Lift a value into an Option as Some (or None if the value is a `null` column). */
 final case class OptionApply(child: Node)
-    extends UnaryNode with SimplyTypedNode {
+    extends UnaryNode
+    with SimplyTypedNode {
   type Self = OptionApply
   protected[this] def rebuild(ch: Node) = copy(child = ch)
   protected def buildType = OptionType(child.nodeType)
@@ -869,7 +891,8 @@ final case class OptionFold(
 }
 
 final case class GetOrElse(child: Node, default: () => Any)
-    extends UnaryNode with SimplyTypedNode {
+    extends UnaryNode
+    with SimplyTypedNode {
   type Self = GetOrElse
   protected[this] def rebuild(ch: Node) = copy(child = ch)
   protected def buildType = child.nodeType.structural.asOptionType.elementType
@@ -879,18 +902,22 @@ final case class GetOrElse(child: Node, default: () => Any)
 /** A compiled statement with a fixed type, a statement string and profile-specific extra data. */
 final case class CompiledStatement(
     statement: String, extra: Any, buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = CompiledStatement
   def rebuild = copy()
   override def getDumpInfo =
-    super.getDumpInfo.copy(mainInfo = if (statement contains '\n') statement
+    super.getDumpInfo.copy(mainInfo =
+          if (statement contains '\n') statement
           else ("\"" + statement + "\""))
 }
 
 /** A client-side type mapping */
 final case class TypeMapping(
     child: Node, mapper: MappedScalaType.Mapper, classTag: ClassTag[_])
-    extends UnaryNode with SimplyTypedNode { self =>
+    extends UnaryNode
+    with SimplyTypedNode {
+  self =>
   type Self = TypeMapping
   def rebuild(ch: Node) = copy(child = ch)
   override def getDumpInfo = super.getDumpInfo.copy(mainInfo = "")
@@ -900,7 +927,9 @@ final case class TypeMapping(
 
 /** Rebuild an Option type on the client side */
 final case class RebuildOption(discriminator: Node, data: Node)
-    extends BinaryNode with SimplyTypedNode { self =>
+    extends BinaryNode
+    with SimplyTypedNode {
+  self =>
   type Self = RebuildOption
   def left = discriminator
   def right = data
@@ -911,7 +940,8 @@ final case class RebuildOption(discriminator: Node, data: Node)
 /** A parameter from a QueryTemplate which gets turned into a bind variable. */
 final case class QueryParameter(
     extractor: (Any => Any), buildType: Type, id: TermSymbol = new AnonSymbol)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = QueryParameter
   def rebuild = copy()
   override def getDumpInfo =
@@ -924,8 +954,8 @@ object QueryParameter {
   /** Create a LiteralNode or QueryParameter that performs a client-side computation
     * on two primitive values. The given Nodes must also be of type `LiteralNode` or
     * `QueryParameter`. */
-  def constOp[T](name: String)(op: (T, T) => T)(l: Node, r: Node)(
-      implicit tpe: ScalaBaseType[T]): Node = (l, r) match {
+  def constOp[T](name: String)(op: (T, T) => T)(
+      l: Node, r: Node)(implicit tpe: ScalaBaseType[T]): Node = (l, r) match {
     case (LiteralNode(lv) :@ (lt: TypedType[_]),
           LiteralNode(rv) :@ (rt: TypedType[_]))
         if lt.scalaType == tpe && rt.scalaType == tpe =>

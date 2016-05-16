@@ -31,7 +31,9 @@ import org.apache.karaf.tooling.exam.options.LogLevelOption
   */
 @RunWith(classOf[JUnit4TestRunner])
 class HakkerStatusTest
-    extends JUnitSuite with Matchers with AssertionsForJUnit {
+    extends JUnitSuite
+    with Matchers
+    with AssertionsForJUnit {
 
   @Inject
   @Filter(timeout = 30000)

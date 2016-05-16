@@ -277,7 +277,8 @@ object WorksheetSourceProcessor {
           val memberName =
             if (el.isInstanceOf[ScValue] ||
                 el.isInstanceOf[ScVariable]) //variable to avoid weird errors
-              variableInstanceName(qualifierName) else qualifierName
+              variableInstanceName(qualifierName)
+            else qualifierName
 
           objectRes append s";{val $qualifierName = $instanceName.$memberName; $printMethodName($macroPrinterName.printImportInfo({$text;}))}\n"
           classRes append s"$text${insertNlsFromWs(imp)}"
@@ -386,8 +387,7 @@ object WorksheetSourceProcessor {
 
         val txt = (varDef.typeElement, varDef.expr) match {
           case (Some(tpl: ScTypeElement), Some(expr)) =>
-            "var " +
-            (typeElement2Types(tpl) zip varDef.declaredElements map {
+            "var " + (typeElement2Types(tpl) zip varDef.declaredElements map {
                   case (tpe, el) => el.name + ": " + tpe.getText
                 }).mkString("(", ",", ")") + " = { " + expr.getText + ";}"
           case (_, Some(expr)) =>
@@ -445,7 +445,8 @@ object WorksheetSourceProcessor {
     insertUntouched(postDeclarations)
 
     classRes append "}"
-    objectRes append (printMethodName + "(\"" + END_OUTPUT_MARKER + "\")\n") append s"} \n $PRINT_ARRAY_TEXT \n }"
+    objectRes append (printMethodName + "(\"" + END_OUTPUT_MARKER +
+        "\")\n") append s"} \n $PRINT_ARRAY_TEXT \n }"
 
     val codeResult =
       objectPrologue + importStmts.mkString(";") + classRes.toString() +

@@ -325,8 +325,8 @@ class EventServiceActor(val eventClient: LEvents,
                          'limit.as[Option[Int]],
                          'reversed.as[Option[Boolean]]) {
                 (startTimeStr, untilTimeStr, entityType, entityId,
-                eventName, // only support one event name
-                targetEntityType, targetEntityId, limit, reversed) =>
+                 eventName, // only support one event name
+                 targetEntityType, targetEntityId, limit, reversed) =>
                   respondWithMediaType(MediaTypes.`application/json`) {
                     complete {
                       logger.debug(s"GET events of appId=${appId} " +
@@ -350,19 +350,19 @@ class EventServiceActor(val eventClient: LEvents,
                       parseTime.flatMap {
                         case (startTime, untilTime) =>
                           val data = eventClient
-                            .futureFind(
-                                appId = appId,
-                                channelId = channelId,
-                                startTime = startTime,
-                                untilTime = untilTime,
-                                entityType = entityType,
-                                entityId = entityId,
-                                eventNames = eventName.map(List(_)),
-                                targetEntityType = targetEntityType.map(
-                                      Some(_)),
-                                targetEntityId = targetEntityId.map(Some(_)),
-                                limit = limit.orElse(Some(20)),
-                                reversed = reversed)
+                            .futureFind(appId = appId,
+                                        channelId = channelId,
+                                        startTime = startTime,
+                                        untilTime = untilTime,
+                                        entityType = entityType,
+                                        entityId = entityId,
+                                        eventNames = eventName.map(List(_)),
+                                        targetEntityType =
+                                          targetEntityType.map(Some(_)),
+                                        targetEntityId =
+                                          targetEntityId.map(Some(_)),
+                                        limit = limit.orElse(Some(20)),
+                                        reversed = reversed)
                             .map { eventIter =>
                               if (eventIter.hasNext) {
                                 (StatusCodes.OK, eventIter.toArray)
@@ -586,7 +586,8 @@ class EventServerActor(val eventClient: LEvents,
                        val accessKeysClient: AccessKeys,
                        val channelsClient: Channels,
                        val config: EventServerConfig)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   val child = context.actorOf(Props(classOf[EventServiceActor],
                                     eventClient,
                                     accessKeysClient,

@@ -119,7 +119,8 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
     * The Singleton actor
     */
   class Consumer(queue: ActorRef, delegateTo: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor
+      with ActorLogging {
 
     import Consumer._
     import PointToPointChannel._
@@ -167,7 +168,8 @@ class ClusterSingletonManagerMultiJvmNode7 extends ClusterSingletonManagerSpec
 class ClusterSingletonManagerMultiJvmNode8 extends ClusterSingletonManagerSpec
 
 class ClusterSingletonManagerSpec
-    extends MultiNodeSpec(ClusterSingletonManagerSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterSingletonManagerSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import ClusterSingletonManagerSpec._
@@ -225,8 +227,8 @@ class ClusterSingletonManagerSpec
         ClusterSingletonManager.props(
             singletonProps = Props(classOf[Consumer], queue, testActor),
             terminationMessage = End,
-            settings = ClusterSingletonManagerSettings(system).withRole(
-                  "worker")),
+            settings =
+              ClusterSingletonManagerSettings(system).withRole("worker")),
         name = "consumer")
     //#create-singleton-manager
   }
@@ -234,9 +236,10 @@ class ClusterSingletonManagerSpec
   def createSingletonProxy(): ActorRef = {
     //#create-singleton-proxy
     system.actorOf(
-        ClusterSingletonProxy.props(singletonManagerPath = "/user/consumer",
-                                    settings = ClusterSingletonProxySettings(
-                                          system).withRole("worker")),
+        ClusterSingletonProxy.props(
+            singletonManagerPath = "/user/consumer",
+            settings =
+              ClusterSingletonProxySettings(system).withRole("worker")),
         name = "consumerProxy")
     //#create-singleton-proxy
   }

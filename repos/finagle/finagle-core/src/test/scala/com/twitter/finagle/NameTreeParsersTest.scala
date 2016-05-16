@@ -51,10 +51,11 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
                                              NameTree.Leaf(Path.Utf8("foo"))),
                            NameTree.Weighted(defaultWeight,
                                              NameTree.Leaf(Path.Utf8("bar")))),
-            NameTree.Union(NameTree.Weighted(defaultWeight,
-                                             NameTree.Leaf(Path.Utf8("bar"))),
-                           NameTree.Weighted(defaultWeight,
-                                             NameTree.Leaf(Path.Utf8("baz"))))))
+            NameTree.Union(
+                NameTree.Weighted(defaultWeight,
+                                  NameTree.Leaf(Path.Utf8("bar"))),
+                NameTree.Weighted(defaultWeight,
+                                  NameTree.Leaf(Path.Utf8("baz"))))))
 
     assert(
         NameTreeParsers.parseNameTree(

@@ -218,17 +218,15 @@ package scalaguide.forms.scalaforms {
 
         //#userForm-handling-failure
         userForm.bindFromRequest.fold(
-            formWithErrors =>
-              {
-                // binding failure, you retrieve the form containing errors:
-                BadRequest(views.html.user(formWithErrors))
+            formWithErrors => {
+              // binding failure, you retrieve the form containing errors:
+              BadRequest(views.html.user(formWithErrors))
             },
-            userData =>
-              {
-                /* binding success, you get the actual value. */
-                val newUser = models.User(userData.name, userData.age)
-                val id = models.User.create(newUser)
-                Redirect(routes.Application.home(id))
+            userData => {
+              /* binding success, you get the actual value. */
+              val newUser = models.User(userData.name, userData.age)
+              val id = models.User.create(newUser)
+              Redirect(routes.Application.home(id))
             }
         )
       //#userForm-handling-failure
@@ -247,7 +245,7 @@ package scalaguide.forms.scalaforms {
       val userPostWithErrors = Action(
           parse.form(userForm,
                      onErrors = (formWithErrors: Form[UserData]) =>
-                         BadRequest(views.html.user(formWithErrors)))) {
+                       BadRequest(views.html.user(formWithErrors)))) {
         implicit request =>
           val userData = request.body
           val newUser = models.User(userData.name, userData.age)
@@ -279,8 +277,8 @@ package scalaguide.forms.scalaforms {
               "name" -> text,
               "age" -> number,
               "accept" -> checked("Please accept the terms and conditions")
-          )((name, age, _) => UserData(name, age))(
-              (user: UserData) => Some(user.name, user.age, false))
+          )((name, age, _) => UserData(name, age))((user: UserData) =>
+                Some(user.name, user.age, false))
       )
       //#userForm-verify
 
@@ -471,22 +469,22 @@ package scalaguide.forms.scalaforms {
             "Contact",
             Some("Fake company"),
             informations = List(
-                  ContactInformation(
-                      "Personal",
-                      Some("fakecontact@gmail.com"),
-                      List("01.23.45.67.89", "98.76.54.32.10")
-                  ),
-                  ContactInformation(
-                      "Professional",
-                      Some("fakecontact@company.com"),
-                      List("01.23.45.67.89")
-                  ),
-                  ContactInformation(
-                      "Previous",
-                      Some("fakecontact@oldcompany.com"),
-                      List()
-                  )
-              )
+                ContactInformation(
+                    "Personal",
+                    Some("fakecontact@gmail.com"),
+                    List("01.23.45.67.89", "98.76.54.32.10")
+                ),
+                ContactInformation(
+                    "Professional",
+                    Some("fakecontact@company.com"),
+                    List("01.23.45.67.89")
+                ),
+                ContactInformation(
+                    "Previous",
+                    Some("fakecontact@oldcompany.com"),
+                    List()
+                )
+            )
         )
         Ok(views.html.contact.form(contactForm.fill(existingContact)))
       }
@@ -495,15 +493,13 @@ package scalaguide.forms.scalaforms {
       // #contact-save
       def saveContact = Action { implicit request =>
         contactForm.bindFromRequest.fold(
-            formWithErrors =>
-              {
-                BadRequest(views.html.contact.form(formWithErrors))
+            formWithErrors => {
+              BadRequest(views.html.contact.form(formWithErrors))
             },
-            contact =>
-              {
-                val contactId = Contact.save(contact)
-                Redirect(routes.Application.showContact(contactId))
-                  .flashing("success" -> "Contact saved!")
+            contact => {
+              val contactId = Contact.save(contact)
+              Redirect(routes.Application.showContact(contactId))
+                .flashing("success" -> "Contact saved!")
             }
         )
       }

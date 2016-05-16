@@ -19,8 +19,11 @@ import scala.util.control.NonFatal
 import org.apache.mesos.{Protos => MesosProtos}
 
 class AppDeployIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -165,8 +168,8 @@ class AppDeployIntegrationTest
     Then("The app count metric should increase")
     result.code should be(201) // Created
     appCount =
-    (marathon.metrics().entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
-      .as[Int]
+      (marathon.metrics().entityJson \ "gauges" \ "service.mesosphere.marathon.app.count" \ "value")
+        .as[Int]
     appCount should be(1)
   }
 
@@ -189,11 +192,11 @@ class AppDeployIntegrationTest
 
   test("create a simple app with http health checks") {
     Given("a new app")
-    val app =
-      appProxy(testBasePath / "http-app",
-               "v1",
-               instances = 1,
-               withHealth = false).copy(healthChecks = Set(healthCheck))
+    val app = appProxy(testBasePath / "http-app",
+                       "v1",
+                       instances = 1,
+                       withHealth =
+                         false).copy(healthChecks = Set(healthCheck))
     val check = appProxyCheck(app.id, "v1", true)
 
     When("The app is deployed")
@@ -246,12 +249,14 @@ class AppDeployIntegrationTest
 
   test("create a simple app with command health checks") {
     Given("a new app")
-    val app = appProxy(testBasePath / "command-app",
-                       "v1",
-                       instances = 1,
-                       withHealth = false).copy(
-        healthChecks = Set(healthCheck.copy(protocol = Protocol.COMMAND,
-                                            command = Some(Command("true")))))
+    val app =
+      appProxy(testBasePath / "command-app",
+               "v1",
+               instances = 1,
+               withHealth = false).copy(healthChecks =
+            Set(
+                healthCheck.copy(protocol = Protocol.COMMAND,
+                                 command = Some(Command("true")))))
 
     When("The app is deployed")
     val result = marathon.createAppV2(app)
@@ -654,8 +659,8 @@ class AppDeployIntegrationTest
         cmd = Some("sleep 1"),
         instances = 0,
         container = Some(Container(
-                  `type` = MesosProtos.ContainerInfo.Type.MESOS
-              ))
+                `type` = MesosProtos.ContainerInfo.Type.MESOS
+            ))
     )
 
     app.container should not be empty

@@ -9,7 +9,7 @@ import scala.util._
 /* Tests various ranges by making sure they all agree on the same answers. */
 @RunWith(classOf[JUnit4])
 class RangeConsistencyTest {
-  def r2nr[T : Integral](
+  def r2nr[T: Integral](
       r: Range,
       puff: T,
       stride: T,
@@ -148,7 +148,7 @@ class RangeConsistencyTest {
   def testSI6736() {
     // These operations on overfull ranges should all succeed.
     assert((0 to Int.MaxValue).contains(4))
-    assert(!( (Int.MinValue to 0).contains(4)))
+    assert(!((Int.MinValue to 0).contains(4)))
     assert((Int.MinValue to 0).last == 0)
     assert((Int.MinValue until 5).last == 4)
     assert((-7 to -99 by -4).last == -99 && (-7 until -99 by -4).last == -95)

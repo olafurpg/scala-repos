@@ -12,7 +12,9 @@ import play.api.test.{WithServer, WsTestClient, PlaySpecification, WithApplicati
 import scala.concurrent.Future
 
 class AhcCurlRequestLoggerSpec
-    extends PlaySpecification with WsTestClient with Mockito
+    extends PlaySpecification
+    with WsTestClient
+    with Mockito
     with org.specs2.specification.mutable.ExecutionEnvironment {
 
   def is(implicit ee: ExecutionEnv) = {

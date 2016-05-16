@@ -95,7 +95,7 @@ class XorTTests extends CatsSuite {
 
   test("withValidated") {
     forAll { (xort: XorT[List, String, Int], f: String => Char,
-    g: Int => Double) =>
+              g: Int => Double) =>
       xort.withValidated(_.bimap(f, g)) should ===(xort.bimap(f, g))
     }
   }
@@ -183,7 +183,7 @@ class XorTTests extends CatsSuite {
 
   test("fold with Id consistent with Xor fold") {
     forAll { (xort: XorT[Id, String, Int], f: String => Long,
-    g: Int => Long) =>
+              g: Int => Long) =>
       xort.fold(f, g) should ===(xort.value.fold(f, g))
     }
   }
@@ -265,7 +265,7 @@ class XorTTests extends CatsSuite {
 
   test("foldRight with Id consistent with Xor foldRight") {
     forAll { (x: XorT[Id, String, Int], l: Eval[Long], f: (Int, Eval[Long]) => Eval[
-        Long]) =>
+                  Long]) =>
       x.foldRight(l)(f) should ===(x.value.foldRight(l)(f))
     }
   }

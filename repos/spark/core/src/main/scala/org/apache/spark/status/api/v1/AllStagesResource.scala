@@ -45,8 +45,10 @@ private[v1] class AllStagesResource(ui: SparkUI) {
       (status, stageList) <- stageAndStatus
       stageInfo: StageInfo <- stageList if adjStatuses.contains(status)
       stageUiData: StageUIData <- listener.synchronized {
-        listener.stageIdToData.get((stageInfo.stageId, stageInfo.attemptId))
-      }
+                                   listener.stageIdToData.get(
+                                       (stageInfo.stageId,
+                                        stageInfo.attemptId))
+                                 }
     } yield {
       AllStagesResource.stageUiToStageData(
           status, stageInfo, stageUiData, includeDetails = false)
@@ -72,7 +74,8 @@ private[v1] object AllStagesResource {
 
     val taskData =
       if (includeDetails) {
-        Some(stageUiData.taskData.map {
+        Some(
+            stageUiData.taskData.map {
           case (k, v) => k -> convertTaskData(v)
         })
       } else {

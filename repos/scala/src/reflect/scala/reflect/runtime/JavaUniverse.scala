@@ -14,7 +14,9 @@ import scala.reflect.api.{TypeCreator, Universe}
   *  @contentDiagram hideNodes "*Api" "*Extractor"
   */
 class JavaUniverse
-    extends InternalSymbolTable with JavaUniverseForce with ReflectSetup
+    extends InternalSymbolTable
+    with JavaUniverseForce
+    with ReflectSetup
     with RuntimeSymbolTable {
   self =>
   def picklerPhase = SomePhase
@@ -50,7 +52,7 @@ class JavaUniverse
   def currentFreshNameCreator = globalFreshNameCreator
 
   override lazy val internal: Internal = new SymbolTableInternal {
-    override def typeTagToManifest[T : ClassTag](
+    override def typeTagToManifest[T: ClassTag](
         mirror0: Any, tag: Universe#TypeTag[T]): Manifest[T] = {
       // SI-6239: make this conversion more precise
       val mirror = mirror0.asInstanceOf[Mirror]

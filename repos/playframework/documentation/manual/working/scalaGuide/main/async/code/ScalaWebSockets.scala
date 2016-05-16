@@ -72,8 +72,8 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-            WebSocket.acceptWithActor[String, String](
-                req => out => Props(new MyActor)),
+            WebSocket.acceptWithActor[String, String](req =>
+                  out => Props(new MyActor)),
             Source.empty,
             0
         ) must beRight[List[Message]]
@@ -92,8 +92,8 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-            WebSocket.acceptWithActor[String, String](
-                req => out => Props(new MyActor)),
+            WebSocket.acceptWithActor[String, String](req =>
+                  out => Props(new MyActor)),
             Source.maybe,
             0
         ) must beRight[List[Message]]

@@ -71,7 +71,7 @@ private[streaming] class WriteAheadLogBackedBlockRDDPartition(
   * @param storageLevel storage level to store when storing in block manager
   *                     (applicable when storeInBlockManager = true)
   */
-private[streaming] class WriteAheadLogBackedBlockRDD[T : ClassTag](
+private[streaming] class WriteAheadLogBackedBlockRDD[T: ClassTag](
     sc: SparkContext,
     @transient private val _blockIds: Array[BlockId],
     @transient val walRecordHandles: Array[WriteAheadLogRecordHandle],

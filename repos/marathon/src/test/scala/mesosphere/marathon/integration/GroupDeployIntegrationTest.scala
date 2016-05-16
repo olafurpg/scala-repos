@@ -11,8 +11,11 @@ import spray.http.DateTime
 import scala.concurrent.duration._
 
 class GroupDeployIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   //clean up state before running the test case
   before(cleanUp())

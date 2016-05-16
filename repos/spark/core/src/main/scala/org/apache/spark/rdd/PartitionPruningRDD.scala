@@ -60,7 +60,7 @@ private[spark] class PruneDependency[T](
   * on partitions that don't have the range covering the key.
   */
 @DeveloperApi
-class PartitionPruningRDD[T : ClassTag](
+class PartitionPruningRDD[T: ClassTag](
     prev: RDD[T], partitionFilterFunc: Int => Boolean)
     extends RDD[T](
         prev.context, List(new PruneDependency(prev, partitionFilterFunc))) {

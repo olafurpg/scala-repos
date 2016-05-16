@@ -22,7 +22,8 @@ import scala.collection.JavaConverters._
   */
 class MavenRemoteRepositoryResolver(
     val repo: MavenRepository, settings: IvySettings)
-    extends MavenRepositoryResolver(settings) with CustomRemoteMavenResolver {
+    extends MavenRepositoryResolver(settings)
+    with CustomRemoteMavenResolver {
   setName(repo.name)
   override def toString = s"${repo.name}: ${repo.root}"
   protected val system = MavenRepositorySystemFactory.newRepositorySystemImpl

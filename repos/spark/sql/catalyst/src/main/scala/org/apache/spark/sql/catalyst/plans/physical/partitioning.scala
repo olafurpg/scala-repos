@@ -242,7 +242,9 @@ case object SinglePartition extends Partitioning {
   * in the same partition.
   */
 case class HashPartitioning(expressions: Seq[Expression], numPartitions: Int)
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   override def children: Seq[Expression] = expressions
   override def nullable: Boolean = false
@@ -286,7 +288,9 @@ case class HashPartitioning(expressions: Seq[Expression], numPartitions: Int)
   * into its child.
   */
 case class RangePartitioning(ordering: Seq[SortOrder], numPartitions: Int)
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   override def children: Seq[SortOrder] = ordering
   override def nullable: Boolean = false
@@ -329,7 +333,9 @@ case class RangePartitioning(ordering: Seq[SortOrder], numPartitions: Int)
   * Outer Join operators.
   */
 case class PartitioningCollection(partitionings: Seq[Partitioning])
-    extends Expression with Partitioning with Unevaluable {
+    extends Expression
+    with Partitioning
+    with Unevaluable {
 
   require(
       partitionings.map(_.numPartitions).distinct.length == 1,

@@ -60,8 +60,8 @@ class CompileServerLauncher extends ApplicationComponent {
           all.headOption
         }
 
-      choice.foreach(
-          sdk => applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
+      choice.foreach(sdk =>
+            applicationSettings.COMPILE_SERVER_SDK = sdk.getName)
 
 //       val message = "JVM SDK is automatically selected: " + name +
 //               "\n(can be changed in Application Settings / Scala)"
@@ -105,8 +105,7 @@ class CompileServerLauncher extends ApplicationComponent {
         val bootclasspathArg =
           if (bootClassPathLibs.isEmpty) Nil
           else
-            Seq(
-                "-Xbootclasspath/a:" +
+            Seq("-Xbootclasspath/a:" +
                 bootClassPathLibs.mkString(File.pathSeparator))
         val classpath = (jdk.tools +: presentFiles)
           .map(_.canonicalPath)
@@ -250,7 +249,8 @@ object CompileServerLauncher {
     val needMaxPermSize = settings.COMPILE_SERVER_SDK < "1.8"
     val maxPermSize =
       if (needMaxPermSize)
-        userMaxPermSize.headOption.orElse(defaultMaxPermSize) else None
+        userMaxPermSize.headOption.orElse(defaultMaxPermSize)
+      else None
 
     xmx ++ otherParams ++ maxPermSize
   }

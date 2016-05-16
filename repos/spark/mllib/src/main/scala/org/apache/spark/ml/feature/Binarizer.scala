@@ -36,7 +36,9 @@ import org.apache.spark.sql.types._
   */
 @Experimental
 final class Binarizer(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("binarizer"))

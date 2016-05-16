@@ -90,7 +90,8 @@ trait DistributedPubSubMediatorRouterSpec {
 
 class DistributedPubSubMediatorWithRandomRouterSpec
     extends AkkaSpec(DistributedPubSubMediatorRouterSpec.config("random"))
-    with DistributedPubSubMediatorRouterSpec with DefaultTimeout
+    with DistributedPubSubMediatorRouterSpec
+    with DefaultTimeout
     with ImplicitSender {
 
   val mediator = DistributedPubSub(system).mediator
@@ -109,7 +110,8 @@ class DistributedPubSubMediatorWithRandomRouterSpec
 class DistributedPubSubMediatorWithHashRouterSpec
     extends AkkaSpec(
         DistributedPubSubMediatorRouterSpec.config("consistent-hashing"))
-    with DistributedPubSubMediatorRouterSpec with DefaultTimeout
+    with DistributedPubSubMediatorRouterSpec
+    with DefaultTimeout
     with ImplicitSender {
 
   "DistributedPubSubMediator with Consistent Hash router" must {

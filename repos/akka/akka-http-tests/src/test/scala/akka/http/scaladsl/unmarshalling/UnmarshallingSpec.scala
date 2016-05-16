@@ -10,7 +10,10 @@ import akka.stream.ActorMaterializer
 import akka.http.scaladsl.model._
 
 class UnmarshallingSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll with ScalatestUtils {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalatestUtils {
   implicit val system = ActorSystem(getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
   import system.dispatcher

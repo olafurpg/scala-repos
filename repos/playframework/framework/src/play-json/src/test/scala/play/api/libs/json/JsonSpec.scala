@@ -430,8 +430,7 @@ object JsonSpec extends org.specs2.mutable.Specification {
               constraints.seq[String]) and (__ \ 'key4).write(
               constraints.map[String])).tupled
 
-      Json.toJson(
-          (
+      Json.toJson((
               List(1, 2, 3),
               Set("alpha", "beta", "gamma"),
               Seq("alpha", "beta", "gamma"),

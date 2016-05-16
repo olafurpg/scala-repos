@@ -28,7 +28,9 @@ import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkCont
 import org.apache.spark.mllib.util.TestingUtils._
 
 class LBFGSSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Matchers {
 
   val nPoints = 10000
   val A = 2.0

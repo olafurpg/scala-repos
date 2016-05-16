@@ -14,8 +14,8 @@ trait SystemSettingsService {
 
   def saveSystemSettings(settings: SystemSettings): Unit = {
     defining(new java.util.Properties()) { props =>
-      settings.baseUrl.foreach(
-          x => props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
+      settings.baseUrl.foreach(x =>
+            props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
       props.setProperty(
           AllowAccountRegistration, settings.allowAccountRegistration.toString)
@@ -25,8 +25,8 @@ trait SystemSettingsService {
           IsCreateRepoOptionPublic, settings.isCreateRepoOptionPublic.toString)
       props.setProperty(Gravatar, settings.gravatar.toString)
       props.setProperty(Notification, settings.notification.toString)
-      settings.activityLogLimit.foreach(
-          x => props.setProperty(ActivityLogLimit, x.toString))
+      settings.activityLogLimit.foreach(x =>
+            props.setProperty(ActivityLogLimit, x.toString))
       props.setProperty(Ssh, settings.ssh.toString)
       settings.sshHost.foreach(x => props.setProperty(SshHost, x.trim))
       settings.sshPort.foreach(x => props.setProperty(SshPort, x.toString))
@@ -49,16 +49,16 @@ trait SystemSettingsService {
           props.setProperty(LdapHost, ldap.host)
           ldap.port.foreach(x => props.setProperty(LdapPort, x.toString))
           ldap.bindDN.foreach(x => props.setProperty(LdapBindDN, x))
-          ldap.bindPassword.foreach(
-              x => props.setProperty(LdapBindPassword, x))
+          ldap.bindPassword.foreach(x =>
+                props.setProperty(LdapBindPassword, x))
           props.setProperty(LdapBaseDN, ldap.baseDN)
           props.setProperty(LdapUserNameAttribute, ldap.userNameAttribute)
-          ldap.additionalFilterCondition.foreach(
-              x => props.setProperty(LdapAdditionalFilterCondition, x))
-          ldap.fullNameAttribute.foreach(
-              x => props.setProperty(LdapFullNameAttribute, x))
-          ldap.mailAttribute.foreach(
-              x => props.setProperty(LdapMailAddressAttribute, x))
+          ldap.additionalFilterCondition.foreach(x =>
+                props.setProperty(LdapAdditionalFilterCondition, x))
+          ldap.fullNameAttribute.foreach(x =>
+                props.setProperty(LdapFullNameAttribute, x))
+          ldap.mailAttribute.foreach(x =>
+                props.setProperty(LdapMailAddressAttribute, x))
           ldap.tls.foreach(x => props.setProperty(LdapTls, x.toString))
           ldap.ssl.foreach(x => props.setProperty(LdapSsl, x.toString))
           ldap.keystore.foreach(x => props.setProperty(LdapKeystore, x))
@@ -78,8 +78,8 @@ trait SystemSettingsService {
         }
       }
       SystemSettings(
-          getOptionValue[String](props, BaseURL, None)
-            .map(x => x.replaceFirst("/\\Z", "")),
+          getOptionValue[String](props, BaseURL, None).map(x =>
+                x.replaceFirst("/\\Z", "")),
           getOptionValue(props, Information, None),
           getValue(props, AllowAccountRegistration, false),
           getValue(props, AllowAnonymousAccess, true),
@@ -215,22 +215,22 @@ object SystemSettingsService {
   private val LdapSsl = "ldap.ssl"
   private val LdapKeystore = "ldap.keystore"
 
-  private def getValue[A : ClassTag](
+  private def getValue[A: ClassTag](
       props: java.util.Properties, key: String, default: A): A =
     defining(props.getProperty(key)) { value =>
       if (value == null || value.isEmpty) default
       else convertType(value).asInstanceOf[A]
     }
 
-  private def getOptionValue[A : ClassTag](props: java.util.Properties,
-                                           key: String,
-                                           default: Option[A]): Option[A] =
+  private def getOptionValue[A: ClassTag](props: java.util.Properties,
+                                          key: String,
+                                          default: Option[A]): Option[A] =
     defining(props.getProperty(key)) { value =>
       if (value == null || value.isEmpty) default
       else Some(convertType(value)).asInstanceOf[Option[A]]
     }
 
-  private def convertType[A : ClassTag](value: String) =
+  private def convertType[A: ClassTag](value: String) =
     defining(implicitly[ClassTag[A]].runtimeClass) { c =>
       if (c == classOf[Boolean]) value.toBoolean
       else if (c == classOf[Int]) value.toInt

@@ -15,7 +15,8 @@ import scala.collection.Set
   * This class mark processor that only implicit object important among all PsiClasses
   */
 abstract class ImplicitProcessor(kinds: Set[Value], withoutPrecedence: Boolean)
-    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[String] {
   protected val precedence: util.HashMap[String, Int] =
     new util.HashMap[String, Int]()
   protected val levelMap: util.HashMap[

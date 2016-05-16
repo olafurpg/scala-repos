@@ -66,7 +66,8 @@ object ActorsLeakSpec {
 }
 
 class ActorsLeakSpec
-    extends AkkaSpec(ActorsLeakSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorsLeakSpec.config)
+    with ImplicitSender {
   import ActorsLeakSpec._
 
   "Remoting" must {
@@ -177,11 +178,9 @@ class ActorsLeakSpec
 
       EventFilter[TimeoutException](occurrences = 1).intercept {}
 
-      val finalActors = targets
-        .flatMap(collectLiveActors)
-        .toSet
+      val finalActors = targets.flatMap(collectLiveActors).toSet
 
-        (finalActors diff initialActors) should be(Set.empty)
+      (finalActors diff initialActors) should be(Set.empty)
     }
   }
 }

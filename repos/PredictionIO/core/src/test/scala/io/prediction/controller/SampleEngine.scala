@@ -446,8 +446,9 @@ class Engine1
 
   def eval(sc: SparkContext,
            engineParams: EngineParams,
-           params: WorkflowParams): Seq[(Engine1.EvalInfo, RDD[
-          (Engine1.Query, Engine1.Prediction, Engine1.Actual)])] = {
+           params: WorkflowParams)
+    : Seq[(Engine1.EvalInfo,
+           RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])] = {
     val dsp = engineParams.dataSourceParams._2.asInstanceOf[Engine1.DSP]
     Seq((Engine1.EvalInfo(dsp.v),
          sc.emptyRDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)]))
@@ -462,9 +463,11 @@ class Metric0
                    Double] {
   override def header: String = "Metric0"
 
-  def calculate(sc: SparkContext,
-                evalDataSet: Seq[(Engine1.EvalInfo, RDD[
-                        (Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
+  def calculate(
+      sc: SparkContext,
+      evalDataSet: Seq[
+          (Engine1.EvalInfo,
+           RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
     : Double = {
     evalDataSet.head._1.v
   }
@@ -483,9 +486,11 @@ class Metric1
         Metric1.Result]()(Ordering.by[Metric1.Result, Double](_.v)) {
   override def header: String = "Metric1"
 
-  def calculate(sc: SparkContext,
-                evalDataSet: Seq[(Engine1.EvalInfo, RDD[
-                        (Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
+  def calculate(
+      sc: SparkContext,
+      evalDataSet: Seq[
+          (Engine1.EvalInfo,
+           RDD[(Engine1.Query, Engine1.Prediction, Engine1.Actual)])])
     : Metric1.Result = {
     Metric1.Result(0, evalDataSet.head._1.v)
   }

@@ -25,7 +25,9 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class IsotonicRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Matchers {
 
   private def round(d: Double) = {
     math.round(d * 100).toDouble / 100

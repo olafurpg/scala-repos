@@ -33,7 +33,8 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext
   * the value is the entire content of file.
   */
 private[spark] class WholeTextFileInputFormat
-    extends CombineFileInputFormat[Text, Text] with Configurable {
+    extends CombineFileInputFormat[Text, Text]
+    with Configurable {
 
   override protected def isSplitable(
       context: JobContext, file: Path): Boolean = false

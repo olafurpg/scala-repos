@@ -4,7 +4,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
 trait FailureCake {
-  implicit def liftAnyFails[T : Manifest]: Any = ???
+  implicit def liftAnyFails[T: Manifest]: Any = ???
 
   // This works
   // implicit def liftAny[T]: Any = ???
@@ -25,8 +25,8 @@ object Bakery {
       val tpeName = newTypeName(names.head)
       names.tail.reverse match {
         case head :: tail ⇒
-          Select(tail.foldLeft[Tree](Ident(newTermName(head)))(
-                     (tree, name) ⇒ Select(tree, newTermName(name))),
+          Select(tail.foldLeft[Tree](Ident(newTermName(head)))((tree, name) ⇒
+                       Select(tree, newTermName(name))),
                  tpeName)
         case Nil ⇒
           Ident(tpeName)

@@ -14,7 +14,8 @@ trait LowerPriorityImplicit {
 }
 
 object SerializationBenchmark
-    extends PerformanceTest.Quickbenchmark with LowerPriorityImplicit {
+    extends PerformanceTest.Quickbenchmark
+    with LowerPriorityImplicit {
   import JavaStreamEnrichments._
 
   val sizes = Gen.range("size")(300000, 1500000, 300000)
@@ -65,7 +66,7 @@ object SerializationBenchmark
       builder.result()
     }
 
-  def roundTrip[T : Serialization](ts: Iterator[T]): Unit =
+  def roundTrip[T: Serialization](ts: Iterator[T]): Unit =
     ts.map { t =>
       Serialization.fromBytes(Serialization.toBytes(t)).get
     }.foreach(_ => ())

@@ -44,7 +44,9 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 
 trait CogroupSpec[M[+ _]]
-    extends TableModuleTestSupport[M] with Specification with ScalaCheck {
+    extends TableModuleTestSupport[M]
+    with Specification
+    with ScalaCheck {
   import SampleData._
   import trans._
   import trans.constants._
@@ -400,36 +402,36 @@ trait CogroupSpec[M[+ _]]
   def testCogroupSliceBoundaries = {
     import JParser.parseUnsafe
 
-    val s1 = SampleData(
-        Stream(
-            toRecord(Array(1), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
-            toRecord(
-                Array(2),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-2.735023101944097E37 }""")),
-            toRecord(
-                Array(3),
-                parseUnsafe("""{ "ruoh5A25Jaxa":2.12274644226519E38 }""")),
-            toRecord(
-                Array(4),
-                parseUnsafe("""{ "ruoh5A25Jaxa":1.085656944502855E38 }""")),
-            toRecord(
-                Array(5),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
-            toRecord(Array(6), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
-            toRecord(
-                Array(7),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
-            toRecord(
-                Array(8),
-                parseUnsafe("""{ "ruoh5A25Jaxa":2.4225587899613125E38 }""")),
-            toRecord(
-                Array(9),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-3.078101074510345E38 }""")),
-            toRecord(Array(10), parseUnsafe("""{ "ruoh5A25Jaxa":0.0 }""")),
-            toRecord(
-                Array(11),
-                parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }"""))
-        ))
+    val s1 =
+      SampleData(Stream(
+              toRecord(Array(1), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
+              toRecord(Array(2),
+                       parseUnsafe(
+                           """{ "ruoh5A25Jaxa":-2.735023101944097E37 }""")),
+              toRecord(Array(3),
+                       parseUnsafe(
+                           """{ "ruoh5A25Jaxa":2.12274644226519E38 }""")),
+              toRecord(
+                  Array(4),
+                  parseUnsafe("""{ "ruoh5A25Jaxa":1.085656944502855E38 }""")),
+              toRecord(Array(5),
+                       parseUnsafe(
+                           """{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
+              toRecord(Array(6), parseUnsafe("""{ "ruoh5A25Jaxa":-1.0 }""")),
+              toRecord(
+                  Array(7),
+                  parseUnsafe("""{ "ruoh5A25Jaxa":-3.4028234663852886E38 }""")),
+              toRecord(
+                  Array(8),
+                  parseUnsafe("""{ "ruoh5A25Jaxa":2.4225587899613125E38 }""")),
+              toRecord(
+                  Array(9),
+                  parseUnsafe("""{ "ruoh5A25Jaxa":-3.078101074510345E38 }""")),
+              toRecord(Array(10), parseUnsafe("""{ "ruoh5A25Jaxa":0.0 }""")),
+              toRecord(
+                  Array(11),
+                  parseUnsafe("""{ "ruoh5A25Jaxa":-2.049657967962047E38 }"""))
+          ))
 
     val s2 = SampleData(
         Stream(
@@ -437,8 +439,8 @@ trait CogroupSpec[M[+ _]]
                      parseUnsafe("""{ "mbsn8ya":-629648309198725501 }""")),
             toRecord(Array(2),
                      parseUnsafe("""{ "mbsn8ya":-1642079669762657762 }""")),
-            toRecord(Array(3),
-                     parseUnsafe("""{ "mbsn8ya":-75462980385303464 }""")),
+            toRecord(
+                Array(3), parseUnsafe("""{ "mbsn8ya":-75462980385303464 }""")),
             toRecord(Array(4),
                      parseUnsafe("""{ "mbsn8ya":-4407493923710190330 }""")),
             toRecord(Array(5),
@@ -498,16 +500,16 @@ trait CogroupSpec[M[+ _]]
             toRecord(Array(77, 46, 75), JArray(JNum(-1) :: Nil)),
             toRecord(Array(77, 65, 58),
                      JArray(JNum(-4032275398385636682l) :: Nil)),
-            toRecord(Array(86, 50, 9),
-                     JArray(JNum(4163435383002324073l) :: Nil))
+            toRecord(
+                Array(86, 50, 9), JArray(JNum(4163435383002324073l) :: Nil))
         ))
 
     val s2 = SampleData(
         Stream(
             toRecord(Array(19, 49, 71),
                      JArray(JUndefined :: JNum(2.2447601450142614E38) :: Nil)),
-            toRecord(
-                Array(28, 15, 27), JArray(JUndefined :: JNum(-1.0) :: Nil)),
+            toRecord(Array(28, 15, 27),
+                     JArray(JUndefined :: JNum(-1.0) :: Nil)),
             toRecord(
                 Array(33, 11, 79),
                 JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil)),
@@ -535,8 +537,8 @@ trait CogroupSpec[M[+ _]]
                      JArray(JUndefined :: JNum(8.51654525599509E37) :: Nil)),
             toRecord(Array(61, 59, 15),
                      JArray(JUndefined :: JNum(3.4028234663852886E38) :: Nil)),
-            toRecord(Array(65, 34, 89),
-                     JArray(JUndefined :: JNum(-1.0) :: Nil)),
+            toRecord(
+                Array(65, 34, 89), JArray(JUndefined :: JNum(-1.0) :: Nil)),
             toRecord(Array(73, 52, 67),
                      JArray(JUndefined :: JNum(5.692401753312787E37) :: Nil)),
             toRecord(Array(74, 60, 85),
@@ -545,8 +547,8 @@ trait CogroupSpec[M[+ _]]
                      JArray(JUndefined :: JNum(-6.05866505535721E37) :: Nil)),
             toRecord(
                 Array(77, 46, 75), JArray(JUndefined :: JNum(0.0) :: Nil)),
-            toRecord(
-                Array(77, 65, 58), JArray(JUndefined :: JNum(1.0) :: Nil)),
+            toRecord(Array(77, 65, 58),
+                     JArray(JUndefined :: JNum(1.0) :: Nil)),
             toRecord(Array(86, 50, 9),
                      JArray(JUndefined :: JNum(-3.4028234663852886E38) :: Nil))
         ))
@@ -701,9 +703,9 @@ trait CogroupSpec[M[+ _]]
         WrapObject(Leaf(Source), "blah!"),
         WrapObject(Leaf(Source), "argh!"),
         InnerObjectConcat(
-            WrapObject(DerefObjectStatic(Leaf(SourceRight),
-                                         CPathField("value")),
-                       "right"),
+            WrapObject(
+                DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
+                "right"),
             WrapObject(
                 DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
                 "left")
@@ -737,9 +739,9 @@ trait CogroupSpec[M[+ _]]
         WrapObject(
             DerefObjectStatic(Leaf(Source), CPathField("value")), "right"),
         InnerObjectConcat(
-            WrapObject(
-                DerefObjectStatic(Leaf(SourceRight), CPathField("value")),
-                "right"),
+            WrapObject(DerefObjectStatic(Leaf(SourceRight),
+                                         CPathField("value")),
+                       "right"),
             WrapObject(
                 DerefObjectStatic(Leaf(SourceLeft), CPathField("value")),
                 "left")

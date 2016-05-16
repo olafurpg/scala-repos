@@ -28,7 +28,9 @@ class NotSerializableExn(val notSer: NotSerializableClass)
     extends Throwable() {}
 
 class DistributedSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   val clusterUrl = "local-cluster[2,1,1024]"
 

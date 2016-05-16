@@ -32,8 +32,8 @@ class SbtProjectOpenProcessor(builder: SbtProjectImportBuilder)
     getBuilder.getControl(null).setLinkedProjectPath(path)
 
     dialog.getWizardContext.setProjectBuilder(getBuilder)
-    dialog.navigateToStep(
-        (step: Step) => step.isInstanceOf[SelectExternalProjectStep])
+    dialog.navigateToStep((step: Step) =>
+          step.isInstanceOf[SelectExternalProjectStep])
 
     if (StringUtil.isEmpty(wizardContext.getProjectName)) {
       val projectName = dialog.getWizardContext.getProjectName

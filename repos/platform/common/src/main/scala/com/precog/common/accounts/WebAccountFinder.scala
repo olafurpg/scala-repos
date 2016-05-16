@@ -97,7 +97,8 @@ class WebAccountFinder(protocol: String,
                        user: String,
                        password: String)(implicit executor: ExecutionContext)
     extends WebClient(protocol, host, port, path)
-    with AccountFinder[Response] with Logging {
+    with AccountFinder[Response]
+    with Logging {
   import scalaz.syntax.monad._
   import EitherT.{left => leftT, right => rightT, _}
   import \/.{left, right}
@@ -166,7 +167,8 @@ class WebAccountFinder(protocol: String,
   }
 
   def invoke[A](f: HttpClient[ByteChunk] => A): A = {
-    val auth = HttpHeaders.Authorization("Basic " + new String(
+    val auth = HttpHeaders.Authorization(
+        "Basic " + new String(
             Base64.encodeBase64((user + ":" + password).getBytes("UTF-8")),
             "UTF-8"))
     withJsonClient { client =>

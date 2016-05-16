@@ -80,9 +80,8 @@ trait OutputFormatter {
     case node => {
         (node
           .children()
-          .map((e: Element) =>
-                {
-              StringEscapeUtils.unescapeHtml(e.text).trim
+          .map((e: Element) => {
+            StringEscapeUtils.unescapeHtml(e.text).trim
           }))
           .toList
           .mkString("\n\n")

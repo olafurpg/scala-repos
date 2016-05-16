@@ -23,8 +23,8 @@ import scala.reflect.ClassTag
   * - Packed: (Column[Int], Column[(Int, String)], (Column[Int], Column[Option[Double]]))
   * - Linearized: (Int, Int, String, Int, Option[Double])
   */
-@implicitNotFound(
-    msg = "No matching Shape found.\nSlick does not know how to map the given types.\nPossible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).\n  Required level: ${Level}\n     Source type: ${Mixed_}\n   Unpacked type: ${Unpacked_}\n     Packed type: ${Packed_}\n")
+@implicitNotFound(msg =
+      "No matching Shape found.\nSlick does not know how to map the given types.\nPossible causes: T in Table[T] does not match your * projection. Or you use an unsupported type in a Query (e.g. scala List).\n  Required level: ${Level}\n     Source type: ${Mixed_}\n   Unpacked type: ${Unpacked_}\n     Packed type: ${Packed_}\n")
 abstract class Shape[Level <: ShapeLevel, -Mixed_, Unpacked_, Packed_] {
   type Mixed = Mixed_ @uncheckedVariance
   type Unpacked = Unpacked_
@@ -52,7 +52,8 @@ abstract class Shape[Level <: ShapeLevel, -Mixed_, Unpacked_, Packed_] {
 }
 
 object Shape
-    extends ConstColumnShapeImplicits with AbstractTableShapeImplicits
+    extends ConstColumnShapeImplicits
+    with AbstractTableShapeImplicits
     with TupleShapeImplicits {
   implicit final def primitiveShape[T, Level <: ShapeLevel](
       implicit tm: TypedType[T]): Shape[Level, T, T, ConstColumn[T]] =
@@ -67,8 +68,8 @@ object Shape
       def toNode(value: Mixed): Node = pack(value).toNode
     }
 
-  @inline implicit final def unitShape[Level <: ShapeLevel]: Shape[
-      Level, Unit, Unit, Unit] =
+  @inline implicit final def unitShape[Level <: ShapeLevel]
+    : Shape[Level, Unit, Unit, Unit] =
     unitShapePrototype.asInstanceOf[Shape[Level, Unit, Unit, Unit]]
 
   val unitShapePrototype: Shape[FlatShapeLevel, Unit, Unit, Unit] =
@@ -100,7 +101,7 @@ trait ConstColumnShapeImplicits extends RepShapeImplicits {
 trait RepShapeImplicits extends OptionShapeImplicits {
 
   /** A Shape for single-column Reps. */
-  @inline implicit def repColumnShape[T : BaseTypedType, Level <: ShapeLevel] =
+  @inline implicit def repColumnShape[T: BaseTypedType, Level <: ShapeLevel] =
     RepShape[Level, Rep[T], T]
 
   /** A Shape for Option-valued Reps. */
@@ -218,18 +219,16 @@ abstract class MappedProductShape[
 }
 
 /** Base class for ProductNodeShapes with a type mapping to a type that extends scala.Product */
-abstract class MappedScalaProductShape[
-    Level <: ShapeLevel, C <: Product, M <: C, U <: C, P <: C](
-    implicit val classTag: ClassTag[U])
+abstract class MappedScalaProductShape[Level <: ShapeLevel, C <: Product,
+    M <: C, U <: C, P <: C](implicit val classTag: ClassTag[U])
     extends MappedProductShape[Level, C, M, U, P] {
   override def getIterator(value: C) = value.productIterator
   def getElement(value: C, idx: Int) = value.productElement(idx)
 }
 
 /** Shape for Scala tuples of all arities */
-final class TupleShape[
-    Level <: ShapeLevel, M <: Product, U <: Product, P <: Product](
-    val shapes: Shape[_, _, _, _]*)
+final class TupleShape[Level <: ShapeLevel, M <: Product, U <: Product,
+    P <: Product](val shapes: Shape[_, _, _, _]*)
     extends ProductNodeShape[Level, Product, M, U, P] {
   override def getIterator(value: Product) = value.productIterator
   def getElement(value: Product, idx: Int) = value.productElement(idx)
@@ -352,7 +351,7 @@ case class ShapedValue[T, U](
   def zip[T2, U2](s2: ShapedValue[T2, U2]) =
     new ShapedValue[(T, T2), (U, U2)](
         (value, s2.value), Shape.tuple2Shape(shape, s2.shape))
-  def <>[R : ClassTag](f: (U => R), g: (R => Option[U])) =
+  def <>[R: ClassTag](f: (U => R), g: (R => Option[U])) =
     new MappedProjection[R, U](
         shape.toNode(value),
         MappedScalaType.Mapper(g.andThen(_.get).asInstanceOf[Any => Any],
@@ -465,8 +464,8 @@ trait ProvenShape[U] {
 object ProvenShape {
 
   /** Convert an appropriately shaped value to a ProvenShape */
-  implicit def proveShapeOf[T, U](v: T)(
-      implicit sh: Shape[_ <: FlatShapeLevel, T, U, _]): ProvenShape[U] =
+  implicit def proveShapeOf[T, U](
+      v: T)(implicit sh: Shape[_ <: FlatShapeLevel, T, U, _]): ProvenShape[U] =
     new ProvenShape[U] {
       def value = v
       val shape: Shape[_ <: FlatShapeLevel, _, U, _] =

@@ -30,7 +30,9 @@ import akka.actor._
 import akka.testkit._
 
 class ActorProducerTest
-    extends TestKit(ActorSystem("test")) with WordSpecLike with Matchers
+    extends TestKit(ActorSystem("test"))
+    with WordSpecLike
+    with Matchers
     with ActorProducerFixture {
   implicit val timeout = Timeout(10 seconds)
 
@@ -330,7 +332,9 @@ class ActorProducerTest
 }
 
 private[camel] trait ActorProducerFixture
-    extends MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends MockitoSugar
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
   self: TestKit with Matchers with Suite ⇒
   var camel: Camel = _
   var exchange: CamelExchangeAdapter = _

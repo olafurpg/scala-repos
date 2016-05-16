@@ -85,10 +85,8 @@ case class Ingest(apiKey: APIKey,
 
   def split(n: Int): List[Event] = {
     val splitSize = (data.length / n) max 1
-    val splitData = data
-      .grouped(splitSize)
-      .toSeq
-      (splitData zip streamRef.split(splitData.size)).map({
+    val splitData = data.grouped(splitSize).toSeq
+    (splitData zip streamRef.split(splitData.size)).map({
       case (d, ref) => this.copy(data = d, streamRef = ref)
     })(collection.breakOut)
   }
@@ -101,7 +99,7 @@ object Ingest {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" :: "streamRef" :: HNil
-  implicit def seqExtractor[A : Extractor]: Extractor[Seq[A]] =
+  implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
   val decomposerV1: Decomposer[Ingest] =

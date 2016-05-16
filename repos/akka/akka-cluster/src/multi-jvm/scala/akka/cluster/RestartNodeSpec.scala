@@ -36,7 +36,8 @@ class RestartNodeMultiJvmNode2 extends RestartNodeSpec
 class RestartNodeMultiJvmNode3 extends RestartNodeSpec
 
 abstract class RestartNodeSpec
-    extends MultiNodeSpec(RestartNodeMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(RestartNodeMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import RestartNodeMultiJvmSpec._

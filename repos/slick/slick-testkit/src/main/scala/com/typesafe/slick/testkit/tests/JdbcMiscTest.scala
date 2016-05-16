@@ -101,6 +101,6 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
         a1.result.head
           .overrideStatements(a2.result.head.statements)
           .map(_ shouldBe 2)
-      )
+    )
   }
 }

@@ -14,7 +14,8 @@ class SeqCoder(words: List[String]) {
 
   /** Invert the mnemonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-  letter <- letters) yield letter -> digit
+                                               letter <- letters) yield
+    letter -> digit
 
   /** Maps a word to the digit string it represents, 
     * e.g. `Java` -> `5282`  */
@@ -41,20 +42,16 @@ class SeqCoder(words: List[String]) {
       //   word <- wordsForNum(number take split)
       //   rest <- encode(number drop split)
       // } yield word :: rest
-      val r =
-        splits.flatMap(
-            split =>
-              {
-            val wfn = wordsForNum(number take split).flatMap(word =>
-                  {
-                val subs = encode(number drop split)
-                val subsmapped = subs.map(rest => word +: rest)
-                subsmemo += (number, number drop split, word) -> subsmapped
-                subsmapped
-            })
-            wfnmemo += (number, number take split) -> wfn.toSet
-            wfn
+      val r = splits.flatMap(split => {
+        val wfn = wordsForNum(number take split).flatMap(word => {
+          val subs = encode(number drop split)
+          val subsmapped = subs.map(rest => word +: rest)
+          subsmemo += (number, number drop split, word) -> subsmapped
+          subsmapped
         })
+        wfnmemo += (number, number take split) -> wfn.toSet
+        wfn
+      })
       memo += number -> r
       r
     }
@@ -80,7 +77,8 @@ class ParCoder(words: List[String]) {
 
   /** Invert the mnemnonics map to give a map from chars 'A' ... 'Z' to '2' ... '9' */
   private val charCode: Map[Char, Char] = for ((digit, letters) <- m;
-  letter <- letters) yield letter -> digit
+                                               letter <- letters) yield
+    letter -> digit
 
   /** Maps a word to the digit string it represents, 
     * e.g. `Java` -> `5282`  */
@@ -104,21 +102,17 @@ class ParCoder(words: List[String]) {
       //   word <- wordsForNum(number take split)
       //   rest <- encode(number drop split)
       // } yield word :: rest
-      val r =
-        splits.flatMap(
-            split =>
-              {
-            val wfn = wordsForNum(number take split).flatMap(word =>
-                  {
-                val subs = encode(number drop split)
-                assertNumber(number drop split, subs)
-                val subsmapped = subs.map(rest => word +: rest)
-                assertSubs(number, number drop split, word, subsmapped)
-                subsmapped
-            })
-            assertWfn(number, number take split, number drop split, wfn)
-            wfn
+      val r = splits.flatMap(split => {
+        val wfn = wordsForNum(number take split).flatMap(word => {
+          val subs = encode(number drop split)
+          assertNumber(number drop split, subs)
+          val subsmapped = subs.map(rest => word +: rest)
+          assertSubs(number, number drop split, word, subsmapped)
+          subsmapped
         })
+        assertWfn(number, number take split, number drop split, wfn)
+        wfn
+      })
       assertNumber(number, r)
       r
     }
@@ -147,17 +141,14 @@ class ParCoder(words: List[String]) {
       println("memoed: " + m.size)
       println("retrying...")
       for (i <- 0 until 30) {
-        val r2: ParSeq[ParSeq[String]] =
-          words.flatMap(
-              word =>
-                {
-              val subs: ParSet[ParSeq[String]] = encode(dropped)
-              println("subs size for '" + dropped + "': " + subs.size)
-              val subsmapped: ParSet[ParSeq[String]] =
-                subs.map(rest => word +: rest)
-              println("map size: " + subsmapped.size)
-              subsmapped.toList
-          })
+        val r2: ParSeq[ParSeq[String]] = words.flatMap(word => {
+          val subs: ParSet[ParSeq[String]] = encode(dropped)
+          println("subs size for '" + dropped + "': " + subs.size)
+          val subsmapped: ParSet[ParSeq[String]] = subs.map(rest =>
+                word +: rest)
+          println("map size: " + subsmapped.size)
+          subsmapped.toList
+        })
         println(i + ") retry size: " + r2.size)
       }
       error("rs != m")

@@ -771,8 +771,7 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * partial function.
     */
   final def collect[B](pf: PartialFunction[A, B]): Box[B] = {
-    flatMap(
-        value =>
+    flatMap(value =>
           if (pf.isDefinedAt(value)) Full(pf(value))
           else Empty)
   }
@@ -1041,7 +1040,8 @@ final class ParamFailure[T](override val msg: String,
                             override val exception: Box[Throwable],
                             override val chain: Box[Failure],
                             val param: T)
-    extends Failure(msg, exception, chain) with Serializable {
+    extends Failure(msg, exception, chain)
+    with Serializable {
   override def toString(): String =
     "ParamFailure(" + msg + ", " + exception + ", " + chain + ", " + param +
     ")"
@@ -1053,8 +1053,7 @@ final class ParamFailure[T](override val msg: String,
   }
 
   override def hashCode(): Int =
-    super.hashCode() +
-    (param match {
+    super.hashCode() + (param match {
           case null => 0
           case x => x.hashCode()
         })

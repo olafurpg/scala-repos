@@ -197,7 +197,7 @@ object Macros {
     c.Expr[Int](Literal(Constant(n)))
   }
 
-  def intAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
+  def intAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Ring[A]]): c.Expr[A] = {
     import c.universe._
     c.Expr[A](
         c.prefix.tree match {
@@ -207,7 +207,7 @@ object Macros {
     })
   }
 
-  def dblAs[A : c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
+  def dblAs[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Field[A]]): c.Expr[A] = {
     import c.universe._
     c.Expr[A](
         c.prefix.tree match {

@@ -33,16 +33,17 @@ import org.apache.kafka.common.utils.Utils
 @deprecated(
     "This class has been deprecated and will be removed in a future release.",
     "0.10.0.0")
-class DefaultEventHandler[K, V](config: ProducerConfig,
-                                private val partitioner: Partitioner,
-                                private val encoder: Encoder[V],
-                                private val keyEncoder: Encoder[K],
-                                private val producerPool: ProducerPool,
-                                private val topicPartitionInfos: HashMap[
-                                    String, TopicMetadata] = new HashMap[
-                                      String, TopicMetadata],
-                                private val time: Time = SystemTime)
-    extends EventHandler[K, V] with Logging {
+class DefaultEventHandler[K, V](
+    config: ProducerConfig,
+    private val partitioner: Partitioner,
+    private val encoder: Encoder[V],
+    private val keyEncoder: Encoder[K],
+    private val producerPool: ProducerPool,
+    private val topicPartitionInfos: HashMap[String, TopicMetadata] =
+      new HashMap[String, TopicMetadata],
+    private val time: Time = SystemTime)
+    extends EventHandler[K, V]
+    with Logging {
 
   val isSync = ("sync" == config.producerType)
 
@@ -94,7 +95,8 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
         // back off and update the topic metadata cache before attempting another send operation
         Thread.sleep(config.retryBackoffMs)
         // get topics of the outstanding produce requests and refresh metadata for those
-        CoreUtils.swallowError(brokerPartitionInfo.updateInfo(
+        CoreUtils.swallowError(
+            brokerPartitionInfo.updateInfo(
                 outstandingProduceRequests.map(_.topic).toSet,
                 correlationId.getAndIncrement))
         sendPartitionPerTopicCache.clear()
@@ -138,16 +140,15 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
             case Some(messageSetPerBroker) =>
               val failedTopicPartitions = send(brokerid, messageSetPerBroker)
               failedTopicPartitions.foreach(
-                  topicPartition =>
-                    {
-                  messagesPerBrokerMap.get(topicPartition) match {
-                    case Some(data) => failedProduceRequests.appendAll(data)
-                    case None => // nothing
-                  }
+                  topicPartition => {
+                messagesPerBrokerMap.get(topicPartition) match {
+                  case Some(data) => failedProduceRequests.appendAll(data)
+                  case None => // nothing
+                }
               })
             case None => // failed to group messages
-              messagesPerBrokerMap.values.foreach(
-                  m => failedProduceRequests.appendAll(m))
+              messagesPerBrokerMap.values.foreach(m =>
+                    failedProduceRequests.appendAll(m))
           }
         }
         failedProduceRequests
@@ -219,8 +220,8 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
             dataPerBroker = element.asInstanceOf[HashMap[
                     TopicAndPartition, Seq[KeyedMessage[K, Message]]]]
           case None =>
-            dataPerBroker = new HashMap[
-                TopicAndPartition, Seq[KeyedMessage[K, Message]]]
+            dataPerBroker =
+              new HashMap[TopicAndPartition, Seq[KeyedMessage[K, Message]]]
             ret.put(leaderBrokerId, dataPerBroker)
         }
 
@@ -229,8 +230,8 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
         var dataPerTopicPartition: ArrayBuffer[KeyedMessage[K, Message]] = null
         dataPerBroker.get(topicAndPartition) match {
           case Some(element) =>
-            dataPerTopicPartition = element
-              .asInstanceOf[ArrayBuffer[KeyedMessage[K, Message]]]
+            dataPerTopicPartition =
+              element.asInstanceOf[ArrayBuffer[KeyedMessage[K, Message]]]
           case None =>
             dataPerTopicPartition = new ArrayBuffer[KeyedMessage[K, Message]]
             dataPerBroker.put(topicAndPartition, dataPerTopicPartition)
@@ -309,8 +310,8 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
       } else partitioner.partition(key, numPartitions)
     if (partition < 0 || partition >= numPartitions)
       throw new UnknownTopicOrPartitionException(
-          "Invalid partition id: " + partition + " for topic " +
-          topic + "; Valid values are in the inclusive range of [0, " +
+          "Invalid partition id: " + partition + " for topic " + topic +
+          "; Valid values are in the inclusive range of [0, " +
           (numPartitions - 1) + "]")
     trace(
         "Assigning message of topic %s and key %s to a selected partition %d"
@@ -367,8 +368,7 @@ class DefaultEventHandler[K, V](config: ProducerConfig,
           if (logger.isTraceEnabled) {
             val successfullySentData =
               response.status.filter(_._2.error == Errors.NONE.code)
-            successfullySentData.foreach(
-                m =>
+            successfullySentData.foreach(m =>
                   messagesPerTopic(m._1).foreach(message =>
                         trace("Successfully sent message: %s".format(
                                 if (message.message.isNull) null

@@ -113,7 +113,8 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
         ConfigFactory
           .parseString(cfg)
           .withFallback(SystemMessageDeliveryStressTest.baseConfig))
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender
+    with DefaultTimeout {
   import SystemMessageDeliveryStressTest._
 
   override def expectedTestDuration: FiniteDuration = 120.seconds
@@ -195,8 +196,8 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
         val start = System.currentTimeMillis()
         probeB.expectMsg(10.minutes, m)
         probeA.expectMsg(10.minutes, m)
-        maxDelay = math.max(maxDelay,
-                            (System.currentTimeMillis() - start) / 1000)
+        maxDelay =
+          math.max(maxDelay, (System.currentTimeMillis() - start) / 1000)
       }
     }
   }
@@ -204,17 +205,17 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
   override def beforeTermination() {
     system.eventStream.publish(
         TestEvent.Mute(
-            EventFilter.warning(
-                source = "akka://AkkaProtocolStressTest/user/$a",
-                start = "received dead letter"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+            EventFilter.warning(source =
+                                  "akka://AkkaProtocolStressTest/user/$a",
+                                start = "received dead letter"),
+            EventFilter.warning(pattern =
+                  "received dead letter.*(InboundPayload|Disassociate)")))
     systemB.eventStream.publish(
         TestEvent.Mute(
             EventFilter[EndpointException](),
             EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+            EventFilter.warning(pattern =
+                  "received dead letter.*(InboundPayload|Disassociate)")))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)

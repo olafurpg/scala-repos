@@ -33,7 +33,8 @@ trait JavaLogging {
   * `java.util.logging` logger.
   */
 class JavaLogger
-    extends Actor with RequiresMessageQueue[LoggerMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[LoggerMessageQueueSemantics] {
 
   def receive = {
     case event @ Error(cause, _, _, _) ⇒

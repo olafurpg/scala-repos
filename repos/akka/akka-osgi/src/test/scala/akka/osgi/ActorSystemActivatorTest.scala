@@ -29,7 +29,9 @@ object ActorSystemActivatorTest {
 }
 
 class PingPongActorSystemActivatorTest
-    extends WordSpec with Matchers with PojoSRTestSupport {
+    extends WordSpec
+    with Matchers
+    with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 
@@ -63,7 +65,9 @@ class PingPongActorSystemActivatorTest
 }
 
 class RuntimeNameActorSystemActivatorTest
-    extends WordSpec with Matchers with PojoSRTestSupport {
+    extends WordSpec
+    with Matchers
+    with PojoSRTestSupport {
 
   import ActorSystemActivatorTest._
 

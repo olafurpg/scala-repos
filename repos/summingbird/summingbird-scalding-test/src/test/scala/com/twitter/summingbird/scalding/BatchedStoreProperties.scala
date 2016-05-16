@@ -33,8 +33,8 @@ import org.scalacheck.Properties
   */
 object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
 
-  implicit def intersectionArb[T : Arbitrary : Ordering]: Arbitrary[
-      Intersection[InclusiveLower, ExclusiveUpper, T]] =
+  implicit def intersectionArb[T: Arbitrary: Ordering]
+    : Arbitrary[Intersection[InclusiveLower, ExclusiveUpper, T]] =
     Arbitrary {
       for {
         l <- Arbitrary.arbitrary[T]
@@ -68,8 +68,8 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   implicit def timeExtractor[T <: (Long, Any)] =
     TestUtil.simpleTimeExtractor[T]
 
-  implicit val arbitraryInputWithTimeStampAndBatcher: Arbitrary[(List[
-          (Long, Int)], Batcher, TestStore[Int, Int])] = Arbitrary {
+  implicit val arbitraryInputWithTimeStampAndBatcher: Arbitrary[
+      (List[(Long, Int)], Batcher, TestStore[Int, Int])] = Arbitrary {
     for {
       arbInt <- Arbitrary.arbitrary[List[Int]]
       in = arbInt.zipWithIndex.map {
@@ -93,9 +93,11 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
       "readAfterLastBatch should return interval starting from the last batch written") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val result =
@@ -122,9 +124,11 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
       "readAfterLastBatch should not extend the end of interval requested") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val result =
@@ -149,9 +153,11 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
   property("the end of merged interval is never extended") = {
     forAll {
       (diskPipeFactory: PipeFactory[Nothing],
-      interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), commutativity: Commutativity, mode: Mode) =>
+       interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       commutativity: Commutativity, mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         val mergeResult = testStore.merge(diskPipeFactory,
@@ -183,8 +189,10 @@ object BatchedStoreProperties extends Properties("BatchedStore's Properties") {
     }
     forAll {
       (interval: Intersection[InclusiveLower, ExclusiveUpper, Timestamp],
-      inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)], Batcher,
-      TestStore[Int, Int]), commutativity: Commutativity, mode: Mode) =>
+       inputWithTimeStampAndBatcherAndStore: (List[(Long, Int)],
+                                              Batcher,
+                                              TestStore[Int, Int]),
+       commutativity: Commutativity, mode: Mode) =>
         val (inputWithTimeStamp, batcher, testStore) =
           inputWithTimeStampAndBatcherAndStore
         (atLeast2MsBatcher(batcher)) ==> {

@@ -358,7 +358,8 @@ trait TypedField[ThisType] extends BaseField {
 }
 
 trait MandatoryTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[ThisType] {
+    extends TypedField[ThisType]
+    with Product1[ThisType] {
 
   /**
     * ValueType represents the type that users will work with.  For MandatoryTypeField, this is
@@ -407,7 +408,8 @@ trait MandatoryTypedField[ThisType]
 }
 
 trait OptionalTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[Box[ThisType]] {
+    extends TypedField[ThisType]
+    with Product1[Box[ThisType]] {
 
   /**
     * ValueType represents the type that users will work with.  For OptionalTypedField, this is
@@ -460,7 +462,8 @@ trait OptionalTypedField[ThisType]
   * A simple field that can store and retrieve a value of a given type
   */
 trait Field[ThisType, OwnerType <: Record[OwnerType]]
-    extends OwnedField[OwnerType] with TypedField[ThisType] {
+    extends OwnedField[OwnerType]
+    with TypedField[ThisType] {
 
   def apply(in: MyType): OwnerType = apply(Full(in))
 
@@ -502,8 +505,9 @@ trait KeyField[
 
 object FieldHelpers {
   def expectedA(what: String, notA: AnyRef): Failure =
-    Failure("Expected a " + what + ", not a " +
-        (if (notA == null) "null" else notA.getClass.getName))
+    Failure(
+        "Expected a " + what + ", not a " + (if (notA == null) "null"
+                                             else notA.getClass.getName))
 }
 
 trait LifecycleCallbacks {

@@ -71,22 +71,20 @@ object IntentionUtils {
 
     if (hasRepeated || !allNamesDefined || hasUnderscore) None
     else {
-      val doIt = () =>
-        {
-          argsAndMatchedParams.foreach {
-            case (argExpr childOf (a: ScAssignStmt), param)
-                if a.getLExpression.getText == param.name =>
-            case (argExpr, param) =>
-              if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean)) {
-                val newArgExpr =
-                  ScalaPsiElementFactory.createExpressionFromText(
-                      param.name + " = " + argExpr.getText, element.getManager)
-                inWriteAction {
-                  argExpr.replace(newArgExpr)
-                }
+      val doIt = () => {
+        argsAndMatchedParams.foreach {
+          case (argExpr childOf (a: ScAssignStmt), param)
+              if a.getLExpression.getText == param.name =>
+          case (argExpr, param) =>
+            if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean)) {
+              val newArgExpr = ScalaPsiElementFactory.createExpressionFromText(
+                  param.name + " = " + argExpr.getText, element.getManager)
+              inWriteAction {
+                argExpr.replace(newArgExpr)
               }
-            case _ =>
-          }
+            }
+          case _ =>
+        }
       }
       Some(doIt)
     }

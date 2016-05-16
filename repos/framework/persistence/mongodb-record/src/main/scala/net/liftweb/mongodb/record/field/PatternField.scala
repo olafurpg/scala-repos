@@ -28,7 +28,8 @@ import net.liftweb.record.{Field, FieldHelpers, MandatoryTypedField}
 import net.liftweb.util.Helpers.tryo
 
 class PatternField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[Pattern, OwnerType] with MandatoryTypedField[Pattern] {
+    extends Field[Pattern, OwnerType]
+    with MandatoryTypedField[Pattern] {
 
   def owner = rec
 

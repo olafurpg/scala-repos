@@ -36,7 +36,9 @@ import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
   */
 @Experimental
 final class Bucketizer(override val uid: String)
-    extends Model[Bucketizer] with HasInputCol with HasOutputCol
+    extends Model[Bucketizer]
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("bucketizer"))

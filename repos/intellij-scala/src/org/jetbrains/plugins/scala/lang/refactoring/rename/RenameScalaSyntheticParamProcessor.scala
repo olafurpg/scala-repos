@@ -10,7 +10,8 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 
 class RenameScalaSyntheticParamProcessor
-    extends RenamePsiElementProcessor with ScalaRenameProcessor {
+    extends RenamePsiElementProcessor
+    with ScalaRenameProcessor {
   def canProcessElement(element: PsiElement): Boolean =
     realParamForSyntheticParam(element).isDefined
 

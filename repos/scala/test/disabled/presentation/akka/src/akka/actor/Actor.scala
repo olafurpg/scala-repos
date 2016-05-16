@@ -23,19 +23,18 @@ sealed trait AutoReceivedMessage { self: LifeCycleMessage =>
 }
 
 case class HotSwap(code: ActorRef => Actor.Receive, discardOld: Boolean = true)
-    extends AutoReceivedMessage with LifeCycleMessage {
+    extends AutoReceivedMessage
+    with LifeCycleMessage {
 
   /** Java API
     */
   def this(code: akka.japi.Function[ActorRef, Procedure[Any]],
            discardOld: Boolean) =
-    this((self: ActorRef) =>
-           {
-             val behavior = code(self)
-             val result: Actor.Receive = { case msg => behavior(msg) }
-             result
-         },
-         discardOld)
+    this((self: ActorRef) => {
+      val behavior = code(self)
+      val result: Actor.Receive = { case msg => behavior(msg) }
+      result
+    }, discardOld)
 
   /** Java API with default non-stacking behavior
     */
@@ -46,19 +45,24 @@ case class HotSwap(code: ActorRef => Actor.Receive, discardOld: Boolean = true)
 case object RevertHotSwap extends AutoReceivedMessage with LifeCycleMessage
 
 case class Restart(reason: Throwable)
-    extends AutoReceivedMessage with LifeCycleMessage
+    extends AutoReceivedMessage
+    with LifeCycleMessage
 
 case class Exit(dead: ActorRef, killer: Throwable)
-    extends AutoReceivedMessage with LifeCycleMessage
+    extends AutoReceivedMessage
+    with LifeCycleMessage
 
 case class Link(child: ActorRef)
-    extends AutoReceivedMessage with LifeCycleMessage
+    extends AutoReceivedMessage
+    with LifeCycleMessage
 
 case class Unlink(child: ActorRef)
-    extends AutoReceivedMessage with LifeCycleMessage
+    extends AutoReceivedMessage
+    with LifeCycleMessage
 
 case class UnlinkAndStop(child: ActorRef)
-    extends AutoReceivedMessage with LifeCycleMessage
+    extends AutoReceivedMessage
+    with LifeCycleMessage
 
 case object PoisonPill extends AutoReceivedMessage with LifeCycleMessage
 
@@ -160,7 +164,7 @@ object Actor extends ListenerManagement {
     *   val actor = actorOf[MyActor].start()
     *  </pre>
     */
-  def actorOf[T <: Actor : ClassTag]: ActorRef =
+  def actorOf[T <: Actor: ClassTag]: ActorRef =
     actorOf(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]])
 
   /** Creates an ActorRef out of the Actor of the specified Class.
@@ -177,28 +181,24 @@ object Actor extends ListenerManagement {
     *  </pre>
     */
   def actorOf(clazz: Class[_ <: Actor]): ActorRef =
-    new LocalActorRef(
-        () =>
-          {
-            import ReflectiveAccess.{createInstance, noParams, noArgs}
-            createInstance[Actor](
-                clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
-              case Right(actor) => actor
-              case Left(exception) =>
-                val cause = exception match {
-                  case i: InvocationTargetException => i.getTargetException
-                  case _ => exception
-                }
+    new LocalActorRef(() => {
+      import ReflectiveAccess.{createInstance, noParams, noArgs}
+      createInstance[Actor](clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
+        case Right(actor) => actor
+        case Left(exception) =>
+          val cause = exception match {
+            case i: InvocationTargetException => i.getTargetException
+            case _ => exception
+          }
 
-                throw new ActorInitializationException(
-                    "Could not instantiate Actor of " + clazz +
-                    "\nMake sure Actor is NOT defined inside a class/trait," +
-                    "\nif so put it outside the class/trait, f.e. in a companion object," +
-                    "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
-                    cause)
-            }
-        },
-        None)
+          throw new ActorInitializationException(
+              "Could not instantiate Actor of " + clazz +
+              "\nMake sure Actor is NOT defined inside a class/trait," +
+              "\nif so put it outside the class/trait, f.e. in a companion object," +
+              "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
+              cause)
+      }
+    }, None)
 
   /** Creates an ActorRef out of the Actor. Allows you to pass in a factory function
     *  that creates the Actor. Please note that this function can be invoked multiple
@@ -244,9 +244,8 @@ object Actor extends ListenerManagement {
     *  }
     *  </pre>
     */
-  def spawn(body: => Unit)(
-      implicit dispatcher: MessageDispatcher = Dispatchers.defaultGlobalDispatcher)
-    : Unit = {
+  def spawn(body: => Unit)(implicit dispatcher: MessageDispatcher =
+                             Dispatchers.defaultGlobalDispatcher): Unit = {
     case object Spawn
     actorOf(
         new Actor() {
@@ -341,15 +340,16 @@ trait Actor {
     val optRef = Actor.actorRefInCreation.get
     if (optRef.isEmpty)
       throw new ActorInitializationException(
-          "ActorRef for instance of actor [" +
-          getClass.getName + "] is not in scope." +
+          "ActorRef for instance of actor [" + getClass.getName +
+          "] is not in scope." +
           "\n\tYou can not create an instance of an actor explicitly using 'new MyActor'." +
           "\n\tYou have to use one of the factory methods in the 'Actor' object to create a new actor." +
           "\n\tEither use:" +
           "\n\t\t'val actor = Actor.actorOf[MyActor]', or" +
           "\n\t\t'val actor = Actor.actorOf(new MyActor(..))'")
     Actor.actorRefInCreation.set(None)
-    optRef.asInstanceOf[Some[ActorRef]].get.id = getClass.getName //FIXME: Is this needed?
+    optRef.asInstanceOf[Some[ActorRef]].get.id =
+      getClass.getName //FIXME: Is this needed?
     optRef.asInstanceOf[Some[ActorRef]]
   }
 
@@ -532,7 +532,7 @@ private[actor] class AnyOptionAsTypedOption(anyOption: Option[Any]) {
   /** Convenience helper to cast the given Option of Any to an Option of the given type. Will swallow a possible
     *  ClassCastException and return None in that case.
     */
-  def asSilently[T : ClassTag]: Option[T] = narrowSilently[T](anyOption)
+  def asSilently[T: ClassTag]: Option[T] = narrowSilently[T](anyOption)
 }
 
 /** Marker interface for proxyable actors (such as typed actor).

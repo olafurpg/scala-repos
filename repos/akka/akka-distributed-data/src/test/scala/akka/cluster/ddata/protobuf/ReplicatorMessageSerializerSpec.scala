@@ -30,7 +30,10 @@ class ReplicatorMessageSerializerSpec
             ConfigFactory.parseString("""
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
-    """))) with WordSpecLike with Matchers with BeforeAndAfterAll {
+    """)))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val serializer = new ReplicatorMessageSerializer(
       system.asInstanceOf[ExtendedActorSystem])
@@ -73,8 +76,8 @@ class ReplicatorMessageSerializerSpec
       checkSerialization(
           DataEnvelope(
               data1,
-              pruning = Map(
-                    address1 -> PruningState(address2, PruningPerformed),
+              pruning =
+                Map(address1 -> PruningState(address2, PruningPerformed),
                     address3 -> PruningState(
                         address2, PruningInitialized(Set(address1.address))))))
       checkSerialization(Write("A", DataEnvelope(data1)))

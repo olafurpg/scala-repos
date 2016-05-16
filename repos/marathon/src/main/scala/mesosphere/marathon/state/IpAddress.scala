@@ -31,7 +31,8 @@ object IpAddress {
         labels = proto.getLabelsList.asScala.map { p =>
           p.getKey -> p.getValue
         }.toMap,
-        discoveryInfo = if (proto.hasDiscoveryInfo)
+        discoveryInfo =
+          if (proto.hasDiscoveryInfo)
             DiscoveryInfo.fromProto(proto.getDiscoveryInfo)
           else DiscoveryInfo.empty
     )

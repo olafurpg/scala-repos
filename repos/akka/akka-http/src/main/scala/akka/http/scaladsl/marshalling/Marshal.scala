@@ -15,7 +15,8 @@ object Marshal {
 
   final case class UnacceptableResponseContentTypeException(
       supported: Set[ContentNegotiator.Alternative])
-      extends RuntimeException with NoStackTrace
+      extends RuntimeException
+      with NoStackTrace
 }
 
 class Marshal[A](val value: A) {
@@ -37,9 +38,9 @@ class Marshal[A](val value: A) {
   /**
     * Marshals `value` to an `HttpResponse` for the given `HttpRequest` with full content-negotiation.
     */
-  def toResponseFor(
-      request: HttpRequest)(implicit m: ToResponseMarshaller[A],
-                            ec: ExecutionContext): Future[HttpResponse] = {
+  def toResponseFor(request: HttpRequest)(
+      implicit m: ToResponseMarshaller[A],
+      ec: ExecutionContext): Future[HttpResponse] = {
     import akka.http.scaladsl.marshalling.Marshal._
     val ctn = ContentNegotiator(request.headers)
 

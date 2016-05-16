@@ -50,7 +50,8 @@ private[spark] class TimeBasedRollingPolicy(
     rollingFileSuffixPattern: String,
     checkIntervalConstraint: Boolean = true // set to false while testing
 )
-    extends RollingPolicy with Logging {
+    extends RollingPolicy
+    with Logging {
 
   import TimeBasedRollingPolicy._
   if (checkIntervalConstraint &&
@@ -104,7 +105,8 @@ private[spark] class SizeBasedRollingPolicy(
     var rolloverSizeBytes: Long,
     checkSizeConstraint: Boolean = true // set to false while testing
 )
-    extends RollingPolicy with Logging {
+    extends RollingPolicy
+    with Logging {
 
   import SizeBasedRollingPolicy._
   if (checkSizeConstraint && rolloverSizeBytes < MINIMUM_SIZE_BYTES) {

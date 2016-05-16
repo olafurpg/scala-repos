@@ -56,24 +56,24 @@ import org.saddle.Index
   *  -- http://labix.org/python-dateutil
   *  -- https://pypi.python.org/pypi/python-dateutil
   */
-case class RRule private (
-    freq: Frequency = DAILY,
-    interval: Int = 1,
-    wkst: Option[Weekday] = None,
-    count: Option[Int] = None,
-    until: Option[DateTime] = None,
-    bysetpos: List[Int] = List.empty,
-    bymonth: List[Int] = List.empty,
-    bymonthday: List[Int] = List.empty,
-    byyearday: List[Int] = List.empty,
-    byweekno: List[Int] = List.empty,
-    byday: List[WeekdayNum] = List.empty,
-    byhour: List[Int] = List.empty,
-    byminute: List[Int] = List.empty,
-    bysecond: List[Int] = List.empty,
-    inzone: DateTimeZone = TZ_LOCAL,
-    joins: List[(RRule, Option[DateTime])] = List.empty,
-    excepts: List[(RRule, Option[DateTime])] = List.empty) {
+case class RRule private (freq: Frequency = DAILY,
+                          interval: Int = 1,
+                          wkst: Option[Weekday] = None,
+                          count: Option[Int] = None,
+                          until: Option[DateTime] = None,
+                          bysetpos: List[Int] = List.empty,
+                          bymonth: List[Int] = List.empty,
+                          bymonthday: List[Int] = List.empty,
+                          byyearday: List[Int] = List.empty,
+                          byweekno: List[Int] = List.empty,
+                          byday: List[WeekdayNum] = List.empty,
+                          byhour: List[Int] = List.empty,
+                          byminute: List[Int] = List.empty,
+                          bysecond: List[Int] = List.empty,
+                          inzone: DateTimeZone = TZ_LOCAL,
+                          joins: List[(RRule, Option[DateTime])] = List.empty,
+                          excepts: List[(RRule, Option[DateTime])] =
+                            List.empty) {
 
   private def dt2dtv(dt: DateTime): com.google.ical.values.DateTimeValueImpl = {
     new com.google.ical.values.DateTimeValueImpl(dt.getYear,

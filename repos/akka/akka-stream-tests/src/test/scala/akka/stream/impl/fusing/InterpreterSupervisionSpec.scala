@@ -69,7 +69,8 @@ object InterpreterSupervisionSpec {
 }
 
 class InterpreterSupervisionSpec
-    extends AkkaSpec with GraphInterpreterSpecKit {
+    extends AkkaSpec
+    with GraphInterpreterSpecKit {
   import InterpreterSupervisionSpec._
   import Supervision.stoppingDecider
   import Supervision.resumingDecider

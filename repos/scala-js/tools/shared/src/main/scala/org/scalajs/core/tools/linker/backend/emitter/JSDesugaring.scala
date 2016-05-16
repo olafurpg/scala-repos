@@ -288,9 +288,9 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
                   js.Apply(genIdentBracketSelect(restParam, "push"),
                            List(js.BracketSelect(arguments, counter))),
                   // i = (i + 1) | 0
-                  js.Assign(
-                      counter,
-                      or0(js.BinaryOp(JSBinaryOp.+, counter, js.IntLiteral(1))))
+                  js.Assign(counter,
+                            or0(js.BinaryOp(
+                                    JSBinaryOp.+, counter, js.IntLiteral(1))))
               ))
       )
     }
@@ -378,8 +378,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
         case StoreModule(cls, value) =>
           unnest(value) { (newValue, env0) =>
             implicit val env = env0
-            js.Assign(envField("n", cls.className),
-                      transformExpr(newValue))
+            js.Assign(envField("n", cls.className), transformExpr(newValue))
           }
 
         case While(cond, body, label) =>
@@ -1168,7 +1167,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
                     newBody = js.Block(pushLhsInto(newLhs, body), js.Break())
                     // desugar alternatives into several cases falling through
                     caze <- (newValues.init map (v => (v, js.Skip()))) :+
-                    (newValues.last, newBody)
+                           (newValues.last, newBody)
                   } yield {
                     caze
                   }
@@ -2153,8 +2152,7 @@ private[emitter] class JSDesugaring(internalOptions: InternalOptions) {
             }
           }
         } else {
-          js.Apply(envField(if (test) "is" else "as", className),
-                   List(expr))
+          js.Apply(envField(if (test) "is" else "as", className), List(expr))
         }
 
       case ArrayType(base, depth) =>

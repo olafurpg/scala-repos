@@ -38,7 +38,8 @@ class Throttler(val desiredRatePerSec: Double,
                 metricName: String = "throttler",
                 units: String = "entries",
                 val time: Time = SystemTime)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   private val lock = new Object
   private val meter = newMeter(metricName, units, TimeUnit.SECONDS)

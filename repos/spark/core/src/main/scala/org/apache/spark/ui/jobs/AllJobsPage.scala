@@ -62,10 +62,8 @@ private[ui] class AllJobsPage(parent: JobsTab) extends WebUIPage("") {
       parent.jobProgresslistener.stageIdToData.get((s.stageId, s.attemptId))
     }
     val name = lastStageInfo.map(_.name).getOrElse("(Unknown Stage Name)")
-    val description = lastStageData
-      .flatMap(_.description)
-      .getOrElse("")
-      (name, description)
+    val description = lastStageData.flatMap(_.description).getOrElse("")
+    (name, description)
   }
 
   private def makeJobEvent(jobUIDatas: Seq[JobUIData]): Seq[String] = {

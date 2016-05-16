@@ -6,7 +6,8 @@ trait WebHookComponent extends TemplateComponent { self: Profile =>
   lazy val WebHooks = TableQuery[WebHooks]
 
   class WebHooks(tag: Tag)
-      extends Table[WebHook](tag, "WEB_HOOK") with BasicTemplate {
+      extends Table[WebHook](tag, "WEB_HOOK")
+      with BasicTemplate {
     val url = column[String]("URL")
     val token = column[Option[String]]("TOKEN", O.Nullable)
     def * =

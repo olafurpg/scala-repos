@@ -10,7 +10,9 @@ import org.scalatra.json.JacksonJsonSupport
 import scala.concurrent.ExecutionContext
 
 class AtmosphereChat
-    extends ScalatraServlet with JacksonJsonSupport with AtmosphereSupport {
+    extends ScalatraServlet
+    with JacksonJsonSupport
+    with AtmosphereSupport {
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,8 +22,10 @@ class AtmosphereChat
         title = "Scalatra Atmosphere Chat",
         content = bodyHtml,
         url = url(_, includeServletPath = false),
-        scripts = "/jquery/jquery.atmosphere.js" :: "/jquery/application.js" :: Nil,
-        defaultScripts = "/assets/js/jquery.min.js" :: "/assets/js/bootstrap.min.js" :: Nil
+        scripts =
+          "/jquery/jquery.atmosphere.js" :: "/jquery/application.js" :: Nil,
+        defaultScripts =
+          "/assets/js/jquery.min.js" :: "/assets/js/bootstrap.min.js" :: Nil
     )
   }
 

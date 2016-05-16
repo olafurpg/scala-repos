@@ -45,7 +45,8 @@ object BinaryPickle {
 }
 
 class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
-    extends BinaryPBuilder with PickleTools {
+    extends BinaryPBuilder
+    with PickleTools {
   import format._
 
   private var output: BinaryOutput = out
@@ -53,8 +54,9 @@ class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
 
   @inline private[this] def mkOutput(knownSize: Int): Unit = {
     if (output == null)
-      output = if (knownSize != -1) new FixedByteArrayOutput(knownSize)
-      else new ByteArrayOutput
+      output =
+        if (knownSize != -1) new FixedByteArrayOutput(knownSize)
+        else new ByteArrayOutput
     else output.ensureCapacity(knownSize)
   }
 
@@ -171,7 +173,9 @@ abstract class AbstractBinaryReader() {
 }
 
 class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
-    extends AbstractBinaryReader() with PReader with PickleTools {
+    extends AbstractBinaryReader()
+    with PReader
+    with PickleTools {
   import format._
 
   def beginEntry: String = {

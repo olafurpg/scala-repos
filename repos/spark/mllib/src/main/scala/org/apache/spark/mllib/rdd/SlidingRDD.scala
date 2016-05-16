@@ -25,7 +25,8 @@ import org.apache.spark.rdd.RDD
 
 private[mllib] class SlidingRDDPartition[T](
     val idx: Int, val prev: Partition, val tail: Seq[T], val offset: Int)
-    extends Partition with Serializable {
+    extends Partition
+    with Serializable {
   override val index: Int = idx
 }
 
@@ -45,7 +46,7 @@ private[mllib] class SlidingRDDPartition[T](
   * @see [[org.apache.spark.mllib.rdd.RDDFunctions.sliding(Int, Int)*]]
   * @see [[scala.collection.IterableLike.sliding(Int, Int)*]]
   */
-private[mllib] class SlidingRDD[T : ClassTag](
+private[mllib] class SlidingRDD[T: ClassTag](
     @transient val parent: RDD[T], val windowSize: Int, val step: Int)
     extends RDD[Array[T]](parent) {
 

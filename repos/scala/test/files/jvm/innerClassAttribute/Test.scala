@@ -91,11 +91,11 @@ object Test extends BytecodeTest {
     println(s"${e.outerClass} / ${e.name} / ${e.descriptor}")
   }
 
-  val methodHandlesLookup = assertMember(
-      _: InnerClassNode,
-      "java/lang/invoke/MethodHandles",
-      "Lookup",
-      flags = publicStatic | Flags.ACC_FINAL)
+  val methodHandlesLookup = assertMember(_: InnerClassNode,
+                                         "java/lang/invoke/MethodHandles",
+                                         "Lookup",
+                                         flags =
+                                           publicStatic | Flags.ACC_FINAL)
 
   def testA1() = {
     val List(b1) = innerClassNodes("A1")
@@ -161,7 +161,8 @@ object Test extends BytecodeTest {
         ann,
         "JavaAnnot_1",
         "Ann",
-        flags = publicAbstractInterface | Flags.ACC_STATIC | Flags.ACC_ANNOTATION)
+        flags =
+          publicAbstractInterface | Flags.ACC_STATIC | Flags.ACC_ANNOTATION)
   }
 
   def testA13() = {
@@ -333,11 +334,9 @@ object Test extends BytecodeTest {
            "SI_9124$O$$anon$13")
         .map({ name =>
           val node = loadClassNode(name)
-          val fMethod = node.methods.asScala
-            .find(_.name.startsWith("f"))
-            .get
-            .name
-            (fMethod, node.name)
+          val fMethod =
+            node.methods.asScala.find(_.name.startsWith("f")).get.name
+          (fMethod, node.name)
         })
         .toMap
     }

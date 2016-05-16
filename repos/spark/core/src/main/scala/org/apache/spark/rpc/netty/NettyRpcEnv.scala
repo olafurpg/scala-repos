@@ -45,7 +45,8 @@ private[netty] class NettyRpcEnv(
     javaSerializerInstance: JavaSerializerInstance,
     host: String,
     securityManager: SecurityManager)
-    extends RpcEnv(conf) with Logging {
+    extends RpcEnv(conf)
+    with Logging {
 
   private[netty] val transportConf = SparkTransportConf.fromSparkConf(
       conf.clone.set("spark.rpc.io.numConnectionsPerPeer", "1"),
@@ -211,7 +212,7 @@ private[netty] class NettyRpcEnv(
     clientFactory.createClient(address.host, address.port)
   }
 
-  private[netty] def ask[T : ClassTag](
+  private[netty] def ask[T: ClassTag](
       message: RequestMessage, timeout: RpcTimeout): Future[T] = {
     val promise = Promise[Any]()
     val remoteAddr = message.receiver.address
@@ -243,7 +244,7 @@ private[netty] class NettyRpcEnv(
             serialize(message),
             onFailure,
             (client,
-            response) => onSuccess(deserialize[Any](client, response)))
+             response) => onSuccess(deserialize[Any](client, response)))
         postToOutbox(message.receiver, rpcMessage)
         promise.future.onFailure {
           case _: TimeoutException => rpcMessage.onTimeout()
@@ -273,7 +274,7 @@ private[netty] class NettyRpcEnv(
     javaSerializerInstance.serialize(content)
   }
 
-  private[netty] def deserialize[T : ClassTag](
+  private[netty] def deserialize[T: ClassTag](
       client: TransportClient, bytes: ByteBuffer): T = {
     NettyRpcEnv.currentClient.withValue(client) {
       deserialize { () =>
@@ -378,8 +379,8 @@ private[netty] class NettyRpcEnv(
             SparkTransportConf.fromSparkConf(clone, module, ioThreads)
           val downloadContext =
             new TransportContext(downloadConf, new NoOpRpcHandler(), true)
-          fileDownloadFactory = downloadContext.createClientFactory(
-              createClientBootstraps())
+          fileDownloadFactory =
+            downloadContext.createClientFactory(createClientBootstraps())
         }
       }
     fileDownloadFactory.createClient(host, port)
@@ -511,7 +512,9 @@ private[netty] class NettyRpcEndpointRef(
     @transient private val conf: SparkConf,
     endpointAddress: RpcEndpointAddress,
     @transient @volatile private var nettyEnv: NettyRpcEnv)
-    extends RpcEndpointRef(conf) with Serializable with Logging {
+    extends RpcEndpointRef(conf)
+    with Serializable
+    with Logging {
 
   @transient
   @volatile var client: TransportClient = _
@@ -535,8 +538,7 @@ private[netty] class NettyRpcEndpointRef(
 
   override def name: String = _name
 
-  override def ask[T : ClassTag](
-      message: Any, timeout: RpcTimeout): Future[T] = {
+  override def ask[T: ClassTag](message: Any, timeout: RpcTimeout): Future[T] = {
     nettyEnv.ask(RequestMessage(nettyEnv.address, this, message), timeout)
   }
 
@@ -584,7 +586,8 @@ private[netty] case class RpcFailure(e: Throwable)
 private[netty] class NettyRpcHandler(dispatcher: Dispatcher,
                                      nettyEnv: NettyRpcEnv,
                                      streamManager: StreamManager)
-    extends RpcHandler with Logging {
+    extends RpcHandler
+    with Logging {
 
   // A variable to track the remote RpcEnv addresses of all clients
   private val remoteAddresses = new ConcurrentHashMap[RpcAddress, RpcAddress]()

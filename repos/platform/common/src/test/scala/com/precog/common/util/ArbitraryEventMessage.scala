@@ -71,8 +71,8 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       apiKey <- alphaStr
       path <- genPath
       ownerAccountId <- alphaStr
-      content <- containerOf[List, JValue](genContentJValue)
-                  .map(l => Vector(l: _*)) if !content.isEmpty
+      content <- containerOf[List, JValue](genContentJValue).map(l =>
+                      Vector(l: _*)) if !content.isEmpty
       jobId <- oneOf(identifier.map(Option.apply), None)
       streamRef <- genStreamRef
     } yield
@@ -95,7 +95,7 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
     for {
       ingest <- genRandomIngest if ingest.writeAs.isDefined
       eventIds <- containerOfN[List, EventId](ingest.data.size, genEventId)
-        .map(l => Vector(l: _*))
+                   .map(l => Vector(l: _*))
       streamRef <- genStreamRef
     } yield {
       //TODO: Replace with IngestMessage.fromIngest when it's usable
@@ -157,8 +157,8 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
     } else {
       parent :: containerOfN[List, String](choose(2, 4).sample.get,
                                            resize(10, alphaStr))
-        .map(_.filter(_.length > 1).flatMap(
-                child => buildChildPaths(child :: parent, depth - 1)))
+        .map(_.filter(_.length > 1).flatMap(child =>
+                  buildChildPaths(child :: parent, depth - 1)))
         .sample
         .get
     }
@@ -183,8 +183,8 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
   def genIngest: Gen[Ingest] =
     for {
       path <- genStablePath
-      ingestData <- containerOf[List, JValue](genIngestData)
-        .map(l => Vector(l: _*))
+      ingestData <- containerOf[List, JValue](genIngestData).map(l =>
+                         Vector(l: _*))
       streamRef <- genStreamRef
     } yield
       Ingest(ingestAPIKey,

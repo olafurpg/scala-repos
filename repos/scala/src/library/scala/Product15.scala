@@ -50,7 +50,8 @@ trait Product15[+T1,
                 +T13,
                 +T14,
                 +T15]
-    extends Any with Product {
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 15

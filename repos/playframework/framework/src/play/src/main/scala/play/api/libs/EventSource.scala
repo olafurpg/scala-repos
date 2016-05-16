@@ -55,7 +55,7 @@ object EventSource {
     * @tparam E from type of the Enumeratee
     */
   @deprecated("Use apply with an Akka source instead", "2.5.0")
-  def apply[E : EventDataExtractor : EventNameExtractor : EventIdExtractor](
+  def apply[E: EventDataExtractor: EventNameExtractor: EventIdExtractor](
       ): Enumeratee[E, Event] =
     Enumeratee.map[E] { e =>
       Event(e)
@@ -71,9 +71,8 @@ object EventSource {
     *   Ok.chunked(jsonStream via EventSource.flow).as(ContentTypes.EVENT_STREAM)
     * }}}
     */
-  def flow[
-      E : EventDataExtractor : EventNameExtractor : EventIdExtractor]: Flow[
-      E, Event, _] = {
+  def flow[E: EventDataExtractor: EventNameExtractor: EventIdExtractor]
+    : Flow[E, Event, _] = {
     Flow[E].map(Event(_))
   }
 

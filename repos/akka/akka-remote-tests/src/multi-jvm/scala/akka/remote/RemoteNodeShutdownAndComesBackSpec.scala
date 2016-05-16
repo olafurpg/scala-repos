@@ -48,7 +48,8 @@ class RemoteNodeShutdownAndComesBackMultiJvmNode2
 
 abstract class RemoteNodeShutdownAndComesBackSpec
     extends MultiNodeSpec(RemoteNodeShutdownAndComesBackSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeShutdownAndComesBackSpec._
 

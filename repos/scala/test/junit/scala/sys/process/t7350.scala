@@ -229,7 +229,8 @@ class PipeSourceSinkTest {
   }
   class DebugOutputStream extends ByteArrayOutputStream with CloseChecking
   class DebugInputStream(s: String)
-      extends ByteArrayInputStream(s.getBytes()) with CloseChecking
+      extends ByteArrayInputStream(s.getBytes())
+      with CloseChecking
   class DebugInfinityInputStream extends InputStream with CloseChecking {
     def read() = 1
   }

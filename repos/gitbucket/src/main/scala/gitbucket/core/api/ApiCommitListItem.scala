@@ -19,16 +19,17 @@ case class ApiCommitListItem(sha: String,
 object ApiCommitListItem {
   def apply(
       commit: CommitInfo, repositoryName: RepositoryName): ApiCommitListItem =
-    ApiCommitListItem(sha = commit.id,
-                      commit = Commit(
-                            message = commit.fullMessage,
-                            author = ApiPersonIdent.author(commit),
-                            committer = ApiPersonIdent.committer(commit)
-                        )(commit.id, repositoryName),
-                      author = None,
-                      committer = None,
-                      parents = commit.parents.map(Parent(_)(repositoryName)))(
-        repositoryName)
+    ApiCommitListItem(
+        sha = commit.id,
+        commit = Commit(
+            message = commit.fullMessage,
+            author = ApiPersonIdent.author(commit),
+            committer = ApiPersonIdent.committer(commit)
+        )(commit.id, repositoryName),
+        author = None,
+        committer = None,
+        parents =
+          commit.parents.map(Parent(_)(repositoryName)))(repositoryName)
 
   case class Parent(sha: String)(repositoryName: RepositoryName) {
     val url = ApiPath(

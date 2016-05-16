@@ -14,13 +14,17 @@ import org.reactivestreams.{Subscription, Subscriber}
 private[akka] object FanIn {
 
   final case class OnError(id: Int, cause: Throwable)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class OnComplete(id: Int)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class OnNext(id: Int, e: Any)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class OnSubscribe(id: Int, subscription: Subscription)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 
   private[akka] final case class SubInput[T](impl: ActorRef, id: Int)
       extends Subscriber[T] {
@@ -69,8 +73,9 @@ private[akka] object FanIn {
       (states(index) & flag) != 0
     private[this] final def setState(
         index: Int, flag: Int, on: Boolean): Unit =
-      states(index) = if (on) (states(index) | flag).toByte
-      else (states(index) & ~flag).toByte
+      states(index) =
+        if (on) (states(index) | flag).toByte
+        else (states(index) & ~flag).toByte
 
     private[this] final def cancelled(index: Int): Boolean =
       hasState(index, Cancelled)
@@ -274,7 +279,9 @@ private[akka] object FanIn {
   */
 private[akka] abstract class FanIn(
     val settings: ActorMaterializerSettings, val inputCount: Int)
-    extends Actor with ActorLogging with Pump {
+    extends Actor
+    with ActorLogging
+    with Pump {
   import FanIn._
 
   protected val primaryOutputs: Outputs = new SimpleOutputs(self, this)

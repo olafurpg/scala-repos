@@ -342,14 +342,13 @@ trait ProtoUser {
     */
   def loginFirst = If(
       loggedIn_? _,
-      () =>
-        {
-          import net.liftweb.http.{RedirectWithState, RedirectState}
-          val uri = S.uriAndQueryString
-          RedirectWithState(
-              loginPageURL,
-              RedirectState(() => { loginRedirect.set(uri) })
-          )
+      () => {
+        import net.liftweb.http.{RedirectWithState, RedirectState}
+        val uri = S.uriAndQueryString
+        RedirectWithState(
+            loginPageURL,
+            RedirectState(() => { loginRedirect.set(uri) })
+        )
       }
   )
 
@@ -607,10 +606,9 @@ trait ProtoUser {
     if (destroySessionOnLogin) {
       S.session
         .openOrThrowException("we have a session here")
-        .destroySessionAndContinueInNewSession(() =>
-              {
-            logUserIn(who)
-            postLogin()
+        .destroySessionAndContinueInNewSession(() => {
+          logUserIn(who)
+          postLogin()
         })
     } else {
       logUserIn(who)
@@ -742,12 +740,10 @@ trait ProtoUser {
       S.notice(S.?("sign.up.message"))
       func()
     } else {
-      logUserIn(theUser,
-                () =>
-                  {
-                    S.notice(S.?("welcome"))
-                    func()
-                })
+      logUserIn(theUser, () => {
+        S.notice(S.?("welcome"))
+        func()
+      })
     }
   }
 
@@ -810,12 +806,10 @@ trait ProtoUser {
   def validateUser(id: String): NodeSeq = findUserByUniqueId(id) match {
     case Full(user) if !user.validated_? =>
       user.setValidated(true).resetUniqueId().save
-      logUserIn(user,
-                () =>
-                  {
-                    S.notice(S.?("account.validated"))
-                    S.redirectTo(homePage)
-                })
+      logUserIn(user, () => {
+        S.notice(S.?("account.validated"))
+        S.redirectTo(homePage)
+      })
 
     case _ => S.error(S.?("invalid.validation.link")); S.redirectTo(homePage)
   }
@@ -882,15 +876,13 @@ trait ProtoUser {
                 homePage
             }
 
-            logUserIn(user,
-                      () =>
-                        {
-                          S.notice(S.?("logged.in"))
+            logUserIn(user, () => {
+              S.notice(S.?("logged.in"))
 
-                          preLoginState()
+              preLoginState()
 
-                          S.redirectTo(redir)
-                      })
+              S.redirectTo(redir)
+            })
           }
 
         case Full(user) if !user.validated_? =>
@@ -1165,7 +1157,7 @@ trait ProtoUser {
     for {
       pointer <- fields
       field <- computeFieldFromPointer(user, pointer).toList if field.show_? &&
-              (!ignorePassword || !pointer.isPasswordField_?)
+      (!ignorePassword || !pointer.isPasswordField_?)
       form <- field.toForm.toList
     } yield <tr><td>{field.displayName}</td><td>{form}</td></tr>
   }

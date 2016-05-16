@@ -968,8 +968,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * @param `as` a sequence of `A` that will have `f` applied to each item sequentially
     * @return a `Future[Seq[B]]` containing the results of `f` being applied to every item in `as`
     */
-  def traverseSequentially[A, B](as: Seq[A])(
-      f: A => Future[B]): Future[Seq[B]] =
+  def traverseSequentially[A, B](
+      as: Seq[A])(f: A => Future[B]): Future[Seq[B]] =
     as.foldLeft(Future.value(Vector.empty[B])) { (resultsFuture, nextItem) =>
       for {
         results <- resultsFuture
@@ -1579,8 +1579,8 @@ abstract class Future[+A] extends Awaitable[A] {
     * discards the result of `this`. Note that this applies only
     * `Unit`-valued  Futures — i.e. side-effects.
     */
-  def before[B](
-      f: => Future[B])(implicit ev: this.type <:< Future[Unit]): Future[B] =
+  def before[B](f: => Future[B])(
+      implicit ev: this.type <:< Future[Unit]): Future[B] =
     transform {
       case Return(_) => f
       case t: Throw[_] => Future.const[B](t.cast[B])
@@ -2635,27 +2635,28 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       t: Future[T],
       u: Future[U])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    Future.join(Seq(a,
-                    b,
-                    c,
-                    d,
-                    e,
-                    f,
-                    g,
-                    h,
-                    i,
-                    j,
-                    k,
-                    l,
-                    m,
-                    n,
-                    o,
-                    p,
-                    q,
-                    r,
-                    s,
-                    t,
-                    u)) map { _ =>
+    Future.join(
+        Seq(a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+            i,
+            j,
+            k,
+            l,
+            m,
+            n,
+            o,
+            p,
+            q,
+            r,
+            s,
+            t,
+            u)) map { _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2708,28 +2709,29 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       u: Future[U],
       v: Future[V]): Future[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    Future.join(Seq(a,
-                    b,
-                    c,
-                    d,
-                    e,
-                    f,
-                    g,
-                    h,
-                    i,
-                    j,
-                    k,
-                    l,
-                    m,
-                    n,
-                    o,
-                    p,
-                    q,
-                    r,
-                    s,
-                    t,
-                    u,
-                    v)) map { _ =>
+    Future.join(
+        Seq(a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+            i,
+            j,
+            k,
+            l,
+            m,
+            n,
+            o,
+            p,
+            q,
+            r,
+            s,
+            t,
+            u,
+            v)) map { _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),

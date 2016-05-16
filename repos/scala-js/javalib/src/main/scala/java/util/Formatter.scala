@@ -7,7 +7,8 @@ import java.io._
 import java.lang._
 
 final class Formatter(private val dest: Appendable)
-    extends Closeable with Flushable {
+    extends Closeable
+    with Flushable {
   import Formatter._
 
   var closed = false

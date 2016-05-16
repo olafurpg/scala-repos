@@ -33,7 +33,8 @@ object SwaggerSerializers {
   private[swagger] def dontAddOnEmpty(key: String, value: List[String])(
       json: JValue) = {
     if (value.nonEmpty)
-      json merge JObject(List(key -> JArray(value map (JString(_))))) else json
+      json merge JObject(List(key -> JArray(value map (JString(_)))))
+    else json
   }
 
   lazy val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
@@ -303,8 +304,8 @@ object SwaggerSerializers {
                             case _ => false
                           },
                           description = (json \ "description")
-                              .getAs[String]
-                              .flatMap(_.blankOption),
+                            .getAs[String]
+                            .flatMap(_.blankOption),
                           allowableValues = json.extract[AllowableValues],
                           items = None)
         }, {
@@ -339,12 +340,12 @@ object SwaggerSerializers {
         }, {
           case x: Model =>
             val required = for ((key, value) <- x.properties
-                                                   if value.required) yield key
+                                if value.required) yield key
             ("id" -> x.id) ~ ("name" -> x.name) ~
             ("qualifiedType" -> x.qualifiedName) ~
             ("description" -> x.description) ~ ("required" -> required) ~
-            ("extends" -> x.baseModel.filter(
-                    s => s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
+            ("extends" -> x.baseModel.filter(s =>
+                      s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
             ("discriminator" -> x.discriminator) ~
             ("properties" ->
                 (x.properties.sortBy { case (_, p) ⇒ p.position } map {
@@ -452,8 +453,7 @@ object SwaggerSerializers {
         }))
 
   class EndpointSerializer
-      extends CustomSerializer[Endpoint](
-          implicit formats =>
+      extends CustomSerializer[Endpoint](implicit formats =>
             ({
           case value =>
             Endpoint((value \ "path").extract[String],

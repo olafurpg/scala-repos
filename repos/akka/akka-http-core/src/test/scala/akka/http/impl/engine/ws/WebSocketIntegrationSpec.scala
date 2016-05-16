@@ -108,9 +108,9 @@ class WebSocketIntegrationSpec
 
       val N = 100
 
-      EventFilter.warning(
-          pattern = "HTTP header .* is not allowed in responses",
-          occurrences = 0) intercept {
+      EventFilter.warning(pattern =
+                            "HTTP header .* is not allowed in responses",
+                          occurrences = 0) intercept {
         val (response, count) = Http().singleWebSocketRequest(
             WebSocketRequest("ws://127.0.0.1:" + myPort),
             Flow.fromSinkAndSourceMat(

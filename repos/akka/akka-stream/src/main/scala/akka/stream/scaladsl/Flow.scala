@@ -26,15 +26,16 @@ import akka.NotUsed
   * A `Flow` is a set of stream processing steps that has one open input and one open output.
   */
 final class Flow[-In, +Out, +Mat](private[stream] override val module: Module)
-    extends FlowOpsMat[Out, Mat] with Graph[FlowShape[In, Out], Mat] {
+    extends FlowOpsMat[Out, Mat]
+    with Graph[FlowShape[In, Out], Mat] {
 
   override val shape: FlowShape[In, Out] =
     module.shape.asInstanceOf[FlowShape[In, Out]]
 
   override def toString: String = s"Flow($shape, $module)"
 
-  override type Repr[+O] = Flow[
-      In @uncheckedVariance, O, Mat @uncheckedVariance]
+  override type Repr[+O] =
+    Flow[In @uncheckedVariance, O, Mat @uncheckedVariance]
   override type ReprMat[+O, +M] = Flow[In @uncheckedVariance, O, M]
 
   override type Closed = Sink[In @uncheckedVariance, Mat @uncheckedVariance]
@@ -380,8 +381,7 @@ object Flow {
   def fromSinkAndSourceMat[I, O, M1, M2, M](
       sink: Graph[SinkShape[I], M1], source: Graph[SourceShape[O], M2])(
       combine: (M1, M2) ⇒ M): Flow[I, O, M] =
-    fromGraph(
-        GraphDSL.create(sink, source)(combine) { implicit b ⇒ (in, out) ⇒
+    fromGraph(GraphDSL.create(sink, source)(combine) { implicit b ⇒ (in, out) ⇒
       FlowShape(in.in, out.out)
     })
 }
@@ -951,8 +951,8 @@ trait FlowOps[+Out, +Mat] {
     * @param strategy Strategy that is used when incoming elements cannot fit inside the buffer
     */
   def delay(of: FiniteDuration,
-            strategy: DelayOverflowStrategy = DelayOverflowStrategy.dropTail)
-    : Repr[Out] =
+            strategy: DelayOverflowStrategy =
+              DelayOverflowStrategy.dropTail): Repr[Out] =
     via(new Delay[Out](of, strategy))
 
   /**
@@ -1680,9 +1680,9 @@ trait FlowOps[+Out, +Mat] {
       combine: (Out, Out2) ⇒ Out3): Repr[Out3] =
     via(zipWithGraph(that)(combine))
 
-  protected def zipWithGraph[Out2, Out3, M](that: Graph[SourceShape[Out2], M])(
-      combine: (Out,
-      Out2) ⇒ Out3): Graph[FlowShape[Out @uncheckedVariance, Out3], M] =
+  protected def zipWithGraph[Out2, Out3, M](
+      that: Graph[SourceShape[Out2], M])(combine: (Out, Out2) ⇒ Out3)
+    : Graph[FlowShape[Out @uncheckedVariance, Out3], M] =
     GraphDSL.create(that) { implicit b ⇒ r ⇒
       val zip = b.add(ZipWith[Out, Out2, Out3](combine))
       r ~> zip.in1
@@ -1769,8 +1769,8 @@ trait FlowOps[+Out, +Mat] {
       implicit ord: Ordering[U]): Repr[U] =
     via(mergeSortedGraph(that))
 
-  protected def mergeSortedGraph[U >: Out, M](
-      that: Graph[SourceShape[U], M])(implicit ord: Ordering[U])
+  protected def mergeSortedGraph[U >: Out, M](that: Graph[SourceShape[U], M])(
+      implicit ord: Ordering[U])
     : Graph[FlowShape[Out @uncheckedVariance, U], M] =
     GraphDSL.create(that) { implicit b ⇒ r ⇒
       val merge = b.add(new MergeSorted[U])

@@ -30,7 +30,7 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30'" in {
       writes(dateTime("2011-12-03T10:15:30")) aka "written date" must_==
-      (JsString("2011-12-03T10:15:30"))
+        (JsString("2011-12-03T10:15:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30'" in {
@@ -48,7 +48,7 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30-01:30'" in {
       writes(OffsetDateTime.parse("2011-12-03T10:15:30-01:30")) aka "written date" must_==
-      (JsString("2011-12-03T10:15:30-01:30"))
+        (JsString("2011-12-03T10:15:30-01:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30 (-01:30)'" in {
@@ -78,12 +78,12 @@ object WritesSpec extends org.specs2.mutable.Specification {
 
     "be written with default implicit as '2011-12-03T10:15:30+01:00[Europe/Paris]'" in {
       writes(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")) aka "written date" must_==
-      (JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
+        (JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
     }
 
     "be written with default implicit as '2011-12-03T10:15:30+06:30'" in {
       writes(dateTime("2011-12-03T10:15:30+06:30")) aka "written date" must_==
-      (JsString("2011-12-03T10:15:30+06:30"))
+        (JsString("2011-12-03T10:15:30+06:30"))
     }
 
     "be written with custom pattern as '03/12/2011, 10:15:30'" in {

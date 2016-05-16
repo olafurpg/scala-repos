@@ -266,7 +266,8 @@ object GridPane {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/GridPane.html]]
   */
 class GridPane(override val delegate: jfxsl.GridPane = new jfxsl.GridPane)
-    extends Pane(delegate) with AlignmentDelegate[jfxsl.GridPane]
+    extends Pane(delegate)
+    with AlignmentDelegate[jfxsl.GridPane]
     with SFXDelegate[jfxsl.GridPane] {
 
   /**

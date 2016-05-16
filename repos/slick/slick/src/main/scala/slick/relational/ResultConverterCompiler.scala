@@ -90,7 +90,8 @@ object ResultConverterCompiler {
 /** A node that wraps a ResultConverter */
 final case class CompiledMapping(
     converter: ResultConverter[_ <: ResultConverterDomain, _], buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = CompiledMapping
   def rebuild = copy()
   override def getDumpInfo = {

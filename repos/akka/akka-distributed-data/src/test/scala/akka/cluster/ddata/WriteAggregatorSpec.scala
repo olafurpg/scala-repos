@@ -59,7 +59,8 @@ class WriteAggregatorSpec
     extends AkkaSpec("""
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
-      """) with ImplicitSender {
+      """)
+    with ImplicitSender {
 
   val nodeA = Address("akka.tcp", "Sys", "a", 2552)
   val nodeB = nodeA.copy(host = Some("b"))

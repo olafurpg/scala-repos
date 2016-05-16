@@ -39,7 +39,10 @@ import org.apache.spark.streaming.util.WriteAheadLogSuite._
 import org.apache.spark.util.{Clock, ManualClock, SystemClock, Utils}
 
 class ReceivedBlockTrackerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with Logging {
 
   val hadoopConf = new Configuration()
   val streamId = 1
@@ -357,8 +360,9 @@ class ReceivedBlockTrackerSuite
     * Get all the data written in the given write ahead log files. By default, it will read all
     * files in the test log directory.
     */
-  def getWrittenLogData(logFiles: Seq[String] = getWriteAheadLogFiles)
-    : Seq[ReceivedBlockTrackerLogEvent] = {
+  def getWrittenLogData(
+      logFiles: Seq[String] =
+        getWriteAheadLogFiles): Seq[ReceivedBlockTrackerLogEvent] = {
     logFiles.flatMap { file =>
       new FileBasedWriteAheadLogReader(file, hadoopConf).toSeq
     }.flatMap { byteBuffer =>
@@ -370,8 +374,8 @@ class ReceivedBlockTrackerSuite
         } else {
           Array(byteBuffer)
         }
-      validBuffer.map(
-          b => Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
+      validBuffer.map(b =>
+            Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
     }.toList
   }
 

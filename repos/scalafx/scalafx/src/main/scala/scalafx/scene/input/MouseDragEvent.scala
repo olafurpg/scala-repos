@@ -81,7 +81,8 @@ object MouseDragEvent {
 }
 
 class MouseDragEvent(override val delegate: jfxsi.MouseDragEvent)
-    extends MouseEvent(delegate) with SFXDelegate[jfxsi.MouseDragEvent] {
+    extends MouseEvent(delegate)
+    with SFXDelegate[jfxsi.MouseDragEvent] {
 
   /**
     * Returns the source object of the ongoing gesture.

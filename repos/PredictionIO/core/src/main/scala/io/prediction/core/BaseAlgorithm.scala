@@ -53,7 +53,8 @@ trait BaseQuerySerializer {
   */
 @DeveloperApi
 abstract class BaseAlgorithm[PD, M, Q, P]
-    extends AbstractDoer with BaseQuerySerializer {
+    extends AbstractDoer
+    with BaseQuerySerializer {
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by workflow

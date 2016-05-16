@@ -21,13 +21,13 @@ import collection.JavaConverters._
 import cascading.tuple.Fields
 
 package object avro {
-  def writePackedAvro[T](pipe: TypedPipe[T], path: String)(
-      implicit mf: Manifest[T],
-      st: AvroSchemaType[T],
-      conv: TupleConverter[T],
-      set: TupleSetter[T],
-      flow: FlowDef,
-      mode: Mode): Unit = {
+  def writePackedAvro[T](
+      pipe: TypedPipe[T], path: String)(implicit mf: Manifest[T],
+                                        st: AvroSchemaType[T],
+                                        conv: TupleConverter[T],
+                                        set: TupleSetter[T],
+                                        flow: FlowDef,
+                                        mode: Mode): Unit = {
     val sink = PackedAvroSource[T](path)
     pipe.write(sink)
   }
@@ -43,8 +43,8 @@ package object avro {
     val sink = UnpackedAvroSource[T](path, Some(schema))
     val outFields = {
       val schemaFields = schema.getFields
-      schemaFields.asScala.foldLeft(new Fields())(
-          (cFields, sField) => cFields.append(new Fields(sField.name())))
+      schemaFields.asScala.foldLeft(new Fields())((cFields, sField) =>
+            cFields.append(new Fields(sField.name())))
     }
     pipe.toPipe(outFields).write(sink)
   }

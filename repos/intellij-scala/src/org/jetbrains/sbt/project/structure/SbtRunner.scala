@@ -43,8 +43,9 @@ class SbtRunner(vmExecutable: File,
         .seq("resolveJavadocs") ++ resolveSbtClassifiers.seq(
           "resolveSbtClassifiers")
 
-    checkFilePresence.fold(read0(directory, options.mkString(", "))(listener))(
-        it => Left(new FileNotFoundException(it)))
+    checkFilePresence
+      .fold(read0(directory, options.mkString(", "))(listener))(it =>
+          Left(new FileNotFoundException(it)))
   }
 
   private def read0(directory: File, options: String)(
@@ -142,9 +143,8 @@ class SbtRunner(vmExecutable: File,
     handler.startNotify()
 
     var processEnded = false
-    while (!processEnded &&
-    !cancellationFlag.get()) processEnded = handler.waitFor(
-        SBT_PROCESS_CHECK_TIMEOUT_MSEC)
+    while (!processEnded && !cancellationFlag.get()) processEnded =
+      handler.waitFor(SBT_PROCESS_CHECK_TIMEOUT_MSEC)
 
     if (!processEnded) {
       handler.setShouldDestroyProcessRecursively(false)
@@ -249,7 +249,8 @@ object SbtRunner {
   private def sbtVersionIn(directory: File): Option[String] = {
     val propertiesFile = directory / "project" / "build.properties"
     if (propertiesFile.exists())
-      readPropertyFrom(propertiesFile, "sbt.version") else None
+      readPropertyFrom(propertiesFile, "sbt.version")
+    else None
   }
 
   private def readPropertyFrom(file: File, name: String): Option[String] = {

@@ -26,7 +26,8 @@ import _root_.scala.collection.mutable.ArrayBuffer
   * Date: 14.03.2008
   */
 class ScSuperReferenceImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScSuperReference {
+    extends ScalaPsiElementImpl(node)
+    with ScSuperReference {
   override def toString = "SuperReference"
 
   def isHardCoded: Boolean = {
@@ -184,8 +185,7 @@ class ScSuperReferenceImpl(node: ASTNode)
     case Some(q) =>
       q.resolve() match {
         case clazz: PsiClass =>
-          Some(
-              clazz.getSuperTypes.map { t =>
+          Some(clazz.getSuperTypes.map { t =>
             ScType.create(t, getProject, getResolveScope)
           })
         case _ => None

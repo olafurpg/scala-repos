@@ -452,7 +452,7 @@ private[spark] class Executor(executorId: String,
     synchronized {
       // Fetch missing dependencies
       for ((name, timestamp) <- newFiles
-                                   if currentFiles.getOrElse(name, -1L) < timestamp) {
+           if currentFiles.getOrElse(name, -1L) < timestamp) {
         logInfo("Fetching " + name + " with timestamp " + timestamp)
         // Fetch file with useCache mode, close cache for local mode.
         Utils.fetchFile(name,

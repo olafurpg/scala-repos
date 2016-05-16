@@ -163,8 +163,8 @@ object FormFieldDirectives extends FormFieldDirectives {
     }
     private def filter[T](
         fieldName: String, fu: FSFFOU[T])(implicit sfu: SFU): Directive1[T] =
-      extract(fieldOfForm(fieldName, fu))
-        .flatMap(r ⇒ handleFieldResult(fieldName, r))
+      extract(fieldOfForm(fieldName, fu)).flatMap(r ⇒
+            handleFieldResult(fieldName, r))
     implicit def forString(
         implicit sfu: SFU,
         fu: FSFFU[String]): FieldDefAux[String, Directive1[String]] =
@@ -268,8 +268,7 @@ object FormFieldDirectives extends FormFieldDirectives {
     import akka.http.scaladsl.server.util.BinaryPolyFunc
     import akka.http.scaladsl.server.util.TupleOps._
 
-    implicit def forTuple[T](
-        implicit fold: FoldLeft[
+    implicit def forTuple[T](implicit fold: FoldLeft[
             Directive0, T, ConvertFieldDefAndConcatenate.type])
       : FieldDefAux[T, fold.Out] =
       fieldDef[T, fold.Out](fold(pass, _))

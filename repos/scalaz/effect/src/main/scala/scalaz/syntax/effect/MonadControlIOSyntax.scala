@@ -20,7 +20,9 @@ sealed trait ToMonadControlIOOps0 {
 }
 
 trait ToMonadControlIOOps
-    extends ToMonadControlIOOps0 with ToLiftControlIOOps with ToMonadOps {
+    extends ToMonadControlIOOps0
+    with ToLiftControlIOOps
+    with ToMonadOps {
   implicit def ToMonadControlIOOps[F[_], A](v: F[A])(
       implicit F0: MonadControlIO[F]) =
     new MonadControlIOOps[F, A](v)
@@ -31,7 +33,8 @@ trait ToMonadControlIOOps
 }
 
 trait MonadControlIOSyntax[F[_]]
-    extends LiftControlIOSyntax[F] with MonadSyntax[F] {
+    extends LiftControlIOSyntax[F]
+    with MonadSyntax[F] {
   implicit def ToMonadControlIOOps[A](v: F[A]): MonadControlIOOps[F, A] =
     new MonadControlIOOps[F, A](v)(MonadControlIOSyntax.this.F)
 

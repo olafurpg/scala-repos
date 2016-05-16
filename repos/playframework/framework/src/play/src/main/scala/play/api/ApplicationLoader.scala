@@ -91,11 +91,11 @@ object ApplicationLoader {
     *                        into the application.
     * @param sourceMapper An optional source mapper.
     */
-  def createContext(
-      environment: Environment,
-      initialSettings: Map[String, AnyRef] = Map.empty[String, AnyRef],
-      sourceMapper: Option[SourceMapper] = None,
-      webCommands: WebCommands = new DefaultWebCommands) = {
+  def createContext(environment: Environment,
+                    initialSettings: Map[String, AnyRef] =
+                      Map.empty[String, AnyRef],
+                    sourceMapper: Option[SourceMapper] = None,
+                    webCommands: WebCommands = new DefaultWebCommands) = {
     val configuration = Configuration.load(environment, initialSettings)
     Context(environment, sourceMapper, webCommands, configuration)
   }

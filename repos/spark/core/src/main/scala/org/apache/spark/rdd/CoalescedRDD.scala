@@ -75,9 +75,9 @@ private[spark] case class CoalescedRDDPartition(
   * @param maxPartitions number of desired partitions in the coalesced RDD (must be positive)
   * @param balanceSlack used to trade-off balance and locality. 1.0 is all locality, 0 is all balance
   */
-private[spark] class CoalescedRDD[T : ClassTag](@transient var prev: RDD[T],
-                                                maxPartitions: Int,
-                                                balanceSlack: Double = 0.10)
+private[spark] class CoalescedRDD[T: ClassTag](@transient var prev: RDD[T],
+                                               maxPartitions: Int,
+                                               balanceSlack: Double = 0.10)
     extends RDD[T](prev.context, Nil) {
   // Nil since we implement getDependencies
 
@@ -163,7 +163,8 @@ private class PartitionCoalescer(
   def compare(
       o1: Option[PartitionGroup], o2: Option[PartitionGroup]): Boolean =
     if (o1 == None) false
-    else if (o2 == None) true else compare(o1.get, o2.get)
+    else if (o2 == None) true
+    else compare(o1.get, o2.get)
 
   val rnd = new scala.util.Random(7919) // keep this class deterministic
 
@@ -200,12 +201,10 @@ private class PartitionCoalescer(
 
     // initializes/resets to start iterating from the beginning
     def resetIterator(): Iterator[(String, Partition)] = {
-      val iterators = (0 to 2).map(
-          x =>
-            prev.partitions.iterator.flatMap(p =>
-                  {
-            if (currPrefLocs(p).size > x) Some((currPrefLocs(p)(x), p))
-            else None
+      val iterators = (0 to 2).map(x =>
+            prev.partitions.iterator.flatMap(p => {
+          if (currPrefLocs(p).size > x) Some((currPrefLocs(p)(x), p))
+          else None
         }))
       iterators.reduceLeft((x, y) => x ++ y)
     }
@@ -218,7 +217,8 @@ private class PartitionCoalescer(
       if (it.hasNext) {
         it.next()
       } else {
-        it = resetIterator() // ran out of preferred locations, reset and rotate to the beginning
+        it =
+          resetIterator() // ran out of preferred locations, reset and rotate to the beginning
         it.next()
       }
     }

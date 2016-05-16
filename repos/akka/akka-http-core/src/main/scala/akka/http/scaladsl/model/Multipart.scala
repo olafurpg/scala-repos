@@ -259,8 +259,8 @@ object Multipart {
         override def toString = s"General($mediaType, $parts)"
       }
 
-    def unapply(value: Multipart.General): Option[(MediaType.Multipart, Source[
-            Multipart.General.BodyPart, Any])] =
+    def unapply(value: Multipart.General): Option[
+        (MediaType.Multipart, Source[Multipart.General.BodyPart, Any])] =
       Some(value.mediaType -> value.parts)
 
     /**
@@ -269,7 +269,8 @@ object Multipart {
     case class Strict(
         mediaType: MediaType.Multipart,
         strictParts: immutable.Seq[Multipart.General.BodyPart.Strict])
-        extends Multipart.General with Multipart.Strict
+        extends Multipart.General
+        with Multipart.Strict
         with jm.Multipart.General.Strict {
       def parts: Source[Multipart.General.BodyPart.Strict, Any] =
         Source(strictParts)
@@ -294,7 +295,8 @@ object Multipart {
       * Body part of the [[General]] model.
       */
     sealed abstract class BodyPart
-        extends Multipart.BodyPart with jm.Multipart.General.BodyPart {
+        extends Multipart.BodyPart
+        with jm.Multipart.General.BodyPart {
       def toStrict(timeout: FiniteDuration)(implicit fm: Materializer)
         : Future[Multipart.General.BodyPart.Strict] = {
         import fm.executionContext
@@ -313,7 +315,7 @@ object Multipart {
 
       private[BodyPart] def tryCreateFormDataBodyPart[T](
           f: (String, Map[String, String],
-          immutable.Seq[HttpHeader]) ⇒ T): Try[T] = {
+              immutable.Seq[HttpHeader]) ⇒ T): Try[T] = {
         val params = dispositionParams
         params.get("name") match {
           case Some(name) ⇒
@@ -329,7 +331,7 @@ object Multipart {
       }
       private[BodyPart] def tryCreateByteRangesBodyPart[T](
           f: (ContentRange, RangeUnit,
-          immutable.Seq[HttpHeader]) ⇒ T): Try[T] =
+              immutable.Seq[HttpHeader]) ⇒ T): Try[T] =
         headers.collectFirst { case x: `Content-Range` ⇒ x } match {
           case Some(`Content-Range`(unit, range)) ⇒
             Success(f(range, unit, headers.filterNot(_ is "content-range")))
@@ -340,9 +342,9 @@ object Multipart {
         }
     }
     object BodyPart {
-      def apply(
-          _entity: BodyPartEntity, _headers: immutable.Seq[HttpHeader] = Nil)
-        : Multipart.General.BodyPart =
+      def apply(_entity: BodyPartEntity,
+                _headers: immutable.Seq[HttpHeader] =
+                  Nil): Multipart.General.BodyPart =
         new Multipart.General.BodyPart {
           def entity = _entity
           def headers: immutable.Seq[HttpHeader] = _headers
@@ -362,7 +364,8 @@ object Multipart {
         */
       case class Strict(
           entity: HttpEntity.Strict, headers: immutable.Seq[HttpHeader] = Nil)
-          extends BodyPart with Multipart.BodyPart.Strict
+          extends BodyPart
+          with Multipart.BodyPart.Strict
           with jm.Multipart.General.BodyPart.Strict {
         override def toStrict(
             timeout: FiniteDuration)(implicit fm: Materializer)
@@ -452,7 +455,8 @@ object Multipart {
       */
     case class Strict(
         strictParts: immutable.Seq[Multipart.FormData.BodyPart.Strict])
-        extends FormData with Multipart.Strict
+        extends FormData
+        with Multipart.Strict
         with jm.Multipart.FormData.Strict {
       def parts: Source[Multipart.FormData.BodyPart.Strict, Any] =
         Source(strictParts)
@@ -477,7 +481,8 @@ object Multipart {
       * Body part of the [[FormData]] model.
       */
     sealed abstract class BodyPart
-        extends Multipart.BodyPart with jm.Multipart.FormData.BodyPart {
+        extends Multipart.BodyPart
+        with jm.Multipart.FormData.BodyPart {
 
       /**
         * The name of this part.
@@ -542,8 +547,8 @@ object Multipart {
       def apply(_name: String,
                 _entity: BodyPartEntity,
                 _additionalDispositionParams: Map[String, String] = Map.empty,
-                _additionalHeaders: immutable.Seq[HttpHeader] = Nil)
-        : Multipart.FormData.BodyPart =
+                _additionalHeaders: immutable.Seq[HttpHeader] =
+                  Nil): Multipart.FormData.BodyPart =
         new Multipart.FormData.BodyPart {
           def name = _name
           def additionalDispositionParams = _additionalDispositionParams
@@ -564,8 +569,10 @@ object Multipart {
                  HttpEntity(contentType, file, chunkSize),
                  Map("filename" -> file.getName))
 
-      def unapply(value: BodyPart): Option[(String, BodyPartEntity, Map[
-              String, String], immutable.Seq[HttpHeader])] =
+      def unapply(value: BodyPart): Option[(String,
+                                            BodyPartEntity,
+                                            Map[String, String],
+                                            immutable.Seq[HttpHeader])] =
         Some(
             (value.name,
              value.entity,
@@ -580,7 +587,8 @@ object Multipart {
           entity: HttpEntity.Strict,
           additionalDispositionParams: Map[String, String] = Map.empty,
           additionalHeaders: immutable.Seq[HttpHeader] = Nil)
-          extends Multipart.FormData.BodyPart with Multipart.BodyPart.Strict
+          extends Multipart.FormData.BodyPart
+          with Multipart.BodyPart.Strict
           with jm.Multipart.FormData.BodyPart.Strict {
         override def toStrict(
             timeout: FiniteDuration)(implicit fm: Materializer)
@@ -596,7 +604,8 @@ object Multipart {
     * https://tools.ietf.org/html/rfc7233#section-5.4.1 and https://tools.ietf.org/html/rfc7233#appendix-A
     */
   sealed abstract class ByteRanges
-      extends Multipart with jm.Multipart.ByteRanges {
+      extends Multipart
+      with jm.Multipart.ByteRanges {
     def mediaType = MediaTypes.`multipart/byteranges`
     def parts: Source[Multipart.ByteRanges.BodyPart, Any]
     def toStrict(timeout: FiniteDuration)(
@@ -635,7 +644,8 @@ object Multipart {
       */
     case class Strict(
         strictParts: immutable.Seq[Multipart.ByteRanges.BodyPart.Strict])
-        extends Multipart.ByteRanges with Multipart.Strict
+        extends Multipart.ByteRanges
+        with Multipart.Strict
         with jm.Multipart.ByteRanges.Strict {
       def parts: Source[Multipart.ByteRanges.BodyPart.Strict, Any] =
         Source(strictParts)
@@ -660,7 +670,8 @@ object Multipart {
       * Body part of the [[ByteRanges]] model.
       */
     sealed abstract class BodyPart
-        extends Multipart.BodyPart with jm.Multipart.ByteRanges.BodyPart {
+        extends Multipart.BodyPart
+        with jm.Multipart.ByteRanges.BodyPart {
 
       /**
         * The [[ContentRange]] contained in this part.
@@ -717,8 +728,8 @@ object Multipart {
       def apply(_contentRange: ContentRange,
                 _entity: BodyPartEntity,
                 _rangeUnit: RangeUnit = RangeUnits.Bytes,
-                _additionalHeaders: immutable.Seq[HttpHeader] = Nil)
-        : Multipart.ByteRanges.BodyPart =
+                _additionalHeaders: immutable.Seq[HttpHeader] =
+                  Nil): Multipart.ByteRanges.BodyPart =
         new Multipart.ByteRanges.BodyPart {
           def contentRange = _contentRange
           def entity = _entity
@@ -729,8 +740,10 @@ object Multipart {
         }
 
       def unapply(value: Multipart.ByteRanges.BodyPart)
-        : Option[(ContentRange, BodyPartEntity, RangeUnit, immutable.Seq[
-                HttpHeader])] =
+        : Option[(ContentRange,
+                  BodyPartEntity,
+                  RangeUnit,
+                  immutable.Seq[HttpHeader])] =
         Some(
             (value.contentRange,
              value.entity,
@@ -744,7 +757,8 @@ object Multipart {
                         entity: HttpEntity.Strict,
                         rangeUnit: RangeUnit = RangeUnits.Bytes,
                         additionalHeaders: immutable.Seq[HttpHeader] = Nil)
-          extends Multipart.ByteRanges.BodyPart with Multipart.BodyPart.Strict
+          extends Multipart.ByteRanges.BodyPart
+          with Multipart.BodyPart.Strict
           with jm.Multipart.ByteRanges.BodyPart.Strict {
         override def toStrict(
             timeout: FiniteDuration)(implicit fm: Materializer)

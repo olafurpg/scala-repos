@@ -148,7 +148,7 @@ class IndexTime(val times: Index[Long],
 
   // maps
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](f: DateTime => B) =
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](f: DateTime => B) =
     times.map(v => f(new DateTime(v, chrono)))
 
   private[saddle] def toArray = {

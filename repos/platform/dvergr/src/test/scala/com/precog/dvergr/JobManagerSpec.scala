@@ -304,8 +304,7 @@ trait JobManagerSpec[M[+ _]] extends Specification {
         jobs.createJob(validAPIKey, "b", "c", None, Some(new DateTime)).copoint
 
       def say(name: String, message: String): JValue =
-        JObject(
-            List(
+        JObject(List(
                 JField("name", JString(name)),
                 JField("message", JString(message))
             ))

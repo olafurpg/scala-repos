@@ -24,13 +24,13 @@ class FutureTest extends SpecLite {
   {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap {
+    implicit def futureEqual[A: Equal] = Equal[Throwable \/ A] contramap {
       future: Future[A] =>
         val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
         Await.result(futureWithError, duration)
     }
 
-    implicit def futureShow[A : Show]: Show[Future[A]] =
+    implicit def futureShow[A: Show]: Show[Future[A]] =
       Contravariant[Show].contramap(Show[String \/ A]) { future: Future[A] =>
         val futureWithError =
           future.map(\/-(_)).recover { case e => -\/(e.toString) }

@@ -44,7 +44,8 @@ private[spark] trait Configurable extends HConfigurable {
   */
 private[spark] class WholeTextFileRecordReader(
     split: CombineFileSplit, context: TaskAttemptContext, index: Integer)
-    extends RecordReader[Text, Text] with Configurable {
+    extends RecordReader[Text, Text]
+    with Configurable {
 
   private[this] val path = split.getPath(index)
   private[this] val fs = path.getFileSystem(context.getConfiguration)
@@ -102,7 +103,8 @@ private[spark] class ConfigurableCombineFileRecordReader[K, V](
         split.asInstanceOf[CombineFileSplit],
         context,
         recordReaderClass
-    ) with Configurable {
+    )
+    with Configurable {
 
   override def initNextRecordReader(): Boolean = {
     val r = super.initNextRecordReader()

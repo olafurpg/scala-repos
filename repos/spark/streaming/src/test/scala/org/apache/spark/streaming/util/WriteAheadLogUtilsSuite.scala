@@ -33,7 +33,7 @@ class WriteAheadLogUtilsSuite extends SparkFunSuite {
   private val logDir = Utils.createTempDir().getAbsolutePath()
   private val hadoopConf = new Configuration()
 
-  def assertDriverLogClass[T <: WriteAheadLog : ClassTag](
+  def assertDriverLogClass[T <: WriteAheadLog: ClassTag](
       conf: SparkConf, isBatched: Boolean = false): WriteAheadLog = {
     val log = WriteAheadLogUtils.createLogForDriver(conf, logDir, hadoopConf)
     if (isBatched) {
@@ -46,7 +46,7 @@ class WriteAheadLogUtilsSuite extends SparkFunSuite {
     log
   }
 
-  def assertReceiverLogClass[T <: WriteAheadLog : ClassTag](
+  def assertReceiverLogClass[T <: WriteAheadLog: ClassTag](
       conf: SparkConf): WriteAheadLog = {
     val log = WriteAheadLogUtils.createLogForReceiver(conf, logDir, hadoopConf)
     assert(log.getClass === implicitly[ClassTag[T]].runtimeClass)

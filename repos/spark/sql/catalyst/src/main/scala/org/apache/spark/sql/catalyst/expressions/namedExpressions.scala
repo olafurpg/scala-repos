@@ -134,7 +134,8 @@ case class Alias(child: Expression, name: String)(
     val qualifiers: Seq[String] = Nil,
     val explicitMetadata: Option[Metadata] = None,
     override val isGenerated: java.lang.Boolean = false)
-    extends UnaryExpression with NamedExpression {
+    extends UnaryExpression
+    with NamedExpression {
 
   // Alias(Generator, xx) need to be transformed into Generate(generator, ...)
   override lazy val resolved =
@@ -211,11 +212,12 @@ case class AttributeReference(
     name: String,
     dataType: DataType,
     nullable: Boolean = true,
-    override val metadata: Metadata = Metadata.empty)(
-    val exprId: ExprId = NamedExpression.newExprId,
-    val qualifiers: Seq[String] = Nil,
-    override val isGenerated: java.lang.Boolean = false)
-    extends Attribute with Unevaluable {
+    override val metadata: Metadata =
+      Metadata.empty)(val exprId: ExprId = NamedExpression.newExprId,
+                      val qualifiers: Seq[String] = Nil,
+                      override val isGenerated: java.lang.Boolean = false)
+    extends Attribute
+    with Unevaluable {
 
   /**
     * Returns true iff the expression id is the same for both attributes.
@@ -320,7 +322,8 @@ case class AttributeReference(
   * expression id or the unresolved indicator.
   */
 case class PrettyAttribute(name: String, dataType: DataType = NullType)
-    extends Attribute with Unevaluable {
+    extends Attribute
+    with Unevaluable {
 
   def this(attribute: Attribute) =
     this(attribute.name, attribute match {

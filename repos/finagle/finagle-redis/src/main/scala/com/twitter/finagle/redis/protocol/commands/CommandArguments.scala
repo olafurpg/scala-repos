@@ -51,7 +51,8 @@ object Limit {
 
 // Represents a list of WEIGHTS
 class Weights(underlying: Array[Double])
-    extends CommandArgument with IndexedSeq[Double] {
+    extends CommandArgument
+    with IndexedSeq[Double] {
   def apply(idx: Int) = underlying(idx)
   def length = underlying.length
   override def toString = Weights.toString + " " + this.mkString(" ")

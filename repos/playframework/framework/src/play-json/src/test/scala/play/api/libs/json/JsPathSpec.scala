@@ -134,13 +134,12 @@ object JsPathSpec extends Specification {
     }
 
     "retrieve recursive in jsobject and jsarray" in {
-      val obj = Json
-        .obj(
+      val obj = Json.obj(
           "level1" -> Json.obj(
-              "key1" -> Json.arr(
+              "key1" -> Json
+                .arr(
                   "key11",
-                  Json
-                    .obj("key111" -> Json.obj("key1111" -> Json.arr(
+                  Json.obj("key111" -> Json.obj("key1111" -> Json.arr(
                               Json.obj("alpha" -> "value11111",
                                        "key11112" -> "value11112"),
                               "beta1",
@@ -164,16 +163,17 @@ object JsPathSpec extends Specification {
     }
 
     "retrieve recursive in jsobject and jsarray 2" in {
-      val obj = Json
-        .obj(
+      val obj = Json.obj(
           "nothing" -> "really",
-          "array" -> Json.arr(
+          "array" -> Json
+            .arr(
               Json.obj("field" -> Json.obj("alpha" -> "v11",
                                            "beta" -> "v12",
                                            "gamma" -> "v13")),
-              Json.obj("field" -> Json.obj("alpha" -> "v21", "gamma" -> "v23", "beta" -> "v22")),
-              Json.obj("field" -> Json.obj(
-                      "beta" -> "v32", "alpha" -> "v31", "gamma" -> "v33"))
+              Json.obj(
+                  "field" -> Json.obj(
+                      "alpha" -> "v21", "gamma" -> "v23", "beta" -> "v22")),
+              Json.obj("field" -> Json.obj("beta" -> "v32", "alpha" -> "v31", "gamma" -> "v33"))
           )
       )
 

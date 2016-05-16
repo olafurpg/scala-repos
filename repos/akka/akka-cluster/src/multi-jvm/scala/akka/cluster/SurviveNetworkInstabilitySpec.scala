@@ -66,7 +66,8 @@ object SurviveNetworkInstabilityMultiJvmSpec extends MultiNodeConfig {
   }
 
   class SimulatedException
-      extends RuntimeException("Simulated") with NoStackTrace
+      extends RuntimeException("Simulated")
+      with NoStackTrace
 }
 
 class SurviveNetworkInstabilityMultiJvmNode1
@@ -88,7 +89,8 @@ class SurviveNetworkInstabilityMultiJvmNode8
 
 abstract class SurviveNetworkInstabilitySpec
     extends MultiNodeSpec(SurviveNetworkInstabilityMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import SurviveNetworkInstabilityMultiJvmSpec._
 

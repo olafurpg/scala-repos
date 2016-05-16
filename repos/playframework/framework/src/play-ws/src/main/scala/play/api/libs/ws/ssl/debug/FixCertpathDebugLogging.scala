@@ -64,7 +64,7 @@ object FixCertpathDebugLogging {
       val debugValue = if (isUsingDebug) newDebug else null
       var isPatched = false
       for (debugClass <- findClasses;
-      debugField <- debugClass.getDeclaredFields) {
+           debugField <- debugClass.getDeclaredFields) {
         if (isValidField(debugField, debugType)) {
           logger.debug(s"run: Patching $debugClass with $debugValue")
           monkeyPatchField(debugField, debugValue)

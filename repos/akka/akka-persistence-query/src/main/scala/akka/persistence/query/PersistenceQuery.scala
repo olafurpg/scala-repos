@@ -14,7 +14,8 @@ import com.typesafe.config.Config
   * Persistence extension for queries.
   */
 object PersistenceQuery
-    extends ExtensionId[PersistenceQuery] with ExtensionIdProvider {
+    extends ExtensionId[PersistenceQuery]
+    with ExtensionIdProvider {
 
   /**
     * Java API.
@@ -94,8 +95,9 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
       system.dynamicAccess
         .createInstanceFor[ReadJournalProvider](pluginClass, args)
 
-    instantiate((classOf[ExtendedActorSystem], system) :: (
-            classOf[Config], pluginConfig) :: Nil).recoverWith {
+    instantiate(
+        (classOf[ExtendedActorSystem], system) :: (classOf[Config],
+                                                   pluginConfig) :: Nil).recoverWith {
       case x: NoSuchMethodException ⇒
         instantiate((classOf[ExtendedActorSystem], system) :: Nil)
     }.recoverWith { case x: NoSuchMethodException ⇒ instantiate(Nil) }.recoverWith {

@@ -117,8 +117,7 @@ trait GenTypes { self: Reifier =>
     def isSynthetic(manifest: Tree) =
       manifest exists
       (sub =>
-            sub.symbol != null &&
-            (sub.symbol == FullManifestModule ||
+            sub.symbol != null && (sub.symbol == FullManifestModule ||
                 sub.symbol.owner == FullManifestModule))
     def searchForManifest(typer: analyzer.Typer): Tree =
       analyzer.inferImplicit(

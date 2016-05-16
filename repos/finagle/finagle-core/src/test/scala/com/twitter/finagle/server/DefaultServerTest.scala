@@ -28,7 +28,7 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val clientTransport = new QueueTransport(qOut, qIn)
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
-      Service[Try[Int], Try[Int]]) => Closable = {
+                             Service[Try[Int], Try[Int]]) => Closable = {
         case (transport, service) =>
           val f =
             transport.read() flatMap { num =>
@@ -68,7 +68,8 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       when(mockConnHandle.close(any[Time])) thenReturn Future.Done
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
-      Service[Try[Int], Try[Int]]) => Closable = (_, _) => mockConnHandle
+                             Service[Try[Int], Try[Int]]) => Closable =
+        (_, _) => mockConnHandle
 
       val server: Server[Try[Int], Try[Int]] =
         DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](
@@ -99,7 +100,7 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       when(mockConnHandle.close(any[Time])) thenReturn Future.Done
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
-      Service[Try[Int], Try[Int]]) => Closable =
+                             Service[Try[Int], Try[Int]]) => Closable =
         new SerialServerDispatcher(_, _)
 
       val server: Server[Try[Int], Try[Int]] =
@@ -114,14 +115,15 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val factory = ServiceFactory.const(svc)
       val listeningServer: ListeningServer = server.serve(socket, factory)
 
-      val transporter: (SocketAddress,
-      StatsReceiver) => Future[Transport[Try[Int], Try[Int]]] = (_,
-      _) => Future.value(clientTransport)
+      val transporter: (SocketAddress, StatsReceiver) => Future[
+          Transport[Try[Int], Try[Int]]] = (_,
+                                            _) => Future.value(clientTransport)
 
       val endpointer: (Address,
-      StatsReceiver) => ServiceFactory[Try[Int], Try[Int]] = Bridge(
-          transporter,
-          (t: Transport[Try[Int], Try[Int]]) => new SerialClientDispatcher(t))
+                       StatsReceiver) => ServiceFactory[Try[Int], Try[Int]] =
+        Bridge(transporter,
+               (t: Transport[Try[Int], Try[Int]]) =>
+                 new SerialClientDispatcher(t))
 
       val client: Client[Try[Int], Try[Int]] =
         DefaultClient("name", endpointer)

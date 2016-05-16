@@ -73,14 +73,13 @@ class WorksheetCompiler {
           WorksheetEditorPrinter.newWorksheetUiFor(editor, worksheetVirtual)
         worksheetPrinter.scheduleWorksheetUpdate()
 
-        val onError = (msg: String) =>
-          {
-            NotificationUtil
-              .builder(project, msg)
-              .setGroup("Scala")
-              .setNotificationType(NotificationType.ERROR)
-              .setTitle(CONFIG_ERROR_HEADER)
-              .show()
+        val onError = (msg: String) => {
+          NotificationUtil
+            .builder(project, msg)
+            .setGroup("Scala")
+            .setNotificationType(NotificationType.ERROR)
+            .setTitle(CONFIG_ERROR_HEADER)
+            .show()
         }
 
         val consumer = new RemoteServerConnector.CompilerInterfaceImpl(

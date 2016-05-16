@@ -51,7 +51,8 @@ class IsotonicRegressionModel @Since("1.3.0")(
     @Since("1.3.0") val boundaries: Array[Double],
     @Since("1.3.0") val predictions: Array[Double],
     @Since("1.3.0") val isotonic: Boolean)
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
   private val predictionOrd =
     if (isotonic) Ordering[Double] else Ordering[Double].reverse
@@ -212,10 +213,8 @@ object IsotonicRegressionModel extends Loader[IsotonicRegressionModel] {
       val dataArray = dataRDD.select("boundary", "prediction").collect()
       val (boundaries, predictions) = dataArray.map { x =>
         (x.getDouble(0), x.getDouble(1))
-      }.toList
-        .sortBy(_._1)
-        .unzip
-        (boundaries.toArray, predictions.toArray)
+      }.toList.sortBy(_._1).unzip
+      (boundaries.toArray, predictions.toArray)
     }
   }
 

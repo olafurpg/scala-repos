@@ -15,31 +15,31 @@ object Relation extends LilaController {
 
   private def env = Env.relation
 
-  private def renderActions(
-      userId: String, mini: Boolean)(implicit ctx: Context) =
+  private def renderActions(userId: String, mini: Boolean)(
+      implicit ctx: Context) =
     (ctx.userId ?? { env.api.fetchRelation(_, userId) }) zip
     (ctx.isAuth ?? { Env.pref.api followable userId }) zip
     (ctx.userId ?? { env.api.fetchBlocks(userId, _) }) flatMap {
       case ((relation, followable), blocked) =>
         negotiate(
             html = fuccess(
-                  Ok(mini.fold(
-                          html.relation.mini(userId,
-                                             blocked = blocked,
-                                             followable = followable,
-                                             relation = relation),
-                          html.relation.actions(userId,
-                                                relation = relation,
-                                                blocked = blocked,
-                                                followable = followable)
-                      ))),
+                Ok(mini.fold(
+                        html.relation.mini(userId,
+                                           blocked = blocked,
+                                           followable = followable,
+                                           relation = relation),
+                        html.relation.actions(userId,
+                                              relation = relation,
+                                              blocked = blocked,
+                                              followable = followable)
+                    ))),
             api = _ =>
-                fuccess(
-                    Ok(Json.obj(
-                            "followable" -> followable,
-                            "following" -> relation.contains(true),
-                            "blocking" -> relation.contains(false)
-                        )))
+              fuccess(
+                  Ok(Json.obj(
+                          "followable" -> followable,
+                          "following" -> relation.contains(true),
+                          "blocking" -> relation.contains(false)
+                      )))
         )
     }
 
@@ -68,10 +68,11 @@ object Relation extends LilaController {
       OptionFuResult(UserRepo named username) { user =>
         RelatedPager(env.api.followingPaginatorAdapter(user.id), page) flatMap {
           pag =>
-            negotiate(html = env.api countFollowers user.id map {
-              nbFollowers =>
-                Ok(html.relation.following(user, pag, nbFollowers))
-            }, api = _ => Ok(jsonRelatedPaginator(pag)).fuccess)
+            negotiate(html =
+                        env.api countFollowers user.id map { nbFollowers =>
+                          Ok(html.relation.following(user, pag, nbFollowers))
+                        },
+                      api = _ => Ok(jsonRelatedPaginator(pag)).fuccess)
         }
       }
     }
@@ -82,10 +83,11 @@ object Relation extends LilaController {
       OptionFuResult(UserRepo named username) { user =>
         RelatedPager(env.api.followersPaginatorAdapter(user.id), page) flatMap {
           pag =>
-            negotiate(html = env.api countFollowing user.id map {
-              nbFollowing =>
-                Ok(html.relation.followers(user, pag, nbFollowing))
-            }, api = _ => Ok(jsonRelatedPaginator(pag)).fuccess)
+            negotiate(html =
+                        env.api countFollowing user.id map { nbFollowing =>
+                          Ok(html.relation.followers(user, pag, nbFollowing))
+                        },
+                      api = _ => Ok(jsonRelatedPaginator(pag)).fuccess)
         }
       }
     }

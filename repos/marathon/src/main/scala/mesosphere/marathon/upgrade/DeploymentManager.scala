@@ -25,7 +25,8 @@ class DeploymentManager(appRepository: AppRepository,
                         storage: StorageProvider,
                         healthCheckManager: HealthCheckManager,
                         eventBus: EventStream)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.dispatcher
   import mesosphere.marathon.upgrade.DeploymentManager._
 

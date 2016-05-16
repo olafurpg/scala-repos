@@ -10,7 +10,8 @@ final class Matcher private[regex](private var pattern0: Pattern,
                                    private var input0: CharSequence,
                                    private var regionStart0: Int,
                                    private var regionEnd0: Int)
-    extends AnyRef with MatchResult {
+    extends AnyRef
+    with MatchResult {
 
   import Matcher._
 
@@ -223,8 +224,7 @@ object Matcher {
     var i = 0
     while (i < s.length) {
       val c = s.charAt(i)
-      result +=
-      ((c: @switch) match {
+      result += ((c: @switch) match {
             case '\\' | '$' => "\\" + c
             case _ => c
           })

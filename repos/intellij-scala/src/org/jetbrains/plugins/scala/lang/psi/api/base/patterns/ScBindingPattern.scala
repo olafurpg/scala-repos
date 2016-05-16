@@ -19,8 +19,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import scala.annotation.tailrec
 
 trait ScBindingPattern
-    extends ScPattern with ScNamedElement with ScTypedDefinition
-    with NavigationItem with PsiDocCommentOwner {
+    extends ScPattern
+    with ScNamedElement
+    with ScTypedDefinition
+    with NavigationItem
+    with PsiDocCommentOwner {
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   def isWildcard: Boolean

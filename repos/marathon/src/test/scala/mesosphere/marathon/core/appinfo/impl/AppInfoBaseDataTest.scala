@@ -18,7 +18,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AppInfoBaseDataTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   class Fixture {
@@ -96,12 +99,12 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeTasks = Some(
-                      Seq(
-                          EnrichedTask(app.id, running1, Seq.empty),
-                          EnrichedTask(app.id, running2, Seq(alive)),
-                          EnrichedTask(app.id, running3, Seq(unhealthy))
-                      )
-                  )))
+                    Seq(
+                        EnrichedTask(app.id, running1, Seq.empty),
+                        EnrichedTask(app.id, running2, Seq(alive)),
+                        EnrichedTask(app.id, running3, Seq(unhealthy))
+                    )
+                )))
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)
@@ -144,11 +147,11 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeCounts = Some(
-                      TaskCounts(tasksStaged = 1,
-                                 tasksRunning = 2,
-                                 tasksHealthy = 1,
-                                 tasksUnhealthy = 1)
-                  )))
+                    TaskCounts(tasksStaged = 1,
+                               tasksRunning = 2,
+                               tasksHealthy = 1,
+                               tasksUnhealthy = 1)
+                )))
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)
@@ -185,8 +188,8 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeDeployments = Some(
-                      Seq(Identifiable(relatedDeployment.id))
-                  )))
+                    Seq(Identifiable(relatedDeployment.id))
+                )))
 
     And("the marathonSchedulerService should have been called to retrieve the deployments")
     verify(f.marathonSchedulerService, times(1)).listRunningDeployments()
@@ -211,8 +214,8 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeDeployments = Some(
-                      Seq.empty
-                  )))
+                    Seq.empty
+                )))
 
     And("the marathonSchedulerService should have been called to retrieve the deployments")
     verify(f.marathonSchedulerService, times(1)).listRunningDeployments()
@@ -236,8 +239,8 @@ class AppInfoBaseDataTest
     appInfo should be(
         AppInfo(app,
                 maybeLastTaskFailure = Some(
-                      TaskFailureTestHelper.taskFailure
-                  )))
+                    TaskFailureTestHelper.taskFailure
+                )))
 
     And("the taskFailureRepository should have been called to retrieve the failure")
     verify(f.taskFailureRepository, times(1)).current(app.id)
@@ -307,10 +310,11 @@ class AppInfoBaseDataTest
       appInfo.maybeTaskStats.get.maybeTotalSummary.get.counts.tasksRunning should be(
           2)
 
-      appInfo should be(AppInfo(
+      appInfo should be(
+          AppInfo(
               app,
               maybeTaskStats = Some(TaskStatsByVersion(
-                        f.clock.now(), app.versionInfo, tasks, statuses))
+                      f.clock.now(), app.versionInfo, tasks, statuses))
           ))
     }
 

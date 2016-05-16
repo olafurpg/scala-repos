@@ -32,7 +32,7 @@ object JobTest {
   def apply(cons: (Args) => Job) = {
     new JobTest(cons)
   }
-  def apply[T <: Job : Manifest] = {
+  def apply[T <: Job: Manifest] = {
     val cons = { (args: Args) =>
       manifest[T].runtimeClass
         .getConstructor(classOf[Args])
@@ -79,7 +79,7 @@ class JobTest(cons: (Args) => Job) {
     this
   }
 
-  private def sourceBuffer[T : TupleSetter](
+  private def sourceBuffer[T: TupleSetter](
       s: Source, tups: Iterable[T]): JobTest = {
     source { src =>
       if (src == s) Some(tups) else None
@@ -132,16 +132,15 @@ class JobTest(cons: (Args) => Job) {
      * you also modify the `finalize` function accordingly.
      */
     sinkSet += s
-    callbacks +=
-    (() =>
+    callbacks += (() =>
           op(buffer.map { tup =>
             conv(new TupleEntry(tup))
           }))
     this
   }
 
-  def typedSink[A](s: Source with TypedSink[A])(op: Buffer[A] => Unit)(
-      implicit conv: TupleConverter[A]) =
+  def typedSink[A](s: Source with TypedSink[A])(
+      op: Buffer[A] => Unit)(implicit conv: TupleConverter[A]) =
     sink[A](s)(op)
 
   // Used to pass an assertion about a counter defined by the given group and name.
@@ -149,8 +148,7 @@ class JobTest(cons: (Args) => Job) {
   // for the counters in the final job's FlowStat.
   def counter(counter: String, group: String = Stats.ScaldingGroup)(
       op: Long => Unit) = {
-    statsCallbacks +=
-    ((stats: CascadingStats) =>
+    statsCallbacks += ((stats: CascadingStats) =>
           op(Stats.getCounterValue(counter, group)(stats)))
     this
   }
@@ -158,7 +156,7 @@ class JobTest(cons: (Args) => Job) {
   // Used to check an assertion on all custom counters of a given scalding job.
   def counters(op: Map[String, Long] => Unit) = {
     statsCallbacks +=
-    ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
+      ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
     this
   }
 

@@ -192,7 +192,8 @@ class LocalLDAModel private[spark](
     @Since("1.5.0") override val docConcentration: Vector,
     @Since("1.5.0") override val topicConcentration: Double,
     override protected[spark] val gammaShape: Double = 100)
-    extends LDAModel with Serializable {
+    extends LDAModel
+    with Serializable {
 
   @Since("1.3.0")
   override def k: Int = topics.numCols
@@ -209,11 +210,9 @@ class LocalLDAModel private[spark](
     val brzTopics = topics.toBreeze.toDenseMatrix
     Range(0, k).map { topicIndex =>
       val topic = normalize(brzTopics(::, topicIndex), 1.0)
-      val (termWeights, terms) = topic.toArray.zipWithIndex
-        .sortBy(-_._1)
-        .take(maxTermsPerTopic)
-        .unzip
-        (terms.toArray, termWeights.toArray)
+      val (termWeights, terms) =
+        topic.toArray.zipWithIndex.sortBy(-_._1).take(maxTermsPerTopic).unzip
+      (terms.toArray, termWeights.toArray)
     }.toArray
   }
 
@@ -630,7 +629,7 @@ class DistributedLDAModel private[clustering](
             var topic = 0
             while (topic < numTopics) {
               queues(topic) +=
-              (n_wk(topic) / N_k(topic) -> index2term(termId.toInt))
+                (n_wk(topic) / N_k(topic) -> index2term(termId.toInt))
               topic += 1
             }
           }
@@ -641,10 +640,8 @@ class DistributedLDAModel private[clustering](
           q1
         }
     topicsInQueues.map { q =>
-      val (termWeights, terms) = q.toArray
-        .sortBy(-_._1)
-        .unzip
-        (terms.toArray, termWeights.toArray)
+      val (termWeights, terms) = q.toArray.sortBy(-_._1).unzip
+      (terms.toArray, termWeights.toArray)
     }
   }
 
@@ -679,10 +676,8 @@ class DistributedLDAModel private[clustering](
         q1
       }
     topicsInQueues.map { q =>
-      val (docTopics, docs) = q.toArray
-        .sortBy(-_._1)
-        .unzip
-        (docs.toArray, docTopics.toArray)
+      val (docTopics, docs) = q.toArray.sortBy(-_._1).unzip
+      (docs.toArray, docTopics.toArray)
     }
   }
 
@@ -702,24 +697,23 @@ class DistributedLDAModel private[clustering](
     val W = vocabSize
     val alpha = docConcentration(0)
     val N_k = globalTopicTotals
-    val sendMsg: EdgeContext[TopicCounts, TokenCount, (Array[Int], Array[Int])] => Unit =
-      (edgeContext) =>
-        {
-          // E-STEP: Compute gamma_{wjk} (smoothed topic distributions).
-          val scaledTopicDistribution: TopicCounts = computePTopic(
-              edgeContext.srcAttr, edgeContext.dstAttr, N_k, W, eta, alpha)
-          // For this (doc j, term w), send top topic k to doc vertex.
-          val topTopic: Int = argmax(scaledTopicDistribution)
-          val term: Int = index2term(edgeContext.dstId)
-          edgeContext.sendToSrc((Array(term), Array(topTopic)))
+    val sendMsg: EdgeContext[
+        TopicCounts, TokenCount, (Array[Int], Array[Int])] => Unit =
+      (edgeContext) => {
+        // E-STEP: Compute gamma_{wjk} (smoothed topic distributions).
+        val scaledTopicDistribution: TopicCounts = computePTopic(
+            edgeContext.srcAttr, edgeContext.dstAttr, N_k, W, eta, alpha)
+        // For this (doc j, term w), send top topic k to doc vertex.
+        val topTopic: Int = argmax(scaledTopicDistribution)
+        val term: Int = index2term(edgeContext.dstId)
+        edgeContext.sendToSrc((Array(term), Array(topTopic)))
       }
-    val mergeMsg: ((Array[Int], Array[Int]), (Array[Int],
-    Array[Int])) => (Array[Int], Array[Int]) = (terms_topics0,
-    terms_topics1) =>
-      {
+    val mergeMsg: ((Array[Int], Array[Int]),
+                   (Array[Int], Array[Int])) => (Array[Int], Array[Int]) =
+      (terms_topics0, terms_topics1) => {
         (terms_topics0._1 ++ terms_topics1._1,
          terms_topics0._2 ++ terms_topics1._2)
-    }
+      }
     // M-STEP: Aggregation computes new N_{kj}, N_{wk} counts.
     val perDocAssignments = graph
       .aggregateMessages[(Array[Int], Array[Int])](sendMsg, mergeMsg)
@@ -727,18 +721,16 @@ class DistributedLDAModel private[clustering](
     perDocAssignments.map {
       case (docID: Long, (terms: Array[Int], topics: Array[Int])) =>
         // TODO: Avoid zip, which is inefficient.
-        val (sortedTerms, sortedTopics) = terms
-          .zip(topics)
-          .sortBy(_._1)
-          .unzip
-          (docID, sortedTerms.toArray, sortedTopics.toArray)
+        val (sortedTerms, sortedTopics) = terms.zip(topics).sortBy(_._1).unzip
+        (docID, sortedTerms.toArray, sortedTopics.toArray)
     }
   }
 
   /** Java-friendly version of [[topicAssignments]] */
   @Since("1.5.0")
-  lazy val javaTopicAssignments: JavaRDD[(java.lang.Long, Array[Int], Array[
-          Int])] = {
+  lazy val javaTopicAssignments: JavaRDD[(java.lang.Long,
+                                          Array[Int],
+                                          Array[Int])] = {
     topicAssignments
       .asInstanceOf[RDD[(java.lang.Long, Array[Int], Array[Int])]]
       .toJavaRDD()
@@ -769,15 +761,14 @@ class DistributedLDAModel private[clustering](
     val smoothed_N_k: TopicCounts = N_k + (vocabSize * (eta - 1.0))
     // Edges: Compute token log probability from phi_{wk}, theta_{kj}.
     val sendMsg: EdgeContext[TopicCounts, TokenCount, Double] => Unit =
-      (edgeContext) =>
-        {
-          val N_wj = edgeContext.attr
-          val smoothed_N_wk: TopicCounts = edgeContext.dstAttr + (eta - 1.0)
-          val smoothed_N_kj: TopicCounts = edgeContext.srcAttr + (alpha - 1.0)
-          val phi_wk: TopicCounts = smoothed_N_wk :/ smoothed_N_k
-          val theta_kj: TopicCounts = normalize(smoothed_N_kj, 1.0)
-          val tokenLogLikelihood = N_wj * math.log(phi_wk.dot(theta_kj))
-          edgeContext.sendToDst(tokenLogLikelihood)
+      (edgeContext) => {
+        val N_wj = edgeContext.attr
+        val smoothed_N_wk: TopicCounts = edgeContext.dstAttr + (eta - 1.0)
+        val smoothed_N_kj: TopicCounts = edgeContext.srcAttr + (alpha - 1.0)
+        val phi_wk: TopicCounts = smoothed_N_wk :/ smoothed_N_k
+        val theta_kj: TopicCounts = normalize(smoothed_N_kj, 1.0)
+        val tokenLogLikelihood = N_wj * math.log(phi_wk.dot(theta_kj))
+        edgeContext.sendToDst(tokenLogLikelihood)
       }
     graph.aggregateMessages[Double](sendMsg, _ + _).map(_._2).fold(0.0)(_ + _)
   }

@@ -23,7 +23,8 @@ package collection
   *  no duplicate keys.
   */
 trait GenMapLike[A, +B, +Repr]
-    extends GenIterableLike[(A, B), Repr] with Equals
+    extends GenIterableLike[(A, B), Repr]
+    with Equals
     with Parallelizable[(A, B), parallel.ParMap[A, B]] {
   def default(key: A): B
   def get(key: A): Option[B]

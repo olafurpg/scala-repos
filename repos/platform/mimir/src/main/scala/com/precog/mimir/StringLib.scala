@@ -165,7 +165,8 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     object matches extends Op2SSB("matches", _ matches _)
 
     object regexMatch
-        extends Op2(StringNamespace, "regexMatch") with Op2Array {
+        extends Op2(StringNamespace, "regexMatch")
+        with Op2Array {
       import trans._
 
       //@deprecated, see the DEPRECATED comment in StringLib
@@ -439,7 +440,8 @@ trait StringLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object splitRegex
-        extends Op2(StringNamespace, "splitRegex") with Op2Array {
+        extends Op2(StringNamespace, "splitRegex")
+        with Op2Array {
       //@deprecated, see the DEPRECATED comment in StringLib
       val tpe = BinaryOperationType(
           StrAndDateT, StrAndDateT, JArrayHomogeneousT(JTextT))

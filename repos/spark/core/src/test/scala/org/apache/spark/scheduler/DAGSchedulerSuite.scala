@@ -67,7 +67,8 @@ class MyRDD(sc: SparkContext,
             dependencies: List[Dependency[_]],
             locations: Seq[Seq[String]] = Nil,
             @(transient @param) tracker: MapOutputTrackerMaster = null)
-    extends RDD[(Int, Int)](sc, dependencies) with Serializable {
+    extends RDD[(Int, Int)](sc, dependencies)
+    with Serializable {
 
   override def compute(
       split: Partition, context: TaskContext): Iterator[(Int, Int)] =
@@ -100,7 +101,9 @@ class MyRDD(sc: SparkContext,
 class DAGSchedulerSuiteDummyException extends Exception
 
 class DAGSchedulerSuite
-    extends SparkFunSuite with LocalSparkContext with Timeouts {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Timeouts {
 
   val conf = new SparkConf
 
@@ -407,8 +410,8 @@ class DAGSchedulerSuite
   test("cache location preferences w/ dependency") {
     val baseRdd = new MyRDD(sc, 1, Nil).cache()
     val finalRdd = new MyRDD(sc, 1, List(new OneToOneDependency(baseRdd)))
-    cacheLocations(baseRdd.id -> 0) = Seq(
-        makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
+    cacheLocations(baseRdd.id -> 0) =
+      Seq(makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
     submit(finalRdd, Array(0))
     val taskSet = taskSets(0)
     assertLocations(taskSet, Seq(Seq("hostA", "hostB")))
@@ -419,12 +422,12 @@ class DAGSchedulerSuite
 
   test("regression test for getCacheLocs") {
     val rdd = new MyRDD(sc, 3, Nil).cache()
-    cacheLocations(rdd.id -> 0) = Seq(
-        makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
-    cacheLocations(rdd.id -> 1) = Seq(
-        makeBlockManagerId("hostB"), makeBlockManagerId("hostC"))
-    cacheLocations(rdd.id -> 2) = Seq(
-        makeBlockManagerId("hostC"), makeBlockManagerId("hostD"))
+    cacheLocations(rdd.id -> 0) =
+      Seq(makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
+    cacheLocations(rdd.id -> 1) =
+      Seq(makeBlockManagerId("hostB"), makeBlockManagerId("hostC"))
+    cacheLocations(rdd.id -> 2) =
+      Seq(makeBlockManagerId("hostC"), makeBlockManagerId("hostD"))
     val locs = scheduler.getCacheLocs(rdd).map(_.map(_.host))
     assert(
         locs === Seq(Seq("hostA", "hostB"),
@@ -455,8 +458,8 @@ class DAGSchedulerSuite
                 tracker = mapOutputTracker)
     val rddC = new MyRDD(sc, 1, List(new OneToOneDependency(rddB))).cache()
     val rddD = new MyRDD(sc, 1, List(new OneToOneDependency(rddC)))
-    cacheLocations(rddC.id -> 0) = Seq(
-        makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
+    cacheLocations(rddC.id -> 0) =
+      Seq(makeBlockManagerId("hostA"), makeBlockManagerId("hostB"))
     submit(rddD, Array(0))
     assert(scheduler.runningStages.size === 1)
     // Make sure that the scheduler is running the final result stage.
@@ -542,8 +545,8 @@ class DAGSchedulerSuite
                                            mapOutputTracker,
                                            blockManagerMaster,
                                            sc.env)
-    dagEventProcessLoopTester = new DAGSchedulerEventProcessLoopTester(
-        noKillScheduler)
+    dagEventProcessLoopTester =
+      new DAGSchedulerEventProcessLoopTester(noKillScheduler)
     val jobId = submit(new MyRDD(sc, 1, Nil), Array(0))
     cancel(jobId)
     // Because the job wasn't actually cancelled, we shouldn't have received a failure message.
@@ -1784,7 +1787,7 @@ class DAGSchedulerSuite
           // if multiple RDD partitions, use id of any one partition, say, first partition id=0
           Seq(0),
           (part: Int,
-          result: Int) => throw new DAGSchedulerSuiteDummyException)
+           result: Int) => throw new DAGSchedulerSuiteDummyException)
     }
     assert(e.getCause.isInstanceOf[DAGSchedulerSuiteDummyException])
 
@@ -2228,8 +2231,8 @@ class DAGSchedulerSuite
   private def assertLocations(taskSet: TaskSet, hosts: Seq[Seq[String]]) {
     assert(hosts.size === taskSet.tasks.size)
     for ((taskLocs, expectedLocs) <- taskSet.tasks
-      .map(_.preferredLocations)
-      .zip(hosts)) {
+                                      .map(_.preferredLocations)
+                                      .zip(hosts)) {
       assert(taskLocs.map(_.host).toSet === expectedLocs.toSet)
     }
   }

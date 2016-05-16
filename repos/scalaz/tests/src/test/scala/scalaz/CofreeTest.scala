@@ -25,7 +25,7 @@ object CofreeTest extends SpecLite {
       A.equal(a.head, b.head) && F.eq1(cofreeEqual[F, A]).equal(a.tail, b.tail)
     }
 
-  implicit def cofreeZipEqual[F[_]: Eq1, A : Equal]: Equal[CofreeZip[F, A]] =
+  implicit def cofreeZipEqual[F[_]: Eq1, A: Equal]: Equal[CofreeZip[F, A]] =
     Tag.subst(cofreeEqual[F, A])
 
   //needed to prevent SOE for testing with equality
@@ -69,7 +69,7 @@ object CofreeTest extends SpecLite {
                     Foldable[CofreeLazyOption].foldRight(s, Stream.empty[A])(
                         _ #:: _))
               .getOrElse(Stream.empty)
-          )
+        )
     }
 
   val treeCofreeStreamIso: Tree <~> CofreeStream =
@@ -80,16 +80,16 @@ object CofreeTest extends SpecLite {
         Tree.Node(c.head, c.tail.map(from(_)))
     }
 
-  implicit def CofreeLazyOptionArb[A : Arbitrary]: Arbitrary[
-      CofreeLazyOption[A]] =
+  implicit def CofreeLazyOptionArb[A: Arbitrary]
+    : Arbitrary[CofreeLazyOption[A]] =
     Functor[Arbitrary].map(implicitly[Arbitrary[OneAndStream[A]]])(
         oneAndStreamCofreeLazyOptionIso.to(_))
 
-  implicit def CofreeStreamArb[A : Arbitrary]: Arbitrary[CofreeStream[A]] =
+  implicit def CofreeStreamArb[A: Arbitrary]: Arbitrary[CofreeStream[A]] =
     Functor[Arbitrary]
       .map(implicitly[Arbitrary[Tree[A]]])(treeCofreeStreamIso.to)
 
-  implicit def CofreeOptionArb[A : Arbitrary]: Arbitrary[CofreeOption[A]] = {
+  implicit def CofreeOptionArb[A: Arbitrary]: Arbitrary[CofreeOption[A]] = {
     import org.scalacheck.Arbitrary._
     import org.scalacheck.Gen
     val arb = Arbitrary {
@@ -117,12 +117,12 @@ object CofreeTest extends SpecLite {
   {
     type CofreeZipLazyOption[A] = CofreeZip[LazyOption, A]
 
-    implicit def CofreeZipLazyOptionArb[A : Arbitrary]: Arbitrary[
-        CofreeZipLazyOption[A]] =
+    implicit def CofreeZipLazyOptionArb[A: Arbitrary]
+      : Arbitrary[CofreeZipLazyOption[A]] =
       Tags.Zip.subst(CofreeLazyOptionArb[A])
 
     // Hack: avoid stack overflow because `Applicative[CofreeLazyOption].point` is infinite stream
-    def CofreeZipLazyOptionEqual[A : Equal]: Equal[CofreeZipLazyOption[A]] =
+    def CofreeZipLazyOptionEqual[A: Equal]: Equal[CofreeZipLazyOption[A]] =
       Equal.equalBy { a =>
         val OneAnd(h, t) = oneAndStreamCofreeLazyOptionIso.from(Tag.unwrap(a))
         h -> t.take(1000)
@@ -136,8 +136,8 @@ object CofreeTest extends SpecLite {
   {
     type CofreeZipStream[A] = CofreeZip[Stream, A]
 
-    implicit def CofreeZipStreamArb[A : Arbitrary]: Arbitrary[
-        CofreeZipStream[A]] =
+    implicit def CofreeZipStreamArb[A: Arbitrary]
+      : Arbitrary[CofreeZipStream[A]] =
       Tags.Zip.subst(CofreeStreamArb[A])
 
     checkAll("CofreeZipStream", ScalazProperties.apply.laws[CofreeZipStream])
@@ -180,14 +180,14 @@ object CofreeTest extends SpecLite {
 
   object instances {
     def comonad[F[_]: Functor] = Comonad[Cofree[F, ?]]
-    def bind[F[_]: Plus : Functor] = Bind[Cofree[F, ?]]
-    def monad[F[_]: PlusEmpty : Functor] = Monad[Cofree[F, ?]]
+    def bind[F[_]: Plus: Functor] = Bind[Cofree[F, ?]]
+    def monad[F[_]: PlusEmpty: Functor] = Monad[Cofree[F, ?]]
     def foldable1[F[_]: Foldable] = Foldable1[Cofree[F, ?]]
     def traverse1[F[_]: Traverse] = Traverse1[Cofree[F, ?]]
 
     // checking absence of ambiguity
-    def bind[F[_]: PlusEmpty : Functor] = Bind[Cofree[F, ?]]
-    def functor[F[_]: PlusEmpty : Traverse] = Functor[Cofree[F, ?]]
+    def bind[F[_]: PlusEmpty: Functor] = Bind[Cofree[F, ?]]
+    def functor[F[_]: PlusEmpty: Traverse] = Functor[Cofree[F, ?]]
     def foldable1[F[_]: Traverse1] = Foldable1[Cofree[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[Cofree[F, ?]]
 

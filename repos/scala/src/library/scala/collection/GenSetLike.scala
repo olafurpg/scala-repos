@@ -22,7 +22,9 @@ package collection
   *  A set is a collection that contains no duplicate elements.
   */
 trait GenSetLike[A, +Repr]
-    extends GenIterableLike[A, Repr] with (A => Boolean) with Equals
+    extends GenIterableLike[A, Repr]
+    with (A => Boolean)
+    with Equals
     with Parallelizable[A, parallel.ParSet[A]] {
 
   def iterator: Iterator[A]

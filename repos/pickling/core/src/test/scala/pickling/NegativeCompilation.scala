@@ -29,7 +29,7 @@ object NegativeCompilation {
     }
   }
 
-  def intercept[T <: Throwable : ClassTag](body: => Any): T = {
+  def intercept[T <: Throwable: ClassTag](body: => Any): T = {
     try {
       body
       throw new Exception(s"Exception of type ${classTag[T]} was not thrown")
@@ -46,8 +46,9 @@ object NegativeCompilation {
     tb.eval(tb.parse(code))
   }
 
-  def mkToolbox(compileOptions: String = "")
-    : ToolBox[_ <: scala.reflect.api.Universe] = {
+  def mkToolbox(
+      compileOptions: String =
+        ""): ToolBox[_ <: scala.reflect.api.Universe] = {
     val m = scala.reflect.runtime.currentMirror
     import scala.tools.reflect.ToolBox
     m.mkToolBox(options = compileOptions)
@@ -85,10 +86,10 @@ object NegativeCompilation {
     else ""
   }
 
-  def expectError(
-      errorSnippet: String,
-      compileOptions: String = "",
-      baseCompileOptions: String = s"-cp ${toolboxClasspath}${quasiquotesJar}")(
+  def expectError(errorSnippet: String,
+                  compileOptions: String = "",
+                  baseCompileOptions: String =
+                    s"-cp ${toolboxClasspath}${quasiquotesJar}")(
       code: String) {
     intercept[ToolBoxError] {
       eval(code, compileOptions + " " + baseCompileOptions)

@@ -242,8 +242,8 @@ class AnalysisSuite extends AnalysisTest {
     checkAnalysis(plan, expected)
 
     // CreateStruct is a special case that we should not trim Alias for it.
-    plan = testRelation.select(
-        CreateStruct(Seq(a, (a + 1).as("a+1"))).as("col"))
+    plan =
+      testRelation.select(CreateStruct(Seq(a, (a + 1).as("a+1"))).as("col"))
     checkAnalysis(plan, plan)
     plan = testRelation.select(
         CreateStructUnsafe(Seq(a, (a + 1).as("a+1"))).as("col"))
@@ -277,10 +277,10 @@ class AnalysisSuite extends AnalysisTest {
 
   test(
       "SPARK-8654: different types in inlist but can be converted to a common type") {
-    val plan = Project(Alias(In(Literal(null),
-                                Seq(Literal(1), Literal(1.2345))),
-                             "a")() :: Nil,
-                       LocalRelation())
+    val plan =
+      Project(Alias(In(Literal(null), Seq(Literal(1), Literal(1.2345))),
+                    "a")() :: Nil,
+              LocalRelation())
     assertAnalysisSuccess(plan)
   }
 

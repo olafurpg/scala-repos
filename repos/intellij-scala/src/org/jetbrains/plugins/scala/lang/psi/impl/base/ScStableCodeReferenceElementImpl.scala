@@ -123,7 +123,8 @@ class ScStableCodeReferenceElementImpl(node: ASTNode)
     }
     if (completion)
       result + ResolveTargets.PACKAGE + ResolveTargets.OBJECT +
-      ResolveTargets.VAL else result
+      ResolveTargets.VAL
+    else result
   }
 
   def nameId: PsiElement =

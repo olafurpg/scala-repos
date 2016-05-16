@@ -44,9 +44,10 @@ object MakePomTest extends Build {
     (readPom) map { (pomXml) =>
       var found = false
       for {
-        dep <- pomXml \ "dependencies" \ "dependency" if (dep \ "artifactId").text == "jsr305"
-              // TODO - Ignore space here.
-              if (dep \ "version").text != "[1.3,1.4)"
+        dep <- pomXml \ "dependencies" \ "dependency"
+        if (dep \ "artifactId").text == "jsr305"
+        // TODO - Ignore space here.
+        if (dep \ "version").text != "[1.3,1.4)"
       } sys.error(s"Found dependency with invalid maven version: $dep")
       ()
     }

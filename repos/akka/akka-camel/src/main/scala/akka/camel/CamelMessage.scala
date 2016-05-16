@@ -19,7 +19,8 @@ import akka.dispatch.Mapper
 class CamelMessage(val body: Any,
                    val headers: Map[String, Any],
                    val attachments: Map[String, DataHandler])
-    extends Serializable with Product {
+    extends Serializable
+    with Product {
   def this(body: Any, headers: JMap[String, Any]) =
     this(body, headers.toMap, Map.empty[String, DataHandler]) //Java
   def this(body: Any,
@@ -70,15 +71,16 @@ class CamelMessage(val body: Any,
     * using the `getCamelContext` method, and is available on the [[akka.camel.CamelExtension]].
     *
     */
-  def headerAs[T](name: String)(
-      implicit t: ClassTag[T], camelContext: CamelContext): Try[T] =
+  def headerAs[T](
+      name: String)(implicit t: ClassTag[T],
+                    camelContext: CamelContext): Try[T] =
     Try(
         headers
           .get(name)
-          .map(camelContext.getTypeConverter.mandatoryConvertTo[T](t.runtimeClass
-                                                                     .asInstanceOf[Class[
-                                                                           T]],
-                                                                   _))
+          .map(
+              camelContext.getTypeConverter.mandatoryConvertTo[T](
+                  t.runtimeClass.asInstanceOf[Class[T]],
+                  _))
           .getOrElse(throw new NoSuchElementException(name)))
 
   /**

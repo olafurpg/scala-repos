@@ -724,7 +724,7 @@ object Buf {
         val rem = buf.slice(8, buf.length)
 
         val value =
-          ( (arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
+          ((arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
           ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
           ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
           ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)

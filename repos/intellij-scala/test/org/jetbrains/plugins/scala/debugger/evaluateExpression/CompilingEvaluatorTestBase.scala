@@ -7,9 +7,11 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * @author Nikolay.Tropin
   */
 class CompilingEvaluatorTest
-    extends CompilingEvaluatorTestBase with ScalaVersion_2_11
+    extends CompilingEvaluatorTestBase
+    with ScalaVersion_2_11
 class CompilingEvaluatorTest_212
-    extends CompilingEvaluatorTestBase with ScalaVersion_2_12
+    extends CompilingEvaluatorTestBase
+    with ScalaVersion_2_12
 
 abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
 

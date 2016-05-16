@@ -27,7 +27,9 @@ import org.apache.spark.internal.Logging
   * Test the integration with [[SchedulerExtensionServices]]
   */
 class ExtensionServiceIntegrationSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfter
     with Logging {
 
   val applicationId = new StubApplicationId(0, 1111L)

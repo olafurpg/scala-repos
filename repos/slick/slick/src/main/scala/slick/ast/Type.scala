@@ -181,7 +181,7 @@ trait CollectionTypeConstructor {
   def isUnique: Boolean
 
   /** Create a `Builder` for the collection type, given a ClassTag for the element type */
-  def createBuilder[E : ClassTag]: Builder[E, Any]
+  def createBuilder[E: ClassTag]: Builder[E, Any]
 
   /** Return a CollectionTypeConstructor which builds a subtype of Iterable
     * but has the same properties otherwise. */
@@ -201,7 +201,7 @@ abstract class TypedCollectionTypeConstructor[C[_]](
       .replaceFirst("^scala.collection.immutable.", "")
       .replaceFirst("^scala.collection.mutable.", "m.")
       .replaceFirst("^scala.collection.generic.", "g.")
-  def createBuilder[E : ClassTag]: Builder[E, C[E]]
+  def createBuilder[E: ClassTag]: Builder[E, C[E]]
   override def hashCode = classTag.hashCode() * 10
   override def equals(o: Any) = o match {
     case o: TypedCollectionTypeConstructor[_] => classTag == o.classTag
@@ -216,7 +216,7 @@ class ErasedCollectionTypeConstructor[C[_]](
     classOf[scala.collection.Seq[_]].isAssignableFrom(classTag.runtimeClass)
   val isUnique =
     classOf[scala.collection.Set[_]].isAssignableFrom(classTag.runtimeClass)
-  def createBuilder[E : ClassTag] =
+  def createBuilder[E: ClassTag] =
     canBuildFrom().asInstanceOf[Builder[E, C[E]]]
 }
 
@@ -240,7 +240,7 @@ object TypedCollectionTypeConstructor {
     new TypedCollectionTypeConstructor[Array](arrayClassTag) {
       def isSequential = true
       def isUnique = false
-      def createBuilder[E : ClassTag]: Builder[E, Array[E]] =
+      def createBuilder[E: ClassTag]: Builder[E, Array[E]] =
         ArrayBuilder.make[E]
     }
 }
@@ -410,7 +410,8 @@ trait ScalaType[T] extends TypedType[T] {
 
 class ScalaBaseType[T](
     implicit val classTag: ClassTag[T], val ordering: scala.math.Ordering[T])
-    extends ScalaType[T] with BaseTypedType[T] {
+    extends ScalaType[T]
+    with BaseTypedType[T] {
   override def toString = classTag.toString.replaceFirst("^java.lang.", "")
   def nullable = false
   def ordered = ordering ne null
@@ -487,12 +488,14 @@ sealed trait OptionDisc
 
 class ScalaNumericType[T](val fromDouble: Double => T)(
     implicit tag: ClassTag[T], val numeric: Numeric[T])
-    extends ScalaBaseType[T]()(tag, numeric) with NumericTypedType {
+    extends ScalaBaseType[T]()(tag, numeric)
+    with NumericTypedType {
   def toDouble(v: T) = numeric.toDouble(v)
 }
 
 class ScalaOptionType[T](val elementType: ScalaType[T])
-    extends ScalaType[Option[T]] with OptionTypedType[T] {
+    extends ScalaType[Option[T]]
+    with OptionTypedType[T] {
   override def toString = "SOption[" + elementType + "]"
   def nullable = true
   def ordered = elementType.ordered

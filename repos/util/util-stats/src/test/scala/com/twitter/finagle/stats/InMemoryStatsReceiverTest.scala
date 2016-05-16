@@ -7,7 +7,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class InMemoryStatsReceiverTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   test("clear") {
     val inMemoryStatsReceiver = new InMemoryStatsReceiver

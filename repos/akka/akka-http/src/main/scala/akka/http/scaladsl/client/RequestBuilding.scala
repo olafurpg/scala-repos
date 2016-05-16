@@ -89,7 +89,7 @@ trait RequestBuilding extends TransformerPipelineSupport {
   def removeHeader(headerName: String): RequestTransformer =
     _ mapHeaders (_ filterNot (_.name equalsIgnoreCase headerName))
 
-  def removeHeader[T <: HttpHeader : ClassTag]: RequestTransformer =
+  def removeHeader[T <: HttpHeader: ClassTag]: RequestTransformer =
     removeHeader(implicitly[ClassTag[T]].runtimeClass)
 
   def removeHeader(clazz: Class[_]): RequestTransformer =

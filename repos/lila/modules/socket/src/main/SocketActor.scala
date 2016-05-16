@@ -14,7 +14,8 @@ import lila.hub.actorApi.{Deploy, GetUids, SocketUids}
 import lila.memo.ExpireSetMemo
 
 abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
-    extends Socket with Actor {
+    extends Socket
+    with Actor {
 
   val members = scala.collection.mutable.Map.empty[String, M]
   val aliveUids = new ExpireSetMemo(uidTtl)
@@ -61,7 +62,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
 
   def receive = receiveSpecific orElse receiveGeneric
 
-  def notifyAll[A : Writes](t: String, data: A) {
+  def notifyAll[A: Writes](t: String, data: A) {
     notifyAll(makeMessage(t, data))
   }
 
@@ -73,7 +74,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
     members.values.foreach(_ push msg)
   }
 
-  def notifyAllAsync[A : Writes](t: String, data: A) = Future {
+  def notifyAllAsync[A: Writes](t: String, data: A) = Future {
     notifyAll(t, data)
   }
 
@@ -85,7 +86,7 @@ abstract class SocketActor[M <: SocketMember](uidTtl: Duration)
     notifyAll(msg)
   }
 
-  def notifyMember[A : Writes](t: String, data: A)(member: M) {
+  def notifyMember[A: Writes](t: String, data: A)(member: M) {
     member push makeMessage(t, data)
   }
 

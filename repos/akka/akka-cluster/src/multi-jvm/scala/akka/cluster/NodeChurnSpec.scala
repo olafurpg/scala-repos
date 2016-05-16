@@ -48,7 +48,8 @@ class NodeChurnMultiJvmNode2 extends NodeChurnSpec
 class NodeChurnMultiJvmNode3 extends NodeChurnSpec
 
 abstract class NodeChurnSpec
-    extends MultiNodeSpec(NodeChurnMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(NodeChurnMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import NodeChurnMultiJvmSpec._

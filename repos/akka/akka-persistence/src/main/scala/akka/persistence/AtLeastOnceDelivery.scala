@@ -382,7 +382,8 @@ trait AtLeastOnceDeliveryLike extends Eventsourced {
   * @see [[AtLeastOnceDeliveryLike]]
   */
 abstract class UntypedPersistentActorWithAtLeastOnceDelivery
-    extends UntypedPersistentActor with AtLeastOnceDeliveryLike {
+    extends UntypedPersistentActor
+    with AtLeastOnceDeliveryLike {
 
   /**
     * Java API: Send the message created by the `deliveryIdToMessage` function to
@@ -446,7 +447,8 @@ abstract class UntypedPersistentActorWithAtLeastOnceDelivery
   * @see [[AtLeastOnceDeliveryLike]]
   */
 abstract class AbstractPersistentActorWithAtLeastOnceDelivery
-    extends AbstractPersistentActor with AtLeastOnceDeliveryLike {
+    extends AbstractPersistentActor
+    with AtLeastOnceDeliveryLike {
 
   /**
     * Java API: Send the message created by the `deliveryIdToMessage` function to

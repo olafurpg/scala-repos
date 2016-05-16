@@ -14,8 +14,9 @@ object Version {
   def versionSettings: Seq[Setting[_]] =
     inConfig(Compile)(
         Seq(
-            resourceGenerators <+= generateVersion(
-                resourceManaged, _ / "version.conf", """|akka.version = "%s"
+            resourceGenerators <+= generateVersion(resourceManaged,
+                                                   _ / "version.conf",
+                                                   """|akka.version = "%s"
          |"""),
             sourceGenerators <+= generateVersion(sourceManaged,
                                                  _ / "akka" / "Version.scala",

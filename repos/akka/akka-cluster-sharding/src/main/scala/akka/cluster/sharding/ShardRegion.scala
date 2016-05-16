@@ -380,7 +380,8 @@ class ShardRegion(typeName: String,
                   extractEntityId: ShardRegion.ExtractEntityId,
                   extractShardId: ShardRegion.ExtractShardId,
                   handOffStopMessage: Any)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import ShardCoordinator.Internal._
   import ShardRegion._
@@ -430,8 +431,8 @@ class ShardRegion(typeName: String,
   }
 
   def coordinatorSelection: Option[ActorSelection] =
-    membersByAge.headOption.map(
-        m ⇒ context.actorSelection(RootActorPath(m.address) + coordinatorPath))
+    membersByAge.headOption.map(m ⇒
+          context.actorSelection(RootActorPath(m.address) + coordinatorPath))
 
   var coordinator: Option[ActorRef] = None
 
@@ -464,8 +465,8 @@ class ShardRegion(typeName: String,
 
   def receiveClusterState(state: CurrentClusterState): Unit = {
     changeMembers(
-        immutable.SortedSet.empty(ageOrdering) union state.members.filter(
-            m ⇒ m.status == MemberStatus.Up && matchingRole(m)))
+        immutable.SortedSet.empty(ageOrdering) union state.members.filter(m ⇒
+              m.status == MemberStatus.Up && matchingRole(m)))
   }
 
   def receiveClusterEvent(evt: ClusterDomainEvent): Unit = evt match {
@@ -485,8 +486,8 @@ class ShardRegion(typeName: String,
     case HostShard(shard) ⇒
       log.debug("Host Shard [{}] ", shard)
       regionByShard = regionByShard.updated(shard, self)
-      regions = regions.updated(
-          self, regions.getOrElse(self, Set.empty) + shard)
+      regions =
+        regions.updated(self, regions.getOrElse(self, Set.empty) + shard)
 
       //Start the shard, if already started this does nothing
       getShard(shard)
@@ -638,7 +639,7 @@ class ShardRegion(typeName: String,
     }.pipeTo(ref)
   }
 
-  def askAllShards[T : ClassTag](msg: Any): Future[Seq[(ShardId, T)]] = {
+  def askAllShards[T: ClassTag](msg: Any): Future[Seq[(ShardId, T)]] = {
     implicit val timeout: Timeout = 3.seconds
     Future.sequence(
         shards.toSeq.map {

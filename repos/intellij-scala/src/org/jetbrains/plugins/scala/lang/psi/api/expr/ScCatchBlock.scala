@@ -23,7 +23,7 @@ object ScCatchBlock {
     for {
       expr <- catchBlock.expression
       child = PsiTreeUtil.findChildOfType(expr, classOf[ScCaseClauses])
-          if child != null
+      if child != null
     } yield child
   }
 }

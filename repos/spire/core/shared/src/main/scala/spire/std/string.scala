@@ -34,11 +34,12 @@ object LevenshteinDistance extends MetricSpace[String, Int] with Serializable {
         val h = row1(j - 1) + 1
         val v = row0(j) + 1
 
-        row1(j) = if (d < h) {
-          if (v < d) v else d
-        } else {
-          if (v < h) v else h
-        }
+        row1(j) =
+          if (d < h) {
+            if (v < d) v else d
+          } else {
+            if (v < h) v else h
+          }
       }
 
       var tmp = row0; row0 = row1; row1 = tmp

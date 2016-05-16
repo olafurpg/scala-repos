@@ -40,7 +40,8 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 @Since("1.1.0")
 @DeveloperApi
 class MultivariateOnlineSummarizer
-    extends MultivariateStatisticalSummary with Serializable {
+    extends MultivariateStatisticalSummary
+    with Serializable {
 
   private var n = 0
   private var currMean: Array[Double] = _
@@ -103,8 +104,9 @@ class MultivariateOnlineSummarizer
 
         val prevMean = localCurrMean(index)
         val diff = value - prevMean
-        localCurrMean(index) = prevMean + weight * diff /
-        (localNnz(index) + weight)
+        localCurrMean(index) =
+          prevMean + weight * diff /
+          (localNnz(index) + weight)
         localCurrM2n(index) += weight * (value - localCurrMean(index)) * diff
         localCurrM2(index) += weight * value * value
         localCurrL1(index) += weight * math.abs(value)
@@ -210,8 +212,8 @@ class MultivariateOnlineSummarizer
       val len = currM2n.length
       while (i < len) {
         realVariance(i) =
-        (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
-            (weightSum - nnz(i)) / weightSum) / denominator
+          (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
+              (weightSum - nnz(i)) / weightSum) / denominator
         i += 1
       }
     }

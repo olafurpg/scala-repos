@@ -32,7 +32,10 @@ import org.apache.spark.sql.types.{IntegerType, StructType}
   * Common params for BisectingKMeans and BisectingKMeansModel
   */
 private[clustering] trait BisectingKMeansParams
-    extends Params with HasMaxIter with HasFeaturesCol with HasSeed
+    extends Params
+    with HasMaxIter
+    with HasFeaturesCol
+    with HasSeed
     with HasPredictionCol {
 
   /**
@@ -82,7 +85,8 @@ class BisectingKMeansModel private[ml](
     @Since("2.0.0") override val uid: String,
     private val parentModel: MLlibBisectingKMeansModel
 )
-    extends Model[BisectingKMeansModel] with BisectingKMeansParams {
+    extends Model[BisectingKMeansModel]
+    with BisectingKMeansParams {
 
   @Since("2.0.0")
   override def copy(extra: ParamMap): BisectingKMeansModel = {
@@ -140,7 +144,8 @@ class BisectingKMeansModel private[ml](
 @Since("2.0.0")
 @Experimental
 class BisectingKMeans @Since("2.0.0")(@Since("2.0.0") override val uid: String)
-    extends Estimator[BisectingKMeansModel] with BisectingKMeansParams {
+    extends Estimator[BisectingKMeansModel]
+    with BisectingKMeansParams {
 
   setDefault(k -> 4, maxIter -> 20, minDivisibleClusterSize -> 1.0)
 

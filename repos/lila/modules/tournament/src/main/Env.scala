@@ -49,23 +49,23 @@ final class Env(config: Config,
   lazy val cached = new Cached(
       createdTtl = CreatedCacheTtl, rankingTtl = RankingCacheTtl)
 
-  lazy val api = new TournamentApi(
-      cached = cached,
-      scheduleJsonView = scheduleJsonView,
-      system = system,
-      sequencers = sequencerMap,
-      autoPairing = autoPairing,
-      clearJsonViewCache = jsonView.clearCache,
-      router = hub.actor.router,
-      renderer = hub.actor.renderer,
-      timeline = hub.actor.timeline,
-      socketHub = socketHub,
-      site = hub.socket.site,
-      lobby = hub.socket.lobby,
-      trophyApi = trophyApi,
-      indexLeaderboard = leaderboardIndexer.indexOne _,
-      roundMap = roundMap,
-      roundSocketHub = roundSocketHub)
+  lazy val api = new TournamentApi(cached = cached,
+                                   scheduleJsonView = scheduleJsonView,
+                                   system = system,
+                                   sequencers = sequencerMap,
+                                   autoPairing = autoPairing,
+                                   clearJsonViewCache = jsonView.clearCache,
+                                   router = hub.actor.router,
+                                   renderer = hub.actor.renderer,
+                                   timeline = hub.actor.timeline,
+                                   socketHub = socketHub,
+                                   site = hub.socket.site,
+                                   lobby = hub.socket.lobby,
+                                   trophyApi = trophyApi,
+                                   indexLeaderboard =
+                                     leaderboardIndexer.indexOne _,
+                                   roundMap = roundMap,
+                                   roundSocketHub = roundSocketHub)
 
   val tourAndRanks = api tourAndRanks _
 

@@ -13,7 +13,10 @@ import com.wix.accord._
 import scala.collection.immutable.Seq
 
 class DeploymentPlanTest
-    extends MarathonSpec with Matchers with GivenWhenThen with Mockito {
+    extends MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
 
   protected def actionsOf(plan: DeploymentPlan): Seq[DeploymentAction] =
     plan.steps.flatMap(_.actions)
@@ -34,9 +37,9 @@ class DeploymentPlanTest
         id = "/test".toPath,
         apps = Set(c, d),
         groups = Set(
-              Group("/test/database".toPath, Set(a)),
-              Group("/test/service".toPath, Set(b))
-          )
+            Group("/test/database".toPath, Set(a)),
+            Group("/test/service".toPath, Set(b))
+        )
     )
 
     When("the group's apps are grouped by the longest outbound path")
@@ -161,12 +164,12 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
-          mongoId,
-          Some("mng2"),
-          instances = 8,
-          upgradeStrategy = strategy,
-          versionInfo = versionInfo)
+                    versionInfo =
+                      versionInfo) -> AppDefinition(mongoId,
+                                                    Some("mng2"),
+                                                    instances = 8,
+                                                    upgradeStrategy = strategy,
+                                                    versionInfo = versionInfo)
 
     val service: (AppDefinition, AppDefinition) =
       AppDefinition(serviceId,
@@ -185,16 +188,16 @@ class DeploymentPlanTest
     val from = Group(
         id = "/test".toPath,
         groups = Set(
-              Group("/test/database".toPath, Set(mongo._1)),
-              Group("/test/service".toPath, Set(service._1))
-          )
+            Group("/test/database".toPath, Set(mongo._1)),
+            Group("/test/service".toPath, Set(service._1))
+        )
     )
 
     val to = Group("/test".toPath,
                    groups = Set(
-                         Group("/test/database".toPath, Set(mongo._2)),
-                         Group("/test/service".toPath, Set(service._2))
-                     ))
+                       Group("/test/database".toPath, Set(mongo._2)),
+                       Group("/test/service".toPath, Set(service._2))
+                   ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -250,37 +253,36 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
-          mongoId,
-          Some("mng2"),
-          instances = 8,
-          upgradeStrategy = strategy,
-          versionInfo = versionInfo)
+                    versionInfo =
+                      versionInfo) -> AppDefinition(mongoId,
+                                                    Some("mng2"),
+                                                    instances = 8,
+                                                    upgradeStrategy = strategy,
+                                                    versionInfo = versionInfo)
 
     val service =
       AppDefinition(serviceId,
                     Some("srv1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
-          serviceId,
-          Some("srv2"),
-          instances = 10,
-          upgradeStrategy = strategy,
-          versionInfo = versionInfo)
+                    versionInfo =
+                      versionInfo) -> AppDefinition(serviceId,
+                                                    Some("srv2"),
+                                                    instances = 10,
+                                                    upgradeStrategy = strategy,
+                                                    versionInfo = versionInfo)
 
-    val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-                  Group("/test/database".toPath, Set(mongo._1)),
-                  Group("/test/service".toPath, Set(service._1))
-              ))
+    val from: Group = Group("/test".toPath,
+                            groups = Set(
+                                Group("/test/database".toPath, Set(mongo._1)),
+                                Group("/test/service".toPath, Set(service._1))
+                            ))
 
     val to: Group = Group("/test".toPath,
                           groups = Set(
-                                Group("/test/database".toPath, Set(mongo._2)),
-                                Group("/test/service".toPath, Set(service._2))
-                            ))
+                              Group("/test/database".toPath, Set(mongo._2)),
+                              Group("/test/service".toPath, Set(service._2))
+                          ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -306,25 +308,26 @@ class DeploymentPlanTest
                     Some("mng1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
-          mongoId,
-          Some("mng2"),
-          instances = 8,
-          upgradeStrategy = strategy,
-          versionInfo = versionInfo)
+                    versionInfo =
+                      versionInfo) -> AppDefinition(mongoId,
+                                                    Some("mng2"),
+                                                    instances = 8,
+                                                    upgradeStrategy = strategy,
+                                                    versionInfo = versionInfo)
 
     val service =
       AppDefinition(serviceId,
                     Some("srv1"),
                     instances = 4,
                     upgradeStrategy = strategy,
-                    versionInfo = versionInfo) -> AppDefinition(
-          serviceId,
-          Some("srv2"),
-          dependencies = Set(mongoId),
-          instances = 10,
-          upgradeStrategy = strategy,
-          versionInfo = versionInfo)
+                    versionInfo =
+                      versionInfo) -> AppDefinition(serviceId,
+                                                    Some("srv2"),
+                                                    dependencies =
+                                                      Set(mongoId),
+                                                    instances = 10,
+                                                    upgradeStrategy = strategy,
+                                                    versionInfo = versionInfo)
 
     val independent =
       AppDefinition(appId,
@@ -343,18 +346,18 @@ class DeploymentPlanTest
     val from: Group =
       Group("/test".toPath,
             groups = Set(
-                  Group("/test/database".toPath, Set(mongo._1)),
-                  Group("/test/service".toPath, Set(service._1, toStop)),
-                  Group("/test/independent".toPath, Set(independent._1))
-              ))
+                Group("/test/database".toPath, Set(mongo._1)),
+                Group("/test/service".toPath, Set(service._1, toStop)),
+                Group("/test/independent".toPath, Set(independent._1))
+            ))
 
     val to: Group =
       Group("/test".toPath,
             groups = Set(
-                  Group("/test/database".toPath, Set(mongo._2)),
-                  Group("/test/service".toPath, Set(service._2, toStart)),
-                  Group("/test/independent".toPath, Set(independent._2))
-              ))
+                Group("/test/database".toPath, Set(mongo._2)),
+                Group("/test/service".toPath, Set(service._2, toStart)),
+                Group("/test/independent".toPath, Set(independent._2))
+            ))
 
     When("the deployment plan is computed")
     val plan = DeploymentPlan(from, to)
@@ -381,11 +384,10 @@ class DeploymentPlanTest
                     Some("app2"),
                     instances = 3,
                     upgradeStrategy = strategy) -> None
-    val from: Group =
-      Group("/test".toPath,
-            groups = Set(
-                  Group("/test/independent".toPath, Set(app._1))
-              ))
+    val from: Group = Group("/test".toPath,
+                            groups = Set(
+                                Group("/test/independent".toPath, Set(app._1))
+                            ))
     val to: Group = Group("/test".toPath)
 
     When("the deployment plan is computed")
@@ -447,17 +449,18 @@ class DeploymentPlanTest
   test("ScaleApplication step is created with TasksToKill") {
     Given("a group with one app")
     val aId = "/test/some/a".toPath
-    val oldApp = AppDefinition(
-        aId,
-        versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10)))
+    val oldApp =
+      AppDefinition(aId,
+                    versionInfo =
+                      AppDefinition.VersionInfo.forNewConfig(Timestamp(10)))
 
     When("A deployment plan is generated")
     val originalGroup = Group(
         id = "/test".toPath,
         apps = Set(oldApp),
         groups = Set(
-              Group("/test/some".toPath, Set(oldApp))
-          )
+            Group("/test/some".toPath, Set(oldApp))
+        )
     )
 
     val newApp = oldApp.copy(instances = 5)
@@ -465,8 +468,8 @@ class DeploymentPlanTest
         id = "/test".toPath,
         apps = Set(newApp),
         groups = Set(
-              Group("/test/some".toPath, Set(newApp))
-          )
+            Group("/test/some".toPath, Set(newApp))
+        )
     )
 
     val taskToKill = MarathonTestHelper.stagedTaskForApp(aId)
@@ -527,9 +530,9 @@ class DeploymentPlanTest
           id = PathId(id),
           container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
           residency = Some(
-                Residency(
-                    123,
-                    Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
+              Residency(
+                  123,
+                  Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
       )
     }
     val vol1 = persistentVolume("foo")

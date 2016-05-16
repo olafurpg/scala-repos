@@ -14,15 +14,40 @@ import java.util.concurrent.TimeUnit
 import scala.reflect.internal.{TreeGen => InternalTreeGen}
 
 abstract class SymbolTable
-    extends macros.Universe with Collections with Names with Symbols with Types
-    with Variances with Kinds with ExistentialsAndSkolems with FlagSets
-    with Scopes with Mirrors with Definitions with Constants with BaseTypeSeqs
-    with InfoTransformers with transform.Transforms with StdNames
-    with AnnotationInfos with AnnotationCheckers with Trees with Printers
-    with Positions with TypeDebugging with Importers with Required
-    with CapturedVariables with StdAttachments with StdCreators
-    with ReificationSupport with PrivateWithin with pickling.Translations
-    with FreshNames with Internals with Reporting {
+    extends macros.Universe
+    with Collections
+    with Names
+    with Symbols
+    with Types
+    with Variances
+    with Kinds
+    with ExistentialsAndSkolems
+    with FlagSets
+    with Scopes
+    with Mirrors
+    with Definitions
+    with Constants
+    with BaseTypeSeqs
+    with InfoTransformers
+    with transform.Transforms
+    with StdNames
+    with AnnotationInfos
+    with AnnotationCheckers
+    with Trees
+    with Printers
+    with Positions
+    with TypeDebugging
+    with Importers
+    with Required
+    with CapturedVariables
+    with StdAttachments
+    with StdCreators
+    with ReificationSupport
+    with PrivateWithin
+    with pickling.Translations
+    with FreshNames
+    with Internals
+    with Reporting {
 
   val gen = new InternalTreeGen {
     val global: SymbolTable.this.type = SymbolTable.this
@@ -117,9 +142,10 @@ abstract class SymbolTable
     SimpleNameOrdering.asInstanceOf[Ordering[T]]
 
   private object SimpleNameOrdering extends Ordering[Names#Name] {
-    def compare(n1: Names#Name, n2: Names#Name) = (if (n1 eq n2) 0
-                                                   else
-                                                     n1.toString compareTo n2.toString)
+    def compare(n1: Names#Name, n2: Names#Name) =
+      (if (n1 eq n2) 0
+       else
+         n1.toString compareTo n2.toString)
   }
 
   /** Dump each symbol to stdout after shutdown.
@@ -302,8 +328,7 @@ abstract class SymbolTable
       val method = params.last.owner
       val elemtp = formals.last.typeArgs.head match {
         case RefinedType(List(t1, t2), _)
-            if
-            (t1.typeSymbol.isAbstractType &&
+            if (t1.typeSymbol.isAbstractType &&
                 t2.typeSymbol == definitions.ObjectClass) =>
           t1 // drop intersection with Object for abstract types in varargs. UnCurry can handle them.
         case t =>

@@ -17,7 +17,9 @@ import java.util.concurrent.TimeoutException
 import akka.util.Timeout
 
 class ActivationIntegrationTest
-    extends WordSpec with Matchers with SharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with SharedCamelSystem {
   val timeoutDuration = 10 seconds
   implicit val timeout = Timeout(timeoutDuration)
   def template: ProducerTemplate = camel.template

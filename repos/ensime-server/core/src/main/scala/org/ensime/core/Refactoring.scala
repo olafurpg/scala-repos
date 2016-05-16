@@ -255,13 +255,13 @@ trait RefactoringImpl { self: RichPresentationCompiler =>
           tpe,
           new refactoring.RefactoringParameters(
               options = List(
-                    refactoring.SortImports,
-                    refactoring.SortImportSelectors,
-                    refactoring.CollapseImports,
-                    refactoring.SimplifyWildcards,
-                    refactoring.RemoveDuplicates,
-                    refactoring.GroupImports(List("java", "scala"))
-                )
+                  refactoring.SortImports,
+                  refactoring.SortImportSelectors,
+                  refactoring.CollapseImports,
+                  refactoring.SimplifyWildcards,
+                  refactoring.RemoveDuplicates,
+                  refactoring.GroupImports(List("java", "scala"))
+              )
           ))
     }.result
 

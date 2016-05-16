@@ -139,7 +139,8 @@ class ScalaCaseClassParametersNameContributer
           val myPosition = patterns.get.indexOf(me)
           val coresponedParameter =
             if ((myPosition >= 0) && (myPosition != classParams.length))
-              Some(classParams.apply(myPosition)) else None
+              Some(classParams.apply(myPosition))
+            else None
 
           ParameterWithPosition(coresponedParameter, myPosition)
         }

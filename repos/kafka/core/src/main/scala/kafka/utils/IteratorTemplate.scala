@@ -27,7 +27,8 @@ object FAILED extends State
   * override makeNext and call allDone() when there is no more items
   */
 abstract class IteratorTemplate[T]
-    extends Iterator[T] with java.util.Iterator[T] {
+    extends Iterator[T]
+    with java.util.Iterator[T] {
 
   private var state: State = NOT_READY
   private var nextItem = null.asInstanceOf[T]

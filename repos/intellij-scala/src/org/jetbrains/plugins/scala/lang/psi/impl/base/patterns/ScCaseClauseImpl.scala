@@ -19,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * Date: 28.02.2008
   */
 class ScCaseClauseImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCaseClause {
+    extends ScalaPsiElementImpl(node)
+    with ScCaseClause {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

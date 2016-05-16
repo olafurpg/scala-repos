@@ -16,7 +16,10 @@ import org.apache.camel.impl.DefaultCamelContext
 import akka.actor.{ExtendedActorSystem}
 
 class DefaultCamelTest
-    extends WordSpec with SharedCamelSystem with Matchers with MockitoSugar {
+    extends WordSpec
+    with SharedCamelSystem
+    with Matchers
+    with MockitoSugar {
 
   import org.mockito.Mockito.{when, verify}
   val sys = mock[ExtendedActorSystem]

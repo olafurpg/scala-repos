@@ -1,7 +1,7 @@
 import scala.reflect.runtime.universe._
 
 object Test extends App {
-  def manifestIsTypeTag[T : Manifest] = {
+  def manifestIsTypeTag[T: Manifest] = {
     println(typeOf[T])
   }
 

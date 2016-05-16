@@ -63,7 +63,9 @@ object AtLeastOnceDeliveryFailureSpec {
   }
 
   class ChaosSender(destination: ActorRef, val probe: ActorRef)
-      extends PersistentActor with ChaosSupport with ActorLogging
+      extends PersistentActor
+      with ChaosSupport
+      with ActorLogging
       with AtLeastOnceDelivery {
     val config =
       context.system.settings.config.getConfig("akka.persistence.sender.chaos")
@@ -127,7 +129,9 @@ object AtLeastOnceDeliveryFailureSpec {
   }
 
   class ChaosDestination(val probe: ActorRef)
-      extends Actor with ChaosSupport with ActorLogging {
+      extends Actor
+      with ChaosSupport
+      with ActorLogging {
     val config = context.system.settings.config
       .getConfig("akka.persistence.destination.chaos")
     val confirmFailureRate = config.getDouble("confirm-failure-rate")
@@ -173,7 +177,8 @@ object AtLeastOnceDeliveryFailureSpec {
 }
 
 class AtLeastOnceDeliveryFailureSpec
-    extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config) with Cleanup
+    extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config)
+    with Cleanup
     with ImplicitSender {
   import AtLeastOnceDeliveryFailureSpec._
 

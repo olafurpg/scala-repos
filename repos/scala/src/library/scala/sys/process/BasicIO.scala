@@ -172,11 +172,9 @@ object BasicIO {
     *          with all data read from the stream.
     */
   def processFully(processLine: String => Unit): InputStream => Unit =
-    in =>
-      {
-        val reader = new BufferedReader(new InputStreamReader(in))
-        try processLinesFully(processLine)(reader.readLine) finally reader
-          .close()
+    in => {
+      val reader = new BufferedReader(new InputStreamReader(in))
+      try processLinesFully(processLine)(reader.readLine) finally reader.close()
     }
 
   /** Calls `processLine` with the result of `readLine` until the latter returns
@@ -237,10 +235,9 @@ object BasicIO {
     try transferFullyImpl(in, out) catch onIOInterrupt(())
 
   private[this] def appendLine(buffer: Appendable): String => Unit =
-    line =>
-      {
-        buffer append line
-        buffer append Newline
+    line => {
+      buffer append line
+      buffer append Newline
     }
 
   private[this] def transferFullyImpl(in: InputStream, out: OutputStream) {

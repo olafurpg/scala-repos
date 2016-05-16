@@ -34,8 +34,11 @@ import scala.collection.JavaConverters._
 import scala.util.control.Exception.allCatch
 
 trait AtmosphereSupport
-    extends Initializable with Handler with CometProcessor
-    with HttpEventServlet with org.apache.catalina.comet.CometProcessor
+    extends Initializable
+    with Handler
+    with CometProcessor
+    with HttpEventServlet
+    with org.apache.catalina.comet.CometProcessor
     with ScalatraAsyncSupport {
   self: ScalatraBase with org.scalatra.SessionSupport with JsonSupport[_] =>
 

@@ -551,8 +551,8 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
       """.stripMargin),
                 Row(1))
 
-    checkAnswer(sql("select key from (select * from testData) x limit 1"),
-                Row(1))
+    checkAnswer(
+        sql("select key from (select * from testData) x limit 1"), Row(1))
 
     checkAnswer(
         sql("""
@@ -952,12 +952,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
     val df2 = sqlContext.createDataFrame(rowRDD2, schema2)
     df2.registerTempTable("applySchema2")
-    checkAnswer(sql("SELECT * FROM applySchema2"),
-                Row(Row(1, true), Map("A1" -> null)) :: Row(
-                    Row(2, false), Map("B2" -> null)) :: Row(
-                    Row(3, true),
-                    Map("C3" -> null)) :: Row(Row(4, true),
-                                              Map("D4" -> 2147483644)) :: Nil)
+    checkAnswer(
+        sql("SELECT * FROM applySchema2"),
+        Row(Row(1, true), Map("A1" -> null)) :: Row(Row(2, false),
+                                                    Map("B2" -> null)) :: Row(
+            Row(3, true),
+            Map("C3" -> null)) :: Row(Row(4, true),
+                                      Map("D4" -> 2147483644)) :: Nil)
 
     checkAnswer(sql("SELECT f1.f11, f2['D4'] FROM applySchema2"),
                 Row(1, null) :: Row(2, null) :: Row(3, null) :: Row(
@@ -1504,14 +1505,13 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
     checkAnswer(df,
                 Row(new CalendarInterval(
                         12 * 3 - 3, 7L * 1000 * 1000 * 3600 * 24 * 7 + 123)))
-    withTempPath(f =>
-          {
-        // Currently we don't yet support saving out values of interval data type.
-        val e = intercept[AnalysisException] {
-          df.write.json(f.getCanonicalPath)
-        }
-        e.message.contains(
-            "Cannot save interval data type into external storage")
+    withTempPath(f => {
+      // Currently we don't yet support saving out values of interval data type.
+      val e = intercept[AnalysisException] {
+        df.write.json(f.getCanonicalPath)
+      }
+      e.message.contains(
+          "Cannot save interval data type into external storage")
     })
 
     val e1 = intercept[AnalysisException] {
@@ -1673,15 +1673,14 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
   test("run sql directly on files") {
     val df = sqlContext.range(100).toDF()
-    withTempPath(f =>
-          {
-        df.write.json(f.getCanonicalPath)
-        checkAnswer(sql(s"select id from json.`${f.getCanonicalPath}`"), df)
-        checkAnswer(
-            sql(s"select id from `org.apache.spark.sql.json`.`${f.getCanonicalPath}`"),
-            df)
-        checkAnswer(
-            sql(s"select a.id from json.`${f.getCanonicalPath}` as a"), df)
+    withTempPath(f => {
+      df.write.json(f.getCanonicalPath)
+      checkAnswer(sql(s"select id from json.`${f.getCanonicalPath}`"), df)
+      checkAnswer(
+          sql(s"select id from `org.apache.spark.sql.json`.`${f.getCanonicalPath}`"),
+          df)
+      checkAnswer(
+          sql(s"select a.id from json.`${f.getCanonicalPath}` as a"), df)
     })
 
     val e1 = intercept[AnalysisException] {
@@ -1904,12 +1903,10 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
 
       // Identity udf that tracks the number of times it is called.
       val countAcc = sparkContext.accumulator(0, "CallCount")
-      sqlContext.udf.register("testUdf",
-                              (x: Int) =>
-                                {
-                                  countAcc.++=(1)
-                                  x
-                              })
+      sqlContext.udf.register("testUdf", (x: Int) => {
+        countAcc.++=(1)
+        x
+      })
 
       // Evaluates df, verifying it is equal to the expectedResult and the accumulator's value
       // is correct.
@@ -1936,10 +1933,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
           Row(4, 2),
           2)
 
-      val testUdf = functions.udf((x: Int) =>
-            {
-          countAcc.++=(1)
-          x
+      val testUdf = functions.udf((x: Int) => {
+        countAcc.++=(1)
+        x
       })
       verifyCallCount(
           df.groupBy().agg(sum(testUdf($"b") + testUdf($"b") + testUdf($"b"))),
@@ -2018,9 +2014,9 @@ class SQLQuerySuite extends QueryTest with SharedSQLContext {
             "group by course, earnings grouping sets((), (course), (course, earnings)) " +
             "order by course, sum"),
         Row(null, 113000.0, 3) :: Row("Java", 20000.0, 0) :: Row(
-            "Java",
-            30000.0,
-            0) :: Row("Java", 50000.0, 1) :: Row("dotNET", 5000.0, 0) :: Row(
+            "Java", 30000.0, 0) :: Row("Java", 50000.0, 1) :: Row("dotNET",
+                                                                  5000.0,
+                                                                  0) :: Row(
             "dotNET", 10000.0, 0) :: Row("dotNET", 48000.0, 0) :: Row("dotNET",
                                                                       63000.0,
                                                                       1) :: Nil

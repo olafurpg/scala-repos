@@ -11,7 +11,7 @@ import org.typelevel.discipline.Laws
 trait InvariantTests[F[_]] extends Laws {
   def laws: InvariantLaws[F]
 
-  def invariant[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def invariant[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit ArbFA: Arbitrary[F[A]],
       EqFA: Eq[F[A]],
       EqFC: Eq[F[C]]): RuleSet = {

@@ -64,9 +64,12 @@ final class Vector[+A] private[immutable](
     private[collection] val endIndex: Int,
     focus: Int)
     extends AbstractSeq[A]
-    with IndexedSeq[A] with GenericTraversableTemplate[A, Vector]
-    with IndexedSeqLike[A, Vector[A]] with VectorPointer[A @uncheckedVariance]
-    with Serializable with CustomParallelizable[A, ParVector[A]] {
+    with IndexedSeq[A]
+    with GenericTraversableTemplate[A, Vector]
+    with IndexedSeqLike[A, Vector[A]]
+    with VectorPointer[A @uncheckedVariance]
+    with Serializable
+    with CustomParallelizable[A, ParVector[A]] {
   self =>
 
   override def companion: GenericCompanion[Vector] = Vector
@@ -218,7 +221,8 @@ final class Vector[+A] private[immutable](
         again.size match {
           // Often it's better to append small numbers of elements (or prepend if RHS is a vector)
           case n
-              if n <= TinyAppendFaster || n < (this.size >> Log2ConcatFaster) =>
+              if n <= TinyAppendFaster ||
+              n < (this.size >> Log2ConcatFaster) =>
             var v: Vector[B] = this
             for (x <- again) v = v :+ x
             v.asInstanceOf[That]
@@ -658,7 +662,8 @@ final class Vector[+A] private[immutable](
 }
 
 class VectorIterator[+A](_startIndex: Int, endIndex: Int)
-    extends AbstractIterator[A] with Iterator[A]
+    extends AbstractIterator[A]
+    with Iterator[A]
     with VectorPointer[A @uncheckedVariance] {
 
   private var blockIndex: Int = _startIndex & ~31

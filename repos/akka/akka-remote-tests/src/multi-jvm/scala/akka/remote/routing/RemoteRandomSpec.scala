@@ -45,8 +45,10 @@ class RemoteRandomMultiJvmNode3 extends RemoteRandomSpec
 class RemoteRandomMultiJvmNode4 extends RemoteRandomSpec
 
 class RemoteRandomSpec
-    extends MultiNodeSpec(RemoteRandomMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteRandomMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteRandomMultiJvmSpec._
 
   def initialParticipants = roles.size

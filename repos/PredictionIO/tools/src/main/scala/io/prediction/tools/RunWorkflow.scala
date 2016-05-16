@@ -142,9 +142,11 @@ object RunWorkflow extends Logging {
         .map(x => Seq("--engine-params-key", x))
         .getOrElse(Seq()) ++
       (if (deployMode == "cluster")
-         Seq("--deploy-mode", "cluster") else Seq()) ++
+         Seq("--deploy-mode", "cluster")
+       else Seq()) ++
       (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch) else Seq()) ++
+         Seq("--batch", ca.common.batch)
+       else Seq()) ++
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++
       (if (ca.common.skipSanityCheck) Seq("--skip-sanity-check") else Seq()) ++
       (if (ca.common.stopAfterRead) Seq("--stop-after-read") else Seq()) ++
@@ -160,8 +162,8 @@ object RunWorkflow extends Logging {
         .map(x => Seq("--engine-params-generator-class", x))
         .getOrElse(Seq()) ++
       (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch) else Seq()) ++ Seq(
-          "--json-extractor", ca.common.jsonExtractor.toString)
+         Seq("--batch", ca.common.batch)
+       else Seq()) ++ Seq("--json-extractor", ca.common.jsonExtractor.toString)
 
     info(s"Submission command: ${sparkSubmit.mkString(" ")}")
     Process(sparkSubmit,
@@ -186,7 +188,8 @@ object RunWorkflow extends Logging {
         .map(x => Seq("--engine-params-key", x))
         .getOrElse(Seq()) ++
       (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch) else Seq()) ++
+         Seq("--batch", ca.common.batch)
+       else Seq()) ++
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++
       (if (ca.common.skipSanityCheck) Seq("--skip-sanity-check") else Seq()) ++
       (if (ca.common.stopAfterRead) Seq("--stop-after-read") else Seq()) ++
@@ -202,8 +205,8 @@ object RunWorkflow extends Logging {
         .map(x => Seq("--engine-params-generator-class", x))
         .getOrElse(Seq()) ++
       (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch) else Seq()) ++ Seq(
-          "--json-extractor", ca.common.jsonExtractor.toString)
+         Seq("--batch", ca.common.batch)
+       else Seq()) ++ Seq("--json-extractor", ca.common.jsonExtractor.toString)
 
     Runner.runOnSpark("io.prediction.workflow.CreateWorkflow",
                       args,

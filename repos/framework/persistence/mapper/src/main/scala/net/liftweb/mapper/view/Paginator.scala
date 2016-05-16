@@ -65,7 +65,8 @@ class MapperPaginator[T <: Mapper[T]](val meta: MetaMapper[T])
   * @param meta The singleton of the Mapper class you're paginating
   */
 class MapperPaginatorSnippet[T <: Mapper[T]](meta: MetaMapper[T])
-    extends MapperPaginator[T](meta) with PaginatorSnippet[T]
+    extends MapperPaginator[T](meta)
+    with PaginatorSnippet[T]
 
 /**
   * Implements MapperPaginator and SortedPaginator.

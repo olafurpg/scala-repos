@@ -59,12 +59,12 @@ object HiveThriftServer2 extends Logging {
     server.start()
     listener = new HiveThriftServer2Listener(server, sqlContext.conf)
     sqlContext.sparkContext.addSparkListener(listener)
-    uiTab = if (sqlContext.sparkContext.getConf.getBoolean(
-                    "spark.ui.enabled", true)) {
-      Some(new ThriftServerTab(sqlContext.sparkContext))
-    } else {
-      None
-    }
+    uiTab =
+      if (sqlContext.sparkContext.getConf.getBoolean("spark.ui.enabled", true)) {
+        Some(new ThriftServerTab(sqlContext.sparkContext))
+      } else {
+        None
+      }
   }
 
   def main(args: Array[String]) {
@@ -91,12 +91,13 @@ object HiveThriftServer2 extends Logging {
       listener = new HiveThriftServer2Listener(
           server, SparkSQLEnv.hiveContext.conf)
       SparkSQLEnv.sparkContext.addSparkListener(listener)
-      uiTab = if (SparkSQLEnv.sparkContext.getConf.getBoolean(
-                      "spark.ui.enabled", true)) {
-        Some(new ThriftServerTab(SparkSQLEnv.sparkContext))
-      } else {
-        None
-      }
+      uiTab =
+        if (SparkSQLEnv.sparkContext.getConf.getBoolean(
+                "spark.ui.enabled", true)) {
+          Some(new ThriftServerTab(SparkSQLEnv.sparkContext))
+        } else {
+          None
+        }
       // If application was killed before HiveThriftServer2 start successfully then SparkSubmit
       // process can not exit, so check whether if SparkContext was stopped.
       if (SparkSQLEnv.sparkContext.stopped.get()) {
@@ -280,7 +281,8 @@ object HiveThriftServer2 extends Logging {
 }
 
 private[hive] class HiveThriftServer2(hiveContext: HiveContext)
-    extends HiveServer2 with ReflectedCompositeService {
+    extends HiveServer2
+    with ReflectedCompositeService {
   // state is tracked internally so that the server only attempts to shut down if it successfully
   // started, and then once only.
   private val started = new AtomicBoolean(false)

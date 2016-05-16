@@ -10,8 +10,8 @@ import org.scalastyle._
 import scala.collection.mutable
 
 object ScalastyleCodeInspection {
-  private type TimestampedScalastyleConfiguration = (Long,
-  ScalastyleConfiguration)
+  private type TimestampedScalastyleConfiguration =
+    (Long, ScalastyleConfiguration)
   private val cache =
     new mutable.HashMap[VirtualFile, TimestampedScalastyleConfiguration]()
 
@@ -97,7 +97,7 @@ class ScalastyleCodeInspection extends LocalInspectionTool {
             line: Int, column: Option[Int]): Option[PsiElement] = {
           (for {
             element <- scalaFile.depthFirst if element != scalaFile &&
-                      atPosition(element, line, column)
+            atPosition(element, line, column)
           } yield element).toList.headOption
         }
 

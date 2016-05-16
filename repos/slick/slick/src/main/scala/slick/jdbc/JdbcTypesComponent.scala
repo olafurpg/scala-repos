@@ -52,7 +52,7 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
   }
 
   object MappedJdbcType extends MappedColumnTypeFactory {
-    def base[T : ClassTag, U : BaseColumnType](
+    def base[T: ClassTag, U: BaseColumnType](
         tmap: T => U, tcomap: U => T): BaseColumnType[T] = {
       assertNonNullType(implicitly[BaseColumnType[U]])
       new MappedJdbcType[T, U] with BaseTypedType[T] {
@@ -320,7 +320,8 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
     }
 
     class BigDecimalJdbcType
-        extends DriverJdbcType[BigDecimal] with NumericTypedType {
+        extends DriverJdbcType[BigDecimal]
+        with NumericTypedType {
       def sqlType = java.sql.Types.DECIMAL
       def setValue(v: BigDecimal, p: PreparedStatement, idx: Int) =
         p.setBigDecimal(idx, v.bigDecimal)

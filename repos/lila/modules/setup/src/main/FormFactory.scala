@@ -75,7 +75,7 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
       )(FriendConfig.<<)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid FEN", _.validFen)
-    )
+  )
 
   def friendConfig(implicit ctx: UserContext): Fu[FriendConfig] =
     savedConfig map (_.friend)
@@ -98,7 +98,7 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
       )(HookConfig.<<)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
-    )
+  )
 
   def hookConfig(implicit ctx: UserContext): Fu[HookConfig] =
     savedConfig map (_.hook)

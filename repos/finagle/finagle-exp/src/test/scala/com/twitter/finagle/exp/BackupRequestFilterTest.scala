@@ -14,7 +14,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class BackupRequestFilterTest
-    extends FunSuite with MockitoSugar with Matchers {
+    extends FunSuite
+    with MockitoSugar
+    with Matchers {
   def quantile(ds: Seq[Duration], which: Int) = {
     val sorted = ds.sorted
     sorted(which * sorted.size / 100)

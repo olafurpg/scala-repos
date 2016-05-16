@@ -22,7 +22,7 @@ object KList {
 
   // Function which will only accept HList's whose elements all have have Option as their
   // outer type constructor
-  def acceptOption[L <: HList : *->*[Option]#λ](l: L) = true
+  def acceptOption[L <: HList: *->*[Option]#λ](l: L) = true
 
   val l1 = Option(23) :: Option(true) :: Option("foo") :: HNil
   val l2 = Option(23) :: true :: Option("foo") :: HNil

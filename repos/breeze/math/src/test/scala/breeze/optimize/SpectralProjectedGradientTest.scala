@@ -45,8 +45,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class SpectralProjectedGradientTest
-    extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    extends PropSpec
+    with PropertyChecks
+    with OptimizeTestBaseTrait
+    with VectorMatchers
+    with Matchers {
 
   property("optimize a simple multivariate gaussian") {
     val optimizer =

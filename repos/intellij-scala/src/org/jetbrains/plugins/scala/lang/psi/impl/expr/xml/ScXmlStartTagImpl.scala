@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
   * Date: 21.04.2008
   */
 class ScXmlStartTagImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlStartTag {
+    extends ScalaPsiElementImpl(node)
+    with ScXmlStartTag {
   override def toString: String = "XmlStartTag"
 
   override def accept(visitor: PsiElementVisitor) {

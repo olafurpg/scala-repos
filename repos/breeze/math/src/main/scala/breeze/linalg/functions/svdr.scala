@@ -117,10 +117,9 @@ object svdr extends UFunc {
     val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
     val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
     signs.zipWithIndex.foreach(
-        s =>
-          {
-        u(::, s._2) :*= s._1
-        v(s._2, ::) :*= s._1
+        s => {
+      u(::, s._2) :*= s._1
+      v(s._2, ::) :*= s._1
     })
     (u, v)
   }

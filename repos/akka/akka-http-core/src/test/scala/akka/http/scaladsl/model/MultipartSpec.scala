@@ -15,7 +15,10 @@ import akka.actor.ActorSystem
 import headers._
 
 class MultipartSpec
-    extends WordSpec with Matchers with Inside with BeforeAndAfterAll {
+    extends WordSpec
+    with Matchers
+    with Inside
+    with BeforeAndAfterAll {
 
   val testConf: Config =
     ConfigFactory.parseString("""
@@ -58,21 +61,22 @@ class MultipartSpec
           Source(Multipart.ByteRanges.BodyPart(
                   ContentRange(0, 6),
                   defaultEntity("snippet"),
-                  _additionalHeaders = List(ETag("abc"))) :: Multipart.ByteRanges
-                .BodyPart(ContentRange(8, 9),
-                          defaultEntity("PR"),
-                          _additionalHeaders = List(ETag("xzy"))) :: Nil))
+                  _additionalHeaders =
+                    List(ETag("abc"))) :: Multipart.ByteRanges.BodyPart(
+                  ContentRange(8, 9),
+                  defaultEntity("PR"),
+                  _additionalHeaders = List(ETag("xzy"))) :: Nil))
       val strict = Await.result(streamed.toStrict(1.second), 1.second)
 
       strict shouldEqual Multipart.ByteRanges(
-          Multipart.ByteRanges.BodyPart.Strict(
-              ContentRange(0, 6),
-              HttpEntity("snippet"),
-              additionalHeaders = List(ETag("abc"))),
-          Multipart.ByteRanges.BodyPart.Strict(
-              ContentRange(8, 9),
-              HttpEntity("PR"),
-              additionalHeaders = List(ETag("xzy"))))
+          Multipart.ByteRanges.BodyPart.Strict(ContentRange(0, 6),
+                                               HttpEntity("snippet"),
+                                               additionalHeaders =
+                                                 List(ETag("abc"))),
+          Multipart.ByteRanges.BodyPart.Strict(ContentRange(8, 9),
+                                               HttpEntity("PR"),
+                                               additionalHeaders =
+                                                 List(ETag("xzy"))))
     }
   }
 

@@ -59,7 +59,8 @@ object IsRational {
 }
 
 trait IsIntegral[@sp(Byte, Short, Int, Long) A]
-    extends Any with IsRational[A] {
+    extends Any
+    with IsRational[A] {
   def ceil(a: A): A = a
   def floor(a: A): A = a
   def round(a: A): A = a

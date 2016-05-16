@@ -107,7 +107,9 @@ trait Scanners extends ScannersCommon {
   }
 
   abstract class Scanner
-      extends CharArrayReader with TokenData with ScannerData
+      extends CharArrayReader
+      with TokenData
+      with ScannerData
       with ScannerCommon {
     private def isDigit(c: Char) = java.lang.Character isDigit c
 
@@ -289,8 +291,8 @@ trait Scanners extends ScannersCommon {
         case CASE =>
           sepRegions = ARROW :: sepRegions
         case RBRACE =>
-          while (!sepRegions.isEmpty &&
-          sepRegions.head != RBRACE) sepRegions = sepRegions.tail
+          while (!sepRegions.isEmpty && sepRegions.head != RBRACE) sepRegions =
+            sepRegions.tail
           if (!sepRegions.isEmpty) sepRegions = sepRegions.tail
 
           discardDocBuffer()
@@ -335,8 +337,9 @@ trait Scanners extends ScannersCommon {
           inFirstOfStat(token) &&
           (sepRegions.isEmpty || sepRegions.head == RBRACE)) {
         next copyFrom this
-        offset = if (lineStartOffset <= offset) lineStartOffset
-        else lastLineStartOffset
+        offset =
+          if (lineStartOffset <= offset) lineStartOffset
+          else lastLineStartOffset
         token = if (pastBlankLine()) NEWLINES else NEWLINE
       }
 
@@ -374,9 +377,8 @@ trait Scanners extends ScannersCommon {
 
     /** Is current token first one after a newline? */
     private def afterLineEnd(): Boolean =
-      lastOffset < lineStartOffset &&
-      (lineStartOffset <= offset || lastOffset < lastLineStartOffset &&
-          lastLineStartOffset <= offset)
+      lastOffset < lineStartOffset && (lineStartOffset <= offset ||
+          lastOffset < lastLineStartOffset && lastLineStartOffset <= offset)
 
     /** Is there a blank line between the current token and the last one?
       *  @pre  afterLineEnd().
@@ -477,7 +479,8 @@ trait Scanners extends ScannersCommon {
                   nextRawChar()
                   getStringPart(multiLine = true)
                   sepRegions = STRINGPART :: sepRegions // indicate string part
-                  sepRegions = STRINGLIT :: sepRegions // once more to indicate multi line string part
+                  sepRegions =
+                    STRINGLIT :: sepRegions // once more to indicate multi line string part
                 } else {
                   nextChar()
                   token = STRINGLIT
@@ -486,7 +489,8 @@ trait Scanners extends ScannersCommon {
               } else {
                 offset += 1
                 getStringPart(multiLine = false)
-                sepRegions = STRINGLIT :: sepRegions // indicate single line string part
+                sepRegions =
+                  STRINGLIT :: sepRegions // indicate single line string part
               }
             } else {
               nextChar()
@@ -843,7 +847,8 @@ trait Scanners extends ScannersCommon {
 
     private def getLitChars(delimiter: Char) = {
       while (ch != delimiter && !isAtEnd &&
-      (ch != SU && ch != CR && ch != LF || isUnicodeEscape)) getLitChar()
+             (ch != SU && ch != CR && ch != LF ||
+                 isUnicodeEscape)) getLitChar()
     }
 
     /** read fractional part and exponent of floating point number
@@ -1264,7 +1269,8 @@ trait Scanners extends ScannersCommon {
     /** The source code with braces and line starts annotated with [NN] showing the index */
     private def markedSource = {
       val code = unit.source.content
-      val braces = code.indices filter (idx => "{}\n" contains code(idx)) toSet;
+      val braces =
+        code.indices filter (idx => "{}\n" contains code(idx)) toSet;
       val mapped =
         code.indices map
         (idx => if (braces(idx)) s"${code(idx)}[$idx]" else "" + code(idx))
@@ -1418,7 +1424,7 @@ trait Scanners extends ScannersCommon {
             else {
               var lin = line(loff) + 1
               while (lin < lineStart.length &&
-              column(lineStart(lin)) > lindent) lin += 1
+                     column(lineStart(lin)) > lindent) lin += 1
               if (lin < lineStart.length) {
                 val patches1 = insertPatch(
                     patches, BracePatch(lineStart(lin), inserted = true))

@@ -13,6 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
   * Date: 20.02.2008
   */
 class ScRequiresBlockImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScRequiresBlock {
+    extends ScalaPsiElementImpl(node)
+    with ScRequiresBlock {
   override def toString: String = "RequiresBlock"
 }

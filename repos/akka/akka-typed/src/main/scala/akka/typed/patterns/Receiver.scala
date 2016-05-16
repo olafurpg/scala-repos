@@ -54,8 +54,7 @@ object Receiver {
   def behavior[T]: Behavior[Command[T]] =
     ContextAware[Any] { ctx ⇒
       SynchronousSelf { syncself ⇒
-        Or(
-            empty(ctx).widen {
+        Or(empty(ctx).widen {
           case c: Command[t] ⇒ c.asInstanceOf[Command[T]]
         }, Static[Any] {
           case msg ⇒ syncself ! Enqueue(msg)

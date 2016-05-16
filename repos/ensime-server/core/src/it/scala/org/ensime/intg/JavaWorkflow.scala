@@ -9,8 +9,10 @@ import org.ensime.util.file._
 
 // a pure java project, checking that how things behave without scala
 class JavaWorkflow
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.JavaTestProject
 

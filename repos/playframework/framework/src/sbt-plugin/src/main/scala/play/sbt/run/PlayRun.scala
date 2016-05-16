@@ -79,16 +79,15 @@ object PlayRun {
               .toEither
               .right
               .toOption
-      )
+    )
 
-    val runSbtTask: String => AnyRef = (task: String) =>
-      {
-        val parser = Act.scopedKeyParser(state)
-        val Right(sk) = complete.DefaultParsers.result(parser, task)
-        val result = Project
-          .runTask(sk.asInstanceOf[Def.ScopedKey[Task[AnyRef]]], state)
-          .map(_._2)
-        result.flatMap(_.toEither.right.toOption).orNull
+    val runSbtTask: String => AnyRef = (task: String) => {
+      val parser = Act.scopedKeyParser(state)
+      val Right(sk) = complete.DefaultParsers.result(parser, task)
+      val result = Project
+        .runTask(sk.asInstanceOf[Def.ScopedKey[Task[AnyRef]]], state)
+        .map(_._2)
+      result.flatMap(_.toEither.right.toOption).orNull
     }
 
     lazy val devModeServer = Reloader.startDevMode(
@@ -130,7 +129,7 @@ object PlayRun {
         val maybeContinuous = for {
           watched <- state.get(Watched.Configuration)
           watchState <- state.get(Watched.ContinuousState)
-                           if watchState.count == 1
+          if watchState.count == 1
         } yield watched
 
         maybeContinuous match {

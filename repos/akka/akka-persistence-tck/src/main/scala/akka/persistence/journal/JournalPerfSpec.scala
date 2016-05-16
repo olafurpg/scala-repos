@@ -14,7 +14,8 @@ import com.typesafe.config.Config
 object JournalPerfSpec {
   class BenchActor(
       override val persistenceId: String, replyTo: ActorRef, replyAfter: Int)
-      extends PersistentActor with ActorLogging {
+      extends PersistentActor
+      with ActorLogging {
 
     var counter = 0
 

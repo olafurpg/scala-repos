@@ -36,7 +36,8 @@ case class AppDefinition(
     constraints: Set[Constraint] = AppDefinition.DefaultConstraints,
     fetch: Seq[FetchUri] = AppDefinition.DefaultFetch,
     storeUrls: Seq[String] = AppDefinition.DefaultStoreUrls,
-    portDefinitions: Seq[PortDefinition] = AppDefinition.DefaultPortDefinitions,
+    portDefinitions: Seq[PortDefinition] =
+      AppDefinition.DefaultPortDefinitions,
     requirePorts: Boolean = AppDefinition.DefaultRequirePorts,
     backoff: FiniteDuration = AppDefinition.DefaultBackoff,
     backoffFactor: Double = AppDefinition.DefaultBackoffFactor,
@@ -181,7 +182,8 @@ case class AppDefinition(
 
     val containerOption =
       if (proto.hasContainer)
-        Some(ContainerSerializer.fromProto(proto.getContainer)) else None
+        Some(ContainerSerializer.fromProto(proto.getContainer))
+      else None
 
     val acceptedResourceRoles: Option[Set[String]] =
       if (proto.hasAcceptedResourceRoles)
@@ -203,7 +205,8 @@ case class AppDefinition(
 
     val residencyOption =
       if (proto.hasResidency)
-        Some(ResidencySerializer.fromProto(proto.getResidency)) else None
+        Some(ResidencySerializer.fromProto(proto.getResidency))
+      else None
 
     // TODO (gkleiman): we have to be able to read the ports from the deprecated field in order to perform migrations
     // until the deprecation cycle is complete.
@@ -233,24 +236,23 @@ case class AppDefinition(
         mem = resourcesMap.getOrElse(Resource.MEM, this.mem),
         disk = resourcesMap.getOrElse(Resource.DISK, this.disk),
         env = envMap,
-        fetch = proto.getCmd.getUrisList.asScala
-            .map(FetchUri.fromProto)
-            .to[Seq],
+        fetch =
+          proto.getCmd.getUrisList.asScala.map(FetchUri.fromProto).to[Seq],
         storeUrls = proto.getStoreUrlsList.asScala.to[Seq],
         container = containerOption,
         healthChecks = proto.getHealthChecksList.asScala
-            .map(new HealthCheck().mergeFromProto)
-            .toSet,
+          .map(new HealthCheck().mergeFromProto)
+          .toSet,
         labels = proto.getLabelsList.asScala.map { p =>
           p.getKey -> p.getValue
         }.toMap,
         versionInfo = versionInfoFromProto,
-        upgradeStrategy = if (proto.hasUpgradeStrategy)
+        upgradeStrategy =
+          if (proto.hasUpgradeStrategy)
             UpgradeStrategy.fromProto(proto.getUpgradeStrategy)
           else UpgradeStrategy.empty,
-        dependencies = proto.getDependenciesList.asScala
-            .map(PathId.apply)
-            .toSet,
+        dependencies =
+          proto.getDependenciesList.asScala.map(PathId.apply).toSet,
         ipAddress = ipAddressOption,
         residency = residencyOption
     )
@@ -539,8 +541,7 @@ object AppDefinition {
     isTrue(
         "Health check port indices must address an element of the ports array or container port mappings.") {
       hc =>
-        hc.protocol == Protocol.COMMAND ||
-        (hc.portIndex match {
+        hc.protocol == Protocol.COMMAND || (hc.portIndex match {
               case Some(idx) => hostPortsIndices contains idx
               case None =>
                 hostPortsIndices.length == 1 && hostPortsIndices.head == 0

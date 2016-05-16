@@ -40,7 +40,8 @@ class ScalaBackspaceHandler extends BackspaceHandlerDelegate {
                   tagToDelete.getNode.getElementType)) {
             val textLength =
               if (tagToDelete.getNode.getElementType != ScalaDocTokenType.DOC_BOLD_TAG)
-                tagToDelete.getTextLength else 1
+                tagToDelete.getTextLength
+              else 1
             document.deleteString(tagToDelete.getTextOffset,
                                   tagToDelete.getTextOffset + textLength)
           }

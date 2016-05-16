@@ -28,7 +28,8 @@ object GroupSelector {
 
   private[appinfo] class AllGroupSelectorsMustMatch(
       selectors: Iterable[GroupSelector])
-      extends AllAppSelectorsMustMatch(selectors) with GroupSelector {
+      extends AllAppSelectorsMustMatch(selectors)
+      with GroupSelector {
     override def matches(group: Group): Boolean =
       selectors.forall(_.matches(group))
   }

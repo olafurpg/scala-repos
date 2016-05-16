@@ -21,8 +21,8 @@ object StateTTest extends SpecLite {
 
   object instances {
     def functor[S, F[_]: Functor] = Functor[StateT[F, S, ?]]
-    def plus[F[_]: Monad : Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
-    def bindRec[S, F[_]: Monad : BindRec] = BindRec[StateT[F, S, ?]]
+    def plus[F[_]: Monad: Plus, S1, S2] = Plus[IndexedStateT[F, S1, S2, ?]]
+    def bindRec[S, F[_]: Monad: BindRec] = BindRec[StateT[F, S, ?]]
     def monadState[S, F[_]: Monad] = MonadState[StateT[F, S, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
 
@@ -41,7 +41,7 @@ object StateTTest extends SpecLite {
 
   "monadState.constantState" in {
     instances.monadState[Boolean].constantState(42, false).run(true) must_===
-    ((false, 42))
+      ((false, 42))
   }
 
   "monadState.get" in {
@@ -68,7 +68,7 @@ object StateTTest extends SpecLite {
     val a = StateT[List, Int, Boolean](s => List((s, false)))
     val b = StateT[List, Int, Boolean](s => List((s, true)))
     instances.monadPlus[Int, List].plus(a, b).run(0) must_===
-    (List((0, false), (0, true)))
+      (List((0, false), (0, true)))
   }
 
   "StateT can be trampolined without stack overflow" in {
@@ -76,8 +76,8 @@ object StateTTest extends SpecLite {
     val result = (0 to 4000).toList
       .map(i =>
             StateT[Trampoline, Int, Int]((ii: Int) => Trampoline.done((i, i))))
-      .foldLeft(StateT((s: Int) => Trampoline.done((s, s))))((a,
-          b) => a.flatMap(_ => b))
+      .foldLeft(StateT((s: Int) => Trampoline.done((s, s))))((a, b) =>
+            a.flatMap(_ => b))
     4000 must_=== result(0).run._1
   }
 }

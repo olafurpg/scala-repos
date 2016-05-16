@@ -291,7 +291,8 @@ object Matrix2Props extends Properties("Matrix2") {
       right <- genFormula(depth + 1)
     } yield
       if (depth > 5) randomProduct(p)
-      else (if (v > 0) randomProduct(p) else Sum(left, right, ring))
+      else (if (v > 0) randomProduct(p)
+            else Sum(left, right, ring))
 
   def genFormula(depth: Int): Gen[Matrix2[Any, Any, Double]] =
     if (depth > 5) genLeaf((0, 0))._1
@@ -337,7 +338,7 @@ object Matrix2Props extends Properties("Matrix2") {
       */
     def toProducts(mf: Matrix2[Any, Any, Double])
       : (Option[Product[Any, Any, Any, Double]],
-      List[Product[Any, Any, Any, Double]]) = {
+         List[Product[Any, Any, Any, Double]]) = {
       mf match {
         case element @ MatrixLiteral(_, _) => (None, Nil)
         case Sum(left, right, _) => {
@@ -376,7 +377,8 @@ object Matrix2Props extends Properties("Matrix2") {
             } else {
               val newP =
                 if (lastLP.isDefined) List(lastLP.get)
-                else if (lastRP.isDefined) List(lastRP.get) else Nil
+                else if (lastRP.isDefined) List(lastRP.get)
+                else Nil
               (None, newP ++ leftR ++ rightR)
             }
           }
@@ -500,11 +502,11 @@ object Matrix2Props extends Properties("Matrix2") {
     * are less than or equal to costs of randomized equivalent plans or product chains
     */
   property(
-      "a cost of an optimized chain of matrix products is <= a random one") = forAll {
-    (a: IndexedSeq[MatrixLiteral[Any, Any, Double]]) =>
+      "a cost of an optimized chain of matrix products is <= a random one") =
+    forAll { (a: IndexedSeq[MatrixLiteral[Any, Any, Double]]) =>
       optimizeProductChain(a, Some(ring, MatrixJoiner2.default))._1 <= evaluate(
           generateRandomPlan(0, a.length - 1, a))
-  }
+    }
 
   property("cost of a random plan is <= a random one") = forAll {
     (a: Matrix2[Any, Any, Double]) =>

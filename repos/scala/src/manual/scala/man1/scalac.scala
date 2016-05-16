@@ -99,14 +99,16 @@ object scalac extends Command {
                           "will not") & " perform tail call optimization.")),
               Definition(CmdOption("help"),
                          "Print a synopsis of standard options."),
-              Definition(CmdOption("javabootclasspath", Argument("path")),
-                         "Override Java boot classpath."),
+              Definition(
+                  CmdOption("javabootclasspath", Argument("path")),
+                  "Override Java boot classpath."),
               Definition(CmdOption("javaextdirs", Argument("path")),
                          "Override Java extdirs classpath."),
               Definition(CmdOptionBound("language:", Argument("feature")),
                          "Enable one or more language features."),
-              Definition(CmdOption("no-specialization"),
-                         "Ignore " & MItalic("@specialize") & " annotations."),
+              Definition(
+                  CmdOption("no-specialization"),
+                  "Ignore " & MItalic("@specialize") & " annotations."),
               Definition(
                   CmdOption("nobootcp"),
                   "Do not use the boot classpath for the Scala jar files."),
@@ -130,19 +132,23 @@ object scalac extends Command {
                       "Enable detailed unchecked (erasure) warnings",
                       "Non variable type-arguments in type patterns are unchecked " & "since they are eliminated by erasure",
                       "Available since Scala version 2.3.0")),
-              Definition(CmdOption("uniqid"),
-                         "Uniquely tag all identifiers in debugging output."),
+              Definition(
+                  CmdOption("uniqid"),
+                  "Uniquely tag all identifiers in debugging output."),
               Definition(
                   CmdOption("usejavacp"),
                   "Utilize the java.class.path in classpath resolution."),
               Definition(CmdOption("usemanifestcp"),
                          "Utilize the manifest in classpath resolution."),
-              Definition(CmdOption("verbose"),
-                         "Output messages about what the compiler is doing"),
-              Definition(CmdOption("version"),
-                         "Print product version and exit."),
-              Definition(Mono(Bold("@") & Argument("file")),
-                         "A text file containing compiler arguments (options and source files)")
+              Definition(
+                  CmdOption("verbose"),
+                  "Output messages about what the compiler is doing"),
+              Definition(
+                  CmdOption("version"),
+                  "Print product version and exit."),
+              Definition(
+                  Mono(Bold("@") & Argument("file")),
+                  "A text file containing compiler arguments (options and source files)")
 
               // TODO - Add macros an dsuch here.
           )),
@@ -164,13 +170,13 @@ object scalac extends Command {
                          "Enable experimental extensions"),
               Definition(CmdOption("Xfatal-warnings"),
                          "Fail the compilation if there are any warnings."),
-              Definition(CmdOption("Xfull-lubs"),
-                         "Retain pre 2.10 behavior of less aggressive truncation of least upper bounds."),
+              Definition(
+                  CmdOption("Xfull-lubs"),
+                  "Retain pre 2.10 behavior of less aggressive truncation of least upper bounds."),
               Definition(CmdOption("Xfuture"),
                          "Turn on future language features."),
-              Definition(
-                  CmdOption("Xgenerate-phase-graph", Argument("file")),
-                  "Generate the phase graphs (outputs .dot files) to fileX.dot."),
+              Definition(CmdOption("Xgenerate-phase-graph", Argument("file")),
+                         "Generate the phase graphs (outputs .dot files) to fileX.dot."),
               Definition(CmdOption("Xlint"),
                          "Enable recommended additional warnings."),
               Definition(
@@ -179,8 +185,9 @@ object scalac extends Command {
               Definition(
                   CmdOption("Xlog-free-types"),
                   "Print a message when reification resorts to generating a free type."),
-              Definition(CmdOption("Xlog-implicit-conversions"),
-                         "Print a message whenever an implicit conversion is inserted."),
+              Definition(
+                  CmdOption("Xlog-implicit-conversions"),
+                  "Print a message whenever an implicit conversion is inserted."),
               Definition(
                   CmdOption("Xlog-implicits"),
                   "Show more detail on why some implicits are not applicable."),
@@ -223,8 +230,9 @@ object scalac extends Command {
                          "Abort if a named plugin is not loaded."),
               Definition(CmdOption("Xpluginsdir", Argument("path")),
                          "Path to search for plugin archives."),
-              Definition(CmdOptionBound("Xprint:", Argument("phases")),
-                         "Print out program after " & Argument("phases") & " (see below)."),
+              Definition(
+                  CmdOptionBound("Xprint:", Argument("phases")),
+                  "Print out program after " & Argument("phases") & " (see below)."),
               Definition(
                   CmdOptionBound("Xprint-icode",
                                  "[:" & Argument("phases") & "]"),
@@ -260,110 +268,76 @@ object scalac extends Command {
                          "Verify generic signatures in generated bytecode (asm backend only)."),
               Definition(
                   CmdOptionBound("Xxml:", "{coalescing}"),
-                  SeqPara("Configure XML parsing.",
-                          Mono("\"coalescing\"") & " convert PCData to Text and coalesce sibling nodes (default in 2.11).")),
+                  SeqPara(
+                      "Configure XML parsing.",
+                      Mono("\"coalescing\"") & " convert PCData to Text and coalesce sibling nodes (default in 2.11).")),
               Definition(CmdOption("Y"),
                          "Print a synopsis of private options.")
           )),
-      Section("Compilation Phases",
-              DefinitionList(
-                  Definition(
-                      MItalic("parser"),
-                      "parse source into ASTs, perform simple desugaring"),
-                  Definition(
-                      MItalic("namer"),
-                      "resolve names, attach symbols to named trees"),
-                  Definition(MItalic("packageobjects"),
-                             "load package objects"),
-                  Definition(MItalic("typer"),
-          "the meat and potatoes: type the trees"),
-        Definition(
-          MItalic("patmat"),
-          "translate match expressions"),
-        Definition(
-          MItalic("superaccessors"),
-          "add super accessors in traits and nested classes"),
-        Definition(
-          MItalic("extmethods"),
-          "add extension methods for inline classes"),
-        Definition(
-          MItalic("pickler"),
-          "serialize symbol tables"),
-        Definition(
-          MItalic("refchecks"),
-          "reference/override checking, translate nested objects"),
-        Definition(
-          MItalic("selectiveanf"),
-          "ANF pre-transform for " & MItalic("@cps") & " (CPS plugin)"),
-        Definition(
-          MItalic("selectivecps"),
-          MItalic("@cps") & "-driven transform of selectiveanf assignments (CPS plugin)"),
-        Definition(
-          MItalic("uncurry"),
-          "uncurry, translate function values to anonymous classes"),
-        Definition(
-          MItalic("tailcalls"),
-          "replace tail calls by jumps"),
-        Definition(
-          MItalic("specialize"),
-          MItalic("@specialized") & "-driven class and method specialization"),
-        Definition(
-          MItalic("explicitouter"),
-          "this refs to outer pointers, translate patterns"),
-        Definition(
-          MItalic("erasure"),
-          "erase types, add interfaces for traits"),
-        Definition(
-          MItalic("posterasure"),
-          "clean up erased inline classes"),
-        Definition(
-          MItalic("lazyvals"),
-          "allocate bitmaps, translate lazy vals into lazified defs"),
-        Definition(
-          MItalic("lambdalift"),
-          "move nested functions to top level"),
-        Definition(
-          MItalic("constructors"),
-          "move field definitions into constructors"),
-        Definition(
-          MItalic("flatten"),
-          "eliminate inner classes"),
-        Definition(
-          MItalic("mixin"),
-          "mixin composition"),
-        Definition(
-          MItalic("cleanup"),
-          "platform-specific cleanups, generate reflective calls"),
-        Definition(
-          MItalic("delambdafy"),
-          "remove lambdas"),
-        Definition(
-          MItalic("icode"),
-          "generate portable intermediate code"),
-        Definition(
-          MItalic("inliner"),
-          "optimization: do inlining"),
-        Definition(
-          MItalic("inlineHandlers"),
-          "optimization: inline exception handlers"),
-        Definition(
-          MItalic("closelim"),
-          "optimization: eliminate uncalled closures"),
-        Definition(
-          MItalic("constopt"),
-          "optimization: optimize null and other constants"),
-        Definition(
-          MItalic("dce"),
-          "optimization: eliminate dead code"),
-        Definition(
-          MItalic("jvm"),
-          "generate JVM bytecode"),
-        Definition(
-          MItalic("terminal"),
-          "the last phase in the compiler chain"),
-        Definition(
-          MItalic("all"),
-          "matches all phases"))))
+      Section(
+          "Compilation Phases",
+          DefinitionList(
+              Definition(MItalic("parser"),
+                         "parse source into ASTs, perform simple desugaring"),
+              Definition(MItalic("namer"),
+                         "resolve names, attach symbols to named trees"),
+              Definition(MItalic("packageobjects"), "load package objects"),
+              Definition(MItalic("typer"),
+                         "the meat and potatoes: type the trees"),
+              Definition(MItalic("patmat"), "translate match expressions"),
+              Definition(MItalic("superaccessors"),
+                         "add super accessors in traits and nested classes"),
+              Definition(MItalic("extmethods"),
+                         "add extension methods for inline classes"),
+              Definition(MItalic("pickler"), "serialize symbol tables"),
+              Definition(MItalic("refchecks"),
+                         "reference/override checking, translate nested objects"),
+              Definition(
+                  MItalic("selectiveanf"),
+                  "ANF pre-transform for " & MItalic("@cps") & " (CPS plugin)"),
+              Definition(
+                  MItalic("selectivecps"),
+                  MItalic("@cps") & "-driven transform of selectiveanf assignments (CPS plugin)"),
+              Definition(
+                  MItalic("uncurry"),
+                  "uncurry, translate function values to anonymous classes"),
+              Definition(MItalic("tailcalls"), "replace tail calls by jumps"),
+              Definition(
+                  MItalic("specialize"),
+                  MItalic("@specialized") & "-driven class and method specialization"),
+              Definition(MItalic("explicitouter"),
+                         "this refs to outer pointers, translate patterns"),
+              Definition(MItalic("erasure"),
+                         "erase types, add interfaces for traits"),
+              Definition(MItalic("posterasure"),
+                         "clean up erased inline classes"),
+              Definition(
+                  MItalic("lazyvals"),
+                  "allocate bitmaps, translate lazy vals into lazified defs"),
+              Definition(MItalic("lambdalift"),
+                         "move nested functions to top level"),
+              Definition(MItalic("constructors"),
+                         "move field definitions into constructors"),
+              Definition(MItalic("flatten"), "eliminate inner classes"),
+              Definition(MItalic("mixin"), "mixin composition"),
+              Definition(
+                  MItalic("cleanup"),
+                  "platform-specific cleanups, generate reflective calls"),
+              Definition(MItalic("delambdafy"), "remove lambdas"),
+              Definition(MItalic("icode"),
+                         "generate portable intermediate code"),
+              Definition(MItalic("inliner"), "optimization: do inlining"),
+              Definition(MItalic("inlineHandlers"),
+                         "optimization: inline exception handlers"),
+              Definition(MItalic("closelim"),
+                         "optimization: eliminate uncalled closures"),
+              Definition(MItalic("constopt"),
+                         "optimization: optimize null and other constants"),
+              Definition(MItalic("dce"), "optimization: eliminate dead code"),
+              Definition(MItalic("jvm"), "generate JVM bytecode"),
+              Definition(MItalic("terminal"),
+                         "the last phase in the compiler chain"),
+              Definition(MItalic("all"), "matches all phases"))))
 
   val environment = Section(
       "ENVIRONMENT",

@@ -10,7 +10,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
   * @author ilyas
   */
 trait ScTemplateDefinitionStub
-    extends PsiClassStub[ScTemplateDefinition] with ScMemberOrLocal {
+    extends PsiClassStub[ScTemplateDefinition]
+    with ScMemberOrLocal {
 
   def qualName: String
 

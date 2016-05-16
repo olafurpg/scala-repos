@@ -61,7 +61,8 @@ object Semigroup {
   * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
   */
 trait CSemigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Semigroup[A]
+    extends Any
+    with Semigroup[A]
 
 object CSemigroup {
   @inline final def apply[A](implicit ev: CSemigroup[A]): CSemigroup[A] = ev

@@ -25,10 +25,10 @@ trait StructuredTypeStrings extends DestructureTypes {
   }
   case class Grouping(
       ldelim: String, mdelim: String, rdelim: String, labels: Boolean) {
-    def join(elems: String*): String = (if (elems.isEmpty) ""
-                                        else
-                                          elems.mkString(
-                                              ldelim, mdelim, rdelim))
+    def join(elems: String*): String =
+      (if (elems.isEmpty) ""
+       else
+         elems.mkString(ldelim, mdelim, rdelim))
   }
   val NoGrouping = Grouping("", "", "", labels = false)
   val ListGrouping = Grouping("(", ", ", ")", labels = false)
@@ -223,7 +223,7 @@ trait TypeStrings {
     brackets(clazz.getTypeParameters map tvarString: _*)
   }
 
-  private def tparamString[T : ru.TypeTag]: String = {
+  private def tparamString[T: ru.TypeTag]: String = {
     import ru._ // get TypeRefTag in scope so that pattern match works (TypeRef is an abstract type)
     def typeArguments: List[ru.Type] = ru.typeOf[T] match {
       case ru.TypeRef(_, _, args) => args; case _ => Nil
@@ -242,7 +242,7 @@ trait TypeStrings {
   def fromValue(value: Any): String =
     if (value == null) "Null" else fromClazz(anyClass(value))
   def fromClazz(clazz: JClass): String = scalaName(clazz) + tparamString(clazz)
-  def fromTag[T : ru.TypeTag : ClassTag]: String =
+  def fromTag[T: ru.TypeTag: ClassTag]: String =
     scalaName(classTag[T].runtimeClass) + tparamString[T]
 
   /** Reducing fully qualified noise for some common packages.

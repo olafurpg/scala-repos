@@ -6,49 +6,49 @@ import mesosphere.marathon.state.{AppDefinition, PathId, Timestamp, Group}
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class GroupVersioningUtilTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   val emptyGroup = Group.empty.copy(version = Timestamp(1))
 
   val nestedApp = Group.empty.copy(
       groups = Set(
-            Group(
-                id = PathId("/nested"),
-                apps = Set(
-                      AppDefinition(PathId("/nested/app"),
-                                    cmd = Some("sleep 123"))
-                  ),
-                version = Timestamp(2)
-            )
-        ),
+          Group(
+              id = PathId("/nested"),
+              apps = Set(
+                  AppDefinition(PathId("/nested/app"), cmd = Some("sleep 123"))
+              ),
+              version = Timestamp(2)
+          )
+      ),
       version = Timestamp(2)
   )
 
   val nestedAppScaled = Group.empty.copy(
       groups = Set(
-            Group(
-                id = PathId("/nested"),
-                apps = Set(
-                      AppDefinition(PathId("/nested/app"),
-                                    cmd = Some("sleep 123"),
-                                    instances = 2)
-                  ),
-                version = Timestamp(2)
-            )
-        ),
+          Group(
+              id = PathId("/nested"),
+              apps = Set(
+                  AppDefinition(PathId("/nested/app"),
+                                cmd = Some("sleep 123"),
+                                instances = 2)
+              ),
+              version = Timestamp(2)
+          )
+      ),
       version = Timestamp(2)
   )
 
   val nestedAppUpdated = Group.empty.copy(
       groups = Set(
-            Group(
-                id = PathId("/nested"),
-                apps = Set(
-                      AppDefinition(PathId("/nested/app"),
-                                    cmd = Some("sleep 234"))
-                  ),
-                version = Timestamp(2)
-            )
-        ),
+          Group(
+              id = PathId("/nested"),
+              apps = Set(
+                  AppDefinition(PathId("/nested/app"), cmd = Some("sleep 234"))
+              ),
+              version = Timestamp(2)
+          )
+      ),
       version = Timestamp(2)
   )
 
@@ -93,8 +93,8 @@ class GroupVersioningUtilTest
     def update(maybeApp: Option[AppDefinition]): AppDefinition =
       maybeApp
         .map(_.copy(versionInfo = VersionInfo
-                    .forNewConfig(Timestamp(0))
-                    .withScaleOrRestartChange(Timestamp(10))))
+                  .forNewConfig(Timestamp(0))
+                  .withScaleOrRestartChange(Timestamp(10))))
         .get
     updated.toString should be(
         nestedAppScaled

@@ -33,7 +33,9 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import scalaz.std.map._
 
 trait ReductionFinderModule[M[+ _]]
-    extends DAG with EvaluatorMethodsModule[M] with TransSpecableModule[M] {
+    extends DAG
+    with EvaluatorMethodsModule[M]
+    with TransSpecableModule[M] {
   type TS1 = trans.TransSpec1
   import library._
   import trans._

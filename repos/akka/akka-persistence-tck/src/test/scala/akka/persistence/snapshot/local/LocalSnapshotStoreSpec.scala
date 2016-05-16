@@ -10,4 +10,5 @@ class LocalSnapshotStoreSpec
     akka.test.timefactor = 3
     akka.persistence.snapshot-store.plugin = "akka.persistence.snapshot-store.local"
     akka.persistence.snapshot-store.local.dir = "target/snapshots"
-    """)) with PluginCleanup
+    """))
+    with PluginCleanup

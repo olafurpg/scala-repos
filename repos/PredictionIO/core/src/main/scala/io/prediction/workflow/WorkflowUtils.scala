@@ -99,7 +99,7 @@ object WorkflowUtils extends Logging {
                 .forName(epg)
                 .newInstance
                 .asInstanceOf[EngineParamsGenerator]
-            )
+          )
         }
     }
   }
@@ -325,7 +325,8 @@ object WorkflowUtils extends Logging {
       jv match {
         case JObject(fields) =>
           for ((namePrefix, childJV) <- fields;
-          (name, value) <- flatten(childJV)) yield (namePrefix :: name) -> value
+               (name, value) <- flatten(childJV)) yield
+            (namePrefix :: name) -> value
         case JArray(_) => {
             error(
                 "Arrays are not allowed in the sparkConf section of engine.js.")
@@ -336,8 +337,8 @@ object WorkflowUtils extends Logging {
       }
     }
 
-    flatten(root \ "sparkConf")
-      .map(x => (x._1.reduce((a, b) => s"$a.$b"), x._2))
+    flatten(root \ "sparkConf").map(x =>
+          (x._1.reduce((a, b) => s"$a.$b"), x._2))
   }
 }
 
@@ -393,7 +394,8 @@ object SparkWorkflowUtils extends Logging {
 }
 
 class UpgradeCheckRunner(val component: String, val engine: String)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
   val version = BuildInfo.version
   val versionsHost = "http://direct.prediction.io/"
 

@@ -56,8 +56,8 @@ trait AccessTokenService {
       .sortBy(_.accessTokenId.desc)
       .list
 
-  def deleteAccessToken(
-      userName: String, accessTokenId: Int)(implicit s: Session): Unit =
+  def deleteAccessToken(userName: String, accessTokenId: Int)(
+      implicit s: Session): Unit =
     AccessTokens filter
     (t =>
           t.userName === userName.bind &&

@@ -27,7 +27,9 @@ import scala.annotation.migration
     "Adaptors are inherently unreliable and prone to performance problems.",
     "2.11.0")
 class ImmutableMapAdaptor[A, B](protected var imap: immutable.Map[A, B])
-    extends AbstractMap[A, B] with Map[A, B] with Serializable {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with Serializable {
 
   override def size: Int = imap.size
 

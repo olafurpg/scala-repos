@@ -259,7 +259,8 @@ trait DiagramDirectiveParser {
           else if ((hideNodesFilter0.isEmpty) && (hideEdgesFilter0.isEmpty) &&
                    (hideIncomingImplicits0 == false) &&
                    (hideOutgoingImplicits0 == false) &&
-                   (hideSuperclasses0 == false) && (hideSubclasses0 == false) &&
+                   (hideSuperclasses0 == false) &&
+                   (hideSubclasses0 == false) &&
                    (hideInheritedNodes0 == false) && (hideDiagram0 == false))
             FullDiagram
           else

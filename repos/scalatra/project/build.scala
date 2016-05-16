@@ -57,7 +57,8 @@ object ScalatraBuild extends Build {
   lazy val scalatraProject = Project(
       id = "scalatra-project",
       base = file("."),
-      settings = scalatraSettings ++ Unidoc.unidocSettings ++ doNotPublish ++ Seq(
+      settings =
+        scalatraSettings ++ Unidoc.unidocSettings ++ doNotPublish ++ Seq(
             description := "A tiny, Sinatra-like web framework for Scala",
             Unidoc.unidocExclude := Seq("scalatra-example"),
             previousArtifacts := Set.empty
@@ -87,7 +88,8 @@ object ScalatraBuild extends Build {
   lazy val scalatraCommon = Project(
       id = "scalatra-common",
       base = file("common"),
-      settings = scalatraSettings ++ Seq(
+      settings =
+        scalatraSettings ++ Seq(
             libraryDependencies ++= Seq(servletApi % "provided,test")
         )
   )
@@ -96,9 +98,9 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra",
         base = file("core"),
-        settings = scalatraSettings ++ Seq(
-              libraryDependencies <++= scalaVersion(sv =>
-                    {
+        settings =
+          scalatraSettings ++ Seq(
+              libraryDependencies <++= scalaVersion(sv => {
                 val default = Seq(
                     servletApi % "provided;test",
                     slf4jApi,
@@ -112,7 +114,7 @@ object ScalatraBuild extends Build {
                 )
                 if (sv.startsWith("2.10")) default
                 else default ++ Seq(parserCombinators, xml)
-            }),
+              }),
               libraryDependencies ++= Seq(akkaTestkit % "test"),
               description := "The core Scalatra framework",
               binaryIssueFilters ++= Seq(
@@ -130,7 +132,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-auth",
         base = file("auth"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(base64),
               description := "Scalatra authentication module"
           )
@@ -140,7 +143,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-fileupload",
         base = file("fileupload"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(commonsFileupload, commonsIo),
               description := "Commons-Fileupload integration with Scalatra"
           )
@@ -150,7 +154,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-atmosphere",
         base = file("atmosphere"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(akkaActor, akkaTestkit % "test"),
               libraryDependencies ++= Seq(atmosphereRuntime,
                                           atmosphereRedis,
@@ -167,7 +172,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-scalate",
         base = file("scalate"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies += scalate,
               description := "Scalate integration with Scalatra"
           )
@@ -177,7 +183,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-json",
         base = file("json"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               description := "JSON support for Scalatra",
               libraryDependencies ++= Seq(json4sJackson % "provided",
                                           json4sNative % "provided",
@@ -189,7 +196,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-commands",
         base = file("commands"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(
                   "commons-validator" % "commons-validator" % "1.5.0",
                   "io.backchat.inflector" %% "scala-inflector" % "1.3.5"
@@ -212,7 +220,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-jetty",
         base = file("jetty"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(
                   servletApi,
                   jettyServlet
@@ -225,7 +234,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-test",
         base = file("test"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(
                   grizzledSlf4j,
                   jettyWebapp,
@@ -245,7 +255,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-scalatest",
         base = file("scalatest"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(scalatest, junit, testng % "optional", guice % "optional"),
               description := "ScalaTest support for the Scalatra test framework"
@@ -256,7 +267,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-specs2",
         base = file("specs2"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= specs2,
               description := "Specs2 support for the Scalatra test framework"
           )
@@ -266,11 +278,12 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-swagger",
         base = file("swagger"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies <++= (scalaVersion) { sv =>
-              val com = Seq(json4sExt, logbackClassic % "provided")
-              if (sv.startsWith("2.10")) com else parserCombinators +: com
-            },
+                val com = Seq(json4sExt, logbackClassic % "provided")
+                if (sv.startsWith("2.10")) com else parserCombinators +: com
+              },
               description := "Scalatra integration with Swagger"
           )
     ) dependsOn
@@ -281,7 +294,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-swagger-ext",
         base = file("swagger-ext"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               description := "Deeper Swagger integration for scalatra"
           )
     ) dependsOn
@@ -293,7 +307,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-slf4j",
         base = file("slf4j"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(grizzledSlf4j, logbackClassic % "provided"),
               description := "Scalatra integration with SLF4J and Logback"
@@ -304,7 +319,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-spring",
         base = file("spring"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies += springWeb,
               description := "Scalatra integration with Spring Framework"
           )
@@ -314,7 +330,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-metrics",
         base = file("metrics"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++=
                 Seq(metricsScala, metricsServlets, metricsServlet),
               description := "Scalatra integration with Metrics"
@@ -325,7 +342,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-cache",
         base = file("cache"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(),
               description := "Scalatra Cache support"
           )
@@ -335,7 +353,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-cache-guava",
         base = file("cache-guava"),
-        settings = scalatraSettings ++ Seq(
+        settings =
+          scalatraSettings ++ Seq(
               libraryDependencies ++= Seq(googleGuava, googleFindBugs),
               description := "Scalatra Cache integration with Google Guava"
           )
@@ -347,7 +366,8 @@ object ScalatraBuild extends Build {
     Project(
         id = "scalatra-example",
         base = file("example"),
-        settings = scalatraSettings ++ doNotPublish ++ scalatraWithWarOverlays ++ Seq(
+        settings =
+          scalatraSettings ++ doNotPublish ++ scalatraWithWarOverlays ++ Seq(
               libraryDependencies += servletApi % "container;test;provided",
               libraryDependencies += jettyWebsocket % "container;test;provided",
               libraryDependencies += jettyServer % "container;test;provided",

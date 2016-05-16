@@ -60,9 +60,9 @@ trait Importers { to: SymbolTable =>
       // FIXME this and reverse should be constantly kept in sync
       // not just synced once upon the first usage of reverse
       for ((theirsym, WeakReference(mysym)) <- StandardImporter.this.symMap) symMap +=
-      ((mysym, WeakReference(theirsym)))
+        ((mysym, WeakReference(theirsym)))
       for ((theirtpe, WeakReference(mytpe)) <- StandardImporter.this.tpeMap) tpeMap +=
-      ((mytpe, WeakReference(theirtpe)))
+        ((mytpe, WeakReference(theirtpe)))
     }
 
     // ============== SYMBOLS ==============
@@ -178,7 +178,8 @@ trait Importers { to: SymbolTable =>
 
           var theirscope =
             if (their.owner.isClass && !their.owner.isRefinementClass)
-              their.owner.info else from.NoType
+              their.owner.info
+            else from.NoType
           val theirexisting =
             if (isModuleClass) theirscope.decl(their.name).moduleClass
             else theirscope.decl(their.name)
@@ -188,7 +189,8 @@ trait Importers { to: SymbolTable =>
           val myowner = importSymbol(their.owner)
           val myscope =
             if (theirscope != from.NoType && !(myowner hasFlag Flags.LOCKED))
-              myowner.info else NoType
+              myowner.info
+            else NoType
           val myexisting = {
             if (isModuleClass) importSymbol(their.sourceModule).moduleClass
             else if (isTparam)

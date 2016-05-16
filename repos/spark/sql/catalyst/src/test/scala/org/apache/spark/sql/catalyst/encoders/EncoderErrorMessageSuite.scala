@@ -103,6 +103,6 @@ class EncoderErrorMessageSuite extends SparkFunSuite {
             s"""array element class: "${clsName[NonEncodable]}""""))
   }
 
-  private def clsName[T : ClassTag]: String =
+  private def clsName[T: ClassTag]: String =
     implicitly[ClassTag[T]].runtimeClass.getName
 }

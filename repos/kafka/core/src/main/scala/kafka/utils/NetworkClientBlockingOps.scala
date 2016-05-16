@@ -120,8 +120,8 @@ class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
     * This method is useful for implementing blocking behaviour on top of the non-blocking `NetworkClient`, use it with
     * care.
     */
-  private def pollUntilFound[T](
-      timeout: Long)(collect: (Seq[ClientResponse], Long) => Option[T])(
+  private def pollUntilFound[T](timeout: Long)(
+      collect: (Seq[ClientResponse], Long) => Option[T])(
       implicit time: JTime): Option[T] = {
 
     val methodStartTime = time.milliseconds()

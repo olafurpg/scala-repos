@@ -21,8 +21,14 @@ import play.api.i18n.Lang
   * }}}
   */
 trait Controller
-    extends Results with BodyParsers with HttpProtocol with Status
-    with HeaderNames with ContentTypes with RequestExtractors with Rendering {
+    extends Results
+    with BodyParsers
+    with HttpProtocol
+    with Status
+    with HeaderNames
+    with ContentTypes
+    with RequestExtractors
+    with Rendering {
 
   /**
     * Provides an empty `Action` implementation: the result is a standard ‘Not implemented yet’ result page.

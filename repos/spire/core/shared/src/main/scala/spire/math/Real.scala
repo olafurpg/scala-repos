@@ -458,8 +458,7 @@ object Real extends RealInstances {
   def roundUp(r: Rational): SafeLong = SafeLong(r.round.toBigInt)
 
   def div2n(x: Real, n: Int): Real =
-    Real(
-        p =>
+    Real(p =>
           if (p >= n) x(p - n)
           else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
@@ -566,8 +565,10 @@ trait RealInstances {
 class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional
-    extends Fractional[Real] with Order[Real]
-    with Signed[Real] with Trig[Real] {
+    extends Fractional[Real]
+    with Order[Real]
+    with Signed[Real]
+    with Trig[Real] {
   def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 

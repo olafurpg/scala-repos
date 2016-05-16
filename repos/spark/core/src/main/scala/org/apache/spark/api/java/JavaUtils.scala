@@ -40,7 +40,9 @@ private[spark] object JavaUtils {
   // Serializable since the MapWrapper class has no no-arg constructor. This class
   // doesn't need a no-arg constructor though.
   class SerializableMapWrapper[A, B](underlying: collection.Map[A, B])
-      extends ju.AbstractMap[A, B] with java.io.Serializable { self =>
+      extends ju.AbstractMap[A, B]
+      with java.io.Serializable {
+    self =>
 
     override def size: Int = underlying.size
 

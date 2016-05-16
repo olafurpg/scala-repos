@@ -76,8 +76,8 @@ class ConsumerFetcherManager(private val consumerIdString: String,
                               correlationId.getAndIncrement)
           .topicsMetadata
         if (logger.isDebugEnabled)
-          topicsMetadata.foreach(
-              topicMetadata => debug(topicMetadata.toString()))
+          topicsMetadata.foreach(topicMetadata =>
+                debug(topicMetadata.toString()))
         topicsMetadata.foreach { tmd =>
           val topic = tmd.topic
           tmd.partitionsMetadata.foreach { pmd =>

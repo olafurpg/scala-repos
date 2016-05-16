@@ -9,7 +9,8 @@ import org.ensime.util.EnsimeSpec
 import scala.reflect.internal.util.RangePosition
 
 class SemanticHighlightingSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 
@@ -211,8 +212,7 @@ class SemanticHighlightingSpec
             """,
         List(ImportedNameSymbol)
     )
-    sds should ===(
-        List(
+    sds should ===(List(
             (ImportedNameSymbol, "RangePosition"),
             (ImportedNameSymbol, "Matchers"),
             (ImportedNameSymbol, "FunSpec")
@@ -278,8 +278,7 @@ class SemanticHighlightingSpec
           """,
         List(PackageSymbol)
     )
-    sds should ===(
-        List(
+    sds should ===(List(
             (PackageSymbol, "com"),
             (PackageSymbol, "example"),
             (PackageSymbol, "other")
@@ -382,8 +381,7 @@ class SemanticHighlightingSpec
           """,
         List(ValSymbol)
     )
-    sds should ===(
-        List(
+    sds should ===(List(
             (ValSymbol, "u"),
             (ValSymbol, "v"),
             (ValSymbol, "u")
@@ -432,8 +430,7 @@ class SemanticHighlightingSpec
           """,
         List(VarSymbol)
     )
-    sds should ===(
-        List(
+    sds should ===(List(
             (VarSymbol, "u"),
             (VarSymbol, "v"),
             (VarSymbol, "u")

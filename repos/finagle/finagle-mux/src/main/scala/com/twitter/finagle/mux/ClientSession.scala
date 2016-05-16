@@ -99,13 +99,14 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
 
       writeLk.lockInterruptibly()
       try {
-        state = if (outstanding.get() > 0) Draining
-        else {
-          if (log.isLoggable(Level.FINE))
-            safeLog(s"Finished draining a connection to $name", Level.FINE)
-          drainedCounter.incr()
-          Drained
-        }
+        state =
+          if (outstanding.get() > 0) Draining
+          else {
+            if (log.isLoggable(Level.FINE))
+              safeLog(s"Finished draining a connection to $name", Level.FINE)
+            drainedCounter.incr()
+            Drained
+          }
         trans.write(Message.Rdrain(tag))
       } finally writeLk.unlock()
 

@@ -36,8 +36,8 @@ final case class PluginManagement(overrides: Set[ModuleID],
     copy(context = Context(globalPluginProject = true, pluginProjectDepth = 0))
   def forPlugin: PluginManagement =
     copy(
-        context = context.copy(
-              pluginProjectDepth = context.pluginProjectDepth + 1))
+        context =
+          context.copy(pluginProjectDepth = context.pluginProjectDepth + 1))
 }
 object PluginManagement {
   final case class Context private[sbt](

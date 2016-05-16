@@ -43,49 +43,55 @@ object Macros {
       }
     // q"import scala.language.experimental.macros; class Workaround { ..$fields }; new Workaround{}"
     c.Expr[Any](
-        Block(
-            List(
-                Import(
-                    Select(Select(Ident(TermName("scala")),
-                                  TermName("language")),
-                           TermName("experimental")),
-                    List(ImportSelector(
-                            TermName("macros"), 51, TermName("macros"), 51))),
-                ClassDef(
-                    NoMods,
-                    TypeName("Workaround"),
-                    Nil,
-                    Template(
-                        List(Select(Ident(TermName("scala")),
-                                    TypeName("AnyRef"))),
-                        noSelfType,
-                        DefDef(NoMods,
-                               termNames.CONSTRUCTOR,
-                               Nil,
-                               List(Nil),
-                               TypeTree(),
-                               Block(List(Apply(Select(Super(This(typeNames.EMPTY), typeNames.EMPTY), termNames.CONSTRUCTOR),
-                                                List())),
-                                     Literal(Constant(())))) +: fields)),
-                ClassDef(
-                    Modifiers(FINAL),
-                    TypeName("$anon"),
-                    Nil,
-                    Template(
-                        List(Ident(TypeName("Workaround"))),
-                        noSelfType,
-                        List(DefDef(
-                                NoMods,
-                                termNames.CONSTRUCTOR,
-                                Nil,
-                                List(Nil),
-                                TypeTree(),
-                                Block(List(Apply(Select(Super(This(typeNames.EMPTY),
-                                                              typeNames.EMPTY),
-                                                        termNames.CONSTRUCTOR),
-                                                 List())),
-                                      Literal(Constant(())))))))),
-            Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR),
+        Block(List(Import(Select(Select(Ident(TermName("scala")),
+                                        TermName("language")),
+                                 TermName("experimental")),
+                          List(ImportSelector(TermName("macros"),
+                                              51,
+                                              TermName("macros"),
+                                              51))),
+                   ClassDef(
+                       NoMods,
+                       TypeName("Workaround"),
+                       Nil,
+                       Template(
+                           List(Select(Ident(TermName("scala")),
+                                       TypeName("AnyRef"))),
+                           noSelfType,
+                           DefDef(NoMods,
+                                  termNames.CONSTRUCTOR,
+                                  Nil,
+                                  List(Nil),
+                                  TypeTree(),
+                                  Block(List(Apply(Select(Super(This(typeNames.EMPTY),
+                                                                typeNames.EMPTY),
+                                                          termNames.CONSTRUCTOR),
+                                                   List())),
+                                        Literal(Constant(())))) +: fields)),
+                   ClassDef(
+                       Modifiers(FINAL),
+                       TypeName("$anon"),
+                       Nil,
+                       Template(
+                           List(Ident(TypeName("Workaround"))),
+                           noSelfType,
+                           List(
+                               DefDef(
+                                   NoMods,
+                                   termNames.CONSTRUCTOR,
+                                   Nil,
+                                   List(Nil),
+                                   TypeTree(),
+                                   Block(
+                                       List(Apply(
+                                               Select(
+                                                   Super(This(typeNames.EMPTY),
+                                                         typeNames.EMPTY),
+                                                   termNames.CONSTRUCTOR),
+                                               List())),
+                                       Literal(Constant(())))))))),
+              Apply(
+                  Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR),
                   List())))
   }
 }

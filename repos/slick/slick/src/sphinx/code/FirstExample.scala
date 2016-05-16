@@ -65,11 +65,11 @@ object FirstExample extends App {
         (suppliers.schema ++ coffees.schema).create,
         // Insert some suppliers
         suppliers +=
-        (101, "Acme, Inc.", "99 Market Street", "Groundsville", "CA", "95199"),
+          (101, "Acme, Inc.", "99 Market Street", "Groundsville", "CA", "95199"),
         suppliers +=
-        (49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460"),
+          (49, "Superior Coffee", "1 Party Place", "Mendocino", "CA", "95460"),
         suppliers +=
-        (150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966"),
+          (150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966"),
         // Equivalent SQL code:
         // insert into SUPPLIERS(SUP_ID, SUP_NAME, STREET, CITY, STATE, ZIP) values (?,?,?,?,?,?)
 
@@ -94,8 +94,8 @@ object FirstExample extends App {
       db.run(coffees.result)
         .map(_.foreach {
           case (name, supID, price, sales, total) =>
-            println("  " + name + "\t" + supID +
-                "\t" + price + "\t" + sales + "\t" + total)
+            println("  " + name + "\t" + supID + "\t" + price +
+                "\t" + sales + "\t" + total)
         })
       // Equivalent SQL code:
       // select COF_NAME, SUP_ID, PRICE, SALES, TOTAL from COFFEES

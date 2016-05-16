@@ -8,7 +8,8 @@ import org.ensime.util.EnsimeSpec
 import scala.reflect.internal.util.{OffsetPosition, RangePosition}
 
 class ImplicitAnalyzerSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 

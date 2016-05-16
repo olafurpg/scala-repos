@@ -571,7 +571,7 @@ trait TraitPreference[This <: android.preference.Preference] {
     })
     basis
   }
-  @inline def setIntent[T : ClassTag](implicit context: Context): Unit =
+  @inline def setIntent[T: ClassTag](implicit context: Context): Unit =
     basis.setIntent(SIntent[T])
 }
 

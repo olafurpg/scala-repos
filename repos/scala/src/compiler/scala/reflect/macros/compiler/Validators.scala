@@ -49,28 +49,26 @@ trait Validators { self: DefaultMacroCompiler =>
       // type parameters of macro defs and macro impls don't have to coincide with each other
       if (aparamss.length != rparamss.length) MacroImplParamssMismatchError()
       map2(aparamss, rparamss)(
-          (aparams, rparams) =>
-            {
-          if (aparams.length < rparams.length)
-            MacroImplMissingParamsError(aparams, rparams)
-          if (rparams.length < aparams.length)
-            MacroImplExtraParamsError(aparams, rparams)
+          (aparams, rparams) => {
+        if (aparams.length < rparams.length)
+          MacroImplMissingParamsError(aparams, rparams)
+        if (rparams.length < aparams.length)
+          MacroImplExtraParamsError(aparams, rparams)
       })
 
       try {
         // cannot fuse this map2 and the map2 above because if aparamss.flatten != rparamss.flatten
         // then `atpeToRtpe` is going to fail with an unsound substitution
-        map2(aparamss.flatten, rparamss.flatten)((aparam, rparam) =>
-              {
-            if (aparam.name != rparam.name && !rparam.isSynthetic)
-              MacroImplParamNameMismatchError(aparam, rparam)
-            if (isRepeated(aparam) ^ isRepeated(rparam))
-              MacroImplVarargMismatchError(aparam, rparam)
-            val aparamtpe = aparam.tpe match {
-              case MacroContextType(tpe) => tpe
-              case tpe => tpe
-            }
-            checkMacroImplParamTypeMismatch(atpeToRtpe(aparamtpe), rparam)
+        map2(aparamss.flatten, rparamss.flatten)((aparam, rparam) => {
+          if (aparam.name != rparam.name && !rparam.isSynthetic)
+            MacroImplParamNameMismatchError(aparam, rparam)
+          if (isRepeated(aparam) ^ isRepeated(rparam))
+            MacroImplVarargMismatchError(aparam, rparam)
+          val aparamtpe = aparam.tpe match {
+            case MacroContextType(tpe) => tpe
+            case tpe => tpe
+          }
+          checkMacroImplParamTypeMismatch(atpeToRtpe(aparamtpe), rparam)
         })
 
         checkMacroImplResultTypeMismatch(atpeToRtpe(aret), rret)
@@ -204,8 +202,8 @@ trait Validators { self: DefaultMacroCompiler =>
             case ThisType(sym) if sym == macroDef.owner =>
               singleType(singleType(ctxPrefix, MacroContextPrefix), ExprValue)
             case SingleType(NoPrefix, sym) =>
-              mfind(macroDdef.vparamss)(_.symbol == sym).fold(pre)(
-                  p => singleType(singleType(NoPrefix, param(p)), ExprValue))
+              mfind(macroDdef.vparamss)(_.symbol == sym).fold(pre)(p =>
+                    singleType(singleType(NoPrefix, param(p)), ExprValue))
             case _ =>
               mapOver(pre)
           }

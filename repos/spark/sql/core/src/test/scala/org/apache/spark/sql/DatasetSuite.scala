@@ -141,11 +141,12 @@ class DatasetSuite extends QueryTest with SharedSQLContext {
 
   test("select 2") {
     val ds = Seq(("a", 1), ("b", 2), ("c", 3)).toDS()
-    checkDataset(ds.select(expr("_1").as[String], expr("_2").as[Int]): Dataset[
-                     (String, Int)],
-                 ("a", 1),
-                 ("b", 2),
-                 ("c", 3))
+    checkDataset(
+        ds.select(expr("_1").as[String], expr("_2").as[Int]): Dataset[(String,
+                                                                       Int)],
+        ("a", 1),
+        ("b", 2),
+        ("c", 3))
   }
 
   test("select 2, primitive and tuple") {

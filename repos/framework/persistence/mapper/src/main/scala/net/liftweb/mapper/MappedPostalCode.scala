@@ -95,8 +95,7 @@ abstract class MappedTimeZone[T <: Mapper[T]](owner: T)
   }
 
   override def _toForm: Box[Elem] =
-    Full(
-        SHtml.select(MappedTimeZone.timeZoneList, Full(this.get), set) %
+    Full(SHtml.select(MappedTimeZone.timeZoneList, Full(this.get), set) %
         ("id" -> fieldId))
 }
 
@@ -115,8 +114,8 @@ abstract class MappedCountry[T <: Mapper[T]](owner: T)
   override def buildDisplayList: List[(Int, String)] = {
     val collator = java.text.Collator.getInstance(S.locale)
 
-    super.buildDisplayList
-      .sortWith((s1, s2) => collator.compare(s1._2, s2._2) < 0)
+    super.buildDisplayList.sortWith((s1, s2) =>
+          collator.compare(s1._2, s2._2) < 0)
   }
 }
 
@@ -146,16 +145,14 @@ abstract class MappedPostalCode[T <: Mapper[T]](
                S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Australia =>
-      valRegex(REPat.compile("(0?|[1-9])[0-9]{3}"),
-               S.?("invalid.postal.code")) _ :: super.validations
+      valRegex(REPat.compile("(0?|[1-9])[0-9]{3}"), S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Canada =>
       valRegex(REPat.compile("[A-Z][0-9][A-Z][ ][0-9][A-Z][0-9]"),
                S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.Germany =>
-      valRegex(REPat.compile("[0-9]{5}"),
-               S.?("invalid.postal.code")) _ :: super.validations
+      valRegex(REPat.compile("[0-9]{5}"), S.?("invalid.postal.code")) _ :: super.validations
 
     case Countries.UK =>
       valRegex(

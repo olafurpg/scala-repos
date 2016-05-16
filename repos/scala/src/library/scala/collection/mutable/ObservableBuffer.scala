@@ -24,7 +24,8 @@ import script._
 @deprecated(
     "Observables are deprecated because scripting is deprecated.", "2.11.0")
 trait ObservableBuffer[A]
-    extends Buffer[A] with Publisher[Message[A] with Undoable] {
+    extends Buffer[A]
+    with Publisher[Message[A] with Undoable] {
   type Pub <: ObservableBuffer[A]
 
   abstract override def +=(element: A): this.type = {

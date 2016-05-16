@@ -48,7 +48,7 @@ trait CValueGenerators {
   private def indexedSeqOf[A](gen: Gen[A]): Gen[IndexedSeq[A]] =
     containerOfAtMostN[List, A](maxArraySize, gen) map (_.toIndexedSeq)
 
-  private def arrayOf[A : Manifest](gen: Gen[A]): Gen[Array[A]] =
+  private def arrayOf[A: Manifest](gen: Gen[A]): Gen[Array[A]] =
     containerOfAtMostN[List, A](maxArraySize, gen) map (_.toArray)
 
   private def genNonArrayCValueType: Gen[CValueType[_]] =

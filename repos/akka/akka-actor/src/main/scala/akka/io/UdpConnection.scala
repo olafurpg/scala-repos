@@ -22,7 +22,8 @@ private[io] class UdpConnection(udpConn: UdpConnectedExt,
                                 channelRegistry: ChannelRegistry,
                                 commander: ActorRef,
                                 connect: Connect)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import connect._

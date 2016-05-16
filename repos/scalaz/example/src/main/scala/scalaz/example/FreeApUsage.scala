@@ -24,7 +24,7 @@ object FreeApUsage extends App {
   def parseString(key: String) = FreeAp.lift(ParseString(key))
   def parseBool(key: String) = FreeAp.lift(ParseBool(key))
 
-  def parseOpt[A : ClassTag](a: Any): Option[A] =
+  def parseOpt[A: ClassTag](a: Any): Option[A] =
     a match {
       case a: A => Some(a)
       case _ => None

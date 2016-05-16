@@ -2,8 +2,8 @@ import collection._
 import collection.generic._
 
 object Test {
-  def collectIDA[A, B, Repr, That](
-      _this: TraversableLike[A, Repr])(pf: PartialFunction[A, B])(
+  def collectIDA[A, B, Repr, That](_this: TraversableLike[A, Repr])(
+      pf: PartialFunction[A, B])(
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     val repr: Repr = _this.asInstanceOf[Repr]
     val b = bf(repr)
@@ -13,8 +13,8 @@ object Test {
     b.result
   }
 
-  def collectRW[A, B, Repr, That](
-      _this: TraversableLike[A, Repr])(pf: PartialFunction[A, B])(
+  def collectRW[A, B, Repr, That](_this: TraversableLike[A, Repr])(
+      pf: PartialFunction[A, B])(
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     val repr: Repr = _this.asInstanceOf[Repr]
     val b = bf(repr)

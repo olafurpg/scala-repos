@@ -126,7 +126,9 @@ sealed trait BodyPartEntity extends HttpEntity with jm.BodyPartEntity {
   * (But not the other way around, since [[HttpEntity.CloseDelimited]] can only be used for responses!)
   */
 sealed trait RequestEntity
-    extends HttpEntity with jm.RequestEntity with ResponseEntity {
+    extends HttpEntity
+    with jm.RequestEntity
+    with ResponseEntity {
   def withContentType(contentType: ContentType): RequestEntity
 
   /**
@@ -166,7 +168,9 @@ sealed trait ResponseEntity extends HttpEntity with jm.ResponseEntity {
 }
 /* An entity that can be used for requests, responses, and body parts */
 sealed trait UniversalEntity
-    extends jm.UniversalEntity with MessageEntity with BodyPartEntity {
+    extends jm.UniversalEntity
+    with MessageEntity
+    with BodyPartEntity {
   def withContentType(contentType: ContentType): UniversalEntity
 
   /**
@@ -253,7 +257,8 @@ object HttpEntity {
     * The model for the entity of a "regular" unchunked HTTP message with known, fixed data.
     */
   final case class Strict(contentType: ContentType, data: ByteString)
-      extends jm.HttpEntity.Strict with UniversalEntity {
+      extends jm.HttpEntity.Strict
+      with UniversalEntity {
 
     override def contentLength: Long = data.length
 
@@ -323,7 +328,8 @@ object HttpEntity {
   final case class Default(contentType: ContentType,
                            contentLength: Long,
                            data: Source[ByteString, Any])
-      extends jm.HttpEntity.Default with UniversalEntity {
+      extends jm.HttpEntity.Default
+      with UniversalEntity {
     require(
         contentLength > 0,
         "contentLength must be positive (use `HttpEntity.empty(contentType)` for empty entities)")
@@ -346,7 +352,9 @@ object HttpEntity {
       else copy(contentType = contentType)
 
     override def withSizeLimit(maxBytes: Long): HttpEntity.Default =
-      copy(data = data withAttributes Attributes(
+      copy(
+          data =
+            data withAttributes Attributes(
                 SizeLimit(maxBytes, Some(contentLength))))
 
     override def withoutSizeLimit: HttpEntity.Default =
@@ -391,7 +399,8 @@ object HttpEntity {
     */
   final case class CloseDelimited(
       contentType: ContentType, data: Source[ByteString, Any])
-      extends jm.HttpEntity.CloseDelimited with ResponseEntity
+      extends jm.HttpEntity.CloseDelimited
+      with ResponseEntity
       with HttpEntity.WithoutKnownLength {
     type Self = HttpEntity.CloseDelimited
 
@@ -414,7 +423,8 @@ object HttpEntity {
     */
   final case class IndefiniteLength(
       contentType: ContentType, data: Source[ByteString, Any])
-      extends jm.HttpEntity.IndefiniteLength with BodyPartEntity
+      extends jm.HttpEntity.IndefiniteLength
+      with BodyPartEntity
       with HttpEntity.WithoutKnownLength {
     type Self = HttpEntity.IndefiniteLength
 
@@ -436,7 +446,8 @@ object HttpEntity {
     */
   final case class Chunked(
       contentType: ContentType, chunks: Source[ChunkStreamPart, Any])
-      extends jm.HttpEntity.Chunked with MessageEntity {
+      extends jm.HttpEntity.Chunked
+      with MessageEntity {
 
     override def isKnownEmpty = chunks eq Source.empty
     override def contentLengthOption: Option[Long] = None

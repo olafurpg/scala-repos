@@ -60,21 +60,22 @@ object PresentationUtil {
         param.lowerBound foreach {
           case psi.types.Nothing =>
           case tp: ScType =>
-            paramText = paramText + " >: " + presentationString(tp,
-                                                                substitutor)
+            paramText =
+              paramText + " >: " + presentationString(tp, substitutor)
         }
         param.upperBound foreach {
           case psi.types.Any =>
           case tp: ScType =>
-            paramText = paramText + " <: " + presentationString(tp,
-                                                                substitutor)
+            paramText =
+              paramText + " <: " + presentationString(tp, substitutor)
         }
         param.viewBound foreach { (tp: ScType) =>
           paramText = paramText + " <% " + presentationString(tp, substitutor)
         }
         param.contextBound foreach { (tp: ScType) =>
-          paramText = paramText + " : " + presentationString(
-              ScTypeUtil.stripTypeArgs(substitutor.subst(tp)), substitutor)
+          paramText =
+            paramText + " : " + presentationString(
+                ScTypeUtil.stripTypeArgs(substitutor.subst(tp)), substitutor)
         }
         paramText
       case param: PsiTypeParameter =>

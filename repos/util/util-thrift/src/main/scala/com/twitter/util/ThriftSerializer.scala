@@ -56,7 +56,8 @@ class JsonThriftSerializer extends ThriftSerializer {
   *       instead of this is recommended.
   */
 class BinaryThriftSerializer
-    extends ThriftSerializer with Base64StringEncoder {
+    extends ThriftSerializer
+    with Base64StringEncoder {
   override def protocolFactory = new TBinaryProtocol.Factory
 }
 
@@ -64,6 +65,7 @@ class BinaryThriftSerializer
   * A thread-safe [[ThriftSerializer]] that uses [[TCompactProtocol]].
   */
 class CompactThriftSerializer
-    extends ThriftSerializer with Base64StringEncoder {
+    extends ThriftSerializer
+    with Base64StringEncoder {
   override def protocolFactory = new TCompactProtocol.Factory
 }

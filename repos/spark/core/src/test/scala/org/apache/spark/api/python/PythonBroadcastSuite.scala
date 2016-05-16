@@ -30,7 +30,9 @@ import org.apache.spark.util.Utils
 // This test suite uses SharedSparkContext because we need a SparkEnv in order to deserialize
 // a PythonBroadcast:
 class PythonBroadcastSuite
-    extends SparkFunSuite with Matchers with SharedSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with SharedSparkContext {
   test("PythonBroadcast can be serialized with Kryo (SPARK-4882)") {
     val tempDir = Utils.createTempDir()
     val broadcastedString = "Hello, world!"

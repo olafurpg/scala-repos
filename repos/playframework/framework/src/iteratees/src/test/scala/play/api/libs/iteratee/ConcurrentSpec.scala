@@ -13,15 +13,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 object ConcurrentSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Concurrent.broadcast (0-arg)" should {
     "broadcast the same to already registered iteratees" in {
       mustExecute(38) { foldEC =>
         val (broadcaster, pushHere) = Concurrent.broadcast[String]
-        val results = Future.sequence(
-            Range(1, 20)
+        val results = Future.sequence(Range(1, 20)
               .map(_ =>
                     Iteratee.fold[String, String]("") { (s, e) =>
               s + e
@@ -172,16 +172,15 @@ object ConcurrentSpec
         val completeCount = new AtomicInteger()
         val errorCount = new AtomicInteger()
         val enumerator = Concurrent.unicast[String](
-            c =>
-              {
-                startCount.incrementAndGet()
-                c.push(a)
-                c.push(b)
-                c.eofAndEnd()
+            c => {
+              startCount.incrementAndGet()
+              c.push(a)
+              c.push(b)
+              c.eofAndEnd()
             },
             () => completeCount.incrementAndGet(),
             (_: String,
-            _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
+             _: Input[String]) => errorCount.incrementAndGet())(unicastEC)
         val promise =
           (enumerator |>> Iteratee.fold[String, String]("")(_ ++ _)(foldEC))
             .flatMap(_.run)

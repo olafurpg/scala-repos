@@ -138,7 +138,9 @@ object Rule extends Rule0 {
 }
 
 abstract class RuleDSL
-    extends RuleDSLBasics with RuleDSLCombinators with RuleDSLActions
+    extends RuleDSLBasics
+    with RuleDSLCombinators
+    with RuleDSLActions
 
 // phantom type for WithSeparatedBy pimp
 trait Repeated

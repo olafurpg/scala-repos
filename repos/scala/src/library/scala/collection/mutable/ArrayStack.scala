@@ -24,7 +24,7 @@ object ArrayStack extends SeqFactory[ArrayStack] {
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, ArrayStack[A]] = new ArrayStack[A]
   def empty: ArrayStack[Nothing] = new ArrayStack()
-  def apply[A : ClassTag](elems: A*): ArrayStack[A] = {
+  def apply[A: ClassTag](elems: A*): ArrayStack[A] = {
     val els: Array[AnyRef] = elems.reverseMap(_.asInstanceOf[AnyRef])(breakOut)
     if (els.length == 0) new ArrayStack()
     else new ArrayStack[A](els, els.length)
@@ -63,11 +63,14 @@ object ArrayStack extends SeqFactory[ArrayStack] {
 @SerialVersionUID(8565219180626620510L)
 class ArrayStack[T] private (private var table: Array[AnyRef],
                              private var index: Int)
-    extends AbstractSeq[T] with IndexedSeq[T]
+    extends AbstractSeq[T]
+    with IndexedSeq[T]
     with IndexedSeqLike[T, ArrayStack[T]]
     with GenericTraversableTemplate[T, ArrayStack]
-    with IndexedSeqOptimized[T, ArrayStack[T]] with Cloneable[ArrayStack[T]]
-    with Builder[T, ArrayStack[T]] with Serializable {
+    with IndexedSeqOptimized[T, ArrayStack[T]]
+    with Cloneable[ArrayStack[T]]
+    with Builder[T, ArrayStack[T]]
+    with Serializable {
   def this() = this(new Array[AnyRef](1), 0)
 
   /** Retrieve n'th element from stack, where top of stack has index 0.

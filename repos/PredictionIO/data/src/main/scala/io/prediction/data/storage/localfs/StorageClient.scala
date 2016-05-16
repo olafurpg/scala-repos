@@ -22,7 +22,8 @@ import io.prediction.data.storage.StorageClientConfig
 import io.prediction.data.storage.StorageClientException
 
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
   override val prefix = "LocalFS"
   val f = new File(
       config.properties.getOrElse("PATH", config.properties("HOSTS")))

@@ -23,7 +23,7 @@ class ScalaGoToClassContributor extends ChooseByNameContributor {
     val packageObjectNames = StubIndex
       .getInstance()
       .getAllKeys(ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY, project)
-      (classNames ++ packageObjectNames).toArray
+    (classNames ++ packageObjectNames).toArray
   }
 
   def getItemsByName(

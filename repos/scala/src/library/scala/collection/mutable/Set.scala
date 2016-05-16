@@ -24,7 +24,8 @@ import generic._
 trait Set[A]
     extends Iterable[A]
 //                with GenSet[A]
-    with scala.collection.Set[A] with GenericSetTemplate[A, Set]
+    with scala.collection.Set[A]
+    with GenericSetTemplate[A, Set]
     with SetLike[A, Set[A]] {
   override def companion: GenericCompanion[Set] = Set
   override def seq: Set[A] = this

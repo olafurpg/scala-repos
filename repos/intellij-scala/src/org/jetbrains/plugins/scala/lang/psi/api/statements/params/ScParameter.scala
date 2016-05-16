@@ -31,8 +31,11 @@ import scala.collection.immutable.HashSet
   * Date: 22.02.2008
   */
 trait ScParameter
-    extends ScTypedDefinition with ScModifierListOwner with PsiParameter
-    with ScAnnotationsHolder with ScImportableDeclarationsOwner {
+    extends ScTypedDefinition
+    with ScModifierListOwner
+    with PsiParameter
+    with ScAnnotationsHolder
+    with ScImportableDeclarationsOwner {
   def getTypeElement: PsiTypeElement
 
   def isWildcard: Boolean = "_" == name

@@ -60,7 +60,8 @@ class OptimizeScalar extends Phase {
       case LiteralNode(v) =>
         Some(
             if (n.nodeType.structural.isInstanceOf[OptionType])
-              v.asInstanceOf[Option[Any]] else Some(v))
+              v.asInstanceOf[Option[Any]]
+            else Some(v))
       case Apply(Library.SilentCast, ConstArray(ch)) => unapply(ch)
       case OptionApply(ch) => unapply(ch).map(_.map(Option.apply _))
       case _ => None

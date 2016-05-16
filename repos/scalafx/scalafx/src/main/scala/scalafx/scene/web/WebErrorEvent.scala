@@ -97,7 +97,8 @@ object WebErrorEvent {
   * @since 8.0
   */
 final class WebErrorEvent(override val delegate: jfxsw.WebErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsw.WebErrorEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsw.WebErrorEvent] {
 
   /**
     * Creates a new WebErrorEvent.

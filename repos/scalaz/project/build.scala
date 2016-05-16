@@ -33,19 +33,17 @@ object build extends Build {
   val isJSProject = SettingKey[Boolean]("isJSProject")
 
   lazy val publishSignedArtifacts = ReleaseStep(
-      action = st =>
-          {
-          val extracted = st.extract
-          val ref = extracted.get(thisProjectRef)
-          extracted.runAggregated(publishSigned in Global in ref, st)
+      action = st => {
+        val extracted = st.extract
+        val ref = extracted.get(thisProjectRef)
+        extracted.runAggregated(publishSigned in Global in ref, st)
       },
-      check = st =>
-          {
-          // getPublishTo fails if no publish repository is set up.
-          val ex = st.extract
-          val ref = ex.get(thisProjectRef)
-          Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
-          st
+      check = st => {
+        // getPublishTo fails if no publish repository is set up.
+        val ex = st.extract
+        val ref = ex.get(thisProjectRef)
+        Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
+        st
       },
       enableCrossBuild = true
   )
@@ -59,7 +57,8 @@ object build extends Build {
   def scalac210Options = Seq("-Yno-generic-signatures")
 
   private[this] val tagName = Def.setting {
-    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value
+    else version.value}"
   }
   private[this] val tagOrHash = Def.setting {
     if (isSnapshot.value) gitHash() else tagName.value
@@ -101,9 +100,9 @@ object build extends Build {
         organization := "org.scalaz",
         scalaVersion := "2.10.6",
         crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M3"),
-        resolvers ++=
-        (if (scalaVersion.value.endsWith("-SNAPSHOT"))
-           List(Opts.resolver.sonatypeSnapshots) else Nil),
+        resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT"))
+                         List(Opts.resolver.sonatypeSnapshots)
+                       else Nil),
         fullResolvers ~= { _.filterNot(_.name == "jcenter") }, // https://github.com/sbt/sbt/issues/2217
         scalaCheckVersion := "1.12.5",
         scalacOptions ++= Seq(
@@ -182,10 +181,10 @@ object build extends Build {
         typeClassTree <<= typeClasses map { tcs =>
           tcs.map(_.doc).mkString("\n")
         },
-        showDoc in Compile <<=
-          (doc in Compile, target in doc in Compile) map { (_, out) =>
-          val index = out / "index.html"
-          if (index.exists()) Desktop.getDesktop.open(out / "index.html")
+        showDoc in Compile <<= (doc in Compile, target in doc in Compile) map {
+          (_, out) =>
+            val index = out / "index.html"
+            if (index.exists()) Desktop.getDesktop.open(out / "index.html")
         },
         credentialsSetting,
         publishSetting,
@@ -273,13 +272,15 @@ object build extends Build {
   lazy val scalaz = Project(
       id = "scalaz",
       base = file("."),
-      settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+      settings =
+        standardSettings ++ unidocSettings ++ Seq[Sett](
             artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
             packagedArtifacts <<=
               Classpaths.packaged(Seq(packageDoc in Compile)),
             unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-            jsProjects.foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
-          }
+              jsProjects.foldLeft(inAnyProject)((acc,
+                                                 a) => acc -- inProjects(a))
+            }
         ) ++ Defaults.packageTaskSettings(
             packageDoc in Compile,
             (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
@@ -307,16 +308,17 @@ object build extends Build {
   lazy val core = crossProject
     .crossType(ScalazCrossType)
     .settings(standardSettings: _*)
-    .settings(
-        name := "scalaz-core",
-        sourceGenerators in Compile <+= (sourceManaged in Compile) map { dir =>
-          Seq(GenerateTupleW(dir), TupleNInstances(dir))
-        },
-        buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-        buildInfoPackage := "scalaz",
-        buildInfoObject := "ScalazBuildInfo",
-        osgiExport("scalaz"),
-        OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    .settings(name := "scalaz-core",
+              sourceGenerators in Compile <+=
+                (sourceManaged in Compile) map { dir =>
+                Seq(GenerateTupleW(dir), TupleNInstances(dir))
+              },
+              buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+              buildInfoPackage := "scalaz",
+              buildInfoObject := "ScalazBuildInfo",
+              osgiExport("scalaz"),
+              OsgiKeys.importPackage :=
+                Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
         scalajsProjectSettings ++ Seq(
@@ -342,7 +344,8 @@ object build extends Build {
   lazy val concurrent = Project(
       id = "concurrent",
       base = file("concurrent"),
-      settings = standardSettings ++ Seq(
+      settings =
+        standardSettings ++ Seq(
             name := ConcurrentName,
             typeClasses := TypeClass.concurrent,
             osgiExport("scalaz.concurrent"),
@@ -382,7 +385,8 @@ object build extends Build {
       id = "example",
       base = file("example"),
       dependencies = Seq(coreJVM, iterateeJVM, concurrent),
-      settings = standardSettings ++ Seq[Sett](
+      settings =
+        standardSettings ++ Seq[Sett](
             name := "scalaz-example",
             publishArtifact := false
         )

@@ -504,49 +504,59 @@ object DAGSpecs extends Specification with DAG with FNDummyModule {
                  Merge))
 
       val expectedSpec = IntersectBucketSpec(
-          IntersectBucketSpec(
-              dag.Group(
-                  0,
-                  Join(DerefObject,
-                       Cross(None),
-                       dag.AbsoluteLoad(Const(CString("/organizations"))(line),
-                                        JType.JUniverseT)(line),
-                       Const(CString("revenue"))(line))(line),
-                  UnfixedSolution(1,
+          IntersectBucketSpec(dag
+                                .Group(0,
+                                       Join(
+                                           DerefObject,
+                                           Cross(None),
+                                           dag.AbsoluteLoad(
+                                               Const(CString("/organizations"))(
+                                                   line),
+                                               JType.JUniverseT)(line),
+                                           Const(CString("revenue"))(line))(
+                                           line),
+                                       UnfixedSolution(
+                                           1,
+                                           Join(DerefObject,
+                                                Cross(None),
+                                                dag.AbsoluteLoad(
+                                                    Const(CString(
+                                                            "/organizations"))(
+                                                        line),
+                                                    JType.JUniverseT)(line),
+                                                Const(CString("revenue"))(
+                                                    line))(line))),
+                              dag.Group(
+                                  2,
                                   Join(DerefObject,
                                        Cross(None),
                                        dag.AbsoluteLoad(
                                            Const(CString("/organizations"))(
                                                line),
                                            JType.JUniverseT)(line),
-                                       Const(CString("revenue"))(line))(
-                                      line))),
-              dag.Group(
-                  2,
+                                       Const(CString("campaign"))(line))(line),
+                                  UnfixedSolution(
+                                      3,
+                                      Join(
+                                          DerefObject,
+                                          Cross(None),
+                                          dag.AbsoluteLoad(
+                                              Const(CString("/organizations"))(
+                                                  line),
+                                              JType.JUniverseT)(line),
+                                          Const(CString("campaign"))(line))(
+                                          line)))),
+          dag.Group(
+              4,
+              dag.AbsoluteLoad(Const(CString("/campaigns"))(line),
+                               JType.JUniverseT)(line),
+              UnfixedSolution(
+                  3,
                   Join(DerefObject,
                        Cross(None),
-                       dag.AbsoluteLoad(Const(CString("/organizations"))(line),
+                       dag.AbsoluteLoad(Const(CString("/campaigns"))(line),
                                         JType.JUniverseT)(line),
-                       Const(CString("campaign"))(line))(line),
-                  UnfixedSolution(
-                      3,
-                      Join(DerefObject,
-                           Cross(None),
-                           dag.AbsoluteLoad(
-                               Const(CString("/organizations"))(line),
-                               JType.JUniverseT)(line),
-                           Const(CString("campaign"))(line))(line)))),
-          dag.Group(4,
-                    dag.AbsoluteLoad(Const(CString("/campaigns"))(line),
-                                     JType.JUniverseT)(line),
-                    UnfixedSolution(
-                        3,
-                        Join(DerefObject,
-                             Cross(None),
-                             dag.AbsoluteLoad(
-                                 Const(CString("/campaigns"))(line),
-                                 JType.JUniverseT)(line),
-                             Const(CString("campaign"))(line))(line))))
+                       Const(CString("campaign"))(line))(line))))
 
       val expectedTarget = Join(
           JoinObject,

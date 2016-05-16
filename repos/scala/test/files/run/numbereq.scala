@@ -11,11 +11,14 @@ object Test {
     )
     val extras = List(
         if (x >= Short.MinValue && x <= Short.MaxValue)
-          List(new java.lang.Short(x.toShort)) else Nil,
+          List(new java.lang.Short(x.toShort))
+        else Nil,
         if (x >= Byte.MinValue && x <= Byte.MaxValue)
-          List(new java.lang.Byte(x.toByte)) else Nil,
+          List(new java.lang.Byte(x.toByte))
+        else Nil,
         if (x >= Char.MinValue && x <= Char.MaxValue)
-          List(new java.lang.Character(x.toChar)) else Nil
+          List(new java.lang.Character(x.toChar))
+        else Nil
     ).flatten
 
     base ::: extras

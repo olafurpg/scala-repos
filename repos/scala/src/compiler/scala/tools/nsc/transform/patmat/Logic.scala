@@ -444,7 +444,8 @@ trait Logic extends Debugging {
 
 trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
   trait TreesAndTypesDomain
-      extends PropositionalLogic with CheckableTreeAndTypeAnalysis {
+      extends PropositionalLogic
+      with CheckableTreeAndTypeAnalysis {
     type Type = global.Type
     type Tree = global.Tree
     import global.definitions.ConstantNull
@@ -819,11 +820,12 @@ trait ScalaLogic extends Interface with Logic with TreeAndTypeAnalysis {
             if (hasStableSymbol(p)) p.symbol.name.toString // tp.toString
             else p.toString //+"#"+ id
 
-          Const.unique(narrowTp,
-                       new ValueConst(
-                           narrowTp,
-                           checkableType(wideTp),
-                           toString)) // must make wide type checkable so that it is comparable to types from TypeConst
+          Const.unique(
+              narrowTp,
+              new ValueConst(
+                  narrowTp,
+                  checkableType(wideTp),
+                  toString)) // must make wide type checkable so that it is comparable to types from TypeConst
         }
       }
     }

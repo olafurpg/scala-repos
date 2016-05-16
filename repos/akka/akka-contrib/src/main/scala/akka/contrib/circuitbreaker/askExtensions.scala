@@ -93,10 +93,10 @@ final class CircuitBreakerAwareFuture(val future: Future[Any]) extends AnyVal {
 
 final class AskeableWithCircuitBreakerActor(val actorRef: ActorRef)
     extends AnyVal {
-  def askWithCircuitBreaker(
-      message: Any)(implicit executionContext: ExecutionContext,
-                    timeout: Timeout,
-                    sender: ActorRef = Actor.noSender): Future[Any] =
+  def askWithCircuitBreaker(message: Any)(
+      implicit executionContext: ExecutionContext,
+      timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAskWithCircuitBreaker(message, timeout, sender)
 
   @throws[OpenCircuitException]
@@ -113,10 +113,10 @@ final class AskeableWithCircuitBreakerActor(val actorRef: ActorRef)
 final class AskeableWithCircuitBreakerActorSelection(
     val actorSelection: ActorSelection)
     extends AnyVal {
-  def askWithCircuitBreaker(
-      message: Any)(implicit executionContext: ExecutionContext,
-                    timeout: Timeout,
-                    sender: ActorRef = Actor.noSender): Future[Any] =
+  def askWithCircuitBreaker(message: Any)(
+      implicit executionContext: ExecutionContext,
+      timeout: Timeout,
+      sender: ActorRef = Actor.noSender): Future[Any] =
     internalAskWithCircuitBreaker(message, timeout, sender)
 
   private[circuitbreaker] def internalAskWithCircuitBreaker(

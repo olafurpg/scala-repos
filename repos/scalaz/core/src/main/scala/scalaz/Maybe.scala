@@ -169,8 +169,8 @@ object Maybe extends MaybeInstances {
   final def fromOption[A](oa: Option[A]): Maybe[A] =
     std.option.cata(oa)(just, empty)
 
-  def fromTryCatchThrowable[T, E <: Throwable](a: => T)(
-      implicit nn: NotNothing[E], ex: ClassTag[E]): Maybe[T] =
+  def fromTryCatchThrowable[T, E <: Throwable](
+      a: => T)(implicit nn: NotNothing[E], ex: ClassTag[E]): Maybe[T] =
     try {
       just(a)
     } catch {
@@ -188,11 +188,11 @@ object Maybe extends MaybeInstances {
 sealed abstract class MaybeInstances {
   import Maybe._
 
-  implicit def maybeEqual[A : Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
+  implicit def maybeEqual[A: Equal]: Equal[Maybe[A]] = new MaybeEqual[A] {
     def A = implicitly
   }
 
-  implicit def maybeOrder[A : Order]: Order[Maybe[A]] =
+  implicit def maybeOrder[A: Order]: Order[Maybe[A]] =
     new Order[Maybe[A]] with MaybeEqual[A] {
       def A = implicitly
 
@@ -260,10 +260,10 @@ sealed abstract class MaybeInstances {
       })
   }
 
-  implicit def maybeMinShow[A : Show]: Show[MinMaybe[A]] =
+  implicit def maybeMinShow[A: Show]: Show[MinMaybe[A]] =
     Tag.subst(Show[Maybe[A]])
 
-  implicit def maybeMinOrder[A : Order]: Order[MinMaybe[A]] =
+  implicit def maybeMinOrder[A: Order]: Order[MinMaybe[A]] =
     Tag.subst(Order[Maybe[A]])
 
   implicit def maybeMinMonad: Monad[MinMaybe] =
@@ -282,10 +282,10 @@ sealed abstract class MaybeInstances {
       })
   }
 
-  implicit def maybeMaxShow[A : Show]: Show[MaxMaybe[A]] =
+  implicit def maybeMaxShow[A: Show]: Show[MaxMaybe[A]] =
     Tag.subst(Show[Maybe[A]])
 
-  implicit def maybeMaxOrder[A : Order]: Order[MaxMaybe[A]] =
+  implicit def maybeMaxOrder[A: Order]: Order[MaxMaybe[A]] =
     Tag.subst(Order[Maybe[A]])
 
   implicit def maybeMaxMonad: Monad[MaxMaybe] =

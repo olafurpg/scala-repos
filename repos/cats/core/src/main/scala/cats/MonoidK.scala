@@ -49,7 +49,8 @@ trait MonoidK[F[_]] extends SemigroupK[F] { self =>
 }
 
 trait CompositeMonoidK[F[_], G[_]]
-    extends MonoidK[λ[α => F[G[α]]]] with CompositeSemigroupK[F, G] {
+    extends MonoidK[λ[α => F[G[α]]]]
+    with CompositeSemigroupK[F, G] {
 
   implicit def F: MonoidK[F]
 

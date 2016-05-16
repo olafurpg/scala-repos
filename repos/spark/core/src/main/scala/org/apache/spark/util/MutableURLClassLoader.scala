@@ -86,10 +86,8 @@ private[spark] class ChildFirstURLClassLoader(
 
   override def getResources(name: String): Enumeration[URL] = {
     val childUrls = super.findResources(name).asScala
-    val parentUrls = parentClassLoader
-      .getResources(name)
-      .asScala
-      (childUrls ++ parentUrls).asJavaEnumeration
+    val parentUrls = parentClassLoader.getResources(name).asScala
+    (childUrls ++ parentUrls).asJavaEnumeration
   }
 
   override def addURL(url: URL) {

@@ -114,7 +114,7 @@ abstract class AbstractTable[T](
   def tableConstraints: Iterator[Constraint] =
     for {
       m <- getClass().getMethods.iterator if m.getParameterTypes.length == 0 &&
-          classOf[Constraint].isAssignableFrom(m.getReturnType)
+      classOf[Constraint].isAssignableFrom(m.getReturnType)
       q = m.invoke(this).asInstanceOf[Constraint]
     } yield q
 
@@ -135,6 +135,6 @@ abstract class AbstractTable[T](
   def indexes: Iterable[Index] =
     (for {
       m <- getClass().getMethods.view if m.getReturnType == classOf[Index] &&
-          m.getParameterTypes.length == 0
+      m.getParameterTypes.length == 0
     } yield m.invoke(this).asInstanceOf[Index]).sortBy(_.name)
 }

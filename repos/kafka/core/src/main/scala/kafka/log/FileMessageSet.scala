@@ -47,7 +47,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
                                     private[log] val start: Int,
                                     private[log] val end: Int,
                                     isSlice: Boolean)
-    extends MessageSet with Logging {
+    extends MessageSet
+    with Logging {
 
   /* the size of the message set in bytes */
   private val _size =
@@ -120,11 +121,11 @@ class FileMessageSet private[kafka](@volatile var file: File,
     if (position < 0)
       throw new IllegalArgumentException("Invalid position: " + position)
     if (size < 0) throw new IllegalArgumentException("Invalid size: " + size)
-    new FileMessageSet(
-        file,
-        channel,
-        start = this.start + position,
-        end = math.min(this.start + position + size, sizeInBytes()))
+    new FileMessageSet(file,
+                       channel,
+                       start = this.start + position,
+                       end =
+                         math.min(this.start + position + size, sizeInBytes()))
   }
 
   /**
@@ -240,8 +241,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
 
     // We use the offset seq to assign offsets so the offset of the messages does not change.
     new ByteBufferMessageSet(compressionCodec = this.headOption
-                                 .map(_.message.compressionCodec)
-                                 .getOrElse(NoCompressionCodec),
+                               .map(_.message.compressionCodec)
+                               .getOrElse(NoCompressionCodec),
                              offsetSeq = offsets,
                              newMessages: _*)
   }
@@ -370,7 +371,8 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * @throws IOException if rename fails.
     */
   def renameTo(f: File) {
-    try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file = f
+    try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file =
+      f
   }
 }
 

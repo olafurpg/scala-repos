@@ -129,14 +129,14 @@ class ContentSecurityPolicySpec extends Specification {
           styleSources = Nil,
           reportUri = None,
           scriptSources = List(
-                ContentSourceRestriction.All,
-                ContentSourceRestriction.Host("https://base.*.example.com"),
-                ContentSourceRestriction.Scheme("data"),
-                ContentSourceRestriction.None,
-                ContentSourceRestriction.Self,
-                ContentSourceRestriction.UnsafeInline,
-                ContentSourceRestriction.UnsafeEval
-            )
+              ContentSourceRestriction.All,
+              ContentSourceRestriction.Host("https://base.*.example.com"),
+              ContentSourceRestriction.Scheme("data"),
+              ContentSourceRestriction.None,
+              ContentSourceRestriction.Self,
+              ContentSourceRestriction.UnsafeInline,
+              ContentSourceRestriction.UnsafeEval
+          )
       ).headers(enforce = true).head._2 must_== "script-src * https://base.*.example.com data: 'none' 'self' 'unsafe-inline' 'unsafe-eval'"
     }
 
@@ -158,8 +158,8 @@ class ContentSecurityPolicySpec extends Specification {
     "combine restrictions for multiple content types correctly" in {
       ContentSecurityPolicy(
           defaultSources = List(ContentSourceRestriction.Self),
-          fontSources = List(
-                ContentSourceRestriction.Host("https://base.*.example.com")),
+          fontSources =
+            List(ContentSourceRestriction.Host("https://base.*.example.com")),
           frameSources = List(ContentSourceRestriction.Scheme("data")),
           imageSources = List(ContentSourceRestriction.All),
           mediaSources = List(ContentSourceRestriction.None),

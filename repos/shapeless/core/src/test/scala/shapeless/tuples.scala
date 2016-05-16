@@ -1772,17 +1772,15 @@ class TupleTests {
 
     {
       val twoByThree = Tuple.fill(2, 3)(None)
-      typed[
-          ((None.type, None.type, None.type), (None.type, None.type, None.type))](
-          twoByThree)
+      typed[((None.type, None.type, None.type),
+             (None.type, None.type, None.type))](twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
     }
 
     {
       val twoByThree = Tuple.fill[None.type](2, 3)(None)
-      typed[
-          ((None.type, None.type, None.type), (None.type, None.type, None.type))](
-          twoByThree)
+      typed[((None.type, None.type, None.type),
+             (None.type, None.type, None.type))](twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
     }
   }

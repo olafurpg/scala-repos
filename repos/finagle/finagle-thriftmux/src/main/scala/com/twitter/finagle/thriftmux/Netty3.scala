@@ -59,14 +59,14 @@ private[finagle] class PipelineFactory(
           2 + (if (header.contexts == null) 0 else header.contexts.size))
 
       contextBuf +=
-      (BufChannelBuffer(Trace.idCtx.marshalId) -> BufChannelBuffer(
+        (BufChannelBuffer(Trace.idCtx.marshalId) -> BufChannelBuffer(
               Trace.idCtx.marshal(richHeader.traceId)))
 
       richHeader.clientId match {
         case Some(clientId) =>
           val clientIdBuf = ClientId.clientIdCtx.marshal(Some(clientId))
           contextBuf +=
-          (BufChannelBuffer(ClientId.clientIdCtx.marshalId) -> BufChannelBuffer(
+            (BufChannelBuffer(ClientId.clientIdCtx.marshalId) -> BufChannelBuffer(
                   clientIdBuf))
         case None =>
       }

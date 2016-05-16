@@ -27,7 +27,8 @@ object Flag {
   */
 @SerialVersionUID(1L)
 final case class Flag(enabled: Boolean)
-    extends ReplicatedData with ReplicatedDataSerialization {
+    extends ReplicatedData
+    with ReplicatedDataSerialization {
 
   type T = Flag
 
@@ -46,4 +47,5 @@ object FlagKey {
 
 @SerialVersionUID(1L)
 final case class FlagKey(_id: String)
-    extends Key[Flag](_id) with ReplicatedDataSerialization
+    extends Key[Flag](_id)
+    with ReplicatedDataSerialization

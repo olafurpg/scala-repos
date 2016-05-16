@@ -36,7 +36,8 @@ trait StaticInlinerModule[M[+ _]] extends DAG with EvaluatorMethodsModule[M] {
 }
 
 trait StdLibStaticInlinerModule[M[+ _]]
-    extends StaticInlinerModule[M] with StdLibModule[M] {
+    extends StaticInlinerModule[M]
+    with StdLibModule[M] {
   import dag._
   import library._
   import instructions._
@@ -59,17 +60,16 @@ trait StdLibStaticInlinerModule[M[+ _]]
                           val newOp1 = op1ForUnOp(op)
                           newOp1.fold(
                               _ => Operate(op, child2)(graph.loc),
-                              newOp1 =>
-                                {
-                                  val result = for {
-                                    // No Op1F1 that can be applied to a complex RValues
-                                    cvalue <- rValueToCValue(value)
-                                    col <- newOp1
-                                            .f1(MorphContext(ctx, graph))
-                                            .apply(cvalue) if col isDefinedAt 0
-                                  } yield col cValue 0
+                              newOp1 => {
+                                val result = for {
+                                  // No Op1F1 that can be applied to a complex RValues
+                                  cvalue <- rValueToCValue(value)
+                                  col <- newOp1
+                                          .f1(MorphContext(ctx, graph))
+                                          .apply(cvalue) if col isDefinedAt 0
+                                } yield col cValue 0
 
-                                  Const(result getOrElse CUndefined)(graph.loc)
+                                Const(result getOrElse CUndefined)(graph.loc)
                               }
                           )
                         }
@@ -184,30 +184,32 @@ trait StdLibStaticInlinerModule[M[+ _]]
                 op2 <- op2ForBinOp(op)
                 op2F2 <- op2.fold(op2 = const(None), op2F2 = { Some(_) })
                 result <- (left2, right2) match {
-                  case (left2 @ Const(CUndefined), _) =>
-                    Some(Const(CUndefined)(left2.loc))
+                           case (left2 @ Const(CUndefined), _) =>
+                             Some(Const(CUndefined)(left2.loc))
 
-                  case (_, right2 @ Const(CUndefined)) =>
-                    Some(Const(CUndefined)(right2.loc))
+                           case (_, right2 @ Const(CUndefined)) =>
+                             Some(Const(CUndefined)(right2.loc))
 
-                  case (
-                      left2 @ Const(leftValue), right2 @ Const(rightValue)) =>
-                    {
-                      val result = for {
-                        // No Op1F1 that can be applied to a complex RValues
-                        leftCValue <- rValueToCValue(leftValue)
-                        rightCValue <- rValueToCValue(rightValue)
-                        col <- op2F2
-                                .f2(MorphContext(ctx, graph))
-                                .partialLeft(leftCValue)
-                                .apply(rightCValue) if col isDefinedAt 0
-                      } yield col cValue 0
+                           case (left2 @ Const(leftValue),
+                                 right2 @ Const(rightValue)) =>
+                             {
+                               val result = for {
+                                 // No Op1F1 that can be applied to a complex RValues
+                                 leftCValue <- rValueToCValue(leftValue)
+                                 rightCValue <- rValueToCValue(rightValue)
+                                 col <- op2F2
+                                         .f2(MorphContext(ctx, graph))
+                                         .partialLeft(leftCValue)
+                                         .apply(rightCValue)
+                                 if col isDefinedAt 0
+                               } yield col cValue 0
 
-                      Some(Const(result getOrElse CUndefined)(graph.loc))
-                    }
+                               Some(Const(result getOrElse CUndefined)(
+                                       graph.loc))
+                             }
 
-                  case _ => None
-                }
+                           case _ => None
+                         }
               } yield result
 
               graphM getOrElse Join(op, sort, left2, right2)(graph.loc)

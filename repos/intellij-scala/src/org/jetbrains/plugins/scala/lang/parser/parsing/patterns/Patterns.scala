@@ -38,7 +38,7 @@ object Patterns {
       case ScalaTokenTypes.tCOMMA =>
         builder.advanceLexer //Ate ,
         var end = false
-        while ( (!end || !underParams) && Pattern.parse(builder)) {
+        while ((!end || !underParams) && Pattern.parse(builder)) {
           builder.getTokenType match {
             case ScalaTokenTypes.tCOMMA => {
                 builder.advanceLexer //Ate ,
@@ -138,7 +138,7 @@ object XmlPatterns extends ParserNode {
     if (!parseSeqWildcard(false) && !parseSeqWildcardBinding(false) &&
         Pattern.parse(builder)) {
       while (builder.getTokenType == ScalaTokenTypes.tCOMMA &&
-      !parseSeqWildcard(true) && !parseSeqWildcardBinding(true)) {
+             !parseSeqWildcard(true) && !parseSeqWildcardBinding(true)) {
         builder.advanceLexer() // eat comma
         Pattern.parse(builder)
       }

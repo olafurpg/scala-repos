@@ -121,8 +121,8 @@ object Expectations {
       Error("null", SbtBundle("sbt.annotation.expectedExpressionType")),
       Error("???", SbtBundle("sbt.annotation.expectedExpressionType")),
       Error("organization",
-            SbtBundle(
-                "sbt.annotation.expressionMustConform", "SettingKey[String]")),
+            SbtBundle("sbt.annotation.expressionMustConform",
+                      "SettingKey[String]")),
       Error("\"some string\"",
             SbtBundle("sbt.annotation.expressionMustConform", "String"))
   )

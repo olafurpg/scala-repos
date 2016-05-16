@@ -52,7 +52,8 @@ import org.apache.spark.util.random.XORShiftRandom
   * Common params for ALS and ALSModel.
   */
 private[recommendation] trait ALSModelParams
-    extends Params with HasPredictionCol {
+    extends Params
+    with HasPredictionCol {
 
   /**
     * Param for the column name for user ids.
@@ -79,8 +80,12 @@ private[recommendation] trait ALSModelParams
   * Common params for ALS.
   */
 private[recommendation] trait ALSParams
-    extends ALSModelParams with HasMaxIter with HasRegParam
-    with HasPredictionCol with HasCheckpointInterval with HasSeed {
+    extends ALSModelParams
+    with HasMaxIter
+    with HasRegParam
+    with HasPredictionCol
+    with HasCheckpointInterval
+    with HasSeed {
 
   /**
     * Param for rank of the matrix factorization (>= 1).
@@ -202,7 +207,9 @@ class ALSModel private[ml](@Since("1.4.0") override val uid: String,
                            @Since("1.4.0") val rank: Int,
                            @transient val userFactors: DataFrame,
                            @transient val itemFactors: DataFrame)
-    extends Model[ALSModel] with ALSModelParams with MLWritable {
+    extends Model[ALSModel]
+    with ALSModelParams
+    with MLWritable {
 
   /** @group setParam */
   @Since("1.4.0")
@@ -328,7 +335,9 @@ object ALSModel extends MLReadable[ALSModel] {
 @Experimental
 @Since("1.3.0")
 class ALS(@Since("1.4.0") override val uid: String)
-    extends Estimator[ALSModel] with ALSParams with DefaultParamsWritable {
+    extends Estimator[ALSModel]
+    with ALSParams
+    with DefaultParamsWritable {
 
   import org.apache.spark.ml.recommendation.ALS.Rating
 
@@ -626,7 +635,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Implementation of the ALS algorithm.
     */
   @DeveloperApi
-  def train[ID : ClassTag](
+  def train[ID: ClassTag](
       // scalastyle:ignore
       ratings: RDD[Rating[ID]],
       rank: Int = 10,
@@ -821,10 +830,10 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @see [[LocalIndexEncoder]]
     */
   private[recommendation] case class InBlock[
-      @specialized(Int, Long) ID : ClassTag](srcIds: Array[ID],
-                                             dstPtrs: Array[Int],
-                                             dstEncodedIndices: Array[Int],
-                                             ratings: Array[Float]) {
+      @specialized(Int, Long) ID: ClassTag](srcIds: Array[ID],
+                                            dstPtrs: Array[Int],
+                                            dstEncodedIndices: Array[Int],
+                                            ratings: Array[Float]) {
 
     /** Size of the block. */
     def size: Int = ratings.length
@@ -864,7 +873,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A rating block that contains src IDs, dst IDs, and ratings, stored in primitive arrays.
     */
   private[recommendation] case class RatingBlock[
-      @specialized(Int, Long) ID : ClassTag](
+      @specialized(Int, Long) ID: ClassTag](
       srcIds: Array[ID], dstIds: Array[ID], ratings: Array[Float]) {
 
     /** Size of the block. */
@@ -877,7 +886,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * Builder for [[RatingBlock]]. [[mutable.ArrayBuilder]] is used to avoid boxing/unboxing.
     */
   private[recommendation] class RatingBlockBuilder[
-      @specialized(Int, Long) ID : ClassTag]
+      @specialized(Int, Long) ID: ClassTag]
       extends Serializable {
 
     private val srcIds = mutable.ArrayBuilder.make[ID]
@@ -918,7 +927,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     *
     * @return an RDD of rating blocks in the form of ((srcBlockId, dstBlockId), ratingBlock)
     */
-  private def partitionRatings[ID : ClassTag](
+  private def partitionRatings[ID: ClassTag](
       ratings: RDD[Rating[ID]],
       srcPart: Partitioner,
       dstPart: Partitioner): RDD[((Int, Int), RatingBlock[ID])] = {
@@ -971,7 +980,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @param encoder encoder for dst indices
     */
   private[recommendation] class UncompressedInBlockBuilder[
-      @specialized(Int, Long) ID : ClassTag](encoder: LocalIndexEncoder)(
+      @specialized(Int, Long) ID: ClassTag](encoder: LocalIndexEncoder)(
       implicit ord: Ordering[ID]) {
 
     private val srcIds = mutable.ArrayBuilder.make[ID]
@@ -1015,9 +1024,9 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * A block of (srcId, dstEncodedIndex, rating) tuples stored in primitive arrays.
     */
   private[recommendation] class UncompressedInBlock[
-      @specialized(Int, Long) ID : ClassTag](val srcIds: Array[ID],
-                                             val dstEncodedIndices: Array[Int],
-                                             val ratings: Array[Float])(
+      @specialized(Int, Long) ID: ClassTag](val srcIds: Array[ID],
+                                            val dstEncodedIndices: Array[Int],
+                                            val ratings: Array[Float])(
       implicit ord: Ordering[ID]) {
 
     /** Size the of block. */
@@ -1085,7 +1094,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     *
     * @see [[UncompressedInBlockSort]]
     */
-  private class KeyWrapper[@specialized(Int, Long) ID : ClassTag](
+  private class KeyWrapper[@specialized(Int, Long) ID: ClassTag](
       implicit ord: Ordering[ID])
       extends Ordered[KeyWrapper[ID]] {
 
@@ -1104,7 +1113,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
   /**
     * [[SortDataFormat]] of [[UncompressedInBlock]] used by [[Sorter]].
     */
-  private class UncompressedInBlockSort[@specialized(Int, Long) ID : ClassTag](
+  private class UncompressedInBlockSort[@specialized(Int, Long) ID: ClassTag](
       implicit ord: Ordering[ID])
       extends SortDataFormat[KeyWrapper[ID], UncompressedInBlock[ID]] {
 
@@ -1174,7 +1183,7 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * @param dstPart partitioner for dst IDs
     * @return (in-blocks, out-blocks)
     */
-  private def makeBlocks[ID : ClassTag](
+  private def makeBlocks[ID: ClassTag](
       prefix: String,
       ratingBlocks: RDD[((Int, Int), RatingBlock[ID])],
       srcPart: Partitioner,
@@ -1243,9 +1252,8 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
         activeIds.map { x =>
           x.result()
         }
-    }.setName(prefix + "OutBlocks")
-      .persist(storageLevel)
-      (inBlocks, outBlocks)
+    }.setName(prefix + "OutBlocks").persist(storageLevel)
+    (inBlocks, outBlocks)
   }
 
   /**
@@ -1340,13 +1348,11 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     */
   private def computeYtY(
       factorBlocks: RDD[(Int, FactorBlock)], rank: Int): NormalEquation = {
-    factorBlocks.values.aggregate(new NormalEquation(rank))(
-        seqOp = (ne, factors) =>
-            {
-            factors.foreach(ne.add(_, 0.0))
-            ne
-        },
-        combOp = (ne1, ne2) => ne1.merge(ne2))
+    factorBlocks.values
+      .aggregate(new NormalEquation(rank))(seqOp = (ne, factors) => {
+      factors.foreach(ne.add(_, 0.0))
+      ne
+    }, combOp = (ne1, ne2) => ne1.merge(ne2))
   }
 
   /**
@@ -1392,5 +1398,6 @@ object ALS extends DefaultParamsReadable[ALS] with Logging {
     * we have getPartition(getPartition(k)) = getPartition(k). Since the default HashPartitioner
     * satisfies this requirement, we simply use a type alias here.
     */
-  private[recommendation] type ALSPartitioner = org.apache.spark.HashPartitioner
+  private[recommendation] type ALSPartitioner =
+    org.apache.spark.HashPartitioner
 }

@@ -169,13 +169,13 @@ trait EnsimeTestData {
               name = "StructureView",
               position = sourcePos2,
               members = List(
-                    StructureViewMember(
-                        keyword = "type",
-                        name = "BasicType",
-                        position = sourcePos4,
-                        members = Nil
-                    )
-                )
+                  StructureViewMember(
+                      keyword = "type",
+                      name = "BasicType",
+                      position = sourcePos4,
+                      members = Nil
+                  )
+              )
           )
       ))
 }

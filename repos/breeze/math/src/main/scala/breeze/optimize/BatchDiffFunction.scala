@@ -9,7 +9,9 @@ import breeze.linalg.support.CanCopy
   * A diff function that supports subsets of the data. By default it evaluates on all the data
   */
 trait BatchDiffFunction[T]
-    extends DiffFunction[T] with ((T, IndexedSeq[Int]) => Double) { outer =>
+    extends DiffFunction[T]
+    with ((T, IndexedSeq[Int]) => Double) {
+  outer =>
 
   /**
     * Calculates the gradient of the function on a subset of the data

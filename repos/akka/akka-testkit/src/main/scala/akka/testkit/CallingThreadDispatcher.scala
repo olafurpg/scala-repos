@@ -54,8 +54,8 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
 
   // we have to forget about long-gone threads sometime
   private def gc(): Unit = {
-    queues =
-    (Map.newBuilder[CallingThreadMailbox, Set[WeakReference[MessageQueue]]] /: queues) {
+    queues = (Map.newBuilder[CallingThreadMailbox,
+                             Set[WeakReference[MessageQueue]]] /: queues) {
       case (m, (k, v)) ⇒
         val nv = v filter (_.get ne null)
         if (nv.isEmpty) m else m += (k -> nv)
@@ -333,7 +333,8 @@ class CallingThreadDispatcherConfigurator(
 
 class CallingThreadMailbox(
     _receiver: akka.actor.Cell, val mailboxType: MailboxType)
-    extends Mailbox(null) with DefaultSystemMessageQueue {
+    extends Mailbox(null)
+    with DefaultSystemMessageQueue {
 
   val system = _receiver.system
   val self = _receiver.self

@@ -343,9 +343,9 @@ object ScalaExtractMethodUtils {
     }
     val res = list.toArray
     Sorting.stableSort[ExtractMethodParameter](
-        res,
-        (p1: ExtractMethodParameter,
-        p2: ExtractMethodParameter) => { p1.oldName < p2.oldName })
+        res, (p1: ExtractMethodParameter, p2: ExtractMethodParameter) => {
+      p1.oldName < p2.oldName
+    })
     res
   }
 
@@ -367,7 +367,8 @@ object ScalaExtractMethodUtils {
                 byName: Boolean = false): String = {
     val colon =
       if (StringUtil.isEmpty(name) || ScalaNamesUtil.isOpCharacter(name.last))
-        " : " else ": "
+        " : "
+      else ": "
     val arrow = ScalaPsiUtil.functionArrow(project) + " "
     val byNameArrow = if (byName) arrow else ""
     s"$name$colon$byNameArrow$typeText"
@@ -429,16 +430,15 @@ object ScalaExtractMethodUtils {
 
     val params = settings.parameters
       .filter(_.passAsParameter)
-      .map(
-          param => parameterText(param) + (if (param.isFunction) " _" else ""))
+      .map(param =>
+            parameterText(param) + (if (param.isFunction) " _" else ""))
 
     val paramsText =
       if (params.nonEmpty) params.mkString("(", ", ", ")") else ""
     val methodCallText = s"${settings.methodName}$paramsText"
     var needExtractorsFromMultipleReturn = false
 
-    val outputTypedNames = settings.outputs.map(
-        o =>
+    val outputTypedNames = settings.outputs.map(o =>
           ScalaExtractMethodUtils.typedName(outputName(o),
                                             o.returnType.canonicalText,
                                             o.fromElement.getProject))

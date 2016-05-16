@@ -21,7 +21,8 @@ case class CompressionConf(enabled: Boolean, sizeLimit: Long)
 
 class ZKStore(
     val client: ZkClient, root: ZNode, compressionConf: CompressionConf)
-    extends PersistentStore with PersistentStoreManagement {
+    extends PersistentStore
+    with PersistentStoreManagement {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] implicit val ec = ExecutionContext.Implicits.global

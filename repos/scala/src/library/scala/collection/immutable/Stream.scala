@@ -200,9 +200,11 @@ import scala.language.implicitConversions
   */
 @deprecatedInheritance("This class will be sealed.", "2.11.0")
 abstract class Stream[+A]
-    extends AbstractSeq[A] with LinearSeq[A]
+    extends AbstractSeq[A]
+    with LinearSeq[A]
     with GenericTraversableTemplate[A, Stream]
-    with LinearSeqOptimized[A, Stream[A]] with Serializable {
+    with LinearSeqOptimized[A, Stream[A]]
+    with Serializable {
   self =>
 
   override def companion: GenericCompanion[Stream] = Stream
@@ -375,8 +377,8 @@ abstract class Stream[+A]
       )
     else super.++(that)(bf)
 
-  override def +:[B >: A, That](elem: B)(
-      implicit bf: CanBuildFrom[Stream[A], B, That]): That =
+  override def +:[B >: A, That](
+      elem: B)(implicit bf: CanBuildFrom[Stream[A], B, That]): That =
     if (isStreamBuilder(bf)) asThat(cons(elem, this))
     else super.+:(elem)(bf)
 
@@ -711,7 +713,7 @@ abstract class Stream[+A]
           if (scout.tailDefined) {
             scout = scout.tail
             // Use 2x 1x iterator trick for cycle detection; slow iterator can add strings
-            while ( (cursor ne scout) && scout.tailDefined) {
+            while ((cursor ne scout) && scout.tailDefined) {
               b append sep append cursor.head
               n += 1
               cursor = cursor.tail
@@ -1063,7 +1065,8 @@ abstract class Stream[+A]
   *  iterate as lazily as it traverses the tail.
   */
 final class StreamIterator[+A] private ()
-    extends AbstractIterator[A] with Iterator[A] {
+    extends AbstractIterator[A]
+    with Iterator[A] {
   def this(self: Stream[A]) {
     this()
     these = new LazyCell(self)
@@ -1256,7 +1259,7 @@ object Stream extends SeqFactory[Stream] {
     loop(0)
   }
 
-  override def range[T : Integral](start: T, end: T, step: T): Stream[T] = {
+  override def range[T: Integral](start: T, end: T, step: T): Stream[T] = {
     val num = implicitly[Integral[T]]
     import num._
 

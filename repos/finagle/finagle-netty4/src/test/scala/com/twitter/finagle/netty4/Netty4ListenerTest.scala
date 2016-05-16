@@ -23,7 +23,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4ListenerTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   // a Transport whose reads and writes never complete
   private[netty4] class NullTransport[In, Out] extends Transport[In, Out] {

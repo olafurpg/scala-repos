@@ -57,8 +57,8 @@ private[round] final class Socket(gameId: String,
     private def isBye = bye > 0
 
     private def isHostingSimul: Fu[Boolean] = userId ?? { u =>
-      simulActor ? lila.hub.actorApi.simul.GetHostIds mapTo manifest[Set[
-              String]] map (_ contains u)
+      simulActor ? lila.hub.actorApi.simul.GetHostIds mapTo manifest[
+          Set[String]] map (_ contains u)
     }
 
     def isGone =
@@ -221,7 +221,7 @@ private[round] final class Socket(gameId: String,
     }
   }
 
-  def notifyOwner[A : Writes](color: Color, t: String, data: A) {
+  def notifyOwner[A: Writes](color: Color, t: String, data: A) {
     ownerOf(color) foreach { m =>
       m push makeMessage(t, data)
     }

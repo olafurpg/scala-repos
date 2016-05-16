@@ -14,10 +14,11 @@ import scala.reflect.ClassTag
 private[play] object WebSocketActor {
 
   object WebSocketActorSupervisor {
-    def props[In, Out : ClassTag](enumerator: Enumerator[In],
-                                  iteratee: Iteratee[Out, Unit],
-                                  createHandler: ActorRef => Props) =
-      Props(new WebSocketActorSupervisor[In, Out](
+    def props[In, Out: ClassTag](enumerator: Enumerator[In],
+                                 iteratee: Iteratee[Out, Unit],
+                                 createHandler: ActorRef => Props) =
+      Props(
+          new WebSocketActorSupervisor[In, Out](
               enumerator, iteratee, createHandler))
   }
 

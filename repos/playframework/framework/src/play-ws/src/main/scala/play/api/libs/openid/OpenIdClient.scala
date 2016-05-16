@@ -202,12 +202,11 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
           ("openid.mode" -> Seq("check_authentication")))
     ws.url(server.url)
       .post(fields)
-      .map(response =>
-            {
-          if (response.status == 200 &&
-              response.body.contains("is_valid:true")) {
-            UserInfo(queryString)
-          } else throw Errors.AUTH_ERROR
+      .map(response => {
+        if (response.status == 200 &&
+            response.body.contains("is_valid:true")) {
+          UserInfo(queryString)
+        } else throw Errors.AUTH_ERROR
       })
   }
 
@@ -225,8 +224,8 @@ class WsOpenIdClient @Inject()(ws: WSClient, discovery: Discovery)
         else
           Seq("openid.ax.if_available" -> axOptional.map(_._1).mkString(","))
 
-      val definitions = (axRequired ++ axOptional).map(
-          attribute => ("openid.ax.type." + attribute._1 -> attribute._2))
+      val definitions = (axRequired ++ axOptional).map(attribute =>
+            ("openid.ax.type." + attribute._1 -> attribute._2))
 
       Seq("openid.ns.ax" -> "http://openid.net/srv/ax/1.0",
           "openid.ax.mode" -> "fetch_request") ++ axRequiredParams ++ axOptionalParams ++ definitions
@@ -298,12 +297,11 @@ class WsDiscovery @Inject()(ws: WSClient) extends Discovery {
     val discoveryUrl = normalizeIdentifier(openID)
     ws.url(discoveryUrl)
       .get()
-      .map(response =>
-            {
-          val maybeOpenIdServer =
-            new XrdsResolver().resolve(response) orElse new HtmlResolver()
-              .resolve(response)
-          maybeOpenIdServer.getOrElse(throw Errors.NETWORK_ERROR)
+      .map(response => {
+        val maybeOpenIdServer =
+          new XrdsResolver().resolve(response) orElse new HtmlResolver()
+            .resolve(response)
+        maybeOpenIdServer.getOrElse(throw Errors.NETWORK_ERROR)
       })
   }
 }
@@ -326,8 +324,8 @@ private[openid] object Discovery {
     def resolve(response: WSResponse) =
       for {
         _ <- response
-          .header(HeaderNames.CONTENT_TYPE)
-          .filter(_.contains("application/xrds+xml"))
+              .header(HeaderNames.CONTENT_TYPE)
+              .filter(_.contains("application/xrds+xml"))
         findInXml = findUriWithType(response.xml) _
         (typeId, uri) <- serviceTypeId.flatMap(findInXml(_)).headOption
       } yield OpenIDServer(typeId, uri, None)
@@ -355,17 +353,15 @@ private[openid] object Discovery {
         .findFirstIn(response.body)
         .orElse(serverRegex.findFirstIn(response.body))
         .flatMap(extractHref(_))
-      serverUrl.map(
-          url =>
-            {
-          val delegate: Option[String] = localidRegex
-            .findFirstIn(response.body)
-            .orElse(delegateRegex.findFirstIn(response.body))
-            .flatMap(extractHref(_))
-          OpenIDServer(
-              "http://specs.openid.net/auth/2.0/signon",
-              url,
-              delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
+      serverUrl.map(url => {
+        val delegate: Option[String] = localidRegex
+          .findFirstIn(response.body)
+          .orElse(delegateRegex.findFirstIn(response.body))
+          .flatMap(extractHref(_))
+        OpenIDServer(
+            "http://specs.openid.net/auth/2.0/signon",
+            url,
+            delegate) //protocol version due to http://openid.net/specs/openid-authentication-2_0.html#html_disco
       })
     }
 

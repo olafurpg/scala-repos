@@ -128,11 +128,8 @@ object CassandraTest {
           mutations.get(0).setColumn_or_supercolumn(new ColumnOrSuperColumn())
           mutations.get(0).column_or_supercolumn.setColumn(colWord)
           mutations.get(1).setColumn_or_supercolumn(new ColumnOrSuperColumn())
-          mutations
-            .get(1)
-            .column_or_supercolumn
-            .setColumn(colCount)
-            (outputkey, mutations)
+          mutations.get(1).column_or_supercolumn.setColumn(colCount)
+          (outputkey, mutations)
         }
     }.saveAsNewAPIHadoopFile("casDemo",
                              classOf[ByteBuffer],

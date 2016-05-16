@@ -156,7 +156,7 @@ object GraphGenerators extends Logging {
     outDegreeFromEdges(sc.parallelize(edges.toList))
   }
 
-  private def outDegreeFromEdges[ED : ClassTag](
+  private def outDegreeFromEdges[ED: ClassTag](
       edges: RDD[Edge[ED]]): Graph[Int, ED] = {
     val vertices = edges.flatMap { edge =>
       List((edge.srcId, 1))

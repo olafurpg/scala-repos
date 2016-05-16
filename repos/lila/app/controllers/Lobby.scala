@@ -14,7 +14,7 @@ object Lobby extends LilaController {
     negotiate(
         html = renderHome(Results.Ok).map(NoCache),
         api = _ =>
-            fuccess {
+          fuccess {
             Ok(Json.obj(
                     "lobby" -> Json.obj("version" -> Env.lobby.history.version)
                 ))
@@ -41,7 +41,7 @@ object Lobby extends LilaController {
     negotiate(
         html = fuccess(NotFound),
         api = _ =>
-            ctx.me.fold(Env.lobby.seekApi.forAnon)(Env.lobby.seekApi.forUser) map {
+          ctx.me.fold(Env.lobby.seekApi.forAnon)(Env.lobby.seekApi.forUser) map {
             seeks =>
               Ok(JsArray(seeks.map(_.render)))
         }

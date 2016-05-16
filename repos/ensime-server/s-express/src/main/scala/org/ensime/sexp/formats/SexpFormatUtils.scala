@@ -24,7 +24,7 @@ object SexpFormatUtils {
   /**
     * Wraps an existing `SexpReader` with `Exception` protection.
     */
-  def safeReader[A : SexpReader] = new SexpReader[Try[A]] {
+  def safeReader[A: SexpReader] = new SexpReader[Try[A]] {
     def read(value: Sexp) = Try(value.convertTo[A])
   }
 

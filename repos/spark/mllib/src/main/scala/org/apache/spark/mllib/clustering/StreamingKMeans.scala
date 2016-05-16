@@ -66,7 +66,8 @@ import org.apache.spark.util.random.XORShiftRandom
 class StreamingKMeansModel @Since("1.2.0")(
     @Since("1.2.0") override val clusterCenters: Array[Vector],
     @Since("1.2.0") val clusterWeights: Array[Double])
-    extends KMeansModel(clusterCenters) with Logging {
+    extends KMeansModel(clusterCenters)
+    with Logging {
 
   /**
     * Perform a k-means update on a batch of data.
@@ -80,11 +81,10 @@ class StreamingKMeansModel @Since("1.2.0")(
     val closest = data.map(point => (this.predict(point), (point, 1L)))
 
     // get sums and counts for updating each cluster
-    val mergeContribs: ((Vector, Long), (Vector, Long)) => (Vector,
-    Long) = (p1, p2) =>
-      {
-        BLAS.axpy(1.0, p2._1, p1._1)
-        (p1._1, p1._2 + p2._2)
+    val mergeContribs: ((Vector, Long),
+                        (Vector, Long)) => (Vector, Long) = (p1, p2) => {
+      BLAS.axpy(1.0, p2._1, p1._1)
+      (p1._1, p1._2 + p2._2)
     }
     val dim = clusterCenters(0).size
 
@@ -175,7 +175,8 @@ class StreamingKMeansModel @Since("1.2.0")(
 class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
                                       @Since("1.2.0") var decayFactor: Double,
                                       @Since("1.2.0") var timeUnit: String)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   @Since("1.2.0")
   def this() = this(2, 1.0, StreamingKMeans.BATCHES)
@@ -307,7 +308,7 @@ class StreamingKMeans @Since("1.2.0")(@Since("1.2.0") var k: Int,
     * @return DStream containing the input keys and the predictions as values
     */
   @Since("1.2.0")
-  def predictOnValues[K : ClassTag](
+  def predictOnValues[K: ClassTag](
       data: DStream[(K, Vector)]): DStream[(K, Int)] = {
     assertInitialized()
     data.mapValues(model.predict)

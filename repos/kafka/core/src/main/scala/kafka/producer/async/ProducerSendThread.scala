@@ -32,7 +32,9 @@ class ProducerSendThread[K, V](val threadName: String,
                                val queueTime: Long,
                                val batchSize: Int,
                                val clientId: String)
-    extends Thread(threadName) with Logging with KafkaMetricsGroup {
+    extends Thread(threadName)
+    with Logging
+    with KafkaMetricsGroup {
 
   private val shutdownLatch = new CountDownLatch(1)
   private val shutdownCommand = new KeyedMessage[K, V](

@@ -40,7 +40,7 @@ Lost after 18/flatten {
   */
 /** A class for methods to be injected into the intp in power mode.
   */
-class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
+class Power[ReplValsImpl <: ReplVals: ru.TypeTag: ClassTag](
     val intp: IMain, replVals: ReplValsImpl) {
   import intp.{beQuietDuring, parse}
   import intp.global._
@@ -159,7 +159,7 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
   }
 
   trait LowPriorityInternalInfo {
-    implicit def apply[T : ru.TypeTag : ClassTag]: InternalInfo[T] =
+    implicit def apply[T: ru.TypeTag: ClassTag]: InternalInfo[T] =
       new InternalInfo[T](None)
   }
   object InternalInfo extends LowPriorityInternalInfo {}
@@ -171,8 +171,7 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     *  of the conveniences exist on that wrapper.
     */
   trait LowPriorityInternalInfoWrapper {}
-  class InternalInfoWrapper[
-      T : ru.TypeTag : ClassTag](value: Option[T] = None) {
+  class InternalInfoWrapper[T: ru.TypeTag: ClassTag](value: Option[T] = None) {
     def ? : InternalInfo[T] = new InternalInfo[T](value)
   }
 
@@ -187,8 +186,9 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     private def isImplClass(s: Symbol) = s.name.toString endsWith "$class"
 
     /** Standard noise reduction filter. */
-    def excludeMember(s: Symbol) = (isSpecialized(s) || isImplClass(s) ||
-        s.isAnonOrRefinementClass || s.isAnonymousFunction)
+    def excludeMember(s: Symbol) =
+      (isSpecialized(s) || isImplClass(s) || s.isAnonOrRefinementClass ||
+          s.isAnonymousFunction)
     def symbol = compilerSymbolFromTag(tag)
     def tpe = compilerTypeFromTag(tag)
     def members = membersUnabridged filterNot excludeMember
@@ -238,7 +238,7 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
       xs flatMap (x => prettify(x))
   }
 
-  abstract class PrettifierClass[T : Prettifier]() {
+  abstract class PrettifierClass[T: Prettifier]() {
     val pretty = implicitly[Prettifier[T]]
     def value: Seq[T]
 
@@ -254,18 +254,19 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     def >(): Unit = pp(identity)
   }
 
-  class MultiPrettifierClass[T : Prettifier](val value: Seq[T])
+  class MultiPrettifierClass[T: Prettifier](val value: Seq[T])
       extends PrettifierClass[T]() {}
-  class SinglePrettifierClass[T : Prettifier](single: T)
+  class SinglePrettifierClass[T: Prettifier](single: T)
       extends PrettifierClass[T]() {
     val value = List(single)
   }
 
   class RichReplString(s: String) {
     // make an url out of the string
-    def u: URL = (if (s contains ":") new URL(s)
-                  else if (new JFile(s) exists) new JFile(s).toURI.toURL
-                  else new URL("http://" + s))
+    def u: URL =
+      (if (s contains ":") new URL(s)
+       else if (new JFile(s) exists) new JFile(s).toURI.toURL
+       else new URL("http://" + s))
   }
   class RichInputStream(in: InputStream)(implicit codec: Codec) {
     def bytes(): Array[Byte] = io.Streamable.bytes(in)
@@ -298,11 +299,11 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     implicit lazy val powerTypeOrdering: Ordering[Type] =
       Ordering[Symbol] on (_.typeSymbol)
 
-    implicit def replInternalInfo[T : ru.TypeTag : ClassTag](
+    implicit def replInternalInfo[T: ru.TypeTag: ClassTag](
         x: T): InternalInfoWrapper[T] = new InternalInfoWrapper[T](Some(x))
     implicit def replEnhancedStrings(s: String): RichReplString =
       new RichReplString(s)
-    implicit def replMultiPrinting[T : Prettifier](
+    implicit def replMultiPrinting[T: Prettifier](
         xs: TraversableOnce[T]): MultiPrettifierClass[T] =
       new MultiPrettifierClass[T](xs.toSeq)
     implicit def replPrettifier[T]: Prettifier[T] = Prettifier.default[T]
@@ -316,10 +317,10 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
   }
 
   trait ReplUtilities {
-    def module[T : ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isPackage)
-    def clazz[T : ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isClass)
-    def info[T : ru.TypeTag : ClassTag] = InternalInfo[T]
-    def ?[T : ru.TypeTag : ClassTag] = InternalInfo[T]
+    def module[T: ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isPackage)
+    def clazz[T: ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isClass)
+    def info[T: ru.TypeTag: ClassTag] = InternalInfo[T]
+    def ?[T: ru.TypeTag: ClassTag] = InternalInfo[T]
     def sanitize(s: String): String = sanitize(s.getBytes())
     def sanitize(s: Array[Byte]): String =
       (s map {
@@ -330,7 +331,8 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     def strings(s: Seq[Byte]): List[String] = {
       if (s.length == 0) Nil
       else
-        s dropWhile (_.toChar.isControl) span (x => !x.toChar.isControl) match {
+        s dropWhile (_.toChar.isControl) span (x =>
+              !x.toChar.isControl) match {
           case (next, rest) => next.map(_.toChar).mkString :: strings(rest)
         }
     }

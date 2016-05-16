@@ -31,7 +31,8 @@ object FSMActorSpec {
   case object Bye
 
   class Lock(code: String, timeout: FiniteDuration, latches: Latches)
-      extends Actor with FSM[LockState, CodeState] {
+      extends Actor
+      with FSM[LockState, CodeState] {
 
     import latches._
 
@@ -101,7 +102,8 @@ object FSMActorSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class FSMActorSpec
-    extends AkkaSpec(Map("akka.actor.debug.fsm" -> true)) with ImplicitSender {
+    extends AkkaSpec(Map("akka.actor.debug.fsm" -> true))
+    with ImplicitSender {
   import FSMActorSpec._
 
   val timeout = Timeout(2 seconds)

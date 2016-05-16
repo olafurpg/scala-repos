@@ -42,8 +42,8 @@ class ScalaTestLocationProvider extends SMTestLocator {
             val clazzes = ScalaShortNamesCacheManager
               .getInstance(project)
               .getClassesByFQName(className, scope)
-            val found = clazzes.find(
-                c => Option(c.getContainingFile).exists(_.name == fileName))
+            val found = clazzes.find(c =>
+                  Option(c.getContainingFile).exists(_.name == fileName))
 
             found match {
               case Some(file) =>
@@ -65,8 +65,8 @@ class ScalaTestLocationProvider extends SMTestLocator {
             val clazz = classes
               .find(!_.isInstanceOf[ScObject])
               .orElse(classes.headOption)
-            clazz.foreach(
-                c => res.add(new PsiLocationWithName(project, c, testName)))
+            clazz.foreach(c =>
+                  res.add(new PsiLocationWithName(project, c, testName)))
           case ScalaTestTopOfMethodPattern(classFqn, methodName, testName) =>
             val classes = ScalaShortNamesCacheManager
               .getInstance(project)
@@ -96,8 +96,8 @@ class ScalaTestLocationProvider extends SMTestLocator {
             val clazzes = ScalaPsiManager
               .instance(project)
               .getCachedClass(GlobalSearchScope.allScope(project), classFqn)
-            val found = clazzes.find(
-                c => Option(c.getContainingFile).exists(_.name == fileName))
+            val found = clazzes.find(c =>
+                  Option(c.getContainingFile).exists(_.name == fileName))
             found match {
               case Some(file) =>
                 res.add(
@@ -128,11 +128,11 @@ class ScalaTestLocationProvider extends SMTestLocator {
     res
   }
 
-  private def createLocationFor(
-      project: Project,
-      psiFile: PsiFile,
-      lineNum: Int,
-      withName: Option[String] = None): Location[_ <: PsiElement] = {
+  private def createLocationFor(project: Project,
+                                psiFile: PsiFile,
+                                lineNum: Int,
+                                withName: Option[String] =
+                                  None): Location[_ <: PsiElement] = {
     assert(lineNum > 0)
     val doc: Document =
       PsiDocumentManager.getInstance(project).getDocument(psiFile)

@@ -599,20 +599,19 @@ object Run {
         optOutputPath = Some(new File("metrics_results").getCanonicalPath)
     )
 
-    Workflow.run(
-        dataSourceClassOpt = Some(classOf[YahooDataSource]),
-        dataSourceParams = dataSourceParams,
-        preparatorClassOpt = Some(
-              PIdentityPreparator(classOf[YahooDataSource])),
-        algorithmClassMapOpt = Some(
-              Map(
-                  //"" -> classOf[MomentumStrategy]
-                  "" -> classOf[RegressionStrategy]
-              )),
-        algorithmParamsList = Seq(("", momentumParams)),
-        servingClassOpt = Some(LFirstServing(classOf[EmptyStrategy])),
-        evaluatorClassOpt = Some(classOf[BacktestingEvaluator]),
-        evaluatorParams = evaluatorParams,
-        params = WorkflowParams(verbose = 0, batch = "Imagine: Stock II"))
+    Workflow.run(dataSourceClassOpt = Some(classOf[YahooDataSource]),
+                 dataSourceParams = dataSourceParams,
+                 preparatorClassOpt =
+                   Some(PIdentityPreparator(classOf[YahooDataSource])),
+                 algorithmClassMapOpt = Some(Map(
+                         //"" -> classOf[MomentumStrategy]
+                         "" -> classOf[RegressionStrategy]
+                     )),
+                 algorithmParamsList = Seq(("", momentumParams)),
+                 servingClassOpt = Some(LFirstServing(classOf[EmptyStrategy])),
+                 evaluatorClassOpt = Some(classOf[BacktestingEvaluator]),
+                 evaluatorParams = evaluatorParams,
+                 params =
+                   WorkflowParams(verbose = 0, batch = "Imagine: Stock II"))
   }
 }

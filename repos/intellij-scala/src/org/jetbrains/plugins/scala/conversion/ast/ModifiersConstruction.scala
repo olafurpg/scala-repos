@@ -55,11 +55,13 @@ case class ModifiersConstruction(
 }
 
 case class ModifierWithExpression(mtype: ModifierType, value: IntermediateNode)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode
+    with Modifier {
   override def modificator: ModifierType = mtype
 }
 
 case class SimpleModifier(mtype: ModifierType)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode
+    with Modifier {
   override def modificator: ModifierType = mtype
 }

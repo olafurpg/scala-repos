@@ -42,7 +42,8 @@ class StreamExecution(val sqlContext: SQLContext,
                       override val name: String,
                       private[sql] val logicalPlan: LogicalPlan,
                       val sink: Sink)
-    extends ContinuousQuery with Logging {
+    extends ContinuousQuery
+    with Logging {
 
   /** An monitor used to wait/notify when batches complete. */
   private val awaitBatchLock = new Object

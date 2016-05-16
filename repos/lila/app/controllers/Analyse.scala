@@ -26,13 +26,13 @@ object Analyse extends LilaController {
 
   def requestAnalysis(id: String) = Auth { implicit ctx => me =>
     OptionFuResult(GameRepo game id) { game =>
-      Env.fishnet.analyser(
-          game,
-          lila.fishnet.Work.Sender(
-              userId = me.id.some,
-              ip = HTTPRequest.lastRemoteAddress(ctx.req).some,
-              mod = isGranted(_.Hunter),
-              system = false)) map {
+      Env.fishnet.analyser(game,
+                           lila.fishnet.Work.Sender(
+                               userId = me.id.some,
+                               ip =
+                                 HTTPRequest.lastRemoteAddress(ctx.req).some,
+                               mod = isGranted(_.Hunter),
+                               system = false)) map {
         case true => Ok(html.analyse.computing(id))
         case false => Unauthorized
       }
@@ -94,12 +94,10 @@ object Analyse extends LilaController {
       fuccess {
         chess.Replay
           .plyAtFen(pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
-          .fold(err =>
-                  {
-                    logger.info(s"RedirectAtFen: $err")
-                    Redirect(url)
-                },
-                ply => Redirect(s"$url#$ply"))
+          .fold(err => {
+            logger.info(s"RedirectAtFen: $err")
+            Redirect(url)
+          }, ply => Redirect(s"$url#$ply"))
       }
     }
 

@@ -39,19 +39,17 @@ import scalafx.collections.ObservableBuffer
 object Example1App extends App {
   val items: ObservableBuffer[String] = ObservableBuffer()
 
-  items.onChange(
-      (_, changes) =>
-        {
-      println(s"onChange(_, $changes")
-      for (change <- changes) change match {
-        case ObservableBuffer.Add(_, _) => println(s"  case Add    : $change")
-        case ObservableBuffer.Remove(_, _) =>
-          println(s"  case Remove : $change")
-        case ObservableBuffer.Reorder(_, _, _) =>
-          println(s"  case Reorder: $change")
-        case ObservableBuffer.Update(_, _) =>
-          println(s"  case Update: $change")
-      }
+  items.onChange((_, changes) => {
+    println(s"onChange(_, $changes")
+    for (change <- changes) change match {
+      case ObservableBuffer.Add(_, _) => println(s"  case Add    : $change")
+      case ObservableBuffer.Remove(_, _) =>
+        println(s"  case Remove : $change")
+      case ObservableBuffer.Reorder(_, _, _) =>
+        println(s"  case Reorder: $change")
+      case ObservableBuffer.Update(_, _) =>
+        println(s"  case Update: $change")
+    }
   })
 
   println("items += \"test\"")

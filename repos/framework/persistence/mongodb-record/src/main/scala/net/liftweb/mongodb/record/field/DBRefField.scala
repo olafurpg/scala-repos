@@ -35,7 +35,8 @@ import org.bson.types.ObjectId
 class DBRefField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType, ref: RefType)
-    extends Field[DBRef, OwnerType] with MandatoryTypedField[DBRef] {
+    extends Field[DBRef, OwnerType]
+    with MandatoryTypedField[DBRef] {
 
   /*
    * get the referenced object

@@ -123,22 +123,19 @@ class InterpretedPicklerRuntime(classLoader: ClassLoader, preclazz: Class[_])(
                     .genPickler(classLoader, fldClass, fldTag)
                     .asInstanceOf[Pickler[Any]]
 
-                builder.putField(
-                    fir.name,
-                    b =>
-                      {
-                        if (isEffFinal) {
-                          b.hintElidedType(fldTag)
-                          pickleInto(fir.tpe, fldValue, b, fldPickler)
-                        } else {
-                          val subPicklee = fldValue
-                          if (subPicklee == null ||
-                              subPicklee.getClass == mirror.runtimeClass(
-                                  fir.tpe.erasure)) b.hintElidedType(fldTag)
-                          else ()
-                          pickleInto(fir.tpe, subPicklee, b, fldPickler)
-                        }
-                    })
+                builder.putField(fir.name, b => {
+                  if (isEffFinal) {
+                    b.hintElidedType(fldTag)
+                    pickleInto(fir.tpe, fldValue, b, fldPickler)
+                  } else {
+                    val subPicklee = fldValue
+                    if (subPicklee == null || subPicklee.getClass == mirror
+                          .runtimeClass(fir.tpe.erasure))
+                      b.hintElidedType(fldTag)
+                    else ()
+                    pickleInto(fir.tpe, subPicklee, b, fldPickler)
+                  }
+                })
 
               // builder.putField(fir.name, b => {
               //   val fstaticTpe = fir.tpe.erasure
@@ -222,20 +219,18 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
                 })
 
             def fieldVals =
-              pendingFields.map(
-                  fir =>
-                    {
-                  val freader = reader.readField(fir.name)
-                  val fstaticTag = FastTypeTag(mirror, fir.tpe, fir.tpe.key)
-                  val fstaticSym = fstaticTag.tpe.typeSymbol
-                  if (fstaticSym.isEffectivelyFinal)
-                    freader.hintElidedType(fstaticTag)
-                  val fdynamicTag = try {
-                    freader.beginEntry()
-                  } catch {
-                    case e @ PicklingException(msg, cause) =>
-                      debug(
-                          s"""error in interpreted runtime unpickler while reading tag of field '${fir.name}
+              pendingFields.map(fir => {
+                val freader = reader.readField(fir.name)
+                val fstaticTag = FastTypeTag(mirror, fir.tpe, fir.tpe.key)
+                val fstaticSym = fstaticTag.tpe.typeSymbol
+                if (fstaticSym.isEffectivelyFinal)
+                  freader.hintElidedType(fstaticTag)
+                val fdynamicTag = try {
+                  freader.beginEntry()
+                } catch {
+                  case e @ PicklingException(msg, cause) =>
+                    debug(
+                        s"""error in interpreted runtime unpickler while reading tag of field '${fir.name}
 ':
                          |$msg
 
@@ -243,24 +238,24 @@ class InterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
 '
                          |static type of field: '${fir.tpe.key}'
                          |""".stripMargin)
-                      throw e
+                    throw e
+                }
+                val fval = {
+                  if (freader.atPrimitive) {
+                    val result = freader.readPrimitive()
+                    if (shouldBotherAboutSharing(fir.tpe))
+                      registerUnpicklee(result, preregisterUnpicklee())
+                    result
+                  } else {
+                    val fieldUnpickler =
+                      scala.pickling.internal.currentRuntime.picklers
+                        .genUnpickler(mirror, fdynamicTag)
+                    fieldUnpickler.unpickle(fdynamicTag, freader)
                   }
-                  val fval = {
-                    if (freader.atPrimitive) {
-                      val result = freader.readPrimitive()
-                      if (shouldBotherAboutSharing(fir.tpe))
-                        registerUnpicklee(result, preregisterUnpicklee())
-                      result
-                    } else {
-                      val fieldUnpickler =
-                        scala.pickling.internal.currentRuntime.picklers
-                          .genUnpickler(mirror, fdynamicTag)
-                      fieldUnpickler.unpickle(fdynamicTag, freader)
-                    }
-                  }
+                }
 
-                  freader.endEntry()
-                  fval
+                freader.endEntry()
+                fval
               })
 
             // TODO: need to support modules and other special guys here
@@ -337,40 +332,38 @@ class ShareNothingInterpretedUnpicklerRuntime(mirror: Mirror, typeTag: String)(
               }
 
             def fieldVals =
-              pendingFields.map(
-                  fir =>
-                    {
-                  val freader = reader.readField(fir.name)
-                  val fstaticTag = FastTypeTag(mirror, fir.tpe, fir.tpe.key)
-                  val fstaticSym = fstaticTag.tpe.typeSymbol
-                  if (fstaticSym.isEffectivelyFinal)
-                    freader.hintElidedType(fstaticTag)
-                  val fdynamicTag = try {
-                    freader.beginEntry()
-                  } catch {
-                    case e @ PicklingException(msg, cause) =>
-                      debug(
-                          s"""error in interpreted runtime unpickler while reading tag of field '${fir.name}':
+              pendingFields.map(fir => {
+                val freader = reader.readField(fir.name)
+                val fstaticTag = FastTypeTag(mirror, fir.tpe, fir.tpe.key)
+                val fstaticSym = fstaticTag.tpe.typeSymbol
+                if (fstaticSym.isEffectivelyFinal)
+                  freader.hintElidedType(fstaticTag)
+                val fdynamicTag = try {
+                  freader.beginEntry()
+                } catch {
+                  case e @ PicklingException(msg, cause) =>
+                    debug(
+                        s"""error in interpreted runtime unpickler while reading tag of field '${fir.name}':
                          |$msg
                          |enclosing object has type: '${tagKey}'
                          |static type of field: '${fir.tpe.key}'
                          |""".stripMargin)
-                      throw e
+                    throw e
+                }
+                val fval = {
+                  if (freader.atPrimitive) {
+                    val result = freader.readPrimitive()
+                    result
+                  } else {
+                    val fieldUnpickler =
+                      scala.pickling.internal.currentRuntime.picklers
+                        .genUnpickler(mirror, fdynamicTag)
+                    fieldUnpickler.unpickle(fdynamicTag, freader)
                   }
-                  val fval = {
-                    if (freader.atPrimitive) {
-                      val result = freader.readPrimitive()
-                      result
-                    } else {
-                      val fieldUnpickler =
-                        scala.pickling.internal.currentRuntime.picklers
-                          .genUnpickler(mirror, fdynamicTag)
-                      fieldUnpickler.unpickle(fdynamicTag, freader)
-                    }
-                  }
+                }
 
-                  freader.endEntry()
-                  fval
+                freader.endEntry()
+                fval
               })
 
             // TODO: need to support modules and other special guys here

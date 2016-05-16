@@ -75,9 +75,9 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
     val lastTaskFailure = new TaskFailure(
         appId = PathId("/myapp"),
         taskId = mesos.TaskID
-            .newBuilder()
-            .setValue("myapp.2da6109e-4cce-11e5-98c1-be5b2935a987")
-            .build(),
+          .newBuilder()
+          .setValue("myapp.2da6109e-4cce-11e5-98c1-be5b2935a987")
+          .build(),
         state = mesos.TaskState.TASK_FAILED,
         message = "Command exited with status 1",
         host = "srv2.dc43.mesosphere.com",

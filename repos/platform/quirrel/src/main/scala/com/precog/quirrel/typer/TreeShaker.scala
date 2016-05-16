@@ -44,8 +44,10 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     }
   }
 
-  def performShake(tree: Expr): (Expr, Set[(Identifier, NameBinding)],
-  Set[(TicId, VarBinding)], Set[Error]) = tree match {
+  def performShake(tree: Expr): (Expr,
+                                 Set[(Identifier, NameBinding)],
+                                 Set[(TicId, VarBinding)],
+                                 Set[Error]) = tree match {
     case b @ Let(loc, id, params, left, right) => {
         lazy val (left2, leftNameBindings, leftVarBindings, leftErrors) =
           performShake(left)
@@ -156,8 +158,11 @@ trait TreeShaker extends Phases with parser.AST with Binder with Errors {
     case e @ NullLit(_) => (e, Set(), Set(), Set())
 
     case ObjectDef(loc, props) => {
-        val mapped: Vector[(String, (Expr, Set[(Identifier, NameBinding)], Set[
-                (TicId, VarBinding)], Set[Error]))] =
+        val mapped: Vector[(String,
+                            (Expr,
+                             Set[(Identifier, NameBinding)],
+                             Set[(TicId, VarBinding)],
+                             Set[Error]))] =
           props map {
             case (key, value) => (key, performShake(value))
           }

@@ -22,8 +22,8 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
   lazy val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+          new File(system.settings.config.getString(s)))
 
   var system: ActorSystem = _
 
@@ -102,7 +102,8 @@ class PersistentActorWithAtLeastOnceDeliveryBenchmark {
 
 class NoPersistPersistentActorWithAtLeastOnceDelivery(
     respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
-    extends PersistentActor with AtLeastOnceDelivery {
+    extends PersistentActor
+    with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 
@@ -136,7 +137,8 @@ class NoPersistPersistentActorWithAtLeastOnceDelivery(
 
 class PersistPersistentActorWithAtLeastOnceDelivery(
     respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
-    extends PersistentActor with AtLeastOnceDelivery {
+    extends PersistentActor
+    with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 
@@ -172,7 +174,8 @@ class PersistPersistentActorWithAtLeastOnceDelivery(
 
 class PersistAsyncPersistentActorWithAtLeastOnceDelivery(
     respondAfter: Int, val upStream: ActorRef, val downStream: ActorPath)
-    extends PersistentActor with AtLeastOnceDelivery {
+    extends PersistentActor
+    with AtLeastOnceDelivery {
 
   override def redeliverInterval = 100.milliseconds
 

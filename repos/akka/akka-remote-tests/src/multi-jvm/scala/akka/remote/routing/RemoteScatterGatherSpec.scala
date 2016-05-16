@@ -46,8 +46,10 @@ class RemoteScatterGatherMultiJvmNode3 extends RemoteScatterGatherSpec
 class RemoteScatterGatherMultiJvmNode4 extends RemoteScatterGatherSpec
 
 class RemoteScatterGatherSpec
-    extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteScatterGatherMultiJvmSpec._
 
   def initialParticipants = roles.size

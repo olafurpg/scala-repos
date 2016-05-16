@@ -29,7 +29,9 @@ import kafka.coordinator.GroupCoordinator
 import org.apache.kafka.common.internals.TopicConstants
 
 class TopicCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness
+    with Logging
+    with RackAwareTest {
 
   @Test
   def testConfigPreservationAcrossPartitionAlteration() {

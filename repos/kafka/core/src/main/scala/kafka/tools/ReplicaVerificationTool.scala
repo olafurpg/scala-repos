@@ -199,17 +199,17 @@ object ReplicaVerificationTool extends Logging {
     val fetcherThreads: Iterable[ReplicaFetcher] =
       topicAndPartitionsPerBroker.map {
         case (brokerId, topicAndPartitions) =>
-          new ReplicaFetcher(
-              name = "ReplicaFetcher-" + brokerId,
-              sourceBroker = brokerMap(brokerId),
-              topicAndPartitions = topicAndPartitions,
-              replicaBuffer = replicaBuffer,
-              socketTimeout = 30000,
-              socketBufferSize = 256000,
-              fetchSize = fetchSize,
-              maxWait = maxWaitMs,
-              minBytes = 1,
-              doVerification = (brokerId == verificationBrokerId))
+          new ReplicaFetcher(name = "ReplicaFetcher-" + brokerId,
+                             sourceBroker = brokerMap(brokerId),
+                             topicAndPartitions = topicAndPartitions,
+                             replicaBuffer = replicaBuffer,
+                             socketTimeout = 30000,
+                             socketBufferSize = 256000,
+                             fetchSize = fetchSize,
+                             maxWait = maxWaitMs,
+                             minBytes = 1,
+                             doVerification =
+                               (brokerId == verificationBrokerId))
       }
 
     Runtime.getRuntime.addShutdownHook(

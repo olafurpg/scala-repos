@@ -81,7 +81,7 @@ object LiftJavaScript {
         "ajaxOnEnd" -> LiftRules.ajaxEnd
           .map(fnc => AnonFunc(fnc()))
           .openOr(AnonFunc(Noop))
-      )
+    )
   }
 
   def initCmd(settings: JsObj): JsCmd = {

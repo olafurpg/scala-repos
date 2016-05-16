@@ -205,8 +205,8 @@ private[server] class MetadataCache(brokerId: Int) extends Logging {
             endPoints.put(protocol, EndPoint(ep.host, ep.port, protocol))
             nodes.put(protocol, new Node(broker.id, ep.host, ep.port))
         }
-        aliveBrokers(broker.id) = Broker(
-            broker.id, endPoints.asScala, Option(broker.rack))
+        aliveBrokers(broker.id) =
+          Broker(broker.id, endPoints.asScala, Option(broker.rack))
         aliveNodes(broker.id) = nodes.asScala
       }
 

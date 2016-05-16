@@ -96,8 +96,8 @@ class LotsOfDataBot extends Actor with ActorLogging {
         if (count == maxEntries) {
           log.info("Reached {} entries", count)
           tickTask.cancel()
-          tickTask = context.system.scheduler
-            .schedule(1.seconds, 1.seconds, self, Tick)
+          tickTask =
+            context.system.scheduler.schedule(1.seconds, 1.seconds, self, Tick)
         }
         val key = ORSetKey[String]((count % maxEntries).toString)
         if (count <= 100) replicator ! Subscribe(key, self)

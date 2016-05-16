@@ -56,16 +56,18 @@ object Markdown {
   /**
     * Extends markedj Renderer for GitBucket
     */
-  class GitBucketMarkedRenderer(
-      options: Options,
-      repository: RepositoryService.RepositoryInfo,
-      enableWikiLink: Boolean,
-      enableRefsLink: Boolean,
-      enableAnchor: Boolean,
-      enableTaskList: Boolean,
-      hasWritePermission: Boolean,
-      pages: List[String])(implicit val context: Context)
-      extends Renderer(options) with LinkConverter with RequestCache {
+  class GitBucketMarkedRenderer(options: Options,
+                                repository: RepositoryService.RepositoryInfo,
+                                enableWikiLink: Boolean,
+                                enableRefsLink: Boolean,
+                                enableAnchor: Boolean,
+                                enableTaskList: Boolean,
+                                hasWritePermission: Boolean,
+                                pages: List[String])(
+      implicit val context: Context)
+      extends Renderer(options)
+      with LinkConverter
+      with RequestCache {
 
     override def heading(text: String, level: Int, raw: String): String = {
       val id = generateAnchorName(text)
@@ -88,9 +90,12 @@ object Markdown {
     }
 
     override def code(code: String, lang: String, escaped: Boolean): String = {
-      "<pre class=\"prettyprint" +
-      (if (lang != null) s" ${options.getLangPrefix}${lang}" else "") + "\">" +
-      (if (escaped) code else escape(code, true)) + "</pre>"
+      "<pre class=\"prettyprint" + (if (lang != null)
+                                      s" ${options.getLangPrefix}${lang}"
+                                    else "") + "\">" + (if (escaped) code
+                                                        else
+                                                          escape(code, true)) +
+      "</pre>"
     }
 
     override def list(body: String, ordered: Boolean): String = {

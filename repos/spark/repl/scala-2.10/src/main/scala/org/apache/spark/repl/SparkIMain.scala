@@ -90,7 +90,9 @@ import org.apache.spark.annotation.DeveloperApi
 class SparkIMain(initialSettings: Settings,
                  val out: JPrintWriter,
                  propagateExceptions: Boolean = false)
-    extends SparkImports with Logging { imain =>
+    extends SparkImports
+    with Logging {
+  imain =>
 
   private val conf = new SparkConf()
 
@@ -349,7 +351,8 @@ class SparkIMain(initialSettings: Settings,
     assert(bindExceptions, "withLastExceptionLock called incorrectly.")
     bindExceptions = false
 
-    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions = true
+    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions =
+      true
   }
 
   /**
@@ -434,17 +437,16 @@ class SparkIMain(initialSettings: Settings,
     // Collect our new jars/directories and add them to the existing set of classpaths
     val allClassPaths = (platform.classPath
           .asInstanceOf[MergedClassPath[AbstractFile]]
-          .entries ++ urls.map(url =>
-              {
-            platform.classPath.context.newClassPath(
-                if (url.getProtocol == "file") {
-                  val f = new File(url.getPath)
-                  if (f.isDirectory) io.AbstractFile.getDirectory(f)
-                  else io.AbstractFile.getFile(f)
-                } else {
-                  io.AbstractFile.getURL(url)
-                }
-            )
+          .entries ++ urls.map(url => {
+          platform.classPath.context.newClassPath(
+              if (url.getProtocol == "file") {
+                val f = new File(url.getPath)
+                if (f.isDirectory) io.AbstractFile.getDirectory(f)
+                else io.AbstractFile.getFile(f)
+              } else {
+                io.AbstractFile.getURL(url)
+              }
+          )
         })).distinct
 
     // Combine all of our classpaths (old and new) into one merged classpath
@@ -512,8 +514,8 @@ class SparkIMain(initialSettings: Settings,
         parentClassLoader match {
       case null => ScalaClassLoader fromURLs compilerClasspath
       case p =>
-        _runtimeClassLoader = new URLClassLoader(compilerClasspath, p)
-        with ExposeAddUrl
+        _runtimeClassLoader =
+          new URLClassLoader(compilerClasspath, p) with ExposeAddUrl
         _runtimeClassLoader
     })
 
@@ -620,13 +622,13 @@ class SparkIMain(initialSettings: Settings,
     // be what people want so I'm waiting until I can do it better.
     for {
       name <- req.definedNames filterNot
-      (x => req.definedNames contains x.companionName)
+             (x => req.definedNames contains x.companionName)
       oldReq <- definedNameMap get name.companionName
       newSym <- req.definedSymbols get name
       oldSym <- oldReq.definedSymbols get name.companionName
-                   if Seq(oldSym, newSym).permutations exists {
-                 case Seq(s1, s2) => s1.isClass && s2.isModule
-               }
+      if Seq(oldSym, newSym).permutations exists {
+        case Seq(s1, s2) => s1.isClass && s2.isModule
+      }
     } {
       afterTyper(replwarn(
               s"warning: previously defined $oldSym is not a companion to $newSym."))
@@ -737,18 +739,17 @@ class SparkIMain(initialSettings: Settings,
     }
     logDebug(
         trees map
-        (t =>
-              {
-                // [Eugene to Paul] previously it just said `t map ...`
-                // because there was an implicit conversion from Tree to a list of Trees
-                // however Martin and I have removed the conversion
-                // (it was conflicting with the new reflection API),
-                // so I had to rewrite this a bit
-                val subs = t collect { case sub => sub }
-                subs map
-                (t0 =>
-                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                    "\n") mkString ""
+        (t => {
+              // [Eugene to Paul] previously it just said `t map ...`
+              // because there was an implicit conversion from Tree to a list of Trees
+              // however Martin and I have removed the conversion
+              // (it was conflicting with the new reflection API),
+              // so I had to rewrite this a bit
+              val subs = t collect { case sub => sub }
+              subs map
+              (t0 =>
+                    "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                  "\n") mkString ""
             }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
@@ -944,7 +945,7 @@ class SparkIMain(initialSettings: Settings,
 
   private def directBind(p: NamedParam): IR.Result =
     directBind(p.name, p.tpe, p.value)
-  private def directBind[T : ru.TypeTag : ClassTag](
+  private def directBind[T: ru.TypeTag: ClassTag](
       name: String, value: T): IR.Result = directBind((name, value))
 
   /**
@@ -985,7 +986,7 @@ class SparkIMain(initialSettings: Settings,
   private[repl] def quietBind(p: NamedParam): IR.Result =
     beQuietDuring(bind(p))
   private def bind(p: NamedParam): IR.Result = bind(p.name, p.tpe, p.value)
-  private def bind[T : ru.TypeTag : ClassTag](
+  private def bind[T: ru.TypeTag: ClassTag](
       name: String, value: T): IR.Result = bind((name, value))
   private def bindSyntheticValue(x: Any): IR.Result =
     bindValue(freshInternalVarName(), x)
@@ -1371,8 +1372,8 @@ class SparkIMain(initialSettings: Settings,
       (compilerTypeOf get name) map (_.typeSymbol.simpleName)
 
     private def typeMap[T](f: Type => T) =
-      mapFrom[Name, Name, T](termNames ++ typeNames)(
-          x => f(cleanMemberDecl(resultSymbol, x)))
+      mapFrom[Name, Name, T](termNames ++ typeNames)(x =>
+            f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
     lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
@@ -1412,8 +1413,7 @@ class SparkIMain(initialSettings: Settings,
   def mostRecentVar: String =
     if (mostRecentlyHandledTree.isEmpty) ""
     else
-      "" +
-      (mostRecentlyHandledTree.get match {
+      "" + (mostRecentlyHandledTree.get match {
             case x: ValOrDefDef => x.name
             case Assign(Ident(name), _) => name
             case ModuleDef(_, name, _) => name
@@ -1676,11 +1676,11 @@ class SparkIMain(initialSettings: Settings,
     findName(termname) orElse getModuleIfDefined(termname)
   }
   // [Eugene to Paul] possibly you could make use of TypeTags here
-  private def types[T : ClassTag]: Symbol =
+  private def types[T: ClassTag]: Symbol =
     types(classTag[T].runtimeClass.getName)
-  private def terms[T : ClassTag]: Symbol =
+  private def terms[T: ClassTag]: Symbol =
     terms(classTag[T].runtimeClass.getName)
-  private def apply[T : ClassTag]: Symbol =
+  private def apply[T: ClassTag]: Symbol =
     apply(classTag[T].runtimeClass.getName)
 
   /**
@@ -1826,7 +1826,9 @@ object SparkIMain {
     }
   }
   abstract class StrippingTruncatingWriter(out: JPrintWriter)
-      extends JPrintWriter(out) with StrippingWriter with TruncatingWriter {
+      extends JPrintWriter(out)
+      with StrippingWriter
+      with TruncatingWriter {
     self =>
 
     def clean(str: String): String = truncate(strip(str))

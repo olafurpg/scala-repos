@@ -54,9 +54,13 @@ import scalaz.syntax.std.option._
 import scala.collection.JavaConverters._
 
 trait StandaloneQueryExecutorConfig
-    extends BaseConfig with ColumnarTableModuleConfig
-    with BlockStoreColumnarTableModuleConfig with ShardQueryExecutorConfig
-    with IdSourceConfig with ManagedQueryModuleConfig with ShardConfig {
+    extends BaseConfig
+    with ColumnarTableModuleConfig
+    with BlockStoreColumnarTableModuleConfig
+    with ShardQueryExecutorConfig
+    with IdSourceConfig
+    with ManagedQueryModuleConfig
+    with ShardConfig {
   def maxSliceSize = config[Int]("engine.max_slice_size", 10000)
   def smallSliceSize = config[Int]("engine.small_slice_size", 8)
 
@@ -78,7 +82,8 @@ trait StandaloneQueryExecutorConfig
 }
 
 trait StandaloneQueryExecutor
-    extends ManagedPlatform with ShardQueryExecutorPlatform[Future]
+    extends ManagedPlatform
+    with ShardQueryExecutorPlatform[Future]
     with Logging {
   platform =>
 

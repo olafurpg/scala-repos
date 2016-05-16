@@ -103,8 +103,7 @@ class SymbolNamer(treeSymbolPrefix: String,
     map.get(s) orElse parent.flatMap(_.get(s))
 
   def apply(s: Symbol): String =
-    get(s).getOrElse(
-        s match {
+    get(s).getOrElse(s match {
       case a: AnonSymbol =>
         val n = create(treeSymbolPrefix)
         update(a, n)

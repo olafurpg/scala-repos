@@ -93,7 +93,8 @@ object BigDecimalRootRefinement {
     apply(poly, lowerBound, upperBound).refine(mc)
 
   private implicit object JBigDecimalOrder
-      extends Signed[JBigDecimal] with Order[JBigDecimal] {
+      extends Signed[JBigDecimal]
+      with Order[JBigDecimal] {
     def signum(a: JBigDecimal): Int = a.signum
     def abs(a: JBigDecimal): JBigDecimal = a.abs
     def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y

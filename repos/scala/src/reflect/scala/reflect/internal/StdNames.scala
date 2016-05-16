@@ -79,8 +79,9 @@ trait StdNames { self: SymbolTable =>
 
       prefix + marker + md5chars + marker + suffix
     }
-    def apply(s: String): String = (if (s.length <= MaxNameLength) s
-                                    else toMD5(s, MaxNameLength / 4))
+    def apply(s: String): String =
+      (if (s.length <= MaxNameLength) s
+       else toMD5(s, MaxNameLength / 4))
   }
 
   abstract class CommonNames extends NamesApi {

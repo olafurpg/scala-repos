@@ -331,9 +331,8 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
 
       // STORE-LOAD PAIRS
       val runStoreLoad =
-        compilerSettings.YoptCopyPropagation &&
-        (requestStoreLoad || boxUnboxChanged || copyPropChanged ||
-            pushPopRemoved)
+        compilerSettings.YoptCopyPropagation && (requestStoreLoad ||
+            boxUnboxChanged || copyPropChanged || pushPopRemoved)
       val storeLoadRemoved = runStoreLoad && eliminateStoreLoad(method)
       traceIfChanged("storeLoadPairs")
 
@@ -474,8 +473,9 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           if (vi.getOpcode == ALOAD)
             toReplace(vi) = List(new InsnNode(ACONST_NULL))
           else if (vi.getOpcode == ASTORE)
-            for (frame <- frameAt(vi) if frame.peekStack(0) == NullValue) toReplace(
-                vi) = List(getPop(1))
+            for (frame <- frameAt(vi)
+                 if frame.peekStack(0) == NullValue) toReplace(vi) =
+              List(getPop(1))
 
         case ji: JumpInsnNode =>
           val isIfNull = ji.getOpcode == IFNULL
@@ -524,9 +524,9 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         case mi: MethodInsnNode =>
           if (isScalaUnbox(mi))
             for (frame <- frameAt(mi) if frame.peekStack(0) == NullValue) {
-              toReplace(mi) = List(
-                  getPop(1),
-                  loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
+              toReplace(mi) =
+                List(getPop(1),
+                     loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
             }
 
         case _ =>
@@ -576,7 +576,8 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
 
         case v: VarInsnNode if isLive =>
           val longSize = if (isSize2LoadOrStore(v.getOpcode)) 1 else 0
-          maxLocals = math.max(maxLocals, v.`var` + longSize + 1) // + 1 because local numbers are 0-based
+          maxLocals =
+            math.max(maxLocals, v.`var` + longSize + 1) // + 1 because local numbers are 0-based
 
         case i: IincInsnNode if isLive =>
           maxLocals = math.max(maxLocals, i.`var` + 1)
@@ -668,8 +669,7 @@ object LocalOptImpls {
     /** True if there exists code between start and end. */
     def containsExecutableCode(
         start: AbstractInsnNode, end: LabelNode): Boolean = {
-      start != end &&
-      ((start.getOpcode: @switch) match {
+      start != end && ((start.getOpcode: @switch) match {
             // FrameNode, LabelNode and LineNumberNode have opcode == -1.
             case -1 | GOTO => containsExecutableCode(start.getNext, end)
             case _ => true
@@ -696,14 +696,13 @@ object LocalOptImpls {
     * the same index, but distinct start / end ranges are different variables, they may have not the
     * same type or name.
     */
-  def removeUnusedLocalVariableNodes(method: MethodNode)(
-      firstLocalIndex: Int = parametersSize(method),
-      renumber: Int => Int = identity): Boolean = {
+  def removeUnusedLocalVariableNodes(
+      method: MethodNode)(firstLocalIndex: Int = parametersSize(method),
+                          renumber: Int => Int = identity): Boolean = {
     @tailrec
     def variableIsUsed(
         start: AbstractInsnNode, end: LabelNode, varIndex: Int): Boolean = {
-      start != end &&
-      (start match {
+      start != end && (start match {
             case v: VarInsnNode if v.`var` == varIndex => true
             case i: IincInsnNode if i.`var` == varIndex => true
             case _ => variableIsUsed(start.getNext, end, varIndex)
@@ -997,8 +996,7 @@ object LocalOptImpls {
       */
     def simplifyGotoReturn(
         instruction: AbstractInsnNode, inTryBlock: Boolean): Boolean =
-      !inTryBlock &&
-      (instruction match {
+      !inTryBlock && (instruction match {
             case Goto(jump) =>
               nextExecutableInstruction(jump.label) match {
                 case Some(target) =>
@@ -1018,8 +1016,7 @@ object LocalOptImpls {
 
       // `.toList` because we're modifying the map while iterating over it
       for ((jumpInsn, inTryBlock) <- jumpInsns.toList
-                                        if jumpInsns.contains(jumpInsn) &&
-                                    isJumpNonJsr(jumpInsn)) {
+           if jumpInsns.contains(jumpInsn) && isJumpNonJsr(jumpInsn)) {
         var jumpRemoved = simplifyThenElseSameTarget(jumpInsn)
 
         if (!jumpRemoved) {

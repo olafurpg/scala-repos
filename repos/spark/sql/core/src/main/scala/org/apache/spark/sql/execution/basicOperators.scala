@@ -27,7 +27,8 @@ import org.apache.spark.sql.types.LongType
 import org.apache.spark.util.random.PoissonSampler
 
 case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = projectList.map(_.toAttribute)
 
@@ -79,7 +80,9 @@ case class Project(projectList: Seq[NamedExpression], child: SparkPlan)
 }
 
 case class Filter(condition: Expression, child: SparkPlan)
-    extends UnaryNode with CodegenSupport with PredicateHelper {
+    extends UnaryNode
+    with CodegenSupport
+    with PredicateHelper {
 
   // Split out all the IsNotNulls from condition.
   private val (notNullPreds, otherPreds) =
@@ -211,7 +214,8 @@ case class Range(start: Long,
                  numSlices: Int,
                  numElements: BigInt,
                  output: Seq[Attribute])
-    extends LeafNode with CodegenSupport {
+    extends LeafNode
+    with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -310,53 +314,51 @@ case class Range(start: Long,
     val numOutputRows = longMetric("numOutputRows")
     sqlContext.sparkContext
       .parallelize(0 until numSlices, numSlices)
-      .mapPartitionsWithIndex((i, _) =>
-            {
-          val partitionStart = (i * numElements) / numSlices * step + start
-          val partitionEnd =
-            (((i + 1) * numElements) / numSlices) * step + start
-          def getSafeMargin(bi: BigInt): Long =
-            if (bi.isValidLong) {
-              bi.toLong
-            } else if (bi > 0) {
-              Long.MaxValue
-            } else {
-              Long.MinValue
-            }
-          val safePartitionStart = getSafeMargin(partitionStart)
-          val safePartitionEnd = getSafeMargin(partitionEnd)
-          val rowSize =
-            UnsafeRow.calculateBitSetWidthInBytes(1) + LongType.defaultSize
-          val unsafeRow = UnsafeRow.createFromByteArray(rowSize, 1)
-
-          new Iterator[InternalRow] {
-            private[this] var number: Long = safePartitionStart
-            private[this] var overflow: Boolean = false
-
-            override def hasNext =
-              if (!overflow) {
-                if (step > 0) {
-                  number < safePartitionEnd
-                } else {
-                  number > safePartitionEnd
-                }
-              } else false
-
-            override def next() = {
-              val ret = number
-              number += step
-              if (number < ret ^ step < 0) {
-                // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
-                // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
-                // back, we are pretty sure that we have an overflow.
-                overflow = true
-              }
-
-              numOutputRows += 1
-              unsafeRow.setLong(0, ret)
-              unsafeRow
-            }
+      .mapPartitionsWithIndex((i, _) => {
+        val partitionStart = (i * numElements) / numSlices * step + start
+        val partitionEnd = (((i + 1) * numElements) / numSlices) * step + start
+        def getSafeMargin(bi: BigInt): Long =
+          if (bi.isValidLong) {
+            bi.toLong
+          } else if (bi > 0) {
+            Long.MaxValue
+          } else {
+            Long.MinValue
           }
+        val safePartitionStart = getSafeMargin(partitionStart)
+        val safePartitionEnd = getSafeMargin(partitionEnd)
+        val rowSize =
+          UnsafeRow.calculateBitSetWidthInBytes(1) + LongType.defaultSize
+        val unsafeRow = UnsafeRow.createFromByteArray(rowSize, 1)
+
+        new Iterator[InternalRow] {
+          private[this] var number: Long = safePartitionStart
+          private[this] var overflow: Boolean = false
+
+          override def hasNext =
+            if (!overflow) {
+              if (step > 0) {
+                number < safePartitionEnd
+              } else {
+                number > safePartitionEnd
+              }
+            } else false
+
+          override def next() = {
+            val ret = number
+            number += step
+            if (number < ret ^ step < 0) {
+              // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
+              // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
+              // back, we are pretty sure that we have an overflow.
+              overflow = true
+            }
+
+            numOutputRows += 1
+            unsafeRow.setLong(0, ret)
+            unsafeRow
+          }
+        }
       })
   }
 }

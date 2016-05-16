@@ -41,7 +41,8 @@ class RemoteDeliveryMultiJvmNode2 extends RemoteDeliverySpec
 class RemoteDeliveryMultiJvmNode3 extends RemoteDeliverySpec
 
 abstract class RemoteDeliverySpec
-    extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteDeliveryMultiJvmSpec._

@@ -24,9 +24,9 @@ final case class WriterT[F[_], L, V](run: F[(L, V)]) {
       }
     }
 
-  def flatMap[U](
-      f: V => WriterT[F, L, U])(implicit flatMapF: FlatMap[F],
-                                semigroupL: Semigroup[L]): WriterT[F, L, U] =
+  def flatMap[U](f: V => WriterT[F, L, U])(
+      implicit flatMapF: FlatMap[F],
+      semigroupL: Semigroup[L]): WriterT[F, L, U] =
     WriterT {
       flatMapF.flatMap(run) { lv =>
         flatMapF.map(f(lv._2).run) { lv2 =>
@@ -61,7 +61,7 @@ object WriterT extends WriterTInstances with WriterTFunctions
 private[data] sealed abstract class WriterTInstances
     extends WriterTInstances0 {
 
-  implicit def writerTIdMonad[L : Monoid]: Monad[WriterT[Id, L, ?]] =
+  implicit def writerTIdMonad[L: Monoid]: Monad[WriterT[Id, L, ?]] =
     writerTMonad[Id, L]
 
   // The Eq[(L, V)] can be derived from an Eq[L] and Eq[V], but we are waiting
@@ -105,7 +105,7 @@ private[data] sealed abstract class WriterTInstances0
   implicit def writerTIdFunctor[L]: Functor[WriterT[Id, L, ?]] =
     writerTFunctor[Id, L]
 
-  implicit def writerTIdFlatMap[L : Semigroup]: FlatMap[WriterT[Id, L, ?]] =
+  implicit def writerTIdFlatMap[L: Semigroup]: FlatMap[WriterT[Id, L, ?]] =
     writerTFlatMap[Id, L]
 
   implicit def writerTEq[F[_], L, V](
@@ -204,7 +204,8 @@ private[data] sealed trait WriterTFunctor[F[_], L]
 }
 
 private[data] sealed trait WriterTApply[F[_], L]
-    extends WriterTFunctor[F, L] with Apply[WriterT[F, L, ?]] {
+    extends WriterTFunctor[F, L]
+    with Apply[WriterT[F, L, ?]] {
   override implicit def F0: Apply[F]
   implicit def L0: Semigroup[L]
 
@@ -220,7 +221,8 @@ private[data] sealed trait WriterTApply[F[_], L]
 }
 
 private[data] sealed trait WriterTFlatMap[F[_], L]
-    extends WriterTApply[F, L] with FlatMap[WriterT[F, L, ?]] {
+    extends WriterTApply[F, L]
+    with FlatMap[WriterT[F, L, ?]] {
   override implicit def F0: FlatMap[F]
   implicit def L0: Semigroup[L]
 
@@ -230,7 +232,8 @@ private[data] sealed trait WriterTFlatMap[F[_], L]
 }
 
 private[data] sealed trait WriterTApplicative[F[_], L]
-    extends WriterTApply[F, L] with Applicative[WriterT[F, L, ?]] {
+    extends WriterTApply[F, L]
+    with Applicative[WriterT[F, L, ?]] {
   override implicit def F0: Applicative[F]
   override implicit def L0: Monoid[L]
 
@@ -239,7 +242,8 @@ private[data] sealed trait WriterTApplicative[F[_], L]
 }
 
 private[data] sealed trait WriterTMonad[F[_], L]
-    extends WriterTApplicative[F, L] with Monad[WriterT[F, L, ?]] {
+    extends WriterTApplicative[F, L]
+    with Monad[WriterT[F, L, ?]] {
   override implicit def F0: Monad[F]
   override implicit def L0: Monoid[L]
 
@@ -257,27 +261,31 @@ private[data] sealed trait WriterTSemigroupK[F[_], L]
 }
 
 private[data] sealed trait WriterTMonoidK[F[_], L]
-    extends MonoidK[WriterT[F, L, ?]] with WriterTSemigroupK[F, L] {
+    extends MonoidK[WriterT[F, L, ?]]
+    with WriterTSemigroupK[F, L] {
   override implicit def F0: MonoidK[F]
 
   def empty[A]: WriterT[F, L, A] = WriterT(F0.empty)
 }
 
 private[data] sealed trait WriterTAlternative[F[_], L]
-    extends Alternative[WriterT[F, L, ?]] with WriterTMonoidK[F, L]
+    extends Alternative[WriterT[F, L, ?]]
+    with WriterTMonoidK[F, L]
     with WriterTApplicative[F, L] {
   override implicit def F0: Alternative[F]
 }
 
 private[data] sealed trait WriterTMonadFilter[F[_], L]
-    extends MonadFilter[WriterT[F, L, ?]] with WriterTMonad[F, L] {
+    extends MonadFilter[WriterT[F, L, ?]]
+    with WriterTMonad[F, L] {
   override implicit def F0: MonadFilter[F]
 
   def empty[A]: WriterT[F, L, A] = WriterT(F0.empty)
 }
 
 private[data] sealed trait WriterTMonadCombine[F[_], L]
-    extends MonadCombine[WriterT[F, L, ?]] with WriterTMonad[F, L]
+    extends MonadCombine[WriterT[F, L, ?]]
+    with WriterTMonad[F, L]
     with WriterTAlternative[F, L] {
   override implicit def F0: MonadCombine[F]
 }

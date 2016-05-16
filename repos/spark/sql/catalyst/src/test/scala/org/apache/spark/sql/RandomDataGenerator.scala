@@ -58,13 +58,12 @@ object RandomDataGenerator {
   private def randomNumeric[T](rand: Random,
                                uniformRand: Random => T,
                                interestingValues: Seq[T]): Some[() => T] = {
-    val f = () =>
-      {
-        if (rand.nextFloat() <= PROBABILITY_OF_INTERESTING_VALUE) {
-          interestingValues(rand.nextInt(interestingValues.length))
-        } else {
-          uniformRand(rand)
-        }
+    val f = () => {
+      if (rand.nextFloat() <= PROBABILITY_OF_INTERESTING_VALUE) {
+        interestingValues(rand.nextInt(interestingValues.length))
+      } else {
+        uniformRand(rand)
+      }
     }
     Some(f)
   }
@@ -140,52 +139,48 @@ object RandomDataGenerator {
       case StringType => Some(() => rand.nextString(rand.nextInt(MAX_STR_LEN)))
       case BinaryType =>
         Some(
-            () =>
-              {
-            val arr = new Array[Byte](rand.nextInt(MAX_STR_LEN))
-            rand.nextBytes(arr)
-            arr
+            () => {
+          val arr = new Array[Byte](rand.nextInt(MAX_STR_LEN))
+          rand.nextBytes(arr)
+          arr
         })
       case BooleanType => Some(() => rand.nextBoolean())
       case DateType =>
-        val generator = () =>
-          {
-            var milliseconds = rand.nextLong() % 253402329599999L
-            // -62135740800000L is the number of milliseconds before January 1, 1970, 00:00:00 GMT
-            // for "0001-01-01 00:00:00.000000". We need to find a
-            // number that is greater or equals to this number as a valid timestamp value.
-            while (milliseconds < -62135740800000L) {
-              // 253402329599999L is the number of milliseconds since
-              // January 1, 1970, 00:00:00 GMT for "9999-12-31 23:59:59.999999".
-              milliseconds = rand.nextLong() % 253402329599999L
-            }
-            DateTimeUtils.toJavaDate(
-                (milliseconds / DateTimeUtils.MILLIS_PER_DAY).toInt)
+        val generator = () => {
+          var milliseconds = rand.nextLong() % 253402329599999L
+          // -62135740800000L is the number of milliseconds before January 1, 1970, 00:00:00 GMT
+          // for "0001-01-01 00:00:00.000000". We need to find a
+          // number that is greater or equals to this number as a valid timestamp value.
+          while (milliseconds < -62135740800000L) {
+            // 253402329599999L is the number of milliseconds since
+            // January 1, 1970, 00:00:00 GMT for "9999-12-31 23:59:59.999999".
+            milliseconds = rand.nextLong() % 253402329599999L
+          }
+          DateTimeUtils.toJavaDate(
+              (milliseconds / DateTimeUtils.MILLIS_PER_DAY).toInt)
         }
         Some(generator)
       case TimestampType =>
-        val generator = () =>
-          {
-            var milliseconds = rand.nextLong() % 253402329599999L
-            // -62135740800000L is the number of milliseconds before January 1, 1970, 00:00:00 GMT
-            // for "0001-01-01 00:00:00.000000". We need to find a
-            // number that is greater or equals to this number as a valid timestamp value.
-            while (milliseconds < -62135740800000L) {
-              // 253402329599999L is the number of milliseconds since
-              // January 1, 1970, 00:00:00 GMT for "9999-12-31 23:59:59.999999".
-              milliseconds = rand.nextLong() % 253402329599999L
-            }
-            // DateTimeUtils.toJavaTimestamp takes microsecond.
-            DateTimeUtils.toJavaTimestamp(milliseconds * 1000)
+        val generator = () => {
+          var milliseconds = rand.nextLong() % 253402329599999L
+          // -62135740800000L is the number of milliseconds before January 1, 1970, 00:00:00 GMT
+          // for "0001-01-01 00:00:00.000000". We need to find a
+          // number that is greater or equals to this number as a valid timestamp value.
+          while (milliseconds < -62135740800000L) {
+            // 253402329599999L is the number of milliseconds since
+            // January 1, 1970, 00:00:00 GMT for "9999-12-31 23:59:59.999999".
+            milliseconds = rand.nextLong() % 253402329599999L
+          }
+          // DateTimeUtils.toJavaTimestamp takes microsecond.
+          DateTimeUtils.toJavaTimestamp(milliseconds * 1000)
         }
         Some(generator)
       case CalendarIntervalType =>
         Some(
-            () =>
-              {
-            val months = rand.nextInt(1000)
-            val ns = rand.nextLong()
-            new CalendarInterval(months, ns)
+            () => {
+          val months = rand.nextInt(1000)
+          val ns = rand.nextLong()
+          new CalendarInterval(months, ns)
         })
       case DecimalType.Fixed(precision, scale) =>
         Some(
@@ -238,8 +233,9 @@ object RandomDataGenerator {
         }
       case MapType(keyType, valueType, valueContainsNull) => {
           for (keyGenerator <- forType(keyType, nullable = false, rand);
-          valueGenerator <- forType(
-              valueType, nullable = valueContainsNull, rand)) yield { () =>
+               valueGenerator <- forType(valueType,
+                                         nullable = valueContainsNull,
+                                         rand)) yield { () =>
             {
               val length = rand.nextInt(MAX_MAP_SIZE)
               val keys = scala.collection.mutable
@@ -278,14 +274,13 @@ object RandomDataGenerator {
 
           if (maybeSqlTypeGenerator.isDefined) {
             val sqlTypeGenerator = maybeSqlTypeGenerator.get
-            val generator = () =>
-              {
-                val generatedScalaValue = sqlTypeGenerator.apply()
-                if (generatedScalaValue == null) {
-                  null
-                } else {
-                  udt.deserialize(toCatalystType(generatedScalaValue))
-                }
+            val generator = () => {
+              val generatedScalaValue = sqlTypeGenerator.apply()
+              if (generatedScalaValue == null) {
+                null
+              } else {
+                udt.deserialize(toCatalystType(generatedScalaValue))
+              }
             }
             Some(generator)
           } else {

@@ -7,17 +7,16 @@ import scala.collection.{immutable, mutable}
 // TODO(jsuereth) - Register runtime pickler generators
 
 trait SetPicklers {
-  implicit def setPickler[T : FastTypeTag](
-      implicit elemPickler: Pickler[T],
-      elemUnpickler: Unpickler[T],
-      collTag: FastTypeTag[Set[T]],
-      cbf: CanBuildFrom[Set[T], T, Set[T]])
+  implicit def setPickler[T: FastTypeTag](implicit elemPickler: Pickler[T],
+                                          elemUnpickler: Unpickler[T],
+                                          collTag: FastTypeTag[Set[T]],
+                                          cbf: CanBuildFrom[Set[T], T, Set[T]])
     : Pickler[Set[T]] with Unpickler[Set[T]] =
     SeqSetPickler[T, Set]
 }
 
 trait ImmutableSortedSetPicklers {
-  implicit def immutableSortedSetPickler[T : FastTypeTag](
+  implicit def immutableSortedSetPickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[immutable.SortedSet[T]],
@@ -27,7 +26,7 @@ trait ImmutableSortedSetPicklers {
 }
 
 trait MutableSetPicklers {
-  implicit def mutableSetPickler[T : FastTypeTag](
+  implicit def mutableSetPickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[mutable.Set[T]],
@@ -37,7 +36,7 @@ trait MutableSetPicklers {
 }
 
 trait MutableSortedSetPicklers {
-  implicit def mutableSortedSetPickler[T : FastTypeTag](
+  implicit def mutableSortedSetPickler[T: FastTypeTag](
       implicit elemPickler: Pickler[T],
       elemUnpickler: Unpickler[T],
       collTag: FastTypeTag[mutable.SortedSet[T]],

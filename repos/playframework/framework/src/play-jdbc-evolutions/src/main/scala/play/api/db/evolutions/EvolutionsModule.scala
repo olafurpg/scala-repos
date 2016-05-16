@@ -22,7 +22,7 @@ class EvolutionsModule extends Module {
         bind[ApplicationEvolutions]
           .toProvider[ApplicationEvolutionsProvider]
           .eagerly
-      )
+    )
   }
 }
 

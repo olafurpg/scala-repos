@@ -33,7 +33,8 @@ trait NewScalaParserXXX extends NewScalaScannerXXX with ScalaPrecedenceXXX {
   type NewLine <: Statement with NewLineImpl;
   trait MyNewLine extends super [NewScalaScannerXXX].NewLineImpl;
   trait NewLineImpl
-      extends MyNewLine with super [ScalaPrecedenceXXX].NewLineImpl
+      extends MyNewLine
+      with super [ScalaPrecedenceXXX].NewLineImpl
       with StatementImpl {
     def self: NewLine;
     override def isActive = super [MyNewLine].isActive;

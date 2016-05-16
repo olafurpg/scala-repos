@@ -10,7 +10,7 @@ import org.jboss.netty.handler.codec.http._
 /**
   * Stream StreamResponse messages into HTTP chunks.
   */
-private[twitter] class StreamServerDispatcher[Req : RequestType](
+private[twitter] class StreamServerDispatcher[Req: RequestType](
     trans: Transport[Any, Any],
     service: Service[Req, StreamResponse]
 )

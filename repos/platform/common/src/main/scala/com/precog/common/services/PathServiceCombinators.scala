@@ -37,7 +37,8 @@ import com.weiglewilczek.slf4s.Logging
 import scalaz.syntax.show._
 
 trait PathServiceCombinators
-    extends HttpRequestHandlerCombinators with Logging {
+    extends HttpRequestHandlerCombinators
+    with Logging {
   def dataPath[A, B, C](prefix: String)(
       next: HttpService[A, (B, Path) => Future[C]]) = {
     // FIXME: We need documentation *right here* about what this regex
@@ -47,15 +48,14 @@ trait PathServiceCombinators
             prefix)) {
       new DelegatingService[A, B => Future[C], A, (B, Path) => Future[C]] {
         val delegate = next
-        val service = (request: HttpRequest[A]) =>
-          {
-            logger.debug("Handling dataPath request " + request.shows)
+        val service = (request: HttpRequest[A]) => {
+          logger.debug("Handling dataPath request " + request.shows)
 
-            val path: Option[String] =
-              request.parameters.get('prefixPath).filter(_ != null)
-            next.service(request) map { f => (b: B) =>
-              f(b, Path(path.getOrElse("")))
-            }
+          val path: Option[String] =
+            request.parameters.get('prefixPath).filter(_ != null)
+          next.service(request) map { f => (b: B) =>
+            f(b, Path(path.getOrElse("")))
+          }
         }
 
         val metadata = AboutMetadata(

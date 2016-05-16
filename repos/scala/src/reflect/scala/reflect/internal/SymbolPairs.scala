@@ -65,7 +65,8 @@ abstract class SymbolPairs {
   case class SymbolPair(base: Symbol, low: Symbol, high: Symbol) {
     def pos =
       if (low.owner == base) low.pos
-      else if (high.owner == base) high.pos else base.pos
+      else if (high.owner == base) high.pos
+      else base.pos
     def self: Type = base.thisType
     def rootType: Type = base.thisType
 

@@ -60,10 +60,10 @@ object JavaWebSocket extends JavaHelpers {
                   socketIn.closeCallbacks.asScala.foreach(_.run())
                 })
 
-                val source = Source
-                  .actorRef[A](256, OverflowStrategy.dropNew)
-                  .mapMaterializedValue {
-                    actor =>
+                val source =
+                  Source
+                    .actorRef[A](256, OverflowStrategy.dropNew)
+                    .mapMaterializedValue { actor =>
                       val socketOut = new JWebSocket.Out[A] {
                         def write(frame: A) = {
                           actor ! frame
@@ -74,7 +74,7 @@ object JavaWebSocket extends JavaHelpers {
                       }
 
                       jws.onReady(socketIn, socketOut)
-                  }
+                    }
 
                 transformer.transform(Flow.fromSinkAndSource(sink, source))
               }

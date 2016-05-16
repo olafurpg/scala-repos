@@ -293,8 +293,8 @@ class KafkaApis(val requestChannel: RequestChannel,
       def sendResponseCallback(
           commitStatus: immutable.Map[TopicPartition, Short]) {
         val mergedCommitStatus =
-          commitStatus ++ unauthorizedRequestInfo.mapValues(
-              _ => Errors.TOPIC_AUTHORIZATION_FAILED.code)
+          commitStatus ++ unauthorizedRequestInfo.mapValues(_ =>
+                Errors.TOPIC_AUTHORIZATION_FAILED.code)
 
         mergedCommitStatus.foreach {
           case (topicPartition, errorCode) =>
@@ -411,8 +411,7 @@ class KafkaApis(val requestChannel: RequestChannel,
         responseStatus: Map[TopicPartition, PartitionResponse]) {
 
       val mergedResponseStatus =
-        responseStatus ++ unauthorizedRequestInfo.mapValues(
-            _ =>
+        responseStatus ++ unauthorizedRequestInfo.mapValues(_ =>
               new PartitionResponse(Errors.TOPIC_AUTHORIZATION_FAILED.code,
                                     -1,
                                     Message.NoTimestamp))
@@ -644,63 +643,60 @@ class KafkaApis(val requestChannel: RequestChannel,
           new ListOffsetResponse.PartitionData(
               Errors.TOPIC_AUTHORIZATION_FAILED.code, List[JLong]().asJava))
 
-    val responseMap =
-      authorizedRequestInfo.map(
-          elem =>
-            {
-          val (topicPartition, partitionData) = elem
-          try {
-            // ensure leader exists
-            val localReplica =
-              if (offsetRequest.replicaId != ListOffsetRequest.DEBUGGING_REPLICA_ID)
-                replicaManager.getLeaderReplicaIfLocal(
-                    topicPartition.topic, topicPartition.partition)
-              else
-                replicaManager.getReplicaOrException(
-                    topicPartition.topic, topicPartition.partition)
-            val offsets = {
-              val allOffsets = fetchOffsets(replicaManager.logManager,
-                                            topicPartition,
-                                            partitionData.timestamp,
-                                            partitionData.maxNumOffsets)
-              if (offsetRequest.replicaId != ListOffsetRequest.CONSUMER_REPLICA_ID) {
-                allOffsets
-              } else {
-                val hw = localReplica.highWatermark.messageOffset
-                if (allOffsets.exists(_ > hw))
-                  hw +: allOffsets.dropWhile(_ > hw)
-                else allOffsets
-              }
-            }
-            (topicPartition,
-             new ListOffsetResponse.PartitionData(
-                 Errors.NONE.code, offsets.map(new JLong(_)).asJava))
-          } catch {
-            // NOTE: UnknownTopicOrPartitionException and NotLeaderForPartitionException are special cased since these error messages
-            // are typically transient and there is no value in logging the entire stack trace for the same
-            case utpe: UnknownTopicOrPartitionException =>
-              debug("Offset request with correlation id %d from client %s on partition %s failed due to %s"
-                    .format(correlationId,
-                            clientId,
-                            topicPartition,
-                            utpe.getMessage))
-              (topicPartition,
-               new ListOffsetResponse.PartitionData(
-                   Errors.forException(utpe).code, List[JLong]().asJava))
-            case nle: NotLeaderForPartitionException =>
-              debug("Offset request with correlation id %d from client %s on partition %s failed due to %s"
-                    .format(
-                      correlationId, clientId, topicPartition, nle.getMessage))
-              (topicPartition,
-               new ListOffsetResponse.PartitionData(
-                   Errors.forException(nle).code, List[JLong]().asJava))
-            case e: Throwable =>
-              error("Error while responding to offset request", e)
-              (topicPartition,
-               new ListOffsetResponse.PartitionData(
-                   Errors.forException(e).code, List[JLong]().asJava))
+    val responseMap = authorizedRequestInfo.map(elem => {
+      val (topicPartition, partitionData) = elem
+      try {
+        // ensure leader exists
+        val localReplica =
+          if (offsetRequest.replicaId != ListOffsetRequest.DEBUGGING_REPLICA_ID)
+            replicaManager.getLeaderReplicaIfLocal(
+                topicPartition.topic, topicPartition.partition)
+          else
+            replicaManager.getReplicaOrException(
+                topicPartition.topic, topicPartition.partition)
+        val offsets = {
+          val allOffsets = fetchOffsets(replicaManager.logManager,
+                                        topicPartition,
+                                        partitionData.timestamp,
+                                        partitionData.maxNumOffsets)
+          if (offsetRequest.replicaId != ListOffsetRequest.CONSUMER_REPLICA_ID) {
+            allOffsets
+          } else {
+            val hw = localReplica.highWatermark.messageOffset
+            if (allOffsets.exists(_ > hw))
+              hw +: allOffsets.dropWhile(_ > hw)
+            else allOffsets
           }
-      })
+        }
+        (topicPartition,
+         new ListOffsetResponse.PartitionData(
+             Errors.NONE.code, offsets.map(new JLong(_)).asJava))
+      } catch {
+        // NOTE: UnknownTopicOrPartitionException and NotLeaderForPartitionException are special cased since these error messages
+        // are typically transient and there is no value in logging the entire stack trace for the same
+        case utpe: UnknownTopicOrPartitionException =>
+          debug("Offset request with correlation id %d from client %s on partition %s failed due to %s"
+                .format(correlationId,
+                        clientId,
+                        topicPartition,
+                        utpe.getMessage))
+          (topicPartition,
+           new ListOffsetResponse.PartitionData(
+               Errors.forException(utpe).code, List[JLong]().asJava))
+        case nle: NotLeaderForPartitionException =>
+          debug("Offset request with correlation id %d from client %s on partition %s failed due to %s"
+                .format(
+                  correlationId, clientId, topicPartition, nle.getMessage))
+          (topicPartition,
+           new ListOffsetResponse.PartitionData(
+               Errors.forException(nle).code, List[JLong]().asJava))
+        case e: Throwable =>
+          error("Error while responding to offset request", e)
+          (topicPartition,
+           new ListOffsetResponse.PartitionData(
+               Errors.forException(e).code, List[JLong]().asJava))
+      }
+    })
 
     val mergedResponseMap = responseMap ++ unauthorizedResponseStatus
 
@@ -736,11 +732,11 @@ class KafkaApis(val requestChannel: RequestChannel,
       offsetTimeArray = new Array[(Long, Long)](segsArray.length + 1)
     else offsetTimeArray = new Array[(Long, Long)](segsArray.length)
 
-    for (i <- 0 until segsArray.length) offsetTimeArray(i) = (
-        segsArray(i).baseOffset, segsArray(i).lastModified)
+    for (i <- 0 until segsArray.length) offsetTimeArray(i) =
+      (segsArray(i).baseOffset, segsArray(i).lastModified)
     if (segsArray.last.size > 0)
-      offsetTimeArray(segsArray.length) = (
-          log.logEndOffset, SystemTime.milliseconds)
+      offsetTimeArray(segsArray.length) =
+        (log.logEndOffset, SystemTime.milliseconds)
 
     var startIndex = -1
     timestamp match {
@@ -750,9 +746,8 @@ class KafkaApis(val requestChannel: RequestChannel,
         startIndex = 0
       case _ =>
         var isFound = false
-        debug(
-            "Offset time array = " +
-            offsetTimeArray.foreach(o => "%d, %d".format(o._1, o._2)))
+        debug("Offset time array = " + offsetTimeArray.foreach(o =>
+                  "%d, %d".format(o._1, o._2)))
         startIndex = offsetTimeArray.length - 1
         while (startIndex >= 0 && !isFound) {
           if (offsetTimeArray(startIndex)._2 <= timestamp) isFound = true
@@ -770,11 +765,12 @@ class KafkaApis(val requestChannel: RequestChannel,
     ret.toSeq.sortBy(-_)
   }
 
-  private def createTopic(topic: String,
-                          numPartitions: Int,
-                          replicationFactor: Int,
-                          properties: Properties = new Properties())
-    : MetadataResponse.TopicMetadata = {
+  private def createTopic(
+      topic: String,
+      numPartitions: Int,
+      replicationFactor: Int,
+      properties: Properties =
+        new Properties()): MetadataResponse.TopicMetadata = {
     try {
       AdminUtils.createTopic(zkUtils,
                              topic,
@@ -861,7 +857,7 @@ class KafkaApis(val requestChannel: RequestChannel,
           .filter(topic =>
                 authorize(
                     request.session, Describe, new Resource(Topic, topic)))
-          (authorized, mutable.Set[String]())
+        (authorized, mutable.Set[String]())
       } else {
         topics.partition(topic =>
               authorize(request.session, Describe, new Resource(Topic, topic)))

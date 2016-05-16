@@ -197,8 +197,8 @@ trait ScPattern extends ScalaPsiElement {
                 this, true, classOf[ScTemplateDefinition])
             clazz match {
               case clazz: ScTemplateDefinition =>
-                undefSubst = undefSubst.followed(
-                    new ScSubstitutor(ScThisType(clazz)))
+                undefSubst =
+                  undefSubst.followed(new ScSubstitutor(ScThisType(clazz)))
               case _ =>
             }
             val firstParameterType =
@@ -535,8 +535,9 @@ object ScPattern {
                     val productFqn = "scala.Product" + productChance.length
                     (for {
                       productClass <- ScalaPsiManager
-                        .instance(place.getProject)
-                        .getCachedClass(place.getResolveScope, productFqn)
+                                       .instance(place.getProject)
+                                       .getCachedClass(place.getResolveScope,
+                                                       productFqn)
                       clazz <- ScType.extractClass(tp, Some(place.getProject))
                     } yield
                       clazz == productClass ||

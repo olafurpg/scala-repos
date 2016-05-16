@@ -31,7 +31,8 @@ class PiercingShouldKeepQuarantineSpecMultiJvmNode2
 
 abstract class PiercingShouldKeepQuarantineSpec
     extends MultiNodeSpec(PiercingShouldKeepQuarantineSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import PiercingShouldKeepQuarantineSpec._
 

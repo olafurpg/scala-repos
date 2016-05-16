@@ -81,7 +81,7 @@ private[streaming] class JavaStreamingListenerWrapper(
         batchInfo.outputOperationInfos
           .mapValues(toJavaOutputOperationInfo(_))
           .asJava
-      )
+    )
   }
 
   override def onReceiverStarted(

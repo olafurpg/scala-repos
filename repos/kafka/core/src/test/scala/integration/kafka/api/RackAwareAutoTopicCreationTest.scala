@@ -28,7 +28,8 @@ import org.junit.Test
 import scala.collection.Map
 
 class RackAwareAutoTopicCreationTest
-    extends KafkaServerTestHarness with RackAwareTest {
+    extends KafkaServerTestHarness
+    with RackAwareTest {
   val numServers = 4
   val numPartitions = 8
   val replicationFactor = 2

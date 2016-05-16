@@ -36,7 +36,7 @@ object Test {
   val testParVector = ParVector(1, 2, 3)
   val testParArray = ParArray(1, 2, 3)
 
-  def testConversion[A : ClassTag](
+  def testConversion[A: ClassTag](
       name: String, col: => GenTraversableOnce[A]): Unit = {
     val tmp = col
     println("-- Testing " + name + " ---")

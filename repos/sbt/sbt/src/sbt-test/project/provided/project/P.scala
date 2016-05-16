@@ -4,11 +4,11 @@ import Keys._
 
 object P extends Build {
   lazy val superRoot = Project("super-root", file("super")) dependsOn (root)
-  lazy val root: Project = Project(
-      "root",
-      file("."),
-      settings = rootSettings,
-      dependencies = (sub % "provided->test") :: Nil)
+  lazy val root: Project = Project("root",
+                                   file("."),
+                                   settings = rootSettings,
+                                   dependencies =
+                                     (sub % "provided->test") :: Nil)
   lazy val sub = Project("sub", file("sub"))
 
   def rootSettings =

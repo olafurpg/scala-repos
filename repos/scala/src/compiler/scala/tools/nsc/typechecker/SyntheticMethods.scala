@@ -135,8 +135,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
     /* Common code for productElement and (currently disabled) productElementName */
     def perElementMethod(name: Name, returnType: Type)(
         caseFn: Symbol => Tree): Tree =
-      createSwitchMethod(name, accessors.indices, returnType)(
-          idx => caseFn(accessors(idx)))
+      createSwitchMethod(name, accessors.indices, returnType)(idx =>
+            caseFn(accessors(idx)))
 
     // def productElementNameMethod = perElementMethod(nme.productElementName, StringTpe)(x => LIT(x.name.toString))
 
@@ -147,8 +147,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
      */
     def canEqualMethod: Tree = {
       syntheticCanEqual = true
-      createMethod(nme.canEqual_, List(AnyTpe), BooleanTpe)(
-          m => Ident(m.firstParam) IS_OBJ classExistentialType(clazz))
+      createMethod(nme.canEqual_, List(AnyTpe), BooleanTpe)(m =>
+            Ident(m.firstParam) IS_OBJ classExistentialType(clazz))
     }
 
     /* that match { case _: this.C => true ; case _ => false }
@@ -198,7 +198,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       val canEq = gen.mkMethodCall(otherSym, nme.canEqual_, Nil, List(mkThis))
       val tests =
         if (clazz.isDerivedValueClass || clazz.isFinal && syntheticCanEqual)
-          pairwise else pairwise :+ canEq
+          pairwise
+        else pairwise :+ canEq
 
       thatTest(eqmeth) AND Block(
           ValDef(otherSym, thatCast(eqmeth)),
@@ -344,8 +345,9 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
      * no implementation and which are marked serializable (which is true
      * for all case objects.)
      */
-    def needsReadResolve = (clazz.isModuleClass && clazz.isSerializable &&
-        !hasConcreteImpl(nme.readResolve) && clazz.isStatic)
+    def needsReadResolve =
+      (clazz.isModuleClass && clazz.isSerializable &&
+          !hasConcreteImpl(nme.readResolve) && clazz.isStatic)
 
     def synthesize(): List[Tree] = {
       val methods =
@@ -362,7 +364,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       def impls = {
         def shouldGenerate(m: Symbol) = {
           !hasOverridingImplementation(m) || {
-            clazz.isDerivedValueClass && (m == Any_hashCode || m == Any_equals) && {
+            clazz.isDerivedValueClass &&
+            (m == Any_hashCode || m == Any_equals) && {
               // Without a means to suppress this warning, I've thought better of it.
               if (settings.warnValueOverrides) {
                 (clazz.info nonPrivateMember m.name) filter
@@ -387,9 +390,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
           // it is name mangled afterward.  (Wonder why that is.) So it's only protected.
           // For sure special methods like "readResolve" should not be mangled.
           List(
-              createMethod(nme.readResolve, Nil, ObjectTpe)(m =>
-                    {
-              m setFlag PRIVATE; REF(clazz.sourceModule)
+              createMethod(nme.readResolve, Nil, ObjectTpe)(m => {
+            m setFlag PRIVATE; REF(clazz.sourceModule)
           }))
         } else Nil
       }
@@ -409,8 +411,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
       val lb = ListBuffer[Tree]()
       def isRewrite(sym: Symbol) = sym.isCaseAccessorMethod && !sym.isPublic
 
-      for (ddef @ DefDef(_, _, _, _, _, _) <- templ.body; if isRewrite(
-                                                 ddef.symbol)) {
+      for (ddef @ DefDef(_, _, _, _, _, _) <- templ.body;
+           if isRewrite(ddef.symbol)) {
         val original = ddef.symbol
         val i = original.owner.caseFieldAccessors.indexOf(original)
         def freshAccessorName = {
@@ -432,7 +434,8 @@ trait SyntheticMethods extends ast.TreeDSL { self: Analyzer =>
         lb += logResult("case accessor new")(newAcc)
         val renamedInClassMap = renamedCaseAccessors.getOrElseUpdate(
             clazz, mutable.Map() withDefault (x => x))
-        renamedInClassMap(original.name.toTermName) = newAcc.symbol.name.toTermName
+        renamedInClassMap(original.name.toTermName) =
+          newAcc.symbol.name.toTermName
       }
 
       (lb ++= templ.body ++= synthesize()).toList

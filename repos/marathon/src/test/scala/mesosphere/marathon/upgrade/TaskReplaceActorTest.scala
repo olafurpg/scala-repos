@@ -26,8 +26,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class TaskReplaceActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with Eventually with BeforeAndAfterAll with MockitoSugar {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with Eventually
+    with BeforeAndAfterAll
+    with MockitoSugar {
 
   test("Replace without health checks") {
     val app = AppDefinition(id = "myApp".toPath,
@@ -390,7 +394,8 @@ class TaskReplaceActorTest
         id = "myApp".toPath,
         instances = 3,
         healthChecks = Set(HealthCheck()),
-        upgradeStrategy = UpgradeStrategy(1.0, 0.0) // 1 task over-capacity is ok
+        upgradeStrategy =
+          UpgradeStrategy(1.0, 0.0) // 1 task over-capacity is ok
     )
 
     val driver = mock[SchedulerDriver]

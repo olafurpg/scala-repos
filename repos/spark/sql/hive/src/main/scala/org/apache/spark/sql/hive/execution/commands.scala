@@ -141,8 +141,7 @@ private[hive] case class CreateMetastoreDataSource(
     val optionsWithPath =
       if (!options.contains("path") && managedIfNoPath) {
         isExternal = false
-        options +
-        ("path" -> hiveContext.sessionState.catalog
+        options + ("path" -> hiveContext.sessionState.catalog
               .hiveDefaultTableFilePath(tableIdent))
       } else {
         options
@@ -202,8 +201,7 @@ private[hive] case class CreateMetastoreDataSourceAsSelect(
     val optionsWithPath =
       if (!options.contains("path")) {
         isExternal = false
-        options +
-        ("path" -> hiveContext.sessionState.catalog
+        options + ("path" -> hiveContext.sessionState.catalog
               .hiveDefaultTableFilePath(tableIdent))
       } else {
         options

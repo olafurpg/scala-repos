@@ -81,8 +81,9 @@ final class Well512a protected[random](state: Array[Int], i0: Int)
     val z2: Int = mat0pos(11, state(map(M2)))
 
     state(i) = z1 ^ z2
-    state(map(R_1)) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(
-        -5, 0xda442d24, state(i))
+    state(map(R_1)) =
+      mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(
+          -5, 0xda442d24, state(i))
     i = map(R_1)
 
     // val z0: Int = vrm1(i)

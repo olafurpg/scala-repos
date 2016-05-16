@@ -320,7 +320,9 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
 }
 
 class DataFrameStatPerfSuite
-    extends QueryTest with SharedSQLContext with Logging {
+    extends QueryTest
+    with SharedSQLContext
+    with Logging {
 
   // Turn on this test if you want to test the performance of approximate quantiles.
   ignore("computing quantiles should not take much longer than describe()") {

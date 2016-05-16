@@ -37,7 +37,9 @@ trait RequestTaggingHandler extends Handler {
   * that Play uses to handle requests.
   */
 trait EssentialAction
-    extends (RequestHeader => Accumulator[ByteString, Result]) with Handler { self =>
+    extends (RequestHeader => Accumulator[ByteString, Result])
+    with Handler {
+  self =>
 
   /**
     * Returns itself, for better support in the routes file.
@@ -472,8 +474,7 @@ trait ActionBuilder[+R[_]] extends ActionFunction[Request, R] { self =>
     */
   final def async[A](bodyParser: BodyParser[A])(
       block: R[A] => Future[Result]): Action[A] =
-    composeAction(
-        new Action[A] {
+    composeAction(new Action[A] {
       def parser = composeParser(bodyParser)
       def apply(request: Request[A]) =
         try {

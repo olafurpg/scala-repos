@@ -29,7 +29,8 @@ import org.apache.spark.sql.types.{DataType, IntegerType}
     usage = "_FUNC_() - Returns the current partition id of the Spark task",
     extended = "> SELECT _FUNC_();\n 0")
 private[sql] case class SparkPartitionID()
-    extends LeafExpression with Nondeterministic {
+    extends LeafExpression
+    with Nondeterministic {
 
   override def nullable: Boolean = false
 

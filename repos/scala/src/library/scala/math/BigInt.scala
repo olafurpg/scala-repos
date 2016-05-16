@@ -112,7 +112,9 @@ object BigInt {
   *  @version 1.0, 15/07/2003
   */
 final class BigInt(val bigInteger: BigInteger)
-    extends ScalaNumber with ScalaNumericConversions with Serializable
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable
     with Ordered[BigInt] {
 
   /** Returns the hash code for this BigInt. */

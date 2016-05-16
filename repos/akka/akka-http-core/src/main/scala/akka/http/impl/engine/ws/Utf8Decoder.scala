@@ -421,11 +421,12 @@ private[http] object Utf8Decoder extends StreamingCharsetDecoder {
 
         def step(byte: Int): Unit = {
           val chClass = characterClasses(byte)
-          currentCodePoint = if (currentState == Utf8Accept) // first byte
-            (0xff >> chClass) & byte // take as much bits as the characterClass says
-          else
-            // continuation byte
-            (0x3f & byte) | (currentCodePoint << 6) // take 6 bits
+          currentCodePoint =
+            if (currentState == Utf8Accept) // first byte
+              (0xff >> chClass) & byte // take as much bits as the characterClass says
+            else
+              // continuation byte
+              (0x3f & byte) | (currentCodePoint << 6) // take 6 bits
           currentState = states(currentState + chClass)
 
           currentState match {

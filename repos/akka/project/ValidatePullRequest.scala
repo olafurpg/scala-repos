@@ -96,8 +96,8 @@ object ValidatePullRequest extends AutoPlugin {
 
   def changedDirectoryIsDependency(changedDirs: Set[String],
                                    name: String,
-                                   graphsToTest: Seq[
-                                       (Configuration, ModuleGraph)])(
+                                   graphsToTest: Seq[(Configuration,
+                                                      ModuleGraph)])(
       log: Logger): Boolean = {
     val dirsOrExperimental =
       changedDirs.flatMap(dir => Set(dir, s"$dir-experimental"))

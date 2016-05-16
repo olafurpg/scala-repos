@@ -27,8 +27,10 @@ object AnalyzerFixture {
 }
 
 trait IsolatedAnalyzerFixture
-    extends AnalyzerFixture with IsolatedEnsimeVFSFixture
-    with IsolatedSearchServiceFixture with IsolatedTestKitFixture {
+    extends AnalyzerFixture
+    with IsolatedEnsimeVFSFixture
+    with IsolatedSearchServiceFixture
+    with IsolatedTestKitFixture {
 
   override def withAnalyzer(
       testCode: (EnsimeConfig, TestActorRef[Analyzer]) => Any): Any = {
@@ -45,8 +47,10 @@ trait IsolatedAnalyzerFixture
 }
 
 trait SharedAnalyzerFixture
-    extends AnalyzerFixture with SharedTestKitFixture
-    with SharedSearchServiceFixture with BeforeAndAfterAll {
+    extends AnalyzerFixture
+    with SharedTestKitFixture
+    with SharedSearchServiceFixture
+    with BeforeAndAfterAll {
 
   private[fixture] var analyzer: TestActorRef[Analyzer] = _
 

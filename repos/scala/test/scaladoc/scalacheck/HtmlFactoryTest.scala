@@ -59,9 +59,8 @@ object Test extends Properties("HtmlFactory") {
     createFactory.makeUniverse(Left(List(RESOURCES + basename))) match {
       case Some(universe) => {
           new HtmlFactory(universe, new ScalaDocReporter(universe.settings))
-            .writeTemplates((page) =>
-                {
-              result += (page.absoluteLinkTo(page.path) -> page.body)
+            .writeTemplates((page) => {
+            result += (page.absoluteLinkTo(page.path) -> page.body)
           })
         }
       case _ =>
@@ -383,32 +382,32 @@ object Test extends Properties("HtmlFactory") {
     true
   }
 
-  property("SI-5054: Use cases should override their original members") = checkText(
-      "SI_5054_q1.scala")(
-      (None, """def test(): Int""", true)
-      //Disabled because the full signature is now displayed
-      //(None, """def test(implicit lost: Int): Int""", false)
-  )
+  property("SI-5054: Use cases should override their original members") =
+    checkText("SI_5054_q1.scala")(
+        (None, """def test(): Int""", true)
+        //Disabled because the full signature is now displayed
+        //(None, """def test(implicit lost: Int): Int""", false)
+    )
 
   property(
-      "SI-5054: Use cases should keep their flags - final should not be lost") = checkText(
-      "SI_5054_q2.scala")((None, """final def test(): Int""", true))
+      "SI-5054: Use cases should keep their flags - final should not be lost") =
+    checkText("SI_5054_q2.scala")((None, """final def test(): Int""", true))
 
   property(
-      "SI-5054: Use cases should keep their flags - implicit should not be lost") = checkText(
-      "SI_5054_q3.scala")((None, """implicit def test(): Int""", true))
+      "SI-5054: Use cases should keep their flags - implicit should not be lost") =
+    checkText("SI_5054_q3.scala")((None, """implicit def test(): Int""", true))
 
   property(
-      "SI-5054: Use cases should keep their flags - real abstract should not be lost") = checkText(
-      "SI_5054_q4.scala")((None, """abstract def test(): Int""", true))
+      "SI-5054: Use cases should keep their flags - real abstract should not be lost") =
+    checkText("SI_5054_q4.scala")((None, """abstract def test(): Int""", true))
 
   property(
-      "SI-5054: Use cases should keep their flags - traits should not be affected") = checkText(
-      "SI_5054_q5.scala")((None, """def test(): Int""", true))
+      "SI-5054: Use cases should keep their flags - traits should not be affected") =
+    checkText("SI_5054_q5.scala")((None, """def test(): Int""", true))
 
   property(
-      "SI-5054: Use cases should keep their flags - traits should not be affected") = checkText(
-      "SI_5054_q6.scala")((None, """abstract def test(): Int""", true))
+      "SI-5054: Use cases should keep their flags - traits should not be affected") =
+    checkText("SI_5054_q6.scala")((None, """abstract def test(): Int""", true))
 
   property("SI-5054: Use case individual signature test") = checkText(
       "SI_5054_q7.scala")(
@@ -420,20 +419,20 @@ object Test extends Properties("HtmlFactory") {
        true)
   )
 
-  property("SI-5287: Display correct \"Definition classes\"") = checkText(
-      "SI_5287.scala")(
-      (None,
-       """def method(): Int
+  property("SI-5287: Display correct \"Definition classes\"") =
+    checkText("SI_5287.scala")(
+        (None,
+         """def method(): Int
            [use case] The usecase explanation
            [use case] The usecase explanation
            Definition Classes SI_5287 SI_5287_B SI_5287_A""",
-       true)
-  ) // the explanation appears twice, as small comment and full comment
+         true)
+    ) // the explanation appears twice, as small comment and full comment
 
-  property("Comment inheritance: Correct comment inheritance for overriding") = checkText(
-      "implicit-inheritance-override.scala")(
-      (Some("Base"),
-       """def function[T](arg1: T, arg2: String): Double
+  property("Comment inheritance: Correct comment inheritance for overriding") =
+    checkText("implicit-inheritance-override.scala")(
+        (Some("Base"),
+         """def function[T](arg1: T, arg2: String): Double
           The base comment.
           The base comment. And another sentence...
           T the type of the first argument
@@ -441,9 +440,9 @@ object Test extends Properties("HtmlFactory") {
           arg2 The string comment
           returns The return comment
           """,
-       true),
-      (Some("DerivedA"),
-       """def function[T](arg1: T, arg2: String): Double
+         true),
+        (Some("DerivedA"),
+         """def function[T](arg1: T, arg2: String): Double
           Overriding the comment, the params and returns comments should stay the same.
           Overriding the comment, the params and returns comments should stay the same.
           T the type of the first argument
@@ -451,56 +450,56 @@ object Test extends Properties("HtmlFactory") {
           arg2 The string comment
           returns The return comment
           """,
-       true),
-      (Some("DerivedB"),
-       """def function[T](arg1: T, arg2: String): Double
+         true),
+        (Some("DerivedB"),
+         """def function[T](arg1: T, arg2: String): Double
           T the type of the first argument
           arg1 The overridden T term comment
           arg2 The overridden string comment
           returns The return comment
           """,
-       true),
-      (Some("DerivedC"),
-       """def function[T](arg1: T, arg2: String): Double
+         true),
+        (Some("DerivedC"),
+         """def function[T](arg1: T, arg2: String): Double
           T the type of the first argument
           arg1 The T term comment
           arg2 The string comment
           returns The overridden return comment
           """,
-       true),
-      (Some("DerivedD"),
-       """def function[T](arg1: T, arg2: String): Double
+         true),
+        (Some("DerivedD"),
+         """def function[T](arg1: T, arg2: String): Double
           T The overridden type parameter comment
           arg1 The T term comment
           arg2 The string comment
           returns The return comment
           """,
-       true)
-  )
+         true)
+    )
 
   for (useCaseFile <- List("UseCaseInheritance", "UseCaseOverrideInheritance")) {
-    property("Comment inheritance: Correct comment inheritance for usecases") = checkText(
-        "implicit-inheritance-usecase.scala")(
-        (Some(useCaseFile),
-         """def missing_arg[T](arg1: T): Double
+    property("Comment inheritance: Correct comment inheritance for usecases") =
+      checkText("implicit-inheritance-usecase.scala")(
+          (Some(useCaseFile),
+           """def missing_arg[T](arg1: T): Double
             [use case]
             [use case]
             T The type parameter
             arg1 The T term comment
             returns The return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def missing_targ(arg1: Int, arg2: String): Double
+           true),
+          (Some(useCaseFile),
+           """def missing_targ(arg1: Int, arg2: String): Double
             [use case]
             [use case]
             arg1 The T term comment
             arg2 The string comment
             returns The return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def overridden_arg1[T](implicit arg1: T, arg2: String): Double
+           true),
+          (Some(useCaseFile),
+           """def overridden_arg1[T](implicit arg1: T, arg2: String): Double
             [use case]
             [use case]
             T The type parameter
@@ -508,9 +507,9 @@ object Test extends Properties("HtmlFactory") {
             arg2 The string comment
             returns The return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def overridden_targ[T](implicit arg1: T, arg2: String): Double
+           true),
+          (Some(useCaseFile),
+           """def overridden_targ[T](implicit arg1: T, arg2: String): Double
             [use case]
             [use case]
             T The overridden type parameter comment
@@ -518,9 +517,9 @@ object Test extends Properties("HtmlFactory") {
             arg2 The string comment
             returns The return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def overridden_return[T](implicit arg1: T, arg2: String): Double
+           true),
+          (Some(useCaseFile),
+           """def overridden_return[T](implicit arg1: T, arg2: String): Double
             [use case]
             [use case]
             T The type parameter
@@ -528,9 +527,9 @@ object Test extends Properties("HtmlFactory") {
             arg2 The string comment
             returns The overridden return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def added_arg[T](implicit arg1: T, arg2: String, arg3: Float): Double
+           true),
+          (Some(useCaseFile),
+           """def added_arg[T](implicit arg1: T, arg2: String, arg3: Float): Double
             [use case]
             [use case]
             T The type parameter
@@ -539,9 +538,9 @@ object Test extends Properties("HtmlFactory") {
             arg3 The added float comment
             returns The return comment
             """,
-         true),
-        (Some(useCaseFile),
-         """def overridden_comment[T](implicit arg1: T, arg2: String): Double
+           true),
+          (Some(useCaseFile),
+           """def overridden_comment[T](implicit arg1: T, arg2: String): Double
             [use case] The overridden comment.
             [use case] The overridden comment.
             T The type parameter
@@ -549,14 +548,14 @@ object Test extends Properties("HtmlFactory") {
             arg2 The string comment
             returns The return comment
             """,
-         true)
-    )
+           true)
+      )
   }
 
-  property("Comment inheritance: Correct explicit inheritance for override") = checkText(
-      "explicit-inheritance-override.scala")(
-      (Some("InheritDocDerived"),
-       """def function[T](arg1: T, arg2: String): Double
+  property("Comment inheritance: Correct explicit inheritance for override") =
+    checkText("explicit-inheritance-override.scala")(
+        (Some("InheritDocDerived"),
+         """def function[T](arg1: T, arg2: String): Double
         Starting line
         Starting line
         The base comment. And another sentence...
@@ -567,9 +566,9 @@ object Test extends Properties("HtmlFactory") {
           arg1    Start1 The T term comment End1
           arg2    Start2 The string comment End2
           returns StartRet The return comment EndRet""",
-       true),
-      (Some("InheritDocDerived"),
-       """Definition Classes InheritDocDerived → InheritDocBase
+         true),
+        (Some("InheritDocDerived"),
+         """Definition Classes InheritDocDerived → InheritDocBase
         Example:   StartExample function[Int](3, "something") EndExample
         Version    StartVer 0.0.2 EndVer
         Since      StartSince 0.0.1 EndSince
@@ -580,12 +579,12 @@ object Test extends Properties("HtmlFactory") {
         Note       StartNote Be careful! EndNote
         See also   StartSee The Manual EndSee
      """,
-       true))
+         true))
 
-  property("Comment inheritance: Correct explicit inheritance for usecase") = checkText(
-      "explicit-inheritance-usecase.scala")(
-      (Some("UseCaseInheritDoc"),
-       """def function[T](arg1: T, arg2: String): Double
+  property("Comment inheritance: Correct explicit inheritance for usecase") =
+    checkText("explicit-inheritance-usecase.scala")(
+        (Some("UseCaseInheritDoc"),
+         """def function[T](arg1: T, arg2: String): Double
         [use case] Starting line
         [use case] Starting line
         The base comment. And another sentence...
@@ -596,9 +595,9 @@ object Test extends Properties("HtmlFactory") {
           arg1    Start1 The T term comment End1
           arg2    Start2 The string comment End2
           returns StartRet The return comment EndRet""",
-       true),
-      (Some("UseCaseInheritDoc"),
-       """Example:   StartExample function[Int](3,"something") EndExample
+         true),
+        (Some("UseCaseInheritDoc"),
+         """Example:   StartExample function[Int](3,"something") EndExample
         Version    StartVer 0.0.2 EndVer
         Since      StartSince 0.0.1 EndSince
         Exceptions thrown
@@ -608,47 +607,47 @@ object Test extends Properties("HtmlFactory") {
         Note       StartNote Be careful! EndNote
         See also   StartSee The Manual EndSee
      """,
-       true))
+         true))
 
-  property("Comment inheritance: Correct explicit inheritance in corner cases") = checkText(
-      "inheritdoc-corner-cases.scala")(
-      (Some("D"),
-       """def hello1: Int
+  property("Comment inheritance: Correct explicit inheritance in corner cases") =
+    checkText("inheritdoc-corner-cases.scala")(
+        (Some("D"),
+         """def hello1: Int
           Inherited: Hello 1 comment
           Inherited: Hello 1 comment
           Definition Classes D → A
        """,
-       true),
-      (Some("D"),
-       """def hello2: Int
+         true),
+        (Some("D"),
+         """def hello2: Int
           Inherited: Hello 2 comment
           Inherited: Hello 2 comment
           Definition Classes D → B
        """,
-       true),
-      (Some("G"),
-       """def hello1: Int
+         true),
+        (Some("G"),
+         """def hello1: Int
           Inherited: Hello 1 comment
           Inherited: Hello 1 comment
           Definition Classes G → D → A
        """,
-       true),
-      (Some("G"),
-       """def hello2: Int
+         true),
+        (Some("G"),
+         """def hello2: Int
           Inherited: Hello 2 comment
           Inherited: Hello 2 comment
           Definition Classes G → D → B
        """,
-       true),
-      (Some("I"),
-       """def hello1(i: Int): Unit
+         true),
+        (Some("I"),
+         """def hello1(i: Int): Unit
           [use case] Inherited: Hello 1 comment
           [use case] Inherited: Hello 1 comment
           Definition Classes I → G → D → A
        """,
-       true)
-      // traits E, F and H shouldn't crash scaladoc but we don't need to check the output
-  )
+         true)
+        // traits E, F and H shouldn't crash scaladoc but we don't need to check the output
+    )
 
   property("Indentation normalization for code blocks") = {
     val files = createTemplates("code-indent.scala")
@@ -714,11 +713,14 @@ object Test extends Properties("HtmlFactory") {
 
     property("class") = files.get("com/example/p1/Clazz.html") match {
       case Some(node: scala.xml.Node) => {
-          property("implicit conversion") = node.toString contains "<span class=\"modifier\">implicit </span>"
+          property("implicit conversion") =
+            node.toString contains "<span class=\"modifier\">implicit </span>"
 
-          property("gt4s") = node.toString contains "title=\"gt4s: $colon$colon\""
+          property("gt4s") =
+            node.toString contains "title=\"gt4s: $colon$colon\""
 
-          property("gt4s of a deprecated method") = node.toString contains "title=\"gt4s: $colon$colon$colon$colon. Deprecated: "
+          property("gt4s of a deprecated method") =
+            node.toString contains "title=\"gt4s: $colon$colon$colon$colon. Deprecated: "
           true
         }
       case _ => false
@@ -802,40 +804,41 @@ object Test extends Properties("HtmlFactory") {
         case _ => false
       }
 
-    property("SI-8144: Members' permalink - inner package") = check(
-        "some/pack/index.html") { node =>
-      ("type link" |: node.assertTypeLink("../../some/pack/index.html")) &&
-      ("member: SomeType (object)" |: node.assertValuesLink(
-              "some.pack.SomeType", "../../some/pack/index.html#SomeType")) &&
-      ("member: SomeType (class)" |: node.assertMemberLink("types")(
-              "some.pack.SomeType",
-              "../../some/pack/index.html#SomeTypeextendsAnyRef"))
-    }
+    property("SI-8144: Members' permalink - inner package") =
+      check("some/pack/index.html") { node =>
+        ("type link" |: node.assertTypeLink("../../some/pack/index.html")) &&
+        ("member: SomeType (object)" |: node.assertValuesLink(
+                "some.pack.SomeType",
+                "../../some/pack/index.html#SomeType")) &&
+        ("member: SomeType (class)" |: node.assertMemberLink("types")(
+                "some.pack.SomeType",
+                "../../some/pack/index.html#SomeTypeextendsAnyRef"))
+      }
 
-    property("SI-8144: Members' permalink - companion object") = check(
-        "some/pack/SomeType$.html") { node =>
-      ("type link" |: node.assertTypeLink("../../some/pack/SomeType$.html")) &&
-      ("member: someVal" |: node.assertMemberLink("allMembers")(
-              "some.pack.SomeType#someVal",
-              "../../some/pack/SomeType$.html#someVal:String"))
-    }
+    property("SI-8144: Members' permalink - companion object") =
+      check("some/pack/SomeType$.html") { node =>
+        ("type link" |: node.assertTypeLink("../../some/pack/SomeType$.html")) &&
+        ("member: someVal" |: node.assertMemberLink("allMembers")(
+                "some.pack.SomeType#someVal",
+                "../../some/pack/SomeType$.html#someVal:String"))
+      }
 
-    property("SI-8144: Members' permalink - class") = check(
-        "some/pack/SomeType.html") { node =>
-      ("type link" |: node.assertTypeLink("../../some/pack/SomeType.html")) &&
-      ("constructor " |: node.assertMemberLink("constructors")(
-              "some.pack.SomeType#<init>",
-              "../../some/pack/SomeType.html#<init>(arg:String):some.pack.SomeType")) &&
-      ("member: type TypeAlias" |: node.assertMemberLink("types")(
-              "some.pack.SomeType.TypeAlias",
-              "../../some/pack/SomeType.html#TypeAlias=String")) &&
-      ("member: def >#<():Int " |: node.assertValuesLink(
-              "some.pack.SomeType#>#<",
-              "../../some/pack/SomeType.html#>#<():Int")) &&
-      ("member: def >@<():TypeAlias " |: node.assertValuesLink(
-              "some.pack.SomeType#>@<",
-              "../../some/pack/SomeType.html#>@<():SomeType.this.TypeAlias"))
-    }
+    property("SI-8144: Members' permalink - class") =
+      check("some/pack/SomeType.html") { node =>
+        ("type link" |: node.assertTypeLink("../../some/pack/SomeType.html")) &&
+        ("constructor " |: node.assertMemberLink("constructors")(
+                "some.pack.SomeType#<init>",
+                "../../some/pack/SomeType.html#<init>(arg:String):some.pack.SomeType")) &&
+        ("member: type TypeAlias" |: node.assertMemberLink("types")(
+                "some.pack.SomeType.TypeAlias",
+                "../../some/pack/SomeType.html#TypeAlias=String")) &&
+        ("member: def >#<():Int " |: node.assertValuesLink(
+                "some.pack.SomeType#>#<",
+                "../../some/pack/SomeType.html#>#<():Int")) &&
+        ("member: def >@<():TypeAlias " |: node.assertValuesLink(
+                "some.pack.SomeType#>@<",
+                "../../some/pack/SomeType.html#>@<():SomeType.this.TypeAlias"))
+      }
   }
 
   property("SI-9599 Multiple @todo formatted with comma on separate line") = {

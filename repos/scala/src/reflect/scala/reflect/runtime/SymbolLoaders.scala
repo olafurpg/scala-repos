@@ -15,7 +15,8 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  is found, a package is created instead.
     */
   class TopClassCompleter(clazz: Symbol, module: Symbol)
-      extends SymLoader with FlagAssigningCompleter {
+      extends SymLoader
+      with FlagAssigningCompleter {
     markFlagsCompleted(clazz, module)(mask = ~TopLevelPickledFlags)
     override def complete(sym: Symbol) = {
       debugInfo("completing " + sym + "/" + clazz.fullName)
@@ -40,7 +41,7 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
   protected def initAndEnterClassAndModule(owner: Symbol,
                                            name: TypeName,
                                            completer: (Symbol,
-                                           Symbol) => LazyType) = {
+                                                       Symbol) => LazyType) = {
     assert(!(name.toString endsWith "[]"), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)

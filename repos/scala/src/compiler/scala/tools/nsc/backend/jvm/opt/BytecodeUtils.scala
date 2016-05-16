@@ -134,9 +134,9 @@ object BytecodeUtils {
     t.getSort == Type.OBJECT || t.getSort == Type.ARRAY
 
   @tailrec
-  def nextExecutableInstruction(
-      insn: AbstractInsnNode, alsoKeep: AbstractInsnNode => Boolean = Set())
-    : Option[AbstractInsnNode] = {
+  def nextExecutableInstruction(insn: AbstractInsnNode,
+                                alsoKeep: AbstractInsnNode => Boolean =
+                                  Set()): Option[AbstractInsnNode] = {
     val next = insn.getNext
     if (next == null || isExecutable(next) || alsoKeep(next)) Option(next)
     else nextExecutableInstruction(next, alsoKeep)
@@ -360,8 +360,7 @@ object BytecodeUtils {
     methodNode.localVariables
       .iterator()
       .asScala
-      .map(
-          localVariable =>
+      .map(localVariable =>
             new LocalVariableNode(
                 prefix + localVariable.name,
                 localVariable.desc,

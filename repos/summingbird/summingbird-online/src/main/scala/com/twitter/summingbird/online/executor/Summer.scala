@@ -53,7 +53,7 @@ import scala.util.control.NonFatal
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-class Summer[Key, Value : Semigroup, Event, S, D, RC](
+class Summer[Key, Value: Semigroup, Event, S, D, RC](
     @transient storeSupplier: MergeableStoreFactory[Key, Value],
     @transient flatMapOp: FlatMapOperation[
         (Key, (Option[Value], Value)), Event],
@@ -91,8 +91,10 @@ class Summer[Key, Value : Semigroup, Event, S, D, RC](
     storePromise.setValue(storeBox.get.mergeableStore())
     store.toString // Do the lazy evaluation now so we can connect before tuples arrive.
 
-    successHandlerOpt = if (includeSuccessHandler.get)
-      Some(successHandlerBox.get) else None
+    successHandlerOpt =
+      if (includeSuccessHandler.get)
+        Some(successHandlerBox.get)
+      else None
   }
 
   override def notifyFailure(

@@ -98,25 +98,23 @@ private[sql] object FrequentItems extends Logging {
       .select(cols.map(Column(_)): _*)
       .rdd
       .aggregate(countMaps)(
-          seqOp = (counts, row) =>
-              {
-              var i = 0
-              while (i < numCols) {
-                val thisMap = counts(i)
-                val key = row.get(i)
-                thisMap.add(key, 1L)
-                i += 1
-              }
-              counts
+          seqOp = (counts, row) => {
+            var i = 0
+            while (i < numCols) {
+              val thisMap = counts(i)
+              val key = row.get(i)
+              thisMap.add(key, 1L)
+              i += 1
+            }
+            counts
           },
-          combOp = (baseCounts, counts) =>
-              {
-              var i = 0
-              while (i < numCols) {
-                baseCounts(i).merge(counts(i))
-                i += 1
-              }
-              baseCounts
+          combOp = (baseCounts, counts) => {
+            var i = 0
+            while (i < numCols) {
+              baseCounts(i).merge(counts(i))
+              i += 1
+            }
+            baseCounts
           }
       )
     val justItems = freqItems.map(m => m.baseMap.keys.toArray)

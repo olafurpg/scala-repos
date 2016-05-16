@@ -192,7 +192,9 @@ class ChainingSample extends Actor with Aggregator {
 //#chain-sample
 
 class AggregatorSpec
-    extends TestKit(ActorSystem("test")) with ImplicitSender with FunSuiteLike
+    extends TestKit(ActorSystem("test"))
+    with ImplicitSender
+    with FunSuiteLike
     with Matchers {
 
   test("Test request 1 account type") {

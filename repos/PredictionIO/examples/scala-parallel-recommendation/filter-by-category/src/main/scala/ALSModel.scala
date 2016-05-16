@@ -76,13 +76,13 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
         productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
         userStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/userStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/userStringIntMap")
+          .first,
         itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+          .first,
         categoryItemsMap = sc.get
-            .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
-            .first)
+          .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
+          .first)
   }
 }

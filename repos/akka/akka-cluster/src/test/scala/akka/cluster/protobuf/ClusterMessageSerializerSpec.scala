@@ -74,9 +74,9 @@ class ClusterMessageSerializerSpec
       val reachability3 = Reachability.empty
         .unreachable(a1.uniqueAddress, e1.uniqueAddress)
         .unreachable(b1.uniqueAddress, e1.uniqueAddress)
-      val g3 =
-        g2.copy(members = SortedSet(a1, b1, c1, d1, e1),
-                overview = g2.overview.copy(reachability = reachability3))
+      val g3 = g2.copy(members = SortedSet(a1, b1, c1, d1, e1),
+                       overview =
+                         g2.overview.copy(reachability = reachability3))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g1))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g2))
       checkSerialization(GossipEnvelope(a1.uniqueAddress, uniqueAddress2, g3))

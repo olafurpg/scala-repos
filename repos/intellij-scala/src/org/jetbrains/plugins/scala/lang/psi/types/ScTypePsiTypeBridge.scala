@@ -50,9 +50,9 @@ trait ScTypePsiTypeBridge {
             if (classType.isRaw && visitedRawTypes.contains(clazz))
               return types.Any
             val tps = clazz.getTypeParameters
-            def constructTypeForClass(
-                clazz: PsiClass,
-                withTypeParameters: Boolean = false): ScType = {
+            def constructTypeForClass(clazz: PsiClass,
+                                      withTypeParameters: Boolean =
+                                        false): ScType = {
               clazz match {
                 case wrapper: PsiClassWrapper =>
                   return constructTypeForClass(wrapper.definition)
@@ -62,13 +62,12 @@ trait ScTypePsiTypeBridge {
               val res =
                 if (containingClass == null) ScDesignatorType(clazz)
                 else {
-                  ScProjectionType(
-                      constructTypeForClass(
-                          containingClass,
-                          withTypeParameters = !clazz.hasModifierProperty(
-                                "static")),
-                      clazz,
-                      superReference = false)
+                  ScProjectionType(constructTypeForClass(
+                                       containingClass,
+                                       withTypeParameters =
+                                         !clazz.hasModifierProperty("static")),
+                                   clazz,
+                                   superReference = false)
                 }
               if (withTypeParameters) {
                 val typeParameters: Array[PsiTypeParameter] =
@@ -119,46 +118,45 @@ trait ScTypePsiTypeBridge {
                 ScParameterizedType(
                     des,
                     tps
-                      .map(tp =>
-                            {
-                          val psiType = substitutor.substitute(tp)
-                          psiType match {
-                            case wild: PsiWildcardType =>
-                              ScSkolemizedType(s"_$$${ index += 1; index }",
-                                               Nil,
-                                               if (wild.isSuper)
-                                                 create(wild.getSuperBound,
-                                                        project,
-                                                        scope,
-                                                        visitedRawTypes)
-                                               else types.Nothing,
-                                               if (wild.isExtends)
-                                                 create(wild.getExtendsBound,
-                                                        project,
-                                                        scope,
-                                                        visitedRawTypes)
-                                               else types.Any)
-                            case capture: PsiCapturedWildcardType =>
-                              val wild = capture.getWildcard
-                              ScSkolemizedType(s"_$$${ index += 1; index }",
-                                               Nil,
-                                               if (wild.isSuper)
-                                                 create(capture.getLowerBound,
-                                                        project,
-                                                        scope,
-                                                        visitedRawTypes)
-                                               else types.Nothing,
-                                               if (wild.isExtends)
-                                                 create(capture.getUpperBound,
-                                                        project,
-                                                        scope,
-                                                        visitedRawTypes)
-                                               else types.Any)
-                            case _ if psiType != null =>
-                              ScType.create(
-                                  psiType, project, scope, visitedRawTypes)
-                            case _ => ScalaPsiManager.typeVariable(tp)
-                          }
+                      .map(tp => {
+                        val psiType = substitutor.substitute(tp)
+                        psiType match {
+                          case wild: PsiWildcardType =>
+                            ScSkolemizedType(s"_$$${ index += 1; index }",
+                                             Nil,
+                                             if (wild.isSuper)
+                                               create(wild.getSuperBound,
+                                                      project,
+                                                      scope,
+                                                      visitedRawTypes)
+                                             else types.Nothing,
+                                             if (wild.isExtends)
+                                               create(wild.getExtendsBound,
+                                                      project,
+                                                      scope,
+                                                      visitedRawTypes)
+                                             else types.Any)
+                          case capture: PsiCapturedWildcardType =>
+                            val wild = capture.getWildcard
+                            ScSkolemizedType(s"_$$${ index += 1; index }",
+                                             Nil,
+                                             if (wild.isSuper)
+                                               create(capture.getLowerBound,
+                                                      project,
+                                                      scope,
+                                                      visitedRawTypes)
+                                             else types.Nothing,
+                                             if (wild.isExtends)
+                                               create(capture.getUpperBound,
+                                                      project,
+                                                      scope,
+                                                      visitedRawTypes)
+                                             else types.Any)
+                          case _ if psiType != null =>
+                            ScType.create(
+                                psiType, project, scope, visitedRawTypes)
+                          case _ => ScalaPsiManager.typeVariable(tp)
+                        }
                       })
                       .toSeq).unpackedType
             }

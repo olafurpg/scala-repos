@@ -27,8 +27,12 @@ import typer._
 import emitter._
 
 object LineErrorsSpecs
-    extends Specification with Parser with TreeShaker with GroupSolver
-    with LineErrors with RandomLibrarySpec {
+    extends Specification
+    with Parser
+    with TreeShaker
+    with GroupSolver
+    with LineErrors
+    with RandomLibrarySpec {
 
   "line errors" should {
     "be correct" in {

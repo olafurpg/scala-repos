@@ -56,7 +56,7 @@ class TinyJoinAndMergeJob(args: Args) extends Job(args) {
     }
     .joinWithTiny('id -> 'id, people)
 
-    (messages ++ people).groupBy('id) { _.size('count) }.write(output)
+  (messages ++ people).groupBy('id) { _.size('count) }.write(output)
 }
 
 object TsvNoCacheJob {
@@ -343,7 +343,7 @@ object OrderedSerializationTest {
     } yield NestedCaseClass(RichDate(ts), (b, b))
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
   val data = sample[List[NestedCaseClass]].take(1000)
 }
 
@@ -430,17 +430,15 @@ class CheckForFlowProcessInTypedJob(args: Args) extends Job(args) {
   inA.group
     .join(inB.group)
     .forceToReducers
-    .mapGroup((key, valuesIter) =>
-          {
-        stat.inc
+    .mapGroup((key, valuesIter) => {
+      stat.inc
 
-        val flowProcess = RuntimeStats.getFlowProcessForUniqueId(uniqueID)
-        if (flowProcess == null) {
-          throw new NullPointerException(
-              "No active FlowProcess was available.")
-        }
+      val flowProcess = RuntimeStats.getFlowProcessForUniqueId(uniqueID)
+      if (flowProcess == null) {
+        throw new NullPointerException("No active FlowProcess was available.")
+      }
 
-        valuesIter.map({ case (a, b) => s"$a:$b" })
+      valuesIter.map({ case (a, b) => s"$a:$b" })
     })
     .toTypedPipe
     .write(TypedTsv[(String, String)]("output"))
@@ -460,7 +458,9 @@ object PlatformTest {
 // Keeping all of the specifications in the same tests puts the result output all together at the end.
 // This is useful given that the Hadoop MiniMRCluster and MiniDFSCluster spew a ton of logging.
 class PlatformTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
 
   "An InAndOutTest" should {
     val inAndOut = Seq("a", "b", "c")

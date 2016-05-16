@@ -92,7 +92,10 @@ class JavaFutureSpec extends JavaFutureTests with JUnitSuiteLike
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class FutureSpec
-    extends AkkaSpec with Checkers with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec
+    with Checkers
+    with BeforeAndAfterAll
+    with DefaultTimeout {
   import FutureSpec._
   implicit val ec: ExecutionContext = system.dispatcher
   "A Promise" when {
@@ -520,8 +523,8 @@ class FutureSpec
           (1 to 10).toList map { i ⇒
             Future(i)
           }
-        Await.result(futures.foldLeft(Future(0))((fr,
-                         fa) ⇒ for (r ← fr; a ← fa) yield (r + a)),
+        Await.result(futures.foldLeft(Future(0))((fr, fa) ⇒
+                           for (r ← fr; a ← fa) yield (r + a)),
                      timeout.duration) should ===(55)
       }
 
@@ -787,12 +790,12 @@ class FutureSpec
       f((future, result) ⇒ future.value should ===(Some(Success(result))))
     }
     "return result with 'get'" in {
-      f((future,
-          result) ⇒ Await.result(future, timeout.duration) should ===(result))
+      f((future, result) ⇒
+            Await.result(future, timeout.duration) should ===(result))
     }
     "return result with 'Await.result'" in {
-      f((future,
-          result) ⇒ Await.result(future, timeout.duration) should ===(result))
+      f((future, result) ⇒
+            Await.result(future, timeout.duration) should ===(result))
     }
     "not timeout" in { f((future, _) ⇒ FutureSpec.ready(future, 0 millis)) }
     "filter result" in {
@@ -865,17 +868,16 @@ class FutureSpec
     }
   }
 
-  def futureWithException[E <: Throwable : ClassTag](
+  def futureWithException[E <: Throwable: ClassTag](
       f: ((Future[Any], String) ⇒ Unit) ⇒ Unit) {
     "be completed" in { f((future, _) ⇒ future should be('completed)) }
     "contain a value" in {
       f(
-          (future, message) ⇒
-            {
-          future.value should be('defined)
-          future.value.get should be('failure)
-          val Failure(f) = future.value.get
-          f.getMessage should ===(message)
+          (future, message) ⇒ {
+        future.value should be('defined)
+        future.value.get should be('failure)
+        val Failure(f) = future.value.get
+        f.getMessage should ===(message)
       })
     }
     "throw exception with 'get'" in {
@@ -937,8 +939,7 @@ class FutureSpec
     }
     "not perform action on result" is pending
     "project a failure" in {
-      f(
-          (future, message) ⇒
+      f((future, message) ⇒
             Await.result(future.failed, timeout.duration).getMessage should ===(
                 message))
     }
@@ -976,6 +977,6 @@ class FutureSpec
     Gen.oneOf(genMapAction, genFlatMapAction)
   }
 
-  def checkType[A : ClassTag, B](in: Future[A], reftag: ClassTag[B]): Boolean =
+  def checkType[A: ClassTag, B](in: Future[A], reftag: ClassTag[B]): Boolean =
     implicitly[ClassTag[A]].runtimeClass == reftag.runtimeClass
 }

@@ -38,7 +38,8 @@ import scalaz.Failure
 import scalaz.Success
 
 trait JoinOptimizerSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -150,29 +151,29 @@ trait JoinOptimizerSpecs[M[+ _]]
                                  "value",
                                  0)
 
-      val input = Filter(IdentitySort,
-                         Join(JoinObject,
+      val input =
+        Filter(IdentitySort,
+               Join(JoinObject,
+                    Cross(None),
+                    Join(WrapObject,
+                         Cross(None),
+                         height,
+                         Join(DerefObject,
                               Cross(None),
-                              Join(WrapObject,
-                                   Cross(None),
-                                   height,
-                                   Join(DerefObject,
-                                        Cross(None),
-                                        heightWeight,
-                                        height)(line))(line),
-                              Join(WrapObject,
-                                   Cross(None),
-                                   name,
-                                   Join(DerefObject, Cross(None), users, name)(
-                                       line))(line))(line),
-                         Join(Eq,
-                              Cross(None),
-                              Join(DerefObject, Cross(None), users, userId)(
-                                  line),
-                              Join(DerefObject,
-                                   Cross(None),
-                                   heightWeight,
-                                   userId)(line))(line))(line)
+                              heightWeight,
+                              height)(line))(line),
+                    Join(WrapObject,
+                         Cross(None),
+                         name,
+                         Join(DerefObject, Cross(None), users, name)(line))(
+                        line))(line),
+               Join(Eq,
+                    Cross(None),
+                    Join(DerefObject, Cross(None), users, userId)(line),
+                    Join(DerefObject,
+                         Cross(None),
+                         heightWeight,
+                         userId)(line))(line))(line)
 
       val opt = optimizeJoins(input, ctx, new IdGen)
 
@@ -459,12 +460,11 @@ trait JoinOptimizerSpecs[M[+ _]]
                                            users,
                                            name)(line))(line))(line),
                             name)(line))(line),
-               Join(
-                   Eq,
-                   Cross(None),
-                   Join(DerefObject, Cross(None), users, userId)(line),
-                   Join(DerefObject, Cross(None), heightWeight, userId)(line))(
-                   line))(line)
+               Join(Eq,
+                    Cross(None),
+                    Join(DerefObject, Cross(None), users, userId)(line),
+                    Join(DerefObject, Cross(None), heightWeight, userId)(
+                        line))(line))(line)
 
       val opt = optimizeJoins(input, ctx, new IdGen)
 
@@ -567,8 +567,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                Join(Eq,
                     Cross(None),
                     Join(DerefObject, Cross(None), users, userId)(line),
-                    Join(DerefObject, Cross(None), heightWeight, userId)(line))(
-                   line))(line)
+                    Join(DerefObject, Cross(None), heightWeight, userId)(
+                        line))(line))(line)
 
       val opt = optimizeJoins(input, ctx, new IdGen)
 
@@ -736,27 +736,27 @@ trait JoinOptimizerSpecs[M[+ _]]
                                  "value",
                                  0)
 
-      val input = Filter(IdentitySort,
-                         Join(JoinArray,
-                              Cross(None),
-                              Operate(WrapArray,
-                                      Join(DerefObject,
-                                           Cross(None),
-                                           heightWeight,
-                                           height)(line))(line),
-                              Operate(WrapArray,
-                                      Join(DerefObject,
-                                           Cross(None),
-                                           users,
-                                           name)(line))(line))(line),
-                         Join(Eq,
-                              Cross(None),
-                              Join(DerefObject, Cross(None), users, userId)(
-                                  line),
-                              Join(DerefObject,
-                                   Cross(None),
-                                   heightWeight,
-                                   userId)(line))(line))(line)
+      val input =
+        Filter(IdentitySort,
+               Join(JoinArray,
+                    Cross(None),
+                    Operate(WrapArray,
+                            Join(DerefObject,
+                                 Cross(None),
+                                 heightWeight,
+                                 height)(line))(line),
+                    Operate(WrapArray,
+                            Join(DerefObject,
+                                 Cross(None),
+                                 users,
+                                 name)(line))(line))(line),
+               Join(Eq,
+                    Cross(None),
+                    Join(DerefObject, Cross(None), users, userId)(line),
+                    Join(DerefObject,
+                         Cross(None),
+                         heightWeight,
+                         userId)(line))(line))(line)
 
       val opt = optimizeJoins(input, ctx, new IdGen)
 
@@ -1362,4 +1362,5 @@ trait JoinOptimizerSpecs[M[+ _]]
 }
 
 object JoinOptimizerSpecs
-    extends JoinOptimizerSpecs[YId] with yggdrasil.test.YIdInstances
+    extends JoinOptimizerSpecs[YId]
+    with yggdrasil.test.YIdInstances

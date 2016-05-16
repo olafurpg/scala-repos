@@ -40,7 +40,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 11.06.2009
   */
 class ScalaIntroduceParameterHandler
-    extends RefactoringActionHandler with DialogConflictsReporter {
+    extends RefactoringActionHandler
+    with DialogConflictsReporter {
 
   private var occurrenceHighlighters = Seq.empty[RangeHighlighter]
 

@@ -152,10 +152,10 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
         Source
           .single(42)
           .log("flow-6")
-          .withAttributes(
-              Attributes.logLevels(onElement = Logging.WarningLevel,
-                                   onFinish = Logging.InfoLevel,
-                                   onFailure = Logging.DebugLevel))
+          .withAttributes(Attributes.logLevels(onElement =
+                                                 Logging.WarningLevel,
+                                               onFinish = Logging.InfoLevel,
+                                               onFailure = Logging.DebugLevel))
           .runWith(Sink.ignore)
 
         logProbe.expectMsg(

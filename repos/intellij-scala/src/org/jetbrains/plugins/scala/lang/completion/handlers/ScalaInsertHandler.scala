@@ -132,19 +132,19 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
       var elem = element
       var parent = elem.getParent
       while (parent match {
-        case _: ScStableCodeReferenceElement =>
-          parent.getParent match {
-            case _: ScThisReference | _: ScSuperReference => true
-            case _ => false
-          }
-        case _: ScReferenceExpression => true
-        case _: ScThisReference => true
-        case _: ScSuperReference => true
-        case inf: ScInfixExpr if elem == inf.operation => true
-        case pref: ScPrefixExpr if elem == pref.operation => true
-        case postf: ScPostfixExpr if elem == postf.operation => true
-        case _ => false
-      }) {
+               case _: ScStableCodeReferenceElement =>
+                 parent.getParent match {
+                   case _: ScThisReference | _: ScSuperReference => true
+                   case _ => false
+                 }
+               case _: ScReferenceExpression => true
+               case _: ScThisReference => true
+               case _: ScSuperReference => true
+               case inf: ScInfixExpr if elem == inf.operation => true
+               case pref: ScPrefixExpr if elem == pref.operation => true
+               case postf: ScPostfixExpr if elem == postf.operation => true
+               case _ => false
+             }) {
         elem = parent
         parent = parent.getParent
       }
@@ -209,8 +209,7 @@ class ScalaInsertHandler extends InsertHandler[LookupElement] {
             shiftEndOffset(1)
           }
         }
-      } else if (withSpace &&
-                 (nextChar != ' ' ||
+      } else if (withSpace && (nextChar != ' ' ||
                      documentText.charAt(endOffset + 1) != openChar)) {
         document.insertString(endOffset, " ")
         shiftEndOffset(1, withSomeNum = false)

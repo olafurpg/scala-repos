@@ -35,7 +35,7 @@ object Account extends LilaController {
     negotiate(
         html = notFound,
         api = _ =>
-            ctx.me match {
+          ctx.me match {
             case None => fuccess(unauthorizedApiResult)
             case Some(me) =>
               relationEnv.api.countFollowers(me.id) zip relationEnv.api.countFollowing(

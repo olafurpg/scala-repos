@@ -11,7 +11,9 @@ import java.net.{InetSocketAddress, SocketAddress}
   * relinquishes resources that are associated with the server.
   */
 trait ListeningServer
-    extends Closable with Awaitable[Unit] with Group[SocketAddress] {
+    extends Closable
+    with Awaitable[Unit]
+    with Group[SocketAddress] {
 
   /**
     * The address to which this server is bound.

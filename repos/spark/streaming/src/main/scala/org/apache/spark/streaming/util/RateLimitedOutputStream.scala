@@ -26,7 +26,8 @@ import org.apache.spark.internal.Logging
 
 private[streaming] class RateLimitedOutputStream(
     out: OutputStream, desiredBytesPerSec: Int)
-    extends OutputStream with Logging {
+    extends OutputStream
+    with Logging {
 
   require(desiredBytesPerSec > 0)
 

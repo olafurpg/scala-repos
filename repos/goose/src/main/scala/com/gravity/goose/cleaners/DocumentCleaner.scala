@@ -225,13 +225,12 @@ trait DocumentCleaner {
         val replacements = getReplacementNodes(doc, elem)
         elem.children().foreach(_.remove())
         replacements.foreach(
-            n =>
-              {
-            try {
-              elem.appendChild(n)
-            } catch {
-              case ex: Exception => info(ex, "Failed to append cleaned child!")
-            }
+            n => {
+          try {
+            elem.appendChild(n)
+          } catch {
+            case ex: Exception => info(ex, "Failed to append cleaned child!")
+          }
         })
       }
     }
@@ -259,14 +258,13 @@ trait DocumentCleaner {
 
           div.children().foreach(_.remove())
           replaceNodes.foreach(
-              node =>
-                {
+              node => {
 
-              try {
-                div.appendChild(node)
-              } catch {
-                case e: Exception => info(e, e.toString)
-              }
+            try {
+              div.appendChild(node)
+            } catch {
+              case e: Exception => info(e, e.toString)
+            }
           })
         }
       } catch {
@@ -328,12 +326,13 @@ trait DocumentCleaner {
 
           var prevSibNode = kidTextNode.previousSibling()
           while (prevSibNode != null && prevSibNode.nodeName() == "a" &&
-          prevSibNode.attr("grv-usedalready") != "yes") {
+                 prevSibNode.attr("grv-usedalready") != "yes") {
             replacementText.append(" " + prevSibNode.outerHtml() + " ")
             nodesToRemove += prevSibNode
             prevSibNode.attr("grv-usedalready", "yes")
-            prevSibNode = if (prevSibNode.previousSibling() == null) null
-            else prevSibNode.previousSibling()
+            prevSibNode =
+              if (prevSibNode.previousSibling() == null) null
+              else prevSibNode.previousSibling()
           }
           // add the text of the node
           replacementText.append(replaceText)
@@ -341,12 +340,13 @@ trait DocumentCleaner {
           //          check the next set of links that might be after text (see businessinsider2.txt)
           var nextSibNode = kidTextNode.nextSibling()
           while (nextSibNode != null && nextSibNode.nodeName() == "a" &&
-          nextSibNode.attr("grv-usedalready") != "yes") {
+                 nextSibNode.attr("grv-usedalready") != "yes") {
             replacementText.append(" " + nextSibNode.outerHtml() + " ")
             nodesToRemove += nextSibNode
             nextSibNode.attr("grv-usedalready", "yes")
-            nextSibNode = if (nextSibNode.nextSibling() == null) null
-            else nextSibNode.nextSibling()
+            nextSibNode =
+              if (nextSibNode.nextSibling() == null) null
+              else nextSibNode.nextSibling()
           }
         }
         nodesToRemove += kid

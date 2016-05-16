@@ -32,4 +32,7 @@ import quirrel.typer._
 import scalaz._
 
 trait ParseEvalStack[M[+ _]]
-    extends Compiler with LineErrors with Emitter with StdLibEvaluatorStack[M]
+    extends Compiler
+    with LineErrors
+    with Emitter
+    with StdLibEvaluatorStack[M]

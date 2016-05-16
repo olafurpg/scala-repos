@@ -21,11 +21,11 @@ import std.Transform.{DummyTaskMap, TaskAndValue}
 import TaskName._
 
 @deprecated("Use EvaluateTaskConfig instead.", "0.13.5")
-final case class EvaluateConfig(
-    cancelable: Boolean,
-    restrictions: Seq[Tags.Rule],
-    checkCycles: Boolean = false,
-    progress: ExecuteProgress[Task] = EvaluateTask.defaultProgress)
+final case class EvaluateConfig(cancelable: Boolean,
+                                restrictions: Seq[Tags.Rule],
+                                checkCycles: Boolean = false,
+                                progress: ExecuteProgress[Task] =
+                                  EvaluateTask.defaultProgress)
 
 /**
   * An API that allows you to cancel executing tasks upon some signal.
@@ -439,13 +439,14 @@ object EvaluateTask {
     for (t <- structure.data.get(resolvedScope, taskKey.key)) yield
       (t, nodeView(state, streams, taskKey :: Nil))
   }
-  def nodeView[HL <: HList](
-      state: State,
-      streams: Streams,
-      roots: Seq[ScopedKey[_]],
-      dummies: DummyTaskMap = DummyTaskMap(Nil)): NodeView[Task] =
-    Transform((dummyRoots, roots) :: (dummyStreamsManager, streams) :: (
-            dummyState, state) :: dummies)
+  def nodeView[HL <: HList](state: State,
+                            streams: Streams,
+                            roots: Seq[ScopedKey[_]],
+                            dummies: DummyTaskMap =
+                              DummyTaskMap(Nil)): NodeView[Task] =
+    Transform(
+        (dummyRoots, roots) :: (dummyStreamsManager, streams) :: (dummyState,
+                                                                  state) :: dummies)
 
   @deprecated("Use new EvaluateTaskConfig option to runTask", "0.13.5")
   def runTask[T](root: Task[T],
@@ -517,8 +518,8 @@ object EvaluateTask {
   private[this] def storeValuesForPrevious(
       results: RMap[Task, Result], state: State, streams: Streams): Unit =
     for (referenced <- Previous.references in Global get Project
-      .structure(state)
-      .data) Previous.complete(referenced, results, streams)
+                        .structure(state)
+                        .data) Previous.complete(referenced, results, streams)
 
   def applyResults[T](results: RMap[Task, Result],
                       state: State,
@@ -553,9 +554,10 @@ object EvaluateTask {
   def convertCyclic(c: AnyCyclic): String =
     (c.caller, c.target) match {
       case (caller: Task[_], target: Task[_]) =>
-        c.toString +
-        (if (caller eq target) "(task: " + name(caller) + ")"
-         else "(caller: " + name(caller) + ", target: " + name(target) + ")")
+        c.toString + (if (caller eq target) "(task: " + name(caller) + ")"
+                      else
+                        "(caller: " + name(caller) + ", target: " +
+                        name(target) + ")")
       case _ => c.toString
     }
 

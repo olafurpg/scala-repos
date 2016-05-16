@@ -129,8 +129,7 @@ class ScalateSupportSpec extends ScalatraSpec {
   // Testing the default layouts is going to be hard, but we can at least
   // verify that it's looking in the right place.
   def e5 = get("/layout-strategy") {
-    body must_==
-    (List(
+    body must_== (List(
             "/WEB-INF/templates/layouts/default.mustache",
             "/WEB-INF/templates/layouts/default.ssp",
             "/WEB-INF/templates/layouts/default.scaml",

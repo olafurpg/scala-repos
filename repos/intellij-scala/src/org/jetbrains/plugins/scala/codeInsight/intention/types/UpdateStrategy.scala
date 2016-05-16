@@ -180,7 +180,7 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
               .find(ScType
                     .extractClass(_, Option(context.getProject))
                     .exists(isSealed))
-              (sealedType.toSeq :+ tp).map(typeElemFromType)
+            (sealedType.toSeq :+ tp).map(typeElemFromType)
           case Some(sc: ScTypeDefinition)
               if sc.getTruncedQualifiedName.startsWith("scala.collection") =>
             val goodTypes = Set(
@@ -198,7 +198,7 @@ abstract class UpdateStrategy(editor: Option[Editor]) extends Strategy {
               .get(tp)
               .map(_.canonicalText)
               .filter(t => goodTypes.exists(t.startsWith))
-              (tp.canonicalText +: baseTypes).map(typeElemfromText)
+            (tp.canonicalText +: baseTypes).map(typeElemfromText)
           case _ => Seq(typeElemFromType(tp))
         }
     }

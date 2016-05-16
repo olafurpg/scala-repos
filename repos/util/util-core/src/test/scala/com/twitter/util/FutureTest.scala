@@ -21,7 +21,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class FutureTest
-    extends WordSpec with MockitoSugar with GeneratorDrivenPropertyChecks {
+    extends WordSpec
+    with MockitoSugar
+    with GeneratorDrivenPropertyChecks {
   implicit class FutureMatcher[A](future: Future[A]) {
     def mustProduce(expected: Try[A]) {
       expected match {
@@ -491,10 +493,9 @@ class FutureTest
         class TraverseTestSpy() {
           var goWasCalled = false
           var promise = Promise[Int]()
-          val go = () =>
-            {
-              goWasCalled = true
-              promise
+          val go = () => {
+            goWasCalled = true
+            promise
           }
         }
 
@@ -742,7 +743,7 @@ class FutureTest
 
       def testJoin(label: String,
                    joiner: ((Future[Int],
-                   Future[Int]) => Future[(Int, Int)])) {
+                             Future[Int]) => Future[(Int, Int)])) {
         "join(%s)".format(label) should {
           trait JoinHelper {
             val p0 = new HandledPromise[Int]
@@ -1093,7 +1094,7 @@ class FutureTest
 
       def testSequence(which: String,
                        seqop: (Future[Unit],
-                       () => Future[Unit]) => Future[Unit]) {
+                               () => Future[Unit]) => Future[Unit]) {
         which when {
           "successes" should {
             "interruption of the produced future" which {

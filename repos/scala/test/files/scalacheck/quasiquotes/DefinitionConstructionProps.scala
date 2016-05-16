@@ -4,9 +4,14 @@ internal.reificationSupport.ScalaDot
 
 object DefinitionConstructionProps
     extends QuasiquoteProperties("definition construction")
-    with ClassConstruction with TraitConstruction with TypeDefConstruction
-    with ValDefConstruction with PatDefConstruction with DefConstruction
-    with PackageConstruction with ImportConstruction {
+    with ClassConstruction
+    with TraitConstruction
+    with TypeDefConstruction
+    with ValDefConstruction
+    with PatDefConstruction
+    with DefConstruction
+    with PackageConstruction
+    with ImportConstruction {
 
   val x: Tree = q"val x: Int"
   property("SI-6842 a1") = test {

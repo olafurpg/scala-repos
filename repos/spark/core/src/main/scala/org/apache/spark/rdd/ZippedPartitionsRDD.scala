@@ -43,7 +43,7 @@ private[spark] class ZippedPartitionsPartition(
     }
 }
 
-private[spark] abstract class ZippedPartitionsBaseRDD[V : ClassTag](
+private[spark] abstract class ZippedPartitionsBaseRDD[V: ClassTag](
     sc: SparkContext,
     var rdds: Seq[RDD[_]],
     preservesPartitioning: Boolean = false)
@@ -80,7 +80,7 @@ private[spark] abstract class ZippedPartitionsBaseRDD[V : ClassTag](
 }
 
 private[spark] class ZippedPartitionsRDD2[
-    A : ClassTag, B : ClassTag, V : ClassTag](
+    A: ClassTag, B: ClassTag, V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B]) => Iterator[V],
     var rdd1: RDD[A],
@@ -104,7 +104,7 @@ private[spark] class ZippedPartitionsRDD2[
 }
 
 private[spark] class ZippedPartitionsRDD3[
-    A : ClassTag, B : ClassTag, C : ClassTag, V : ClassTag](
+    A: ClassTag, B: ClassTag, C: ClassTag, V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B], Iterator[C]) => Iterator[V],
     var rdd1: RDD[A],
@@ -131,7 +131,7 @@ private[spark] class ZippedPartitionsRDD3[
 }
 
 private[spark] class ZippedPartitionsRDD4[
-    A : ClassTag, B : ClassTag, C : ClassTag, D : ClassTag, V : ClassTag](
+    A: ClassTag, B: ClassTag, C: ClassTag, D: ClassTag, V: ClassTag](
     sc: SparkContext,
     var f: (Iterator[A], Iterator[B], Iterator[C], Iterator[D]) => Iterator[V],
     var rdd1: RDD[A],

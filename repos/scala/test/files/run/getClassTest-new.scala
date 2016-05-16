@@ -53,7 +53,7 @@ class MoreAnyRefs {
 }
 
 object Test {
-  def returnTypes[T : ClassTag] =
+  def returnTypes[T: ClassTag] =
     (classTag[T].runtimeClass.getMethods.toList filter
         (_.getName startsWith "f") sortBy (_.getName) map
         (m => m.getName + ": " + m.getGenericReturnType.toString))

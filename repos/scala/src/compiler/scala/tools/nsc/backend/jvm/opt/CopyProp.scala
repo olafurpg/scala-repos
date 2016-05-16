@@ -558,8 +558,9 @@ class CopyProp[BT <: BTypes](val btypes: BT) {
       case _ =>
     }
 
-    val pairStartStack = new mutable.Stack[
-        (AbstractInsnNode, mutable.ListBuffer[RemovePairDependency])]
+    val pairStartStack =
+      new mutable.Stack[(AbstractInsnNode,
+                         mutable.ListBuffer[RemovePairDependency])]
 
     def push(insn: AbstractInsnNode) = {
       pairStartStack push ((insn, mutable.ListBuffer.empty))

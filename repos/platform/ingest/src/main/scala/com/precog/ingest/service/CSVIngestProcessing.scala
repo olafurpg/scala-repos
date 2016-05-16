@@ -64,7 +64,8 @@ class CSVIngestProcessing(apiKey: APIKey,
 
   final class IngestProcessor(
       delimiter: Option[String], quote: Option[String], escape: Option[String])
-      extends IngestProcessorLike with Logging {
+      extends IngestProcessorLike
+      with Logging {
     import scalaz.syntax.apply._
     import scalaz.Validation._
 
@@ -197,18 +198,18 @@ class CSVIngestProcessing(apiKey: APIKey,
                                 jvals,
                                 jobId,
                                 if (done)
-                                  streamRef.terminate else streamRef) flatMap {
-                _ =>
-                  if (done)
-                    M.point(BatchResult(total + batch.length,
-                                        ingested + batch.length,
-                                        errors))
-                  else
-                    readBatches(paths,
-                                reader,
-                                total + batch.length,
-                                ingested + batch.length,
-                                errors)
+                                  streamRef.terminate
+                                else streamRef) flatMap { _ =>
+                if (done)
+                  M.point(BatchResult(total + batch.length,
+                                      ingested + batch.length,
+                                      errors))
+                else
+                  readBatches(paths,
+                              reader,
+                              total + batch.length,
+                              ingested + batch.length,
+                              errors)
               }
             }
         }
@@ -230,10 +231,10 @@ class CSVIngestProcessing(apiKey: APIKey,
       readerBuilder map { f =>
         for {
           (file, size) <- writeToFile(data)
-          result <- ingestSync(
-              f(new InputStreamReader(new FileInputStream(file), "UTF-8")),
-              durability.jobId,
-              StreamRef.forWriteMode(storeMode, false))
+          result <- ingestSync(f(new InputStreamReader(
+                                       new FileInputStream(file), "UTF-8")),
+                               durability.jobId,
+                               StreamRef.forWriteMode(storeMode, false))
         } yield {
           file.delete()
           result

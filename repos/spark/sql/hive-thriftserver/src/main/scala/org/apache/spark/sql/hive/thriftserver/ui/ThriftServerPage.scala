@@ -31,7 +31,8 @@ import org.apache.spark.ui.UIUtils._
 
 /** Page for Spark Web UI that shows statistics of a thrift server */
 private[ui] class ThriftServerPage(parent: ThriftServerTab)
-    extends WebUIPage("") with Logging {
+    extends WebUIPage("")
+    with Logging {
 
   private val listener = parent.listener
   private val startTime = Calendar.getInstance().getTime()

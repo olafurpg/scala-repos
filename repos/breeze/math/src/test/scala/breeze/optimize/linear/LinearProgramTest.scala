@@ -52,7 +52,8 @@ class LinearProgramTest extends FunSuite {
     val x3 = Real()
 
     val lpp =
-      ((x0 * 0.5 + x1 * 3 + x2 + x3 * 4) subjectTo (x0 + x1 + x2 + x3 <= 40) subjectTo
+      ((x0 * 0.5 + x1 * 3 + x2 + x3 * 4) subjectTo (x0 + x1 + x2 +
+              x3 <= 40) subjectTo
           (x0 * 2 + x1 - x2 - x3 >= 10) subjectTo (x3 - x1 >= 10) subjectTo
           (List(x0, x1, x2, x3).map(x => x >= 0): _*))
 

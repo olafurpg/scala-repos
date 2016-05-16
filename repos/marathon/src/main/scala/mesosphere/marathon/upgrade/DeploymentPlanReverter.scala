@@ -95,8 +95,8 @@ private[upgrade] object DeploymentPlanReverter {
               s"readding removed {${removedDependencies.mkString(", ")}}, " +
               s"removing added {${addedDependencies.mkString(", ")}}")
 
-        group.copy(
-            dependencies = group.dependencies ++ removedDependencies -- addedDependencies)
+        group.copy(dependencies =
+              group.dependencies ++ removedDependencies -- addedDependencies)
       } else {
         // common case, unchanged
         group
@@ -125,12 +125,11 @@ private[upgrade] object DeploymentPlanReverter {
           if (log.isDebugEnabled)
             log.debug(s"group ${newGroup.id} has changed. " +
                 s"Removed added dependencies ${newGroup.dependencies.mkString(", ")}")
-          result.update(
-              newGroup.id,
-              group =>
-                group.copy(
-                    dependencies = group.dependencies -- newGroup.dependencies),
-              version)
+          result.update(newGroup.id,
+                        group =>
+                          group.copy(dependencies =
+                                group.dependencies -- newGroup.dependencies),
+                        version)
         case _ =>
           // still contains apps/groups, so we keep it
           result

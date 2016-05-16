@@ -9,7 +9,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class FixedLengthDecoderTest
-    extends FunSuite with GeneratorDrivenPropertyChecks {
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks {
 
   def stringDecoder(frameSize: Int) =
     new FixedLengthDecoder(frameSize, Buf.Utf8.unapply(_).getOrElse("????"))

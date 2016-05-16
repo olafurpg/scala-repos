@@ -54,7 +54,8 @@ private[streaming] class FileBasedWriteAheadLog(
     maxFailures: Int,
     closeFileAfterWrite: Boolean
 )
-    extends WriteAheadLog with Logging {
+    extends WriteAheadLog
+    with Logging {
 
   import FileBasedWriteAheadLog._
 
@@ -233,8 +234,8 @@ private[streaming] class FileBasedWriteAheadLog(
             logDirectory,
             timeToLogFile(currentLogWriterStartTime, currentLogWriterStopTime))
         currentLogPath = Some(newLogPath.toString)
-        currentLogWriter = new FileBasedWriteAheadLogWriter(
-            currentLogPath.get, hadoopConf)
+        currentLogWriter =
+          new FileBasedWriteAheadLogWriter(currentLogPath.get, hadoopConf)
       }
       currentLogWriter
     }

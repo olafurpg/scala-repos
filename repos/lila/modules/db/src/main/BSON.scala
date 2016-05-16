@@ -6,7 +6,8 @@ import org.joda.time.DateTime
 import reactivemongo.bson._
 
 abstract class BSON[T]
-    extends BSONHandler[BSONDocument, T] with BSONDocumentReader[T]
+    extends BSONHandler[BSONDocument, T]
+    with BSONDocumentReader[T]
     with BSONDocumentWriter[T] {
 
   import BSON._
@@ -78,7 +79,7 @@ object BSON {
           // mutable optimized implementation
           val b = collection.immutable.Map.newBuilder[String, V]
           for (tuple <- bson.elements) b +=
-          (tuple._1 -> valueReader.read(tuple._2))
+            (tuple._1 -> valueReader.read(tuple._2))
           b.result
         }
       }
@@ -140,7 +141,7 @@ object BSON {
       // mutable optimized implementation
       val b = collection.immutable.Map.newBuilder[String, BSONValue]
       for (tuple <- doc.stream if tuple.isSuccess) b +=
-      (tuple.get._1 -> tuple.get._2)
+        (tuple.get._1 -> tuple.get._2)
       b.result
     }
 

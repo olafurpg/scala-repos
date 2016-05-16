@@ -89,8 +89,8 @@ class SecurityServiceHandlers(
         Success { (authAPIKey: APIKey) =>
           for {
             content <- request.content
-              .toSuccess(badRequest(missingContentMessage))
-              .sequence[Future, JValue]
+                        .toSuccess(badRequest(missingContentMessage))
+                        .sequence[Future, JValue]
             response <- content.map(create(authAPIKey, _)).sequence[Future, R]
           } yield {
             response.toEither.merge
@@ -139,7 +139,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadAPIKeyDetailsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         // since having an api key means you can see the details, we don't check perms.
@@ -161,7 +162,8 @@ class SecurityServiceHandlers(
   }
 
   object DeleteAPIKeyHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('apikey) map { apiKey =>
@@ -178,7 +180,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadAPIKeyGrantsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('apikey) map { apiKey =>
@@ -197,7 +200,8 @@ class SecurityServiceHandlers(
   }
 
   object CreateAPIKeyGrantHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     private def create(apiKey: APIKey, requestBody: JValue): Future[R] = {
       requestBody.validated[GrantId]("grantId") match {
         case Success(grantId) =>
@@ -224,8 +228,9 @@ class SecurityServiceHandlers(
           .toSuccess(badRequest("Missing API key from request URL"))
         for {
           contentV <- request.content
-            .toSuccess(badRequest("Missing body content for grant creation."))
-            .sequence[Future, JValue]
+                       .toSuccess(badRequest(
+                               "Missing body content for grant creation."))
+                       .sequence[Future, JValue]
           response <- (for (apiKey <- apiKeyV; content <- contentV) yield
                        create(apiKey, content)).sequence[Future, R]
         } yield response.toEither.merge
@@ -236,7 +241,8 @@ class SecurityServiceHandlers(
   }
 
   object DeleteAPIKeyGrantHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         Apply[Option].apply2(request.parameters.get('apikey),
@@ -303,7 +309,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadGrantDetailsHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('grantId) map { grantId =>
@@ -321,7 +328,8 @@ class SecurityServiceHandlers(
   }
 
   object ReadGrantChildrenHandler
-      extends CustomHttpService[Future[JValue], Future[R]] with Logging {
+      extends CustomHttpService[Future[JValue], Future[R]]
+      with Logging {
     val service = (request: HttpRequest[Future[JValue]]) =>
       Success {
         request.parameters.get('grantId) map { grantId =>
@@ -370,11 +378,12 @@ class SecurityServiceHandlers(
           .toSuccess(badRequest("Missing grant ID from request URL"))
         for {
           contentV <- request.content
-            .toSuccess(badRequest("Missing body content for grant creation."))
-            .sequence[Future, JValue]
+                       .toSuccess(badRequest(
+                               "Missing body content for grant creation."))
+                       .sequence[Future, JValue]
           response <- (for (parentId <- parentIdV; content <- contentV) yield
                        create(authAPIKey, parentId, content))
-            .sequence[Future, R]
+                       .sequence[Future, R]
         } yield response.toEither.merge
     }
 

@@ -15,7 +15,8 @@ import play.api.libs.ws.ssl.MonkeyPatcher
   * in {{newOptions}}.  This is the only way to change JSSE debugging after the class loads.
   */
 abstract class FixLoggingAction
-    extends PrivilegedExceptionAction[Unit] with MonkeyPatcher
+    extends PrivilegedExceptionAction[Unit]
+    with MonkeyPatcher
     with ClassFinder {
 
   def newOptions: String

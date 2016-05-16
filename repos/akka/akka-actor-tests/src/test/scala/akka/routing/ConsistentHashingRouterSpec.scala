@@ -49,7 +49,8 @@ object ConsistentHashingRouterSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ConsistentHashingRouterSpec
-    extends AkkaSpec(ConsistentHashingRouterSpec.config) with DefaultTimeout
+    extends AkkaSpec(ConsistentHashingRouterSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
   import ConsistentHashingRouterSpec._
   implicit val ec = system.dispatcher
@@ -86,10 +87,11 @@ class ConsistentHashingRouterSpec
       def hashMapping: ConsistentHashMapping = {
         case Msg2(key, data) ⇒ key
       }
-      val router2 = system.actorOf(
-          ConsistentHashingPool(nrOfInstances = 1, hashMapping = hashMapping)
-            .props(Props[Echo]),
-          "router2")
+      val router2 =
+        system.actorOf(ConsistentHashingPool(nrOfInstances = 1,
+                                             hashMapping =
+                                               hashMapping).props(Props[Echo]),
+                       "router2")
 
       router2 ! Msg2("a", "A")
       val destinationA = expectMsgType[ActorRef]

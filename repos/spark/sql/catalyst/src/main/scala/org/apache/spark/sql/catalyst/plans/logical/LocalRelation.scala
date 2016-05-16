@@ -43,7 +43,8 @@ object LocalRelation {
 }
 
 case class LocalRelation(output: Seq[Attribute], data: Seq[InternalRow] = Nil)
-    extends LeafNode with analysis.MultiInstanceRelation {
+    extends LeafNode
+    with analysis.MultiInstanceRelation {
 
   // A local relation must have resolved output.
   require(output.forall(_.resolved),

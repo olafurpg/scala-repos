@@ -12,7 +12,9 @@ import org.springframework.context.ApplicationContext
 
 /** @author Stephen Samuel */
 class SpringScalatraBootstrapTest
-    extends FunSuite with OneInstancePerTest with MockitoSugar {
+    extends FunSuite
+    with OneInstancePerTest
+    with MockitoSugar {
 
   val applicationContext = mock[ApplicationContext]
   val servletContext = mock[ServletContext]

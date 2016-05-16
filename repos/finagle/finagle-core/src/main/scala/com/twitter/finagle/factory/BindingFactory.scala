@@ -24,8 +24,9 @@ private class DynNameFactory[Req, Rep](
 
   private sealed trait State
   private case class Pending(
-      q: immutable.Queue[
-          (ClientConnection, Promise[Service[Req, Rep]], Stopwatch.Elapsed)]
+      q: immutable.Queue[(ClientConnection,
+                          Promise[Service[Req, Rep]],
+                          Stopwatch.Elapsed)]
   )
       extends State
   private case class Named(name: NameTree[Name.Bound]) extends State

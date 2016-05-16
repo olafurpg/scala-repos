@@ -134,14 +134,14 @@ class SyslogHandler(val server: String,
   * @param truncateStackTracesAt
   * Truncate stack traces in exception logging (line count).
   */
-class SyslogFormatter(
-    val hostname: String = NetUtil.getLocalHostName(),
-    val serverName: Option[String] = None,
-    val useIsoDateFormat: Boolean = true,
-    val priority: Int = SyslogHandler.PRIORITY_USER,
-    timezone: Option[String] = None,
-    truncateAt: Int = 0,
-    truncateStackTracesAt: Int = Formatter.DefaultStackTraceSizeLimit)
+class SyslogFormatter(val hostname: String = NetUtil.getLocalHostName(),
+                      val serverName: Option[String] = None,
+                      val useIsoDateFormat: Boolean = true,
+                      val priority: Int = SyslogHandler.PRIORITY_USER,
+                      timezone: Option[String] = None,
+                      truncateAt: Int = 0,
+                      truncateStackTracesAt: Int =
+                        Formatter.DefaultStackTraceSizeLimit)
     extends Formatter(timezone,
                       truncateAt,
                       truncateStackTracesAt,

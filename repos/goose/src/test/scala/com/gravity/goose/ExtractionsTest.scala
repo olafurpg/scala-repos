@@ -43,7 +43,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "At Home Depot, we first realized we needed to have a real conversation with",
+        expectedStart =
+          "At Home Depot, we first realized we needed to have a real conversation with",
         expectedImage = null)
     TestUtils.printReport()
   }
@@ -57,7 +58,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Get ready, America, because by Christmas 2012 you will have an Apple TV in your living room",
+        expectedStart =
+          "Get ready, America, because by Christmas 2012 you will have an Apple TV in your living room",
         expectedImage = null)
     TestUtils.printReport()
   }
@@ -231,7 +233,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "If you believe what college football coaches have said about sports")
+        expectedStart =
+          "If you believe what college football coaches have said about sports")
   }
 
   @Test
@@ -243,7 +246,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Streaming and downloading TV content to mobiles is nice")
+        expectedStart =
+          "Streaming and downloading TV content to mobiles is nice")
   }
 
   @Test
@@ -285,7 +289,8 @@ class ExtractionsTest {
     TestUtils.runArticleAssertions(
         article = article,
         expectedStart = "This month, the federal government released",
-        expectedTitle = "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life")
+        expectedTitle =
+          "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life")
   }
 
   @Test
@@ -297,7 +302,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Despite what the jeers of jaded Californians might suggest")
+        expectedStart =
+          "Despite what the jeers of jaded Californians might suggest")
   }
 
   @Test
@@ -321,7 +327,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "SAN FRANCISCO (AP) — Steve Jobs, the mind behind the iPhone")
+        expectedStart =
+          "SAN FRANCISCO (AP) — Steve Jobs, the mind behind the iPhone")
   }
 
   @Test
@@ -332,7 +339,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "If the newest Census Bureau estimates stay close to form")
+        expectedStart =
+          "If the newest Census Bureau estimates stay close to form")
   }
 
   @Test
@@ -359,7 +367,8 @@ class ExtractionsTest {
 
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "From Goldman on the FOMC operation twist announcement")
+        expectedStart =
+          "From Goldman on the FOMC operation twist announcement")
   }
 
   @Test
@@ -370,7 +379,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Some traders found Wednesday's Fed statement to be a bit gloomier than expected.")
+        expectedStart =
+          "Some traders found Wednesday's Fed statement to be a bit gloomier than expected.")
   }
 
   /*
@@ -399,7 +409,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US.")
+        expectedStart =
+          "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US.")
   }
 
   @Test
@@ -411,7 +422,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Emergency services were called to Kismot Restaurant's curry-eating challenge,",
+        expectedStart =
+          "Emergency services were called to Kismot Restaurant's curry-eating challenge,",
         expectedImage = null)
   }
 
@@ -425,7 +437,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
         article = article,
-        expectedStart = "Opposition to a proposal to remove certain personal data",
+        expectedStart =
+          "Opposition to a proposal to remove certain personal data",
         expectedImage = null)
   }
 }

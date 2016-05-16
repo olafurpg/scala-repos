@@ -89,8 +89,8 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     */
   private def testBinary(c: (Expression, Expression) => Expression,
                          f: (Double, Double) => Double,
-                         domain: Iterable[(Double, Double)] = (-20 to 20).map(
-                               v => (v * 0.1, v * -0.1)),
+                         domain: Iterable[(Double, Double)] =
+                           (-20 to 20).map(v => (v * 0.1, v * -0.1)),
                          expectNull: Boolean = false,
                          expectNaN: Boolean = false): Unit = {
     if (expectNull) {

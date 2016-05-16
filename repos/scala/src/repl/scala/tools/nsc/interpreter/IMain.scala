@@ -59,7 +59,9 @@ import java.net.URL
 class IMain(@BeanProperty val factory: ScriptEngineFactory,
             initialSettings: Settings,
             protected val out: JPrintWriter)
-    extends AbstractScriptEngine with Compilable with Imports
+    extends AbstractScriptEngine
+    with Compilable
+    with Imports
     with PresentationCompilation {
   imain =>
 
@@ -230,7 +232,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     assert(bindExceptions, "withLastExceptionLock called incorrectly.")
     bindExceptions = false
 
-    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions = true
+    try beQuietDuring(body) catch logAndDiscard("withLastExceptionLock", alt) finally bindExceptions =
+      true
   }
 
   def executionWrapper = _executionWrapper
@@ -292,11 +295,12 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     _classLoader
   }
 
-  def backticked(s: String): String = ((s split '.').toList map {
-        case "_" => "_"
-        case s if nme.keywords(newTermName(s)) => s"`$s`"
-        case s => s
-      } mkString ".")
+  def backticked(s: String): String =
+    ((s split '.').toList map {
+          case "_" => "_"
+          case s if nme.keywords(newTermName(s)) => s"`$s`"
+          case s => s
+        } mkString ".")
   def readRootPath(readPath: String) = getModuleIfDefined(readPath)
 
   abstract class PhaseDependentOps {
@@ -367,8 +371,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   }
   private def makeClassLoader(): util.AbstractFileClassLoader =
     new TranslatingClassLoader({
-      _runtimeClassLoader = new URLClassLoader(
-          compilerClasspath, parentClassLoader)
+      _runtimeClassLoader =
+        new URLClassLoader(compilerClasspath, parentClassLoader)
       _runtimeClassLoader
     })
 
@@ -421,17 +425,17 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     // enough to just redefine them together but that may not always
     // be what people want so I'm waiting until I can do it better.
     exitingTyper {
-      req.defines filterNot (s => req.defines contains s.companionSymbol) foreach {
-        newSym =>
-          val oldSym = replScope lookup newSym.name.companionName
-          if (Seq(oldSym, newSym).permutations exists {
-                case Seq(s1, s2) => s1.isClass && s2.isModule
-              }) {
-            replwarn(
-                s"warning: previously defined $oldSym is not a companion to $newSym.")
-            replwarn(
-                "Companions must be defined together; you may wish to use :paste mode for this.")
-          }
+      req.defines filterNot (s =>
+            req.defines contains s.companionSymbol) foreach { newSym =>
+        val oldSym = replScope lookup newSym.name.companionName
+        if (Seq(oldSym, newSym).permutations exists {
+              case Seq(s1, s2) => s1.isClass && s2.isModule
+            }) {
+          replwarn(
+              s"warning: previously defined $oldSym is not a companion to $newSym.")
+          replwarn(
+              "Companions must be defined together; you may wish to use :paste mode for this.")
+        }
       }
     }
     exitingTyper {
@@ -496,18 +500,17 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     }
     repltrace(
         trees map
-        (t =>
-              {
-                // [Eugene to Paul] previously it just said `t map ...`
-                // because there was an implicit conversion from Tree to a list of Trees
-                // however Martin and I have removed the conversion
-                // (it was conflicting with the new reflection API),
-                // so I had to rewrite this a bit
-                val subs = t collect { case sub => sub }
-                subs map
-                (t0 =>
-                      "  " + safePos(t0, -1) + ": " + t0.shortClass +
-                    "\n") mkString ""
+        (t => {
+              // [Eugene to Paul] previously it just said `t map ...`
+              // because there was an implicit conversion from Tree to a list of Trees
+              // however Martin and I have removed the conversion
+              // (it was conflicting with the new reflection API),
+              // so I had to rewrite this a bit
+              val subs = t collect { case sub => sub }
+              subs map
+              (t0 =>
+                    "  " + safePos(t0, -1) + ": " + t0.shortClass +
+                  "\n") mkString ""
             }) mkString "\n"
     )
     // If the last tree is a bare expression, pinpoint where it begins using the
@@ -724,8 +727,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
     result
   }
   def directBind(p: NamedParam): IR.Result = directBind(p.name, p.tpe, p.value)
-  def directBind[T : ru.TypeTag : ClassTag](
-      name: String, value: T): IR.Result = directBind((name, value))
+  def directBind[T: ru.TypeTag: ClassTag](name: String, value: T): IR.Result =
+    directBind((name, value))
 
   def rebind(p: NamedParam): IR.Result = {
     val name = p.name
@@ -737,7 +740,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   }
   def quietBind(p: NamedParam): IR.Result = beQuietDuring(bind(p))
   def bind(p: NamedParam): IR.Result = bind(p.name, p.tpe, p.value)
-  def bind[T : ru.TypeTag : ClassTag](name: String, value: T): IR.Result =
+  def bind[T: ru.TypeTag: ClassTag](name: String, value: T): IR.Result =
     bind((name, value))
 
   /** Reset this interpreter, forgetting all user-specified requests. */
@@ -1089,8 +1092,8 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
       typeOf.getOrElse(name, typeOf(global.encode(name.toString)))
 
     private def typeMap[T](f: Type => T) =
-      mapFrom[Name, Name, T](termNames ++ typeNames)(
-          x => f(cleanMemberDecl(resultSymbol, x)))
+      mapFrom[Name, Name, T](termNames ++ typeNames)(x =>
+            f(cleanMemberDecl(resultSymbol, x)))
 
     /** Types of variables defined by this request. */
     lazy val compilerTypeOf = typeMap[Type](x => x) withDefaultValue NoType
@@ -1161,8 +1164,7 @@ class IMain(@BeanProperty val factory: ScriptEngineFactory,
   def mostRecentVar: String =
     if (mostRecentlyHandledTree.isEmpty) ""
     else
-      "" +
-      (mostRecentlyHandledTree.get match {
+      "" + (mostRecentlyHandledTree.get match {
             case x: ValOrDefDef => x.name
             case Assign(Ident(name), _) => name
             case ModuleDef(_, name, _) => name
@@ -1454,7 +1456,9 @@ object IMain {
     }
   }
   abstract class StrippingTruncatingWriter(out: JPrintWriter)
-      extends JPrintWriter(out) with StrippingWriter with TruncatingWriter {
+      extends JPrintWriter(out)
+      with StrippingWriter
+      with TruncatingWriter {
     self =>
 
     def clean(str: String): String = truncate(strip(str))

@@ -25,7 +25,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 import scala.language.experimental.{macros => sMacros}
 
-class CompareJob[T : OrderedSerialization](in: Iterable[T], args: Args)
+class CompareJob[T: OrderedSerialization](in: Iterable[T], args: Args)
     extends Job(args) {
   TypedPipe
     .from(in)
@@ -44,7 +44,9 @@ private[macros] trait InstanceProvider[T] {
   def g(idx: Int): T
 }
 class PlatformTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
   org.apache.log4j.Logger
     .getLogger("org.apache.hadoop")
     .setLevel(org.apache.log4j.Level.FATAL)
@@ -56,12 +58,12 @@ class PlatformTest
 
   import ScroogeGenerators._
 
-  implicit def arbitraryInstanceProvider[T : Arbitrary] =
+  implicit def arbitraryInstanceProvider[T: Arbitrary] =
     new InstanceProvider[T] {
       def g(idx: Int) = ScroogeGenerators.dataProvider[T](idx)
     }
 
-  def runCompareTest[T : OrderedSerialization](
+  def runCompareTest[T: OrderedSerialization](
       implicit iprov: InstanceProvider[T]) {
     val input = (0 until 10000).map { idx =>
       iprov.g(idx % 50)

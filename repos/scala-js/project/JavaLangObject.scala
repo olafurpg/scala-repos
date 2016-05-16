@@ -92,30 +92,30 @@ object JavaLangObject {
             /* def toString(): String =
              *   getClass().getName() + "@" + Integer.toHexString(hashCode())
              */
-            MethodDef(static = false,
-                      Ident("toString__T", Some("toString__T")),
-                      Nil,
-                      ClassType(StringClass), {
-                        BinaryOp(
-                            BinaryOp.String_+,
-                            BinaryOp(
-                                BinaryOp.String_+,
-                                Apply(Apply(This()(ThisType),
-                                            Ident("getClass__jl_Class",
-                                                  Some("getClass__jl_Class")),
-                                            Nil)(ClassType(ClassClass)),
-                                      Ident("getName__T"),
-                                      Nil)(ClassType(StringClass)),
-                                // +
-                                StringLiteral("@")),
-                            // +
-                            Apply(LoadModule(ClassType("jl_Integer$")),
-                                  Ident("toHexString__I__T"),
-                                  List(Apply(This()(ThisType),
-                                             Ident("hashCode__I"),
-                                             Nil)(IntType)))(
-                                ClassType(StringClass)))
-                      })(OptimizerHints.empty, None),
+            MethodDef(
+                static =
+                  false,
+                Ident("toString__T", Some("toString__T")),
+                Nil,
+                ClassType(StringClass), {
+                  BinaryOp(
+                      BinaryOp.String_+,
+                      BinaryOp(BinaryOp.String_+,
+                               Apply(Apply(This()(ThisType),
+                                           Ident("getClass__jl_Class",
+                                                 Some("getClass__jl_Class")),
+                                           Nil)(ClassType(ClassClass)),
+                                     Ident("getName__T"),
+                                     Nil)(ClassType(StringClass)),
+                               // +
+                               StringLiteral("@")),
+                      // +
+                      Apply(LoadModule(ClassType("jl_Integer$")),
+                            Ident("toHexString__I__T"),
+                            List(Apply(This()(ThisType),
+                                       Ident("hashCode__I"),
+                                       Nil)(IntType)))(ClassType(StringClass)))
+                })(OptimizerHints.empty, None),
             /* Since wait() is not supported in any way, a correct implementation
              * of notify() and notifyAll() is to do nothing.
              */

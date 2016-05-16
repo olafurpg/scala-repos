@@ -325,8 +325,7 @@ private[optimizer] abstract class OptimizerCore(
           val newOptLabel = Some(Ident(info.newName, None))
           if (!info.acceptRecords) {
             val newExpr = transformExpr(expr)
-            info.returnedTypes.value ::=
-            (newExpr.tpe, RefinedType(newExpr.tpe))
+            info.returnedTypes.value ::= (newExpr.tpe, RefinedType(newExpr.tpe))
             Return(newExpr, newOptLabel)
           } else
             trampoline {
@@ -779,15 +778,14 @@ private[optimizer] abstract class OptimizerCore(
                               refinedOrigType,
                               cancelFun))
 
-                    case (
-                        PreTransRecordTree(thenTree,
-                                           thenOrigType,
-                                           thenCancelFun),
-                        _) if telsep.tpe.isNothingType =>
+                    case (PreTransRecordTree(thenTree,
+                                             thenOrigType,
+                                             thenCancelFun),
+                          _) if telsep.tpe.isNothingType =>
                       cont(PreTransRecordTree(
-                              If(
-                                  newCond, thenTree, finishTransformExpr(telsep))(
-                                  thenTree.tpe),
+                              If(newCond,
+                                 thenTree,
+                                 finishTransformExpr(telsep))(thenTree.tpe),
                               thenOrigType,
                               thenCancelFun))
 
@@ -894,13 +892,14 @@ private[optimizer] abstract class OptimizerCore(
               Binding(name, origName, tpe, mutable, value)
             }
             withNewLocalDefs(captureBindings) { (captureLocalDefs, cont1) =>
-              val replacement = TentativeClosureReplacement(
-                  captureParams,
-                  params,
-                  body,
-                  captureLocalDefs,
-                  alreadyUsed = newSimpleState(false),
-                  cancelFun)
+              val replacement =
+                TentativeClosureReplacement(captureParams,
+                                            params,
+                                            body,
+                                            captureLocalDefs,
+                                            alreadyUsed =
+                                              newSimpleState(false),
+                                            cancelFun)
               val localDef = LocalDef(RefinedType(AnyType,
                                                   isExact = false,
                                                   isNullable = false),
@@ -1088,8 +1087,8 @@ private[optimizer] abstract class OptimizerCore(
             if (!isImmutableType(recordType)) cancelFun()
             PreTransRecordTree(
                 RecordValue(recordType,
-                            recordType.fields.map(
-                                f => fieldLocalDefs(f.name).newReplacement)),
+                            recordType.fields.map(f =>
+                                  fieldLocalDefs(f.name).newReplacement)),
                 tpe,
                 cancelFun)
 
@@ -1256,8 +1255,7 @@ private[optimizer] abstract class OptimizerCore(
                   // Trait impl forwarder
                   case ApplyStatic(
                       ClassType(staticCls), Ident(methodName, _), _) =>
-                    impls.tail.forall(
-                        getMethodBody(_).body match {
+                    impls.tail.forall(getMethodBody(_).body match {
                       case ApplyStatic(
                           ClassType(`staticCls`), Ident(`methodName`, _), _) =>
                         true
@@ -1359,8 +1357,7 @@ private[optimizer] abstract class OptimizerCore(
                           usePreTransform)(cont)
           } else {
             val shouldInline =
-              target.inlineable &&
-              (target.shouldInline ||
+              target.inlineable && (target.shouldInline ||
                   shouldInlineBecauseOfArgs(target, treceiver :: targs))
             val allocationSites =
               (treceiver :: targs).map(_.tpe.allocationSite)
@@ -1804,8 +1801,7 @@ private[optimizer] abstract class OptimizerCore(
       case ClassGetComponentType =>
         newReceiver match {
           case ClassOf(ArrayType(base, depth)) =>
-            contTree(
-                ClassOf(if (depth == 1) ClassType(base)
+            contTree(ClassOf(if (depth == 1) ClassType(base)
                     else ArrayType(base, depth - 1)))
           case ClassOf(ClassType(_)) =>
             contTree(Null())
@@ -2041,14 +2037,14 @@ private[optimizer] abstract class OptimizerCore(
         val stat = stats.head.asInstanceOf[If]
         val ass = stat.elsep.asInstanceOf[Assign]
         val lhs = ass.lhs
-        inlineClassConstructorBodyList(allocationSite,
-                                       thisLocalDef,
-                                       inputFieldsLocalDefs,
-                                       cls,
-                                       Assign(lhs,
-                                              If(cond, th, value)(lhs.tpe)(
-                                                  stat.pos))(ass.pos) :: rest,
-                                       cancelFun)(buildInner)(cont)
+        inlineClassConstructorBodyList(
+            allocationSite,
+            thisLocalDef,
+            inputFieldsLocalDefs,
+            cls,
+            Assign(lhs,
+                   If(cond, th, value)(lhs.tpe)(stat.pos))(ass.pos) :: rest,
+            cancelFun)(buildInner)(cont)
 
       case ApplyStatically(ths: This, superClass, superCtor, args) :: rest
           if isConstructorName(superCtor.name) =>
@@ -2159,17 +2155,16 @@ private[optimizer] abstract class OptimizerCore(
               elsep
 
             // Example: (x > y) || (x == y)  ->  (x >= y)
-            case (BinaryOp(op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> |
-                           Num_>=),
-                           l1,
-                           r1),
+            case (BinaryOp(
+                  op1 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
+                  l1,
+                  r1),
                   BooleanLiteral(true),
                   BinaryOp(
                   op2 @ (Num_== | Num_!= | Num_< | Num_<= | Num_> | Num_>=),
                   l2,
                   r2))
-                if
-                ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
+                if ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
                     (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
                     (l1 == l2 && r1 == r2)) =>
               val canBeEqual =
@@ -2195,8 +2190,7 @@ private[optimizer] abstract class OptimizerCore(
                   l2,
                   r2),
                   BooleanLiteral(false))
-                if
-                ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
+                if ((l1.isInstanceOf[Literal] || l1.isInstanceOf[VarRef]) &&
                     (r1.isInstanceOf[Literal] || r1.isInstanceOf[VarRef]) &&
                     (l1 == l2 && r1 == r2)) =>
               val canBeEqual =
@@ -2383,13 +2377,13 @@ private[optimizer] abstract class OptimizerCore(
                  * will not go into infinite recursion.
                  */
                 implicit val scope = Scope.Empty
-                inline(
-                    Nil,
-                    Some(PreTransTree(x)),
-                    Nil,
-                    target,
-                    isStat = false,
-                    usePreTransform = false)(finishTransform(isStat = false))
+                inline(Nil,
+                       Some(PreTransTree(x)),
+                       Nil,
+                       target,
+                       isStat = false,
+                       usePreTransform =
+                         false)(finishTransform(isStat = false))
               }
             }
 
@@ -2404,13 +2398,13 @@ private[optimizer] abstract class OptimizerCore(
                  * rationale.
                  */
                 implicit val scope = Scope.Empty
-                inline(
-                    Nil,
-                    Some(PreTransTree(arg)),
-                    Nil,
-                    target,
-                    isStat = false,
-                    usePreTransform = false)(finishTransform(isStat = false))
+                inline(Nil,
+                       Some(PreTransTree(arg)),
+                       Nil,
+                       target,
+                       isStat = false,
+                       usePreTransform =
+                         false)(finishTransform(isStat = false))
               }
             }
         }
@@ -3260,8 +3254,8 @@ private[optimizer] abstract class OptimizerCore(
     val allLocalDefs = thisLocalDef ++: paramLocalDefs
 
     val allocationSites = List.fill(allLocalDefs.size)(None)
-    val scope0 = optTarget.fold(Scope.Empty)(
-        target => Scope.Empty.inlining((allocationSites, target)))
+    val scope0 = optTarget.fold(Scope.Empty)(target =>
+          Scope.Empty.inlining((allocationSites, target)))
     val scope = scope0.withEnv(OptEnv.Empty.withLocalDefs(allLocalDefs))
     val newBody = transform(body, resultType == NoType)(scope)
 
@@ -3534,9 +3528,8 @@ private[optimizer] abstract class OptimizerCore(
                 withNewLocalDef(
                     Binding("x", None, IntType, false, PreTransTree(arg))) {
                   (intLocalDef, cont1) =>
-                    doDoBuildInner(
-                        Some(() => LongFromInt(intLocalDef.newReplacement)))(
-                        cont1)
+                    doDoBuildInner(Some(() =>
+                              LongFromInt(intLocalDef.newReplacement)))(cont1)
                 }(cont)
 
               case BinaryOp(op @ (BinaryOp.Long_+ | BinaryOp.Long_-),
@@ -3755,8 +3748,7 @@ private[optimizer] object OptimizerCore {
     }
 
     def contains(that: LocalDef): Boolean = {
-      (this eq that) ||
-      (replacement match {
+      (this eq that) || (replacement match {
             case TentativeClosureReplacement(
                 _, _, _, captureLocalDefs, _, _) =>
               captureLocalDefs.exists(_.contains(that))
@@ -3840,8 +3832,8 @@ private[optimizer] object OptimizerCore {
   }
 
   private class Scope(val env: OptEnv,
-                      val implsBeingInlined: Set[
-                          (List[Option[AllocationSite]], AbstractMethodID)]) {
+                      val implsBeingInlined: Set[(List[Option[AllocationSite]],
+                                                  AbstractMethodID)]) {
     def withEnv(env: OptEnv): Scope =
       new Scope(env, implsBeingInlined)
 
@@ -4134,30 +4126,31 @@ private[optimizer] object OptimizerCore {
       }
 
       inlineable = !optimizerHints.noinline
-      shouldInline = inlineable && {
-        optimizerHints.inline || isForwarder || {
-          val MethodDef(_, _, params, _, body) = originalDef
-          body match {
-            case _: Skip | _: This | _: Literal => true
+      shouldInline =
+        inlineable && {
+          optimizerHints.inline || isForwarder || {
+            val MethodDef(_, _, params, _, body) = originalDef
+            body match {
+              case _: Skip | _: This | _: Literal => true
 
-            // Shape of accessors
-            case Select(This(), _) if params.isEmpty => true
-            case Assign(Select(This(), _), VarRef(_)) if params.size == 1 =>
-              true
+              // Shape of accessors
+              case Select(This(), _) if params.isEmpty => true
+              case Assign(Select(This(), _), VarRef(_)) if params.size == 1 =>
+                true
 
-            // Shape of trivial call-super constructors
-            case Block(stats)
-                if params.isEmpty && isConstructorName(encodedName) &&
-                stats.forall(isTrivialConstructorStat) =>
-              true
+              // Shape of trivial call-super constructors
+              case Block(stats)
+                  if params.isEmpty && isConstructorName(encodedName) &&
+                  stats.forall(isTrivialConstructorStat) =>
+                true
 
-            // Simple method
-            case SimpleMethodBody() => true
+              // Simple method
+              case SimpleMethodBody() => true
 
-            case _ => false
+              case _ => false
+            }
           }
         }
-      }
     }
   }
 

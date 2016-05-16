@@ -235,8 +235,10 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     *    not fall below zero), organized as a `BitSet`.
     */
   class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
-      extends AbstractSet[Value] with immutable.SortedSet[Value]
-      with SortedSetLike[Value, ValueSet] with Serializable {
+      extends AbstractSet[Value]
+      with immutable.SortedSet[Value]
+      with SortedSetLike[Value, ValueSet]
+      with Serializable {
 
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =

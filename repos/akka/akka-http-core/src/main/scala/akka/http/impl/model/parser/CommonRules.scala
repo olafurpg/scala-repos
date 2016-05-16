@@ -479,8 +479,8 @@ private[parser] trait CommonRules {
 
   // parses a potentially long series of digits and extracts its Long value capping at Int.MaxValue in case of overflows
   def longNumberCappedAtIntMaxValue = rule {
-    capture((1 to 11).times(DIGIT)) ~> (s ⇒ math.min(s.toLong, Int.MaxValue)) ~ zeroOrMore(
-        DIGIT) ~ OWS
+    capture((1 to 11).times(DIGIT)) ~> (s ⇒
+          math.min(s.toLong, Int.MaxValue)) ~ zeroOrMore(DIGIT) ~ OWS
   }
 
   // parses a potentially long series of digits and extracts its Long value capping at 999,999,999,999,999,999 in case of overflows

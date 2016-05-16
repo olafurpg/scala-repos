@@ -30,11 +30,11 @@ object Equivalence {
   /**
     * @param falseUndef use false to consider undef type equals to any type
     */
-  def equivInner(
-      l: ScType,
-      r: ScType,
-      subst: ScUndefinedSubstitutor,
-      falseUndef: Boolean = true): (Boolean, ScUndefinedSubstitutor) = {
+  def equivInner(l: ScType,
+                 r: ScType,
+                 subst: ScUndefinedSubstitutor,
+                 falseUndef: Boolean =
+                   true): (Boolean, ScUndefinedSubstitutor) = {
     ProgressManager.checkCanceled()
 
     if (l == r) return (true, subst)

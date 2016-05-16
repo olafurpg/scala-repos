@@ -38,7 +38,9 @@ import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages.RegisterE
   * End-to-end tests for dynamic allocation in standalone mode.
   */
 class StandaloneDynamicAllocationSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfterAll
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfterAll
     with PrivateMethodTester {
 
   private val numWorkers = 2
@@ -56,8 +58,8 @@ class StandaloneDynamicAllocationSuite
     */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    masterRpcEnv = RpcEnv.create(
-        Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
+    masterRpcEnv =
+      RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
       RpcEnv.create(
           Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)

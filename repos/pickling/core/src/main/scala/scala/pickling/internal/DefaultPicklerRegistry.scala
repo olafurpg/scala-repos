@@ -8,7 +8,8 @@ import scala.pickling.spi.{PicklerRegistry, RuntimePicklerGenerator}
 
 /** Default pickle registry just uses TrieMaps and delgates behavior to a runtime pickler generator. */
 final class DefaultPicklerRegistry(generator: RuntimePicklerGenerator)
-    extends PicklerRegistry with RuntimePicklerRegistryHelper {
+    extends PicklerRegistry
+    with RuntimePicklerRegistryHelper {
   type PicklerGenerator = AppliedType => Pickler[_]
   type UnpicklerGenerator = AppliedType => Unpickler[_]
   // TODO - We need to move the special encoding for runtime classes into here, rather than in magical traits.

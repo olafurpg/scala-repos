@@ -29,7 +29,8 @@ class ReplicatedCacheSpecMultiJvmNode2 extends ReplicatedCacheSpec
 class ReplicatedCacheSpecMultiJvmNode3 extends ReplicatedCacheSpec
 
 class ReplicatedCacheSpec
-    extends MultiNodeSpec(ReplicatedCacheSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatedCacheSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatedCacheSpec._
   import ReplicatedCache._

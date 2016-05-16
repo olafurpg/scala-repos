@@ -125,8 +125,8 @@ class TextSuite extends QueryTest with SharedSQLContext {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+              hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }

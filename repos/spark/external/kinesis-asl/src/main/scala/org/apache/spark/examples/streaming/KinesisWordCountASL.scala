@@ -235,16 +235,15 @@ object KinesisWordProducerASL {
       val records = (1 to recordsPerSecond.toInt).foreach { recordNum =>
         // Randomly generate wordsPerRecord number of words
         val data = (1 to wordsPerRecord.toInt)
-          .map(x =>
-                {
-              // Get a random index to a word
-              val randomWordIdx = Random.nextInt(randomWords.size)
-              val randomWord = randomWords(randomWordIdx)
+          .map(x => {
+            // Get a random index to a word
+            val randomWordIdx = Random.nextInt(randomWords.size)
+            val randomWord = randomWords(randomWordIdx)
 
-              // Increment total count to compare to server counts later
-              totals(randomWord) = totals.getOrElse(randomWord, 0) + 1
+            // Increment total count to compare to server counts later
+            totals(randomWord) = totals.getOrElse(randomWord, 0) + 1
 
-              randomWord
+            randomWord
           })
           .mkString(" ")
 

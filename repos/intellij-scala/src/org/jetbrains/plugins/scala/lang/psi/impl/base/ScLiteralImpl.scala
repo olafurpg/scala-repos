@@ -29,7 +29,8 @@ import scala.StringContext.InvalidEscapeException
   * Date: 22.02.2008
   */
 class ScLiteralImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScLiteral
+    extends ScalaPsiElementImpl(node)
+    with ScLiteral
     with ContributedReferenceHost {
   def isValidHost: Boolean = getValue.isInstanceOf[String]
 
@@ -226,7 +227,8 @@ class ScLiteralImpl(node: ASTNode)
   def setTypeWithoutImplicits(tp: Option[ScType]) {
     if (getFirstChild.getNode.getElementType != ScalaTokenTypes.kNULL)
       assert(assertion = false,
-             message = "Only null literals accepted, type: " +
+             message =
+               "Only null literals accepted, type: " +
                getFirstChild.getNode.getElementType)
     typeWithoutImplicits = tp
   }
@@ -268,8 +270,9 @@ class ScLiteralImpl(node: ASTNode)
     if (System.currentTimeMillis() > expirationTime ||
         myAnnotationOwner.exists(!_.isValid)) {
       myAnnotationOwner = annotationOwnerLookUp(this)
-      expirationTime = System.currentTimeMillis() +
-      (2 + expTimeLengthGenerator.nextInt(8)) * 1000
+      expirationTime =
+        System.currentTimeMillis() +
+        (2 + expTimeLengthGenerator.nextInt(8)) * 1000
     }
 
     myAnnotationOwner

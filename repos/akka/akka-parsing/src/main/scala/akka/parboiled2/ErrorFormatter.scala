@@ -263,9 +263,9 @@ class ErrorFormatter(showExpected: Boolean = true,
   /**
     * Formats the head element of a [[RuleTrace]] into a String.
     */
-  def formatNonTerminal(
-      nonTerminal: RuleTrace.NonTerminal,
-      showFrameStartOffset: Boolean = showFrameStartOffset): String = {
+  def formatNonTerminal(nonTerminal: RuleTrace.NonTerminal,
+                        showFrameStartOffset: Boolean =
+                          showFrameStartOffset): String = {
     import RuleTrace._
     import CharUtils.escape
     val keyString = nonTerminal.key match {
@@ -290,7 +290,8 @@ class ErrorFormatter(showExpected: Boolean = true,
       case ZeroOrMore ⇒ "*"
     }
     if (nonTerminal.offset != 0 && showFrameStartOffset)
-      keyString + ':' + nonTerminal.offset else keyString
+      keyString + ':' + nonTerminal.offset
+    else keyString
   }
 
   def formatTerminal(terminal: RuleTrace.Terminal): String = {

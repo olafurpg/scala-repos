@@ -9,7 +9,8 @@ import com.wix.accord.dsl._
 import com.wix.accord._
 
 case class PathId(path: List[String], absolute: Boolean = true)
-    extends Ordered[PathId] with plugin.PathId {
+    extends Ordered[PathId]
+    with plugin.PathId {
 
   def root: String = path.headOption.getOrElse("")
 
@@ -118,8 +119,8 @@ object PathId {
 
   private val validPathChars = new Validator[PathId] {
     override def apply(pathId: PathId): Result = {
-      validate(pathId.path)(
-          validator = pathId.path.each should matchRegexFully(
+      validate(pathId.path)(validator =
+            pathId.path.each should matchRegexFully(
                 ID_PATH_SEGMENT_PATTERN.pattern))
     }
   }

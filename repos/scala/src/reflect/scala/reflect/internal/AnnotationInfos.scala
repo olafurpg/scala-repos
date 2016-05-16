@@ -90,7 +90,8 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
     *  an instance of a Java enumeration value).
     */
   case class LiteralAnnotArg(const: Constant)
-      extends ClassfileAnnotArg with LiteralArgumentApi {
+      extends ClassfileAnnotArg
+      with LiteralArgumentApi {
     def value = const
     override def toString = const.escapedStringValue
   }
@@ -98,14 +99,16 @@ trait AnnotationInfos extends api.Annotations { self: SymbolTable =>
 
   /** Represents an array of classfile annotation arguments */
   case class ArrayAnnotArg(args: Array[ClassfileAnnotArg])
-      extends ClassfileAnnotArg with ArrayArgumentApi {
+      extends ClassfileAnnotArg
+      with ArrayArgumentApi {
     override def toString = args.mkString("[", ", ", "]")
   }
   object ArrayAnnotArg extends ArrayArgumentExtractor
 
   /** Represents a nested classfile annotation */
   case class NestedAnnotArg(annInfo: AnnotationInfo)
-      extends ClassfileAnnotArg with NestedArgumentApi {
+      extends ClassfileAnnotArg
+      with NestedArgumentApi {
     // The nested annotation should not have any Scala annotation arguments
     assert(annInfo.args.isEmpty, annInfo.args)
     def annotation = annInfo

@@ -134,7 +134,7 @@ object PathMatchers {
       convert: Function[String, T], clazz: Class[T]): PathMatcher[T] =
     matcher(_ ⇒ ScalaPathMatchers.Segment.map(convert(_)))(ClassTag(clazz))
 
-  private def matcher[T : ClassTag](
+  private def matcher[T: ClassTag](
       scalaMatcher: ScalaPathMatchers.type ⇒ PathMatcher1[T]): PathMatcher[T] =
     new PathMatcherImpl[T](scalaMatcher(ScalaPathMatchers))
   private def matcher0(

@@ -87,10 +87,10 @@ object Databases {
     * @param block The block of code to run
     * @return The result of the block
     */
-  def withInMemory[T](name: String = "default",
-                      urlOptions: Map[String, String] = Map.empty,
-                      config: Map[String, _ <: Any] = Map.empty)(
-      block: Database => T): T = {
+  def withInMemory[T](
+      name: String = "default",
+      urlOptions: Map[String, String] = Map.empty,
+      config: Map[String, _ <: Any] = Map.empty)(block: Database => T): T = {
     val database = inMemory(name, urlOptions, config)
     try {
       block(database)

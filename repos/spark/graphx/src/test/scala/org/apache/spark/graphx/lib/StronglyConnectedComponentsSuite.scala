@@ -21,7 +21,8 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.graphx._
 
 class StronglyConnectedComponentsSuite
-    extends SparkFunSuite with LocalSparkContext {
+    extends SparkFunSuite
+    with LocalSparkContext {
 
   test("Island Strongly Connected Components") {
     withSpark { sc =>

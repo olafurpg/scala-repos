@@ -402,14 +402,13 @@ class ConnectionPoolSpec
       c.handleWithSyncHandler(
           testServerHandler(incomingConnectionCounter.incrementAndGet()))
 
-    def cachedHostConnectionPool[T](
-        maxConnections: Int = 2,
-        maxRetries: Int = 2,
-        maxOpenRequests: Int = 8,
-        pipeliningLimit: Int = 1,
-        idleTimeout: Duration = 5.seconds,
-        ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+    def cachedHostConnectionPool[T](maxConnections: Int = 2,
+                                    maxRetries: Int = 2,
+                                    maxOpenRequests: Int = 8,
+                                    pipeliningLimit: Int = 1,
+                                    idleTimeout: Duration = 5.seconds,
+                                    ccSettings: ClientConnectionSettings =
+                                      ClientConnectionSettings(system)) = {
       val settings = new ConnectionPoolSettingsImpl(
           maxConnections,
           maxRetries,
@@ -421,14 +420,13 @@ class ConnectionPoolSpec
             .cachedHostConnectionPool[T](serverHostName, serverPort, settings))
     }
 
-    def superPool[T](
-        maxConnections: Int = 2,
-        maxRetries: Int = 2,
-        maxOpenRequests: Int = 8,
-        pipeliningLimit: Int = 1,
-        idleTimeout: Duration = 5.seconds,
-        ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+    def superPool[T](maxConnections: Int = 2,
+                     maxRetries: Int = 2,
+                     maxOpenRequests: Int = 8,
+                     pipeliningLimit: Int = 1,
+                     idleTimeout: Duration = 5.seconds,
+                     ccSettings: ClientConnectionSettings =
+                       ClientConnectionSettings(system)) = {
       val settings = new ConnectionPoolSettingsImpl(
           maxConnections,
           maxRetries,

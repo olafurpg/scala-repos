@@ -182,7 +182,7 @@ object Variable {
     }
   }
 
-  case class Categorical[+F : Ring](label: String = Unlabeled)
+  case class Categorical[+F: Ring](label: String = Unlabeled)
       extends Variable[F] {
     def apply() = new Builder[String, String => List[F]] {
       var categories: Set[String] = Set.empty
@@ -225,13 +225,11 @@ object Variable {
           val k = real(v)
           acc + (k -> (acc.getOrElse(k, 0) + 1))
         }
-        val mostCommon = occurences
-          .maxBy(_._2)
-          ._1
+        val mostCommon = occurences.maxBy(_._2)._1
 
-          { s =>
-            if (s == sentinel) mostCommon else real(s)
-          }
+        { s =>
+          if (s == sentinel) mostCommon else real(s)
+        }
       }
     }
   }

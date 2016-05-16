@@ -5,7 +5,9 @@ import java.util.Formatter
 
 class PrintStream private (
     _out: OutputStream, autoFlush: Boolean, charset: Charset)
-    extends FilterOutputStream(_out) with Appendable with Closeable {
+    extends FilterOutputStream(_out)
+    with Appendable
+    with Closeable {
 
   /* The way we handle charsets here is a bit tricky, because we want to
    * minimize the area of reachability for normal programs.
@@ -93,8 +95,7 @@ class PrintStream private (
        * checkError() result. This is not clearly specified by the JavaDoc,
        * but, experimentally, the JDK seems to behave that way.
        */
-      errorFlag ||
-      (out match {
+      errorFlag || (out match {
             case out: PrintStream => out.checkError()
             case _ => false
           })

@@ -45,8 +45,10 @@ import org.apache.spark.sql.functions._
 @Experimental
 final class GBTRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Predictor[Vector, GBTRegressor, GBTRegressionModel] with GBTParams
-    with TreeRegressorParams with Logging {
+    extends Predictor[Vector, GBTRegressor, GBTRegressionModel]
+    with GBTParams
+    with TreeRegressorParams
+    with Logging {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("gbtr"))
@@ -191,7 +193,8 @@ final class GBTRegressionModel private[ml](
     private val _trees: Array[DecisionTreeRegressionModel],
     private val _treeWeights: Array[Double],
     override val numFeatures: Int)
-    extends PredictionModel[Vector, GBTRegressionModel] with TreeEnsembleModel
+    extends PredictionModel[Vector, GBTRegressionModel]
+    with TreeEnsembleModel
     with Serializable {
 
   require(numTrees > 0, "GBTRegressionModel requires at least 1 tree.")

@@ -416,7 +416,8 @@ private[akka] object LocalActorRefProvider {
    * Root and user guardian
    */
   private class Guardian(override val supervisorStrategy: SupervisorStrategy)
-      extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      extends Actor
+      with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
     def receive = {
       case Terminated(_) ⇒ context.stop(self)
@@ -433,7 +434,8 @@ private[akka] object LocalActorRefProvider {
   private class SystemGuardian(
       override val supervisorStrategy: SupervisorStrategy,
       val guardian: ActorRef)
-      extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      extends Actor
+      with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
     import SystemGuardian._
 
     var terminationHooks = Set.empty[ActorRef]
@@ -545,9 +547,10 @@ private[akka] class LocalActorRefProvider private[akka](
       def isWalking = causeOfTermination.future.isCompleted == false
 
       override def stop(): Unit = {
-        causeOfTermination.trySuccess(Terminated(provider.rootGuardian)(
-                existenceConfirmed = true,
-                addressTerminated = true)) //Idempotent
+        causeOfTermination.trySuccess(
+            Terminated(provider.rootGuardian)(existenceConfirmed = true,
+                                              addressTerminated =
+                                                true)) //Idempotent
         terminationPromise.tryCompleteWith(causeOfTermination.future) // Signal termination downstream, idempotent
       }
 
@@ -555,8 +558,8 @@ private[akka] class LocalActorRefProvider private[akka](
           "Use context.watch(actor) and receive Terminated(actor)", "2.2")
       override private[akka] def isTerminated: Boolean = !isWalking
 
-      override def !(
-          message: Any)(implicit sender: ActorRef = Actor.noSender): Unit =
+      override def !(message: Any)(
+          implicit sender: ActorRef = Actor.noSender): Unit =
         if (isWalking)
           message match {
             case null ⇒ throw new InvalidMessageException("Message is null")

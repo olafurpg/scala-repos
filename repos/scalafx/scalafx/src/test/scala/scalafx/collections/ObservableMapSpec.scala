@@ -304,10 +304,10 @@ class ObservableMapSpec[K, V]
     }
 
     // Execution
-    compareInstances((map +=
-                         ((3, 3.toString), (1, 1.toString), (5, 5.toString))),
-                     map,
-                     true)
+    compareInstances(
+        (map += ((3, 3.toString), (1, 1.toString), (5, 5.toString))),
+        map,
+        true)
     compareInstances((map -= (1, 4)), map, true)
     map(3) = "three"
 

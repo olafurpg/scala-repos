@@ -63,7 +63,7 @@ object MultiNode extends AutoPlugin {
         SbtScalariform.configScalariformSettings) ++ Seq(
         jvmOptions in MultiJvm := defaultMultiJvmOptions,
         compileInputs in (MultiJvm, compile) <<=
-        (compileInputs in (MultiJvm, compile)) dependsOn
+          (compileInputs in (MultiJvm, compile)) dependsOn
         (ScalariformKeys.format in MultiJvm),
         scalacOptions in MultiJvm <<= scalacOptions in Test,
         compile in MultiJvm <<= (compile in MultiJvm) triggeredBy

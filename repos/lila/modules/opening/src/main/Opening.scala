@@ -70,8 +70,8 @@ object Opening {
       Move(first = r str "first",
            cp = r int "cp",
            line = chess.format.pgn.Binary
-               .readMoves(r.bytes("line").value.toList)
-               .get)
+             .readMoves(r.bytes("line").value.toList)
+             .get)
 
     def writes(w: BSON.Writer, o: Move) =
       BSONDocument(

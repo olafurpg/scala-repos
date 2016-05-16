@@ -256,27 +256,26 @@ trait QuirrelCache extends AST { parser: Parser =>
         val width = widths(name)
         val delta = width - oldWidth
         lineNum -> (colNum, delta)
-    }.groupBy(_._1)
-      .map {
-        case (lineNum, ds) =>
-          (lineNum, ds.map(_._2).sortBy(_._1))
-      }
+    }.groupBy(_._1).map {
+      case (lineNum, ds) =>
+        (lineNum, ds.map(_._2).sortBy(_._1))
+    }
 
-      { (loc: LineStream) =>
-        val colNum =
-          deltas get loc.lineNum map { ds =>
-            ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
-          } map (_ + loc.colNum) getOrElse loc.colNum
+    { (loc: LineStream) =>
+      val colNum =
+        deltas get loc.lineNum map { ds =>
+          ds.takeWhile(_._1 < loc.colNum).map(_._2).sum
+        } map (_ + loc.colNum) getOrElse loc.colNum
 
-        loc match {
-          case ln: LazyLineCons =>
-            new LazyLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
-          case ln: StrictLineCons =>
-            new StrictLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
-          case LineNil =>
-            LineNil
-        }
+      loc match {
+        case ln: LazyLineCons =>
+          new LazyLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
+        case ln: StrictLineCons =>
+          new StrictLineCons(ln.head, ln.tail, ln.line, ln.lineNum, colNum)
+        case LineNil =>
+          LineNil
       }
+    }
   }
 
   private type BindingS[+A] = StateT[Option, List[Binding], A]
@@ -471,8 +470,8 @@ trait QuirrelCache extends AST { parser: Parser =>
     val result = for {
       expr <- repl(expr0)
       _ <- StateT { s: List[Binding] =>
-        s.isEmpty.option((Nil, ()))
-      }: BindingS[Unit]
+            s.isEmpty.option((Nil, ()))
+          }: BindingS[Unit]
     } yield expr
 
     result.eval(bindings)

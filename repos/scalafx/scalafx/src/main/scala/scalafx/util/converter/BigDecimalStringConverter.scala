@@ -38,7 +38,8 @@ object BigDecimalStringConverter {
 }
 
 class BigDecimalStringConverter(
-    delegate: jfxuc.BigDecimalStringConverter = new jfxuc.BigDecimalStringConverter)
+    delegate: jfxuc.BigDecimalStringConverter =
+      new jfxuc.BigDecimalStringConverter)
     extends StringConverterDelegate[
         jm.BigDecimal, BigDecimal, jfxuc.BigDecimalStringConverter](delegate) {
 

@@ -53,7 +53,9 @@ import com.weiglewilczek.slf4s.Logging
   * Provides a simple interface for ingesting bulk JSON data.
   */
 trait NIHDBIngestSupport
-    extends VFSColumnarTableModule with ActorVFSModule with Logging {
+    extends VFSColumnarTableModule
+    with ActorVFSModule
+    with Logging {
   implicit def M: Monad[Future] with Comonad[Future]
   def actorSystem: ActorSystem
 
@@ -117,23 +119,24 @@ trait NIHDBIngestSupport
     val projection = {
       for {
         _ <- M point {
-          vfs.unsecured
-            .writeAll(
-                Seq((0,
-                     IngestMessage(apiKey,
-                                   path,
-                                   Authorities(accountId),
-                                   records,
-                                   None,
-                                   clock.instant,
-                                   StreamRef.Append))))
-            .unsafePerformIO
-        }
+              vfs.unsecured
+                .writeAll(
+                    Seq((0,
+                         IngestMessage(apiKey,
+                                       path,
+                                       Authorities(accountId),
+                                       records,
+                                       None,
+                                       clock.instant,
+                                       StreamRef.Append))))
+                .unsafePerformIO
+            }
         _ = logger.debug(
             "Insert complete on //%s, waiting for cook".format(db))
         projection <- vfs
-          .readProjection(apiKey, path, Version.Current, AccessMode.Read)
-          .run
+                       .readProjection(
+                           apiKey, path, Version.Current, AccessMode.Read)
+                       .run
       } yield {
         (projection valueOr { err =>
               sys.error(

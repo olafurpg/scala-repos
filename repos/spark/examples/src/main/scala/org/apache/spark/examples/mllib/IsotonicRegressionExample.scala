@@ -34,10 +34,8 @@ object IsotonicRegressionExample {
 
     // Create label, feature, weight tuples from input data with weight set to default value 1.0.
     val parsedData = data.map { line =>
-      val parts = line
-        .split(',')
-        .map(_.toDouble)
-        (parts(0), parts(1), 1.0)
+      val parts = line.split(',').map(_.toDouble)
+      (parts(0), parts(1), 1.0)
     }
 
     // Split data into training (60%) and test (40%) sets.

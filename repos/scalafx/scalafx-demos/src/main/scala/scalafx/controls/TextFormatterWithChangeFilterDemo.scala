@@ -90,12 +90,11 @@ object TextFormatterWithChangeFilterDemo extends JFXApp {
   val textField = new TextField {
     text = prompt
     textFormatter = formatter
-    onAction = (a: ActionEvent) =>
-      {
-        val str = text()
-        val message = converter.fromString(str) + "\n"
-        outputTextArea.text = message + outputTextArea.text()
-        text() = ""
+    onAction = (a: ActionEvent) => {
+      val str = text()
+      val message = converter.fromString(str) + "\n"
+      outputTextArea.text = message + outputTextArea.text()
+      text() = ""
     }
   }
 

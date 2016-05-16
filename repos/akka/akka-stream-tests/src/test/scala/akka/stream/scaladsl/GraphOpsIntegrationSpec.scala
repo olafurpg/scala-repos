@@ -61,8 +61,7 @@ class GraphOpsIntegrationSpec extends AkkaSpec {
 
     "support broadcast - merge layouts" in {
       val resultFuture = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ (sink) ⇒
+        .fromGraph(GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ (sink) ⇒
           val bcast = b.add(Broadcast[Int](2))
           val merge = b.add(Merge[Int](2))
 
@@ -150,8 +149,7 @@ class GraphOpsIntegrationSpec extends AkkaSpec {
     "allow adding of flows to sources and sinks to flows" in {
 
       val resultFuture = RunnableGraph
-        .fromGraph(
-            GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ (sink) ⇒
+        .fromGraph(GraphDSL.create(Sink.head[Seq[Int]]) { implicit b ⇒ (sink) ⇒
           val bcast = b.add(Broadcast[Int](2))
           val merge = b.add(Merge[Int](2))
 

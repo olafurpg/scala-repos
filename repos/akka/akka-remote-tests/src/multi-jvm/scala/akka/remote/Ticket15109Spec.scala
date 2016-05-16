@@ -46,7 +46,8 @@ class Ticket15109SpecMultiJvmNode1 extends Ticket15109Spec
 class Ticket15109SpecMultiJvmNode2 extends Ticket15109Spec
 
 abstract class Ticket15109Spec
-    extends MultiNodeSpec(Ticket15109Spec) with STMultiNodeSpec
+    extends MultiNodeSpec(Ticket15109Spec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import Ticket15109Spec._

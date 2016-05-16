@@ -17,8 +17,8 @@ private[pubsub] trait PerGroupingBuffer {
     buffers.get(grouping) match {
       case None ⇒ action
       case Some(messages) ⇒
-        buffers = buffers.updated(
-            grouping, messages :+ ((message, originalSender)))
+        buffers =
+          buffers.updated(grouping, messages :+ ((message, originalSender)))
         totalBufferSize += 1
     }
   }

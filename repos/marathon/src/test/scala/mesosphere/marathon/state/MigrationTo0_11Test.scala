@@ -11,7 +11,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class MigrationTo0_11Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   class Fixture {
@@ -131,12 +133,11 @@ class MigrationTo0_11Test
     Then("the versionInfo is accurate in the group")
     val correctedAppV1 = appV1.copy(
         versionInfo = appV1.versionInfo.withConfigChange(appV1.version))
-    val correctedAppV2 =
-      appV2Upgrade.copy(versionInfo = correctedAppV1.versionInfo
-              .withConfigChange(appV2Upgrade.version))
+    val correctedAppV2 = appV2Upgrade.copy(versionInfo =
+          correctedAppV1.versionInfo.withConfigChange(appV2Upgrade.version))
     val correctedAppV3 =
       appV3Scaling.copy(versionInfo = correctedAppV2.versionInfo
-              .withScaleOrRestartChange(appV3Scaling.version))
+            .withScaleOrRestartChange(appV3Scaling.version))
 
     val maybeGroup: Option[Group] = f.groupRepo.rootGroup().futureValue
     maybeGroup should be(Some(groupWithApp.copy(apps = Set(correctedAppV3))))
@@ -189,12 +190,11 @@ class MigrationTo0_11Test
     Then("the versionInfo is accurate in the group")
     val correctedAppV1 = appV1.copy(
         versionInfo = appV1.versionInfo.withConfigChange(appV1.version))
-    val correctedAppV2 =
-      appV2Upgrade.copy(versionInfo = correctedAppV1.versionInfo
-              .withConfigChange(appV2Upgrade.version))
+    val correctedAppV2 = appV2Upgrade.copy(versionInfo =
+          correctedAppV1.versionInfo.withConfigChange(appV2Upgrade.version))
     val correctedAppV3 =
       appV3Scaling.copy(versionInfo = correctedAppV2.versionInfo
-              .withScaleOrRestartChange(appV3Scaling.version))
+            .withScaleOrRestartChange(appV3Scaling.version))
 
     val maybeGroup: Option[Group] = f.groupRepo.rootGroup().futureValue
     maybeGroup should be(Some(groupWithApp.copy(apps = Set(correctedAppV3))))

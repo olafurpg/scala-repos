@@ -81,8 +81,11 @@ trait Lifecycle {
 }
 
 class REPLConfig(dataDir: Option[String])
-    extends BaseConfig with IdSourceConfig with EvaluatorConfig
-    with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig {
+    extends BaseConfig
+    with IdSourceConfig
+    with EvaluatorConfig
+    with ColumnarTableModuleConfig
+    with BlockStoreColumnarTableModuleConfig {
   val defaultConfig =
     Configuration.loadResource("/default_ingest.conf", BlockFormat)
   val config =
@@ -110,8 +113,10 @@ class REPLConfig(dataDir: Option[String])
 }
 
 trait REPL
-    extends ParseEvalStack[Future] with ActorVFSModule
-    with SecureVFSModule[Future, Slice] with VFSColumnarTableModule
+    extends ParseEvalStack[Future]
+    with ActorVFSModule
+    with SecureVFSModule[Future, Slice]
+    with VFSColumnarTableModule
     with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
 

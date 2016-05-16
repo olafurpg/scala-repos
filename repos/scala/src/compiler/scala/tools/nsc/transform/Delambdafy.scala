@@ -32,7 +32,9 @@ import scala.collection.mutable.LinkedHashMap
   *    The captured arguments include `this` if `liftedBody` is unable to be made STATIC.
   */
 abstract class Delambdafy
-    extends Transform with TypingTransformers with ast.TreeDSL
+    extends Transform
+    with TypingTransformers
+    with ast.TreeDSL
     with TypeAdaptingTransformer {
   import global._
   import definitions._
@@ -55,7 +57,8 @@ abstract class Delambdafy
     new DelambdafyTransformer(unit)
 
   class DelambdafyTransformer(unit: CompilationUnit)
-      extends TypingTransformer(unit) with TypeAdapter {
+      extends TypingTransformer(unit)
+      with TypeAdapter {
     private val lambdaClassDefs =
       new mutable.LinkedHashMap[Symbol, List[Tree]] withDefaultValue Nil
 
@@ -445,10 +448,8 @@ abstract class Delambdafy
         // will only appear directly as a parameter type in a method signature, as shown
         // https://gist.github.com/retronym/ba81dbd462282c504ff8
         val info = target.info
-        val boxedParamTypes = info.paramTypes
-          .takeRight(arity)
-          .map(boxed)
-          (boxedParamTypes, boxed(info.resultType))
+        val boxedParamTypes = info.paramTypes.takeRight(arity).map(boxed)
+        (boxedParamTypes, boxed(info.resultType))
       }
       val functionType =
         definitions.functionType(functionParamTypes, functionResultType)

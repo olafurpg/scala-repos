@@ -198,7 +198,7 @@ trait Pattern {
     private def reduceComponents(components: List[Expr[T]])(
         implicit num: NumericOps[T]): List[Expr[T]] = {
       val pairs = for (a <- components; b <- components if Neg(a) == b ||
-                                            a == Neg(b)) yield (a, b)
+                       a == Neg(b)) yield (a, b)
       pairs.foldLeft(components) { (c, pair) =>
         if (c.contains(pair._1) && c.contains(pair._2))
           c.diff(pair._1 :: pair._2 :: Nil)
@@ -346,7 +346,8 @@ trait Pattern {
   trait NonZero[T] extends Expr[T]
 
   case class Const[T](value: T)(implicit num: NumericOps[T])
-      extends Leaf[T] with NonZero[T] {
+      extends Leaf[T]
+      with NonZero[T] {
     def derivative(variable: Var[T]) = Zero[T]
     def eval(f: Any => Any) = value
     override def toString = value.toString
@@ -385,8 +386,8 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  case class Add2[T](
-      left: Expr[T], right: Expr[T])(implicit num: NumericOps[T])
+  case class Add2[T](left: Expr[T], right: Expr[T])(
+      implicit num: NumericOps[T])
       extends TwoArg[T] {
     def eval(f: Any => Any) = num.add(left.eval(f), right.eval(f))
     def derivative(v: Var[T]) = Add2(left.derivative(v), right.derivative(v))
@@ -395,8 +396,8 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  case class Add3[T](a1: Expr[T], a2: Expr[T], a3: Expr[T])(
-      implicit num: NumericOps[T])
+  case class Add3[T](
+      a1: Expr[T], a2: Expr[T], a3: Expr[T])(implicit num: NumericOps[T])
       extends ManyArg[T] {
     val args = List(a1, a2, a3)
     def eval(f: Any => Any) = num.add(a1.eval(f), a2.eval(f), a3.eval(f))
@@ -443,8 +444,7 @@ trait Pattern {
     //    f'(x) / g(x) + f(x) * [-1 / g(x) ^ 2] * g'(x) = (f'(x) * g(x) - f(x) * g'(x)) / g(x)^2
     def derivative(v: Var[T]) =
       Div(
-          Sub(Mul(left.derivative(v), right),
-              Mul(left, right.derivative(v))),
+          Sub(Mul(left.derivative(v), right), Mul(left, right.derivative(v))),
           Sqr(right)
       )
 

@@ -31,7 +31,7 @@ object ExistentialDclSeq {
         return
     }
     while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON ||
-    builder.newlineBeforeCurrentToken) {
+           builder.newlineBeforeCurrentToken) {
       if (builder.getTokenType == ScalaTokenTypes.tSEMICOLON)
         builder.advanceLexer() //Ate semi
       builder.getTokenType match {

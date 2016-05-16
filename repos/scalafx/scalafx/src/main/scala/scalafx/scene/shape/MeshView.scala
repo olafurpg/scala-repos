@@ -42,7 +42,8 @@ object MeshView {
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/MeshView.html]].
   */
 class MeshView(override val delegate: jfxss.MeshView = new jfxss.MeshView())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.MeshView] {
+    extends Shape3D(delegate)
+    with SFXDelegate[jfxss.MeshView] {
 
   def this(mesh: Mesh) = this(new jfxss.MeshView(mesh))
 

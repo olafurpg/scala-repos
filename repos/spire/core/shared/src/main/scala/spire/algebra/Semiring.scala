@@ -10,7 +10,9 @@ package algebra
   * A Semiring with all of the above is a Ring.
   */
 trait Semiring[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with AdditiveMonoid[A] with MultiplicativeSemigroup[A] {
+    extends Any
+    with AdditiveMonoid[A]
+    with MultiplicativeSemigroup[A] {
 
   /**
     * Returns `a` multiplied with itself `n` times. For instance,

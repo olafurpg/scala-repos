@@ -8,7 +8,8 @@ import org.ensime.util.EnsimeSpec
 import scala.collection.mutable.ListBuffer
 
 class StructureViewBuilderSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
 

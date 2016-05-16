@@ -76,7 +76,8 @@ private[lease] class Coordinator(
     }, { () =>
       // TODO MN: reenable
       if (verbose) {
-        log.info("DRAIN-LOOP: target=" +
+        log.info(
+            "DRAIN-LOOP: target=" +
             ((counter.info.remaining - space.minDiscount) / 100).inBytes +
             "; n=" + npending() + "; counter=" + counter + "; maxMs=" +
             ((maxWait - elapsed()) / 2).inMilliseconds.toInt)

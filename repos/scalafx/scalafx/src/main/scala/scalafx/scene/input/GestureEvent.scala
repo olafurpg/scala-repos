@@ -49,7 +49,8 @@ object GestureEvent {
   *
   */
 class GestureEvent(override val delegate: jfxsi.GestureEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.GestureEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.GestureEvent] {
 
   /**
     * Creates and returns a copy of this event with the specified event source and target.

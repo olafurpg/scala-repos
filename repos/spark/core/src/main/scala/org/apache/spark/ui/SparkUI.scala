@@ -55,7 +55,9 @@ private[spark] class SparkUI private (
                   SparkUI.getUIPort(conf),
                   conf,
                   basePath,
-                  "SparkUI") with Logging with UIRoot {
+                  "SparkUI")
+    with Logging
+    with UIRoot {
 
   val killEnabled =
     sc.map(_.conf.getBoolean("spark.ui.killEnabled", true)).getOrElse(false)
@@ -115,16 +117,15 @@ private[spark] class SparkUI private (
             maxCores = None,
             coresPerExecutor = None,
             memoryPerExecutorMB = None,
-            attempts = Seq(
-                  new ApplicationAttemptInfo(
-                      attemptId = None,
-                      startTime = new Date(startTime),
-                      endTime = new Date(-1),
-                      duration = 0,
-                      lastUpdated = new Date(startTime),
-                      sparkUser = "",
-                      completed = false
-                  ))
+            attempts = Seq(new ApplicationAttemptInfo(
+                    attemptId = None,
+                    startTime = new Date(startTime),
+                    endTime = new Date(-1),
+                    duration = 0,
+                    lastUpdated = new Date(startTime),
+                    sparkUser = "",
+                    completed = false
+                ))
         ))
   }
 }

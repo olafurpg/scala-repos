@@ -10,7 +10,8 @@ import core.Reporter
 import core.TestSettings
 
 trait InteractiveTestSettings
-    extends TestSettings with PresentationCompilerInstance {
+    extends TestSettings
+    with PresentationCompilerInstance {
 
   /** Character delimiter for comments in .opts file */
   private final val CommentStartDelimiter = "#"
@@ -48,7 +49,8 @@ trait InteractiveTestSettings
 
     // Make the --sourcepath path provided in the .flags file (if any) relative to the test's base directory
     if (settings.sourcepath.isSetByUser)
-      settings.sourcepath.value = (baseDir / Path(settings.sourcepath.value)).path
+      settings.sourcepath.value =
+        (baseDir / Path(settings.sourcepath.value)).path
 
     adjustPaths(settings.bootclasspath,
                 settings.classpath,

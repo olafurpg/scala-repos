@@ -20,7 +20,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class LaunchQueueModuleTest
-    extends MarathonSpec with BeforeAndAfter with GivenWhenThen
+    extends MarathonSpec
+    with BeforeAndAfter
+    with GivenWhenThen
     with MarathonShutdownHookSupport {
 
   test("empty queue returns no results") {

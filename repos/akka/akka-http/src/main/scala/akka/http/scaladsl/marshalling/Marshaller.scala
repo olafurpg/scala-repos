@@ -24,8 +24,8 @@ sealed abstract class Marshaller[-A, +B] {
     * charsets it allows the new [[akka.http.scaladsl.model.MediaType]] must be compatible, since akka-http will never recode entities.
     * If the wrapping is illegal the [[scala.concurrent.Future]] produced by the resulting marshaller will contain a [[RuntimeException]].
     */
-  def wrap[C, D >: B](newMediaType: MediaType)(f: C ⇒ A)(
-      implicit mto: ContentTypeOverrider[D]): Marshaller[C, D] =
+  def wrap[C, D >: B](newMediaType: MediaType)(
+      f: C ⇒ A)(implicit mto: ContentTypeOverrider[D]): Marshaller[C, D] =
     wrapWithEC[C, D](newMediaType)(_ ⇒ f)
 
   /**
@@ -35,8 +35,8 @@ sealed abstract class Marshaller[-A, +B] {
     * charsets it allows the new [[akka.http.scaladsl.model.MediaType]] must be compatible, since akka-http will never recode entities.
     * If the wrapping is illegal the [[scala.concurrent.Future]] produced by the resulting marshaller will contain a [[RuntimeException]].
     */
-  def wrapWithEC[C, D >: B](newMediaType: MediaType)(
-      f: ExecutionContext ⇒ C ⇒ A)(
+  def wrapWithEC[C, D >: B](
+      newMediaType: MediaType)(f: ExecutionContext ⇒ C ⇒ A)(
       implicit cto: ContentTypeOverrider[D]): Marshaller[C, D] =
     Marshaller { implicit ec ⇒ value ⇒
       import Marshalling._
@@ -88,8 +88,10 @@ sealed abstract class Marshaller[-A, +B] {
 
 //# marshaller-creation
 object Marshaller
-    extends GenericMarshallers with PredefinedToEntityMarshallers
-    with PredefinedToResponseMarshallers with PredefinedToRequestMarshallers {
+    extends GenericMarshallers
+    with PredefinedToEntityMarshallers
+    with PredefinedToResponseMarshallers
+    with PredefinedToRequestMarshallers {
 
   /**
     * Creates a [[Marshaller]] from the given function.
@@ -155,8 +157,8 @@ object Marshaller
     * Helper for creating a [[Marshaller]] combined of the provided `marshal` function
     * and an implicit Marshaller which is able to produce the required final type.
     */
-  def combined[A, B, C](
-      marshal: A ⇒ B)(implicit m2: Marshaller[B, C]): Marshaller[A, C] =
+  def combined[A, B, C](marshal: A ⇒ B)(
+      implicit m2: Marshaller[B, C]): Marshaller[A, C] =
     Marshaller[A, C] { ec ⇒ a ⇒
       m2.compose(marshal).apply(a)(ec)
     }

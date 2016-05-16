@@ -57,12 +57,10 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       StreamingKMeansDataGenerator(numPoints, numBatches, k, d, r, 42)
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           model.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      model.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // estimated center should be close to true center
@@ -97,12 +95,10 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       StreamingKMeansDataGenerator(numPoints, numBatches, k, d, r, 42)
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           kMeans.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      kMeans.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -138,12 +134,10 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
         numPoints, numBatches, k, d, r, 42, Array(Vectors.dense(0.0)))
 
     // setup and run the model training
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[Vector]) =>
-                         {
-                           kMeans.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[Vector]) => {
+      kMeans.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -166,14 +160,15 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     assert(kMeans.decayFactor === 2.0)
   }
 
-  def StreamingKMeansDataGenerator(numPoints: Int,
-                                   numBatches: Int,
-                                   k: Int,
-                                   d: Int,
-                                   r: Double,
-                                   seed: Int,
-                                   initCenters: Array[Vector] = null)
-    : (IndexedSeq[IndexedSeq[Vector]], Array[Vector]) = {
+  def StreamingKMeansDataGenerator(
+      numPoints: Int,
+      numBatches: Int,
+      k: Int,
+      d: Int,
+      r: Double,
+      seed: Int,
+      initCenters: Array[Vector] =
+        null): (IndexedSeq[IndexedSeq[Vector]], Array[Vector]) = {
     val rand = new XORShiftRandom(seed)
     val centers = initCenters match {
       case null =>

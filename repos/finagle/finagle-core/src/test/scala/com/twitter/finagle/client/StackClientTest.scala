@@ -59,8 +59,12 @@ private object StackClientTest {
 
 @RunWith(classOf[JUnitRunner])
 class StackClientTest
-    extends FunSuite with StringClient with StringServer
-    with AssertionsForJUnit with Eventually with IntegrationPatience
+    extends FunSuite
+    with StringClient
+    with StringServer
+    with AssertionsForJUnit
+    with Eventually
+    with IntegrationPatience
     with BeforeAndAfter {
 
   trait Ctx {
@@ -533,13 +537,14 @@ class StackClientTest
 
     val sr = new InMemoryStatsReceiver
     val params =
-      Stack.Params.empty + param.Stats(sr) +
-      DefaultPool.Param(low = 0,
-                        high = 2,
-                        bufferSize = 0,
-                        idleTime = Duration.Zero,
-                        maxWaiters = 0) + FactoryToService.Enabled(false) +
-      PendingRequestFilter.Param(Some(2)) +
+      Stack.Params.empty + param.Stats(sr) + DefaultPool.Param(low = 0,
+                                                               high = 2,
+                                                               bufferSize = 0,
+                                                               idleTime =
+                                                                 Duration.Zero,
+                                                               maxWaiters =
+                                                                 0) +
+      FactoryToService.Enabled(false) + PendingRequestFilter.Param(Some(2)) +
       BindingFactory.Dest(Name.Path(Path.read("/$/inet/localhost/0")))
 
     val svcFac = stack.make(params)

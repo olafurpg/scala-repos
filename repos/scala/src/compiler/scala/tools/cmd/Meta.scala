@@ -34,15 +34,14 @@ object Meta {
       */
     object Bash extends Opt {
       val name = "bash"
-      val action = () =>
-        {
-          val file = File.makeTemp("scala.cmd.bash")
-          file writeAll interpolate(bashTemplate)
+      val action = () => {
+        val file = File.makeTemp("scala.cmd.bash")
+        file writeAll interpolate(bashTemplate)
 
-          // Would be nice to print something like this but comments are
-          // not always comments in bash, and breaking it is worse.
-          // Console println ("# Run the following line, or issue the --bash command in `backticks`.")
-          Console println (". " + file.normalize.path)
+        // Would be nice to print something like this but comments are
+        // not always comments in bash, and breaking it is worse.
+        // Console println ("# Run the following line, or issue the --bash command in `backticks`.")
+        Console println (". " + file.normalize.path)
       }
     }
 
@@ -55,12 +54,11 @@ object Meta {
       */
     object SelfUpdate extends Opt {
       val name = "self-update"
-      val action = () =>
-        {
-          val file = File(selfUpdateName.get)
-          file writeAll interpolate(runnerTemplate)
-          file setExecutable true
-          ()
+      val action = () => {
+        val file = File(selfUpdateName.get)
+        file writeAll interpolate(runnerTemplate)
+        file setExecutable true
+        ()
       }
     }
   }

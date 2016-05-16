@@ -121,7 +121,7 @@ class PluginRegistry {
       method: String,
       path: String,
       function: (HttpServletRequest, HttpServletResponse, Context,
-      RepositoryInfo) => Any
+                 RepositoryInfo) => Any
   )
 }
 

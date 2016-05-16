@@ -121,8 +121,8 @@ trait PlayRunners extends HttpVerbs {
     * Constructs a in-memory (h2) database configuration to add to a FakeApplication.
     */
   def inMemoryDatabase(name: String = "default",
-                       options: Map[String, String] = Map
-                           .empty[String, String]): Map[String, String] = {
+                       options: Map[String, String] =
+                         Map.empty[String, String]): Map[String, String] = {
     val optionsForDbUrl = options.map { case (k, v) => k + "=" + v }
       .mkString(";", ";", "")
 
@@ -358,9 +358,9 @@ trait ResultExtractors { self: HeaderNames with Status =>
   /**
     * Extracts the content as bytes.
     */
-  def contentAsBytes(of: Future[Result])(
-      implicit timeout: Timeout,
-      mat: Materializer = NoMaterializer): ByteString = {
+  def contentAsBytes(of: Future[Result])(implicit timeout: Timeout,
+                                         mat: Materializer =
+                                           NoMaterializer): ByteString = {
     val result = Await.result(of, timeout.duration)
     Await.result(result.body.consumeData, timeout.duration)
   }
@@ -427,9 +427,16 @@ trait ResultExtractors { self: HeaderNames with Status =>
 }
 
 object Helpers
-    extends PlayRunners with HeaderNames with Status with MimeTypes
-    with HttpProtocol with DefaultAwaitTimeout with ResultExtractors
-    with Writeables with EssentialActionCaller with RouteInvokers
+    extends PlayRunners
+    with HeaderNames
+    with Status
+    with MimeTypes
+    with HttpProtocol
+    with DefaultAwaitTimeout
+    with ResultExtractors
+    with Writeables
+    with EssentialActionCaller
+    with RouteInvokers
     with FutureAwaits
 
 /**

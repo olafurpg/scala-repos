@@ -42,7 +42,8 @@ object RowConstraints {
 
 class RowConstraints(
     override val delegate: jfxsl.RowConstraints = new jfxsl.RowConstraints)
-    extends ConstraintsBase(delegate) with SFXDelegate[jfxsl.RowConstraints] {
+    extends ConstraintsBase(delegate)
+    with SFXDelegate[jfxsl.RowConstraints] {
 
   /**
     * Creates a row constraint object with a fixed height.

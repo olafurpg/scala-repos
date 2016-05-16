@@ -30,7 +30,7 @@ object Options {
     * Given a list of names, return the first option and the name that matches,
     * if it exists, from the given options
     */
-  def getFirst[T <: AnyRef : ClassTag](
+  def getFirst[T <: AnyRef: ClassTag](
       options: Map[String, Options],
       names: List[String]): Option[(String, T)] =
     (for {
@@ -41,7 +41,7 @@ object Options {
   /**
     * Get the option of type T for the given name
     */
-  def get[T <: AnyRef : ClassTag](
+  def get[T <: AnyRef: ClassTag](
       options: Map[String, Options], name: String): Option[T] =
     options.get(name).flatMap(_.get[T])
 }
@@ -54,11 +54,11 @@ class Options(val opts: Map[Class[_], Any]) {
   def getOrElse[T](klass: Class[T], default: T): T =
     opts.getOrElse(klass, default).asInstanceOf[T]
 
-  private def klass[T : ClassTag] =
+  private def klass[T: ClassTag] =
     classTag[T].runtimeClass.asInstanceOf[Class[T]]
 
-  def get[T : ClassTag]: Option[T] = get(klass[T])
-  def getOrElse[T : ClassTag](default: T): T = getOrElse(klass[T], default)
+  def get[T: ClassTag]: Option[T] = get(klass[T])
+  def getOrElse[T: ClassTag](default: T): T = getOrElse(klass[T], default)
 
   override def toString = "Options(%s)".format(opts.toString)
 }

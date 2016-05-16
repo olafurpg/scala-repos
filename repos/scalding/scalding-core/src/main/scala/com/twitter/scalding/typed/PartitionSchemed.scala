@@ -35,8 +35,10 @@ import cascading.tuple.{Fields, Tuple, TupleEntry}
   * that should be written to file and not the partition fields.
   */
 trait PartitionSchemed[P, T]
-    extends SchemedSource with TypedSink[(P, T)]
-    with Mappable[(P, T)] with HfsTapProvider {
+    extends SchemedSource
+    with TypedSink[(P, T)]
+    with Mappable[(P, T)]
+    with HfsTapProvider {
   def path: String
   def template: String
   def valueSetter: TupleSetter[T]

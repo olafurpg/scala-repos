@@ -334,14 +334,14 @@ final class AskableActorRef(val actorRef: ActorRef) extends AnyVal {
  */
 final class ExplicitlyAskableActorRef(val actorRef: ActorRef) extends AnyVal {
 
-  def ask(message: ActorRef ⇒ Any)(
-      implicit timeout: Timeout,
-      sender: ActorRef = Actor.noSender): Future[Any] =
+  def ask(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
+                                   sender: ActorRef =
+                                     Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
-  def ?(message: ActorRef ⇒ Any)(
-      implicit timeout: Timeout,
-      sender: ActorRef = Actor.noSender): Future[Any] =
+  def ?(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
+                                 sender: ActorRef =
+                                   Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
   /**
@@ -454,14 +454,14 @@ final class AskableActorSelection(val actorSel: ActorSelection)
 final class ExplicitlyAskableActorSelection(val actorSel: ActorSelection)
     extends AnyVal {
 
-  def ask(message: ActorRef ⇒ Any)(
-      implicit timeout: Timeout,
-      sender: ActorRef = Actor.noSender): Future[Any] =
+  def ask(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
+                                   sender: ActorRef =
+                                     Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
-  def ?(message: ActorRef ⇒ Any)(
-      implicit timeout: Timeout,
-      sender: ActorRef = Actor.noSender): Future[Any] =
+  def ?(message: ActorRef ⇒ Any)(implicit timeout: Timeout,
+                                 sender: ActorRef =
+                                   Actor.noSender): Future[Any] =
     internalAsk(message, timeout, sender)
 
   /**

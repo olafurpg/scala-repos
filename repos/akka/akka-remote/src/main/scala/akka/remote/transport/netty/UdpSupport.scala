@@ -79,7 +79,8 @@ private[remote] class UdpServerHandler(
   */
 private[remote] class UdpClientHandler(
     _transport: NettyTransport, remoteAddress: Address)
-    extends ClientHandler(_transport, remoteAddress) with UdpHandlers {
+    extends ClientHandler(_transport, remoteAddress)
+    with UdpHandlers {
 
   override def initUdp(channel: Channel,
                        remoteSocketAddress: SocketAddress,

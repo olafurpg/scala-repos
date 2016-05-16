@@ -23,7 +23,8 @@ import scalikejdbc._
 /** JDBC implementations of [[EvaluationInstances]] */
 class JDBCEvaluationInstances(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EvaluationInstances with Logging {
+    extends EvaluationInstances
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "evaluationinstances")

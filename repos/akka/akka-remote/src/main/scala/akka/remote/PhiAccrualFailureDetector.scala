@@ -71,10 +71,10 @@ class PhiAccrualFailureDetector(val threshold: Double,
     this(threshold = config.getDouble("threshold"),
          maxSampleSize = config.getInt("max-sample-size"),
          minStdDeviation = config.getMillisDuration("min-std-deviation"),
-         acceptableHeartbeatPause = config.getMillisDuration(
-               "acceptable-heartbeat-pause"),
-         firstHeartbeatEstimate = config.getMillisDuration(
-               "heartbeat-interval"))
+         acceptableHeartbeatPause =
+           config.getMillisDuration("acceptable-heartbeat-pause"),
+         firstHeartbeatEstimate =
+           config.getMillisDuration("heartbeat-interval"))
 
   require(threshold > 0.0, "failure-detector.threshold must be > 0")
   require(maxSampleSize > 0, "failure-detector.max-sample-size must be > 0")
@@ -134,9 +134,9 @@ class PhiAccrualFailureDetector(val threshold: Double,
         else oldState.history
     }
 
-    val newState = oldState.copy(
-        history = newHistory,
-        timestamp = Some(timestamp)) // record new timestamp
+    val newState = oldState.copy(history = newHistory,
+                                 timestamp =
+                                   Some(timestamp)) // record new timestamp
 
     // if we won the race then update else try again
     if (!state.compareAndSet(oldState, newState)) heartbeat() // recur
@@ -240,20 +240,20 @@ private[akka] final case class HeartbeatHistory private (
   @tailrec
   final def :+(interval: Long): HeartbeatHistory = {
     if (intervals.size < maxSampleSize)
-      HeartbeatHistory(
-          maxSampleSize,
-          intervals = intervals :+ interval,
-          intervalSum = intervalSum + interval,
-          squaredIntervalSum = squaredIntervalSum + pow2(interval))
+      HeartbeatHistory(maxSampleSize,
+                       intervals = intervals :+ interval,
+                       intervalSum = intervalSum + interval,
+                       squaredIntervalSum =
+                         squaredIntervalSum + pow2(interval))
     else dropOldest :+ interval // recur
   }
 
   private def dropOldest: HeartbeatHistory =
-    HeartbeatHistory(
-        maxSampleSize,
-        intervals = intervals drop 1,
-        intervalSum = intervalSum - intervals.head,
-        squaredIntervalSum = squaredIntervalSum - pow2(intervals.head))
+    HeartbeatHistory(maxSampleSize,
+                     intervals = intervals drop 1,
+                     intervalSum = intervalSum - intervals.head,
+                     squaredIntervalSum =
+                       squaredIntervalSum - pow2(intervals.head))
 
   private def pow2(x: Long) = x * x
 }

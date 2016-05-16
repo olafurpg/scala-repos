@@ -405,7 +405,7 @@ sealed abstract class ISet[A] {
     -- for some @(x,y)@, @x \/= y && f x == f y@
     }}}
     */
-  def map[B : Order](f: A => B) =
+  def map[B: Order](f: A => B) =
     fromList(toList.map(f))
 
   // -- * Folds
@@ -628,11 +628,11 @@ sealed abstract class ISet[A] {
 sealed abstract class ISetInstances {
   import ISet._
 
-  implicit def setEqual[A : Equal]: Equal[ISet[A]] = new ISetEqual[A] {
+  implicit def setEqual[A: Equal]: Equal[ISet[A]] = new ISetEqual[A] {
     def A = implicitly
   }
 
-  implicit def setOrder[A : Order]: Order[ISet[A]] =
+  implicit def setOrder[A: Order]: Order[ISet[A]] =
     new Order[ISet[A]] with ISetEqual[A] {
       import std.list._
       def A = implicitly
@@ -641,12 +641,12 @@ sealed abstract class ISetInstances {
         Order[List[A]].order(x.toAscList, y.toAscList)
     }
 
-  implicit def setShow[A : Show]: Show[ISet[A]] = new Show[ISet[A]] {
+  implicit def setShow[A: Show]: Show[ISet[A]] = new Show[ISet[A]] {
     override def shows(f: ISet[A]) =
       f.toAscList.mkString("ISet(", ",", ")")
   }
 
-  implicit def setMonoid[A : Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
+  implicit def setMonoid[A: Order]: Monoid[ISet[A]] = new Monoid[ISet[A]] {
     def zero: ISet[A] =
       empty[A]
 
@@ -727,10 +727,10 @@ sealed abstract class ISetInstances {
     override def length[A](fa: ISet[A]) =
       fa.size
 
-    override def maximum[A : Order](fa: ISet[A]) =
+    override def maximum[A: Order](fa: ISet[A]) =
       fa.findMax
 
-    override def minimum[A : Order](fa: ISet[A]) =
+    override def minimum[A: Order](fa: ISet[A]) =
       fa.findMin
 
     override def empty[A](fa: ISet[A]) =

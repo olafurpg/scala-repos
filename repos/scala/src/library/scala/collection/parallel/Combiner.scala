@@ -30,7 +30,9 @@ import scala.collection.generic.Sizing
   *  @since 2.9
   */
 trait Combiner[-Elem, +To]
-    extends Builder[Elem, To] with Sizing with Parallel {
+    extends Builder[Elem, To]
+    with Sizing
+    with Parallel {
 
   @transient
   @volatile

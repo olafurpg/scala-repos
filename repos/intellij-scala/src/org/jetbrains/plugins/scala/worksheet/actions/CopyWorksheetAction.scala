@@ -58,7 +58,8 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
       result append
       (if (textLeft.length < CopyWorksheetAction.COPY_BORDER) textLeft
        else textLeft.substring(0, CopyWorksheetAction.COPY_BORDER))
-      for (_ <- 1 to (CopyWorksheetAction.COPY_BORDER - textLeft.length)) result append sym
+      for (_ <- 1 to (CopyWorksheetAction.COPY_BORDER -
+                   textLeft.length)) result append sym
       result append "//"
       result append textRight
       result append lineSeparator
@@ -95,7 +96,7 @@ class CopyWorksheetAction extends AnAction with TopComponentAction {
               var j = lastEnd
 
               while (getFromLeft(j).trim.length == 0 &&
-              j < leftDocument.getLineCount) j += 1
+                     j < leftDocument.getLineCount) j += 1
               if (j == leftDocument.getLineCount) return result.toString()
               else j
             }

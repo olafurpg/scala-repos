@@ -354,8 +354,8 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
             (a: ByteString, b: ByteString) ⇒ (a ++ b).size == a.size + b.size)
       }
       "dropping" in {
-        check((a: ByteString,
-            b: ByteString) ⇒ (a ++ b).drop(b.size).size == a.size)
+        check((a: ByteString, b: ByteString) ⇒
+              (a ++ b).drop(b.size).size == a.size)
       }
     }
 
@@ -735,20 +735,18 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
 
           val toRead = b - a
           var (nRead, eof) = (0, false)
-          while ( (nRead < toRead) && !eof) {
+          while ((nRead < toRead) && !eof) {
             val n = input.asInputStream.read(output, a + nRead, toRead - nRead)
             if (n == -1) eof = true
             else nRead += n
           }
           if (eof) throw new RuntimeException("Unexpected EOF")
 
-          for (i ← b until bytes.length) output(i) = input.asInputStream
-            .read()
-            .toByte
+          for (i ← b until bytes.length) output(i) =
+            input.asInputStream.read().toByte
 
-            (output.toSeq.drop(a) == bytes.drop(a)) &&
-          (input.asInputStream.read() == -1) &&
-          ((output.length < 1) ||
+          (output.toSeq.drop(a) == bytes.drop(a)) &&
+          (input.asInputStream.read() == -1) && ((output.length < 1) ||
               (input.asInputStream.read(output, 0, 1) == -1))
         }
       }
@@ -825,7 +823,7 @@ class ByteStringSpec extends WordSpec with Matchers with Checkers {
       "adding various contents using ++= and +=" in {
         check {
           (array1: Array[Byte], array2: Array[Byte], bs1: ByteString,
-          bs2: ByteString, bs3: ByteString) ⇒
+           bs2: ByteString, bs3: ByteString) ⇒
             likeVecBld { builder ⇒
               builder ++= array1
               bs1 foreach { b ⇒

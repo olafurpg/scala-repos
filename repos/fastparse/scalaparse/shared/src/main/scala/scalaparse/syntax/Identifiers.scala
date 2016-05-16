@@ -14,8 +14,7 @@ object Identifiers {
   val VarId = VarId0(true)
 
   def VarId0(dollar: Boolean) = P(!Keywords ~ Lower ~ IdRest(dollar))
-  val PlainId = P(
-      !Keywords ~ Upper ~ IdRest(true) | VarId | Operator ~
+  val PlainId = P(!Keywords ~ Upper ~ IdRest(true) | VarId | Operator ~
       (!OpChar | &("/*" | "//")))
   val PlainIdNoDollar = P(
       !Keywords ~ Upper ~ IdRest(false) | VarId0(false) | Operator)

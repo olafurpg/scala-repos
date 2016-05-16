@@ -49,7 +49,8 @@ import org.apache.spark.sql.types._
   * to [[prepareForRead()]], but use a private `var` for simplicity.
   */
 private[parquet] class CatalystReadSupport
-    extends ReadSupport[InternalRow] with Logging {
+    extends ReadSupport[InternalRow]
+    with Logging {
   private var catalystRequestedSchema: StructType = _
 
   /**
@@ -294,8 +295,7 @@ private[parquet] object CatalystReadSupport {
           t.copy(elementType = expand(t.elementType))
 
         case t: MapType =>
-          t.copy(keyType = expand(t.keyType),
-                 valueType = expand(t.valueType))
+          t.copy(keyType = expand(t.keyType), valueType = expand(t.valueType))
 
         case t: StructType =>
           val expandedFields =

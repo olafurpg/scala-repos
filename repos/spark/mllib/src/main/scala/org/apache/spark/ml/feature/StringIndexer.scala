@@ -35,7 +35,10 @@ import org.apache.spark.util.collection.OpenHashMap
   * Base trait for [[StringIndexer]] and [[StringIndexerModel]].
   */
 private[feature] trait StringIndexerBase
-    extends Params with HasInputCol with HasOutputCol with HasHandleInvalid {
+    extends Params
+    with HasInputCol
+    with HasOutputCol
+    with HasHandleInvalid {
 
   /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
@@ -66,7 +69,8 @@ private[feature] trait StringIndexerBase
   */
 @Experimental
 class StringIndexer(override val uid: String)
-    extends Estimator[StringIndexerModel] with StringIndexerBase
+    extends Estimator[StringIndexerModel]
+    with StringIndexerBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("strIdx"))
@@ -117,7 +121,9 @@ object StringIndexer extends DefaultParamsReadable[StringIndexer] {
   */
 @Experimental
 class StringIndexerModel(override val uid: String, val labels: Array[String])
-    extends Model[StringIndexerModel] with StringIndexerBase with MLWritable {
+    extends Model[StringIndexerModel]
+    with StringIndexerBase
+    with MLWritable {
 
   import StringIndexerModel._
 
@@ -254,7 +260,9 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
   */
 @Experimental
 class IndexToString private[ml](override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() =

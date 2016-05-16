@@ -115,10 +115,12 @@ final class EMLDAOptimizer extends LDAOptimizer {
         s"LDA topicConcentration " +
         s"must be > 1.0 (or -1 for auto) for EM Optimizer, but was set to $topicConcentration")
 
-    this.docConcentration = if (docConcentration == -1) (50.0 / k) + 1.0
-    else docConcentration
-    this.topicConcentration = if (topicConcentration == -1) 1.1
-    else topicConcentration
+    this.docConcentration =
+      if (docConcentration == -1) (50.0 / k) + 1.0
+      else docConcentration
+    this.topicConcentration =
+      if (topicConcentration == -1) 1.1
+      else topicConcentration
     val randomSeed = lda.getSeed
 
     // For each document, create an edge (Document -> Term) for each unique term in the document.
@@ -154,9 +156,9 @@ final class EMLDAOptimizer extends LDAOptimizer {
     this.k = k
     this.vocabSize = docs.take(1).head._2.size
     this.checkpointInterval = lda.getCheckpointInterval
-    this.graphCheckpointer = new PeriodicGraphCheckpointer[
-        TopicCounts, TokenCount](
-        checkpointInterval, graph.vertices.sparkContext)
+    this.graphCheckpointer =
+      new PeriodicGraphCheckpointer[TopicCounts, TokenCount](
+          checkpointInterval, graph.vertices.sparkContext)
     this.graphCheckpointer.update(this.graph)
     this.globalTopicTotals = computeGlobalTopicTotals()
     this
@@ -170,28 +172,28 @@ final class EMLDAOptimizer extends LDAOptimizer {
     val alpha = docConcentration
 
     val N_k = globalTopicTotals
-    val sendMsg: EdgeContext[TopicCounts, TokenCount, (Boolean, TopicCounts)] => Unit =
-      (edgeContext) =>
-        {
-          // Compute N_{wj} gamma_{wjk}
-          val N_wj = edgeContext.attr
-          // E-STEP: Compute gamma_{wjk} (smoothed topic distributions), scaled by token count
-          // N_{wj}.
-          val scaledTopicDistribution: TopicCounts =
-            computePTopic(edgeContext.srcAttr,
-                          edgeContext.dstAttr,
-                          N_k,
-                          W,
-                          eta,
-                          alpha) *= N_wj
-          edgeContext.sendToDst((false, scaledTopicDistribution))
-          edgeContext.sendToSrc((false, scaledTopicDistribution))
+    val sendMsg: EdgeContext[
+        TopicCounts, TokenCount, (Boolean, TopicCounts)] => Unit =
+      (edgeContext) => {
+        // Compute N_{wj} gamma_{wjk}
+        val N_wj = edgeContext.attr
+        // E-STEP: Compute gamma_{wjk} (smoothed topic distributions), scaled by token count
+        // N_{wj}.
+        val scaledTopicDistribution: TopicCounts =
+          computePTopic(edgeContext.srcAttr,
+                        edgeContext.dstAttr,
+                        N_k,
+                        W,
+                        eta,
+                        alpha) *= N_wj
+        edgeContext.sendToDst((false, scaledTopicDistribution))
+        edgeContext.sendToSrc((false, scaledTopicDistribution))
       }
     // The Boolean is a hack to detect whether we could modify the values in-place.
     // TODO: Add zero/seqOp/combOp option to aggregateMessages. (SPARK-5438)
-    val mergeMsg: ((Boolean, TopicCounts), (Boolean, TopicCounts)) => (Boolean,
-    TopicCounts) = (m0, m1) =>
-      {
+    val mergeMsg: ((Boolean, TopicCounts),
+                   (Boolean, TopicCounts)) => (Boolean, TopicCounts) =
+      (m0, m1) => {
         val sum =
           if (m0._1) {
             m0._2 += m1._2
@@ -201,7 +203,7 @@ final class EMLDAOptimizer extends LDAOptimizer {
             m0._2 + m1._2
           }
         (true, sum)
-    }
+      }
     // M-STEP: Aggregation computes new N_{kj}, N_{wk} counts.
     val docTopicDistributions: VertexRDD[TopicCounts] = graph
       .aggregateMessages[(Boolean, TopicCounts)](sendMsg, mergeMsg)
@@ -418,25 +420,27 @@ final class OnlineLDAOptimizer extends LDAOptimizer {
     this.k = lda.getK
     this.corpusSize = docs.count()
     this.vocabSize = docs.first()._2.size
-    this.alpha = if (lda.getAsymmetricDocConcentration.size == 1) {
-      if (lda.getAsymmetricDocConcentration(0) == -1)
-        Vectors.dense(Array.fill(k)(1.0 / k))
-      else {
-        require(lda.getAsymmetricDocConcentration(0) >= 0,
-                s"all entries in alpha must be >=0, got: $alpha")
-        Vectors.dense(Array.fill(k)(lda.getAsymmetricDocConcentration(0)))
+    this.alpha =
+      if (lda.getAsymmetricDocConcentration.size == 1) {
+        if (lda.getAsymmetricDocConcentration(0) == -1)
+          Vectors.dense(Array.fill(k)(1.0 / k))
+        else {
+          require(lda.getAsymmetricDocConcentration(0) >= 0,
+                  s"all entries in alpha must be >=0, got: $alpha")
+          Vectors.dense(Array.fill(k)(lda.getAsymmetricDocConcentration(0)))
+        }
+      } else {
+        require(lda.getAsymmetricDocConcentration.size == k,
+                s"alpha must have length k, got: $alpha")
+        lda.getAsymmetricDocConcentration.foreachActive {
+          case (_, x) =>
+            require(x >= 0, s"all entries in alpha must be >= 0, got: $alpha")
+        }
+        lda.getAsymmetricDocConcentration
       }
-    } else {
-      require(lda.getAsymmetricDocConcentration.size == k,
-              s"alpha must have length k, got: $alpha")
-      lda.getAsymmetricDocConcentration.foreachActive {
-        case (_, x) =>
-          require(x >= 0, s"all entries in alpha must be >= 0, got: $alpha")
-      }
-      lda.getAsymmetricDocConcentration
-    }
-    this.eta = if (lda.getTopicConcentration == -1) 1.0 / k
-    else lda.getTopicConcentration
+    this.eta =
+      if (lda.getTopicConcentration == -1) 1.0 / k
+      else lda.getTopicConcentration
     this.randomGenerator = new Random(lda.getSeed)
 
     this.docs = docs
@@ -606,7 +610,8 @@ private[clustering] object OnlineLDAOptimizer {
     while (meanGammaChange > 1e-3) {
       val lastgamma = gammad.copy
       //        K                  K * ids               ids
-      gammad := (expElogthetad :* (expElogbetad.t * (ctsVector :/ phiNorm))) :+ alpha
+      gammad :=
+        (expElogthetad :* (expElogbetad.t * (ctsVector :/ phiNorm))) :+ alpha
       expElogthetad := exp(LDAUtils.dirichletExpectation(gammad))
       // TODO: Keep more values in log space, and only exponentiate when needed.
       phiNorm := expElogbetad * expElogthetad :+ 1e-100

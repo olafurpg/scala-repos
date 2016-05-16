@@ -60,7 +60,7 @@ object HttpBinApplication {
                         .file("upload")
                         .map(v => FileUtils.readFileToString(v.ref.file))
                         .getOrElse(""))
-                )
+              )
             case b =>
               Json.obj("data" -> JsString(b.toString))
           })
@@ -180,8 +180,8 @@ object HttpBinApplication {
   val cookies: Routes = {
     case GET(p"/cookies") =>
       Action { request =>
-        Ok(Json.obj("cookies" -> JsObject(request.cookies.toSeq
-                      .map(x => x.name -> JsString(x.value)))))
+        Ok(Json.obj("cookies" -> JsObject(request.cookies.toSeq.map(x =>
+                          x.name -> JsString(x.value)))))
       }
   }
 
@@ -377,7 +377,7 @@ object HttpBinApplication {
             .orElse(delay)
             .orElse(html)
             .orElse(robots)
-        )
+      )
     }.application
   }
 }

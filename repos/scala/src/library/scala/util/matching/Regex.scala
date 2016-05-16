@@ -752,7 +752,9 @@ object Regex {
     */
   class MatchIterator(
       val source: CharSequence, val regex: Regex, val groupNames: Seq[String])
-      extends AbstractIterator[String] with Iterator[String] with MatchData {
+      extends AbstractIterator[String]
+      with Iterator[String]
+      with MatchData {
     self =>
 
     protected[Regex] val matcher = regex.pattern.matcher(source)

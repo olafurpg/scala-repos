@@ -298,12 +298,12 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       var e: ScopeEntry = null
       if (hashtable ne null) {
         e = hashtable(name.start & HASHMASK)
-        while ( (e ne null) && e.sym.name != name) {
+        while ((e ne null) && e.sym.name != name) {
           e = e.tail
         }
       } else {
         e = elems
-        while ( (e ne null) && e.sym.name != name) {
+        while ((e ne null) && e.sym.name != name) {
           e = e.next
         }
       }
@@ -318,9 +318,9 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     def lookupNextEntry(entry: ScopeEntry): ScopeEntry = {
       var e = entry
       if (hashtable ne null)
-        do { e = e.tail } while ( (e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.tail } while ((e ne null) && e.sym.name != entry.sym.name)
       else
-        do { e = e.next } while ( (e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.next } while ((e ne null) && e.sym.name != entry.sym.name)
       e
     }
 
@@ -353,7 +353,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
         var symbols: List[Symbol] = Nil
         var count = 0
         var e = elems
-        while ( (e ne null) && e.owner == this) {
+        while ((e ne null) && e.owner == this) {
           count += 1
           symbols ::= e.sym
           e = e.next
@@ -438,8 +438,8 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     nested.elems = outer.elems
     nested.nestinglevel = outer.nestinglevel + 1
     if (outer.hashtable ne null)
-      nested.hashtable = java.util.Arrays
-        .copyOf(outer.hashtable, outer.hashtable.length)
+      nested.hashtable =
+        java.util.Arrays.copyOf(outer.hashtable, outer.hashtable.length)
     nested
   }
 

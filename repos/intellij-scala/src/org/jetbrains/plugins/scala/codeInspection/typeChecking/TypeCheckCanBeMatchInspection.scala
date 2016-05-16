@@ -49,8 +49,8 @@ class TypeCheckCanBeMatchInspection
         ifStmt <- Option(PsiTreeUtil.getParentOfType(call, classOf[ScIfStmt]))
         condition <- ifStmt.condition
         iioCall <- findIsInstanceOfCalls(condition, onlyFirst = true)
-                      if iioCall == call
-                  if typeCheckIsUsedEnough(ifStmt, call)
+        if iioCall == call
+        if typeCheckIsUsedEnough(ifStmt, call)
       } {
         val fix = new TypeCheckCanBeMatchQuickFix(call, ifStmt)
         holder.registerProblem(call,
@@ -112,7 +112,7 @@ object TypeCheckToMatchUtil {
         val matchStmt = ScalaPsiElementFactory
           .createExpressionFromText(matchStmtText, ifStmt.getManager)
           .asInstanceOf[ScMatchStmt]
-          (Some(matchStmt), renameData)
+        (Some(matchStmt), renameData)
       case _ => (None, null)
     }
   }
@@ -285,7 +285,7 @@ object TypeCheckToMatchUtil {
     for {
       index <- ifStmts.indices
       text <- buildCaseClauseText(
-          ifStmts(index), isInstOf(index), index, renameData)
+                 ifStmts(index), isInstOf(index), index, renameData)
     } {
       builder.append(text)
     }
@@ -354,8 +354,8 @@ object TypeCheckToMatchUtil {
         for {
           base1 <- baseExpr(isInstOfCall)
           base2 <- baseExpr(call) if isAsInstOfCall(call)
-                  if equalTypes(call, isInstOfCall)
-                  if equiv(base1, base2)
+          if equalTypes(call, isInstOfCall)
+          if equiv(base1, base2)
         } {
           result += call
         }

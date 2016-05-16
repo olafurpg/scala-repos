@@ -385,7 +385,8 @@ abstract class Duplicators extends Analyzer {
           debuglog("Duplicators default case: " + tree.summaryString)
           debuglog(" ---> " + tree)
           if (tree.hasSymbolField && tree.symbol.safeOwner == AnyClass)
-            tree.symbol = NoSymbol // maybe we can find a more specific member in a subclass of Any (see AnyVal members, like ==)
+            tree.symbol =
+              NoSymbol // maybe we can find a more specific member in a subclass of Any (see AnyVal members, like ==)
 
           val ntree = castType(tree, pt)
           super.typed(ntree, mode, pt)

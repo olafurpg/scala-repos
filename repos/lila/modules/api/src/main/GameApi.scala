@@ -25,37 +25,41 @@ private[api] final class GameApi(netBaseUrl: String,
 
   import lila.round.JsonView.openingWriter
 
-  def byUser(user: User,
-             rated: Option[Boolean],
-             analysed: Option[Boolean],
-             withAnalysis: Boolean,
-             withMoves: Boolean,
-             withOpening: Boolean,
-             withMoveTimes: Boolean,
-             token: Option[String],
-             nb: Option[Int],
-             page: Option[Int]): Fu[JsObject] =
-    Paginator(adapter = new CachedAdapter(
+  def byUser(
+      user: User,
+      rated: Option[Boolean],
+      analysed: Option[Boolean],
+      withAnalysis: Boolean,
+      withMoves: Boolean,
+      withOpening: Boolean,
+      withMoveTimes: Boolean,
+      token: Option[String],
+      nb: Option[Int],
+      page: Option[Int]): Fu[JsObject] =
+    Paginator(adapter =
+                new CachedAdapter(
                     adapter = new BSONAdapter[Game](
-                          collection = gameTube.coll,
-                          selector = BSONDocument(
-                                G.playerUids -> user.id,
-                                G.status -> BSONDocument(
-                                    "$gte" -> chess.Status.Mate.id),
-                                G.rated -> rated.map(_.fold[BSONValue](
-                                        BSONBoolean(true),
-                                        BSONDocument("$exists" -> false))),
-                                G.analysed -> analysed.map(
-                                    _.fold[BSONValue](BSONBoolean(true),
-                                                      BSONDocument("$exists" -> false)))
-                            ),
-                          projection = BSONDocument(),
-                          sort = BSONDocument(G.createdAt -> -1)
-                      ),
+                        collection =
+                          gameTube.coll,
+                        selector = BSONDocument(
+                            G.playerUids -> user.id,
+                            G.status -> BSONDocument(
+                                "$gte" -> chess.Status.Mate.id),
+                            G.rated -> rated.map(
+                                _.fold[BSONValue](
+                                    BSONBoolean(true),
+                                    BSONDocument("$exists" -> false))),
+                            G.analysed -> analysed.map(_.fold[BSONValue](
+                                    BSONBoolean(true),
+                                    BSONDocument("$exists" -> false)))
+                        ),
+                        projection = BSONDocument(),
+                        sort = BSONDocument(G.createdAt -> -1)
+                    ),
                     nbResults = fuccess {
-                    rated.fold(user.count.game)(
-                        _.fold(user.count.rated, user.count.casual))
-                  }
+                      rated.fold(user.count.game)(
+                          _.fold(user.count.rated, user.count.casual))
+                    }
                 ),
               currentPage = math.max(0, page | 1),
               maxPerPage = math.max(1, math.min(100, nb | 10))) flatMap {

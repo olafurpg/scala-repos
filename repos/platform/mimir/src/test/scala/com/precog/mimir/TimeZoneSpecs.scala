@@ -33,7 +33,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeZoneSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 

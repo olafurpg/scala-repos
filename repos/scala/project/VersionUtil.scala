@@ -112,8 +112,8 @@ object VersionUtil {
       Versions(canonicalV, mavenV, osgiV, sha, date, release)
     }
 
-  private lazy val generateVersionPropertiesFileImpl: Def.Initialize[
-      Task[File]] = Def.task {
+  private lazy val generateVersionPropertiesFileImpl: Def.Initialize[Task[
+          File]] = Def.task {
     writeProps(
         versionProperties.value.toMap +
         ("copyright.string" -> copyrightString.value),

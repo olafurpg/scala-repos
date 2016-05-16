@@ -95,8 +95,8 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
            backlog: Int = 100,
            options: immutable.Traversable[SocketOption] = Nil,
            halfClose: Boolean = false,
-           idleTimeout: Duration = Duration.Inf)
-    : Source[IncomingConnection, Future[ServerBinding]] =
+           idleTimeout: Duration =
+             Duration.Inf): Source[IncomingConnection, Future[ServerBinding]] =
     Source.fromGraph(
         new ConnectionSourceStage(IO(IoTcp)(system),
                                   new InetSocketAddress(interface, port),

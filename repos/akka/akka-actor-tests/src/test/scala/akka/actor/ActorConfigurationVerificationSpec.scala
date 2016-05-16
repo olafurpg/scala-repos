@@ -36,7 +36,8 @@ object ActorConfigurationVerificationSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorConfigurationVerificationSpec
     extends AkkaSpec(ActorConfigurationVerificationSpec.config)
-    with DefaultTimeout with BeforeAndAfterEach {
+    with DefaultTimeout
+    with BeforeAndAfterEach {
   import ActorConfigurationVerificationSpec._
 
   override def atStartup {

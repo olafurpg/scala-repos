@@ -110,15 +110,15 @@ trait ModelLibModule[M[+ _]] {
             .sortBy(_._1)
             .map(_._2)
 
-            { (row: Int) =>
-              keys map { cols =>
-                cols map {
-                  case (ref, col) =>
-                    (ref,
-                     if (col.isDefinedAt(row)) col.cValue(row) else CUndefined)
-                }
+          { (row: Int) =>
+            keys map { cols =>
+              cols map {
+                case (ref, col) =>
+                  (ref,
+                   if (col.isDefinedAt(row)) col.cValue(row) else CUndefined)
               }
             }
+          }
         }
       }
     }
@@ -337,77 +337,76 @@ trait ModelLibModule[M[+ _]] {
                     featuresCols(field)))
           } toMap
 
-          val rowModels: Int => Set[Model] = (i: Int) =>
-            {
-              val joined =
-                joined0 filterNot {
-                  case (_, cols) =>
-                    val definedCols =
-                      cols map {
-                        _ filter { case (_, col) => col.isDefinedAt(i) }
-                      }
-                    definedCols.exists(_.isEmpty)
-                }
-
-              joined.collect {
-                case (field,
-                      cols @ List(
-                      constant, resStdErr, degs, varCovar, values)) =>
-                  val cnst =
-                    constant.map {
-                      case (_, col) =>
-                        col.apply(i)
-                    }.headOption getOrElse {
-                      sys.error("Constant term must exist")
+          val rowModels: Int => Set[Model] = (i: Int) => {
+            val joined =
+              joined0 filterNot {
+                case (_, cols) =>
+                  val definedCols =
+                    cols map {
+                      _ filter { case (_, col) => col.isDefinedAt(i) }
                     }
+                  definedCols.exists(_.isEmpty)
+              }
 
-                  val rse =
-                    resStdErr.map {
-                      case (_, col) =>
-                        col.apply(i)
-                    }.headOption getOrElse {
-                      sys.error("Error term must exist")
-                    }
-
-                  val dof =
-                    degs.map {
-                      case (_, col) =>
-                        col.apply(i).toInt
-                    }.headOption getOrElse { sys.error("DOF term must exist") }
-
-                  val fts =
-                    values map {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`coefficients`),
-                                  CPathIndex(0),
-                                  rest @ _ *),
-                            col) =>
-                        val paths0 = paths.Value +: rest.take(rest.length - 1)
-                        (CPath(paths0: _*), col.apply(i))
-                    }
-
-                  val vc: Map[CPath, Double] =
-                    varCovar map {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`varianceCovariance`),
-                                  rest @ _ *),
-                            col) =>
-                        (CPath(rest: _*), col.apply(i))
-                    }
-                  val size = fts.size + 1
-                  val acc = Array.fill(size)(new Array[Double](size))
-
-                  vc foreach {
-                    case (CPath(CPathIndex(i), CPathIndex(j)), value)
-                        if (i < size) && (j < size) =>
-                      acc(i)(j) = value
-                    case _ => sys.error("Incorrect CPath structure found.")
+            joined.collect {
+              case (field,
+                    cols @ List(
+                    constant, resStdErr, degs, varCovar, values)) =>
+                val cnst =
+                  constant.map {
+                    case (_, col) =>
+                      col.apply(i)
+                  }.headOption getOrElse {
+                    sys.error("Constant term must exist")
                   }
 
-                  Model(field, fts, cnst, rse, acc, dof)
-              }.toSet
+                val rse =
+                  resStdErr.map {
+                    case (_, col) =>
+                      col.apply(i)
+                  }.headOption getOrElse {
+                    sys.error("Error term must exist")
+                  }
+
+                val dof =
+                  degs.map {
+                    case (_, col) =>
+                      col.apply(i).toInt
+                  }.headOption getOrElse { sys.error("DOF term must exist") }
+
+                val fts =
+                  values map {
+                    case (CPath(paths.Value,
+                                CPathField(_),
+                                CPathField(`coefficients`),
+                                CPathIndex(0),
+                                rest @ _ *),
+                          col) =>
+                      val paths0 = paths.Value +: rest.take(rest.length - 1)
+                      (CPath(paths0: _*), col.apply(i))
+                  }
+
+                val vc: Map[CPath, Double] =
+                  varCovar map {
+                    case (CPath(paths.Value,
+                                CPathField(_),
+                                CPathField(`varianceCovariance`),
+                                rest @ _ *),
+                          col) =>
+                      (CPath(rest: _*), col.apply(i))
+                  }
+                val size = fts.size + 1
+                val acc = Array.fill(size)(new Array[Double](size))
+
+                vc foreach {
+                  case (CPath(CPathIndex(i), CPathIndex(j)), value)
+                      if (i < size) && (j < size) =>
+                    acc(i)(j) = value
+                  case _ => sys.error("Incorrect CPath structure found.")
+                }
+
+                Model(field, fts, cnst, rse, acc, dof)
+            }.toSet
           }
 
           range.toList flatMap { i =>
@@ -473,42 +472,41 @@ trait ModelLibModule[M[+ _]] {
               (field, List(interceptCols(field), featuresCols(field)))
           } toMap
 
-          val rowModels: Int => Set[Model] = (i: Int) =>
-            {
-              val joined =
-                joined0 filterNot {
-                  case (_, cols) =>
-                    val definedCols =
-                      cols map {
-                        _ filter { case (_, col) => col.isDefinedAt(i) }
-                      }
-                    definedCols.exists(_.isEmpty)
-                }
-
-              joined.collect {
-                case (field, cols @ List(constant, values)) =>
-                  val cnst =
-                    constant.map {
-                      case (_, col) =>
-                        col.apply(i)
-                    }.headOption getOrElse {
-                      sys.error("Constant term must exist")
+          val rowModels: Int => Set[Model] = (i: Int) => {
+            val joined =
+              joined0 filterNot {
+                case (_, cols) =>
+                  val definedCols =
+                    cols map {
+                      _ filter { case (_, col) => col.isDefinedAt(i) }
                     }
+                  definedCols.exists(_.isEmpty)
+              }
 
-                  val fts =
-                    values collect {
-                      case (CPath(paths.Value,
-                                  CPathField(_),
-                                  CPathField(`coefficients`),
-                                  CPathIndex(0),
-                                  rest @ _ *),
-                            col) if col.isDefinedAt(i) =>
-                        val paths0 = paths.Value +: rest.take(rest.length - 1)
-                        (CPath(paths0: _*), col.apply(i))
-                    }
+            joined.collect {
+              case (field, cols @ List(constant, values)) =>
+                val cnst =
+                  constant.map {
+                    case (_, col) =>
+                      col.apply(i)
+                  }.headOption getOrElse {
+                    sys.error("Constant term must exist")
+                  }
 
-                  Model(field, fts, cnst)
-              }.toSet
+                val fts =
+                  values collect {
+                    case (CPath(paths.Value,
+                                CPathField(_),
+                                CPathField(`coefficients`),
+                                CPathIndex(0),
+                                rest @ _ *),
+                          col) if col.isDefinedAt(i) =>
+                      val paths0 = paths.Value +: rest.take(rest.length - 1)
+                      (CPath(paths0: _*), col.apply(i))
+                  }
+
+                Model(field, fts, cnst)
+            }.toSet
           }
 
           range.toList flatMap { i =>

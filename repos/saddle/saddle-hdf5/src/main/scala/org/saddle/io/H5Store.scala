@@ -64,7 +64,7 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def readSeries[X : ST : ORD, T : ST](
+  def readSeries[X: ST: ORD, T: ST](
       path: String, group: String): Series[X, T] = withMonitor {
     readPandasSeries[X, T](path, group)
   }
@@ -81,7 +81,7 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def readSeriesSlice[X : ST : ORD, T : ST](
+  def readSeriesSlice[X: ST: ORD, T: ST](
       path: String,
       group: String,
       from: X,
@@ -99,7 +99,7 @@ object H5Store {
     * @tparam CX Frame col index type
     * @tparam T Frame values type
     */
-  def readFrame[RX : ST : ORD, CX : ST : ORD, T : ST](
+  def readFrame[RX: ST: ORD, CX: ST: ORD, T: ST](
       path: String, group: String): Frame[RX, CX, T] = withMonitor {
     readPandasFrame[RX, CX, T](path, group)
   }
@@ -120,7 +120,7 @@ object H5Store {
     * @tparam CX Frame col index type
     * @tparam T Frame values type
     */
-  def readFrameSlice[RX : ST : ORD, CX : ST : ORD, T : ST](
+  def readFrameSlice[RX: ST: ORD, CX: ST: ORD, T: ST](
       path: String,
       group: String,
       rowFrom: RX,
@@ -141,10 +141,10 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def readSeries[X : ST : ORD, T : ST](
-      fileid: Int, group: String): Series[X, T] = withMonitor {
-    readPandasSeries[X, T](fileid, group)
-  }
+  def readSeries[X: ST: ORD, T: ST](fileid: Int, group: String): Series[X, T] =
+    withMonitor {
+      readPandasSeries[X, T](fileid, group)
+    }
 
   /**
     * Read a Series slice from an HDF5 file. Note that this still loads the entire series into
@@ -158,7 +158,7 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def readSeriesSlice[X : ST : ORD, T : ST](
+  def readSeriesSlice[X: ST: ORD, T: ST](
       fileid: Int,
       group: String,
       from: X,
@@ -176,7 +176,7 @@ object H5Store {
     * @tparam CX Frame col index type
     * @tparam T Frame values type
     */
-  def readFrame[RX : ST : ORD, CX : ST : ORD, T : ST](
+  def readFrame[RX: ST: ORD, CX: ST: ORD, T: ST](
       fileid: Int, group: String): Frame[RX, CX, T] = withMonitor {
     readPandasFrame[RX, CX, T](fileid, group)
   }
@@ -197,7 +197,7 @@ object H5Store {
     * @tparam CX Frame col index type
     * @tparam T Frame values type
     */
-  def readFrameSlice[RX : ST : ORD, CX : ST : ORD, T : ST](
+  def readFrameSlice[RX: ST: ORD, CX: ST: ORD, T: ST](
       fileid: Int,
       group: String,
       rowFrom: RX,
@@ -220,7 +220,7 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def writeSeries[X : ST : ORD, T : ST](
+  def writeSeries[X: ST: ORD, T: ST](
       path: String, group: String, s: Series[X, T]) {
     withMonitor {
       writePandasSeries(path, group, s.index, s.values)
@@ -235,7 +235,7 @@ object H5Store {
     * @tparam C Frame col index type
     * @tparam T Framevalues type
     */
-  def writeFrame[R : ST : ORD, C : ST : ORD, T : ST](
+  def writeFrame[R: ST: ORD, C: ST: ORD, T: ST](
       path: String, group: String, df: Frame[R, C, T]) {
     withMonitor {
       writePandasFrame(path, group, df)
@@ -249,7 +249,7 @@ object H5Store {
     * @tparam X Series index type
     * @tparam T Series values type
     */
-  def writeSeries[X : ST : ORD, T : ST](
+  def writeSeries[X: ST: ORD, T: ST](
       fileid: Int, group: String, s: Series[X, T]) {
     withMonitor {
       writePandasSeries(fileid, group, s.index, s.values)
@@ -264,7 +264,7 @@ object H5Store {
     * @tparam C Frame col index type
     * @tparam T Framevalues type
     */
-  def writeFrame[R : ST : ORD, C : ST : ORD, T : ST](
+  def writeFrame[R: ST: ORD, C: ST: ORD, T: ST](
       fileid: Int, group: String, df: Frame[R, C, T]) {
     withMonitor {
       writePandasFrame(fileid, group, df)
@@ -643,10 +643,10 @@ object H5Store {
   // data set readers / writers
 
   // write a one-dimensional array (dataset) to a group
-  private def write1DArray[T : ST](node_id: Int,
-                                   name: String,
-                                   data: Array[T],
-                                   withAttr: List[(String, String)] = Nil) {
+  private def write1DArray[T: ST](node_id: Int,
+                                  name: String,
+                                  data: Array[T],
+                                  withAttr: List[(String, String)] = Nil) {
 
     // create space for array
     val space_id = H5.H5Screate_simple(1, Array[Long](data.length), null)
@@ -667,12 +667,12 @@ object H5Store {
   }
 
   // write a two-dimensional array (dataset) to a group
-  private def write2DArray[T : ST](node_id: Int,
-                                   name: String,
-                                   dim1: Int,
-                                   dim2: Int,
-                                   data: Array[T],
-                                   withAttr: List[(String, String)] = Nil) {
+  private def write2DArray[T: ST](node_id: Int,
+                                  name: String,
+                                  dim1: Int,
+                                  dim2: Int,
+                                  data: Array[T],
+                                  withAttr: List[(String, String)] = Nil) {
     assertException(data.length == dim1 * dim2,
                     "Data dimensions do not correspond to data length!")
 
@@ -699,11 +699,11 @@ object H5Store {
   }
 
   // common array-writing code
-  private def writeArray[T : ST](node_id: Int,
-                                 space_id: Int,
-                                 name: String,
-                                 data: Array[T],
-                                 dataDims: Array[Long]): Int = {
+  private def writeArray[T: ST](node_id: Int,
+                                space_id: Int,
+                                name: String,
+                                data: Array[T],
+                                dataDims: Array[Long]): Int = {
     val stag = implicitly[ST[T]]
 
     // extract the (possibly transformed) data type of the array
@@ -782,7 +782,7 @@ object H5Store {
   }
 
   // reads a dataset from file into an array in memory
-  private def readArray[X : ST](grpid: Int, dsname: String): Array[X] = {
+  private def readArray[X: ST](grpid: Int, dsname: String): Array[X] = {
     // get dataset id
     val dsetid = H5.H5Dopen(grpid, dsname, HDF5Constants.H5P_DEFAULT)
     assertException(
@@ -799,7 +799,7 @@ object H5Store {
   private case class Array2D[T](rows: Int, cols: Int, data: Array[T])
 
   // read a two-dimensional array (dataset) and return (rowcount, colcount, values)
-  private def read2DArray[T : ST](node_id: Int, dsname: String): Array2D[T] = {
+  private def read2DArray[T: ST](node_id: Int, dsname: String): Array2D[T] = {
     // get dataset id
     val dsetid = H5.H5Dopen(node_id, dsname, HDF5Constants.H5P_DEFAULT)
     assertException(
@@ -892,7 +892,7 @@ object H5Store {
     Array2D(sz(1).toInt, sz(0).toInt, result)
   }
 
-  private def readArray[X : ST](grpid: Int, dsetid: Int): Array[X] = {
+  private def readArray[X: ST](grpid: Int, dsetid: Int): Array[X] = {
     // get space
     val dspaceid = H5.H5Dget_space(dsetid)
     assertException(
@@ -1049,7 +1049,7 @@ object H5Store {
          ("VERSION", "2.3"))
   }
 
-  private def getPandasIndexAttribs[X : ST](index: Index[X]) = {
+  private def getPandasIndexAttribs[X: ST](index: Index[X]) = {
     val attribs = getPandasSeriesAttribs ++ List(("name", "N."))
     val stag = implicitly[ST[X]]
     attribs ++ {
@@ -1069,7 +1069,7 @@ object H5Store {
     }
   }
 
-  private def writePandasSeries[X : ST, T : ST](
+  private def writePandasSeries[X: ST, T: ST](
       file: String, name: String, index: Index[X], values: Array[T]): Int = {
 
     val (fileid, writeHeader) =
@@ -1090,7 +1090,7 @@ object H5Store {
     }
   }
 
-  private def writePandasSeries[X : ST, T : ST](
+  private def writePandasSeries[X: ST, T: ST](
       fileid: Int, group: String, index: Index[X], values: Array[T]): Int = {
     assertException(fileid >= 0,
                     "File ID : " + fileid + " does not belong to a valid file")
@@ -1106,7 +1106,7 @@ object H5Store {
     H5.H5Fflush(fileid, HDF5Constants.H5F_SCOPE_GLOBAL)
   }
 
-  private def readPandasSeries[X : ST : ORD, T : ST](
+  private def readPandasSeries[X: ST: ORD, T: ST](
       file: String, group: String): Series[X, T] = {
 
     val fileid = openFile(file)
@@ -1120,7 +1120,7 @@ object H5Store {
     }
   }
 
-  private def readPandasSeries[X : ST : ORD, T : ST](
+  private def readPandasSeries[X: ST: ORD, T: ST](
       fileid: Int, name: String): Series[X, T] = {
     val nodeid = openNode(fileid, name)
     assertException(nodeid >= 0, "Group : " + name + " is not a valid group")
@@ -1183,7 +1183,7 @@ object H5Store {
     result
   }
 
-  private def writePandasFrame[R : ST : ORD, C : ST : ORD, T : ST](
+  private def writePandasFrame[R: ST: ORD, C: ST: ORD, T: ST](
       file: String, name: String, frame: Frame[R, C, T]): Int = {
 
     val (fileid, writeHeader) =
@@ -1208,7 +1208,7 @@ object H5Store {
     }
   }
 
-  private def writePandasFrame[R : ST : ORD, C : ST : ORD, T : ST](
+  private def writePandasFrame[R: ST: ORD, C: ST: ORD, T: ST](
       fileid: Int, name: String, frame: Frame[R, C, T]): Int = {
     // dissect frame into different types, write to corresponding blocks.
     val dfDouble = frame.colType[Double] // block_0
@@ -1307,7 +1307,7 @@ object H5Store {
     H5.H5Fflush(fileid, HDF5Constants.H5F_SCOPE_GLOBAL)
   }
 
-  private def readPandasFrame[RX : ST : ORD, CX : ST : ORD, T : ST](
+  private def readPandasFrame[RX: ST: ORD, CX: ST: ORD, T: ST](
       file: String, name: String): Frame[RX, CX, T] = {
 
     val fileid = openFile(file)
@@ -1321,7 +1321,7 @@ object H5Store {
     }
   }
 
-  private def readPandasFrame[RX : ST : ORD, CX : ST : ORD, T : ST](
+  private def readPandasFrame[RX: ST: ORD, CX: ST: ORD, T: ST](
       fileid: Int, name: String): Frame[RX, CX, T] = {
     val nodeid = openNode(fileid, name)
     assertException(nodeid >= 0, "Group : " + name + " is not a valid group")

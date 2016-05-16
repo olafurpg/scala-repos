@@ -151,4 +151,5 @@ trait SerializationSupport {
   * Java API
   */
 abstract class AbstractSerializationSupport
-    extends JSerializer with SerializationSupport
+    extends JSerializer
+    with SerializationSupport

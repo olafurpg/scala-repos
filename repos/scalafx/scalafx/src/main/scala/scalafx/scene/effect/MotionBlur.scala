@@ -40,7 +40,8 @@ object MotionBlur {
 
 class MotionBlur(
     override val delegate: jfxse.MotionBlur = new jfxse.MotionBlur)
-    extends Effect(delegate) with InputDelegate[jfxse.MotionBlur]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.MotionBlur]
     with SFXDelegate[jfxse.MotionBlur] {
 
   /**

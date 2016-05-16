@@ -75,7 +75,8 @@ abstract class ScalaCompletionSortingTestCase(completionType: CompletionType,
   override def tearDown() {
     LookupManager.getInstance(getProject).hideActiveLookup()
     UISettings.getInstance.SORT_LOOKUP_ELEMENTS_LEXICOGRAPHICALLY = false
-    CodeInsightSettings.getInstance.COMPLETION_CASE_SENSITIVE = CodeInsightSettings.FIRST_LETTER
+    CodeInsightSettings.getInstance.COMPLETION_CASE_SENSITIVE =
+      CodeInsightSettings.FIRST_LETTER
     super.tearDown()
   }
 }

@@ -146,7 +146,8 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
             //getting indent for braces from tryBlock
             if (settings.BRACE_STYLE == CommonCodeStyleSettings.NEXT_LINE_SHIFTED ||
                 settings.BRACE_STYLE == CommonCodeStyleSettings.NEXT_LINE_SHIFTED2)
-              Indent.getNormalIndent else Indent.getNoneIndent
+              Indent.getNormalIndent
+            else Indent.getNoneIndent
           case ScalaTokenTypes.kTRY => Indent.getNoneIndent
           case _ => Indent.getNormalIndent
         }
@@ -249,7 +250,8 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
               case _: ScBlockExpr => Indent.getNoneIndent
               case _ =>
                 if (scalaSettings.DO_NOT_INDENT_CASE_CLAUSE_BODY)
-                  Indent.getNoneIndent else Indent.getNormalIndent
+                  Indent.getNoneIndent
+                else Indent.getNormalIndent
             }
           case _ => Indent.getNoneIndent
         }
@@ -312,8 +314,7 @@ object ScalaIndentProcessor extends ScalaTokenTypes {
   private def isConstructorArgOrMemberFunctionParameter(
       paramClause: ScParameterClause): Boolean = {
     val owner = paramClause.owner
-    owner != null &&
-    (owner.isInstanceOf[ScPrimaryConstructor] ||
+    owner != null && (owner.isInstanceOf[ScPrimaryConstructor] ||
         owner.isInstanceOf[ScFunction])
   }
 }

@@ -52,7 +52,9 @@ class TreeSetWithNullTest extends TreeSetTest(new TreeSetWithNullFactory) {
 }
 
 abstract class TreeSetTest(val factory: TreeSetFactory)
-    extends AbstractSetTest with SortedSetTest with NavigableSetTest {
+    extends AbstractSetTest
+    with SortedSetTest
+    with NavigableSetTest {
 
   @Test def should_store_and_remove_ordered_integers(): Unit = {
     val ts = factory.empty[Int]
@@ -344,11 +346,13 @@ object TreeSetFactory extends TreeSetFactory {
 }
 
 class TreeSetFactory
-    extends AbstractSetFactory with NavigableSetFactory with SortedSetFactory {
+    extends AbstractSetFactory
+    with NavigableSetFactory
+    with SortedSetFactory {
   def implementationName: String =
     "java.util.TreeSet"
 
-  def empty[E : ClassTag]: ju.TreeSet[E] =
+  def empty[E: ClassTag]: ju.TreeSet[E] =
     new TreeSet[E]
 
   def empty[E](cmp: ju.Comparator[E]): ju.TreeSet[E] =
@@ -378,7 +382,7 @@ class TreeSetWithNullFactory extends TreeSetFactory {
       }
   }
 
-  override def empty[E : ClassTag]: ju.TreeSet[E] =
+  override def empty[E: ClassTag]: ju.TreeSet[E] =
     new TreeSet[E](EvenNullComp[E]())
 
   override def allowsNullElement: Boolean = true

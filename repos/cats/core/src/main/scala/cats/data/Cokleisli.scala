@@ -86,7 +86,8 @@ private[data] sealed abstract class CokleisliInstances0 {
 }
 
 private trait CokleisliArrow[F[_]]
-    extends Arrow[Cokleisli[F, ?, ?]] with CokleisliSplit[F]
+    extends Arrow[Cokleisli[F, ?, ?]]
+    with CokleisliSplit[F]
     with CokleisliProfunctor[F] {
   implicit def F: Comonad[F]
 

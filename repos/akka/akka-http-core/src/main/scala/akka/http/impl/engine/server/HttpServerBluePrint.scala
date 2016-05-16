@@ -151,7 +151,8 @@ private[http] object HttpServerBluePrint {
           case RequestStart(method, uri, protocol, hdrs, entityCreator, _, _) ⇒
             val effectiveMethod =
               if (method == HttpMethods.HEAD &&
-                  settings.transparentHeadRequests) HttpMethods.GET else method
+                  settings.transparentHeadRequests) HttpMethods.GET
+              else method
             val effectiveHeaders =
               if (settings.remoteAddressHeader && remoteAddress.isDefined)
                 headers.`Remote-Address`(RemoteAddress(remoteAddress.get)) +: hdrs
@@ -189,8 +190,8 @@ private[http] object HttpServerBluePrint {
             case StreamedEntityCreator(creator) ⇒ streamRequestEntity(creator)
           }
 
-        def streamRequestEntity(creator: (Source[
-                ParserOutput.RequestOutput, NotUsed]) => RequestEntity)
+        def streamRequestEntity(creator: (Source[ParserOutput.RequestOutput,
+                                                 NotUsed]) => RequestEntity)
           : RequestEntity = {
           // stream incoming chunks into the request entity until we reach the end of it
           // and then toggle back to "idle"
@@ -306,8 +307,8 @@ private[http] object HttpServerBluePrint {
   }
 
   class RequestTimeoutSupport(initialTimeout: FiniteDuration)
-      extends GraphStage[BidiShape[
-              HttpRequest, HttpRequest, HttpResponse, HttpResponse]] {
+      extends GraphStage[
+          BidiShape[HttpRequest, HttpRequest, HttpResponse, HttpResponse]] {
     private val requestIn = Inlet[HttpRequest]("requestIn")
     private val requestOut = Outlet[HttpRequest]("requestOut")
     private val responseIn = Inlet[HttpResponse]("responseIn")
@@ -333,9 +334,9 @@ private[http] object HttpServerBluePrint {
                                     interpreter.materializer)
             openTimeouts = openTimeouts.enqueue(access)
             push(requestOut,
-                 request.copy(
-                     headers = request.headers :+ `Timeout-Access`(access),
-                     entity = entity))
+                 request.copy(headers =
+                                request.headers :+ `Timeout-Access`(access),
+                              entity = entity))
           }
           override def onUpstreamFinish() = complete(requestOut)
           override def onUpstreamFailure(ex: Throwable) = fail(requestOut, ex)
@@ -376,7 +377,8 @@ private[http] object HttpServerBluePrint {
       requestEnd: Future[Unit],
       trigger: AsyncCallback[(TimeoutAccess, HttpResponse)],
       materializer: Materializer)
-      extends AtomicReference[Future[TimeoutSetup]] with TimeoutAccess
+      extends AtomicReference[Future[TimeoutSetup]]
+      with TimeoutAccess
       with (HttpRequest ⇒ HttpResponse) {
     self ⇒
     import materializer.executionContext
@@ -393,7 +395,8 @@ private[http] object HttpServerBluePrint {
       //#default-request-timeout-httpresponse
       HttpResponse(
           StatusCodes.ServiceUnavailable,
-          entity = "The server was not able " +
+          entity =
+            "The server was not able " +
             "to produce a timely response to your request.\r\nPlease try again in a short while!")
     //#
 
@@ -471,8 +474,8 @@ private[http] object HttpServerBluePrint {
             grab(requestParsingIn) match {
               case r: RequestStart ⇒
                 openRequests = openRequests.enqueue(r)
-                messageEndPending = r.createEntity
-                  .isInstanceOf[StreamedEntityCreator[_, _]]
+                messageEndPending =
+                  r.createEntity.isInstanceOf[StreamedEntityCreator[_, _]]
                 val rs =
                   if (r.expect100Continue) {
                     oneHundredContinueResponsePending = true
@@ -757,8 +760,7 @@ private[http] object HttpServerBluePrint {
           }
 
           val sinkIn = new SubSinkInlet[ByteString]("FrameSink")
-          sinkIn.setHandler(
-              new InHandler {
+          sinkIn.setHandler(new InHandler {
             override def onPush(): Unit = push(toNet, sinkIn.grab())
             override def onUpstreamFinish(): Unit = complete(toNet)
             override def onUpstreamFailure(ex: Throwable): Unit =
@@ -780,10 +782,9 @@ private[http] object HttpServerBluePrint {
             val sourceOut = new SubSourceOutlet[ByteString]("FrameSource")
 
             val timeoutKey = SubscriptionTimeout(
-                () ⇒
-                  {
-                sourceOut.timeout(timeout)
-                if (sourceOut.isClosed) completeStage()
+                () ⇒ {
+              sourceOut.timeout(timeout)
+              if (sourceOut.isClosed) completeStage()
             })
             addTimeout(timeoutKey)
 

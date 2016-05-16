@@ -583,15 +583,11 @@ abstract class GraphStageLogic private[stream](
         // If we aren't already done
         requireNotReading(in)
         if (!hasBeenPulled(in)) pull(in)
-        setHandler(in,
-                   new Reading(in, n - pos, getHandler(in))(
-                       (elem: T) ⇒
-                         {
-                           result(pos) = elem
-                           pos += 1
-                           if (pos == n) andThen(result)
-                       },
-                       () ⇒ onClose(result.take(pos))))
+        setHandler(in, new Reading(in, n - pos, getHandler(in))((elem: T) ⇒ {
+          result(pos) = elem
+          pos += 1
+          if (pos == n) andThen(result)
+        }, () ⇒ onClose(result.take(pos))))
       } else andThen(result)
     }
 

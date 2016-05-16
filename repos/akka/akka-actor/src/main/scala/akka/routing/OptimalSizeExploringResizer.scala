@@ -61,14 +61,13 @@ case object OptimalSizeExploringResizer {
     DefaultOptimalSizeExploringResizer(
         lowerBound = resizerCfg.getInt("lower-bound"),
         upperBound = resizerCfg.getInt("upper-bound"),
-        chanceOfScalingDownWhenFull = resizerCfg.getDouble(
-              "chance-of-ramping-down-when-full"),
+        chanceOfScalingDownWhenFull =
+          resizerCfg.getDouble("chance-of-ramping-down-when-full"),
         actionInterval = resizerCfg.getDuration("action-interval").asScala,
-        downsizeAfterUnderutilizedFor = resizerCfg
-            .getDuration("downsize-after-underutilized-for")
-            .asScala,
-        numOfAdjacentSizesToConsiderDuringOptimization = resizerCfg.getInt(
-              "optimization-range"),
+        downsizeAfterUnderutilizedFor =
+          resizerCfg.getDuration("downsize-after-underutilized-for").asScala,
+        numOfAdjacentSizesToConsiderDuringOptimization =
+          resizerCfg.getInt("optimization-range"),
         exploreStepSize = resizerCfg.getDouble("explore-step-size"),
         explorationProbability = resizerCfg.getDouble("chance-of-exploration"),
         weightOfLatestMetric = resizerCfg.getDouble("weight-of-latest-metric"),

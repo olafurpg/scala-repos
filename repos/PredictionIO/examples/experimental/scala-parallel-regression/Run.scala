@@ -90,8 +90,8 @@ object Run {
     Workflow.run(
         dataSourceClassOpt = Some(classOf[ParallelDataSource]),
         dataSourceParams = dataSourceParams,
-        preparatorClassOpt = Some(
-              classOf[IdentityPreparator[RDD[LabeledPoint]]]),
+        preparatorClassOpt =
+          Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
         algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
         algorithmParamsList = algorithmParamsList,
         servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),

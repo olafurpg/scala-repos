@@ -106,7 +106,7 @@ object Cross {
   // Creates a delegate for a scoped key that pulls the setting from the global scope.
   private[this] def delegateToGlobal[T](key: ScopedKey[T]): Setting[_] =
     SettingKey[T](key.key) in key.scope :=
-    (SettingKey[T](key.key) in GlobalScope).value
+      (SettingKey[T](key.key) in GlobalScope).value
 
   @deprecated("No longer used.", "0.13.0")
   def crossExclude(s: Setting[_]): Boolean =

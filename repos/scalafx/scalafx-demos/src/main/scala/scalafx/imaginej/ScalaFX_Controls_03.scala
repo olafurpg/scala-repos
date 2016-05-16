@@ -64,8 +64,8 @@ object ScalaFX_Controls_03 extends JFXApp {
     val selectedToggle = theToggleGroup.getSelectedToggle
     if (selectedToggle != null) {
       val userDataString = selectedToggle.getUserData.toString
-      iconImageView.image = new Image(
-          this, "images/" + userDataString + ".jpg")
+      iconImageView.image =
+        new Image(this, "images/" + userDataString + ".jpg")
     }
   }
 

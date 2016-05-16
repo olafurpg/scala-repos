@@ -35,7 +35,9 @@ import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 import org.apache.spark.util.Utils
 
 class ReliableKafkaStreamSuite
-    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfter
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with BeforeAndAfter
     with Eventually {
 
   private val sparkConf = new SparkConf()

@@ -45,7 +45,8 @@ abstract class ParallelConcurrentTrieMapCheck[K, V](tp: String)
 
 class IntIntParallelConcurrentTrieMapCheck(val tasksupport: TaskSupport)
     extends ParallelConcurrentTrieMapCheck[Int, Int]("Int, Int")
-    with PairOperators[Int, Int] with PairValues[Int, Int] {
+    with PairOperators[Int, Int]
+    with PairValues[Int, Int] {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values

@@ -68,7 +68,8 @@ object SharedLeveldbJournalSpec {
 }
 
 class SharedLeveldbJournalSpec
-    extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup {
+    extends AkkaSpec(SharedLeveldbJournalSpec.config)
+    with Cleanup {
   import SharedLeveldbJournalSpec._
 
   val systemA = ActorSystem("SysA", system.settings.config)

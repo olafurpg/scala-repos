@@ -80,8 +80,10 @@ trait ActorPlatformSpecs {
 }
 
 trait TestStackLike[M[+ _]]
-    extends ParseEvalStack[M] with EchoHttpClientModule[M]
-    with MemoryDatasetConsumer[M] with IdSourceScannerModule
+    extends ParseEvalStack[M]
+    with EchoHttpClientModule[M]
+    with MemoryDatasetConsumer[M]
+    with IdSourceScannerModule
     with EvalStackLike {
   self =>
   import TestStack._

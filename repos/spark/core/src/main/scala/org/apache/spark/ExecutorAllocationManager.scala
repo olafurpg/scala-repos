@@ -379,8 +379,8 @@ private[spark] class ExecutorAllocationManager(
     // Ensure that our target doesn't exceed what we need at the present moment:
     numExecutorsTarget = math.min(numExecutorsTarget, maxNumExecutorsNeeded)
     // Ensure that our target fits within configured bounds:
-    numExecutorsTarget = math.max(
-        math.min(numExecutorsTarget, maxNumExecutors), minNumExecutors)
+    numExecutorsTarget =
+      math.max(math.min(numExecutorsTarget, maxNumExecutors), minNumExecutors)
 
     val delta = numExecutorsTarget - oldNumExecutorsTarget
 
@@ -399,11 +399,12 @@ private[spark] class ExecutorAllocationManager(
       logInfo(
           s"Requesting $delta new $executorsString because tasks are backlogged" +
           s" (new desired total will be $numExecutorsTarget)")
-      numExecutorsToAdd = if (delta == numExecutorsToAdd) {
-        numExecutorsToAdd * 2
-      } else {
-        1
-      }
+      numExecutorsToAdd =
+        if (delta == numExecutorsToAdd) {
+          numExecutorsToAdd * 2
+        } else {
+          1
+        }
       delta
     } else {
       logWarning(

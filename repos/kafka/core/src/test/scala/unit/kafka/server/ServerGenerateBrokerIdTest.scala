@@ -133,12 +133,14 @@ class ServerGenerateBrokerIdTest extends ZooKeeperTestHarness {
     // check if configured brokerId and stored brokerId are equal or throw InconsistentBrokerException
     var server1 = new KafkaServer(
         config1,
-        threadNamePrefix = Option(this.getClass.getName)) //auto generate broker Id
+        threadNamePrefix =
+          Option(this.getClass.getName)) //auto generate broker Id
     server1.startup()
     server1.shutdown()
     server1 = new KafkaServer(
         config2,
-        threadNamePrefix = Option(this.getClass.getName)) // user specified broker id
+        threadNamePrefix =
+          Option(this.getClass.getName)) // user specified broker id
     try {
       server1.startup()
     } catch {

@@ -151,8 +151,8 @@ trait BlockParsers extends Parsers {
     def addResultPlain(level: Int, out: StringBuilder) {
 
       val temp = new StringBuilder()
-      lines.foreach(
-          line => temp.append(indent(level)).append(line.payload).append('\n'))
+      lines.foreach(line =>
+            temp.append(indent(level)).append(line.payload).append('\n'))
       val result = applyInline(temp.toString, lookup)
       out.append(result)
 
@@ -400,7 +400,7 @@ trait BlockParsers extends Parsers {
     * parses a list of lines that may make up the body of a list item
     */
   def itemLines: Parser[List[MarkdownLine]] =
-    ( (line(classOf[CodeLine]) | line(classOf[OtherLine])) *)
+    ((line(classOf[CodeLine]) | line(classOf[OtherLine])) *)
 
   /**
     * The continuation of a list item:

@@ -38,7 +38,7 @@ import scala.reflect._
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class LAlgorithm[PD, M : ClassTag, Q, P]
+abstract class LAlgorithm[PD, M: ClassTag, Q, P]
     extends BaseAlgorithm[RDD[PD], RDD[M], Q, P] {
 
   def trainBase(sc: SparkContext, pd: RDD[PD]): RDD[M] = pd.map(train)

@@ -461,7 +461,7 @@ trait BodyParsers {
     def form[A](form: Form[A],
                 maxLength: Option[Long] = None,
                 onErrors: Form[A] => Result = (formErrors: Form[A]) =>
-                    Results.BadRequest): BodyParser[A] =
+                  Results.BadRequest): BodyParser[A] =
       BodyParser { requestHeader =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         anyContent(maxLength)(requestHeader).map { resultOrBody =>
@@ -554,9 +554,8 @@ trait BodyParsers {
     def file(to: File): BodyParser[File] = BodyParser("file, to=" + to) {
       request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        Accumulator(
-            StreamConverters.fromOutputStream(() => new FileOutputStream(to)))
-          .map(_ => Right(to))
+        Accumulator(StreamConverters.fromOutputStream(() =>
+                  new FileOutputStream(to))).map(_ => Right(to))
     }
 
     /**
@@ -601,8 +600,8 @@ trait BodyParsers {
       */
     def urlFormEncoded(maxLength: Int): BodyParser[Map[String, Seq[String]]] =
       when(
-          _.contentType
-            .exists(_.equalsIgnoreCase("application/x-www-form-urlencoded")),
+          _.contentType.exists(
+              _.equalsIgnoreCase("application/x-www-form-urlencoded")),
           tolerantFormUrlEncoded(maxLength),
           createBadResult("Expecting application/x-www-form-urlencoded body",
                           UNSUPPORTED_MEDIA_TYPE)
@@ -654,24 +653,24 @@ trait BodyParsers {
         contentType match {
           case Some("text/plain") =>
             logger.trace("Parsing AnyContent as text")
-            text(maxLengthOrDefault)(request)
-              .map(_.right.map(s => AnyContentAsText(s)))
+            text(maxLengthOrDefault)(request).map(_.right.map(s =>
+                      AnyContentAsText(s)))
 
           case Some("text/xml") | Some("application/xml") |
               Some(ApplicationXmlMatcher()) =>
             logger.trace("Parsing AnyContent as xml")
-            xml(maxLengthOrDefault)(request)
-              .map(_.right.map(x => AnyContentAsXml(x)))
+            xml(maxLengthOrDefault)(request).map(_.right.map(x =>
+                      AnyContentAsXml(x)))
 
           case Some("text/json") | Some("application/json") =>
             logger.trace("Parsing AnyContent as json")
-            json(maxLengthOrDefault)(request)
-              .map(_.right.map(j => AnyContentAsJson(j)))
+            json(maxLengthOrDefault)(request).map(_.right.map(j =>
+                      AnyContentAsJson(j)))
 
           case Some("application/x-www-form-urlencoded") =>
             logger.trace("Parsing AnyContent as urlFormEncoded")
-            urlFormEncoded(maxLengthOrDefault)(request)
-              .map(_.right.map(d => AnyContentAsFormUrlEncoded(d)))
+            urlFormEncoded(maxLengthOrDefault)(request).map(_.right.map(d =>
+                      AnyContentAsFormUrlEncoded(d)))
 
           case Some("multipart/form-data") =>
             logger.trace("Parsing AnyContent as multipartFormData")
@@ -700,9 +699,10 @@ trait BodyParsers {
       *
       * @param filePartHandler Handles file parts.
       */
-    def multipartFormData[A](filePartHandler: Multipart.FilePartHandler[A],
-                             maxLength: Long = DefaultMaxDiskLength)
-      : BodyParser[MultipartFormData[A]] = {
+    def multipartFormData[A](
+        filePartHandler: Multipart.FilePartHandler[A],
+        maxLength: Long =
+          DefaultMaxDiskLength): BodyParser[MultipartFormData[A]] = {
       BodyParser("multipartFormData") { request =>
         val app = Play.privateMaybeApplication.get // throw exception
         implicit val mat = app.materializer
@@ -732,17 +732,17 @@ trait BodyParsers {
           // Apply the request
           val parserSink = parser.apply(request).toSink
 
-          Accumulator(
-              takeUpToFlow.toMat(parserSink) { (statusFuture, resultFuture) =>
-            statusFuture.flatMap {
-              case exceeded: MaxSizeExceeded =>
-                Future.successful(Right(Left(exceeded)))
-              case _ =>
-                resultFuture.map {
-                  case Left(result) => Left(result)
-                  case Right(a) => Right(Right(a))
-                }
-            }
+          Accumulator(takeUpToFlow.toMat(parserSink) {
+            (statusFuture, resultFuture) =>
+              statusFuture.flatMap {
+                case exceeded: MaxSizeExceeded =>
+                  Future.successful(Right(Left(exceeded)))
+                case _ =>
+                  resultFuture.map {
+                    case Left(result) => Left(result)
+                    case Right(a) => Right(Right(a))
+                  }
+              }
           })
       }
 
@@ -832,8 +832,8 @@ trait BodyParsers {
             request,
             maxLength,
             Accumulator(
-                Sink.fold[ByteString, ByteString](ByteString.empty)((state,
-                    bs) => state ++ bs)
+                Sink.fold[ByteString, ByteString](ByteString.empty)(
+                    (state, bs) => state ++ bs)
             ) mapFuture { bytes =>
               try {
                 Future.successful(Right(parser(request, bytes)))

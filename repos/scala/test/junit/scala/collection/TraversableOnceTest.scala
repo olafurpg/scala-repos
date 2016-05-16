@@ -62,10 +62,9 @@ class TraversableOnceTest {
     var evaluatedCountOfMaxBy = 0
 
     val max = list.maxBy(
-        x =>
-          {
-        evaluatedCountOfMaxBy += 1
-        x * 10
+        x => {
+      evaluatedCountOfMaxBy += 1
+      x * 10
     })
     assert(
         evaluatedCountOfMaxBy == list.length,
@@ -74,10 +73,9 @@ class TraversableOnceTest {
     var evaluatedCountOfMinBy = 0
 
     val min = list.minBy(
-        x =>
-          {
-        evaluatedCountOfMinBy += 1
-        x * 10
+        x => {
+      evaluatedCountOfMinBy += 1
+      x * 10
     })
     assert(
         evaluatedCountOfMinBy == list.length,

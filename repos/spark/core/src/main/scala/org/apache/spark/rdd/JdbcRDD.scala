@@ -53,7 +53,7 @@ private[spark] class JdbcPartition(idx: Int, val lower: Long, val upper: Long)
   *   This should only call getInt, getString, etc; the RDD takes care of calling next.
   *   The default maps a ResultSet to an array of Object.
   */
-class JdbcRDD[T : ClassTag](
+class JdbcRDD[T: ClassTag](
     sc: SparkContext,
     getConnection: () => Connection,
     sql: String,
@@ -61,17 +61,17 @@ class JdbcRDD[T : ClassTag](
     upperBound: Long,
     numPartitions: Int,
     mapRow: (ResultSet) => T = JdbcRDD.resultSetToObjectArray _)
-    extends RDD[T](sc, Nil) with Logging {
+    extends RDD[T](sc, Nil)
+    with Logging {
 
   override def getPartitions: Array[Partition] = {
     // bounds are inclusive, hence the + 1 here and - 1 on end
     val length = BigInt(1) + upperBound - lowerBound
     (0 until numPartitions)
-      .map(i =>
-            {
-          val start = lowerBound + ((i * length) / numPartitions)
-          val end = lowerBound + (((i + 1) * length) / numPartitions) - 1
-          new JdbcPartition(i, start.toLong, end.toLong)
+      .map(i => {
+        val start = lowerBound + ((i * length) / numPartitions)
+        val end = lowerBound + (((i + 1) * length) / numPartitions) - 1
+        new JdbcPartition(i, start.toLong, end.toLong)
       })
       .toArray
   }
@@ -137,8 +137,8 @@ class JdbcRDD[T : ClassTag](
 
 object JdbcRDD {
   def resultSetToObjectArray(rs: ResultSet): Array[Object] = {
-    Array.tabulate[Object](rs.getMetaData.getColumnCount)(
-        i => rs.getObject(i + 1))
+    Array.tabulate[Object](rs.getMetaData.getColumnCount)(i =>
+          rs.getObject(i + 1))
   }
 
   trait ConnectionFactory extends Serializable {

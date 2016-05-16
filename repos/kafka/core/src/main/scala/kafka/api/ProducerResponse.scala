@@ -29,19 +29,17 @@ object ProducerResponse {
   def readFrom(buffer: ByteBuffer): ProducerResponse = {
     val correlationId = buffer.getInt
     val topicCount = buffer.getInt
-    val statusPairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partition = buffer.getInt
-            val error = buffer.getShort
-            val offset = buffer.getLong
-            val timestamp = buffer.getLong
-            (TopicAndPartition(topic, partition),
-             ProducerResponseStatus(error, offset, timestamp))
-        })
+    val statusPairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partition = buffer.getInt
+        val error = buffer.getShort
+        val offset = buffer.getLong
+        val timestamp = buffer.getLong
+        (TopicAndPartition(topic, partition),
+         ProducerResponseStatus(error, offset, timestamp))
+      })
     })
 
     val throttleTime = buffer.getInt
@@ -74,16 +72,15 @@ case class ProducerResponse(
     val groupedStatus = statusGroupedByTopic
     4 + /* correlation id */
     4 + /* topic count */
-    groupedStatus.foldLeft(0)((foldedTopics, currTopic) =>
-          {
-        foldedTopics + shortStringLength(currTopic._1) + 4 +
-        /* partition count for this topic */
-        currTopic._2.size * {
-          4 + /* partition id */
-          2 + /* error code */
-          8 + /* offset */
-          8 /* timestamp */
-        }
+    groupedStatus.foldLeft(0)((foldedTopics, currTopic) => {
+      foldedTopics + shortStringLength(currTopic._1) + 4 +
+      /* partition count for this topic */
+      currTopic._2.size * {
+        4 + /* partition id */
+        2 + /* error code */
+        8 + /* offset */
+        8 /* timestamp */
+      }
     }) + throttleTimeSize
   }
 
@@ -92,20 +89,18 @@ case class ProducerResponse(
     buffer.putInt(correlationId)
     buffer.putInt(groupedStatus.size) // topic count
 
-    groupedStatus.foreach(
-        topicStatus =>
-          {
-        val (topic, errorsAndOffsets) = topicStatus
-        writeShortString(buffer, topic)
-        buffer.putInt(errorsAndOffsets.size) // partition count
-        errorsAndOffsets.foreach {
-          case ((TopicAndPartition(_, partition),
-                 ProducerResponseStatus(error, nextOffset, timestamp))) =>
-            buffer.putInt(partition)
-            buffer.putShort(error)
-            buffer.putLong(nextOffset)
-            buffer.putLong(timestamp)
-        }
+    groupedStatus.foreach(topicStatus => {
+      val (topic, errorsAndOffsets) = topicStatus
+      writeShortString(buffer, topic)
+      buffer.putInt(errorsAndOffsets.size) // partition count
+      errorsAndOffsets.foreach {
+        case ((TopicAndPartition(_, partition),
+               ProducerResponseStatus(error, nextOffset, timestamp))) =>
+          buffer.putInt(partition)
+          buffer.putShort(error)
+          buffer.putLong(nextOffset)
+          buffer.putLong(timestamp)
+      }
     })
     // Throttle time is only supported on V1 style requests
     if (requestVersion > 0) buffer.putInt(throttleTime)

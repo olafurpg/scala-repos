@@ -192,8 +192,8 @@ object MediaRange {
     val char = acceptIf(_ < 0x80)(_ => "Expected an ascii character")
     val text = not(ctl) ~> any
     val separators = {
-      acceptIf(c => separatorBitSet(c))(
-          _ => "Expected one of " + separatorChars)
+      acceptIf(c => separatorBitSet(c))(_ =>
+            "Expected one of " + separatorChars)
     }
 
     val token = rep1(not(separators | ctl) ~> any) ^^ charSeqToString

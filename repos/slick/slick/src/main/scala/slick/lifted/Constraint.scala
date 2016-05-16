@@ -76,7 +76,8 @@ class ForeignKeyQuery[E <: AbstractTable[_], U](
     generator: AnonSymbol,
     aliasedValue: E
 )
-    extends WrappingQuery[E, U, Seq](nodeDelegate, base) with Constraint {
+    extends WrappingQuery[E, U, Seq](nodeDelegate, base)
+    with Constraint {
 
   /** Combine the constraints of this `ForeignKeyQuery` with another one with the
     * same target table, leading to a single instance of the target table which

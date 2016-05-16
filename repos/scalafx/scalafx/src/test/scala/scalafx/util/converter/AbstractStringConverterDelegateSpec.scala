@@ -78,8 +78,8 @@ abstract private[converter] class AbstractStringConverterDelegateSpec[
       stringToS should equal(s)
     }
 
-    examples.foreach(
-        example => runConversionsForExamples(example._1, example._2))
+    examples.foreach(example =>
+          runConversionsForExamples(example._1, example._2))
   }
 
   protected val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

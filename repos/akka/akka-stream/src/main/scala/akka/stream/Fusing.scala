@@ -40,8 +40,7 @@ object Fusing {
     * topology for convenient graph traversal.
     */
   case class FusedGraph[+S <: Shape @uncheckedVariance, +M](
-      override val module: FusedModule,
-      override val shape: S)
+      override val module: FusedModule, override val shape: S)
       extends Graph[S, M] {
     // the @uncheckedVariance look like a compiler bug ... why does it work in Graph but not here?
     override def withAttributes(attr: Attributes) =

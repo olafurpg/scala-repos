@@ -51,7 +51,9 @@ class HiveMetastoreCatalogSuite extends SparkFunSuite with TestHiveSingleton {
 }
 
 class DataSourceWithHiveMetastoreCatalogSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import testImplicits._
 

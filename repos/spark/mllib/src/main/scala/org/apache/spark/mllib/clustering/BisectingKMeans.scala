@@ -175,7 +175,7 @@ class BisectingKMeans private (private var k: Int,
     var numLeafClustersNeeded = k - 1
     var level = 1
     while (activeClusters.nonEmpty && numLeafClustersNeeded > 0 &&
-    level < LEVEL_LIMIT) {
+           level < LEVEL_LIMIT) {
       // Divisible clusters are sufficiently large and have non-trivial cost.
       var divisibleClusters = activeClusters.filter {
         case (_, summary) =>

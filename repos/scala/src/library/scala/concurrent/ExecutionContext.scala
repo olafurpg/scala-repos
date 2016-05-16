@@ -101,7 +101,8 @@ trait ExecutionContextExecutor extends ExecutionContext with Executor
   * Java [[http://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html ExecutorService]].
   */
 trait ExecutionContextExecutorService
-    extends ExecutionContextExecutor with ExecutorService
+    extends ExecutionContextExecutor
+    with ExecutorService
 
 /** Contains factory methods for creating execution contexts.
   */

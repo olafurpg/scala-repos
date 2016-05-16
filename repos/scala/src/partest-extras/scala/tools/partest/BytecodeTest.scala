@@ -88,7 +88,7 @@ abstract class BytecodeTest {
   def similarBytecode(methA: MethodNode,
                       methB: MethodNode,
                       similar: (List[Instruction],
-                      List[Instruction]) => Boolean) = {
+                                List[Instruction]) => Boolean) = {
     val isa = instructionsFromMethod(methA)
     val isb = instructionsFromMethod(methB)
     if (isa == isb) println("bytecode identical")
@@ -109,7 +109,8 @@ abstract class BytecodeTest {
 
         println(
             s"""$line${" " * (lineWidth - line.toString.length)} ${if (a == b)
-          "==" else "<>"} $a${" " * (width - a.length)} | $b""")
+          "=="
+        else "<>"} $a${" " * (width - a.length)} | $b""")
       }
     }
   }

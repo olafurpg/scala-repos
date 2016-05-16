@@ -21,8 +21,8 @@ object Func extends FuncInstances {
     }
 
   /** applicative function. */
-  def appFunc[F[_], A, B](
-      run0: A => F[B])(implicit FF: Applicative[F]): AppFunc[F, A, B] =
+  def appFunc[F[_], A, B](run0: A => F[B])(
+      implicit FF: Applicative[F]): AppFunc[F, A, B] =
     new AppFunc[F, A, B] {
       def F: Applicative[F] = FF
       def run: A => F[B] = run0
@@ -67,7 +67,8 @@ sealed trait FuncFunctor[F[_], C] extends Functor[Lambda[X => Func[F, C, X]]] {
 }
 
 sealed trait FuncApply[F[_], C]
-    extends Apply[Lambda[X => Func[F, C, X]]] with FuncFunctor[F, C] {
+    extends Apply[Lambda[X => Func[F, C, X]]]
+    with FuncFunctor[F, C] {
   def F: Apply[F]
   def ap[A, B](f: Func[F, C, A => B])(fa: Func[F, C, A]): Func[F, C, B] =
     Func.func(c => F.ap(f.run(c))(fa.run(c)))
@@ -76,7 +77,8 @@ sealed trait FuncApply[F[_], C]
 }
 
 sealed trait FuncApplicative[F[_], C]
-    extends Applicative[Lambda[X => Func[F, C, X]]] with FuncApply[F, C] {
+    extends Applicative[Lambda[X => Func[F, C, X]]]
+    with FuncApply[F, C] {
   def F: Applicative[F]
   def pure[A](a: A): Func[F, C, A] =
     Func.func(c => F.pure(a))

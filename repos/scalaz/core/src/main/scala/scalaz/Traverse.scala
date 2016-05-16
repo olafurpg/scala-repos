@@ -69,8 +69,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     G.TC.traverse(fa)(G.leibniz.onF(f))(this)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
-  final def traverseM[A, G[_], B](fa: F[A])(f: A => G[F[B]])(
-      implicit G: Applicative[G], F: Bind[F]): G[F[B]] =
+  final def traverseM[A, G[_], B](fa: F[A])(
+      f: A => G[F[B]])(implicit G: Applicative[G], F: Bind[F]): G[F[B]] =
     G.map(G.traverse(fa)(f)(this))(F.join)
 
   /** Traverse with `State`. */
@@ -86,12 +86,10 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     import Free._
     implicit val A =
       StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
-    State[S, G[F[B]]](
-        s =>
-          {
-        val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(
-            f(_: A).lift[Trampoline])
-        st.run(s).run
+    State[S, G[F[B]]](s => {
+      val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(
+          f(_: A).lift[Trampoline])
+      st.run(s).run
     })
   }
 
@@ -102,11 +100,10 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     implicit val A =
       Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](
-        s =>
-          {
-        val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(
-            z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
-        kl.run
+        s => {
+      val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(z =>
+            Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
+      kl.run
     })
   }
 
@@ -148,8 +145,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
       } yield e.head)._2
   }
 
-  def zipWith[A, B, C](
-      fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) =
+  def zipWith[A, B, C](fa: F[A], fb: F[B])(
+      f: (A, Option[B]) => C): (List[B], F[C]) =
     runTraverseS(fa, toList(fb))(
         a =>
           for {

@@ -34,7 +34,8 @@ import specs2._
 import scalaz._
 
 class MetadataTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
 
   val simpleData = """
     {"a":1,"b":"Tom"}

@@ -301,7 +301,8 @@ object TreeTableView {
     *
     */
   abstract class TreeTableViewSelectionModel[S](
-      override val delegate: jfxsc.TreeTableView.TreeTableViewSelectionModel[S])
+      override val delegate: jfxsc.TreeTableView.TreeTableViewSelectionModel[
+          S])
       extends SFXDelegate[jfxsc.TreeTableView.TreeTableViewSelectionModel[S]] {
 
     type Delegate = jfxsc.TreeTableView.TreeTableViewSelectionModel[S]
@@ -576,8 +577,8 @@ object TreeTableView {
     *
     * @since 8.0
     */
-  def classCssMetaData: mutable.Buffer[jfxcss.CssMetaData[
-          _ <: jfxcss.Styleable, _]] =
+  def classCssMetaData: mutable.Buffer[
+      jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
     jfxsc.PopupControl.getClassCssMetaData
 }
 
@@ -600,7 +601,8 @@ object TreeTableView {
   */
 class TreeTableView[S](
     override val delegate: jfxsc.TreeTableView[S] = new jfxsc.TreeTableView[S])
-    extends Control(delegate) with SFXDelegate[jfxsc.TreeTableView[S]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TreeTableView[S]] {
 
   type Delegate = jfxsc.TreeTableView[S]
 
@@ -753,12 +755,12 @@ class TreeTableView[S](
       jfxu.Callback[jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]]] =
     delegate.rowFactoryProperty
   def rowFactory_=(v: (TreeTableView[S] => TreeTableRow[S])): Unit = {
-    rowFactory() = new jfxu.Callback[
-        jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]] {
-      def call(tv: jfxsc.TreeTableView[S]): jfxsc.TreeTableRow[S] = {
-        v(tv)
+    rowFactory() =
+      new jfxu.Callback[jfxsc.TreeTableView[S], jfxsc.TreeTableRow[S]] {
+        def call(tv: jfxsc.TreeTableView[S]): jfxsc.TreeTableRow[S] = {
+          v(tv)
+        }
       }
-    }
   }
 
   /**
@@ -883,8 +885,9 @@ class TreeTableView[S](
   def onScrollToColumn_=(
       v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TreeTableColumn[S, _]]])
     : Unit = {
-    ObjectProperty.fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[
-                jfxsc.TreeTableColumn[S, _]]]](onScrollToColumn, v)
+    ObjectProperty.fillProperty[
+        jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TreeTableColumn[S, _]]]](
+        onScrollToColumn, v)
   }
 
   /**

@@ -16,19 +16,18 @@ trait IterateeFunctions {
     import Iteratee._
     def step(acc: F[A])(s: Input[E]): Iteratee[E, F[A]] =
       s(el = e =>
-            iter.foldT[Iteratee[E, F[A]]](
-                done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
-                cont = k =>
-                    k(elInput(e)).foldT(
-                        done = (a,
-                          _) => cont(step(mon.append(acc, F.point(a)))),
-                        cont = k2 =>
-                            cont((in: Input[E]) =>
-                                  for {
+          iter.foldT[Iteratee[E, F[A]]](
+              done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
+              cont = k =>
+                k(elInput(e)).foldT(
+                    done = (a, _) => cont(step(mon.append(acc, F.point(a)))),
+                    cont = k2 =>
+                      cont((in: Input[E]) =>
+                            for {
                           h <- k2(in)
                           t <- this.repeatBuild[E, A, F](iter)
                         } yield mon.append(acc, mon.append(F.point(h), t)))
-                  )),
+              )),
         empty = cont(step(acc)),
         eof = done(acc, eofInput))
     cont(step(mon.zero))
@@ -58,8 +57,8 @@ trait IterateeFunctions {
       implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] = {
     def loop(acc: F[A], n: Int)(s: Input[A]): Iteratee[A, F[A]] =
       s(el = e =>
-            if (n <= 0) done[A, Id, F[A]](acc, s)
-            else cont(loop(mon.append(acc, pt.point(e)), n - 1)),
+          if (n <= 0) done[A, Id, F[A]](acc, s)
+          else cont(loop(mon.append(acc, pt.point(e)), n - 1)),
         empty = cont(loop(acc, n)),
         eof = done[A, Id, F[A]](acc, s))
     cont(loop(mon.zero, n))
@@ -72,8 +71,8 @@ trait IterateeFunctions {
       implicit mon: Monoid[F[A]], pt: Applicative[F]): Iteratee[A, F[A]] = {
     def loop(acc: F[A])(s: Input[A]): Iteratee[A, F[A]] =
       s(el = e =>
-            if (p(e)) cont(loop(mon.append(acc, pt.point(e))))
-            else done[A, Id, F[A]](acc, s),
+          if (p(e)) cont(loop(mon.append(acc, pt.point(e))))
+          else done[A, Id, F[A]](acc, s),
         empty = cont(loop(acc)),
         eof = done[A, Id, F[A]](acc, eofInput))
     cont(loop(mon.zero))

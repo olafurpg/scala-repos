@@ -18,8 +18,9 @@ object SbtWatcherMain {
     "Waiting for source changes... (press enter to interrupt)"
   private val MESSAGE_LIMIT = 12
   private val WAIT_TIME = 150
-  private var currentExec: Option[(SbtWatcherExec, CachingMessageConsumer, Seq[
-          String])] = None
+  private var currentExec: Option[(SbtWatcherExec,
+                                   CachingMessageConsumer,
+                                   Seq[String])] = None
 
   def nailMain(context: NGContext) {
     handle(context.getArgs.toSeq, context.out)
@@ -113,8 +114,7 @@ object SbtWatcherMain {
         }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
-        write2source(
-            currentExec.map { a =>
+        write2source(currentExec.map { a =>
           toMessage(a._1.isRunning)
         } getOrElse FALSE)
       case _ =>

@@ -71,10 +71,18 @@ trait ScFun extends ScTypeParametersOwner {
   * Represents Scala's internal function definitions and declarations
   */
 trait ScFunction
-    extends ScalaPsiElement with ScMember with ScTypeParametersOwner
-    with ScParameterOwner with ScDocCommentOwner with ScTypedDefinition
-    with ScCommentOwner with ScDeclaredElementsHolder with ScAnnotationsHolder
-    with ScMethodLike with ScBlockStatement with ScModifiableTypedDeclaration {
+    extends ScalaPsiElement
+    with ScMember
+    with ScTypeParametersOwner
+    with ScParameterOwner
+    with ScDocCommentOwner
+    with ScTypedDefinition
+    with ScCommentOwner
+    with ScDeclaredElementsHolder
+    with ScAnnotationsHolder
+    with ScMethodLike
+    with ScBlockStatement
+    with ScModifiableTypedDeclaration {
 
   private var synthNavElement: Option[PsiElement] = None
   var syntheticCaseClass: Option[ScClass] = None
@@ -411,17 +419,15 @@ trait ScFunction
   def isBridge: Boolean = {
     //todo: fix algorithm for annotation resolve to not resolve objects (if it's possible)
     //heuristic algorithm to avoid SOE in MixinNodes.build
-    annotations.exists(
-        annot =>
-          {
-        annot.typeElement match {
-          case s: ScSimpleTypeElement =>
-            s.reference match {
-              case Some(ref) => ref.refName == "bridge"
-              case _ => false
-            }
-          case _ => false
-        }
+    annotations.exists(annot => {
+      annot.typeElement match {
+        case s: ScSimpleTypeElement =>
+          s.reference match {
+            case Some(ref) => ref.refName == "bridge"
+            case _ => false
+          }
+        case _ => false
+      }
     })
   }
 
@@ -461,17 +467,17 @@ trait ScFunction
     * @return Empty array, if containing class is null.
     */
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def getFunctionWrappers(
-      isStatic: Boolean,
-      isInterface: Boolean,
-      cClass: Option[PsiClass] = None): Seq[ScFunctionWrapper] = {
+  def getFunctionWrappers(isStatic: Boolean,
+                          isInterface: Boolean,
+                          cClass: Option[PsiClass] =
+                            None): Seq[ScFunctionWrapper] = {
     val buffer = new ArrayBuffer[ScFunctionWrapper]
     if (cClass.isDefined || containingClass != null) {
       buffer += new ScFunctionWrapper(this, isStatic, isInterface, cClass)
       for {
         clause <- clauses
         first <- clause.clauses.headOption if first.hasRepeatedParam
-                if isJavaVarargs
+        if isJavaVarargs
       } {
         buffer += new ScFunctionWrapper(
             this, isStatic, isInterface, cClass, isJavaVarargs = true)
@@ -716,7 +722,8 @@ trait ScFunction
   override def getName = {
     val res =
       if (isConstructor && getContainingClass != null)
-        getContainingClass.getName else super.getName
+        getContainingClass.getName
+      else super.getName
     if (JavaLexer.isKeyword(res, LanguageLevel.HIGHEST)) "_mth" + res
     else res
   }
@@ -761,8 +768,8 @@ trait ScFunction
       case Some(params) =>
         val project = getProject
         val resolveScope = getResolveScope
-        rt.map(params.foldLeft(_)((res,
-                params) => ScFunctionType(res, params)(project, resolveScope)))
+        rt.map(params.foldLeft(_)((res, params) =>
+                  ScFunctionType(res, params)(project, resolveScope)))
       case None => Failure("no params", Some(this))
     }
   }

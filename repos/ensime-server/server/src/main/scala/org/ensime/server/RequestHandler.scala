@@ -15,7 +15,8 @@ class RequestHandler(
     project: ActorRef,
     server: ActorRef
 )
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   override def preStart(): Unit = {
     log.debug(envelope.req.toString)

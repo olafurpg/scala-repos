@@ -47,14 +47,14 @@ case class SampleClassG(a: java.util.Date)
 case class SampleClassFail(a: Option[Option[Int]])
 
 object MacroProperties extends Properties("TypeDescriptor.roundTrip") {
-  def roundTrip[T : Arbitrary : TypeDescriptor]: Prop = forAll { t: T =>
+  def roundTrip[T: Arbitrary: TypeDescriptor]: Prop = forAll { t: T =>
     val setter = implicitly[TypeDescriptor[T]].setter
     val converter = implicitly[TypeDescriptor[T]].converter
     val fields = implicitly[TypeDescriptor[T]].fields
     converter(new TupleEntry(fields, setter(t))) == t
   }
 
-  def propertyFor[T : TypeTag : Arbitrary : TypeDescriptor]: Unit = {
+  def propertyFor[T: TypeTag: Arbitrary: TypeDescriptor]: Unit = {
     property(typeTag[T].tpe.toString) = roundTrip[T]
   }
 
@@ -83,14 +83,13 @@ class MacrosUnitTests extends WordSpec with Matchers {
     def fields = sys.error("dummy")
   }
 
-  def isMacroTupleConverterAvailable[T](
-      implicit proof: TupleConverter[T] = dummy
-          .asInstanceOf[TupleConverter[T]]) =
+  def isMacroTupleConverterAvailable[T](implicit proof: TupleConverter[T] =
+        dummy.asInstanceOf[TupleConverter[T]]) =
     proof.isInstanceOf[MacroGenerated]
 
   def isMacroTypeDescriptorAvailable[T](
-      implicit proof: TypeDescriptor[T] = dummy2
-          .asInstanceOf[TypeDescriptor[T]]) =
+      implicit proof: TypeDescriptor[T] =
+        dummy2.asInstanceOf[TypeDescriptor[T]]) =
     proof.isInstanceOf[MacroGenerated]
 
   def mgConv[T](te: TupleEntry)(implicit conv: TupleConverter[T]): T =
@@ -98,11 +97,11 @@ class MacrosUnitTests extends WordSpec with Matchers {
   def mgSet[T](t: T)(implicit set: TupleSetter[T]): TupleEntry =
     new TupleEntry(isMg(set)(t))
 
-  def shouldRoundTrip[T : IsCaseClass : TupleSetter : TupleConverter](t: T) {
+  def shouldRoundTrip[T: IsCaseClass: TupleSetter: TupleConverter](t: T) {
     t shouldBe mgConv(mgSet(t))
   }
 
-  def shouldRoundTripOther[T : IsCaseClass : TupleSetter : TupleConverter](
+  def shouldRoundTripOther[T: IsCaseClass: TupleSetter: TupleConverter](
       te: TupleEntry, t: T) {
     val inter = mgConv(te)
     inter shouldBe t

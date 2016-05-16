@@ -61,14 +61,15 @@ private[spark] class SqlNewHadoopPartition(
   * Note: This is RDD is basically a cloned version of [[org.apache.spark.rdd.NewHadoopRDD]] with
   * changes based on [[org.apache.spark.rdd.HadoopRDD]].
   */
-private[spark] class SqlNewHadoopRDD[V : ClassTag](
+private[spark] class SqlNewHadoopRDD[V: ClassTag](
     sqlContext: SQLContext,
     broadcastedConf: Broadcast[SerializableConfiguration],
     @transient private val initDriverSideJobFuncOpt: Option[Job => Unit],
     initLocalJobFuncOpt: Option[Job => Unit],
     inputFormatClass: Class[_ <: InputFormat[Void, V]],
     valueClass: Class[V])
-    extends RDD[V](sqlContext.sparkContext, Nil) with Logging {
+    extends RDD[V](sqlContext.sparkContext, Nil)
+    with Logging {
 
   protected def getJob(): Job = {
     val conf = broadcastedConf.value.value
@@ -306,9 +307,9 @@ private[spark] class SqlNewHadoopRDD[V : ClassTag](
     * the given function rather than the index of the partition.
     */
   private[spark] class NewHadoopMapPartitionsWithSplitRDD[
-      U : ClassTag, T : ClassTag](prev: RDD[T],
-                                  f: (InputSplit, Iterator[T]) => Iterator[U],
-                                  preservesPartitioning: Boolean = false)
+      U: ClassTag, T: ClassTag](prev: RDD[T],
+                                f: (InputSplit, Iterator[T]) => Iterator[U],
+                                preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =

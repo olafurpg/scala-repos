@@ -16,8 +16,8 @@ trait QaController extends LilaController {
   protected def renderQuestion(
       q: Question, answerForm: Option[Form[_]] = None)(
       implicit ctx: Context): Fu[Result] =
-    (api.answer popular q.id) zip fetchPopular zip api.relation
-      .questions(q, 10) zip
+    (api.answer popular q.id) zip fetchPopular zip api.relation.questions(
+        q, 10) zip
     (QaAuth.canAsk ?? { forms.anyCaptcha map (_.some) }) flatMap {
       case (((answers, popular), related), captcha) =>
         fuccess {
@@ -27,8 +27,10 @@ trait QaController extends LilaController {
                   answers,
                   popular,
                   related,
-                  answerForm = if (QaAuth canAnswer q)
-                      answerForm orElse Some(forms.answer) else None,
+                  answerForm =
+                    if (QaAuth canAnswer q)
+                      answerForm orElse Some(forms.answer)
+                    else None,
                   captcha = captcha))
         }
       case _ => notFound

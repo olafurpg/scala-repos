@@ -79,12 +79,12 @@ object Swagger {
   val SpecVersion = "1.2"
   val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
 
-  def collectModels[T : Manifest](alreadyKnown: Set[Model]): Set[Model] =
+  def collectModels[T: Manifest](alreadyKnown: Set[Model]): Set[Model] =
     collectModels(Reflector.scalaTypeOf[T], alreadyKnown)
-  private[swagger] def collectModels(
-      tpe: ScalaType,
-      alreadyKnown: Set[Model],
-      known: Set[ScalaType] = Set.empty): Set[Model] = {
+  private[swagger] def collectModels(tpe: ScalaType,
+                                     alreadyKnown: Set[Model],
+                                     known: Set[ScalaType] =
+                                       Set.empty): Set[Model] = {
     if (tpe.isMap)
       collectModels(tpe.typeArgs.head, alreadyKnown, tpe.typeArgs.toSet) ++ collectModels(
           tpe.typeArgs.last, alreadyKnown, tpe.typeArgs.toSet)
@@ -101,13 +101,13 @@ object Swagger {
           case descriptor: ClassDescriptor =>
             val ctorModels =
               descriptor.mostComprehensive.filterNot(_.isPrimitive).toVector
-            val propModels = descriptor.properties.filterNot(
-                p => p.isPrimitive || ctorModels.exists(_.name == p.name))
+            val propModels = descriptor.properties.filterNot(p =>
+                  p.isPrimitive || ctorModels.exists(_.name == p.name))
             val subModels =
               (ctorModels.map(_.argType) ++ propModels.map(_.returnType)).toSet -- known
             val topLevel = for {
-              tl <- subModels + descriptor.erasure if !(tl.isCollection ||
-                       tl.isMap || tl.isOption)
+              tl <- subModels + descriptor.erasure
+              if !(tl.isCollection || tl.isMap || tl.isOption)
               m <- modelToSwagger(tl)
             } yield m
 
@@ -136,11 +136,13 @@ object Swagger {
       prop: PropertyDescriptor) = {
     val ctorParam =
       if (!prop.returnType.isOption)
-        descr.mostComprehensive.find(_.name == prop.name) else None
+        descr.mostComprehensive.find(_.name == prop.name)
+      else None
     //    if (descr.simpleName == "Pet") println("converting property: " + prop)
     val mp = ModelProperty(
         DataType.fromScalaType(if (prop.returnType.isOption)
-              prop.returnType.typeArgs.head else prop.returnType),
+              prop.returnType.typeArgs.head
+            else prop.returnType),
         if (position.isDefined && position.forall(_ >= 0)) position.get
         else ctorParam.map(_.argIndex).getOrElse(position.getOrElse(0)),
         required = required && !prop.returnType.isOption,
@@ -548,7 +550,8 @@ case class Model(id: String,
   def setRequired(property: String, required: Boolean): Model = {
     val prop = properties.find(_._1 == property).get
     copy(
-        properties = (property -> prop._2.copy(required = required)) :: properties)
+        properties =
+          (property -> prop._2.copy(required = required)) :: properties)
   }
 }
 

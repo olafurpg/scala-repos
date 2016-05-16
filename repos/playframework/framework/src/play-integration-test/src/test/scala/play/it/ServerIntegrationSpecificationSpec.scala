@@ -26,7 +26,8 @@ object AkkaHttpServerIntegrationSpecificationSpec
   * server backends, works properly.
   */
 trait ServerIntegrationSpecificationSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   def isAkkaHttpServer: Boolean

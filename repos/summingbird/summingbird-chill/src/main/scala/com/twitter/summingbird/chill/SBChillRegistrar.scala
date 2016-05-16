@@ -29,12 +29,12 @@ import com.twitter.summingbird.batch.{BatchID, Timestamp}
   */
 object SBChillRegistrar {
 
-  def injectionRegistrar[T : Manifest : Codec]: InjectionRegistrar[T] =
+  def injectionRegistrar[T: Manifest: Codec]: InjectionRegistrar[T] =
     InjectionRegistrar(
         manifest[T].runtimeClass.asInstanceOf[Class[T]], implicitly[Codec[T]])
 
-  def injectionDefaultRegistrar[
-      T : Manifest : Codec]: InjectionDefaultRegistrar[T] =
+  def injectionDefaultRegistrar[T: Manifest: Codec]
+    : InjectionDefaultRegistrar[T] =
     InjectionDefaultRegistrar(
         manifest[T].runtimeClass.asInstanceOf[Class[T]], implicitly[Codec[T]])
 
@@ -60,7 +60,7 @@ object SBChillRegistrar {
         new ScalaKryoInstantiator()
           .withRegistrar(new IterableRegistrar(iterableRegistrars ++ defaults))
           .setReferences(false)
-      )
+    )
     kryoConfig.unwrap
   }
 }

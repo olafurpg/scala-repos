@@ -14,8 +14,8 @@ object Test extends App {
         "jline", "org.apache.tools.ant", "$anonfun")
 
     def ok(t: Throwable) = {
-      allowedMissingPackages.exists(
-          p => t.getMessage.replace('/', '.').contains(p))
+      allowedMissingPackages.exists(p =>
+            t.getMessage.replace('/', '.').contains(p))
     }
 
     def unapply(t: Throwable): Option[Throwable] = t match {

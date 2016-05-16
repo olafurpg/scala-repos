@@ -39,7 +39,8 @@ private[akka] object SubscriberManagement {
   * INTERNAL API
   */
 private[akka] trait SubscriptionWithCursor[T]
-    extends Subscription with ResizableMultiReaderRingBuffer.Cursor {
+    extends Subscription
+    with ResizableMultiReaderRingBuffer.Cursor {
   import ReactiveStreamsCompliance._
 
   def subscriber: Subscriber[_ >: T]
@@ -130,7 +131,8 @@ private[akka] trait SubscriberManagement[T]
               if (requested == 0) {
                 // if we are at end-of-stream and have nothing more to read we complete now rather than after the next `requestMore`
                 if ((eos ne NotReached) && buffer.count(subscription) == 0)
-                  Long.MinValue else 0
+                  Long.MinValue
+                else 0
               } else if (buffer.count(subscription) > 0) {
                 val goOn = try {
                   subscription.dispatch(buffer.read(subscription))
@@ -216,9 +218,9 @@ private[akka] trait SubscriberManagement[T]
   protected def completeDownstream(): Unit = {
     if (endOfStream eq NotReached) {
       @tailrec
-      def completeDoneSubscriptions(
-          remaining: Subscriptions,
-          result: Subscriptions = Nil): Subscriptions =
+      def completeDoneSubscriptions(remaining: Subscriptions,
+                                    result: Subscriptions =
+                                      Nil): Subscriptions =
         remaining match {
           case head :: tail ⇒
             if (buffer.count(head) == 0) {

@@ -155,17 +155,15 @@ private[server] object ForwardedHeaderHandler {
             fh <- fhs.split(",\\s*")
           } yield fh)
             .map(_.split(";")
-                  .flatMap(s =>
-                        {
-                  val splitted = s.split("=", 2)
-                  if (splitted.length < 2) Seq.empty
-                  else {
-                    // Remove surrounding quotes
-                    val name =
-                      splitted(0).toLowerCase(java.util.Locale.ENGLISH)
-                    val value = unquote(splitted(1))
-                    Seq(name -> value)
-                  }
+                  .flatMap(s => {
+                val splitted = s.split("=", 2)
+                if (splitted.length < 2) Seq.empty
+                else {
+                  // Remove surrounding quotes
+                  val name = splitted(0).toLowerCase(java.util.Locale.ENGLISH)
+                  val value = unquote(splitted(1))
+                  Seq(name -> value)
+                }
               })
                   .toMap)
             .map { paramMap: Map[String, String] =>

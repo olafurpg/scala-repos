@@ -105,16 +105,15 @@ class ScProjectionType private (
           val args: ArrayBuffer[ScExistentialArgument] =
             new ArrayBuffer[ScExistentialArgument]()
           val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-              ta.typeParameters
-                .map(tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
               ta.typeParameters.map(tp =>
-                    {
-                  val name = tp.name + "$$"
-                  args += new ScExistentialArgument(name,
-                                                    Nil,
-                                                    types.Nothing,
-                                                    types.Any)
-                  ScTypeVariable(name)
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              ta.typeParameters.map(tp => {
+                val name = tp.name + "$$"
+                args += new ScExistentialArgument(name,
+                                                  Nil,
+                                                  types.Nothing,
+                                                  types.Any)
+                ScTypeVariable(name)
               }))
           val s = actualSubst.followed(genericSubst)
           Some(
@@ -133,8 +132,9 @@ class ScProjectionType private (
 
   override def hashCode: Int = {
     if (hash == -1) {
-      hash = projected.hashCode() + element.hashCode() * 31 +
-      (if (superReference) 239 else 0)
+      hash =
+        projected.hashCode() + element.hashCode() * 31 +
+        (if (superReference) 239 else 0)
     }
     hash
   }
@@ -491,14 +491,13 @@ case class ScDesignatorType(element: PsiNamedElement) extends ValueType {
         val args: ArrayBuffer[ScExistentialArgument] =
           new ArrayBuffer[ScExistentialArgument]()
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters
-              .map(tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             ta.typeParameters.map(tp =>
-                  {
-                val name = tp.name + "$$"
-                args += new ScExistentialArgument(
-                    name, Nil, types.Nothing, types.Any)
-                ScTypeVariable(name)
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+            ta.typeParameters.map(tp => {
+              val name = tp.name + "$$"
+              args +=
+                new ScExistentialArgument(name, Nil, types.Nothing, types.Any)
+              ScTypeVariable(name)
             }))
         Some(
             AliasType(ta,

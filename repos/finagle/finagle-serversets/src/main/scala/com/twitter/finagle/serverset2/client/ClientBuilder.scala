@@ -145,8 +145,7 @@ private[client] class ClientBuilder(config: ClientConfig) {
     * @return configured ClientBuilder
     */
   def hosts(zkHosts: Seq[InetSocketAddress]): ClientBuilder =
-    hosts(
-        zkHosts.map { h =>
+    hosts(zkHosts.map { h =>
       "%s:%d,".format(h.getHostName, h.getPort)
     }.mkString)
 

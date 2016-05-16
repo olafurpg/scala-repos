@@ -14,7 +14,9 @@ import spire.syntax.nroot._
 
 //scalastyle:off equals.hash.code
 sealed abstract class Rational
-    extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Ordered[Rational] {
   lhs =>
 
   def numerator: SafeLong
@@ -227,8 +229,7 @@ object Rational extends RationalInstances {
         val dShared = d >> dLowerLength
 
         val addBit =
-          if (nShared < dShared ||
-              (nShared == dShared &&
+          if (nShared < dShared || (nShared == dShared &&
                   d.toBigInteger.getLowestSetBit < dLowerLength)) {
             1
           } else {
@@ -356,7 +357,8 @@ object Rational extends RationalInstances {
 
   @SerialVersionUID(0L)
   private final class LongRational(val n: Long, val d: Long)
-      extends Rational with Serializable {
+      extends Rational
+      with Serializable {
     def numerator: SafeLong = SafeLong(n)
     def denominator: SafeLong = SafeLong(d)
 
@@ -659,7 +661,8 @@ object Rational extends RationalInstances {
 
   @SerialVersionUID(0L)
   private final class BigRational(val n: SafeLong, val d: SafeLong)
-      extends Rational with Serializable {
+      extends Rational
+      with Serializable {
     def numerator: SafeLong = n
     def denominator: SafeLong = d
 
@@ -868,4 +871,6 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 
 @SerialVersionUID(1L)
 class RationalAlgebra
-    extends RationalIsField with RationalIsReal with Serializable
+    extends RationalIsField
+    with RationalIsReal
+    with Serializable

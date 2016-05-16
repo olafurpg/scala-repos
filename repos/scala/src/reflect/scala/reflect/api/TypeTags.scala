@@ -319,7 +319,8 @@ trait TypeTags { self: Universe =>
 
   /* @group TypeTags */
   private class TypeTagImpl[T](mirror: Mirror, tpec: TypeCreator)
-      extends WeakTypeTagImpl[T](mirror, tpec) with TypeTag[T] {
+      extends WeakTypeTagImpl[T](mirror, tpec)
+      with TypeTag[T] {
     override def in[U <: Universe with Singleton](
         otherMirror: scala.reflect.api.Mirror[U]): U#TypeTag[T] = {
       val otherMirror1 = otherMirror
@@ -381,7 +382,7 @@ trait TypeTags { self: Universe =>
     * Type symbol of `x` as derived from a type tag.
     * @group TypeTags
     */
-  def symbolOf[T : WeakTypeTag]: TypeSymbol
+  def symbolOf[T: WeakTypeTag]: TypeSymbol
 }
 
 // This class should be final, but we can't do that in Scala 2.11.x without breaking

@@ -259,13 +259,13 @@ object EnsimeBuild extends Build {
           case PathList("org", "apache", "commons", "vfs2", xs @ _ *) =>
             MergeStrategy.first // assumes our classpath is setup correctly
           case other => MergeStrategy.defaultMergeStrategy(other)
-        }, assemblyExcludedJars in assembly <<= (fullClasspath in assembly).map {
-          everything =>
-            everything.filter { attr =>
-              val n = attr.data.getName
-              n.startsWith("scala-library") | n.startsWith("scala-compiler") | n
-                .startsWith("scala-reflect") | n.startsWith("scalap")
-            } :+ Attributed.blank(JavaTools)
+        }, assemblyExcludedJars in assembly <<=
+          (fullClasspath in assembly).map { everything =>
+          everything.filter { attr =>
+            val n = attr.data.getName
+            n.startsWith("scala-library") | n.startsWith("scala-compiler") | n
+              .startsWith("scala-reflect") | n.startsWith("scalap")
+          } :+ Attributed.blank(JavaTools)
         }, assemblyJarName in assembly :=
           s"ensime_${scalaBinaryVersion.value}-${version.value}-assembly.jar")
 }

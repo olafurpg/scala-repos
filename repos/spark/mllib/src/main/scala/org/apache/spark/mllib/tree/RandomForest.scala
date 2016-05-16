@@ -68,7 +68,8 @@ private class RandomForest(private val strategy: Strategy,
                            private val numTrees: Int,
                            featureSubsetStrategy: String,
                            private val seed: Int)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /*
      ALGORITHM
@@ -152,8 +153,7 @@ private class RandomForest(private val strategy: Strategy,
     val (splits, bins) = DecisionTree.findSplitsBins(retaggedInput, metadata)
     timer.stop("findSplitsBins")
     logDebug("numBins: feature: number of bins")
-    logDebug(
-        Range(0, metadata.numFeatures).map { featureIndex =>
+    logDebug(Range(0, metadata.numFeatures).map { featureIndex =>
       s"\t$featureIndex\t${metadata.numBins(featureIndex)}"
     }.mkString("\n"))
 
@@ -232,8 +232,8 @@ private class RandomForest(private val strategy: Strategy,
     // Allocate and queue root nodes.
     val topNodes: Array[Node] =
       Array.fill[Node](numTrees)(Node.emptyNode(nodeIndex = 1))
-    Range(0, numTrees).foreach(
-        treeIndex => nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
+    Range(0, numTrees).foreach(treeIndex =>
+          nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
 
     while (nodeQueue.nonEmpty) {
       // Collect some nodes to split, and choose features for each node (if subsampling).
@@ -342,16 +342,16 @@ object RandomForest extends Serializable with Logging {
     * @return RandomForestModel that can be used for prediction.
     */
   @Since("1.2.0")
-  def trainClassifier(
-      input: RDD[LabeledPoint],
-      numClasses: Int,
-      categoricalFeaturesInfo: Map[Int, Int],
-      numTrees: Int,
-      featureSubsetStrategy: String,
-      impurity: String,
-      maxDepth: Int,
-      maxBins: Int,
-      seed: Int = Utils.random.nextInt()): RandomForestModel = {
+  def trainClassifier(input: RDD[LabeledPoint],
+                      numClasses: Int,
+                      categoricalFeaturesInfo: Map[Int, Int],
+                      numTrees: Int,
+                      featureSubsetStrategy: String,
+                      impurity: String,
+                      maxDepth: Int,
+                      maxBins: Int,
+                      seed: Int =
+                        Utils.random.nextInt()): RandomForestModel = {
     val impurityType = Impurities.fromString(impurity)
     val strategy = new Strategy(Classification,
                                 impurityType,
@@ -552,11 +552,11 @@ object RandomForest extends Serializable with Logging {
         nodeQueue.dequeue()
         mutableNodesForGroup.getOrElseUpdate(
             treeIndex, new mutable.ArrayBuffer[Node]()) += node
-        mutableTreeToNodeToIndexInfo.getOrElseUpdate(treeIndex,
-                                                     new mutable.HashMap[
-                                                         Int,
-                                                         NodeIndexInfo]())(
-            node.id) = new NodeIndexInfo(numNodesInGroup, featureSubset)
+        mutableTreeToNodeToIndexInfo.getOrElseUpdate(
+            treeIndex,
+            new mutable.HashMap[Int,
+                                NodeIndexInfo]())(node.id) = new NodeIndexInfo(
+            numNodesInGroup, featureSubset)
       }
       numNodesInGroup += 1
       memUsage += nodeMemUsage
@@ -564,10 +564,9 @@ object RandomForest extends Serializable with Logging {
     // Convert mutable maps to immutable ones.
     val nodesForGroup: Map[Int, Array[Node]] =
       mutableNodesForGroup.mapValues(_.toArray).toMap
-    val treeToNodeToIndexInfo = mutableTreeToNodeToIndexInfo
-      .mapValues(_.toMap)
-      .toMap
-      (nodesForGroup, treeToNodeToIndexInfo)
+    val treeToNodeToIndexInfo =
+      mutableTreeToNodeToIndexInfo.mapValues(_.toMap).toMap
+    (nodesForGroup, treeToNodeToIndexInfo)
   }
 
   /**

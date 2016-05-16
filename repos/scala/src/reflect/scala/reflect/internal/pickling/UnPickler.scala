@@ -335,13 +335,14 @@ abstract class UnPickler {
 
         markFlagsCompleted(sym)(mask = AllFlags)
         sym.privateWithin = privateWithin
-        sym.info = (if (atEnd) {
-                      assert(!sym.isSuperAccessor, sym)
-                      newLazyTypeRef(inforef)
-                    } else {
-                      assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
-                      newLazyTypeRefAndAlias(inforef, readNat())
-                    })
+        sym.info =
+          (if (atEnd) {
+             assert(!sym.isSuperAccessor, sym)
+             newLazyTypeRef(inforef)
+           } else {
+             assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
+             newLazyTypeRefAndAlias(inforef, readNat())
+           })
         if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
 
         sym
@@ -744,7 +745,8 @@ abstract class UnPickler {
 
     /** A lazy type which when completed returns type at index `i`. */
     private class LazyTypeRef(i: Int)
-        extends LazyType with FlagAgnosticCompleter {
+        extends LazyType
+        with FlagAgnosticCompleter {
       private val definedAtRunId = currentRunId
       private val p = phase
       protected def completeInternal(sym: Symbol): Unit =

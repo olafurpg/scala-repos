@@ -47,8 +47,7 @@ class HoconObjectEntryMover extends LineMover {
   override def checkAvailable(
       editor: Editor, file: PsiFile, info: MoveInfo, down: Boolean): Boolean =
     super.checkAvailable(editor, file, info, down) &&
-    !editor.getSelectionModel.hasSelection &&
-    (file match {
+    !editor.getSelectionModel.hasSelection && (file match {
           case hoconFile: HoconPsiFile =>
             checkAvailableHocon(editor, hoconFile, info, down)
           case _ =>
@@ -104,11 +103,11 @@ class HoconObjectEntryMover extends LineMover {
     def isByEdge(entry: HObjectEntry) = !entry.parent.exists(_.isToplevel) && {
       // todo suspicious
       if (down)
-        entry.nextEntry.forall(
-            ne => entry.parent.exists(pp => startLine(ne) == endLine(pp)))
+        entry.nextEntry.forall(ne =>
+              entry.parent.exists(pp => startLine(ne) == endLine(pp)))
       else
-        entry.previousEntry.forall(
-            pe => entry.parent.exists(pp => endLine(pe) == startLine(pp)))
+        entry.previousEntry.forall(pe =>
+              entry.parent.exists(pp => endLine(pe) == startLine(pp)))
     }
 
     def keyString(keyedField: HKeyedField) =
@@ -167,8 +166,8 @@ class HoconObjectEntryMover extends LineMover {
         field: HObjectField): Option[(HObjectField, List[String])] =
       for {
         adjacentField <- adjacentEntry(field)
-          .collect({ case f: HObjectField => f })
-          .filter(canInsertInto)
+                          .collect({ case f: HObjectField => f })
+                          .filter(canInsertInto)
         prefixToRemove <- {
           val prefix =
             adjacentField.keyedField.fieldsInPathForward.map(keyString).toList

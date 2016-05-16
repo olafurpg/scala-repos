@@ -9,7 +9,10 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import scala.concurrent.Future
 
 class DefaultInfoServiceTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   test("queryForAppId") {
@@ -272,11 +275,11 @@ class DefaultInfoServiceTest
   val someGroupWithNested = Group.empty.copy(
       apps = someApps,
       groups = Set(
-            Group.empty.copy(
-                id = PathId("/nested"),
-                apps = someNestedApps
-            )
-        )
+          Group.empty.copy(
+              id = PathId("/nested"),
+              apps = someNestedApps
+          )
+      )
   )
 
   val nestedGroup = Group(

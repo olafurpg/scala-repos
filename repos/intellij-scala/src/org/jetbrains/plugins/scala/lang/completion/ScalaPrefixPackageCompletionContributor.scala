@@ -99,7 +99,7 @@ object ScalaPrefixPackageCompletionContributor {
     for {
       fqn <- prefixPackages(project)
       name = fqn.substring(fqn.lastIndexOf('.'))
-          if prefixMatcher.prefixMatches(name)
+      if prefixMatcher.prefixMatches(name)
     } {
       addPackageForCompletion(fqn)
     }

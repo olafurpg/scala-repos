@@ -239,7 +239,8 @@ private[akka] trait FaultHandling {
         DeathWatchNotification(
             self,
             existenceConfirmed = true,
-            addressTerminated = false)) finally try stopFunctionRefs() finally try tellWatchersWeDied() finally try unwatchWatchedActors(
+            addressTerminated =
+              false)) finally try stopFunctionRefs() finally try tellWatchersWeDied() finally try unwatchWatchedActors(
         a) // stay here as we expect an emergency stop from handleInvokeFailure
     finally {
       if (system.settings.DebugLifecycle)
@@ -259,7 +260,8 @@ private[akka] trait FaultHandling {
       try resumeNonRecursive() finally clearFailed() // must happen in any case, so that failure is propagated
 
       val freshActor = newActor()
-      actor = freshActor // this must happen before postRestart has a chance to fail
+      actor =
+        freshActor // this must happen before postRestart has a chance to fail
       if (freshActor eq failedActor)
         setActorFields(freshActor, this, self) // If the creator returns the same instance, we need to restore our nulled out fields.
 
@@ -272,11 +274,10 @@ private[akka] trait FaultHandling {
       (child ⇒
             try child.asInstanceOf[InternalActorRef].restart(cause) catch handleNonFatalOrInterruptedException {
               e ⇒
-                publish(
-                    Error(e,
-                          self.path.toString,
-                          clazz(freshActor),
-                          "restarting " + child))
+                publish(Error(e,
+                              self.path.toString,
+                              clazz(freshActor),
+                              "restarting " + child))
           })
     } catch handleNonFatalOrInterruptedException { e ⇒
       clearActorFields(actor, recreate = false) // in order to prevent preRestart() from happening again

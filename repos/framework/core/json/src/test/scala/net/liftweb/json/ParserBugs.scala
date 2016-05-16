@@ -58,11 +58,10 @@ object ParserBugs extends Specification {
     parse(s) mustEqual json
   }
 
-  private val discardParser = (p: JsonParser.Parser) =>
-    {
-      var token: JsonParser.Token = null
-      do {
-        token = p.nextToken
-      } while (token != JsonParser.End)
+  private val discardParser = (p: JsonParser.Parser) => {
+    var token: JsonParser.Token = null
+    do {
+      token = p.nextToken
+    } while (token != JsonParser.End)
   }
 }

@@ -37,7 +37,9 @@ import org.apache.spark.util.Utils
   * End-to-end tests for application client in standalone mode.
   */
 class AppClientSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfterAll {
   private val numWorkers = 2
   private val conf = new SparkConf()
   private val securityManager = new SecurityManager(conf)
@@ -53,8 +55,8 @@ class AppClientSuite
     */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    masterRpcEnv = RpcEnv.create(
-        Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
+    masterRpcEnv =
+      RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
       RpcEnv.create(
           Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)

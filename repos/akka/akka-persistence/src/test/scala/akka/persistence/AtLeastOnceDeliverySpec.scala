@@ -54,7 +54,9 @@ object AtLeastOnceDeliverySpec {
                destinations: Map[String, ActorPath],
                async: Boolean,
                actorSelectionDelivery: Boolean)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+      extends PersistentActor
+      with AtLeastOnceDelivery
+      with ActorLogging {
 
     override def persistenceId: String = name
 
@@ -66,8 +68,8 @@ object AtLeastOnceDeliverySpec {
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
             recoveryRunning)
-        deliver(context.actorSelection(destination))(
-            deliveryId ⇒ Action(deliveryId, payload))
+        deliver(context.actorSelection(destination))(deliveryId ⇒
+              Action(deliveryId, payload))
 
       case AcceptedReq(payload, destination) ⇒
         log.debug(
@@ -158,7 +160,8 @@ object AtLeastOnceDeliverySpec {
     Props(new Unreliable(dropMod, target))
 
   class Unreliable(dropMod: Int, target: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor
+      with ActorLogging {
     var count = 0
     def receive = {
       case msg ⇒
@@ -173,7 +176,8 @@ object AtLeastOnceDeliverySpec {
   }
 
   class DeliverToStarSelection(name: String)
-      extends PersistentActor with AtLeastOnceDelivery {
+      extends PersistentActor
+      with AtLeastOnceDelivery {
     override def persistenceId = name
 
     override def receiveCommand = {
@@ -189,7 +193,8 @@ object AtLeastOnceDeliverySpec {
 }
 
 abstract class AtLeastOnceDeliverySpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import akka.persistence.AtLeastOnceDeliverySpec._
 
   "AtLeastOnceDelivery" must {
@@ -221,16 +226,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         val dst = system.actorOf(destinationProps(probeA.ref))
         val destinations =
           Map("A" -> system.actorOf(unreliableProps(3, dst)).path)
-        val snd = system.actorOf(
-            senderProps(probe.ref,
-                        name,
-                        1000.millis,
-                        5,
-                        1000,
-                        destinations,
-                        async = false,
-                        actorSelectionDelivery = deliverUsingActorSelection),
-            name)
+        val snd = system.actorOf(senderProps(probe.ref,
+                                             name,
+                                             1000.millis,
+                                             5,
+                                             1000,
+                                             destinations,
+                                             async = false,
+                                             actorSelectionDelivery =
+                                               deliverUsingActorSelection),
+                                 name)
         snd.tell(Req("a-1"), probe.ref)
         probe.expectMsg(ReqAck)
         probeA.expectMsg(Action(1, "a-1"))

@@ -80,7 +80,8 @@ case class SchedulerExtensionServiceBinding(
   * is undefined.
   */
 private[spark] class SchedulerExtensionServices
-    extends SchedulerExtensionService with Logging {
+    extends SchedulerExtensionService
+    with Logging {
   private var serviceOption: Option[String] = None
   private var services: List[SchedulerExtensionService] = Nil
   private val started = new AtomicBoolean(false)

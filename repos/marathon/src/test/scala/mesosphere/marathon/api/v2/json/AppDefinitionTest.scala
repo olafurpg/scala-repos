@@ -95,20 +95,24 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     app = AppDefinition(
         id = "test".toPath,
-        cmd = Some("true"),
-        container = Some(
+        cmd =
+          Some("true"),
+        container =
+          Some(
               Container(
-                  docker = Some(Docker(
-                            image = "mesosphere/marathon",
-                            network = Some(
-                                  mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                            portMappings = Some(Seq(
-                                      Docker.PortMapping(
-                                          8080, 0, 0, "tcp", Some("foo")),
-                                      Docker.PortMapping(
-                                          8081, 0, 0, "tcp", Some("foo"))
-                                  ))
-                        ))
+                  docker = Some(
+                      Docker(
+                          image =
+                            "mesosphere/marathon",
+                          network = Some(
+                              mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                          portMappings = Some(Seq(
+                                  Docker.PortMapping(
+                                      8080, 0, 0, "tcp", Some("foo")),
+                                  Docker.PortMapping(
+                                      8081, 0, 0, "tcp", Some("foo"))
+                              ))
+                      ))
               )),
         portDefinitions = Nil
     )
@@ -122,9 +126,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         id = "test".toPath,
         cmd = Some("true"),
         portDefinitions = Seq(
-              PortDefinition(port = 9000, name = Some("foo")),
-              PortDefinition(port = 9001, name = Some("foo"))
-          )
+            PortDefinition(port = 9000, name = Some("foo")),
+            PortDefinition(port = 9001, name = Some("foo"))
+        )
     )
     shouldViolate(
         app,
@@ -134,21 +138,23 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     val correct = AppDefinition(id = "test".toPath)
 
-    app = correct.copy(
-        container = Some(
-              Container(
-                  docker = Some(Docker(
-                            image = "mesosphere/marathon",
-                            network = Some(
-                                  mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                            portMappings = Some(Seq(
-                                      Docker.PortMapping(
-                                          8080, 0, 0, "tcp", Some("foo")),
-                                      Docker.PortMapping(
-                                          8081, 0, 0, "tcp", Some("bar"))
-                                  ))
-                        ))
-              )),
+    app = correct
+      .copy(
+        container = Some(Container(
+                docker =
+                  Some(Docker(
+                          image =
+                            "mesosphere/marathon",
+                          network = Some(
+                              mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                          portMappings = Some(Seq(
+                                  Docker.PortMapping(
+                                      8080, 0, 0, "tcp", Some("foo")),
+                                  Docker.PortMapping(
+                                      8081, 0, 0, "tcp", Some("bar"))
+                              ))
+                      ))
+            )),
         portDefinitions = Nil)
     shouldNotViolate(
         app,
@@ -158,9 +164,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     app = correct.copy(
         portDefinitions = Seq(
-              PortDefinition(port = 9000, name = Some("foo")),
-              PortDefinition(port = 9001, name = Some("bar"))
-          )
+            PortDefinition(port = 9000, name = Some("foo")),
+            PortDefinition(port = 9001, name = Some("bar"))
+        )
     )
     shouldNotViolate(
         app,
@@ -266,16 +272,16 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     app = correct.copy(
         container = Some(
-              Container(
-                  docker = Some(Docker(
-                            network = Some(
-                                  mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                            portMappings = Some(Seq(
-                                      Docker.PortMapping(8080, 0, 0, "tcp"),
-                                      Docker.PortMapping(8081, 0, 0, "tcp")
-                                  ))
-                        ))
-              )),
+            Container(
+                docker = Some(Docker(
+                        network =
+                          Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                        portMappings = Some(Seq(
+                                Docker.PortMapping(8080, 0, 0, "tcp"),
+                                Docker.PortMapping(8081, 0, 0, "tcp")
+                            ))
+                    ))
+            )),
         portDefinitions = Nil,
         healthChecks = Set(HealthCheck(portIndex = Some(1)))
     )
@@ -288,13 +294,13 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     app = correct.copy(
         container = Some(
-              Container(
-                  docker = Some(Docker(
-                            network = Some(
-                                  mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                            portMappings = None
-                        ))
-              )),
+            Container(
+                docker = Some(Docker(
+                        network =
+                          Some(mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                        portMappings = None
+                    ))
+            )),
         portDefinitions = Nil,
         healthChecks = Set(HealthCheck(protocol = Protocol.COMMAND))
     )
@@ -399,12 +405,12 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         disk = 550.0,
         executor = "",
         constraints = Set(
-              Constraint.newBuilder
-                .setField("attribute")
-                .setOperator(Constraint.Operator.GROUP_BY)
-                .setValue("value")
-                .build
-            ),
+            Constraint.newBuilder
+              .setField("attribute")
+              .setOperator(Constraint.Operator.GROUP_BY)
+              .setValue("value")
+              .build
+        ),
         storeUrls = Seq("http://my.org.com/artifacts/foo.bar"),
         portDefinitions = PortDefinitions(9001, 9002),
         requirePorts = true,
@@ -412,8 +418,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         backoffFactor = 1.5,
         maxLaunchDelay = 3.minutes,
         container = Some(
-              Container(docker = Some(Container.Docker("group/image")))
-          ),
+            Container(docker = Some(Container.Docker("group/image")))
+        ),
         healthChecks = Set(HealthCheck(portIndex = Some(0))),
         dependencies = Set(PathId("/prod/product/backend")),
         upgradeStrategy = UpgradeStrategy(minimumHealthCapacity = 0.75)
@@ -476,16 +482,16 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("sleep 30"),
         portDefinitions = Seq.empty,
         container = Some(
-              Container(
-                  docker = Some(
-                        Docker(
-                            portMappings = Some(
-                                  Seq(Docker.PortMapping())
-                              )
+            Container(
+                docker = Some(
+                    Docker(
+                        portMappings = Some(
+                            Seq(Docker.PortMapping())
                         )
                     )
-              )
-          ),
+                )
+            )
+        ),
         healthChecks = Set(HealthCheck())
     )
 
@@ -505,14 +511,14 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("sleep 30"),
         portDefinitions = Seq.empty,
         container = Some(
-              Container(
-                  docker = Some(
-                        Docker(
-                            portMappings = Some(Seq.empty)
-                        )
+            Container(
+                docker = Some(
+                    Docker(
+                        portMappings = Some(Seq.empty)
                     )
-              )
-          ),
+                )
+            )
+        ),
         healthChecks = Set(HealthCheck())
     )
 
@@ -531,18 +537,18 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         id = "bridged-webapp".toPath,
         cmd = Some("python3 -m http.server 8080"),
         container = Some(
-              Container(
-                  docker = Some(Docker(
-                            image = "python:3",
-                            network = Some(Network.BRIDGE),
-                            portMappings = Some(Seq(
-                                      PortMapping(containerPort = 8080,
-                                                  hostPort = 0,
-                                                  servicePort = 9000,
-                                                  protocol = "tcp")
-                                  ))
-                        ))
-              ))
+            Container(
+                docker = Some(Docker(
+                        image = "python:3",
+                        network = Some(Network.BRIDGE),
+                        portMappings = Some(Seq(
+                                PortMapping(containerPort = 8080,
+                                            hostPort = 0,
+                                            servicePort = 9000,
+                                            protocol = "tcp")
+                            ))
+                    ))
+            ))
     )
 
     val json4 =
@@ -573,15 +579,15 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         id = "app-with-fetch".toPath,
         cmd = Some("brew update"),
         fetch = Seq(
-              new FetchUri(uri = "http://example.com/file1",
-                           executable = false,
-                           extract = true,
-                           cache = true),
-              new FetchUri(uri = "http://example.com/file2",
-                           executable = true,
-                           extract = false,
-                           cache = false)
-          )
+            new FetchUri(uri = "http://example.com/file1",
+                         executable = false,
+                         extract = true,
+                         cache = true),
+            new FetchUri(uri = "http://example.com/file2",
+                         executable = true,
+                         extract = false,
+                         cache = false)
+        )
     )
 
     val json = """
@@ -632,15 +638,15 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         id = "app-with-fetch".toPath,
         cmd = Some("brew update"),
         fetch = Seq(
-              new FetchUri(uri = "http://example.com/file1",
-                           executable = false,
-                           extract = true,
-                           cache = true),
-              new FetchUri(uri = "http://example.com/file2",
-                           executable = true,
-                           extract = false,
-                           cache = false)
-          )
+            new FetchUri(uri = "http://example.com/file1",
+                         executable = false,
+                         extract = true,
+                         cache = true),
+            new FetchUri(uri = "http://example.com/file2",
+                         executable = true,
+                         extract = false,
+                         cache = false)
+        )
     )
 
     val proto = app.toProto
@@ -664,18 +670,18 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("python3 -m http.server 8080"),
         portDefinitions = Nil,
         ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo(
-                        ports = Seq(Port(name = "http",
-                                         number = 80,
-                                         protocol = "tcp"))
-                    )
-              )),
+            IpAddress(
+                groups = Seq("a", "b", "c"),
+                labels = Map(
+                    "foo" -> "bar",
+                    "baz" -> "buzz"
+                ),
+                discoveryInfo = DiscoveryInfo(
+                    ports = Seq(Port(name = "http",
+                                     number = 80,
+                                     protocol = "tcp"))
+                )
+            )),
         maxLaunchDelay = 3600.seconds
     )
 
@@ -710,14 +716,14 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("python3 -m http.server 8080"),
         portDefinitions = Nil,
         ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo.empty
-              )),
+            IpAddress(
+                groups = Seq("a", "b", "c"),
+                labels = Map(
+                    "foo" -> "bar",
+                    "baz" -> "buzz"
+                ),
+                discoveryInfo = DiscoveryInfo.empty
+            )),
         maxLaunchDelay = 3600.seconds
     )
 
@@ -802,9 +808,11 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
   test("Residency serialization (toProto) and deserialization (fromProto)") {
     val app = AppDefinition(
         id = "/test".toRootPath,
-        residency = Some(Residency(
-                  relaunchEscalationTimeoutSeconds = 3600,
-                  taskLostBehavior = Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER)))
+        residency = Some(
+            Residency(
+                relaunchEscalationTimeoutSeconds = 3600,
+                taskLostBehavior =
+                  Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER)))
     val proto = app.toProto
 
     proto.hasResidency shouldBe true

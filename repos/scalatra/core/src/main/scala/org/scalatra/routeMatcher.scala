@@ -36,7 +36,8 @@ trait ReversibleRouteMatcher {
   * An implementation of Sinatra's path pattern syntax.
   */
 final class SinatraRouteMatcher(pattern: String)
-    extends RouteMatcher with ReversibleRouteMatcher {
+    extends RouteMatcher
+    with ReversibleRouteMatcher {
 
   lazy val generator: (Builder => Builder) = BuilderGeneratorParser(pattern)
 
@@ -131,7 +132,8 @@ final class SinatraRouteMatcher(pattern: String)
   * An implementation of Rails' path pattern syntax
   */
 final class RailsRouteMatcher(pattern: String)
-    extends RouteMatcher with ReversibleRouteMatcher {
+    extends RouteMatcher
+    with ReversibleRouteMatcher {
 
   lazy val generator: (Builder => Builder) = BuilderGeneratorParser(pattern)
 

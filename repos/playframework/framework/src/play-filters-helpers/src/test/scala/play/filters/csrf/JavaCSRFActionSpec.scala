@@ -29,7 +29,7 @@ object JavaCSRFActionSpec extends CSRFCommonSpecs {
   def ws = Play.privateMaybeApplication.get.injector.instanceOf[WSClient]
   //def crypto = Play.privateMaybeApplication.get.injector.instanceOf[CSRFTokenSigner]
 
-  def javaAction[T : ClassTag](method: String, inv: => Result) =
+  def javaAction[T: ClassTag](method: String, inv: => Result) =
     new JavaAction(javaHandlerComponents) {
       val clazz = implicitly[ClassTag[T]].runtimeClass
       def parser =

@@ -78,9 +78,11 @@ import generic._
     "Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.",
     "2.11.0")
 class LinkedList[A]()
-    extends AbstractSeq[A] with LinearSeq[A]
+    extends AbstractSeq[A]
+    with LinearSeq[A]
     with GenericTraversableTemplate[A, LinkedList]
-    with LinkedListLike[A, LinkedList[A]] with Serializable {
+    with LinkedListLike[A, LinkedList[A]]
+    with Serializable {
   next = this
 
   /** Creates a new list. If the parameter next is null, the result is an empty list. Otherwise, the result is

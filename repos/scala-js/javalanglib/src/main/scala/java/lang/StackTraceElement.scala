@@ -7,7 +7,8 @@ final class StackTraceElement(declaringClass: String,
                               methodName: String,
                               fileName: String,
                               lineNumber: Int)
-    extends AnyRef with java.io.Serializable {
+    extends AnyRef
+    with java.io.Serializable {
 
   private[this] var columnNumber: Int = -1
 

@@ -8,7 +8,8 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed abstract class TransferEncoding
-    extends jm.TransferEncoding with Renderable {
+    extends jm.TransferEncoding
+    with Renderable {
   def name: String
   def params: Map[String, String]
 
@@ -17,7 +18,8 @@ sealed abstract class TransferEncoding
 
 object TransferEncodings {
   protected abstract class Predefined
-      extends TransferEncoding with SingletonValueRenderable {
+      extends TransferEncoding
+      with SingletonValueRenderable {
     def name: String = value
     def params: Map[String, String] = Map.empty
   }

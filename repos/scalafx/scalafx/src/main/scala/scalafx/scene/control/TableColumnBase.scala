@@ -63,7 +63,8 @@ object TableColumnBase {
   */
 abstract class TableColumnBase[S, T] protected (
     override val delegate: jfxsc.TableColumnBase[S, T])
-    extends EventHandlerDelegate with Styleable
+    extends EventHandlerDelegate
+    with Styleable
     with SFXDelegate[jfxsc.TableColumnBase[S, T]] {
 
   /**

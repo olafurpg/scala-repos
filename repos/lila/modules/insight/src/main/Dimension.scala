@@ -7,7 +7,7 @@ import chess.{Color, Role}
 import lila.db.Types._
 import lila.rating.PerfType
 
-sealed abstract class Dimension[A : BSONValueHandler](
+sealed abstract class Dimension[A: BSONValueHandler](
     val key: String,
     val name: String,
     val dbKey: String,

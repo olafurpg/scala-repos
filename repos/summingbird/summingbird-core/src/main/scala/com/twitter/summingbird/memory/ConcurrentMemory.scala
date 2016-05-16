@@ -63,7 +63,8 @@ sealed trait PhysicalNode[-I] {
 
 object PhysicalNode {
   case class SourceNode[O](data: TraversableOnce[O], next: PhysicalNode[O])
-      extends ConcurrentMemoryPlan with PhysicalNode[Nothing] {
+      extends ConcurrentMemoryPlan
+      with PhysicalNode[Nothing] {
     def run(implicit ec: ExecutionContext): Future[Unit] =
       Future
         .sequence(data.map { o =>
@@ -149,7 +150,8 @@ object PhysicalNode {
 
 class ConcurrentMemory(
     implicit jobID: JobId = JobId("default.concurrent.memory.jobId"))
-    extends Platform[ConcurrentMemory] with DagOptimizer[ConcurrentMemory] {
+    extends Platform[ConcurrentMemory]
+    with DagOptimizer[ConcurrentMemory] {
 
   type Source[T] = TraversableOnce[T]
   type Store[K, V] = ConcurrentHashMap[K, V]

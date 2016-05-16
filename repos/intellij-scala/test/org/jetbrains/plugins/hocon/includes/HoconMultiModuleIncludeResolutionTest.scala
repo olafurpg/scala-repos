@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.extensions._
   * @author ghik
   */
 class HoconMultiModuleIncludeResolutionTest
-    extends UsefulTestCase with HoconIncludeResolutionTest {
+    extends UsefulTestCase
+    with HoconIncludeResolutionTest {
   private var fixture: CodeInsightTestFixture = null
   private var modules: Map[String, Module] = null
   private val testdataPath = "testdata/hocon/includes/multimodule"
@@ -46,9 +47,8 @@ class HoconMultiModuleIncludeResolutionTest
       def subpath(name: String) = new File(dir, name).getPath
       def libMapping(lib: String) =
         Map(OrderRootType.CLASSES -> lib,
-            OrderRootType.SOURCES -> (lib + "src"))
-          .mapValues(s => Array(subpath(s)))
-          .asJava
+            OrderRootType.SOURCES -> (lib +
+                "src")).mapValues(s => Array(subpath(s))).asJava
 
       builder.addLibrary(dir.getName + "lib", libMapping("lib"))
       builder.addLibrary(dir.getName + "testlib", libMapping("testlib"))

@@ -20,7 +20,9 @@ import org.scalatest.{Matchers, FlatSpec}
 import scala.language.reflectiveCalls
 
 class CategoricalNaiveBayesTest
-    extends FlatSpec with Matchers with SharedSparkContext
+    extends FlatSpec
+    with Matchers
+    with SharedSparkContext
     with NaiveBayesFixture {
   val Tolerance = .0001
   val labeledPoints = fruit.labeledPoints

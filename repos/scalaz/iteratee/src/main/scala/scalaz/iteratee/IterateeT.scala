@@ -45,13 +45,13 @@ sealed abstract class IterateeT[E, F[_], A] {
                 s.fold[F[StepT[E, F, B]]](
                     cont = k => F.point(StepT.scont(u => through(k(u)))),
                     done = (a, i) =>
-                        if (i.isEmpty) f(a).value
-                        else
-                          F.bind(f(a).value)(_.fold(
-                                  cont = kk => kk(i).value,
-                                  done = (aa, _) =>
-                                      F.point(StepT.sdone[E, F, B](aa, i))
-                              ))
+                      if (i.isEmpty) f(a).value
+                      else
+                        F.bind(f(a).value)(_.fold(
+                                cont = kk => kk(i).value,
+                                done = (aa, _) =>
+                                  F.point(StepT.sdone[E, F, B](aa, i))
+                            ))
               )))
     through(this)
   }
@@ -132,7 +132,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     val M0 = IterateeT.IterateeTMonad[E, F]
     def check: StepT[I, F, B] => IterateeT[E, F, B] = _.fold(
         cont = k =>
-            k(eofInput) >>== { s =>
+          k(eofInput) >>== { s =>
             s.mapContOr(_ => sys.error("diverging iteratee"), check(s))
         },
         done = (a, _) => M0.point(a)
@@ -174,7 +174,7 @@ sealed abstract class IterateeT[E, F[_], A] {
     def loop(x: IterateeT[E, F, A], y: IterateeT[E, F, B])(
         in: Input[E]): IterateeT[E, F, (A, B)] = in(
         el = _ =>
-            step(x, in) flatMap {
+          step(x, in) flatMap {
             case (a, xx) =>
               step(y, in) flatMap {
                 case (b, yy) =>
@@ -186,7 +186,8 @@ sealed abstract class IterateeT[E, F[_], A] {
               }
         },
         empty = cont(loop(x, y)),
-        eof = (x &= enumEofT[E, F]) flatMap
+        eof =
+          (x &= enumEofT[E, F]) flatMap
           (a => (y &= enumEofT[E, F]) map (b => (a, b)))
     )
     cont(loop(this, other))
@@ -215,8 +216,8 @@ sealed abstract class IterateeTInstances0 {
 }
 
 sealed abstract class IterateeTInstances extends IterateeTInstances0 {
-  implicit def IterateeTMonadTrans[E]: Hoist[
-      λ[(α[_], β) => IterateeT[E, α, β]]] =
+  implicit def IterateeTMonadTrans[E]
+    : Hoist[λ[(α[_], β) => IterateeT[E, α, β]]] =
     new IterateeTHoist[E] {}
 
   implicit def IterateeTHoistT[E, H[_ [_], _]](
@@ -231,8 +232,8 @@ sealed abstract class IterateeTInstances extends IterateeTInstances0 {
       implicit def F = M0
     }
 
-  implicit def IterateeTContravariant[F[_]: Monad, A]: Contravariant[IterateeT[
-          ?, F, A]] =
+  implicit def IterateeTContravariant[F[_]: Monad, A]
+    : Contravariant[IterateeT[?, F, A]] =
     new Contravariant[IterateeT[?, F, A]] {
       def contramap[E, EE](r: IterateeT[E, F, A])(f: EE => E) = r.contramap(f)
     }
@@ -264,8 +265,8 @@ trait IterateeTFunctions {
   /**
     * An iteratee that consumes all of the input into something that is PlusEmpty and Applicative.
     */
-  def consume[E, F[_]: Monad, A[_]: PlusEmpty : Applicative]: IterateeT[
-      E, F, A[E]] = {
+  def consume[E, F[_]: Monad, A[_]: PlusEmpty: Applicative]
+    : IterateeT[E, F, A[E]] = {
     import scalaz.syntax.plus._
     def step(e: Input[E]): IterateeT[E, F, A[E]] =
       e.fold(empty = cont(step),
@@ -364,8 +365,8 @@ trait IterateeTFunctions {
     def step(acc: A): Input[E] => IterateeT[E, F, A] =
       s =>
         s(el = e =>
-              IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)) flatMap
-              (a => cont(step(a))),
+            IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)) flatMap
+            (a => cont(step(a))),
           empty = cont(step(acc)),
           eof = done(acc, eofInput[E]))
     cont(step(init))
@@ -383,9 +384,9 @@ trait IterateeTFunctions {
   def isEof[E, F[_]: Applicative]: IterateeT[E, F, Boolean] =
     cont(in => done(in.isEof, in))
 
-  def sum[E : Monoid, F[_]: Monad]: IterateeT[E, F, E] =
-    foldM[E, F, E](Monoid[E].zero)(
-        (a, e) => Applicative[F].point(Monoid[E].append(a, e)))
+  def sum[E: Monoid, F[_]: Monad]: IterateeT[E, F, E] =
+    foldM[E, F, E](Monoid[E].zero)((a, e) =>
+          Applicative[F].point(Monoid[E].append(a, e)))
 }
 
 //
@@ -421,7 +422,8 @@ private trait IterateeTHoist[E]
 }
 
 private trait IterateeTMonadIO[E, F[_]]
-    extends MonadIO[IterateeT[E, F, ?]] with IterateeTMonad[E, F] {
+    extends MonadIO[IterateeT[E, F, ?]]
+    with IterateeTMonad[E, F] {
   implicit def F: MonadIO[F]
 
   def liftIO[A](ioa: IO[A]) =

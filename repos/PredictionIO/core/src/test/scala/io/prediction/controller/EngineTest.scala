@@ -55,10 +55,10 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
                                     preparatorParams = PPreparator1.Params(1),
                                     algorithmParamsList = Seq(
-                                          ("PAlgo2", PAlgo2.Params(2)),
-                                          ("PAlgo3", PAlgo3.Params(21)),
-                                          ("PAlgo3", PAlgo3.Params(22))
-                                      ),
+                                        ("PAlgo2", PAlgo2.Params(2)),
+                                        ("PAlgo3", PAlgo3.Params(21)),
+                                        ("PAlgo3", PAlgo3.Params(22))
+                                    ),
                                     servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
@@ -125,13 +125,13 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
                                     preparatorParams = PPreparator1.Params(1),
                                     algorithmParamsList = Seq(
-                                          ("PAlgo2", PAlgo2.Params(20)),
-                                          ("PAlgo3", PAlgo3.Params(21)),
-                                          ("PAlgo3", PAlgo3.Params(22)),
-                                          ("NAlgo2", NAlgo2.Params(23)),
-                                          ("NAlgo3", NAlgo3.Params(24)),
-                                          ("NAlgo3", NAlgo3.Params(25))
-                                      ),
+                                        ("PAlgo2", PAlgo2.Params(20)),
+                                        ("PAlgo3", PAlgo3.Params(21)),
+                                        ("PAlgo3", PAlgo3.Params(22)),
+                                        ("NAlgo2", NAlgo2.Params(23)),
+                                        ("NAlgo3", NAlgo3.Params(24)),
+                                        ("NAlgo3", NAlgo3.Params(25))
+                                    ),
                                     servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))
@@ -225,13 +225,13 @@ class EngineSuite extends FunSuite with Inside with SharedSparkContext {
     val engineParams = EngineParams(dataSourceParams = PDataSource2.Params(0),
                                     preparatorParams = PPreparator1.Params(1),
                                     algorithmParamsList = Seq(
-                                          ("PAlgo2", PAlgo2.Params(20)),
-                                          ("PAlgo3", PAlgo3.Params(21)),
-                                          ("PAlgo3", PAlgo3.Params(22)),
-                                          ("NAlgo2", NAlgo2.Params(23)),
-                                          ("NAlgo3", NAlgo3.Params(24)),
-                                          ("NAlgo3", NAlgo3.Params(25))
-                                      ),
+                                        ("PAlgo2", PAlgo2.Params(20)),
+                                        ("PAlgo3", PAlgo3.Params(21)),
+                                        ("PAlgo3", PAlgo3.Params(22)),
+                                        ("NAlgo2", NAlgo2.Params(23)),
+                                        ("NAlgo3", NAlgo3.Params(24)),
+                                        ("NAlgo3", NAlgo3.Params(25))
+                                    ),
                                     servingParams = LServing1.Params(3))
 
     val pd = ProcessedData(1, TrainingData(0))

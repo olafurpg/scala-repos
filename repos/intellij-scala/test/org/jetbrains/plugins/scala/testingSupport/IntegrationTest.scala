@@ -115,8 +115,7 @@ trait IntegrationTest {
   protected def checkConfig(testClass: String,
                             testNames: Seq[String],
                             config: AbstractTestRunConfiguration): Boolean = {
-    config.getTestClassPath == testClass &&
-    (config.getTestName match {
+    config.getTestClassPath == testClass && (config.getTestName match {
           case "" => testNames.isEmpty
           case configTestName =>
             val configTests = parseTestName(configTestName)
@@ -149,17 +148,19 @@ trait IntegrationTest {
       names: Iterable[String],
       allowTail: Boolean = false): Option[List[AbstractTestProxy]] = {
     @tailrec
-    def buildConditions(names: Iterable[String],
-                        acc: List[AbstractTestProxy => Boolean] = List())
-      : List[AbstractTestProxy => Boolean] = names.size match {
+    def buildConditions(
+        names: Iterable[String],
+        acc: List[AbstractTestProxy => Boolean] =
+          List()): List[AbstractTestProxy => Boolean] = names.size match {
       case 0 => List(_ => true) //got an empty list of names as initial input
       case 1 =>
         ((node: AbstractTestProxy) =>
-          node.getName == names.head && (node.isLeaf || allowTail)) :: acc //last element must be leaf
+           node.getName == names.head &&
+           (node.isLeaf || allowTail)) :: acc //last element must be leaf
       case _ =>
         buildConditions(names.tail,
                         ((node: AbstractTestProxy) =>
-                          node.getName == names.head && !node.isLeaf) :: acc)
+                           node.getName == names.head && !node.isLeaf) :: acc)
     }
     getPathFromResultTree(root, buildConditions(names).reverse, allowTail)
   }
@@ -186,10 +187,10 @@ trait IntegrationTest {
     }
   }
 
-  protected def checkResultTreeHasExactNamedPath(
-      root: AbstractTestProxy,
-      names: Iterable[String],
-      allowTail: Boolean = false): Boolean =
+  protected def checkResultTreeHasExactNamedPath(root: AbstractTestProxy,
+                                                 names: Iterable[String],
+                                                 allowTail: Boolean =
+                                                   false): Boolean =
     getExactNamePathFromResultTree(root, names, allowTail).isDefined
 
   protected def checkResultTreeHasPath(

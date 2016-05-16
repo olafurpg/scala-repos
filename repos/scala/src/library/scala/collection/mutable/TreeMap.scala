@@ -39,8 +39,10 @@ object TreeMap extends MutableSortedMapFactory[TreeMap] {
 sealed class TreeMap[A, B] private (
     tree: RB.Tree[A, B])(implicit val ordering: Ordering[A])
     extends AbstractSortedMap[A, B]
-    with SortedMap[A, B] with MapLike[A, B, TreeMap[A, B]]
-    with SortedMapLike[A, B, TreeMap[A, B]] with Serializable {
+    with SortedMap[A, B]
+    with MapLike[A, B, TreeMap[A, B]]
+    with SortedMapLike[A, B, TreeMap[A, B]]
+    with Serializable {
 
   /**
     * Creates an empty `TreeMap`.

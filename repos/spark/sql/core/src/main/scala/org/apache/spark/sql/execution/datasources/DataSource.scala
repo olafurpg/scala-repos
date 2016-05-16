@@ -311,8 +311,8 @@ case class DataSource(sqlContext: SQLContext,
             org.apache.spark.sql.catalyst.analysis.caseInsensitiveResolution
           }
 
-        val dataSchema = StructType(data.schema.filterNot(
-                f => partitionColumns.exists(equality(_, f.name))))
+        val dataSchema = StructType(data.schema.filterNot(f =>
+                  partitionColumns.exists(equality(_, f.name))))
 
         // If we are appending to a table that already exists, make sure the partitioning matches
         // up.  If we fail to load the table for whatever reason, ignore the check.

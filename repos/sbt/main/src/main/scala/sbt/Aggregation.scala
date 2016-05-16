@@ -54,12 +54,12 @@ final object Aggregation {
 
   @deprecated(
       "Use `timedRun` and `showRun` directly or use `runTasks`.", "0.13.0")
-  def runTasksWithResult[T](s: State,
-                            structure: BuildStructure,
-                            ts: Values[Task[T]],
-                            extra: DummyTaskMap,
-                            show: ShowConfig)(
-      implicit display: Show[ScopedKey[_]])
+  def runTasksWithResult[T](
+      s: State,
+      structure: BuildStructure,
+      ts: Values[Task[T]],
+      extra: DummyTaskMap,
+      show: ShowConfig)(implicit display: Show[ScopedKey[_]])
     : (State, Result[Seq[KeyValue[T]]]) = {
     val complete = timedRun[T](s, ts, extra)
     showRun(complete, show)

@@ -20,7 +20,8 @@ abstract class LongBufferTest extends BaseBufferTest {
   }
 
   class WrappedLongBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedBufferFactory {
     def baseWrap(array: Array[Long]): LongBuffer =
       LongBuffer.wrap(array)
 
@@ -30,7 +31,8 @@ abstract class LongBufferTest extends BaseBufferTest {
 
   class ByteBufferLongViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory
+      with BufferFactory.ByteBufferViewFactory {
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): LongBuffer =

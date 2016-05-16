@@ -55,7 +55,8 @@ private[spark] class AppClient(rpcEnv: RpcEnv,
   private val registered = new AtomicBoolean(false)
 
   private class ClientEndpoint(override val rpcEnv: RpcEnv)
-      extends ThreadSafeRpcEndpoint with Logging {
+      extends ThreadSafeRpcEndpoint
+      with Logging {
 
     private var master: Option[RpcEndpointRef] = None
     // To avoid calling listener.disconnected() multiple times

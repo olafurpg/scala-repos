@@ -9,7 +9,9 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.JavaConverters._
 
 class MigrationTo0_16Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   import mesosphere.FutureTestSupport._
 
   class Fixture {
@@ -119,9 +121,10 @@ class MigrationTo0_16Test
             PathId("/test"),
             cmd = Some("true"),
             portDefinitions = PortDefinitions(1000, 1001),
-            versionInfo = AppDefinition.VersionInfo.OnlyVersion(
-                  Timestamp(version))
-        ) with DeprecatedSerialization
+            versionInfo =
+              AppDefinition.VersionInfo.OnlyVersion(Timestamp(version))
+        )
+        with DeprecatedSerialization
 
     new T()
   }

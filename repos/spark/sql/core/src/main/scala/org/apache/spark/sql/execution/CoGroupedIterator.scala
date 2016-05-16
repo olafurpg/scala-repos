@@ -29,8 +29,9 @@ import org.apache.spark.sql.catalyst.expressions.codegen.GenerateOrdering
 class CoGroupedIterator(left: Iterator[(InternalRow, Iterator[InternalRow])],
                         right: Iterator[(InternalRow, Iterator[InternalRow])],
                         groupingSchema: Seq[Attribute])
-    extends Iterator[
-        (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
+    extends Iterator[(InternalRow,
+                      Iterator[InternalRow],
+                      Iterator[InternalRow])] {
 
   private val keyOrdering = GenerateOrdering.generate(
       groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)

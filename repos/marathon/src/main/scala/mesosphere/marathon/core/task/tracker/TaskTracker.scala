@@ -108,13 +108,11 @@ object TaskTracker {
       of(Map(apps.map(app => app.appId -> app): _*))
 
     def forTasks(tasks: Task*): TasksByApp = of(
-        tasks
-          .groupBy(_.appId)
-          .map {
-            case (appId, appTasks) =>
-              appId -> AppTasks.forTasks(appId, appTasks)
-          }
-      )
+        tasks.groupBy(_.appId).map {
+          case (appId, appTasks) =>
+            appId -> AppTasks.forTasks(appId, appTasks)
+        }
+    )
 
     def empty: TasksByApp =
       of(collection.immutable.Map.empty[PathId, TaskTracker.AppTasks])

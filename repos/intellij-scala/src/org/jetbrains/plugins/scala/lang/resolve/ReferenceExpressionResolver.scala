@@ -147,8 +147,8 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
 
       var result: Array[ResolveResult] = Array.empty
       if (shapesOnly) {
-        result = reference.doResolve(
-            reference, processor(smartProcessor = false))
+        result =
+          reference.doResolve(reference, processor(smartProcessor = false))
       } else {
         val candidatesS =
           processor(smartProcessor = true).candidatesS //let's try to avoid treeWalkUp
@@ -159,8 +159,8 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
           // so shape resolve return this wrong result
           // however there is implicit conversion with right argument
           // this is ugly, but it can improve performance
-          result = reference.doResolve(
-              reference, processor(smartProcessor = false))
+          result =
+            reference.doResolve(reference, processor(smartProcessor = false))
         } else {
           result = candidatesS.toArray
         }

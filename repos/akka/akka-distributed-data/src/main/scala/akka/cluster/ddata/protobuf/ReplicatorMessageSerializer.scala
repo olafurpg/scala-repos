@@ -139,7 +139,8 @@ private[akka] object ReplicatorMessageSerializer {
   * Protobuf serializer of ReplicatorMessage messages.
   */
 class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with SerializationSupport
+    extends SerializerWithStringManifest
+    with SerializationSupport
     with BaseSerializer {
   import ReplicatorMessageSerializer.SmallCache
 
@@ -274,10 +275,9 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
   private def gossipFromBinary(bytes: Array[Byte]): Gossip = {
     val gossip = dm.Gossip.parseFrom(decompress(bytes))
-    Gossip(
-        gossip.getEntriesList.asScala
-          .map(e ⇒ e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
-        sendBack = gossip.getSendBack)
+    Gossip(gossip.getEntriesList.asScala.map(e ⇒
+                 e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
+           sendBack = gossip.getSendBack)
   }
 
   private def getToProto(get: Get[_]): dm.Get = {
@@ -329,7 +329,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     val key = otherMessageFromProto(getSuccess.getKey).asInstanceOf[KeyR]
     val request =
       if (getSuccess.hasRequest())
-        Some(otherMessageFromProto(getSuccess.getRequest)) else None
+        Some(otherMessageFromProto(getSuccess.getRequest))
+      else None
     val data =
       otherMessageFromProto(getSuccess.getData).asInstanceOf[ReplicatedData]
     GetSuccess(key, request)(data)
@@ -345,7 +346,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     val notFound = dm.NotFound.parseFrom(bytes)
     val request =
       if (notFound.hasRequest())
-        Some(otherMessageFromProto(notFound.getRequest)) else None
+        Some(otherMessageFromProto(notFound.getRequest))
+      else None
     val key = otherMessageFromProto(notFound.getKey).asInstanceOf[KeyR]
     NotFound(key, request)
   }
@@ -361,7 +363,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     val getFailure = dm.GetFailure.parseFrom(bytes)
     val request =
       if (getFailure.hasRequest())
-        Some(otherMessageFromProto(getFailure.getRequest)) else None
+        Some(otherMessageFromProto(getFailure.getRequest))
+      else None
     val key = otherMessageFromProto(getFailure.getKey).asInstanceOf[KeyR]
     GetFailure(key, request)
   }

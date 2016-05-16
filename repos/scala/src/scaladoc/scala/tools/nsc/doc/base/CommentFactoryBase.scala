@@ -278,7 +278,7 @@ trait CommentFactoryBase {
         else
           lastTagKey match {
             case Some(key) =>
-              val value = ( (tags get key): @unchecked) match {
+              val value = ((tags get key): @unchecked) match {
                 case Some(b :: bs) => (b + endOfLine + marker) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
               }
@@ -317,7 +317,7 @@ trait CommentFactoryBase {
           else
             lastTagKey match {
               case Some(key) =>
-                val value = ( (tags get key): @unchecked) match {
+                val value = ((tags get key): @unchecked) match {
                   case Some(b :: bs) => (b + endOfLine + marker) :: bs
                   case None =>
                     oops("lastTagKey set when no tag exists for key")
@@ -358,7 +358,7 @@ trait CommentFactoryBase {
           val newtags =
             if (!line.isEmpty) {
               val key = lastTagKey.get
-              val value = ( (tags get key): @unchecked) match {
+              val value = ((tags get key): @unchecked) match {
                 case Some(b :: bs) => (b + endOfLine + line) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
               }
@@ -404,7 +404,7 @@ trait CommentFactoryBase {
 
           def oneTag(
               key: SimpleTagKey, filterEmpty: Boolean = true): Option[Body] =
-            ( (bodyTags remove key): @unchecked) match {
+            ((bodyTags remove key): @unchecked) match {
               case Some(r :: rs) if !(filterEmpty && r.blocks.isEmpty) =>
                 if (!rs.isEmpty)
                   reporter.warning(
@@ -458,12 +458,16 @@ trait CommentFactoryBase {
           }
 
           val com = createComment(
-              body0 = Some(parseWikiAtSymbol(docBody.toString, pos, site)),
-              authors0 = allTags(SimpleTagKey("author")),
-              see0 = allTags(SimpleTagKey("see")),
+              body0 =
+                Some(parseWikiAtSymbol(docBody.toString, pos, site)),
+              authors0 =
+                allTags(SimpleTagKey("author")),
+              see0 =
+                allTags(SimpleTagKey("see")),
               result0 = oneTag(SimpleTagKey("return")),
               throws0 = linkedExceptions,
-              valueParams0 = allSymsOneTag(SimpleTagKey("param")),
+              valueParams0 =
+                allSymsOneTag(SimpleTagKey("param")),
               typeParams0 = allSymsOneTag(SimpleTagKey("tparam")),
               version0 = oneTag(SimpleTagKey("version")),
               since0 = oneTag(SimpleTagKey("since")),
@@ -857,8 +861,7 @@ trait CommentFactoryBase {
     }
 
     def checkParaEnded(): Boolean = {
-      (char == endOfText) ||
-      ((char == endOfLine) && {
+      (char == endOfText) || ((char == endOfLine) && {
             val poff = offset
             nextChar() // read EOL
             val ok = {
@@ -949,7 +952,7 @@ trait CommentFactoryBase {
     final def jump(chars: String): Boolean = {
       var index = 0
       while (index < chars.length && char == chars.charAt(index) &&
-      char != endOfText) {
+             char != endOfText) {
         nextChar()
         index += 1
       }

@@ -24,7 +24,7 @@ case class Utils[C <: Context](c: C) {
   }
 }
 object QueryableMacros {
-  def _helper[C <: Context, S : c.WeakTypeTag](c: C)(
+  def _helper[C <: Context, S: c.WeakTypeTag](c: C)(
       name: String, projection: c.Expr[_]) = {
     import c.universe._
     import internal._
@@ -39,10 +39,10 @@ object QueryableMacros {
                                     List(projection.tree))
                           )
                           .asInstanceOf[Tree]
-                      )))
+                    )))
     c.universe.reify { Queryable.factory[S](foo.splice) }
   }
-  def map[T : c.WeakTypeTag, S : c.WeakTypeTag](c: Context)(
+  def map[T: c.WeakTypeTag, S: c.WeakTypeTag](c: Context)(
       projection: c.Expr[T => S]): c.Expr[Queryable[S]] =
     _helper[c.type, S](c)("_map", projection)
 }

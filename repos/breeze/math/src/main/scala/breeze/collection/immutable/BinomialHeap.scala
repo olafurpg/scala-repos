@@ -27,7 +27,8 @@ import breeze.util.Iterators
   * @author dlwh
   */
 class BinomialHeap[T <% Ordered[T]]
-    extends Iterable[T] with IterableLike[T, BinomialHeap[T]]
+    extends Iterable[T]
+    with IterableLike[T, BinomialHeap[T]]
     with Serializable {
   import BinomialHeap._
   protected val trees: List[Node[T]] = Nil
@@ -130,8 +131,8 @@ object BinomialHeap {
 
   def apply[T <% Ordered[T]](t: T*): BinomialHeap[T] = empty[T] ++ t
 
-  implicit def cbfForBinomialHeap[T <: B, B <% Ordered[B]]: CanBuildFrom[
-      BinomialHeap[T], B, BinomialHeap[B]] =
+  implicit def cbfForBinomialHeap[T <: B, B <% Ordered[B]]
+    : CanBuildFrom[BinomialHeap[T], B, BinomialHeap[B]] =
     new CanBuildFrom[BinomialHeap[T], B, BinomialHeap[B]] {
       def apply(): Builder[B, BinomialHeap[B]] = {
         empty[B].newBuilder

@@ -64,13 +64,15 @@ trait ExecutorServiceFactoryProvider {
   * A small configuration DSL to create ThreadPoolExecutors that can be provided as an ExecutorServiceFactoryProvider to Dispatcher
   */
 final case class ThreadPoolConfig(
-    allowCorePoolTimeout: Boolean = ThreadPoolConfig.defaultAllowCoreThreadTimeout,
+    allowCorePoolTimeout: Boolean =
+      ThreadPoolConfig.defaultAllowCoreThreadTimeout,
     corePoolSize: Int = ThreadPoolConfig.defaultCorePoolSize,
     maxPoolSize: Int = ThreadPoolConfig.defaultMaxPoolSize,
     threadTimeout: Duration = ThreadPoolConfig.defaultTimeout,
-    queueFactory: ThreadPoolConfig.QueueFactory = ThreadPoolConfig
-        .linkedBlockingQueue(),
-    rejectionPolicy: RejectedExecutionHandler = ThreadPoolConfig.defaultRejectionPolicy)
+    queueFactory: ThreadPoolConfig.QueueFactory =
+      ThreadPoolConfig.linkedBlockingQueue(),
+    rejectionPolicy: RejectedExecutionHandler =
+      ThreadPoolConfig.defaultRejectionPolicy)
     extends ExecutorServiceFactoryProvider {
   class ThreadPoolExecutorServiceFactory(val threadFactory: ThreadFactory)
       extends ExecutorServiceFactory {
@@ -129,8 +131,8 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
 
   def withNewThreadPoolWithArrayBlockingQueueWithCapacityAndFairness(
       capacity: Int, fair: Boolean): ThreadPoolConfigBuilder =
-    this.copy(config = config.copy(
-              queueFactory = arrayBlockingQueue(capacity, fair)))
+    this.copy(config =
+          config.copy(queueFactory = arrayBlockingQueue(capacity, fair)))
 
   def setFixedPoolSize(size: Int): ThreadPoolConfigBuilder =
     this.copy(config = config.copy(corePoolSize = size, maxPoolSize = size))
@@ -141,8 +143,8 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
                              maxPoolSize = math.max(size, config.maxPoolSize)))
 
   def setMaxPoolSize(size: Int): ThreadPoolConfigBuilder =
-    this.copy(config = config.copy(
-              maxPoolSize = math.max(size, config.corePoolSize)))
+    this.copy(config =
+          config.copy(maxPoolSize = math.max(size, config.corePoolSize)))
 
   def setCorePoolSizeFromFactor(
       min: Int, multiplier: Double, max: Int): ThreadPoolConfigBuilder =
@@ -177,7 +179,8 @@ object MonitorableThreadFactory {
     }
 
   private[akka] class AkkaForkJoinWorkerThread(_pool: ForkJoinPool)
-      extends ForkJoinWorkerThread(_pool) with BlockContext {
+      extends ForkJoinWorkerThread(_pool)
+      with BlockContext {
     override def blockOn[T](thunk: ⇒ T)(implicit permission: CanAwait): T = {
       val result = new AtomicReference[Option[T]](None)
       ForkJoinPool.managedBlock(
@@ -197,9 +200,11 @@ final case class MonitorableThreadFactory(
     name: String,
     daemonic: Boolean,
     contextClassLoader: Option[ClassLoader],
-    exceptionHandler: Thread.UncaughtExceptionHandler = MonitorableThreadFactory.doNothing,
+    exceptionHandler: Thread.UncaughtExceptionHandler =
+      MonitorableThreadFactory.doNothing,
     protected val counter: AtomicLong = new AtomicLong)
-    extends ThreadFactory with ForkJoinPool.ForkJoinWorkerThreadFactory {
+    extends ThreadFactory
+    with ForkJoinPool.ForkJoinWorkerThreadFactory {
 
   def newThread(pool: ForkJoinPool): ForkJoinWorkerThread = {
     val t = wire(new MonitorableThreadFactory.AkkaForkJoinWorkerThread(pool))

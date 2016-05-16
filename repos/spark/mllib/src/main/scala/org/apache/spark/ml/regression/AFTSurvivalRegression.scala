@@ -41,8 +41,14 @@ import org.apache.spark.storage.StorageLevel
   * Params for accelerated failure time (AFT) regression.
   */
 private[regression] trait AFTSurvivalRegressionParams
-    extends Params with HasFeaturesCol with HasLabelCol with HasPredictionCol
-    with HasMaxIter with HasTol with HasFitIntercept with Logging {
+    extends Params
+    with HasFeaturesCol
+    with HasLabelCol
+    with HasPredictionCol
+    with HasMaxIter
+    with HasTol
+    with HasFitIntercept
+    with Logging {
 
   /**
     * Param for censor column name.
@@ -128,7 +134,9 @@ private[regression] trait AFTSurvivalRegressionParams
 class AFTSurvivalRegression @Since("1.6.0")(
     @Since("1.6.0") override val uid: String)
     extends Estimator[AFTSurvivalRegressionModel]
-    with AFTSurvivalRegressionParams with DefaultParamsWritable with Logging {
+    with AFTSurvivalRegressionParams
+    with DefaultParamsWritable
+    with Logging {
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("aftSurvReg"))
@@ -274,7 +282,8 @@ class AFTSurvivalRegressionModel private[ml](
     @Since("1.6.0") val coefficients: Vector,
     @Since("1.6.0") val intercept: Double,
     @Since("1.6.0") val scale: Double)
-    extends Model[AFTSurvivalRegressionModel] with AFTSurvivalRegressionParams
+    extends Model[AFTSurvivalRegressionModel]
+    with AFTSurvivalRegressionParams
     with MLWritable {
 
   /** @group setParam */
@@ -362,7 +371,8 @@ object AFTSurvivalRegressionModel
   private[AFTSurvivalRegressionModel] class AFTSurvivalRegressionModelWriter(
       instance: AFTSurvivalRegressionModel
   )
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(
         coefficients: Vector, intercept: Double, scale: Double)
@@ -559,11 +569,11 @@ private class AFTCostFun(data: RDD[AFTPoint], fitIntercept: Boolean)
     val aftAggregator =
       data.treeAggregate(new AFTAggregator(parameters, fitIntercept))(
           seqOp = (c, v) =>
-              (c, v) match {
+            (c, v) match {
               case (aggregator, instance) => aggregator.add(instance)
           },
           combOp = (c1, c2) =>
-              (c1, c2) match {
+            (c1, c2) match {
               case (aggregator1, aggregator2) => aggregator1.merge(aggregator2)
           })
 

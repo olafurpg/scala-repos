@@ -68,7 +68,7 @@ trait ObjectOperator extends LogicalPlan {
 }
 
 object MapPartitions {
-  def apply[T : Encoder, U : Encoder](
+  def apply[T: Encoder, U: Encoder](
       func: Iterator[T] => Iterator[U], child: LogicalPlan): MapPartitions = {
     MapPartitions(func.asInstanceOf[Iterator[Any] => Iterator[Any]],
                   encoderFor[T].fromRowExpression,
@@ -87,14 +87,15 @@ case class MapPartitions(func: Iterator[Any] => Iterator[Any],
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: LogicalPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
   override def deserializers: Seq[(Expression, Seq[Attribute])] =
     Seq(deserializer -> child.output)
 }
 
 /** Factory for constructing new `AppendColumn` nodes. */
 object AppendColumns {
-  def apply[T : Encoder, U : Encoder](
+  def apply[T: Encoder, U: Encoder](
       func: T => U, child: LogicalPlan): AppendColumns = {
     new AppendColumns(func.asInstanceOf[Any => Any],
                       encoderFor[T].fromRowExpression,
@@ -114,7 +115,8 @@ case class AppendColumns(func: Any => Any,
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: LogicalPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] = child.output ++ newColumns
 
@@ -126,7 +128,7 @@ case class AppendColumns(func: Any => Any,
 
 /** Factory for constructing new `MapGroups` nodes. */
 object MapGroups {
-  def apply[K : Encoder, T : Encoder, U : Encoder](
+  def apply[K: Encoder, T: Encoder, U: Encoder](
       func: (K, Iterator[T]) => TraversableOnce[U],
       groupingAttributes: Seq[Attribute],
       dataAttributes: Seq[Attribute],
@@ -158,7 +160,8 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
                      groupingAttributes: Seq[Attribute],
                      dataAttributes: Seq[Attribute],
                      child: LogicalPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def deserializers: Seq[(Expression, Seq[Attribute])] =
     Seq(keyDeserializer -> groupingAttributes,
@@ -167,7 +170,7 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
 
 /** Factory for constructing new `CoGroup` nodes. */
 object CoGroup {
-  def apply[Key : Encoder, Left : Encoder, Right : Encoder, Result : Encoder](
+  def apply[Key: Encoder, Left: Encoder, Right: Encoder, Result: Encoder](
       func: (Key, Iterator[Left], Iterator[Right]) => TraversableOnce[Result],
       leftGroup: Seq[Attribute],
       rightGroup: Seq[Attribute],
@@ -178,20 +181,18 @@ object CoGroup {
     require(StructType.fromAttributes(leftGroup) == StructType.fromAttributes(
             rightGroup))
 
-    CoGroup(
-        func
-          .asInstanceOf[(Any, Iterator[Any], Iterator[Any]) => TraversableOnce[
-                Any]],
-        encoderFor[Key].fromRowExpression,
-        encoderFor[Left].fromRowExpression,
-        encoderFor[Right].fromRowExpression,
-        encoderFor[Result].namedExpressions,
-        leftGroup,
-        rightGroup,
-        leftData,
-        rightData,
-        left,
-        right)
+    CoGroup(func.asInstanceOf[(Any, Iterator[Any],
+                               Iterator[Any]) => TraversableOnce[Any]],
+            encoderFor[Key].fromRowExpression,
+            encoderFor[Left].fromRowExpression,
+            encoderFor[Right].fromRowExpression,
+            encoderFor[Result].namedExpressions,
+            leftGroup,
+            rightGroup,
+            leftData,
+            rightData,
+            left,
+            right)
   }
 }
 
@@ -211,7 +212,8 @@ case class CoGroup(
     rightAttr: Seq[Attribute],
     left: LogicalPlan,
     right: LogicalPlan)
-    extends BinaryNode with ObjectOperator {
+    extends BinaryNode
+    with ObjectOperator {
 
   override def deserializers: Seq[(Expression, Seq[Attribute])] =
     // The `leftGroup` and `rightGroup` are guaranteed te be of same schema, so it's safe to resolve

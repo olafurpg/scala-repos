@@ -13,7 +13,8 @@ class JavaCharArrayReader(buf: IndexedSeq[Char],
                           start: Int, /* startline: int, startcol: int, */
                           decodeUni: Boolean,
                           error: String => Unit)
-    extends Iterator[Char] with Cloneable {
+    extends Iterator[Char]
+    with Cloneable {
 
   def this(buf: IndexedSeq[Char], decodeUni: Boolean, error: String => Unit) =
     this(buf, 0, /* 1, 1, */ decodeUni, error)

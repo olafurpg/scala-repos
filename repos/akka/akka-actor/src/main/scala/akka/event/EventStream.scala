@@ -26,7 +26,8 @@ object EventStream {
   * as Debug-Events
   */
 class EventStream(sys: ActorSystem, private val debug: Boolean)
-    extends LoggingBus with SubchannelClassification {
+    extends LoggingBus
+    with SubchannelClassification {
 
   def this(sys: ActorSystem) = this(sys, debug = false)
 

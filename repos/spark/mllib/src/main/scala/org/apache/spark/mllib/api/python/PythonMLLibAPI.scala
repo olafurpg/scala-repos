@@ -727,13 +727,13 @@ private[python] class PythonMLLibAPI extends Serializable {
 
     val algo = Algo.fromString(algoStr)
     val impurity = Impurities.fromString(impurityStr)
-    val strategy = new Strategy(
-        algo = algo,
-        impurity = impurity,
-        maxDepth = maxDepth,
-        numClasses = numClasses,
-        maxBins = maxBins,
-        categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap)
+    val strategy = new Strategy(algo = algo,
+                                impurity = impurity,
+                                maxDepth = maxDepth,
+                                numClasses = numClasses,
+                                maxBins = maxBins,
+                                categoricalFeaturesInfo =
+                                  categoricalFeaturesInfo.asScala.toMap)
     val cached = data.rdd.persist(StorageLevel.MEMORY_AND_DISK)
     try {
       if (algo == Algo.Classification) {
@@ -769,7 +769,8 @@ private[python] class PythonMLLibAPI extends Serializable {
     boostingStrategy.setLearningRate(learningRate)
     boostingStrategy.treeStrategy.setMaxDepth(maxDepth)
     boostingStrategy.treeStrategy.setMaxBins(maxBins)
-    boostingStrategy.treeStrategy.categoricalFeaturesInfo = categoricalFeaturesInfo.asScala.toMap
+    boostingStrategy.treeStrategy.categoricalFeaturesInfo =
+      categoricalFeaturesInfo.asScala.toMap
 
     val cached = data.rdd.persist(StorageLevel.MEMORY_AND_DISK)
     try {
@@ -1026,9 +1027,8 @@ private[python] class PythonMLLibAPI extends Serializable {
     * Java stub for the constructor of Python mllib RankingMetrics
     */
   def newRankingMetrics(predictionAndLabels: DataFrame): RankingMetrics[Any] = {
-    new RankingMetrics(
-        predictionAndLabels.rdd.map(
-            r => (r.getSeq(0).toArray[Any], r.getSeq(1).toArray[Any])))
+    new RankingMetrics(predictionAndLabels.rdd.map(r =>
+              (r.getSeq(0).toArray[Any], r.getSeq(1).toArray[Any])))
   }
 
   /**
@@ -1198,8 +1198,9 @@ private[spark] object SerDe extends Serializable {
   /**
     * Base class used for pickle
     */
-  private[python] abstract class BasePickler[T : ClassTag]
-      extends IObjectPickler with IObjectConstructor {
+  private[python] abstract class BasePickler[T: ClassTag]
+      extends IObjectPickler
+      with IObjectConstructor {
 
     private val cls = implicitly[ClassTag[T]].runtimeClass
     private val module = PYSPARK_PACKAGE + "." + cls.getName.split('.')(4)

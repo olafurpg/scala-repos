@@ -207,8 +207,8 @@ object DecisionTreeRunner {
             if (classIndexMap.isEmpty) {
               origExamples
             } else {
-              origExamples.map(
-                  lp => LabeledPoint(classIndexMap(lp.label), lp.features))
+              origExamples.map(lp =>
+                    LabeledPoint(classIndexMap(lp.label), lp.features))
             }
           }
           val numExamples = examples.count()
@@ -244,8 +244,8 @@ object DecisionTreeRunner {
                 if (classIndexMap.isEmpty) {
                   origTestExamples
                 } else {
-                  origTestExamples.map(
-                      lp => LabeledPoint(classIndexMap(lp.label), lp.features))
+                  origTestExamples.map(lp =>
+                        LabeledPoint(classIndexMap(lp.label), lp.features))
                 }
               }
               Array(examples, testExamples)
@@ -313,8 +313,8 @@ object DecisionTreeRunner {
         println(model) // Print model summary.
       }
       if (params.algo == Classification) {
-        val trainAccuracy = new MulticlassMetrics(training.map(
-                lp => (model.predict(lp.features), lp.label))).precision
+        val trainAccuracy = new MulticlassMetrics(training.map(lp =>
+                  (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision
@@ -342,8 +342,8 @@ object DecisionTreeRunner {
         } else {
           println(model) // Print model summary.
         }
-        val trainAccuracy = new MulticlassMetrics(training.map(
-                lp => (model.predict(lp.features), lp.label))).precision
+        val trainAccuracy = new MulticlassMetrics(training.map(lp =>
+                  (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision

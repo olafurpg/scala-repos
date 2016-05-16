@@ -195,7 +195,8 @@ private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
   * <b>NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS</b>
   */
 private[akka] sealed trait SystemMessage
-    extends PossiblyHarmful with Serializable {
+    extends PossiblyHarmful
+    with Serializable {
   // Next fields are only modifiable via the SystemMessageList value class
   @transient
   private[sysmsg] var next: SystemMessage = _
@@ -282,9 +283,12 @@ private[akka] case object NoMessage extends SystemMessage // switched into the m
 @SerialVersionUID(1L)
 private[akka] final case class Failed(
     child: ActorRef, cause: Throwable, uid: Int)
-    extends SystemMessage with StashWhenFailed with StashWhenWaitingForChildren
+    extends SystemMessage
+    with StashWhenFailed
+    with StashWhenWaitingForChildren
 
 @SerialVersionUID(1L)
 private[akka] final case class DeathWatchNotification(
     actor: ActorRef, existenceConfirmed: Boolean, addressTerminated: Boolean)
-    extends SystemMessage with DeadLetterSuppression
+    extends SystemMessage
+    with DeadLetterSuppression

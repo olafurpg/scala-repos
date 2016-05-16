@@ -37,7 +37,7 @@ trait SetInstances {
     *
     * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
     */
-  implicit def setOrder[A : Order]: Order[Set[A]] = new Order[Set[A]] {
+  implicit def setOrder[A: Order]: Order[Set[A]] = new Order[Set[A]] {
     def order(a1: Set[A], a2: Set[A]) = {
       import anyVal._
       import scala.math.Ordering.Implicits._
@@ -67,7 +67,7 @@ trait SetInstances {
     def zero: Set[A] = Set[A]()
   }
 
-  implicit def setShow[A : Show]: Show[Set[A]] = new Show[Set[A]] {
+  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
     override def show(as: Set[A]) =
       Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq: _*), ")")
   }

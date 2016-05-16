@@ -33,7 +33,8 @@ import scalaz.{NonEmptyList => NEL, Monad, StreamT}
 
 final class NIHDBProjection(
     snapshot: NIHDBSnapshot, val authorities: Authorities, projectionId: Int)
-    extends ProjectionLike[Future, Slice] with Logging {
+    extends ProjectionLike[Future, Slice]
+    with Logging {
   type Key = Long
 
   private[this] val readers = snapshot.readers

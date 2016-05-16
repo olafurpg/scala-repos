@@ -101,7 +101,8 @@ object ActorRef {
   * the unique id of the actor is not taken into account when comparing actor paths.
   */
 abstract class ActorRef
-    extends java.lang.Comparable[ActorRef] with Serializable {
+    extends java.lang.Comparable[ActorRef]
+    with Serializable {
   scalaRef: InternalActorRef ⇒
 
   /**
@@ -116,7 +117,8 @@ abstract class ActorRef
     val x = this.path compareTo other.path
     if (x == 0)
       if (this.path.uid < other.path.uid) -1
-      else if (this.path.uid == other.path.uid) 0 else 1
+      else if (this.path.uid == other.path.uid) 0
+      else 1
     else x
   }
 
@@ -221,7 +223,8 @@ private[akka] trait RepointableRef extends ActorRefScope {
   * DO NOT USE THIS UNLESS INTERNALLY WITHIN AKKA!
   */
 private[akka] abstract class InternalActorRef
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef
+    with ScalaActorRef {
   this: ActorRefScope ⇒
   /*
    * Actor life-cycle management, invoked only internally (in response to user requests via ActorContext).
@@ -314,7 +317,8 @@ private[akka] class LocalActorRef private[akka](_system: ActorSystemImpl,
                                                 _mailboxType: MailboxType,
                                                 _supervisor: InternalActorRef,
                                                 override val path: ActorPath)
-    extends ActorRefWithCell with LocalRef {
+    extends ActorRefWithCell
+    with LocalRef {
 
   /*
    * Safe publication of this class’s fields is guaranteed by mailbox.setActor()
@@ -564,7 +568,8 @@ private[akka] class EmptyLocalActorRef(override val provider: ActorRefProvider,
       eventStream.publish(
           DeadLetter(message,
                      if (sender eq Actor.noSender)
-                       provider.deadLetters else sender,
+                       provider.deadLetters
+                     else sender,
                      this))
     case _ ⇒
   }
@@ -599,7 +604,8 @@ private[akka] class EmptyLocalActorRef(override val provider: ActorRefProvider,
         eventStream.publish(
             SuppressedDeadLetter(m,
                                  if (sender eq Actor.noSender)
-                                   provider.deadLetters else sender,
+                                   provider.deadLetters
+                                 else sender,
                                  this))
         true
       case _ ⇒ false

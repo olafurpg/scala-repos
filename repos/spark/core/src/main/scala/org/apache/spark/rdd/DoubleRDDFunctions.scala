@@ -83,7 +83,7 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
       timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
       val processPartition = (ctx: TaskContext,
-      ns: Iterator[Double]) => StatCounter(ns)
+                              ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new MeanEvaluator(self.partitions.length, confidence)
       self.context.runApproximateJob(
           self, processPartition, evaluator, timeout)
@@ -96,7 +96,7 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
       timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
       val processPartition = (ctx: TaskContext,
-      ns: Iterator[Double]) => StatCounter(ns)
+                              ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new SumEvaluator(self.partitions.length, confidence)
       self.context.runApproximateJob(
           self, processPartition, evaluator, timeout)
@@ -120,9 +120,10 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
       }
       // Compute the minimum and the maximum
       val (max: Double, min: Double) = self.mapPartitions { items =>
-        Iterator(items.foldRight(Double.NegativeInfinity,
-                                 Double.PositiveInfinity)((e: Double,
-                x: (Double, Double)) => (x._1.max(e), x._2.min(e))))
+        Iterator(
+            items.foldRight(Double.NegativeInfinity, Double.PositiveInfinity)(
+                (e: Double, x: (Double, Double)) =>
+                  (x._1.max(e), x._2.min(e))))
       }.reduce { (maxmin1, maxmin2) =>
         (maxmin1._1.max(maxmin2._1), maxmin1._2.min(maxmin2._2))
       }

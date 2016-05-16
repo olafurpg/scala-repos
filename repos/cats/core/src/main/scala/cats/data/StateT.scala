@@ -10,8 +10,8 @@ package data
 final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     extends Serializable {
 
-  def flatMap[B](fas: A => StateT[F, S, B])(
-      implicit F: Monad[F]): StateT[F, S, B] =
+  def flatMap[B](
+      fas: A => StateT[F, S, B])(implicit F: Monad[F]): StateT[F, S, B] =
     StateT(
         s =>
           F.flatMap(runF) { fsf =>
@@ -62,8 +62,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
   /**
     * Like [[map]], but also allows the state (`S`) value to be modified.
     */
-  def transform[B](f: (S, A) => (S, B))(
-      implicit F: Monad[F]): StateT[F, S, B] =
+  def transform[B](
+      f: (S, A) => (S, B))(implicit F: Monad[F]): StateT[F, S, B] =
     transformF { fsa =>
       F.map(fsa) { case (s, a) => f(s, a) }
     }
@@ -93,8 +93,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     * res1: Option[(GlobalEnv, Double)] = Some(((6,hello),5.0))
     * }}}
     */
-  def transformS[R](
-      f: R => S, g: (R, S) => R)(implicit F: Monad[F]): StateT[F, R, A] =
+  def transformS[R](f: R => S, g: (R, S) => R)(
+      implicit F: Monad[F]): StateT[F, R, A] =
     StateT { r =>
       F.flatMap(runF) { ff =>
         val s = f(r)

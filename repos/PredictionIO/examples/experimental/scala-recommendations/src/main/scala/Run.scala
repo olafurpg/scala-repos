@@ -129,9 +129,9 @@ object Run {
         algorithmParamsList = Seq(("", ap)),
         servingClassOpt = Some(LFirstServing(classOf[ALSAlgorithm])),
         params = WorkflowParams(
-              batch = "Imagine: P Recommendations",
-              verbose = 1
-          )
+            batch = "Imagine: P Recommendations",
+            verbose = 1
+        )
     )
   }
 }

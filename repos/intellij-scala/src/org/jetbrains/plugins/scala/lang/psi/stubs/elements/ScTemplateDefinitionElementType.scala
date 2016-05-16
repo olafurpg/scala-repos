@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 /**
   * @author ilyas, alefas
   */
-abstract class ScTemplateDefinitionElementType[
-    TypeDef <: ScTemplateDefinition](debugName: String)
+abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
+    debugName: String)
     extends ScStubElementType[ScTemplateDefinitionStub, ScTemplateDefinition](
         debugName) {
 
@@ -29,7 +29,8 @@ abstract class ScTemplateDefinitionElementType[
     val file = psi.getContainingFile
     val fileName =
       if (file != null && file.getVirtualFile != null)
-        file.getVirtualFile.getName else null
+        file.getVirtualFile.getName
+      else null
     val signs = psi.functions.map(_.name).toArray
     val isPO = psi match {
       case td: ScTypeDefinition => td.isPackageObject

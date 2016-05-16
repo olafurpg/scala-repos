@@ -487,15 +487,16 @@ object ScalaPsiElementFactory {
     child match {
       case expr: ScExpression =>
         if (expr.getNextSibling == null &&
-            !PsiTreeUtil.hasErrorElements(dummyFile)) Some(expr) else None
+            !PsiTreeUtil.hasErrorElements(dummyFile)) Some(expr)
+        else None
       case _ => None
     }
   }
 
   def createIdentifier(name: String, manager: PsiManager): ASTNode = {
     val text =
-      "package " +
-      (if (!ScalaNamesUtil.isKeyword(name)) name else "`" + name + "`")
+      "package " + (if (!ScalaNamesUtil.isKeyword(name)) name
+                    else "`" + name + "`")
     try {
       val dummyFile = PsiFileFactory
         .getInstance(manager.getProject)
@@ -583,7 +584,7 @@ object ScalaPsiElementFactory {
       case _ =>
         var element: PsiElement = holder
         while (element != null && !element.isInstanceOf[ScalaFile] &&
-        !element.isInstanceOf[ScPackaging]) element = element.getParent
+               !element.isInstanceOf[ScPackaging]) element = element.getParent
         element match {
           case packaging: ScPackaging => packaging.getPackageName
           case _ => null
@@ -591,9 +592,8 @@ object ScalaPsiElementFactory {
     }
     val name = getShortName(qualifiedName, packageName)
     val text =
-      "import " +
-      (if (isResolved(name, clazz, packageName, manager)) name
-       else "_root_." + qualifiedName)
+      "import " + (if (isResolved(name, clazz, packageName, manager)) name
+                   else "_root_." + qualifiedName)
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
       .createFileFromText(
@@ -992,7 +992,7 @@ object ScalaPsiElementFactory {
         var hasOverride = false
         if (m.getModifierList.getNode != null)
           for (modifier <- m.getModifierList.getNode.getChildren(null);
-          modText = modifier.getText) {
+               modText = modifier.getText) {
             modText match {
               case "override" =>
                 hasOverride = true;
@@ -1027,7 +1027,8 @@ object ScalaPsiElementFactory {
           def buildText(typeParam: ScTypeParam): String = {
             val variance =
               if (typeParam.isContravariant) "-"
-              else if (typeParam.isCovariant) "+" else ""
+              else if (typeParam.isCovariant) "+"
+              else ""
             val clauseText = typeParam.typeParametersClause match {
               case None => ""
               case Some(x) =>
@@ -1074,8 +1075,8 @@ object ScalaPsiElementFactory {
                   val typeText = ScType.canonicalText(substitutor.subst(
                           x.getType(TypingContext.empty).getOrAny))
                   val arrow = ScalaPsiUtil.functionArrow(param.getProject)
-                  name + colon +
-                  (if (param.isCallByNameParameter) arrow else "") + typeText +
+                  name + colon + (if (param.isCallByNameParameter) arrow
+                                  else "") + typeText +
                   (if (param.isRepeatedParameter) "*" else "")
                 case _ => name
               }
@@ -1110,8 +1111,8 @@ object ScalaPsiElementFactory {
             val extendsTypesText =
               if (extendsTypes.length > 0) {
                 val typeTexts = extendsTypes.map((t: PsiClassType) =>
-                      ScType.canonicalText(substitutor.subst(
-                              ScType.create(t, method.getProject))))
+                      ScType
+                        .canonicalText(substitutor.subst(ScType.create(t, method.getProject))))
                 typeTexts.mkString(" <: ", " with ", "")
               } else ""
             param.name + extendsTypesText
@@ -1173,7 +1174,8 @@ object ScalaPsiElementFactory {
         case alias: ScTypeAliasDefinition =>
           val overrideText =
             if (needsOverride && !alias.hasModifierProperty("override"))
-              "override " else ""
+              "override "
+            else ""
           val modifiersText = alias.getModifierList.getText
           val typeText = ScType.canonicalText(substitutor.subst(
                   alias.aliasedType(TypingContext.empty).getOrAny))
@@ -1203,7 +1205,8 @@ object ScalaPsiElementFactory {
     val overrideText =
       if (needsOverride &&
           (modOwner == null || !modOwner.hasModifierProperty("override")))
-        "override " else ""
+        "override "
+      else ""
     val modifiersText =
       if (modOwner != null) modOwner.getModifierList.getText + " " else ""
     val keyword = if (isVal) "val " else "var "
@@ -1221,7 +1224,7 @@ object ScalaPsiElementFactory {
     val pArray = packageName.split("[.]")
     var i = 0
     while (i < qArray.length - 1 && i < pArray.length &&
-    qArray(i) == pArray(i)) i = i + 1
+           qArray(i) == pArray(i)) i = i + 1
     var res = ""
     while (i < qArray.length) {
       res = res + qArray(i)
@@ -1305,7 +1308,8 @@ object ScalaPsiElementFactory {
       case call: ScMethodCall =>
         val res =
           if (call.argumentExpressions.size > 0)
-            call.argumentExpressions.apply(0) else null
+            call.argumentExpressions.apply(0)
+          else null
         if (res != null) res.setContext(context, child)
         res
       case _ => null

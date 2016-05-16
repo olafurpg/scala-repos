@@ -144,10 +144,10 @@ object BatchedService extends java.io.Serializable {
     * a BatchedService
     * Assumes the batcher is the same for both
     */
-  def fromStoreAndSink[K, V](
-      store: BatchedStore[K, V],
-      sink: BatchedSink[(K, Option[V])],
-      reducerOption: Option[Int] = None): BatchedService[K, V] =
+  def fromStoreAndSink[K, V](store: BatchedStore[K, V],
+                             sink: BatchedSink[(K, Option[V])],
+                             reducerOption: Option[Int] =
+                               None): BatchedService[K, V] =
     new BatchedService[K, V] {
       override def ordering = store.ordering
       override def batcher = {
@@ -166,10 +166,10 @@ object BatchedService extends java.io.Serializable {
     * a BatchedService
     * Assumes the batcher is the same for both
     */
-  def fromStoreAndDeltaSink[K, V : Semigroup](
+  def fromStoreAndDeltaSink[K, V: Semigroup](
       store: BatchedStore[K, V],
       sink: BatchedSink[(K, V)],
-      reducerOption: Option[Int] = None)
-    : scalding.service.BatchedDeltaService[K, V] =
+      reducerOption: Option[Int] =
+        None): scalding.service.BatchedDeltaService[K, V] =
     new scalding.service.BatchedDeltaService[K, V](store, sink, reducerOption)
 }

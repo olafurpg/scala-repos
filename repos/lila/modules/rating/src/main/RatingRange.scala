@@ -22,7 +22,7 @@ object RatingRange {
     for {
       min ← parseIntOption(from takeWhile ('-' !=)) if acceptable(min)
       max ← parseIntOption(from dropWhile ('-' !=) tail) if acceptable(max)
-           if min <= max
+      if min <= max
     } yield RatingRange(min, max)
 
   def orDefault(from: String) = apply(from) | default

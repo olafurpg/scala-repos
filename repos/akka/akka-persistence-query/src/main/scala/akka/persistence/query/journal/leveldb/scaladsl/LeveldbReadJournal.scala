@@ -36,9 +36,12 @@ import com.typesafe.config.Config
   * for the default [[LeveldbReadJournal#Identifier]]. See `reference.conf`.
   */
 class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
-    extends ReadJournal with AllPersistenceIdsQuery
-    with CurrentPersistenceIdsQuery with EventsByPersistenceIdQuery
-    with CurrentEventsByPersistenceIdQuery with EventsByTagQuery
+    extends ReadJournal
+    with AllPersistenceIdsQuery
+    with CurrentPersistenceIdsQuery
+    with EventsByPersistenceIdQuery
+    with CurrentEventsByPersistenceIdQuery
+    with EventsByTagQuery
     with CurrentEventsByTagQuery {
 
   private val serialization = SerializationExtension(system)

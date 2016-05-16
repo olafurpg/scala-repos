@@ -26,7 +26,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateBodyStub
   */
 class ScTemplateBodyImpl private (
     stub: StubElement[ScTemplateBody], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTemplateBody
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScTemplateBody
     with ScImportsHolder {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScTemplateBodyStub) = {

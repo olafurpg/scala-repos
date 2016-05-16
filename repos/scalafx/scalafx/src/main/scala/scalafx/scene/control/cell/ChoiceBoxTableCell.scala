@@ -100,7 +100,8 @@ object ChoiceBoxTableCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
+      message =
+        "Use forTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
       since = "1.0")
   def forTableColumn[S, T](
       converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
@@ -160,8 +161,9 @@ object ChoiceBoxTableCell {
   * @define ITEMSPARAM Zero or more items that will be shown to the user when the ChoiceBox menu is showing. 
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   */
-class ChoiceBoxTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTableCell[
-        S, T] = new jfxscc.ChoiceBoxTableCell[S, T])
+class ChoiceBoxTableCell[S, T](
+    override val delegate: jfxscc.ChoiceBoxTableCell[S, T] =
+      new jfxscc.ChoiceBoxTableCell[S, T])
     extends TableCell[S, T](delegate)
     with ConvertableCell[jfxscc.ChoiceBoxTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxTableCell[S, T], T]

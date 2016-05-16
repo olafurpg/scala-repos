@@ -101,7 +101,8 @@ private[camel] class ActorActivationException(
   * Registry for Camel Consumers and Producers. Supervises the registrars.
   */
 private[camel] class Registry(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   import context.{stop, parent}
 
   private val producerRegistrar = context.actorOf(
@@ -182,7 +183,8 @@ private[camel] class Registry(activationTracker: ActorRef)
   * Registers Producers.
   */
 private[camel] class ProducerRegistrar(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   private var camelObjects = Map[ActorRef, (Endpoint, SendProcessor)]()
 
   def receive = {
@@ -225,7 +227,8 @@ private[camel] class ProducerRegistrar(activationTracker: ActorRef)
   * Registers Consumers.
   */
 private[camel] class ConsumerRegistrar(activationTracker: ActorRef)
-    extends Actor with CamelSupport {
+    extends Actor
+    with CamelSupport {
   def receive = {
     case Register(consumer, endpointUri, Some(consumerConfig)) ⇒
       try {

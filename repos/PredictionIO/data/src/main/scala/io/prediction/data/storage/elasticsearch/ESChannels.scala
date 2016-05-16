@@ -28,7 +28,8 @@ import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
 class ESChannels(client: Client, config: StorageClientConfig, index: String)
-    extends Channels with Logging {
+    extends Channels
+    with Logging {
 
   implicit val formats = DefaultFormats.lossless
   private val estype = "channels"

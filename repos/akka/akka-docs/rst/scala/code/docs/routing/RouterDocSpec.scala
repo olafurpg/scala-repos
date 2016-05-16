@@ -494,7 +494,8 @@ router-dispatcher {}
 }
 
 class RouterDocSpec
-    extends AkkaSpec(RouterDocSpec.config) with ImplicitSender {
+    extends AkkaSpec(RouterDocSpec.config)
+    with ImplicitSender {
 
   import RouterDocSpec._
 

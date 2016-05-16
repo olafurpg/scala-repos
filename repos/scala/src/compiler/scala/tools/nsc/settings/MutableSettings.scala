@@ -17,8 +17,10 @@ import scala.reflect.{ClassTag, classTag}
 /** A mutable Settings object.
   */
 class MutableSettings(val errorFn: String => Unit)
-    extends scala.reflect.internal.settings.MutableSettings with AbsSettings
-    with ScalaSettings with Mutable {
+    extends scala.reflect.internal.settings.MutableSettings
+    with AbsSettings
+    with ScalaSettings
+    with Mutable {
   type ResultOfTryToSet = List[String]
 
   def withErrorFn(errorFn: String => Unit): MutableSettings = {
@@ -143,8 +145,9 @@ class MutableSettings(val errorFn: String => Unit)
       } else {
         for {
           (p, args) <- StringOps.splitWhere(s, _ == ':', doDropIndex = true)
-          rest <- tryToSetIfExists(
-              p, (args split ",").toList, (s: Setting) => s.tryToSetColon _)
+          rest <- tryToSetIfExists(p,
+                                   (args split ",").toList,
+                                   (s: Setting) => s.tryToSetColon _)
         } yield rest
       }
 
@@ -190,7 +193,7 @@ class MutableSettings(val errorFn: String => Unit)
     * The class loader defining `T` should provide resources `app.class.path`
     * and `boot.class.path`.  These resources should contain the application
     * and boot classpaths in the same form as would be passed on the command line.*/
-  def embeddedDefaults[T : ClassTag]: Unit =
+  def embeddedDefaults[T: ClassTag]: Unit =
     // called from sbt and repl
     embeddedDefaults(classTag[T].runtimeClass.getClassLoader)
 
@@ -199,7 +202,8 @@ class MutableSettings(val errorFn: String => Unit)
     * and `boot.class.path`.  These resources should contain the application
     * and boot classpaths in the same form as would be passed on the command line.*/
   def embeddedDefaults(loader: ClassLoader) {
-    explicitParentLoader = Option(loader) // for the Interpreter parentClassLoader
+    explicitParentLoader =
+      Option(loader) // for the Interpreter parentClassLoader
     getClasspath("app", loader) foreach { classpath.value = _ }
     getClasspath("boot", loader) foreach { bootclasspath append _ }
   }
@@ -401,7 +405,9 @@ class MutableSettings(val errorFn: String => Unit)
     *  Subclasses each define a `value` field of the appropriate type.
     */
   abstract class Setting(val name: String, val helpDescription: String)
-      extends AbsSetting with SettingValue with Mutable {
+      extends AbsSetting
+      with SettingValue
+      with Mutable {
 
     /** Will be called after this Setting is set for any extra work. */
     private var _postSetHook: this.type => Unit = (x: this.type) => ()
@@ -840,7 +846,8 @@ class MutableSettings(val errorFn: String => Unit)
     */
   class MultiStringSetting private[nsc](
       name: String, val arg: String, descr: String)
-      extends Setting(name, descr) with Clearable {
+      extends Setting(name, descr)
+      with Clearable {
     type T = List[String]
     protected var v: T = Nil
     def appendToValue(str: String) = value ++= List(str)
@@ -906,8 +913,8 @@ class MutableSettings(val errorFn: String => Unit)
   }
 
   private def mkPhasesHelp(descr: String, default: String) = {
-    descr + " <phases>" +
-    (if (default == "") "" else " (default: " + default + ")")
+    descr + " <phases>" + (if (default == "") ""
+                           else " (default: " + default + ")")
   }
 
   /** A setting represented by a list of strings which should be prefixes of
@@ -920,7 +927,8 @@ class MutableSettings(val errorFn: String => Unit)
       descr: String,
       default: String
   )
-      extends Setting(name, mkPhasesHelp(descr, default)) with Clearable {
+      extends Setting(name, mkPhasesHelp(descr, default))
+      with Clearable {
     private[nsc] def this(name: String, descr: String) = this(name, descr, "")
 
     type T = List[String]

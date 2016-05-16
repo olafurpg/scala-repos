@@ -35,7 +35,8 @@ class MBeanMultiJvmNode3 extends MBeanSpec
 class MBeanMultiJvmNode4 extends MBeanSpec
 
 abstract class MBeanSpec
-    extends MultiNodeSpec(MBeanMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(MBeanMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import MBeanMultiJvmSpec._
   import ClusterEvent._

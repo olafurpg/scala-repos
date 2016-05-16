@@ -44,7 +44,9 @@ case class ParquetDataWithKey(
     intField: Int, pi: Int, stringField: String, ps: String)
 
 class ParquetPartitionDiscoverySuite
-    extends QueryTest with ParquetTest with SharedSQLContext {
+    extends QueryTest
+    with ParquetTest
+    with SharedSQLContext {
   import PartitioningUtils._
   import testImplicits._
 
@@ -153,7 +155,7 @@ class ParquetPartitionDiscoverySuite
       assert(expected === actual)
     }
 
-    def checkThrows[T <: Throwable : Manifest](
+    def checkThrows[T <: Throwable: Manifest](
         path: String, expected: String): Unit = {
       val message = intercept[T] {
         parsePartition(
@@ -251,16 +253,18 @@ class ParquetPartitionDiscoverySuite
                     InternalRow(null, UTF8String.fromString("hello")),
                     s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"))))
 
-    check(Seq(s"hdfs://host:9000/path/a=10/b=$defaultPartitionName",
-              s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"),
-          PartitionSpec(
-              StructType(Seq(StructField("a", DoubleType),
-                             StructField("b", StringType))),
-              Seq(Partition(
-                      InternalRow(10, null),
-                      s"hdfs://host:9000/path/a=10/b=$defaultPartitionName"),
-                  Partition(InternalRow(10.5, null),
-                            s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"))))
+    check(
+        Seq(s"hdfs://host:9000/path/a=10/b=$defaultPartitionName",
+            s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"),
+        PartitionSpec(
+            StructType(Seq(StructField("a", DoubleType),
+                           StructField("b", StringType))),
+            Seq(Partition(
+                    InternalRow(10, null),
+                    s"hdfs://host:9000/path/a=10/b=$defaultPartitionName"),
+                Partition(
+                    InternalRow(10.5, null),
+                    s"hdfs://host:9000/path/a=10.5/b=$defaultPartitionName"))))
 
     check(Seq(s"hdfs://host:9000/path1", s"hdfs://host:9000/path2"),
           PartitionSpec.emptySpec)
@@ -313,16 +317,18 @@ class ParquetPartitionDiscoverySuite
                                         UTF8String.fromString("hello")),
                             "hdfs://host:9000/path/a=10.5/b=hello"))))
 
-    check(Seq(s"hdfs://host:9000/path/a=10/b=20",
-              s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"),
-          PartitionSpec(
-              StructType(Seq(StructField("a", StringType),
-                             StructField("b", StringType))),
-              Seq(Partition(InternalRow(UTF8String.fromString("10"),
-                                        UTF8String.fromString("20")),
-                            s"hdfs://host:9000/path/a=10/b=20"),
-                  Partition(InternalRow(null, UTF8String.fromString("hello")),
-                            s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"))))
+    check(
+        Seq(s"hdfs://host:9000/path/a=10/b=20",
+            s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"),
+        PartitionSpec(
+            StructType(Seq(StructField("a", StringType),
+                           StructField("b", StringType))),
+            Seq(Partition(InternalRow(UTF8String.fromString("10"),
+                                      UTF8String.fromString("20")),
+                          s"hdfs://host:9000/path/a=10/b=20"),
+                Partition(
+                    InternalRow(null, UTF8String.fromString("hello")),
+                    s"hdfs://host:9000/path/a=$defaultPartitionName/b=hello"))))
 
     check(
         Seq(s"hdfs://host:9000/path/a=10/b=$defaultPartitionName",
@@ -511,8 +517,8 @@ class ParquetPartitionDiscoverySuite
 
       withTempTable("t") {
         checkAnswer(sql("SELECT * FROM t"),
-                    (1 to 10).map(i => Row(i, null, 1)) ++ (1 to 10).map(
-                        i => Row(i, i.toString, 2)))
+                    (1 to 10).map(i => Row(i, null, 1)) ++ (1 to 10).map(i =>
+                          Row(i, i.toString, 2)))
       }
     }
   }

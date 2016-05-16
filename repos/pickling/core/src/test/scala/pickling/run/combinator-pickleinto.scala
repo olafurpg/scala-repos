@@ -41,12 +41,10 @@ class CombinatorPickleIntoTest extends FunSuite {
           // then we can make use of a size hint, so that a fixed-size array can be used for pickling
           builder.hintKnownSize(100) // FIXME: if the value is too small, we can get java.lang.ArrayIndexOutOfBoundsException
           builder.beginEntry(p, implicitly[FastTypeTag[Person]])
-          builder.putField("id",
-                           b =>
-                             {
-                               b.hintElidedType(FastTypeTag.Int)
-                               intp.pickle(p.id, b)
-                           })
+          builder.putField("id", b => {
+            b.hintElidedType(FastTypeTag.Int)
+            intp.pickle(p.id, b)
+          })
           builder.endEntry()
         }
       }

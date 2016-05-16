@@ -272,10 +272,10 @@ trait AnalyzerPlugins { self: Analyzer =>
       *
       * $nonCumulativeReturnValueDoc.
       */
-    def pluginsEnsureCompanionObject(
-        namer: Namer,
-        cdef: ClassDef,
-        creator: ClassDef => Tree = companionModuleDef(_)): Option[Symbol] =
+    def pluginsEnsureCompanionObject(namer: Namer,
+                                     cdef: ClassDef,
+                                     creator: ClassDef => Tree =
+                                       companionModuleDef(_)): Option[Symbol] =
       None
 
     /**
@@ -442,7 +442,8 @@ trait AnalyzerPlugins { self: Analyzer =>
   /** @see MacroPlugin.pluginsMacroExpand */
   def pluginsMacroExpand(
       typer: Typer, expandee: Tree, mode: Mode, pt: Type): Tree =
-    invoke(new NonCumulativeOp[Tree] {
+    invoke(
+        new NonCumulativeOp[Tree] {
       def position = expandee.pos
       def description = "expand this macro application"
       def default = standardMacroExpand(typer, expandee, mode, pt)
@@ -462,8 +463,7 @@ trait AnalyzerPlugins { self: Analyzer =>
 
   /** @see MacroPlugin.pluginsMacroRuntime */
   def pluginsMacroRuntime(expandee: Tree): MacroRuntime =
-    invoke(
-        new NonCumulativeOp[MacroRuntime] {
+    invoke(new NonCumulativeOp[MacroRuntime] {
       def position = expandee.pos
       def description = "compute macro runtime for this macro application"
       def default = standardMacroRuntime(expandee)

@@ -549,17 +549,15 @@ class CodegenContext {
     // elimination.
     val commonExprs =
       equivalentExpressions.getAllEquivalentExprs.filter(_.size > 1)
-    commonExprs.foreach(
-        e =>
-          {
-        val expr = e.head
-        val fnName = freshName("evalExpr")
-        val isNull = s"${fnName}IsNull"
-        val value = s"${fnName}Value"
+    commonExprs.foreach(e => {
+      val expr = e.head
+      val fnName = freshName("evalExpr")
+      val isNull = s"${fnName}IsNull"
+      val value = s"${fnName}Value"
 
-        // Generate the code for this expression tree and wrap it in a function.
-        val code = expr.gen(this)
-        val fn = s"""
+      // Generate the code for this expression tree and wrap it in a function.
+      val code = expr.gen(this)
+      val fn = s"""
            |private void $fnName(InternalRow $INPUT_ROW) {
            |  ${code.code.trim}
            |  $isNull = ${code.isNull};
@@ -567,32 +565,32 @@ class CodegenContext {
            |}
            """.stripMargin
 
-        addNewFunction(fnName, fn)
+      addNewFunction(fnName, fn)
 
-        // Add a state and a mapping of the common subexpressions that are associate with this
-        // state. Adding this expression to subExprEliminationExprMap means it will call `fn`
-        // when it is code generated. This decision should be a cost based one.
-        //
-        // The cost of doing subexpression elimination is:
-        //   1. Extra function call, although this is probably *good* as the JIT can decide to
-        //      inline or not.
-        //   2. Extra branch to check isLoaded. This branch is likely to be predicted correctly
-        //      very often. The reason it is not loaded is because of a prior branch.
-        //   3. Extra store into isLoaded.
-        // The benefit doing subexpression elimination is:
-        //   1. Running the expression logic. Even for a simple expression, it is likely more than 3
-        //      above.
-        //   2. Less code.
-        // Currently, we will do this for all non-leaf only expression trees (i.e. expr trees with
-        // at least two nodes) as the cost of doing it is expected to be low.
-        addMutableState("boolean", isNull, s"$isNull = false;")
-        addMutableState(javaType(expr.dataType),
-                        value,
-                        s"$value = ${defaultValue(expr.dataType)};")
+      // Add a state and a mapping of the common subexpressions that are associate with this
+      // state. Adding this expression to subExprEliminationExprMap means it will call `fn`
+      // when it is code generated. This decision should be a cost based one.
+      //
+      // The cost of doing subexpression elimination is:
+      //   1. Extra function call, although this is probably *good* as the JIT can decide to
+      //      inline or not.
+      //   2. Extra branch to check isLoaded. This branch is likely to be predicted correctly
+      //      very often. The reason it is not loaded is because of a prior branch.
+      //   3. Extra store into isLoaded.
+      // The benefit doing subexpression elimination is:
+      //   1. Running the expression logic. Even for a simple expression, it is likely more than 3
+      //      above.
+      //   2. Less code.
+      // Currently, we will do this for all non-leaf only expression trees (i.e. expr trees with
+      // at least two nodes) as the cost of doing it is expected to be low.
+      addMutableState("boolean", isNull, s"$isNull = false;")
+      addMutableState(javaType(expr.dataType),
+                      value,
+                      s"$value = ${defaultValue(expr.dataType)};")
 
-        subexprFunctions += s"$fnName($INPUT_ROW);"
-        val state = SubExprEliminationState(isNull, value)
-        e.foreach(subExprEliminationExprs.put(_, state))
+      subexprFunctions += s"$fnName($INPUT_ROW);"
+      val state = SubExprEliminationState(isNull, value)
+      e.foreach(subExprEliminationExprs.put(_, state))
     })
   }
 
@@ -601,9 +599,9 @@ class CodegenContext {
     * elimination will be performed. Subexpression elimination assumes that the code will for each
     * expression will be combined in the `expressions` order.
     */
-  def generateExpressions(
-      expressions: Seq[Expression],
-      doSubexpressionElimination: Boolean = false): Seq[ExprCode] = {
+  def generateExpressions(expressions: Seq[Expression],
+                          doSubexpressionElimination: Boolean =
+                            false): Seq[ExprCode] = {
     if (doSubexpressionElimination) subexpressionElimination(expressions)
     expressions.map(e => e.gen(this))
   }

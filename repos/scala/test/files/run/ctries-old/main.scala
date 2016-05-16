@@ -25,7 +25,7 @@ object Test {
     }
 
     def evaluating[U](body: => U) = new {
-      def shouldProduce[T <: Throwable : ClassManifest]() = {
+      def shouldProduce[T <: Throwable: ClassManifest]() = {
         var produced = false
         try body catch {
           case e: Throwable =>

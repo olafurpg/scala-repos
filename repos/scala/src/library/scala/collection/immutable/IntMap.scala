@@ -172,7 +172,8 @@ import IntMap._
   *  @define willNotTerminateInf
   */
 sealed abstract class IntMap[+T]
-    extends AbstractMap[Int, T] with Map[Int, T]
+    extends AbstractMap[Int, T]
+    with Map[Int, T]
     with MapLike[Int, T, IntMap[T]] {
 
   override def empty: IntMap[T] = IntMap.Nil

@@ -32,8 +32,7 @@ object CodeGenerator extends App {
       H2Profile.createModel(Some(H2Profile.defaultTables)) // you can filter specific tables here
     val modelFuture = db.run(modelAction)
     // customize code generator
-    val codegenFuture = modelFuture.map(
-        model =>
+    val codegenFuture = modelFuture.map(model =>
           new SourceCodeGenerator(model) {
         // override mapped table and class name
         override def entityName =

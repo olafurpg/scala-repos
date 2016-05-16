@@ -41,6 +41,6 @@ package object inject {
     *
     * @see The [[play.api.inject.Module Module]] class for information on how to provide bindings.
     */
-  def bind[T : ClassTag]: BindingKey[T] =
+  def bind[T: ClassTag]: BindingKey[T] =
     BindingKey(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
 }

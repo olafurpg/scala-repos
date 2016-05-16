@@ -103,7 +103,7 @@ private[mllib] object Loader {
     * @param loadedSchema  Schema for model data loaded from file.
     * @tparam Data  Expected data type from which an expected schema can be derived.
     */
-  def checkSchema[Data : TypeTag](loadedSchema: StructType): Unit = {
+  def checkSchema[Data: TypeTag](loadedSchema: StructType): Unit = {
     // Check schema explicitly since erasure makes it hard to use match-case for checking.
     val expectedFields: Array[StructField] =
       ScalaReflection.schemaFor[Data].dataType.asInstanceOf[StructType].fields

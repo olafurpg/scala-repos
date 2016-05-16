@@ -7,7 +7,8 @@ object CanTraverseValuesBenchmark
     extends MyRunner(classOf[CanTraverseValuesBenchmark])
 
 class CanTraverseValuesBenchmark
-    extends BreezeBenchmark with BuildsRandomVectors {
+    extends BreezeBenchmark
+    with BuildsRandomVectors {
 
   /*
   def timeSumWithCanTraverseValues(reps: Int) = runWith(reps, { randomArray(1024*8) })(arr => {

@@ -36,7 +36,8 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.SparkFunSuite
 
 class ClientDistributedCacheManagerSuite
-    extends SparkFunSuite with MockitoSugar {
+    extends SparkFunSuite
+    with MockitoSugar {
 
   class MockClientDistributedCacheManager
       extends ClientDistributedCacheManager {

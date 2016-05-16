@@ -42,20 +42,20 @@ object Test extends Properties("concurrent.TrieMap") {
     threads map (_.result)
   }
 
-  property("concurrent getOrElseUpdate insertions") = forAll(
-      threadCounts, sizes) { (p, sz) =>
-    val chm = new ConcurrentHashMap[Wrap, Int]().asScala
+  property("concurrent getOrElseUpdate insertions") =
+    forAll(threadCounts, sizes) { (p, sz) =>
+      val chm = new ConcurrentHashMap[Wrap, Int]().asScala
 
-    val results = inParallel(p) { idx =>
-      for (i <- 0 until sz) yield chm.getOrElseUpdate(new Wrap(i), idx)
+      val results = inParallel(p) { idx =>
+        for (i <- 0 until sz) yield chm.getOrElseUpdate(new Wrap(i), idx)
+      }
+
+      val resultSets = for (i <- 0 until sz) yield results.map(_ (i)).toSet
+      val largerThanOne = resultSets.zipWithIndex.find(_._1.size != 1)
+      val allThreadsAgreeOnWhoInserted = {
+        largerThanOne == None
+      } :| s"$p threads agree on who inserted [disagreement (differentResults, position) = $largerThanOne]"
+
+      allThreadsAgreeOnWhoInserted
     }
-
-    val resultSets = for (i <- 0 until sz) yield results.map(_ (i)).toSet
-    val largerThanOne = resultSets.zipWithIndex.find(_._1.size != 1)
-    val allThreadsAgreeOnWhoInserted = {
-      largerThanOne == None
-    } :| s"$p threads agree on who inserted [disagreement (differentResults, position) = $largerThanOne]"
-
-    allThreadsAgreeOnWhoInserted
-  }
 }

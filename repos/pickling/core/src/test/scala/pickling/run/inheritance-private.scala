@@ -15,7 +15,8 @@ class Employee {
 }
 
 case class Firefighter(val name: String, val age: Int, val since: Int)
-    extends Employee with Person
+    extends Employee
+    with Person
 object Firefighter {
   implicit val fpickler = PicklerUnpickler.generate[Firefighter]
 }

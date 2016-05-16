@@ -13,7 +13,8 @@ import org.ensime.indexer.SearchServiceTestUtils
 import org.ensime.util.EnsimeSpec
 
 class JavaCompilerSpec
-    extends EnsimeSpec with IsolatedJavaCompilerFixture
+    extends EnsimeSpec
+    with IsolatedJavaCompilerFixture
     with SearchServiceTestUtils {
 
   val original = EnsimeConfigFixture.SimpleTestProject

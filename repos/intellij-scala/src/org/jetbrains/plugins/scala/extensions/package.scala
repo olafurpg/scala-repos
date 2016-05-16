@@ -156,7 +156,7 @@ package object extensions {
   implicit class ObjectExt[T](val v: T) extends AnyVal {
     def toOption: Option[T] = Option(v)
 
-    def asOptionOf[E : ClassTag]: Option[E] = {
+    def asOptionOf[E: ClassTag]: Option[E] = {
       if (classTag[E].runtimeClass.isInstance(v)) Some(v.asInstanceOf[E])
       else None
     }
@@ -253,8 +253,8 @@ package object extensions {
               case t: ScTrait =>
                 val linearization = MixinNodes
                   .linearization(clazz)
-                  .flatMap(
-                      tp => ScType.extractClass(tp, Some(clazz.getProject)))
+                  .flatMap(tp =>
+                        ScType.extractClass(tp, Some(clazz.getProject)))
                 var index = linearization.indexWhere(_ == t)
                 while (index >= 0) {
                   val cl = linearization(index)
@@ -288,8 +288,7 @@ package object extensions {
             processName(method.getName)
           }
         case t: ScTypedDefinition
-            if t.isVal || t.isVar ||
-            (t.isInstanceOf[ScClassParameter] &&
+            if t.isVal || t.isVar || (t.isInstanceOf[ScClassParameter] &&
                 t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
           PsiTypedDefinitionWrapper.processWrappersFor(t,
                                                        concreteClassFor(t),

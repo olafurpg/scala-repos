@@ -131,19 +131,23 @@ trait ProvenanceChecker extends parser.AST with Binder {
             } else if (prov1.isParametric || prov2.isParametric) {
               if (unified.isDefined) {
                 (unified.get, addedConstr, addedErrors): (Provenance,
-                Set[ProvConstraint], Set[Error])
+                                                          Set[ProvConstraint],
+                                                          Set[Error])
               } else {
                 val prov = UnifiedProvenance(prov1, prov2)
                 (prov, addedConstr ++ Set(Related(prov1, prov2)), addedErrors): (Provenance,
-                Set[ProvConstraint], Set[Error])
+                                                                                 Set[ProvConstraint],
+                                                                                 Set[Error])
               }
             } else if (unified.isDefined) {
               (unified.get, addedConstr, addedErrors): (Provenance,
-              Set[ProvConstraint], Set[Error])
+                                                        Set[ProvConstraint],
+                                                        Set[Error])
             } else {
               val errors = Set(Error(expr, OperationOnUnrelatedSets))
               (NullProvenance, addedConstr, addedErrors ++ errors): (Provenance,
-              Set[ProvConstraint], Set[Error])
+                                                                     Set[ProvConstraint],
+                                                                     Set[Error])
             }
           }
 
@@ -547,13 +551,11 @@ trait ProvenanceChecker extends parser.AST with Binder {
               }
 
             val relations2 =
-              relations +
-              (from.provenance ->
+              relations + (from.provenance ->
                   (relations.getOrElse(from.provenance, Set()) +
                       to.provenance))
             val relations3 =
-              relations2 +
-              (to.provenance ->
+              relations2 + (to.provenance ->
                   (relations.getOrElse(to.provenance, Set()) +
                       from.provenance))
 
@@ -688,8 +690,8 @@ trait ProvenanceChecker extends parser.AST with Binder {
                   val constraints3 =
                     mapped collect { case Right(constr) => constr }
 
-                  expr.provenance = resolveUnifications(relations)(
-                      sub(let.resultProvenance))
+                  expr.provenance =
+                    resolveUnifications(relations)(sub(let.resultProvenance))
 
                   val finalErrors = actualErrors ++ constrErrors
                   if (!finalErrors.isEmpty) {

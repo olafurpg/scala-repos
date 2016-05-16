@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScSubstitutor
   * @author Alexander Podkhalyuzin
   */
 class ScCompoundTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCompoundTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScCompoundTypeElement {
   override def toString: String = "CompoundType: " + getText
 
   protected def innerType(ctx: TypingContext) = {

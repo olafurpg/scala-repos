@@ -26,7 +26,9 @@ import org.scalatest.{Matchers, FreeSpec}
 import akka.http.impl.util._
 
 class WebSocketClientSpec
-    extends FreeSpec with Matchers with WithMaterializerSpec {
+    extends FreeSpec
+    with Matchers
+    with WithMaterializerSpec {
   "The client-side WebSocket implementation should" - {
     "establish a websocket connection when the user requests it" in new EstablishedConnectionSetup
     with ClientEchoes
@@ -334,18 +336,17 @@ class WebSocketClientSpec
       val netOut = ByteStringSinkProbe()
       val netIn = TestPublisher.probe[ByteString]()
 
-      val graph =
-        RunnableGraph.fromGraph(GraphDSL.create(clientLayer) {
-          implicit b ⇒ client ⇒
-            import GraphDSL.Implicits._
-            Source.fromPublisher(netIn) ~> Flow[ByteString]
-              .map(SessionBytes(null, _)) ~> client.in2
-            client.out1 ~> Flow[SslTlsOutbound].collect {
-              case SendBytes(x) ⇒ x
-            } ~> netOut.sink
-            client.out2 ~> clientImplementation ~> client.in1
-            ClosedShape
-        })
+      val graph = RunnableGraph.fromGraph(
+          GraphDSL.create(clientLayer) { implicit b ⇒ client ⇒
+        import GraphDSL.Implicits._
+        Source.fromPublisher(netIn) ~> Flow[ByteString].map(
+            SessionBytes(null, _)) ~> client.in2
+        client.out1 ~> Flow[SslTlsOutbound].collect {
+          case SendBytes(x) ⇒ x
+        } ~> netOut.sink
+        client.out2 ~> clientImplementation ~> client.in1
+        ClosedShape
+      })
 
       val response = graph.run()
 

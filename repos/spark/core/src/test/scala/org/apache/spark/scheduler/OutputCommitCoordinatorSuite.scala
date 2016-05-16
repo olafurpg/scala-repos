@@ -83,8 +83,8 @@ class OutputCommitCoordinatorSuite extends SparkFunSuite with BeforeAndAfter {
           conf: SparkConf,
           isLocal: Boolean,
           listenerBus: LiveListenerBus): SparkEnv = {
-        outputCommitCoordinator = spy(
-            new OutputCommitCoordinator(conf, isDriver = true))
+        outputCommitCoordinator =
+          spy(new OutputCommitCoordinator(conf, isDriver = true))
         // Use Mockito.spy() to maintain the default infrastructure everywhere else.
         // This mocking allows us to control the coordinator responses in test cases.
         SparkEnv.createDriverEnv(conf,
@@ -195,11 +195,11 @@ class OutputCommitCoordinatorSuite extends SparkFunSuite with BeforeAndAfter {
     assert(!outputCommitCoordinator.canCommit(
             stage, partition, nonAuthorizedCommitter))
     // The non-authorized committer fails
-    outputCommitCoordinator.taskCompleted(
-        stage,
-        partition,
-        attemptNumber = nonAuthorizedCommitter,
-        reason = TaskKilled)
+    outputCommitCoordinator.taskCompleted(stage,
+                                          partition,
+                                          attemptNumber =
+                                            nonAuthorizedCommitter,
+                                          reason = TaskKilled)
     // New tasks should still not be able to commit because the authorized committer has not failed
     assert(!outputCommitCoordinator.canCommit(
             stage, partition, nonAuthorizedCommitter + 1))

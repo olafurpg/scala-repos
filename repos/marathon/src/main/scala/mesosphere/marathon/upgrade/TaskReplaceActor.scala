@@ -22,7 +22,8 @@ class TaskReplaceActor(driver: SchedulerDriver,
                        eventBus: EventStream,
                        app: AppDefinition,
                        promise: Promise[Unit])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.dispatcher
 
   val tasksToKill = taskTracker.appTasksLaunchedSync(app.id)

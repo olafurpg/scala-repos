@@ -50,7 +50,9 @@ class ClusterConsistentHashingGroupMultiJvmNode3
 
 abstract class ClusterConsistentHashingGroupSpec
     extends MultiNodeSpec(ClusterConsistentHashingGroupMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import ClusterConsistentHashingGroupMultiJvmSpec._
 
   /**

@@ -164,7 +164,7 @@ class Column(protected[sql] val expr: Expression) extends Logging {
     * results into the correct JVM types.
     * @since 1.6.0
     */
-  def as[U : Encoder]: TypedColumn[Any, U] =
+  def as[U: Encoder]: TypedColumn[Any, U] =
     new TypedColumn[Any, U](expr, encoderFor[U])
 
   /**

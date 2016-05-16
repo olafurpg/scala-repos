@@ -351,11 +351,11 @@ private[streaming] class ReceiverTracker(
   private def reportError(streamId: Int, message: String, error: String) {
     val newReceiverTrackingInfo = receiverTrackingInfos.get(streamId) match {
       case Some(oldInfo) =>
-        val errorInfo = ReceiverErrorInfo(lastErrorMessage = message,
-                                          lastError = error,
-                                          lastErrorTime = oldInfo.errorInfo
-                                              .map(_.lastErrorTime)
-                                              .getOrElse(-1L))
+        val errorInfo = ReceiverErrorInfo(
+            lastErrorMessage = message,
+            lastError = error,
+            lastErrorTime =
+              oldInfo.errorInfo.map(_.lastErrorTime).getOrElse(-1L))
         oldInfo.copy(errorInfo = Some(errorInfo))
       case None =>
         logWarning("No prior receiver info")
@@ -459,11 +459,10 @@ private[streaming] class ReceiverTracker(
     */
   private def launchReceivers(): Unit = {
     val receivers = receiverInputStreams.map(
-        nis =>
-          {
-        val rcvr = nis.getReceiver()
-        rcvr.setReceiverId(nis.id)
-        rcvr
+        nis => {
+      val rcvr = nis.getReceiver()
+      rcvr.setReceiverId(nis.id)
+      rcvr
     })
 
     runDummySparkJob()
@@ -498,7 +497,8 @@ private[streaming] class ReceiverTracker(
         for (receiver <- receivers) {
           val executors = scheduledLocations(receiver.streamId)
           updateReceiverScheduledExecutors(receiver.streamId, executors)
-          receiverPreferredLocations(receiver.streamId) = receiver.preferredLocation
+          receiverPreferredLocations(receiver.streamId) =
+            receiver.preferredLocation
           startReceiver(receiver, executors)
         }
       case RestartReceiver(receiver) =>
@@ -622,25 +622,24 @@ private[streaming] class ReceiverTracker(
 
       // Function to start the receiver on the worker node
       val startReceiverFunc: Iterator[Receiver[_]] => Unit =
-        (iterator: Iterator[Receiver[_]]) =>
-          {
-            if (!iterator.hasNext) {
-              throw new SparkException(
-                  "Could not start receiver as object not found.")
-            }
-            if (TaskContext.get().attemptNumber() == 0) {
-              val receiver = iterator.next()
-              assert(iterator.hasNext == false)
-              val supervisor = new ReceiverSupervisorImpl(
-                  receiver,
-                  SparkEnv.get,
-                  serializableHadoopConf.value,
-                  checkpointDirOption)
-              supervisor.start()
-              supervisor.awaitTermination()
-            } else {
-              // It's restarted by TaskScheduler, but we want to reschedule it again. So exit it.
-            }
+        (iterator: Iterator[Receiver[_]]) => {
+          if (!iterator.hasNext) {
+            throw new SparkException(
+                "Could not start receiver as object not found.")
+          }
+          if (TaskContext.get().attemptNumber() == 0) {
+            val receiver = iterator.next()
+            assert(iterator.hasNext == false)
+            val supervisor = new ReceiverSupervisorImpl(
+                receiver,
+                SparkEnv.get,
+                serializableHadoopConf.value,
+                checkpointDirOption)
+            supervisor.start()
+            supervisor.awaitTermination()
+          } else {
+            // It's restarted by TaskScheduler, but we want to reschedule it again. So exit it.
+          }
         }
 
       // Create the RDD using the scheduledLocations to run the receiver in a Spark job

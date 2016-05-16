@@ -29,7 +29,10 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
 class ClientServerSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures {
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]
@@ -543,15 +546,15 @@ class ClientServerSpec
           ServerSettings(_))
       val connections = Http().bind(hostname, port, settings = settings)
       val probe = TestSubscriber.manualProbe[Http.IncomingConnection]
-      val binding = connections
-        .toMat(Sink.fromSubscriber(probe))(Keep.left)
-        .run()
-        (probe, binding)
+      val binding =
+        connections.toMat(Sink.fromSubscriber(probe))(Keep.left).run()
+      (probe, binding)
     }
     val connSourceSub = connSource.expectSubscription()
 
     def openNewClientConnection(
-        settings: ClientConnectionSettings = ClientConnectionSettings(system)) = {
+        settings: ClientConnectionSettings =
+          ClientConnectionSettings(system)) = {
       val requestPublisherProbe = TestPublisher.manualProbe[HttpRequest]()
       val responseSubscriberProbe = TestSubscriber.manualProbe[HttpResponse]()
 
@@ -570,7 +573,7 @@ class ClientServerSpec
     }
 
     def acceptConnection(): (TestSubscriber.ManualProbe[HttpRequest],
-    TestPublisher.ManualProbe[HttpResponse]) = {
+                             TestPublisher.ManualProbe[HttpResponse]) = {
       connSourceSub.request(1)
       val incomingConnection = connSource.expectNext()
       val sink = Sink.asPublisher[HttpRequest](false)
@@ -599,7 +602,7 @@ class ClientServerSpec
 
     def readAll(socket: Socket)(
         reader: BufferedReader = new BufferedReader(new InputStreamReader(
-                  socket.getInputStream))): (String, BufferedReader) = {
+                socket.getInputStream))): (String, BufferedReader) = {
       val sb = new java.lang.StringBuilder
       val cbuf = new Array[Char](256)
       @tailrec def drain(): (String, BufferedReader) =

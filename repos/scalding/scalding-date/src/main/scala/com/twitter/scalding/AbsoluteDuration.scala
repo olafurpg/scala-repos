@@ -86,8 +86,8 @@ object AbsoluteDuration extends java.io.Serializable {
             val theseUnits = diffInMs / cnt
             require(
                 (theseUnits <= Int.MaxValue) && (theseUnits >= Int.MinValue),
-                "diff not representable in an Int: " + theseUnits +
-                AbsoluteDurationList(acc) + "total: " +
+                "diff not representable in an Int: " +
+                theseUnits + AbsoluteDurationList(acc) + "total: " +
                 (diffInMs + AbsoluteDurationList(acc).toMillisecs))
             val thisPart = fn(theseUnits.toInt)
             if (acc.isEmpty) thisPart
@@ -152,19 +152,22 @@ case class Millisecs(cnt: Int)
 }
 
 case class Seconds(cnt: Int)
-    extends Duration(Calendar.SECOND, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.SECOND, cnt, DateOps.UTC)
+    with AbsoluteDuration {
   override def toSeconds = cnt.toDouble
   override def toMillisecs = (cnt.toLong) * 1000L
 }
 
 case class Minutes(cnt: Int)
-    extends Duration(Calendar.MINUTE, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.MINUTE, cnt, DateOps.UTC)
+    with AbsoluteDuration {
   override def toSeconds = cnt * 60.0
   override def toMillisecs = cnt.toLong * 60L * 1000L
 }
 
 case class Hours(cnt: Int)
-    extends Duration(Calendar.HOUR, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.HOUR, cnt, DateOps.UTC)
+    with AbsoluteDuration {
   override def toSeconds = cnt * 60.0 * 60.0
   override def toMillisecs = cnt.toLong * 60L * 60L * 1000L
 }

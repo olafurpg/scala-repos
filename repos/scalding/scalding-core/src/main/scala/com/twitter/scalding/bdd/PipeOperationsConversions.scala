@@ -51,15 +51,18 @@ trait PipeOperationsConversions {
   implicit val fromSingleRichPipeToPipeFunctionToOperation =
     (op: RichPipe => Pipe) => new OnePipeOperation(op(_))
 
-  implicit val fromTwoRichPipesFunctionToOperation = (op: (RichPipe,
-  RichPipe) => RichPipe) => new TwoPipesOperation(op(_, _).pipe)
-  implicit val fromTwoRichPipesToRichPipeFunctionToOperation = (op: (RichPipe,
-  RichPipe) => Pipe) => new TwoPipesOperation(op(_, _))
+  implicit val fromTwoRichPipesFunctionToOperation =
+    (op: (RichPipe, RichPipe) => RichPipe) =>
+      new TwoPipesOperation(op(_, _).pipe)
+  implicit val fromTwoRichPipesToRichPipeFunctionToOperation =
+    (op: (RichPipe, RichPipe) => Pipe) => new TwoPipesOperation(op(_, _))
 
-  implicit val fromThreeRichPipesFunctionToOperation = (op: (RichPipe,
-  RichPipe, RichPipe) => RichPipe) => new ThreePipesOperation(op(_, _, _).pipe)
-  implicit val fromThreeRichPipesToPipeFunctionToOperation = (op: (RichPipe,
-  RichPipe, RichPipe) => Pipe) => new ThreePipesOperation(op(_, _, _))
+  implicit val fromThreeRichPipesFunctionToOperation =
+    (op: (RichPipe, RichPipe, RichPipe) => RichPipe) =>
+      new ThreePipesOperation(op(_, _, _).pipe)
+  implicit val fromThreeRichPipesToPipeFunctionToOperation =
+    (op: (RichPipe, RichPipe, RichPipe) => Pipe) =>
+      new ThreePipesOperation(op(_, _, _))
 
   implicit val fromRichPipeListFunctionToOperation =
     (op: List[RichPipe] => RichPipe) => new ListRichPipesOperation(op(_).pipe)
@@ -71,15 +74,16 @@ trait PipeOperationsConversions {
   implicit val fromSinglePipeToRichPipeFunctionToOperation =
     (op: Pipe => Pipe) => new OnePipeOperation(op(_))
 
-  implicit val fromTwoPipeFunctionToOperation = (op: (Pipe,
-  Pipe) => RichPipe) => new TwoPipesOperation(op(_, _).pipe)
-  implicit val fromTwoRichPipeToPipeFunctionToOperation = (op: (Pipe,
-  Pipe) => Pipe) => new TwoPipesOperation(op(_, _))
+  implicit val fromTwoPipeFunctionToOperation =
+    (op: (Pipe, Pipe) => RichPipe) => new TwoPipesOperation(op(_, _).pipe)
+  implicit val fromTwoRichPipeToPipeFunctionToOperation =
+    (op: (Pipe, Pipe) => Pipe) => new TwoPipesOperation(op(_, _))
 
   implicit val fromThreePipeFunctionToOperation = (op: (Pipe, Pipe,
-  Pipe) => RichPipe) => new ThreePipesOperation(op(_, _, _).pipe)
-  implicit val fromThreeRichPipeToPipeFunctionToOperation = (op: (Pipe, Pipe,
-  Pipe) => Pipe) => new ThreePipesOperation(op(_, _, _))
+                                                        Pipe) => RichPipe) =>
+    new ThreePipesOperation(op(_, _, _).pipe)
+  implicit val fromThreeRichPipeToPipeFunctionToOperation =
+    (op: (Pipe, Pipe, Pipe) => Pipe) => new ThreePipesOperation(op(_, _, _))
 
   implicit val fromListPipeFunctionToOperation =
     (op: List[Pipe] => RichPipe) => new ListPipesOperation(op(_).pipe)

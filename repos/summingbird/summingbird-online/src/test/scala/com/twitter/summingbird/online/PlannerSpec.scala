@@ -38,7 +38,7 @@ import scala.util.{Try, Success, Failure}
 class PlannerSpec extends WordSpec {
   implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
   private type MemoryDag = Dag[Memory]
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   import TestGraphGenerators._
 

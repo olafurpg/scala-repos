@@ -44,12 +44,15 @@ import scalaz.syntax.std.boolean._
 import scalaz.syntax.traverse._
 
 trait PredictionLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ModelLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ModelLibModule[M] {
   import trans._
   import trans.constants._
 
   trait PredictionSupport
-      extends ColumnarTableLib with ModelSupport with RegressionSupport {
+      extends ColumnarTableLib
+      with ModelSupport
+      with RegressionSupport {
     val confIntvStr = "confidenceInterval"
     val predIntvStr = "predictionInterval"
     val fitStr = "fit"

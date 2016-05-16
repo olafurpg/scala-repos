@@ -9,7 +9,8 @@ import org.ensime.fixture._
 import org.ensime.util.EnsimeSpec
 
 class DocResolverSpec
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
     with IsolatedTestKitFixture {
 
   val original = EnsimeConfigFixture.DocsTestProject
@@ -84,7 +85,8 @@ class DocResolverSpec
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
 
-        serv.resolve(DocSigPair(
+        serv.resolve(
+            DocSigPair(
                 DocSig(
                     DocFqn("scala", "Some"),
                     Some("flatten[B](implicitev:<:<[A,Option[B]]):Option[B]")),

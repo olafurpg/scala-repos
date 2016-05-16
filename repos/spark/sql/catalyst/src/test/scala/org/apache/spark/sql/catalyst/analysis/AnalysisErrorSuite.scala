@@ -82,7 +82,9 @@ private[sql] class UngroupableUDT extends UserDefinedType[UngroupableData] {
 
 case class TestFunction(
     children: Seq[Expression], inputTypes: Seq[AbstractDataType])
-    extends Expression with ImplicitCastInputTypes with Unevaluable {
+    extends Expression
+    with ImplicitCastInputTypes
+    with Unevaluable {
   override def nullable: Boolean = true
   override def dataType: DataType = StringType
 }

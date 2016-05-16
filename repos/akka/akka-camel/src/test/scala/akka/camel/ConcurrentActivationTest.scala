@@ -21,7 +21,9 @@ import akka.actor.ActorLogging
   * A test to concurrently register and de-register consumer and producer endpoints
   */
 class ConcurrentActivationTest
-    extends WordSpec with Matchers with NonSharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with NonSharedCamelSystem {
 
   "Activation" must {
     "support concurrent registrations and de-registrations" in {
@@ -34,8 +36,8 @@ class ConcurrentActivationTest
         // A ConsumerBroadcast creates 'number' amount of ConsumerRegistrars, which will register 'number' amount of endpoints,
         // in total number*number endpoints, activating and deactivating every endpoint.
         // a promise to the list of registrars, which have a list of actorRefs each. A tuple of a list of activated refs and a list of deactivated refs
-        val promiseRegistrarLists = Promise[
-            (Future[List[List[ActorRef]]], Future[List[List[ActorRef]]])]()
+        val promiseRegistrarLists = Promise[(Future[List[List[ActorRef]]],
+                                             Future[List[List[ActorRef]]])]()
         // future to all the futures of activation and deactivation
         val futureRegistrarLists = promiseRegistrarLists.future
 
@@ -46,8 +48,8 @@ class ConcurrentActivationTest
         ref ! CreateRegistrars(number)
         // send a broadcast to all registrars, so that number * number messages are sent
         // every Register registers a consumer and a producer
-        (1 to number).map(
-            i ⇒ ref ! RegisterConsumersAndProducers("direct:concurrent-"))
+        (1 to number).map(i ⇒
+              ref ! RegisterConsumersAndProducers("direct:concurrent-"))
         // de-register all consumers and producers
         ref ! DeRegisterConsumersAndProducers()
 
@@ -91,8 +93,9 @@ class ConcurrentActivationTest
   }
 }
 
-class ConsumerBroadcast(promise: Promise[(Future[List[List[ActorRef]]], Future[
-            List[List[ActorRef]]])])
+class ConsumerBroadcast(
+    promise: Promise[(Future[List[List[ActorRef]]],
+                      Future[List[List[ActorRef]]])])
     extends Actor {
   private var broadcaster: Option[ActorRef] = None
   private implicit val ec = context.dispatcher
@@ -108,7 +111,8 @@ class ConsumerBroadcast(promise: Promise[(Future[List[List[ActorRef]]], Future[
         val deactivationListFuture = deactivationListPromise.future
 
         allActivationFutures = allActivationFutures :+ activationListFuture
-        allDeactivationFutures = allDeactivationFutures :+ deactivationListFuture
+        allDeactivationFutures =
+          allDeactivationFutures :+ deactivationListFuture
         val routee = context.actorOf(Props(classOf[Registrar],
                                            i,
                                            number,
@@ -138,7 +142,8 @@ class Registrar(val start: Int,
                 val number: Int,
                 activationsPromise: Promise[List[ActorRef]],
                 deActivationsPromise: Promise[List[ActorRef]])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   private var actorRefs = Set[ActorRef]()
   private var activations = Set[Future[ActorRef]]()
   private var deActivations = Set[Future[ActorRef]]()

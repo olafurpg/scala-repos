@@ -40,14 +40,14 @@ class SimplificationBuilder private[collections](
     highlightElem(refNameId(exprToReplace).getOrElse(exprToReplace))
 
   def highlightElem(elem: PsiElement) = {
-    this.rangeInParent = elem.getTextRange.shiftRight(
-        -exprToReplace.getTextOffset)
+    this.rangeInParent =
+      elem.getTextRange.shiftRight(-exprToReplace.getTextOffset)
     this
   }
 
   def highlightRange(start: Int, end: Int) = {
-    this.rangeInParent = new TextRange(start, end)
-      .shiftRight(-exprToReplace.getTextOffset)
+    this.rangeInParent =
+      new TextRange(start, end).shiftRight(-exprToReplace.getTextOffset)
     this
   }
 

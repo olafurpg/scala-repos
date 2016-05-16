@@ -10,7 +10,8 @@ import akka.http.scaladsl.unmarshalling.PredefinedFromStringUnmarshallers
 import docs.http.scaladsl.server.RoutingSpec
 
 class ParameterDirectivesExamplesSpec
-    extends RoutingSpec with PredefinedFromStringUnmarshallers {
+    extends RoutingSpec
+    with PredefinedFromStringUnmarshallers {
   "example-1" in {
     val route = parameter('color) { color =>
       complete(s"The color is '$color'")

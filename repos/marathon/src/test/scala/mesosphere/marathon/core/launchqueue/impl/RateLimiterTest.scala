@@ -10,7 +10,9 @@ import org.scalatest.Matchers
 import scala.concurrent.duration._
 
 class RateLimiterTest
-    extends MarathonActorSupport with MarathonSpec with Matchers {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers {
   val clock = ConstantClock(Timestamp.now())
 
   test("addDelay") {

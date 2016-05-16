@@ -28,7 +28,9 @@ import HttpEntity._
 import ParserOutput._
 
 class ResponseParserSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll {
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.event-handlers = ["akka.testkit.TestEventListener"]
@@ -187,7 +189,8 @@ class ResponseParserSpec
             """ABCDEF
             |0
             |
-            |""") should generalMultiParseTo(Right(baseResponse.withEntity(
+            |""") should generalMultiParseTo(
+            Right(baseResponse.withEntity(
                     Chunked(`application/pdf`,
                             source(Chunk(ByteString("abc")),
                                    Chunk(ByteString("0123456789ABCDEF"),
@@ -232,11 +235,10 @@ class ResponseParserSpec
             """ent-Type: application/pdf
           |
           |""") should generalMultiParseTo(
-            Right(
-                HttpResponse(headers = List(`Transfer-Encoding`(
+            Right(HttpResponse(headers = List(`Transfer-Encoding`(
                                        TransferEncodings.Extension("fancy"))),
-                             entity = HttpEntity.Chunked(`application/pdf`,
-                                                         source()))),
+                               entity = HttpEntity.Chunked(`application/pdf`,
+                                                           source()))),
             Left(EntityStreamError(ErrorInfo("Entity stream truncation"))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
@@ -326,14 +328,14 @@ class ResponseParserSpec
     def generalRawMultiParseTo(requestMethod: HttpMethod,
                                expected: Either[ResponseOutput, HttpResponse]*)
       : Matcher[Seq[String]] =
-      equal(expected.map(strictEqualify)).matcher[Seq[Either[
-                  ResponseOutput, StrictEqualHttpResponse]]] compose {
+      equal(expected.map(strictEqualify)).matcher[Seq[
+              Either[ResponseOutput, StrictEqualHttpResponse]]] compose {
         input: Seq[String] ⇒
           collectBlocking {
             rawParse(requestMethod, input: _*).mapAsync(1) {
               case Right(response) ⇒
-                compactEntity(response.entity).fast
-                  .map(x ⇒ Right(response.withEntity(x)))
+                compactEntity(response.entity).fast.map(x ⇒
+                      Right(response.withEntity(x)))
               case Left(error) ⇒ FastFuture.successful(Left(error))
             }
           }.map(strictEqualify)
@@ -379,8 +381,8 @@ class ResponseParserSpec
     private def compactEntity(entity: ResponseEntity): Future[ResponseEntity] =
       entity match {
         case x: HttpEntity.Chunked ⇒
-          compactEntityChunks(x.chunks).fast
-            .map(compacted ⇒ x.copy(chunks = compacted))
+          compactEntityChunks(x.chunks).fast.map(compacted ⇒
+                x.copy(chunks = compacted))
         case _ ⇒ entity.toStrict(250.millis)
       }
 

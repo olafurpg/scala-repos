@@ -37,19 +37,20 @@ import scala.concurrent.Future
   * @param shouldProtect A function that decides based on the headers of the request if a check is needed.
   * @param bypassCorsTrustedOrigins Whether to bypass the CSRF check if the CORS filter trusts this origin
   */
-case class CSRFConfig(
-    tokenName: String = "csrfToken",
-    cookieName: Option[String] = None,
-    secureCookie: Boolean = false,
-    httpOnlyCookie: Boolean = false,
-    createIfNotFound: RequestHeader => Boolean = CSRFConfig.defaultCreateIfNotFound,
-    postBodyBuffer: Long = 102400,
-    signTokens: Boolean = true,
-    checkMethod: String => Boolean = !CSRFConfig.SafeMethods.contains(_),
-    checkContentType: Option[String] => Boolean = _ => true,
-    headerName: String = "Csrf-Token",
-    shouldProtect: RequestHeader => Boolean = _ => false,
-    bypassCorsTrustedOrigins: Boolean = true) {
+case class CSRFConfig(tokenName: String = "csrfToken",
+                      cookieName: Option[String] = None,
+                      secureCookie: Boolean = false,
+                      httpOnlyCookie: Boolean = false,
+                      createIfNotFound: RequestHeader => Boolean =
+                        CSRFConfig.defaultCreateIfNotFound,
+                      postBodyBuffer: Long = 102400,
+                      signTokens: Boolean = true,
+                      checkMethod: String => Boolean =
+                        !CSRFConfig.SafeMethods.contains(_),
+                      checkContentType: Option[String] => Boolean = _ => true,
+                      headerName: String = "Csrf-Token",
+                      shouldProtect: RequestHeader => Boolean = _ => false,
+                      bypassCorsTrustedOrigins: Boolean = true) {
 
   // Java builder methods
   def this() = this(cookieName = None)
@@ -78,8 +79,8 @@ case class CSRFConfig(
     copy(checkContentType = checkContentType.asScala.compose(_.asJava))
   def withShouldProtect(shouldProtect: ju.function.Predicate[JRequestHeader]) =
     copy(
-        shouldProtect = shouldProtect.asScala.compose(
-              new JRequestHeaderImpl(_)))
+        shouldProtect =
+          shouldProtect.asScala.compose(new JRequestHeaderImpl(_)))
   def withBypassCorsTrustedOrigins(bypass: Boolean) =
     copy(bypassCorsTrustedOrigins = bypass)
 }
@@ -160,16 +161,15 @@ object CSRFConfig {
         cookieName = config.get[Option[String]]("cookie.name"),
         secureCookie = config.get[Boolean]("cookie.secure"),
         httpOnlyCookie = config.get[Boolean]("cookie.httpOnly"),
-        postBodyBuffer = config
-            .get[ConfigMemorySize]("body.bufferSize")
-            .toBytes,
+        postBodyBuffer =
+          config.get[ConfigMemorySize]("body.bufferSize").toBytes,
         signTokens = config.get[Boolean]("token.sign"),
         checkMethod = checkMethod,
         checkContentType = checkContentType,
         headerName = config.get[String]("header.name"),
         shouldProtect = shouldProtect,
-        bypassCorsTrustedOrigins = config.get[Boolean](
-              "bypassCorsTrustedOrigins")
+        bypassCorsTrustedOrigins =
+          config.get[Boolean]("bypassCorsTrustedOrigins")
     )
   }
 }
@@ -203,7 +203,7 @@ object CSRF {
     for {
       name <- request.tags.get(Token.NameRequestTag)
       value <- request.tags.get(Token.ReSignedRequestTag) orElse request.tags
-        .get(Token.RequestTag)
+                .get(Token.RequestTag)
     } yield Token(name, value)
   }
 

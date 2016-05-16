@@ -68,7 +68,8 @@ import scalaz.syntax.std.either._
 import scala.collection.JavaConverters._
 
 class MongoQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with MongoColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig
+    with MongoColumnarTableModuleConfig {
   val logPrefix = "mongo"
 
   def mongoServer: String = config[String]("mongo.server", "localhost:27017")
@@ -93,7 +94,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                          val jobManager: JobManager[Future],
                          val jobActorSystem: ActorSystem)(
     implicit val executionContext: ExecutionContext, val M: Monad[Future])
-    extends StandaloneQueryExecutor with MongoColumnarTableModule
+    extends StandaloneQueryExecutor
+    with MongoColumnarTableModule
     with Logging {
   platform =>
   type YggConfig = MongoQueryExecutorConfig
@@ -159,8 +161,7 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
           case dbName :: Nil =>
             val db = Table.mongo.getDB(dbName)
-            Success(
-                if (db == null) JArray(Nil)
+            Success(if (db == null) JArray(Nil)
                 else
                   db.getCollectionNames.asScala.map { d =>
                 d + "/"
@@ -179,8 +180,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
     def structure(userUID: String, path: Path, cpath: CPath)
       : Future[Validation[String, JObject]] = Promise.successful(
-        Success(JObject(Map(
-                    "children" -> JArray.empty,
+        Success(JObject(
+                Map("children" -> JArray.empty,
                     "types" -> JObject.empty))) // TODO: How to implement this?
     )
 

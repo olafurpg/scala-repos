@@ -57,7 +57,9 @@ abstract class DatabaseOnDocker {
 }
 
 abstract class DockerJDBCIntegrationSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Eventually
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Eventually
     with SharedSQLContext {
 
   val db: DatabaseOnDocker

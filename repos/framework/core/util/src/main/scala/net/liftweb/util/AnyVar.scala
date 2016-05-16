@@ -98,7 +98,8 @@ abstract class AnyVar[T, MyType <: AnyVar[T, MyType]](dflt: => T)
   * Abstract a request or a session scoped variable.
   */
 trait AnyVarTrait[T, MyType <: AnyVarTrait[T, MyType]]
-    extends PSettableValueHolder[T] with HasCalcDefaultValue[T] {
+    extends PSettableValueHolder[T]
+    with HasCalcDefaultValue[T] {
   self: MyType =>
   protected lazy val name =
     VarConstants.varPrefix + getClass.getName + "_" + __nameSalt

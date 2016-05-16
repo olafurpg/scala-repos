@@ -29,7 +29,7 @@ import org.apache.spark.rdd.RDD
   * set may additionally be shipped to the edge partitions. Be careful not to store a reference to
   * `edges`, since it may be modified when the attribute shipping level is upgraded.
   */
-private[impl] class ReplicatedVertexView[VD : ClassTag, ED : ClassTag](
+private[impl] class ReplicatedVertexView[VD: ClassTag, ED: ClassTag](
     var edges: EdgeRDDImpl[ED, VD],
     var hasSrcId: Boolean = false,
     var hasDstId: Boolean = false) {
@@ -38,7 +38,7 @@ private[impl] class ReplicatedVertexView[VD : ClassTag, ED : ClassTag](
     * Return a new `ReplicatedVertexView` with the specified `EdgeRDD`, which must have the same
     * shipping level.
     */
-  def withEdges[VD2 : ClassTag, ED2 : ClassTag](
+  def withEdges[VD2: ClassTag, ED2: ClassTag](
       _edges: EdgeRDDImpl[ED2, VD2]): ReplicatedVertexView[VD2, ED2] = {
     new ReplicatedVertexView(_edges, hasSrcId, hasDstId)
   }

@@ -68,7 +68,8 @@ private[akka] final class BalancingRoutingLogic extends RoutingLogic {
 @SerialVersionUID(1L)
 final case class BalancingPool(
     override val nrOfInstances: Int,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
     extends Pool {
 

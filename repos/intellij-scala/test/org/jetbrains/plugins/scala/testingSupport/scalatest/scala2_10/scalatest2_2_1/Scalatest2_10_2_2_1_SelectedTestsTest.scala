@@ -8,4 +8,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.singleTest.ScalaTest
   * @since 09.10.2014.
   */
 class Scalatest2_10_2_2_1_SelectedTestsTest
-    extends Scalatest2_10_2_2_1_Base with ScalaTestSelectedTests {}
+    extends Scalatest2_10_2_2_1_Base
+    with ScalaTestSelectedTests {}

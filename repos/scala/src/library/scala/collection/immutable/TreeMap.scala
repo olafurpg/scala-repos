@@ -52,8 +52,10 @@ object TreeMap extends ImmutableSortedMapFactory[TreeMap] {
     "2.11.0")
 class TreeMap[A, +B] private (
     tree: RB.Tree[A, B])(implicit val ordering: Ordering[A])
-    extends SortedMap[A, B] with SortedMapLike[A, B, TreeMap[A, B]]
-    with MapLike[A, B, TreeMap[A, B]] with Serializable {
+    extends SortedMap[A, B]
+    with SortedMapLike[A, B, TreeMap[A, B]]
+    with MapLike[A, B, TreeMap[A, B]]
+    with Serializable {
 
   override protected[this] def newBuilder: Builder[(A, B), TreeMap[A, B]] =
     TreeMap.newBuilder[A, B]

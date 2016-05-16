@@ -35,7 +35,9 @@ import scala.runtime.ScalaRunTime.arrayElementClass
   */
 @scala.annotation.implicitNotFound(msg = "No ClassTag available for ${T}")
 trait ClassTag[T]
-    extends ClassManifestDeprecatedApis[T] with Equals with Serializable {
+    extends ClassManifestDeprecatedApis[T]
+    with Equals
+    with Serializable {
   // please, don't add any APIs here, like it was with `newWrappedArray` and `newArrayBuilder`
   // class tags, and all tags in general, should be as minimalistic as possible
 
@@ -77,9 +79,7 @@ trait ClassTag[T]
     * is uncheckable, but we have an instance of `ClassTag[T]`.
     */
   def unapply(x: Any): Option[T] =
-    if (null != x &&
-        ((runtimeClass.isInstance(x)) ||
-            (x.isInstanceOf[Byte] &&
+    if (null != x && ((runtimeClass.isInstance(x)) || (x.isInstanceOf[Byte] &&
                 runtimeClass.isAssignableFrom(classOf[Byte])) ||
             (x.isInstanceOf[Short] &&
                 runtimeClass.isAssignableFrom(classOf[Short])) ||

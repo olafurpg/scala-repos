@@ -25,7 +25,8 @@ class WrappedTypedArrayCharBufferJSTest extends CharBufferTest {
   val factory: CharBufferFactory = new WrappedTypedArrayCharBufferJSFactory
 
   class WrappedTypedArrayCharBufferJSFactory
-      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedTypedArrayBufferFactory {
     def baseWrap(array: Array[Char]): CharBuffer =
       TypedArrayBuffer.wrap(new Uint16Array(array.map(_.toInt).toJSArray))
   }

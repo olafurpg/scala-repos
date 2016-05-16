@@ -22,7 +22,8 @@ import scala.util.control.NoStackTrace
 class JavaExtensionSpec extends JavaExtension with JUnitSuiteLike
 
 object TestExtension
-    extends ExtensionId[TestExtension] with ExtensionIdProvider {
+    extends ExtensionId[TestExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new TestExtension(s)
 }
@@ -31,7 +32,8 @@ object TestExtension
 class TestExtension(val system: ExtendedActorSystem) extends Extension
 
 object FailingTestExtension
-    extends ExtensionId[FailingTestExtension] with ExtensionIdProvider {
+    extends ExtensionId[FailingTestExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new FailingTestExtension(s)
 
@@ -57,13 +59,14 @@ object ActorSystemSpec {
     def receive = {
       case n: Int ⇒
         master = sender()
-        terminaters = Set() ++
-        (for (i ← 1 to n) yield {
-              val man =
-                context.watch(context.system.actorOf(Props[Terminater]))
-              man ! "run"
-              man
-            })
+        terminaters =
+          Set() ++
+          (for (i ← 1 to n) yield {
+                val man =
+                  context.watch(context.system.actorOf(Props[Terminater]))
+                man ! "run"
+                man
+              })
       case Terminated(child) if terminaters contains child ⇒
         terminaters -= child
         if (terminaters.isEmpty) {
@@ -160,7 +163,8 @@ object ActorSystemSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorSystemSpec
-    extends AkkaSpec(ActorSystemSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorSystemSpec.config)
+    with ImplicitSender {
 
   import ActorSystemSpec.FastActor
 

@@ -148,8 +148,7 @@ object UnacceptedResponseEncodingRejection {
   * specified in the cause.
   */
 case class AuthenticationFailedRejection(
-    cause: AuthenticationFailedRejection.Cause,
-    challenge: HttpChallenge)
+    cause: AuthenticationFailedRejection.Cause, challenge: HttpChallenge)
     extends Rejection
 
 object AuthenticationFailedRejection {

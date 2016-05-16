@@ -32,10 +32,11 @@ object Puzzle extends LilaController {
       _.map(_.id) ?? env.api.puzzle.find
     }) { puzzle =>
       negotiate(
-          html = (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) flatMap {
-            asPlay =>
-              renderShow(puzzle, asPlay.fold("play", "try")) map { Ok(_) }
-          },
+          html =
+            (ctx.me ?? { env.api.attempt.hasPlayed(_, puzzle) map (!_) }) flatMap {
+              asPlay =>
+                renderShow(puzzle, asPlay.fold("play", "try")) map { Ok(_) }
+            },
           api = _ => puzzleJson(puzzle) map { Ok(_) }
       ) map { NoCache(_) }
     }
@@ -81,7 +82,7 @@ object Puzzle extends LilaController {
             fuccess { Ok(views.html.puzzle.history(ui)) }
           },
           api = _ =>
-              fuccess {
+            fuccess {
               Ok(JsData history ui)
           }
       )
@@ -117,11 +118,11 @@ object Puzzle extends LilaController {
               newCtx =>
                 selectPuzzle(newCtx.me) zip env.userInfos(newCtx.me) map {
                   case (Some(puzzle), infos) =>
-                    Ok(JsData(
-                            puzzle,
-                            infos,
-                            ctx.isAuth.fold("play", "try"),
-                            animationDuration = env.AnimationDuration)(newCtx))
+                    Ok(JsData(puzzle,
+                              infos,
+                              ctx.isAuth.fold("play", "try"),
+                              animationDuration =
+                                env.AnimationDuration)(newCtx))
                   case (None, _) => NotFound(noMorePuzzleJson)
                 }
             }
@@ -160,13 +161,14 @@ object Puzzle extends LilaController {
                         }
                     }
                   case (oldAttempt, Some(win)) =>
-                    env userInfos me.some map { infos =>
-                      Ok(JsData(puzzle,
-                                infos,
-                                "view",
-                                attempt = oldAttempt.some,
-                                win = win.some,
-                                animationDuration = env.AnimationDuration))
+                    env userInfos me.some map {
+                      infos =>
+                        Ok(JsData(puzzle,
+                                  infos,
+                                  "view",
+                                  attempt = oldAttempt.some,
+                                  win = win.some,
+                                  animationDuration = env.AnimationDuration))
                     }
                 }
               case None =>

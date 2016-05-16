@@ -212,8 +212,7 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) this else empty
         })
       case Cons(fa, more) =>
@@ -238,8 +237,7 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) empty else this
         })
       case Cons(fa, more) =>
@@ -314,8 +312,7 @@ sealed abstract class AsyncStream[+A] {
     this match {
       case Empty => empty
       case FromFuture(fa) =>
-        Embed(
-            fa.map { a =>
+        Embed(fa.map { a =>
           if (p(a)) this else empty
         })
       case Cons(fa, more) =>
@@ -467,8 +464,8 @@ sealed abstract class AsyncStream[+A] {
     * @param f a binary operator applied to elements of this stream. Note that
     * the second paramter is call-by-name.
     */
-  def foldRight[B](z: => Future[B])(
-      f: (A, => Future[B]) => Future[B]): Future[B] =
+  def foldRight[B](
+      z: => Future[B])(f: (A, => Future[B]) => Future[B]): Future[B] =
     this match {
       case Empty => z
       case FromFuture(fa) => fa.flatMap(f(_, z))

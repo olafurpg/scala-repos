@@ -43,7 +43,8 @@ object JsonApi {
     case class Acquire(fishnet: Fishnet, engine: BaseEngine) extends Request
 
     case class PostMove(fishnet: Fishnet, engine: BaseEngine, move: MoveResult)
-        extends Request with Result
+        extends Request
+        with Result
 
     case class MoveResult(bestmove: String) {
       def uci: Option[Uci] = Uci(bestmove)
@@ -52,7 +53,8 @@ object JsonApi {
     case class PostAnalysis(fishnet: Fishnet,
                             engine: FullEngine,
                             analysis: List[Evaluation])
-        extends Request with Result
+        extends Request
+        with Result
 
     case class Evaluation(pv: Option[String],
                           score: Score,

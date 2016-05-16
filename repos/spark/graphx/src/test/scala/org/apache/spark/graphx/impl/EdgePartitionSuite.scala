@@ -26,7 +26,7 @@ import org.apache.spark.serializer.KryoSerializer
 
 class EdgePartitionSuite extends SparkFunSuite {
 
-  def makeEdgePartition[A : ClassTag](
+  def makeEdgePartition[A: ClassTag](
       xs: Iterable[(Int, Int, A)]): EdgePartition[A, Int] = {
     val builder = new EdgePartitionBuilder[A, Int]
     for ((src, dst, attr) <- xs) {

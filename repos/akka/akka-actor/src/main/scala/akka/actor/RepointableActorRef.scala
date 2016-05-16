@@ -28,7 +28,8 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
                                         val mailboxType: MailboxType,
                                         val supervisor: InternalActorRef,
                                         val path: ActorPath)
-    extends ActorRefWithCell with RepointableRef {
+    extends ActorRefWithCell
+    with RepointableRef {
 
   import AbstractActorRef.{cellOffset, lookupOffset}
 
@@ -59,7 +60,8 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
   @tailrec final def swapLookup(next: Cell): Cell = {
     val old = lookup
     if (Unsafe.instance.compareAndSwapObject(this, lookupOffset, old, next))
-      old else swapLookup(next)
+      old
+    else swapLookup(next)
   }
 
   /**
@@ -266,8 +268,8 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
                       getClass,
                       "dropping message of type " + msg.message.getClass +
                       " due to enqueue failure"))
-          system.deadLetters.tell(
-              DeadLetter(msg.message, msg.sender, self), msg.sender)
+          system.deadLetters
+            .tell(DeadLetter(msg.message, msg.sender, self), msg.sender)
         } else if (Mailbox.debug)
           println(s"$self temp queueing ${msg.message} from ${msg.sender}")
       } finally lock.unlock()

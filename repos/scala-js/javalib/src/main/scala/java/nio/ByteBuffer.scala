@@ -32,7 +32,8 @@ object ByteBuffer {
 abstract class ByteBuffer private[nio](_capacity: Int,
                                        private[nio] val _array: Array[Byte],
                                        private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[ByteBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[ByteBuffer] {
 
   private[nio] type ElementType = Byte
   private[nio] type BufferType = ByteBuffer

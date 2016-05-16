@@ -150,16 +150,17 @@ class Interpreter(map: AtomicMap[Buf, Entry]) {
   private def getByKeys(keys: Seq[Buf]): Values = {
     Values(
         keys.flatMap { key =>
-          map.lock(key) { data =>
-            data
-              .get(key)
-              .filter { entry =>
-                entry.valid
-              }
-              .map { entry =>
-                val value = entry.value
-                Value(key, value, Some(generateCasUnique(value)))
-              }
+          map.lock(key) {
+            data =>
+              data
+                .get(key)
+                .filter { entry =>
+                  entry.valid
+                }
+                .map { entry =>
+                  val value = entry.value
+                  Value(key, value, Some(generateCasUnique(value)))
+                }
           }
         }
     )

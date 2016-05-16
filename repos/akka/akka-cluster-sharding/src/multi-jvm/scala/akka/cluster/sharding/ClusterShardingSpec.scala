@@ -208,7 +208,9 @@ class DDataClusterShardingMultiJvmNode6 extends DDataClusterShardingSpec
 class DDataClusterShardingMultiJvmNode7 extends DDataClusterShardingSpec
 
 abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config)
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterShardingSpec._
   import config._
 
@@ -217,20 +219,20 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+          new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(controller) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(controller) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
@@ -281,8 +283,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
       val rebalanceEnabled = typeName.toLowerCase.startsWith("rebalancing")
       val rememberEnabled = typeName.toLowerCase.contains("remember")
       val singletonProps = BackoffSupervisor
-        .props(childProps = coordinatorProps(
-                     typeName, rebalanceEnabled, rememberEnabled),
+        .props(childProps =
+                 coordinatorProps(typeName, rebalanceEnabled, rememberEnabled),
                childName = "coordinator",
                minBackoff = 5.seconds,
                maxBackoff = 5.seconds,
@@ -308,14 +310,15 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
     val settings =
       ClusterShardingSettings(cfg).withRememberEntities(rememberEntities)
     system.actorOf(
-        ShardRegion.props(typeName = typeName,
-                          entityProps = qualifiedCounterProps(typeName),
-                          settings = settings,
-                          coordinatorPath = "/user/" +
-                            typeName + "Coordinator/singleton/coordinator",
-                          extractEntityId = extractEntityId,
-                          extractShardId = extractShardId,
-                          handOffStopMessage = PoisonPill),
+        ShardRegion.props(
+            typeName = typeName,
+            entityProps = qualifiedCounterProps(typeName),
+            settings = settings,
+            coordinatorPath =
+              "/user/" + typeName + "Coordinator/singleton/coordinator",
+            extractEntityId = extractEntityId,
+            extractShardId = extractShardId,
+            handOffStopMessage = PoisonPill),
         name = typeName + "Region")
   }
 
@@ -450,7 +453,8 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
             ShardRegion.proxyProps(
                 typeName = "counter",
                 settings,
-                coordinatorPath = "/user/counterCoordinator/singleton/coordinator",
+                coordinatorPath =
+                  "/user/counterCoordinator/singleton/coordinator",
                 extractEntityId = extractEntityId,
                 extractShardId = extractShardId),
             name = "regionProxy")
@@ -614,12 +618,13 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   "easy to use with extensions" in within(50.seconds) {
     runOn(third, fourth, fifth, sixth) {
       //#counter-start
-      val counterRegion: ActorRef = ClusterSharding(system).start(
-          typeName = "Counter",
-          entityProps = Props[Counter],
-          settings = ClusterShardingSettings(system),
-          extractEntityId = extractEntityId,
-          extractShardId = extractShardId)
+      val counterRegion: ActorRef =
+        ClusterSharding(system).start(typeName = "Counter",
+                                      entityProps = Props[Counter],
+                                      settings =
+                                        ClusterShardingSettings(system),
+                                      extractEntityId = extractEntityId,
+                                      extractShardId = extractShardId)
       //#counter-start
       ClusterSharding(system).start(typeName = "AnotherCounter",
                                     entityProps = Props[AnotherCounter],
@@ -671,12 +676,13 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
   }
   "easy API for starting" in within(50.seconds) {
     runOn(first) {
-      val counterRegionViaStart: ActorRef = ClusterSharding(system).start(
-          typeName = "ApiTest",
-          entityProps = Props[Counter],
-          settings = ClusterShardingSettings(system),
-          extractEntityId = extractEntityId,
-          extractShardId = extractShardId)
+      val counterRegionViaStart: ActorRef =
+        ClusterSharding(system).start(typeName = "ApiTest",
+                                      entityProps = Props[Counter],
+                                      settings =
+                                        ClusterShardingSettings(system),
+                                      extractEntityId = extractEntityId,
+                                      extractShardId = extractShardId)
 
       val counterRegionViaGet: ActorRef =
         ClusterSharding(system).shardRegion("ApiTest")
@@ -914,8 +920,9 @@ abstract class ClusterShardingSpec(config: ClusterShardingSpecConfig)
         awaitAssert {
           var count = 0
           for (n ← 2 to 12) {
-            val entity = system.actorSelection(rebalancingPersistentRegion.path /
-                (n % 12).toString / n.toString)
+            val entity =
+              system.actorSelection(rebalancingPersistentRegion.path /
+                  (n % 12).toString / n.toString)
             entity ! Identify(n)
             receiveOne(3 seconds) match {
               case ActorIdentity(id, Some(_)) if id == n ⇒ count = count + 1

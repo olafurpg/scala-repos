@@ -172,7 +172,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
               val switch =
                 if (name.endsWith("Enabled"))
                   Some(name.replace("Enabled", "").capitalize)
-                else if (name.equals("enabled")) Some("") else None
+                else if (name.equals("enabled")) Some("")
+                else None
 
               Some(AndroidProperty(
                       name, tpe, getter, setters, switch, nameClashes))

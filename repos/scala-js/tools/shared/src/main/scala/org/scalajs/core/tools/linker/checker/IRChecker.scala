@@ -344,7 +344,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
     for (ParamDef(name, tpe, _, _) <- params) {
       if (tpe == NoType) reportError(s"Parameter $name has type NoType")
       else if (tpe != AnyType)
-        reportError(s"Parameter $name of exported constructor def has type " +
+        reportError(
+            s"Parameter $name of exported constructor def has type " +
             s"$tpe, but must be Any")
     }
 
@@ -492,7 +493,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
       implicit ctx: ErrorContext): Unit = {
     val tpe = typecheckExpr(tree, env)
     if (!isSubtype(tpe, expectedType))
-      reportError(s"$expectedType expected but $tpe found " +
+      reportError(
+          s"$expectedType expected but $tpe found " +
           s"for tree of type ${tree.getClass.getName}")
   }
 
@@ -529,7 +531,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
         typecheckExpect(actual, env, formal)
       }
       if (tpe != resultType)
-        reportError(s"Call to $methodFullName of type $resultType " +
+        reportError(
+            s"Call to $methodFullName of type $resultType " +
             s"typed as ${tree.tpe}")
     }
 
@@ -817,7 +820,8 @@ private final class IRChecker(unit: LinkingUnit, logger: Logger) {
 
       case Closure(captureParams, params, body, captureValues) =>
         if (captureParams.size != captureValues.size)
-          reportError("Mismatched size for captures: " +
+          reportError(
+              "Mismatched size for captures: " +
               s"${captureParams.size} params vs ${captureValues.size} values")
 
         for ((ParamDef(name, ctpe, mutable, rest), value) <- captureParams zip captureValues) {

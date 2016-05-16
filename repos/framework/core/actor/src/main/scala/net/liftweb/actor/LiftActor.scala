@@ -56,38 +56,37 @@ object LAScheduler extends LAScheduler with Loggable {
   @volatile var blockingQueueSize: Box[Int] = Full(200000)
 
   @volatile
-  var createExecutor: () => ILAExecute = () =>
-    {
-      new ILAExecute {
-        import java.util.concurrent._
+  var createExecutor: () => ILAExecute = () => {
+    new ILAExecute {
+      import java.util.concurrent._
 
-        private val es = // Executors.newFixedThreadPool(threadPoolSize)
-        new ThreadPoolExecutor(threadPoolSize,
-                               maxThreadPoolSize,
-                               60,
-                               TimeUnit.SECONDS,
-                               blockingQueueSize match {
-                                 case Full(x) =>
-                                   new ArrayBlockingQueue(x)
-                                 case _ => new LinkedBlockingQueue
-                               })
+      private val es = // Executors.newFixedThreadPool(threadPoolSize)
+      new ThreadPoolExecutor(threadPoolSize,
+                             maxThreadPoolSize,
+                             60,
+                             TimeUnit.SECONDS,
+                             blockingQueueSize match {
+                               case Full(x) =>
+                                 new ArrayBlockingQueue(x)
+                               case _ => new LinkedBlockingQueue
+                             })
 
-        def execute(f: () => Unit): Unit =
-          es.execute(
-              new Runnable {
-            def run() {
-              try {
-                f()
-              } catch {
-                case e: Exception => logger.error("Lift Actor Scheduler", e)
-              }
+      def execute(f: () => Unit): Unit =
+        es.execute(
+            new Runnable {
+          def run() {
+            try {
+              f()
+            } catch {
+              case e: Exception => logger.error("Lift Actor Scheduler", e)
             }
-          })
+          }
+        })
 
-        def shutdown(): Unit = {
-          es.shutdown()
-        }
+      def shutdown(): Unit = {
+        es.shutdown()
       }
+    }
   }
 
   @volatile
@@ -259,14 +258,14 @@ trait SpecializedLiftActor[T] extends SimpleActor[T] {
 
     def putListIntoMB(): Unit = {
       if (!priorityMsgList.isEmpty) {
-        priorityMsgList.foldRight(baseMailbox)(
-            (msg, mb) => mb.insertAfter(new MailboxItem(msg)))
+        priorityMsgList.foldRight(baseMailbox)((msg, mb) =>
+              mb.insertAfter(new MailboxItem(msg)))
         priorityMsgList = Nil
       }
 
       if (!msgList.isEmpty) {
-        msgList.foldLeft(baseMailbox)(
-            (mb, msg) => mb.insertBefore(new MailboxItem(msg)))
+        msgList.foldLeft(baseMailbox)((mb, msg) =>
+              mb.insertBefore(new MailboxItem(msg)))
         msgList = Nil
       }
     }
@@ -404,7 +403,8 @@ object ActorLogger extends Logger {}
 private final case class MsgWithResp(msg: Any, future: LAFuture[Any])
 
 trait LiftActor
-    extends SpecializedLiftActor[Any] with GenericActor[Any]
+    extends SpecializedLiftActor[Any]
+    with GenericActor[Any]
     with ForwardableActor[Any, Any] {
   @volatile
   private[this] var responseFuture: LAFuture[Any] = null

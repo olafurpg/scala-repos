@@ -22,7 +22,8 @@ object MacroEqualityOrderedSerialization {
 }
 
 abstract class MacroEqualityOrderedSerialization[T]
-    extends OrderedSerialization[T] with EquivSerialization[T] {
+    extends OrderedSerialization[T]
+    with EquivSerialization[T] {
   def uniqueId: String
   override def hashCode =
     MacroEqualityOrderedSerialization.seed ^ uniqueId.hashCode

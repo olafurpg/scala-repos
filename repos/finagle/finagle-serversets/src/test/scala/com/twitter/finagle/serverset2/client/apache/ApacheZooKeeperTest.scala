@@ -18,7 +18,9 @@ import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
 class ApacheZooKeeperTest
-    extends FlatSpec with MockitoSugar with OneInstancePerTest {
+    extends FlatSpec
+    with MockitoSugar
+    with OneInstancePerTest {
   val statsReceiver = new InMemoryStatsReceiver
   val mockZK = mock[org.apache.zookeeper.ZooKeeper]
   val watchedZK = {

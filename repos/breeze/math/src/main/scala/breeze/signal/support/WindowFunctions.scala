@@ -13,8 +13,8 @@ object WindowFunctions {
                     beta: Double = 0.46): DenseVector[Double] = {
     if (n == 1) DenseVector(1d)
     else
-      DenseVector.tabulate(n)(
-          count => alpha - beta * cos(2d * Pi * count / (n - 1)))
+      DenseVector.tabulate(n)(count =>
+            alpha - beta * cos(2d * Pi * count / (n - 1)))
   }
 
   def blackmanWindow(

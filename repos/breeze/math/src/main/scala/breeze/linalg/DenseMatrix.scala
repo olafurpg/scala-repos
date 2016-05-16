@@ -56,7 +56,9 @@ final class DenseMatrix[@spec(Double, Int, Float, Long) V](
     val offset: Int,
     val majorStride: Int,
     val isTranspose: Boolean = false)
-    extends Matrix[V] with MatrixLike[V, DenseMatrix[V]] with Serializable {
+    extends Matrix[V]
+    with MatrixLike[V, DenseMatrix[V]]
+    with Serializable {
 
   /** Creates a matrix with the specified data array, rows, and columns. */
   def this(rows: Int, cols: Int)(implicit man: ClassTag[V]) =
@@ -407,15 +409,18 @@ final class DenseMatrix[@spec(Double, Int, Float, Long) V](
 }
 
 object DenseMatrix
-    extends LowPriorityDenseMatrix with DenseMatrixOps
-    with DenseMatrix_OrderingOps with DenseMatrixMultOps
-    with DenseMatrixMultiplyStuff with DenseMatrixFloatMultiplyStuff
+    extends LowPriorityDenseMatrix
+    with DenseMatrixOps
+    with DenseMatrix_OrderingOps
+    with DenseMatrixMultOps
+    with DenseMatrixMultiplyStuff
+    with DenseMatrixFloatMultiplyStuff
     with MatrixConstructors[DenseMatrix] {
 
   /**
     * The standard way to create an empty matrix, size is rows * cols
     */
-  def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
+  def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
       rows: Int, cols: Int): DenseMatrix[V] = {
     val data = new Array[V](rows * cols)
     if (implicitly[Zero[V]] != null && rows * cols != 0 &&
@@ -435,7 +440,7 @@ object DenseMatrix
     * @tparam V
     * @return
     */
-  def create[@spec(Double, Int, Float, Long) V : Zero](
+  def create[@spec(Double, Int, Float, Long) V: Zero](
       rows: Int, cols: Int, data: Array[V]): DenseMatrix[V] = {
     create(rows, cols, data, 0, rows, isTranspose = false)
   }
@@ -451,13 +456,13 @@ object DenseMatrix
     * @tparam V
     * @return
     */
-  def create[@spec(Double, Int, Float, Long) V](
-      rows: Int,
-      cols: Int,
-      data: Array[V],
-      offset: Int,
-      majorStride: Int,
-      isTranspose: Boolean = false): DenseMatrix[V] = {
+  def create[@spec(Double, Int, Float, Long) V](rows: Int,
+                                                cols: Int,
+                                                data: Array[V],
+                                                offset: Int,
+                                                majorStride: Int,
+                                                isTranspose: Boolean =
+                                                  false): DenseMatrix[V] = {
     (data: Any) match {
       case d: Array[Double] =>
         new DenseMatrix(rows, cols, d, offset, majorStride, isTranspose)
@@ -484,7 +489,7 @@ object DenseMatrix
     * @return
     */
   override def ones[
-      @specialized(Int, Float, Double, Long) V : ClassTag : Zero : Semiring](
+      @specialized(Int, Float, Double, Long) V: ClassTag: Zero: Semiring](
       rows: Int, cols: Int): DenseMatrix[V] = {
     val data = new Array[V](rows * cols)
     if (rows * cols != 0 && data(0) != implicitly[Semiring[V]].one)
@@ -495,7 +500,7 @@ object DenseMatrix
   /**
     * Creates a square diagonal array of size dim x dim, with 1's along the diagonal.
     */
-  def eye[@spec(Double, Int, Float, Long) V : ClassTag : Zero : Semiring](
+  def eye[@spec(Double, Int, Float, Long) V: ClassTag: Zero: Semiring](
       dim: Int): DenseMatrix[V] = {
     val r = zeros[V](dim, dim)
     breeze.linalg.diag.diagDMDVImpl.apply(r) := implicitly[Semiring[V]].one
@@ -545,8 +550,8 @@ object DenseMatrix
   }
 
   // zerosLike
-  implicit def canCreateZerosLike[V : ClassTag : Zero]: CanCreateZerosLike[
-      DenseMatrix[V], DenseMatrix[V]] =
+  implicit def canCreateZerosLike[V: ClassTag: Zero]
+    : CanCreateZerosLike[DenseMatrix[V], DenseMatrix[V]] =
     new CanCreateZerosLike[DenseMatrix[V], DenseMatrix[V]] {
       def apply(v1: DenseMatrix[V]): DenseMatrix[V] = {
         zeros[V](v1.rows, v1.cols)
@@ -555,8 +560,8 @@ object DenseMatrix
 
   // slices
 
-  implicit def canSliceCol[V]: CanSlice2[
-      DenseMatrix[V], ::.type, Int, DenseVector[V]] = {
+  implicit def canSliceCol[V]
+    : CanSlice2[DenseMatrix[V], ::.type, Int, DenseVector[V]] = {
     new CanSlice2[DenseMatrix[V], ::.type, Int, DenseVector[V]] {
       def apply(m: DenseMatrix[V], ignored: ::.type, colWNegative: Int) = {
 
@@ -579,8 +584,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSliceRow[V]: CanSlice2[
-      DenseMatrix[V], Int, ::.type, Transpose[DenseVector[V]]] = {
+  implicit def canSliceRow[V]
+    : CanSlice2[DenseMatrix[V], Int, ::.type, Transpose[DenseVector[V]]] = {
     new CanSlice2[DenseMatrix[V], Int, ::.type, Transpose[DenseVector[V]]] {
       def apply(m: DenseMatrix[V], rowWNegative: Int, ignored: ::.type) = {
         canSliceCol[V].apply(m.t, ::, rowWNegative).t
@@ -588,8 +593,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSliceRows[V]: CanSlice2[
-      DenseMatrix[V], Range, ::.type, DenseMatrix[V]] = {
+  implicit def canSliceRows[V]
+    : CanSlice2[DenseMatrix[V], Range, ::.type, DenseMatrix[V]] = {
     new CanSlice2[DenseMatrix[V], Range, ::.type, DenseMatrix[V]] {
       def apply(m: DenseMatrix[V], rowsWNegative: Range, ignored: ::.type) = {
 
@@ -615,8 +620,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSliceCols[V]: CanSlice2[
-      DenseMatrix[V], ::.type, Range, DenseMatrix[V]] = {
+  implicit def canSliceCols[V]
+    : CanSlice2[DenseMatrix[V], ::.type, Range, DenseMatrix[V]] = {
     new CanSlice2[DenseMatrix[V], ::.type, Range, DenseMatrix[V]] {
       def apply(m: DenseMatrix[V], ignored: ::.type, colsWNegative: Range) = {
 
@@ -642,8 +647,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSliceColsAndRows[V]: CanSlice2[
-      DenseMatrix[V], Range, Range, DenseMatrix[V]] = {
+  implicit def canSliceColsAndRows[V]
+    : CanSlice2[DenseMatrix[V], Range, Range, DenseMatrix[V]] = {
     new CanSlice2[DenseMatrix[V], Range, Range, DenseMatrix[V]] {
       def apply(
           m: DenseMatrix[V], rowsWNegative: Range, colsWNegative: Range) = {
@@ -691,8 +696,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSlicePartOfCol[V]: CanSlice2[
-      DenseMatrix[V], Range, Int, DenseVector[V]] = {
+  implicit def canSlicePartOfCol[V]
+    : CanSlice2[DenseMatrix[V], Range, Int, DenseVector[V]] = {
     new CanSlice2[DenseMatrix[V], Range, Int, DenseVector[V]] {
       def apply(m: DenseMatrix[V], rowsWNegative: Range, colWNegative: Int) = {
 
@@ -725,8 +730,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canSlicePartOfRow[V]: CanSlice2[
-      DenseMatrix[V], Int, Range, Transpose[DenseVector[V]]] = {
+  implicit def canSlicePartOfRow[V]
+    : CanSlice2[DenseMatrix[V], Int, Range, Transpose[DenseVector[V]]] = {
     new CanSlice2[DenseMatrix[V], Int, Range, Transpose[DenseVector[V]]] {
       def apply(m: DenseMatrix[V], rowWNegative: Int, colsWNegative: Range) = {
         canSlicePartOfCol[V].apply(m.t, colsWNegative, rowWNegative).t
@@ -820,8 +825,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
-      DenseMatrix[V], (Int, Int), V] = {
+  implicit def canTraverseKeyValuePairs[V]
+    : CanTraverseKeyValuePairs[DenseMatrix[V], (Int, Int), V] = {
     new CanTraverseKeyValuePairs[DenseMatrix[V], (Int, Int), V] {
       def isTraversableAgain(from: DenseMatrix[V]): Boolean = true
 
@@ -861,9 +866,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canTransformValues[
-      @specialized(Int, Float, Double) V]: CanTransformValues[
-      DenseMatrix[V], V] = {
+  implicit def canTransformValues[@specialized(Int, Float, Double) V]
+    : CanTransformValues[DenseMatrix[V], V] = {
     new CanTransformValues[DenseMatrix[V], V] {
       def transform(from: DenseMatrix[V], fn: (V) => V) {
         if (from.isContiguous) {
@@ -894,7 +898,7 @@ object DenseMatrix
     }
   }
 
-  implicit def canMapKeyValuePairs[V, R : ClassTag] = {
+  implicit def canMapKeyValuePairs[V, R: ClassTag] = {
     new CanMapKeyValuePairs[DenseMatrix[V], (Int, Int), V, R, DenseMatrix[R]] {
       override def map(from: DenseMatrix[V], fn: (((Int, Int), V) => R)) = {
         val data = new Array[R](from.data.length)
@@ -918,7 +922,8 @@ object DenseMatrix
     }
   }
 
-  implicit def canTranspose[V]: CanTranspose[DenseMatrix[V], DenseMatrix[V]] = {
+  implicit def canTranspose[V]
+    : CanTranspose[DenseMatrix[V], DenseMatrix[V]] = {
     new CanTranspose[DenseMatrix[V], DenseMatrix[V]] {
       def apply(from: DenseMatrix[V]) = {
         DenseMatrix.create(data = from.data,
@@ -945,7 +950,7 @@ object DenseMatrix
     }
   }
 
-  implicit def canCopyDenseMatrix[V : ClassTag] = new CanCopy[DenseMatrix[V]] {
+  implicit def canCopyDenseMatrix[V: ClassTag] = new CanCopy[DenseMatrix[V]] {
     def apply(v1: DenseMatrix[V]) = {
       v1.copy
     }
@@ -981,7 +986,7 @@ object DenseMatrix
     * @tparam R
     * @return
     */
-  implicit def canMapRows[V, R : ClassTag : Zero](
+  implicit def canMapRows[V, R: ClassTag: Zero](
       implicit implSet: OpSet.InPlaceImpl2[DenseVector[R], DenseVector[R]])
     : CanCollapseAxis[DenseMatrix[V],
                       Axis._0.type,
@@ -1012,16 +1017,16 @@ object DenseMatrix
       }
     }
 
-  implicit def handholdCanMapRows[V]: CanCollapseAxis.HandHold[
-      DenseMatrix[V], Axis._0.type, DenseVector[V]] =
+  implicit def handholdCanMapRows[V]
+    : CanCollapseAxis.HandHold[DenseMatrix[V], Axis._0.type, DenseVector[V]] =
     new CanCollapseAxis.HandHold[DenseMatrix[V], Axis._0.type, DenseVector[V]]()
 
-  implicit def canMapRowsBitVector[V : ClassTag : Zero]: CanCollapseAxis[
-      DenseMatrix[V],
-      Axis._0.type,
-      DenseVector[V],
-      BitVector,
-      DenseMatrix[Boolean]] =
+  implicit def canMapRowsBitVector[V: ClassTag: Zero]
+    : CanCollapseAxis[DenseMatrix[V],
+                      Axis._0.type,
+                      DenseVector[V],
+                      BitVector,
+                      DenseMatrix[Boolean]] =
     new CanCollapseAxis[DenseMatrix[V],
                         Axis._0.type,
                         DenseVector[V],
@@ -1051,7 +1056,7 @@ object DenseMatrix
     * @tparam V value type
     * @return
     */
-  implicit def canMapCols[V, Res : ClassTag : Zero](
+  implicit def canMapCols[V, Res: ClassTag: Zero](
       implicit implSet: OpSet.InPlaceImpl2[DenseVector[Res], DenseVector[Res]])
     : CanCollapseAxis[DenseMatrix[V],
                       _1.type,
@@ -1091,11 +1096,11 @@ object DenseMatrix
     }
   }
 
-  implicit def handholdCanMapCols[V]: CanCollapseAxis.HandHold[
-      DenseMatrix[V], Axis._1.type, DenseVector[V]] =
+  implicit def handholdCanMapCols[V]
+    : CanCollapseAxis.HandHold[DenseMatrix[V], Axis._1.type, DenseVector[V]] =
     new CanCollapseAxis.HandHold[DenseMatrix[V], Axis._1.type, DenseVector[V]]()
 
-  implicit def canMapColsBitVector[V : ClassTag : Zero] =
+  implicit def canMapColsBitVector[V: ClassTag: Zero] =
     new CanCollapseAxis[DenseMatrix[V],
                         Axis._1.type,
                         DenseVector[V],
@@ -1132,8 +1137,8 @@ object DenseMatrix
     * Iterates over each columns
     * @return
     */
-  implicit def canTraverseCols[V]: CanTraverseAxis[
-      DenseMatrix[V], Axis._0.type, DenseVector[V]] = {
+  implicit def canTraverseCols[V]
+    : CanTraverseAxis[DenseMatrix[V], Axis._0.type, DenseVector[V]] = {
     new CanTraverseAxis[DenseMatrix[V], Axis._0.type, DenseVector[V]] {
       def apply[A](from: DenseMatrix[V], axis: Axis._0.type)(
           f: (DenseVector[V]) => A) {
@@ -1149,8 +1154,8 @@ object DenseMatrix
     * @tparam V
     * @return
     */
-  implicit def canTraverseRows[V]: CanTraverseAxis[
-      DenseMatrix[V], Axis._1.type, DenseVector[V]] = {
+  implicit def canTraverseRows[V]
+    : CanTraverseAxis[DenseMatrix[V], Axis._1.type, DenseVector[V]] = {
     new CanTraverseAxis[DenseMatrix[V], Axis._1.type, DenseVector[V]] {
       def apply[A](from: DenseMatrix[V], axis: Axis._1.type)(
           f: (DenseVector[V]) => A) {
@@ -1166,8 +1171,8 @@ object DenseMatrix
     * Iterates over each columns
     * @return
     */
-  implicit def canIterateCols[V]: CanIterateAxis[
-      DenseMatrix[V], Axis._0.type, DenseVector[V]] = {
+  implicit def canIterateCols[V]
+    : CanIterateAxis[DenseMatrix[V], Axis._0.type, DenseVector[V]] = {
     new CanIterateAxis[DenseMatrix[V], Axis._0.type, DenseVector[V]] {
 
       override def apply[A](
@@ -1182,8 +1187,8 @@ object DenseMatrix
     * @tparam V
     * @return
     */
-  implicit def canIterateRows[V]: CanIterateAxis[
-      DenseMatrix[V], Axis._1.type, DenseVector[V]] = {
+  implicit def canIterateRows[V]
+    : CanIterateAxis[DenseMatrix[V], Axis._1.type, DenseVector[V]] = {
     new CanIterateAxis[DenseMatrix[V], Axis._1.type, DenseVector[V]] {
 
       override def apply[A](
@@ -1206,7 +1211,7 @@ object DenseMatrix
 
   // There's a bizarre error specializing float's here.
   class CanZipMapValuesDenseMatrix[@spec(Double, Int, Float, Long) V,
-                                   @specialized(Int, Double) RV : ClassTag]
+                                   @specialized(Int, Double) RV: ClassTag]
       extends CanZipMapValues[DenseMatrix[V], V, RV, DenseMatrix[RV]] {
 
     def create(rows: Int, cols: Int) =
@@ -1230,7 +1235,7 @@ object DenseMatrix
     }
   }
 
-  implicit def zipMap[V, R : ClassTag]: CanZipMapValuesDenseMatrix[V, R] =
+  implicit def zipMap[V, R: ClassTag]: CanZipMapValuesDenseMatrix[V, R] =
     new CanZipMapValuesDenseMatrix[V, R]
   implicit val zipMap_d: CanZipMapValuesDenseMatrix[Double, Double] =
     new CanZipMapValuesDenseMatrix[Double, Double]
@@ -1240,7 +1245,7 @@ object DenseMatrix
     new CanZipMapValuesDenseMatrix[Int, Int]
 
   class CanZipMapKeyValuesDenseMatrix[@spec(Double, Int, Float, Long) V,
-                                      @specialized(Int, Double) RV : ClassTag]
+                                      @specialized(Int, Double) RV: ClassTag]
       extends CanZipMapKeyValues[
           DenseMatrix[V], (Int, Int), V, RV, DenseMatrix[RV]] {
 
@@ -1273,11 +1278,11 @@ object DenseMatrix
     }
   }
 
-  implicit def zipMapKV[V, R : ClassTag]: CanZipMapKeyValuesDenseMatrix[V, R] =
+  implicit def zipMapKV[V, R: ClassTag]: CanZipMapKeyValuesDenseMatrix[V, R] =
     new CanZipMapKeyValuesDenseMatrix[V, R]
 
-  implicit def canGaxpy[V : Semiring]: scaleAdd.InPlaceImpl3[
-      DenseMatrix[V], V, DenseMatrix[V]] = {
+  implicit def canGaxpy[V: Semiring]
+    : scaleAdd.InPlaceImpl3[DenseMatrix[V], V, DenseMatrix[V]] = {
     new scaleAdd.InPlaceImpl3[DenseMatrix[V], V, DenseMatrix[V]] {
       val ring = implicitly[Semiring[V]]
       def apply(a: DenseMatrix[V], s: V, b: DenseMatrix[V]) {
@@ -1303,7 +1308,7 @@ object DenseMatrix
 
   object FrobeniusInnerProductDenseMatrixSpace {
 
-    implicit def space[S : Field : Zero : ClassTag] = {
+    implicit def space[S: Field: Zero: ClassTag] = {
       val norms = EntrywiseMatrixNorms.make[DenseMatrix[S], S]
       import norms._
       MutableFiniteCoordinateField.make[DenseMatrix[S], (Int, Int), S]

@@ -27,7 +27,8 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 private[clustering] case class TestRow(features: Vector)
 
 class KMeansSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   final val k = 5

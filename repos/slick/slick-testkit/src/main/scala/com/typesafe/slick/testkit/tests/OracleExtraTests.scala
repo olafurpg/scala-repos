@@ -49,7 +49,7 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
           .map(_.id)
           .result
           .map(_ shouldBe Nil)
-      )
+    )
   }
 
   def testSequenceAndTriggerName = {

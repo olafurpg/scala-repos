@@ -217,15 +217,16 @@ object ScalaJSPluginInternal {
           .withCustomOutputWrapper(scalaJSOutputWrapper.value)
           .withPrettyPrint(opts.prettyPrintFullOptJS)
 
-        val newLinker = { () =>
-          Linker(semantics,
-                 outputMode,
-                 withSourceMap,
-                 opts.disableOptimizer,
-                 opts.parallel,
-                 opts.useClosureCompiler,
-                 frontendConfig,
-                 backendConfig)
+        val newLinker = {
+          () =>
+            Linker(semantics,
+                   outputMode,
+                   withSourceMap,
+                   opts.disableOptimizer,
+                   opts.parallel,
+                   opts.useClosureCompiler,
+                   frontendConfig,
+                   backendConfig)
         }
 
         new ClearableLinker(newLinker, opts.batchMode)
@@ -353,11 +354,11 @@ object ScalaJSPluginInternal {
     *  @return Collected elements attributed with physical files they originated
     *      from (key: scalaJSSourceFiles).
     */
-  private def collectFromClasspath[T](cp: Def.Classpath,
-                                      filter: FileFilter,
-                                      collectJar: VirtualJarFile => Seq[T],
-                                      collectFile: (File,
-                                      String) => T): Attributed[Seq[T]] = {
+  private def collectFromClasspath[T](
+      cp: Def.Classpath,
+      filter: FileFilter,
+      collectJar: VirtualJarFile => Seq[T],
+      collectFile: (File, String) => T): Attributed[Seq[T]] = {
 
     val realFiles = Seq.newBuilder[File]
     val results = Seq.newBuilder[T]
@@ -402,23 +403,22 @@ object ScalaJSPluginInternal {
         scalaJSIR := {
           import IRFileCache.IRContainer
 
-          val rawIR = collectFromClasspath(
-              fullClasspath.value,
-              "*.sjsir",
-              collectJar = jar => IRContainer.Jar(jar) :: Nil,
-              collectFile = { (file, relPath) =>
-                IRContainer.File(
-                    FileVirtualScalaJSIRFile.relative(file, relPath))
-              })
+          val rawIR =
+            collectFromClasspath(fullClasspath.value,
+                                 "*.sjsir",
+                                 collectJar =
+                                   jar => IRContainer.Jar(jar) :: Nil,
+                                 collectFile = { (file, relPath) =>
+                                   IRContainer.File(FileVirtualScalaJSIRFile
+                                         .relative(file, relPath))
+                                 })
 
           val cache = scalaJSIRCache.value
           rawIR.map(cache.cached)
         },
-        artifactPath in fastOptJS :=
-        ((crossTarget in fastOptJS).value /
+        artifactPath in fastOptJS := ((crossTarget in fastOptJS).value /
             ((moduleName in fastOptJS).value + "-fastopt.js")),
-        artifactPath in fullOptJS :=
-        ((crossTarget in fullOptJS).value /
+        artifactPath in fullOptJS := ((crossTarget in fullOptJS).value /
             ((moduleName in fullOptJS).value + "-opt.js")),
         scalaJSSemantics in fullOptJS ~= (_.optimized),
         scalaJSOptimizerOptions in fullOptJS := {
@@ -429,7 +429,7 @@ object ScalaJSPluginInternal {
         },
         fullOptJS <<= fullOptJS.dependsOn(packageMinifiedJSDependencies),
         artifactPath in packageScalaJSLauncher :=
-        ((crossTarget in packageScalaJSLauncher).value /
+          ((crossTarget in packageScalaJSLauncher).value /
             ((moduleName in packageScalaJSLauncher).value + "-launcher.js")),
         skip in packageScalaJSLauncher := !persistLauncher.value,
         packageScalaJSLauncher <<= Def.taskDyn {
@@ -454,12 +454,12 @@ object ScalaJSPluginInternal {
             }
         },
         artifactPath in packageJSDependencies :=
-        ((crossTarget in packageJSDependencies).value /
+          ((crossTarget in packageJSDependencies).value /
             ((moduleName in packageJSDependencies).value + "-jsdeps.js")),
         packageJSDependenciesSetting(
             packageJSDependencies, "package-js-deps", _.lib),
         artifactPath in packageMinifiedJSDependencies :=
-        ((crossTarget in packageMinifiedJSDependencies).value /
+          ((crossTarget in packageMinifiedJSDependencies).value /
             ((moduleName in packageMinifiedJSDependencies).value +
                 "-jsdeps.min.js")),
         packageJSDependenciesSetting(
@@ -515,8 +515,8 @@ object ScalaJSPluginInternal {
         },
         products <<= products.dependsOn(jsDependencyManifest),
         console <<= console.dependsOn(Def.task(
-                streams.value.log.warn(
-                    "Scala REPL doesn't work with Scala.js. You " +
+                streams.value.log
+                  .warn("Scala REPL doesn't work with Scala.js. You " +
                     "are running a JVM REPL. JavaScript things won't work.")
             )),
         scalaJSNativeLibraries := {
@@ -583,8 +583,8 @@ object ScalaJSPluginInternal {
           else true
         },
         scalaJSRequestsDOM := {
-          requiresDOM.?.value
-            .getOrElse(jsDependencyManifests.value.data.exists(_.requiresDOM))
+          requiresDOM.?.value.getOrElse(jsDependencyManifests.value.data
+                .exists(_.requiresDOM))
         },
         resolvedJSEnv := jsEnv.?.value.getOrElse {
           if (scalaJSUseRhino.value) {

@@ -66,7 +66,8 @@ object TestOffsetManager {
 
   class CommitThread(
       id: Int, partitionCount: Int, commitIntervalMs: Long, zkUtils: ZkUtils)
-      extends ShutdownableThread("commit-thread") with KafkaMetricsGroup {
+      extends ShutdownableThread("commit-thread")
+      with KafkaMetricsGroup {
 
     private val groupId = "group-" + id
     private val metadata = "Metadata from commit thread " + id
@@ -82,8 +83,8 @@ object TestOffsetManager {
 
     private def ensureConnected() {
       if (!offsetsChannel.isConnected)
-        offsetsChannel = ClientUtils.channelToOffsetManager(
-            groupId, zkUtils, SocketTimeoutMs)
+        offsetsChannel =
+          ClientUtils.channelToOffsetManager(groupId, zkUtils, SocketTimeoutMs)
     }
 
     override def doWork() {
@@ -138,7 +139,8 @@ object TestOffsetManager {
   }
 
   class FetchThread(numGroups: Int, fetchIntervalMs: Long, zkUtils: ZkUtils)
-      extends ShutdownableThread("fetch-thread") with KafkaMetricsGroup {
+      extends ShutdownableThread("fetch-thread")
+      with KafkaMetricsGroup {
 
     private val timer = newTimer(
         "fetch-thread", TimeUnit.MILLISECONDS, TimeUnit.SECONDS)
@@ -200,8 +202,8 @@ object TestOffsetManager {
                 .format(metadataChannel.host, metadataChannel.port))
           metadataChannel.disconnect()
           println("Creating new query channel.")
-          metadataChannel = ClientUtils.channelToAnyBroker(
-              zkUtils, SocketTimeoutMs)
+          metadataChannel =
+            ClientUtils.channelToAnyBroker(zkUtils, SocketTimeoutMs)
       } finally {
         Thread.sleep(fetchIntervalMs)
       }

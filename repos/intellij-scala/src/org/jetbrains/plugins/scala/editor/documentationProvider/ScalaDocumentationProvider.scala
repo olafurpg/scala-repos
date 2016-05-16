@@ -192,8 +192,7 @@ class ScalaDocumentationProvider extends CodeDocumentationProvider {
           case _ => ""
         })
         buffer.append(
-            "<b>" +
-            (element match {
+            "<b>" + (element match {
               case named: ScNamedElement => escapeHtml(named.name)
               case _ => "unknown"
             }) + "</b>")
@@ -495,7 +494,7 @@ object ScalaDocumentationProvider {
       owner.getDocComment match {
         case scalaComment: ScDocComment =>
           for (docTag <- scalaComment.findTagsByName(
-              Set(PARAM_TAG, TYPE_PARAM_TAG).contains _)) {
+                            Set(PARAM_TAG, TYPE_PARAM_TAG).contains _)) {
             docTag.name match {
               case PARAM_TAG => registerInheritedParam(inheritedParams, docTag)
               case TYPE_PARAM_TAG =>
@@ -599,8 +598,7 @@ object ScalaDocumentationProvider {
         processTypeParams(function)
 
         for (annotation <- function.annotations
-                              if annotation.annotationExpr.getText
-                            .startsWith("throws")) {
+             if annotation.annotationExpr.getText.startsWith("throws")) {
           buffer
             .append(leadingAsterisks)
             .append(MyScaladocParsing.THROWS_TAG)
@@ -677,13 +675,9 @@ object ScalaDocumentationProvider {
     buffer.append(if (escape) escapeHtml(param.name) else param.name)
 
     val arrow = ScalaPsiUtil.functionArrow(param.getProject)
-    buffer.append(
-        parseType(param,
-                  t =>
-                    {
-                  (if (param.isCallByNameParameter) s"$arrow " else "") +
-                  typeToString(t)
-              }))
+    buffer.append(parseType(param, t => {
+      (if (param.isCallByNameParameter) s"$arrow " else "") + typeToString(t)
+    }))
     if (param.isRepeatedParameter) buffer.append("*")
     if (param.isDefaultParam) {
       buffer.append(" = ")
@@ -741,8 +735,7 @@ object ScalaDocumentationProvider {
           ref.resolve match {
             case clazz: PsiClass =>
               "[<a href=\"psi_element://" + escapeHtml(clazz.qualifiedName) +
-              "\"><code>" +
-              (x.idText match {
+              "\"><code>" + (x.idText match {
                     case Some(text) => text
                     case None => ""
                   }) + "</code></a>]"
@@ -770,8 +763,8 @@ object ScalaDocumentationProvider {
     val modifiers = Array(
         "abstract", "final", "sealed", "implicit", "lazy", "override")
     for (modifier <- modifiers
-                        if elem.hasModifierPropertyScala(modifier)) buffer
-      .append(modifier + " ")
+         if elem.hasModifierPropertyScala(modifier)) buffer.append(
+        modifier + " ")
     buffer.toString()
   }
 
@@ -862,8 +855,7 @@ object ScalaDocumentationProvider {
              "</p>")
           case _ => ("", "")
         }
-        s1 +
-        (elem match {
+        s1 + (elem match {
               case _: ScFunction | _: ScTypeAlias | _: PsiMethod |
                   _: ScTypeDefinition | _: ScPatternDefinition =>
                 val i = javadoc.indexOf("</PRE>")
@@ -886,9 +878,8 @@ object ScalaDocumentationProvider {
           case method: PsiMethod =>
             var superSignature: MethodSignatureBackedByPsiMethod = null
             try {
-              superSignature = SuperMethodsSearch
-                .search(method, null, true, false)
-                .findFirst
+              superSignature =
+                SuperMethodsSearch.search(method, null, true, false).findFirst
             } catch {
               case e: IndexNotReadyException =>
             }
@@ -1282,8 +1273,8 @@ object ScalaDocumentationProvider {
         else
           clazz.name + " " + clazz.getPresentation.getLocationString + "\n" +
           (if (clParameter.isVal) "val "
-           else if (clParameter.isVar) "var " else "") + clParameter.name +
-          ": " + ScType.presentableText(
+           else if (clParameter.isVar) "var "
+           else "") + clParameter.name + ": " + ScType.presentableText(
               subst.subst(clParameter.getType(TypingContext.empty).getOrAny))
       case _ => defaultText
     }) + (if (parameter.isRepeatedParameter) "*" else "")

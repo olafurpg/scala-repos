@@ -12,7 +12,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-    extends FunSuite with GeneratorDrivenPropertyChecks
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
     with OneInstancePerTest {
 
   val timeout = 10.seconds
@@ -22,10 +23,9 @@ class ChannelTransportTest
     val tr = new ChannelTransport[String, String](ch)
     // We have to remove EmbedChannels' LastInboundHandler to make sure inbound messages
     // reach our own ChannelTransport.
-    ch.pipeline()
-      .removeFirst()
+    ch.pipeline().removeFirst()
 
-      (tr, ch)
+    (tr, ch)
   }
 
   def assertSeenWhatsWritten[A](
@@ -74,8 +74,7 @@ class ChannelTransportTest
 
   test("write (failure)") {
     val e = new Exception()
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
       override def write(ctx: ChannelHandlerContext,
                          msg: scala.Any,
                          promise: ChannelPromise): Unit = {
@@ -91,8 +90,7 @@ class ChannelTransportTest
   }
 
   test("write (ok)") {
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
       override def write(ctx: ChannelHandlerContext,
                          msg: scala.Any,
                          promise: ChannelPromise): Unit = {
@@ -108,8 +106,7 @@ class ChannelTransportTest
 
   test("write (interrupted by caller)") {
     var p: Option[ChannelPromise] = None
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
       override def write(ctx: ChannelHandlerContext,
                          msg: scala.Any,
                          promise: ChannelPromise): Unit = {
@@ -128,8 +125,7 @@ class ChannelTransportTest
   }
 
   test("write (canceled by callee)") {
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
       override def write(ctx: ChannelHandlerContext,
                          msg: scala.Any,
                          promise: ChannelPromise): Unit = {

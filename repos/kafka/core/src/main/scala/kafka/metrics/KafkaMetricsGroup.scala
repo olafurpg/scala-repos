@@ -44,11 +44,11 @@ trait KafkaMetricsGroup extends Logging {
     explicitMetricName(pkg, simpleName, name, tags)
   }
 
-  private def explicitMetricName(
-      group: String,
-      typeName: String,
-      name: String,
-      tags: scala.collection.Map[String, String] = Map.empty) = {
+  private def explicitMetricName(group: String,
+                                 typeName: String,
+                                 name: String,
+                                 tags: scala.collection.Map[String, String] =
+                                   Map.empty) = {
     val nameBuilder: StringBuilder = new StringBuilder
 
     nameBuilder.append(group)
@@ -246,32 +246,30 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
 
   private def removeAllMetricsInList(
       metricNameList: immutable.List[MetricName], clientId: String) {
-    metricNameList.foreach(
-        metric =>
-          {
-        val pattern = (".*clientId=" + clientId + ".*").r
-        val registeredMetrics = scala.collection.JavaConversions
-          .asScalaSet(Metrics.defaultRegistry().allMetrics().keySet())
-        for (registeredMetric <- registeredMetrics) {
-          if (registeredMetric.getGroup == metric.getGroup &&
-              registeredMetric.getName == metric.getName &&
-              registeredMetric.getType == metric.getType) {
-            pattern.findFirstIn(registeredMetric.getMBeanName) match {
-              case Some(_) => {
-                  val beforeRemovalSize =
-                    Metrics.defaultRegistry().allMetrics().keySet().size
-                  Metrics.defaultRegistry().removeMetric(registeredMetric)
-                  val afterRemovalSize =
-                    Metrics.defaultRegistry().allMetrics().keySet().size
-                  trace("Removing metric %s. Metrics registry size reduced from %d to %d"
-                        .format(registeredMetric,
-                                beforeRemovalSize,
-                                afterRemovalSize))
-                }
-              case _ =>
-            }
+    metricNameList.foreach(metric => {
+      val pattern = (".*clientId=" + clientId + ".*").r
+      val registeredMetrics = scala.collection.JavaConversions
+        .asScalaSet(Metrics.defaultRegistry().allMetrics().keySet())
+      for (registeredMetric <- registeredMetrics) {
+        if (registeredMetric.getGroup == metric.getGroup &&
+            registeredMetric.getName == metric.getName &&
+            registeredMetric.getType == metric.getType) {
+          pattern.findFirstIn(registeredMetric.getMBeanName) match {
+            case Some(_) => {
+                val beforeRemovalSize =
+                  Metrics.defaultRegistry().allMetrics().keySet().size
+                Metrics.defaultRegistry().removeMetric(registeredMetric)
+                val afterRemovalSize =
+                  Metrics.defaultRegistry().allMetrics().keySet().size
+                trace("Removing metric %s. Metrics registry size reduced from %d to %d"
+                      .format(registeredMetric,
+                              beforeRemovalSize,
+                              afterRemovalSize))
+              }
+            case _ =>
           }
         }
+      }
     })
   }
 }

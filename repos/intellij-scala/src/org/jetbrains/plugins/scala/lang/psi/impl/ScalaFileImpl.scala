@@ -44,9 +44,12 @@ import scala.collection.mutable.ArrayBuffer
 
 class ScalaFileImpl(viewProvider: FileViewProvider,
                     fileType: LanguageFileType = ScalaFileType.SCALA_FILE_TYPE)
-    extends PsiFileBase(viewProvider, fileType.getLanguage) with ScalaFile
-    with FileDeclarationsHolder with CompiledFileAdjuster
-    with ScControlFlowOwner with FileResolveScopeProvider {
+    extends PsiFileBase(viewProvider, fileType.getLanguage)
+    with ScalaFile
+    with FileDeclarationsHolder
+    with CompiledFileAdjuster
+    with ScControlFlowOwner
+    with FileResolveScopeProvider {
   override def getViewProvider = viewProvider
 
   override def getFileType = fileType

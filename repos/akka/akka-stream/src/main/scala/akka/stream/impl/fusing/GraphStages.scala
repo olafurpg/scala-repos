@@ -276,8 +276,8 @@ object GraphStages {
     override def toString = "TerminationWatcher"
   }
 
-  def terminationWatcher[T]: GraphStageWithMaterializedValue[
-      FlowShape[T, T], Future[Done]] =
+  def terminationWatcher[T]
+    : GraphStageWithMaterializedValue[FlowShape[T, T], Future[Done]] =
     TerminationWatcher.asInstanceOf[GraphStageWithMaterializedValue[
             FlowShape[T, T], Future[Done]]]
 
@@ -314,10 +314,9 @@ object GraphStages {
           schedulePeriodicallyWithInitialDelay(
               "TickTimer", initialDelay, interval)
           val callback = getAsyncCallback[Unit](
-              (_) ⇒
-                {
-              completeStage()
-              cancelled.set(true)
+              (_) ⇒ {
+            completeStage()
+            cancelled.set(true)
           })
 
           cancellable.cancelFuture.onComplete(_ ⇒ callback.invoke(()))(

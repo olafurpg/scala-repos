@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object BaseLaws {
-  def apply[A : Eq : Arbitrary] = new BaseLaws[A] {
+  def apply[A: Eq: Arbitrary] = new BaseLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -44,8 +44,8 @@ trait BaseLaws[A] extends Laws {
         "symmetry" → forAll(
             (a1: A, a2: A) => MSA.distance(a1, a2) === MSA.distance(a2, a1)),
         "triangleInequality" → forAll((a1: A, a2: A, a3: A) =>
-              (MSA.distance(a1, a2) +
-                  MSA.distance(a2, a3)) >= MSA.distance(a1, a3))
+              (MSA.distance(a1, a2) + MSA.distance(a2, a3)) >= MSA.distance(a1,
+                                                                            a3))
     )
 }
 

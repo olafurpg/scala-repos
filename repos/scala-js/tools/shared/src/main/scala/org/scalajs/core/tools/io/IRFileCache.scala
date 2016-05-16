@@ -232,7 +232,8 @@ final class IRFileCache {
 
   private final class PersistentIRFile(
       private[this] var _irFile: VirtualRelativeIRFile)
-      extends VirtualScalaJSIRFile with RelativeVirtualFile {
+      extends VirtualScalaJSIRFile
+      with RelativeVirtualFile {
 
     import ir.Trees._
     import ir.Infos

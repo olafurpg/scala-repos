@@ -97,7 +97,8 @@ final case class RedundancyGroup(
 //#group
 
 class CustomRouterDocSpec
-    extends AkkaSpec(CustomRouterDocSpec.config) with ImplicitSender {
+    extends AkkaSpec(CustomRouterDocSpec.config)
+    with ImplicitSender {
 
   import CustomRouterDocSpec._
   import akka.routing.SeveralRoutees

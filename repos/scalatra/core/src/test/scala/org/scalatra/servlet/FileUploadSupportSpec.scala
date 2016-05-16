@@ -8,7 +8,8 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 import scala.collection.JavaConversions._
 
 class FileUploadSupportSpecServlet
-    extends ScalatraServlet with FileUploadSupport {
+    extends ScalatraServlet
+    with FileUploadSupport {
   def headersToHeaders() {
     request.getHeaderNames
       .filter(_.startsWith("X"))
@@ -16,14 +17,12 @@ class FileUploadSupportSpecServlet
   }
 
   def fileParamsToHeaders() {
-    fileParams.foreach(
-        fileParam =>
-          {
-        response.setHeader("File-" + fileParam._1 + "-Name", fileParam._2.name)
-        response.setHeader(
-            "File-" + fileParam._1 + "-Size", fileParam._2.size.toString)
-        response.setHeader("File-" + fileParam._1 + "-SHA",
-                           DigestUtils.shaHex(fileParam._2.get()))
+    fileParams.foreach(fileParam => {
+      response.setHeader("File-" + fileParam._1 + "-Name", fileParam._2.name)
+      response.setHeader(
+          "File-" + fileParam._1 + "-Size", fileParam._2.size.toString)
+      response.setHeader("File-" + fileParam._1 + "-SHA",
+                         DigestUtils.shaHex(fileParam._2.get()))
     })
   }
 
@@ -57,25 +56,22 @@ class FileUploadSupportSpecServlet
   }
 
   post("/uploadFileMultiParams") {
-    fileMultiParams.foreach(file =>
-          {
-        val name = file._1
-        val items = file._2
-        val first = fileParams(name)
-        var i = 0
+    fileMultiParams.foreach(file => {
+      val name = file._1
+      val items = file._2
+      val first = fileParams(name)
+      var i = 0
 
-        response.setHeader("File-" + name + "-First", first.name)
+      response.setHeader("File-" + name + "-First", first.name)
 
-        items.foreach(item =>
-              {
-            response.setHeader("File-" + name + i + "-Name", item.name)
-            response.setHeader("File-" + name + i + "-Size",
-                               item.size.toString)
-            response.setHeader("File-" + name + i + "-SHA",
-                               DigestUtils.shaHex(item.get()))
+      items.foreach(item => {
+        response.setHeader("File-" + name + i + "-Name", item.name)
+        response.setHeader("File-" + name + i + "-Size", item.size.toString)
+        response.setHeader("File-" + name + i + "-SHA",
+                           DigestUtils.shaHex(item.get()))
 
-            i += 1
-        })
+        i += 1
+      })
     })
 
     "post(/uploadFileMultiParams)"
@@ -99,7 +95,8 @@ class FileUploadSupportSpecServlet
 }
 
 class FileUploadSupportMaxSizeTestServlet
-    extends ScalatraServlet with FileUploadSupport {
+    extends ScalatraServlet
+    with FileUploadSupport {
   configureMultipartHandling(
       MultipartConfig(
           maxFileSize = Some(1024),
@@ -147,9 +144,9 @@ class FileUploadSupportSpec extends MutableScalatraSpec {
     val files =
       ("files[]",
        new File(
-           "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt")) :: (
-          "files[]",
-          new File("core/src/test/resources/org/scalatra/servlet/smiley.png")) :: Nil
+           "core/src/test/resources/org/scalatra/servlet/lorem_ipsum.txt")) :: ("files[]",
+                                                                                new File(
+                                                                                    "core/src/test/resources/org/scalatra/servlet/smiley.png")) :: Nil
 
     post("/uploadFileMultiParams", Map(), files) {
       f

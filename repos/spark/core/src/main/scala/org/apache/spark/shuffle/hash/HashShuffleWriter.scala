@@ -30,7 +30,8 @@ private[spark] class HashShuffleWriter[K, V](
     handle: BaseShuffleHandle[K, V, _],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V]
+    with Logging {
 
   private val dep = handle.dependency
   private val numOutputSplits = dep.partitioner.numPartitions

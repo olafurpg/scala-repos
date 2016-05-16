@@ -113,7 +113,8 @@ private[persistence] object LeveldbJournal {
       extends SubscriptionCommand
   final case class ReplayedTaggedMessage(
       persistent: PersistentRepr, tag: String, offset: Long)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 }
 
 /**

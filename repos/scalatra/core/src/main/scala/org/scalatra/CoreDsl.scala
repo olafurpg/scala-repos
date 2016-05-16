@@ -6,7 +6,9 @@ import org.scalatra.servlet.ServletApiImplicits
   * The core Scalatra DSL.
   */
 trait CoreDsl
-    extends Handler with Control with ScalatraContext
+    extends Handler
+    with Control
+    with ScalatraContext
     with ServletApiImplicits {
 
   /**

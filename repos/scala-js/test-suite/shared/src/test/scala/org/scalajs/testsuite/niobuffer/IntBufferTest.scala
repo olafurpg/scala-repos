@@ -20,7 +20,8 @@ abstract class IntBufferTest extends BaseBufferTest {
   }
 
   class WrappedIntBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedBufferFactory {
     def baseWrap(array: Array[Int]): IntBuffer =
       IntBuffer.wrap(array)
 
@@ -30,7 +31,8 @@ abstract class IntBufferTest extends BaseBufferTest {
 
   class ByteBufferIntViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory
+      with BufferFactory.ByteBufferViewFactory {
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): IntBuffer =

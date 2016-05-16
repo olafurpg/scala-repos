@@ -214,8 +214,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
                   .put(ScSubstitutor.key, subst)
                   .put(CachesUtil.NAMED_PARAM_KEY, java.lang.Boolean.TRUE)
                 if (!ScalaPsiUtil.memberNamesEquals(param.name, ref.refName)) {
-                  state = state.put(
-                      ResolverEnv.nameKey, param.deprecatedName.get)
+                  state =
+                    state.put(ResolverEnv.nameKey, param.deprecatedName.get)
                 }
                 processor.execute(param, state)
               case None =>
@@ -406,14 +406,13 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
           .getOrElse(return )
         val typeArgs: Seq[ScTypeElement] = Seq.empty
         val arguments = s.arguments
-        val secondaryConstructors = (c: ScClass) =>
-          {
-            if (c != clazz) Seq.empty
-            else {
-              c.secondaryConstructors.filter(f =>
-                    !PsiTreeUtil.isContextAncestor(f, s, true) &&
-                    f.getTextRange.getStartOffset < s.getTextRange.getStartOffset)
-            }
+        val secondaryConstructors = (c: ScClass) => {
+          if (c != clazz) Seq.empty
+          else {
+            c.secondaryConstructors.filter(f =>
+                  !PsiTreeUtil.isContextAncestor(f, s, true) &&
+                  f.getTextRange.getStartOffset < s.getTextRange.getStartOffset)
+          }
         }
         processConstructor(s, tp, typeArgs, arguments, secondaryConstructors)
       case constr: ScConstructor =>
@@ -448,8 +447,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
           case assignStmt: ScAssignStmt =>
             assignStmt.getLExpression match {
               case ref: ScReferenceExpression =>
-                val ind = params.indexWhere(
-                    p => ScalaPsiUtil.memberNamesEquals(p.name, ref.refName))
+                val ind = params.indexWhere(p =>
+                      ScalaPsiUtil.memberNamesEquals(p.name, ref.refName))
                 if (ind != -1) params.remove(ind)
                 else tail()
               case _ => tail()
@@ -528,7 +527,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
       case _ =>
     }
 
-    if (candidates.isEmpty || (!shape && candidates.forall(!_.isApplicable())) ||
+    if (candidates.isEmpty ||
+        (!shape && candidates.forall(!_.isApplicable())) ||
         (processor.isInstanceOf[CompletionProcessor] &&
             processor.asInstanceOf[CompletionProcessor].collectImplicits)) {
       processor match {
@@ -625,8 +625,8 @@ trait ResolvableReferenceExpression extends ScReferenceExpression {
             .put(CachesUtil.IMPLICIT_TYPE, res.tp)
           res.getClazz match {
             case Some(cl: PsiClass) =>
-              state = state.put(
-                  ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY, cl)
+              state =
+                state.put(ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY, cl)
             case _ =>
           }
           processor.processType(res.tp, e, state)

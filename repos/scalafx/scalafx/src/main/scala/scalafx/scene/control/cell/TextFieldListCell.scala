@@ -95,8 +95,8 @@ object TextFieldListCell {
   * @define TFLC `TextFieldListCell`
   */
 class TextFieldListCell[T](
-    override val delegate: jfxscc.TextFieldListCell[T] = new jfxscc.TextFieldListCell[
-          T])
+    override val delegate: jfxscc.TextFieldListCell[T] =
+      new jfxscc.TextFieldListCell[T])
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.TextFieldListCell[T], T, T]
     with UpdatableCell[jfxscc.TextFieldListCell[T], T]

@@ -37,7 +37,9 @@ import org.apache.spark.unsafe.types.UTF8String
   * Use [[testWithMemoryLeakDetection]] rather than [[test]] to construct test cases.
   */
 class UnsafeFixedWidthAggregationMapSuite
-    extends SparkFunSuite with Matchers with SharedSQLContext {
+    extends SparkFunSuite
+    with Matchers
+    with SharedSQLContext {
 
   import UnsafeFixedWidthAggregationMap._
 

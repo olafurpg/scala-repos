@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScExistentialArgument, ScExis
   * Date: 11.04.2008
   */
 class ScWildcardTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypeBoundsOwnerImpl
+    extends ScalaPsiElementImpl(node)
+    with ScTypeBoundsOwnerImpl
     with ScWildcardTypeElement {
   override def toString: String = "WildcardType: " + getText
 

@@ -11,7 +11,8 @@ object ByteBufferFactories {
   }
 
   class WrappedByteBufferFactory
-      extends ByteBufferFactory with WrappedBufferFactory {
+      extends ByteBufferFactory
+      with WrappedBufferFactory {
     def baseWrap(array: Array[Byte]): ByteBuffer =
       ByteBuffer.wrap(array)
 
@@ -25,11 +26,14 @@ object ByteBufferFactories {
   }
 
   class ReadOnlyWrappedByteBufferFactory
-      extends WrappedByteBufferFactory with ReadOnlyBufferFactory
+      extends WrappedByteBufferFactory
+      with ReadOnlyBufferFactory
 
   class SlicedAllocByteBufferFactory
-      extends AllocByteBufferFactory with SlicedBufferFactory
+      extends AllocByteBufferFactory
+      with SlicedBufferFactory
 
   class SlicedAllocDirectByteBufferFactory
-      extends AllocDirectByteBufferFactory with SlicedBufferFactory
+      extends AllocDirectByteBufferFactory
+      with SlicedBufferFactory
 }

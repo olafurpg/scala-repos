@@ -249,11 +249,11 @@ final class DataFrameWriter private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def startStream(): ContinuousQuery = {
-    val dataSource = DataSource(
-        df.sqlContext,
-        className = source,
-        options = extraOptions.toMap,
-        partitionColumns = normalizedParCols.getOrElse(Nil))
+    val dataSource = DataSource(df.sqlContext,
+                                className = source,
+                                options = extraOptions.toMap,
+                                partitionColumns =
+                                  normalizedParCols.getOrElse(Nil))
 
     df.sqlContext.sessionState.continuousQueryManager.startQuery(
         extraOptions.getOrElse("queryName", StreamExecution.nextName),

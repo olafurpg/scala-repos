@@ -131,12 +131,12 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
     }
 
   @tailrec
-  def parseHeaderLines(
-      input: ByteString,
-      lineStart: Int,
-      headers: ListBuffer[HttpHeader] = ListBuffer[HttpHeader](),
-      headerCount: Int = 0,
-      cth: Option[`Content-Type`] = None): StateResult = {
+  def parseHeaderLines(input: ByteString,
+                       lineStart: Int,
+                       headers: ListBuffer[HttpHeader] =
+                         ListBuffer[HttpHeader](),
+                       headerCount: Int = 0,
+                       cth: Option[`Content-Type`] = None): StateResult = {
     def contentType =
       cth match {
         case Some(x) ⇒ x.contentType
@@ -195,7 +195,7 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
   def parseEntity(headers: List[HttpHeader],
                   contentType: ContentType,
                   emitPartChunk: (List[HttpHeader], ContentType,
-                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
+                                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
                     emit(
                         BodyPartStart(headers,
                                       entityParts ⇒
@@ -206,12 +206,13 @@ private[http] final class BodyPartParser(defaultContentType: ContentType,
                     emit(bytes)
                   },
                   emitFinalPartChunk: (List[HttpHeader], ContentType,
-                  ByteString) ⇒ Unit = { (headers, ct, bytes) ⇒
-                    emit(
-                        BodyPartStart(headers, { rest ⇒
-                      SubSource.kill(rest)
-                      HttpEntity.Strict(ct, bytes)
-                    }))
+                                       ByteString) ⇒ Unit = {
+                    (headers, ct, bytes) ⇒
+                      emit(
+                          BodyPartStart(headers, { rest ⇒
+                        SubSource.kill(rest)
+                        HttpEntity.Strict(ct, bytes)
+                      }))
                   })(input: ByteString, offset: Int): StateResult =
     try {
       @tailrec def rec(index: Int): StateResult = {

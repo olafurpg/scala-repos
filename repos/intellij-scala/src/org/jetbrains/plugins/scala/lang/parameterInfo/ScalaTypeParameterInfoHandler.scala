@@ -123,29 +123,27 @@ class ScalaTypeParameterInfoHandler
     if (params.length == 0)
       buffer.append(CodeInsightBundle.message("parameter.info.no.parameters"))
     else {
-      buffer.append(
-          params
-            .map((param: PsiTypeParameter) =>
-                  {
-            val isBold =
-              if (params.indexOf(param) == index) true
-              else {
-                //todo: check type
-                false
-              }
-            var paramText = param.name
-            if (paramText == "?") paramText = "_"
-            val refTypes = param.getExtendsList.getReferencedTypes
-            if (refTypes.nonEmpty) {
-              paramText = paramText + refTypes
-                .map((typez: PsiType) =>
-                      {
-                    ScType.presentableText(substitutor.subst(
-                            ScType.create(typez, param.getProject)))
+      buffer.append(params
+            .map((param: PsiTypeParameter) => {
+          val isBold =
+            if (params.indexOf(param) == index) true
+            else {
+              //todo: check type
+              false
+            }
+          var paramText = param.name
+          if (paramText == "?") paramText = "_"
+          val refTypes = param.getExtendsList.getReferencedTypes
+          if (refTypes.nonEmpty) {
+            paramText =
+              paramText + refTypes
+                .map((typez: PsiType) => {
+                  ScType.presentableText(substitutor.subst(
+                          ScType.create(typez, param.getProject)))
                 })
                 .mkString(" <: ", " with ", "")
-            }
-            if (isBold) "<b>" + paramText + "</b>" else paramText
+          }
+          if (isBold) "<b>" + paramText + "</b>" else paramText
         })
             .mkString(", "))
     }
@@ -158,40 +156,41 @@ class ScalaTypeParameterInfoHandler
     if (params.isEmpty)
       buffer.append(CodeInsightBundle.message("parameter.info.no.parameters"))
     else {
-      buffer.append(
-          params
-            .map((param: ScTypeParam) =>
-                  {
-            val isBold =
-              if (params.indexOf(param) == index) true
-              else {
-                //todo: check type
-                false
-              }
-            var paramText = param.name
-            if (param.isContravariant) paramText = "-" + paramText
-            else if (param.isCovariant) paramText = "+" + paramText
-            param.lowerBound foreach {
-              case psi.types.Nothing =>
-              case tp: ScType =>
-                paramText = paramText + " >: " +
-                ScType.presentableText(substitutor.subst(tp))
+      buffer.append(params
+            .map((param: ScTypeParam) => {
+          val isBold =
+            if (params.indexOf(param) == index) true
+            else {
+              //todo: check type
+              false
             }
-            param.upperBound foreach {
-              case psi.types.Any =>
-              case tp: ScType =>
-                paramText = paramText + " <: " +
-                ScType.presentableText(substitutor.subst(tp))
-            }
-            param.viewBound foreach { (tp: ScType) =>
-              paramText = paramText + " <% " +
-              ScType.presentableText(substitutor.subst(tp))
-            }
-            param.contextBound foreach { (tp: ScType) =>
-              paramText = paramText + " : " +
-              ScType.presentableText(substitutor.subst(tp))
-            }
-            if (isBold) "<b>" + paramText + "</b>" else paramText
+          var paramText = param.name
+          if (param.isContravariant) paramText = "-" + paramText
+          else if (param.isCovariant) paramText = "+" + paramText
+          param.lowerBound foreach {
+            case psi.types.Nothing =>
+            case tp: ScType =>
+              paramText =
+                paramText +
+                " >: " + ScType.presentableText(substitutor.subst(tp))
+          }
+          param.upperBound foreach {
+            case psi.types.Any =>
+            case tp: ScType =>
+              paramText =
+                paramText +
+                " <: " + ScType.presentableText(substitutor.subst(tp))
+          }
+          param.viewBound foreach { (tp: ScType) =>
+            paramText =
+              paramText +
+              " <% " + ScType.presentableText(substitutor.subst(tp))
+          }
+          param.contextBound foreach { (tp: ScType) =>
+            paramText =
+              paramText + " : " + ScType.presentableText(substitutor.subst(tp))
+          }
+          if (isBold) "<b>" + paramText + "</b>" else paramText
         })
             .mkString(", "))
     }

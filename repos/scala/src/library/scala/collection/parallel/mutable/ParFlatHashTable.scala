@@ -26,7 +26,8 @@ trait ParFlatHashTable[T] extends scala.collection.mutable.FlatHashTable[T] {
 
   abstract class ParFlatHashTableIterator(
       var idx: Int, val until: Int, val totalsize: Int)
-      extends IterableSplitter[T] with SizeMapUtils {
+      extends IterableSplitter[T]
+      with SizeMapUtils {
     import scala.collection.DebugUtils._
 
     private[this] var traversed = 0

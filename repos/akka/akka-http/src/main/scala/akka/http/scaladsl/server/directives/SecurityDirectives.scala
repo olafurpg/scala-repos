@@ -191,11 +191,11 @@ trait SecurityDirectives {
     * Lifts an authenticator function into a directive. Same as `authenticateOrRejectWithChallenge`
     * but only applies the authenticator function with a certain type of credentials.
     */
-  def authenticateOrRejectWithChallenge[C <: HttpCredentials : ClassTag, T](
+  def authenticateOrRejectWithChallenge[C <: HttpCredentials: ClassTag, T](
       authenticator: Option[C] ⇒ Future[AuthenticationResult[T]])
     : AuthenticationDirective[T] =
-    authenticateOrRejectWithChallenge[T](
-        cred ⇒ authenticator(cred collect { case c: C ⇒ c }))
+    authenticateOrRejectWithChallenge[T](cred ⇒
+          authenticator(cred collect { case c: C ⇒ c }))
 
   /**
     * Applies the given authorization check to the request.

@@ -90,10 +90,14 @@ class QuotasTest extends KafkaServerTestHarness {
     val numPartitions = 1
     val leaders = TestUtils.createTopic(
         zkUtils, topic1, numPartitions, numServers, servers)
-    leaderNode = if (leaders(0).get == servers.head.config.brokerId)
-      servers.head else servers(1)
-    followerNode = if (leaders(0).get != servers.head.config.brokerId)
-      servers.head else servers(1)
+    leaderNode =
+      if (leaders(0).get == servers.head.config.brokerId)
+        servers.head
+      else servers(1)
+    followerNode =
+      if (leaders(0).get != servers.head.config.brokerId)
+        servers.head
+      else servers(1)
     assertTrue("Leader of all partitions of the topic should exist",
                leaders.values.forall(leader => leader.isDefined))
 

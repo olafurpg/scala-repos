@@ -54,7 +54,8 @@ import symtab.Flags._
   *  TODO: Rename phase to "Accessors" because it handles more than just super accessors
   */
 abstract class SuperAccessors
-    extends transform.Transform with transform.TypingTransformers {
+    extends transform.Transform
+    with transform.TypingTransformers {
   import global._
   import definitions._
   import analyzer.{restrictionError}
@@ -264,8 +265,8 @@ abstract class SuperAccessors
 
         // set a flag for all type parameters with `@specialized` annotation so it can be pickled
         case typeDef: TypeDef
-            if typeDef.symbol.deSkolemize
-              .hasAnnotation(definitions.SpecializedClass) =>
+            if typeDef.symbol.deSkolemize.hasAnnotation(
+                definitions.SpecializedClass) =>
           debuglog(
               "setting SPECIALIZED flag on typeDef.symbol.deSkolemize where typeDef = " +
               typeDef)
@@ -501,8 +502,8 @@ abstract class SuperAccessors
             val (receiver :: _) :: tail = newAcc.paramss
             val base: Tree = Select(Ident(receiver), sym)
             val allParamTypes = mapParamss(sym)(_.tpe)
-            val args = map2(tail, allParamTypes)(
-                (params, tpes) => map2(params, tpes)(makeArg(_, receiver, _)))
+            val args = map2(tail, allParamTypes)((params, tpes) =>
+                  map2(params, tpes)(makeArg(_, receiver, _)))
             args.foldLeft(base)(Apply(_, _))
           })
 
@@ -540,7 +541,8 @@ abstract class SuperAccessors
         case _ => NoSymbol
       }
       val result = gen.paramToArg(v)
-      if (clazz != NoSymbol && (obj.tpe.typeSymbol isSubClass clazz)) // path-dependent type
+      if (clazz != NoSymbol &&
+          (obj.tpe.typeSymbol isSubClass clazz)) // path-dependent type
         gen.mkAsInstanceOf(
             result, pt.asSeenFrom(singleType(NoPrefix, obj), clazz))
       else result

@@ -72,8 +72,8 @@ object LiteralRow {
   }
 
   @arityize(22)
-  implicit def tuple[V]: LiteralRow[
-      Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
+  implicit def tuple[V]
+    : LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
     new LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] {
       def foreach[X](tup: Tuple[V @arityize.repeat] @arityize.relative(tuple),
                      fn: ((Int, V) => X)) = {

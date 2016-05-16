@@ -91,7 +91,8 @@ class ClusterMetricsEnabledMultiJvmNode5 extends ClusterMetricsEnabledSpec
 
 abstract class ClusterMetricsEnabledSpec
     extends MultiNodeSpec(ClusterMetricsEnabledConfig)
-    with MultiNodeClusterSpec with RedirectLogging {
+    with MultiNodeClusterSpec
+    with RedirectLogging {
   import ClusterMetricsEnabledConfig._
 
   def isSigar(collector: MetricsCollector): Boolean =
@@ -152,7 +153,8 @@ class ClusterMetricsDisabledMultiJvmNode5 extends ClusterMetricsDisabledSpec
 
 abstract class ClusterMetricsDisabledSpec
     extends MultiNodeSpec(ClusterMetricsDisabledConfig)
-    with MultiNodeClusterSpec with RedirectLogging {
+    with MultiNodeClusterSpec
+    with RedirectLogging {
   import akka.cluster.ClusterEvent.CurrentClusterState
 
   val metricsView = new ClusterMetricsView(cluster.system)

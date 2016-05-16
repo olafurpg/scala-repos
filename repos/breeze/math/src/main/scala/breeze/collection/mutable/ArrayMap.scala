@@ -35,7 +35,8 @@ import scala.reflect.ClassTag
 @SerialVersionUID(1)
 class ArrayMap[@specialized V](defValue: => V, private val arr: ArrayBuffer[V])
     extends scala.collection.mutable.Map[Int, V]
-    with MapLike[Int, V, ArrayMap[V]] with Serializable {
+    with MapLike[Int, V, ArrayMap[V]]
+    with Serializable {
   def this(defValue: => V = ArrayMap.error) =
     this(defValue, new ArrayBuffer[V]())
   override def default(i: Int): V = defValue

@@ -36,7 +36,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.logging.{FileAppender, RollingFileAppender, SizeBasedRollingPolicy, TimeBasedRollingPolicy}
 
 class FileAppenderSuite
-    extends SparkFunSuite with BeforeAndAfter with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Logging {
 
   val testFile =
     new File(Utils.createTempDir(), "FileAppenderSuite-test").getAbsoluteFile
@@ -151,7 +153,7 @@ class FileAppenderSuite
     // on SparkConf settings.
 
     def testAppenderSelection[
-        ExpectedAppender : ClassTag, ExpectedRollingPolicy](
+        ExpectedAppender: ClassTag, ExpectedRollingPolicy](
         properties: Seq[(String, String)],
         expectedRollingPolicyParam: Long = -1): Unit = {
 

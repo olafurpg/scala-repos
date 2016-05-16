@@ -30,7 +30,8 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
 trait PredicatePullupSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification
+    with EvaluatorTestSupport[M] {
   import dag._
   import library._
 
@@ -488,4 +489,5 @@ trait PredicatePullupSpecs[M[+ _]]
 }
 
 object PredicatePullupSpecs
-    extends PredicatePullupSpecs[YId] with yggdrasil.test.YIdInstances
+    extends PredicatePullupSpecs[YId]
+    with yggdrasil.test.YIdInstances

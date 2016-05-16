@@ -32,9 +32,10 @@ private[ui] case class BatchUIData(
     val submissionTime: Long,
     val processingStartTime: Option[Long],
     val processingEndTime: Option[Long],
-    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] = mutable
-        .HashMap(),
-    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] = Seq.empty) {
+    val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] =
+      mutable.HashMap(),
+    var outputOpIdSparkJobIdPairs: Iterable[OutputOpIdAndSparkJobId] =
+      Seq.empty) {
 
   /**
     * Time taken for the first job of this batch to start processing from the time this batch
@@ -50,7 +51,7 @@ private[ui] case class BatchUIData(
     */
   def processingDelay: Option[Long] = {
     for (start <- processingStartTime;
-    end <- processingEndTime) yield end - start
+         end <- processingEndTime) yield end - start
   }
 
   /**

@@ -27,7 +27,9 @@ import scala.collection.mutable.{ArrayBuffer, Set => MSet}
 
 @RunWith(classOf[JUnitRunner])
 class MultiReaderTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
   class MockHandle extends ReadHandle {
     val _messages = new Broker[ReadMessage]
@@ -90,7 +92,7 @@ class MultiReaderTest
         .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
           def load(k: Buf) = new LinkedBlockingDeque[Buf]
         })
-        (host, queues)
+      (host, queues)
     }.toMap
 
     lazy val mockClientBuilder = {
@@ -201,7 +203,7 @@ class MultiReaderTest
         .build(new CacheLoader[Buf, BlockingDeque[Buf]] {
           def load(k: Buf) = new LinkedBlockingDeque[Buf]
         })
-        (host, queues)
+      (host, queues)
     }.toMap
 
     lazy val mockClientBuilder = {

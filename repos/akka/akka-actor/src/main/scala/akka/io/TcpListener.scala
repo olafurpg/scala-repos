@@ -18,7 +18,8 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 private[io] object TcpListener {
 
   final case class RegisterIncoming(channel: SocketChannel)
-      extends HasFailureMessage with NoSerializationVerificationNeeded {
+      extends HasFailureMessage
+      with NoSerializationVerificationNeeded {
     def failureMessage = FailedRegisterIncoming(channel)
   }
 
@@ -34,7 +35,8 @@ private[io] class TcpListener(selectorRouter: ActorRef,
                               channelRegistry: ChannelRegistry,
                               bindCommander: ActorRef,
                               bind: Bind)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import TcpListener._
@@ -131,7 +133,8 @@ private[io] class TcpListener(selectorRouter: ActorRef,
       selectorRouter ! WorkerForCommand(
           RegisterIncoming(socketChannel), self, props)
       acceptAllPending(registration, limit - 1)
-    } else if (bind.pullMode) limit else BatchAcceptLimit
+    } else if (bind.pullMode) limit
+    else BatchAcceptLimit
   }
 
   override def postStop() {

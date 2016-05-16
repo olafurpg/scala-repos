@@ -113,11 +113,9 @@ private[spark] class HttpServer(conf: SparkConf,
     }
 
     server.start()
-    val actualPort = server
-      .getConnectors()(0)
-      .getLocalPort
+    val actualPort = server.getConnectors()(0).getLocalPort
 
-      (server, actualPort)
+    (server, actualPort)
   }
 
   /**

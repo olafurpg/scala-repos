@@ -48,9 +48,9 @@ object LWWRegister {
       node: UniqueAddress, initialValue: A, clock: Clock[A]): LWWRegister[A] =
     new LWWRegister(node, initialValue, clock(0L, initialValue))
 
-  def apply[A](initialValue: A)(
-      implicit node: Cluster,
-      clock: Clock[A] = defaultClock[A]): LWWRegister[A] =
+  def apply[A](
+      initialValue: A)(implicit node: Cluster,
+                       clock: Clock[A] = defaultClock[A]): LWWRegister[A] =
     apply(node.selfUniqueAddress, initialValue, clock)
 
   /**
@@ -97,7 +97,8 @@ object LWWRegister {
 @SerialVersionUID(1L)
 final class LWWRegister[A] private[akka](
     private[akka] val node: UniqueAddress, val value: A, val timestamp: Long)
-    extends ReplicatedData with ReplicatedDataSerialization {
+    extends ReplicatedData
+    with ReplicatedDataSerialization {
   import LWWRegister.{Clock, defaultClock}
 
   type T = LWWRegister[A]
@@ -180,4 +181,5 @@ object LWWRegisterKey {
 
 @SerialVersionUID(1L)
 final case class LWWRegisterKey[A](_id: String)
-    extends Key[LWWRegister[A]](_id) with ReplicatedDataSerialization
+    extends Key[LWWRegister[A]](_id)
+    with ReplicatedDataSerialization

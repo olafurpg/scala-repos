@@ -1,7 +1,7 @@
 object ContextBound {
   val blubb = new Blubb /*#*/
 
-  def work[A : Foo /*#*/ ](f: Blubb /*#*/ => A /*#*/ ): A /*#*/ =
+  def work[A: Foo /*#*/ ](f: Blubb /*#*/ => A /*#*/ ): A /*#*/ =
     f(blubb /*#*/ ) ensuring {
       implicitly[Foo /*#*/ [A /*#*/ ]].foo /*#*/ (_) >= 42
     }

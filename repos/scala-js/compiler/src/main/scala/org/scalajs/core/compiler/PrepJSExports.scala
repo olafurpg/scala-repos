@@ -190,7 +190,7 @@ trait PrepJSExports {
     // Annotations that are directly on the member
     val directAnnots = for {
       annot <- trgSym.annotations if annot.symbol == JSExportAnnotation ||
-              annot.symbol == JSExportNamedAnnotation
+      annot.symbol == JSExportNamedAnnotation
     } yield annot
 
     // Is this a member export (i.e. not a class or module export)?
@@ -306,10 +306,9 @@ trait PrepJSExports {
         forcingSym <- trgSym.ancestors
         annot <- forcingSym.annotations if annot.symbol == trgAnnot
       } yield {
-        val ignoreInvalid = annot
-          .constantAtIndex(0)
-          .fold(false)(_.booleanValue)
-          (forcingSym, ignoreInvalid)
+        val ignoreInvalid =
+          annot.constantAtIndex(0).fold(false)(_.booleanValue)
+        (forcingSym, ignoreInvalid)
       }
 
       // The dominating forcing symbol, is the first that does not ignore
@@ -322,7 +321,7 @@ trait PrepJSExports {
 
       val optExport = for {
         (forcingSym, ignoreInvalid) <- forcingSymInfo if nameValid ||
-                                      !ignoreInvalid
+        !ignoreInvalid
       } yield {
         // Enfore no __ in name
         if (!nameValid) {
@@ -395,7 +394,7 @@ trait PrepJSExports {
     // Construct exporters for default getters
     val defaultGetters = for {
       (param, i) <- expSym.paramss.flatten.zipWithIndex
-                       if param.hasFlag(Flags.DEFAULTPARAM)
+      if param.hasFlag(Flags.DEFAULTPARAM)
     } yield genExportDefaultGetter(clsSym, defSym, expSym, i + 1, pos)
 
     exporter :: defaultGetters

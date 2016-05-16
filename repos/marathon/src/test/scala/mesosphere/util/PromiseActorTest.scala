@@ -9,7 +9,9 @@ import scala.concurrent.{Future, Await, Promise}
 import scala.concurrent.duration._
 
 class PromiseActorTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
     with Matchers {
 
   test("Success") {

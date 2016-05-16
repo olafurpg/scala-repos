@@ -221,8 +221,8 @@ private[http] object RenderVersion {
     val ret: Box[T] = for {
       sess <- S.session
       func <- sess.findFunc(v).collect {
-        case f: S.PageStateHolder => f
-      }
+               case f: S.PageStateHolder => f
+             }
     } yield {
       val tret = ver.doWith(v) {
         val ret = func.runInContext(f)
@@ -336,7 +336,9 @@ private[http] class BooleanThreadGlobal extends ThreadGlobal[Boolean] {
 class LiftSession(private[http] val _contextPath: String,
                   val underlyingId: String,
                   val httpSession: Box[HTTPSession])
-    extends LiftMerge with Loggable with HowStateful {
+    extends LiftMerge
+    with Loggable
+    with HowStateful {
   def sessionHtmlProperties =
     LiftRules.htmlProperties.session.is.make openOr LiftRules.htmlProperties.default.is.vend
 
@@ -372,8 +374,9 @@ class LiftSession(private[http] val _contextPath: String,
   private val functionOwnerRemovalListeners =
     LiftSession.onFunctionOwnersRemoved
 
-  @volatile private[http] var notices: Seq[(NoticeType.Value, NodeSeq, Box[
-          String])] = Nil
+  @volatile private[http] var notices: Seq[(NoticeType.Value,
+                                            NodeSeq,
+                                            Box[String])] = Nil
 
   private case class CometId(cometType: String, cometName: Box[String])
 
@@ -411,8 +414,8 @@ class LiftSession(private[http] val _contextPath: String,
   private var ajaxRequests =
     scala.collection.mutable.Map[String, List[AjaxRequestInfo]]()
 
-  private[http] def withAjaxRequests[T](fn: (scala.collection.mutable.Map[
-          String, List[AjaxRequestInfo]]) => T) = {
+  private[http] def withAjaxRequests[T](
+      fn: (scala.collection.mutable.Map[String, List[AjaxRequestInfo]]) => T) = {
     ajaxRequests.synchronized { fn(ajaxRequests) }
   }
 
@@ -744,7 +747,8 @@ class LiftSession(private[http] val _contextPath: String,
       accessPostPageFuncs {
         for {
           (key, pageInfo) <- postPageFunctions
-        } if (!pageInfo.longLife && (now - pageInfo.lastSeen) > LiftRules.unusedFunctionsLifeTime) {
+        } if (!pageInfo.longLife &&
+              (now - pageInfo.lastSeen) > LiftRules.unusedFunctionsLifeTime) {
           postPageFunctions -= key
         }
       }
@@ -890,8 +894,7 @@ class LiftSession(private[http] val _contextPath: String,
     import scala.collection.JavaConversions._
     (0 /: nmessageCallback)(
         (l, v) =>
-          l +
-          (v._2.owner match {
+          l + (v._2.owner match {
             case Full(owner) if (owner == ownerName) =>
               v._2.lastSeen = time
               1
@@ -942,7 +945,7 @@ class LiftSession(private[http] val _contextPath: String,
     */
   private[http] def locTemplate: Box[NodeSeq] =
     for (loc <- S.location;
-    template <- loc.template) yield template
+         template <- loc.template) yield template
 
   /**
     * Define the context path for this session.  This allows different
@@ -1078,8 +1081,8 @@ class LiftSession(private[http] val _contextPath: String,
                       cleanUpBeforeRender
 
                       PageName(request.uri + " -> " + request.path)
-                      LiftRules.allowParallelSnippets.doWith(
-                          () => !Props.inGAE) {
+                      LiftRules.allowParallelSnippets.doWith(() =>
+                            !Props.inGAE) {
                         (request.location.flatMap(_.earlyResponse) or LiftRules.earlyResponse
                               .firstFull(request)) or
                         (processTemplate(locTemplate,
@@ -1180,11 +1183,9 @@ class LiftSession(private[http] val _contextPath: String,
     f map { fnc =>
       val func: String = {
         val funcName = Helpers.nextFuncName
-        nmessageCallback.put(funcName,
-                             S.NFuncHolder(() =>
-                                   {
-                                 fnc()
-                             }))
+        nmessageCallback.put(funcName, S.NFuncHolder(() => {
+          fnc()
+        }))
         funcName
       }
       Helpers.appendFuncToURL(uri, func + "=_")
@@ -1247,13 +1248,13 @@ class LiftSession(private[http] val _contextPath: String,
         for {
           i <- n.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-              processSurroundAndInclude("Source", xform(ns)))
+                      processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case en: java.util.Enumeration[_] =>
         for {
           i <- en.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-              processSurroundAndInclude("Source", xform(ns)))
+                      processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case se: scala.collection.Iterable[_] =>
         runSourceContext(se.iterator, xform, ns)
@@ -1261,7 +1262,7 @@ class LiftSession(private[http] val _contextPath: String,
         for {
           i <- se.toSeq;
           nodes <- currentSourceContext.doWith(i)(
-              processSurroundAndInclude("Source", xform(ns)))
+                      processSurroundAndInclude("Source", xform(ns)))
         } yield nodes
       case a: Array[_] => runSourceContext(a.toList, xform, ns)
       case x =>
@@ -1361,7 +1362,8 @@ class LiftSession(private[http] val _contextPath: String,
 
   private[liftweb] def findTemplate(name: String): Box[NodeSeq] = {
     val splits = (if (name.startsWith("/"))
-                    name else "/" + name).split("/").toList.drop(1) match {
+                    name
+                  else "/" + name).split("/").toList.drop(1) match {
       case Nil => List("index")
       case s => s
     }
@@ -1377,8 +1379,8 @@ class LiftSession(private[http] val _contextPath: String,
     try {
       LiftSession.constructFrom(
           this,
-          S.location.flatMap(_.currentValue.map(
-                  v => ParamPair(v, v.asInstanceOf[Object].getClass))),
+          S.location.flatMap(_.currentValue.map(v =>
+                    ParamPair(v, v.asInstanceOf[Object].getClass))),
           c)
     } catch {
       case e: IllegalAccessException => Empty
@@ -1457,9 +1459,9 @@ class LiftSession(private[http] val _contextPath: String,
 
     for {
       template <- Templates(name, S.locale) ?~
-      ("Template " + name + " not found")
-      res <- findElem(
-          processSurroundAndInclude(name.mkString("/", "/", ""), template))
+                 ("Template " + name + " not found")
+      res <- findElem(processSurroundAndInclude(
+                    name.mkString("/", "/", ""), template))
     } yield res
   }
 
@@ -1622,8 +1624,7 @@ class LiftSession(private[http] val _contextPath: String,
 
     () =>
       {
-        requestVarFunc(
-            () =>
+        requestVarFunc(() =>
               executeInScope(currentReq, renderVersion)(deferredFunction()))
       }
   }
@@ -1642,8 +1643,7 @@ class LiftSession(private[http] val _contextPath: String,
 
     (in: A) =>
       {
-        requestVarFunc(
-            () =>
+        requestVarFunc(() =>
               executeInScope(currentReq, renderVersion)(deferredFunction(in)))
       }
   }
@@ -1687,7 +1687,7 @@ class LiftSession(private[http] val _contextPath: String,
     // Locate a snippet as defined by our SiteMap Loc
     def locSnippet(snippet: String): Box[NodeSeq] =
       for (loc <- S.location;
-      func <- loc.snippet(snippet)) yield func(kids)
+           func <- loc.snippet(snippet)) yield func(kids)
 
     def locateAndCacheSnippet(tagName: String): Box[AnyRef] =
       snippetMap.is.get(tagName) orElse {
@@ -1731,7 +1731,8 @@ class LiftSession(private[http] val _contextPath: String,
               // different behavior in stateless mode
               case Full(inst: StatelessBehavior) if !stateful_? =>
                 if (inst.statelessDispatch.isDefinedAt(method))
-                  inst.statelessDispatch(method)(kids) else NodeSeq.Empty
+                  inst.statelessDispatch(method)(kids)
+                else NodeSeq.Empty
 
               case Full(inst: StatefulSnippet) if !stateful_? =>
                 reportSnippetError(page,
@@ -1744,10 +1745,10 @@ class LiftSession(private[http] val _contextPath: String,
                 if (inst.dispatch.isDefinedAt(method)) {
                   val res = inst.dispatch(method)(kids)
 
-                  inst.mergeIntoForm(
-                      isForm,
-                      res,
-                      SHtml.hidden(() => inst.registerThisSnippet))
+                  inst.mergeIntoForm(isForm,
+                                     res,
+                                     SHtml.hidden(() =>
+                                           inst.registerThisSnippet))
                   /* (if (isForm && !res.isEmpty) SHtml.hidden(() => inst.registerThisSnippet) else NodeSeq.Empty) ++
                       res*/
                 } else
@@ -1773,8 +1774,8 @@ class LiftSession(private[http] val _contextPath: String,
                   def gotIt: Box[NodeSeq] =
                     for {
                       meth <- tryo(inst.getClass.getMethod(method))
-                                 if classOf[CssBindFunc].isAssignableFrom(
-                                 meth.getReturnType)
+                      if classOf[CssBindFunc].isAssignableFrom(
+                          meth.getReturnType)
                     } yield
                       meth.invoke(inst).asInstanceOf[CssBindFunc].apply(kids)
 
@@ -1821,14 +1822,14 @@ class LiftSession(private[http] val _contextPath: String,
                   def nodeSeqFunc: Box[NodeSeq] =
                     for {
                       meth <- tryo(inst.getClass.getMethod(method))
-                                 if isFuncNodeSeq(meth)
+                      if isFuncNodeSeq(meth)
                     } yield
                       meth
                         .invoke(inst)
                         .asInstanceOf[Function1[NodeSeq, NodeSeq]]
                         .apply(kids)
 
-                    (gotIt or nodeSeqFunc) openOr {
+                  (gotIt or nodeSeqFunc) openOr {
 
                     val ar: Array[AnyRef] = List(Group(kids)).toArray
                     ((Helpers.invokeMethod(inst.getClass,
@@ -1933,16 +1934,16 @@ class LiftSession(private[http] val _contextPath: String,
             net.liftweb.builtin.snippet.Form.post(ret)
           } match {
             case e: Elem =>
-              e % LiftRules.formAttrs.vend.foldLeft[MetaData](Null)((base,
-                  name) => checkAttr(name, attrs, base))
+              e % LiftRules.formAttrs.vend.foldLeft[MetaData](Null)(
+                  (base, name) => checkAttr(name, attrs, base))
             case x => x
           }
 
         case Some("ajax") =>
           net.liftweb.builtin.snippet.Form.render(ret) match {
             case e: Elem =>
-              e % LiftRules.formAttrs.vend.foldLeft[MetaData](Null)((base,
-                  name) => checkAttr(name, attrs, base))
+              e % LiftRules.formAttrs.vend.foldLeft[MetaData](Null)(
+                  (base, name) => checkAttr(name, attrs, base))
             case x => x
           }
 
@@ -1950,8 +1951,8 @@ class LiftSession(private[http] val _contextPath: String,
           <form action={S.uri} method={ft}>
             {ret}
           </form> % checkMultiPart(attrs) % LiftRules.formAttrs.vend
-            .foldLeft[MetaData](Null)((base,
-              name) => checkAttr(name, attrs, base))
+            .foldLeft[MetaData](Null)((base, name) =>
+                checkAttr(name, attrs, base))
 
         case _ => ret
       }
@@ -2038,8 +2039,8 @@ class LiftSession(private[http] val _contextPath: String,
         processSnippet(page, Full(snippetInfo), metaData, elm, kids)
     }
 
-  liftTagProcessing = LiftRules.liftTagProcessing.toList ::: List(
-      _defaultLiftTagProcessing)
+  liftTagProcessing =
+    LiftRules.liftTagProcessing.toList ::: List(_defaultLiftTagProcessing)
 
   private def asNodeSeq(in: Seq[Node]): NodeSeq = in
 
@@ -2089,25 +2090,24 @@ class LiftSession(private[http] val _contextPath: String,
       val req = S.request.map(_.snapshot)
 
       // send the ProcessSnippet message to the Actor
-      actor ! ProcessSnippet(() =>
-            {
-          executeInScope(req, renderVersion) {
-            // process the message
-            val bns = tryo {
-              reqVarCallback(() => f)
-            }
-
-            // set the node
-            hash.synchronized {
-              hash(nodeId) = bns match {
-                case Empty => Failure("Weird Empty Node", Empty, Empty)
-                case x => x
-              }
-
-              // and notify listeners
-              hash.notify()
-            }
+      actor ! ProcessSnippet(() => {
+        executeInScope(req, renderVersion) {
+          // process the message
+          val bns = tryo {
+            reqVarCallback(() => f)
           }
+
+          // set the node
+          hash.synchronized {
+            hash(nodeId) = bns match {
+              case Empty => Failure("Weird Empty Node", Empty, Empty)
+              case x => x
+            }
+
+            // and notify listeners
+            hash.notify()
+          }
+        }
       })
 
       theNode
@@ -2177,12 +2177,10 @@ class LiftSession(private[http] val _contextPath: String,
     testStatefulFeature {
       AnonFunc("x",
                SHtml
-                 .jsonCall(JsRaw("x"),
-                           (p: JsonAST.JValue) =>
-                             {
-                               in ! p
-                               JsCmds.Noop
-                           })
+                 .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
+                   in ! p
+                   JsCmds.Noop
+                 })
                  .cmd)
     }
   }
@@ -2216,21 +2214,17 @@ class LiftSession(private[http] val _contextPath: String,
       AnonFunc(
           "x",
           SHtml
-            .jsonCall(
-                JsRaw("x"),
-                (p: JsonAST.JValue) =>
-                  {
-                    in.!(xlate(p) match {
-                      case Full(v) => v
-                      case Empty =>
-                        logger.error(
-                            "Failed to deserialize JSON message " + p); p
-                      case Failure(msg, _, _) =>
-                        logger.error("Failed to deserialize JSON message " +
-                            p + ". Error " + msg); p
-                    })
-                    JsCmds.Noop
-                })
+            .jsonCall(JsRaw("x"), (p: JsonAST.JValue) => {
+              in.!(xlate(p) match {
+                case Full(v) => v
+                case Empty =>
+                  logger.error("Failed to deserialize JSON message " + p); p
+                case Failure(msg, _, _) =>
+                  logger.error("Failed to deserialize JSON message " + p +
+                      ". Error " + msg); p
+              })
+              JsCmds.Noop
+            })
             .cmd)
     }
   }
@@ -2324,8 +2318,7 @@ class LiftSession(private[http] val _contextPath: String,
 
                     val ser: Box[String] = Helpers.tryo(Serialization.write(x))
 
-                    ser.foreach(
-                        s =>
+                    ser.foreach(s =>
                           partialUpdate(JsCmds.JsSchedule(JsCmds.JsTry(
                                       JsRaw(toCall + "(" + s + ")").cmd,
                                       false))))
@@ -2854,111 +2847,116 @@ class LiftSession(private[http] val _contextPath: String,
       }
 
       def localFunc(in: JValue): JsCmd = {
-        LAScheduler.execute(() =>
-              {
-            executeInScope(currentReq, renderVersion)(for {
-              JString(guid) <- in \ "guid"
-              JString(name) <- in \ "name"
-              func <- map.get(name)
-              payload = in \ "payload"
-              reified <- if (func.manifest == jvmanifest) Some(payload)
-                        else {
-                          try {
-                            Some(
-                                payload.extract(defaultFormats, func.manifest))
-                          } catch {
-                            case e: Exception =>
-                              logger.error("Failed to extract " + payload +
-                                           " as " + func.manifest,
-                                           e)
-                              ca ! FailMsg(guid,
-                                           "Failed to extract payload as " +
-                                           func.manifest + " exception " +
-                                           e.getMessage)
-                              None
-                          }
+        LAScheduler.execute(() => {
+          executeInScope(currentReq, renderVersion)(for {
+            JString(guid) <- in \ "guid"
+            JString(name) <- in \ "name"
+            func <- map.get(name)
+            payload = in \ "payload"
+            reified <- if (func.manifest == jvmanifest) Some(payload)
+                      else {
+                        try {
+                          Some(payload.extract(defaultFormats, func.manifest))
+                        } catch {
+                          case e: Exception =>
+                            logger.error("Failed to extract " +
+                                         payload + " as " + func.manifest,
+                                         e)
+                            ca ! FailMsg(guid,
+                                         "Failed to extract payload as " +
+                                         func.manifest + " exception " +
+                                         e.getMessage)
+                            None
                         }
-            } {
-              func match {
-                case StreamRoundTrip(_, func) =>
-                  try {
-                    for (v <- func
-                      .asInstanceOf[Function1[Any, Stream[Any]]](reified)) {
-                      v match {
-                        case jsCmd: JsCmd => ca ! jsCmd
-                        case jsExp: JsExp => ca ! jsExp
-                        case v => ca ! ItemMsg(guid, fixIt(v))
                       }
-                    }
-                    ca ! DoneMsg(guid)
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
-                  }
-
-                case SimpleRoundTrip(_, func) =>
-                  try {
-                    func.asInstanceOf[Function1[Any, Any]](reified) match {
+          } {
+            func match {
+              case StreamRoundTrip(_, func) =>
+                try {
+                  for (v <- func.asInstanceOf[Function1[Any, Stream[Any]]](
+                               reified)) {
+                    v match {
                       case jsCmd: JsCmd => ca ! jsCmd
                       case jsExp: JsExp => ca ! jsExp
                       case v => ca ! ItemMsg(guid, fixIt(v))
                     }
-                    ca ! DoneMsg(guid)
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
                   }
+                  ca ! DoneMsg(guid)
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
 
-                case HandledRoundTrip(_, func) =>
-                  try {
-                    func.asInstanceOf[Function2[Any,
-                                                RoundTripHandlerFunc,
-                                                Unit]](
-                        reified, new RoundTripHandlerFunc {
-                      @volatile private var done_? = false
-                      def done() {
-                        if (!done_?) {
-                          done_? = true
-                          ca ! DoneMsg(guid)
-                        }
-                      }
-
-                      def failure(msg: String) {
-                        if (!done_?) {
-                          done_? = true
-                          ca ! FailMsg(guid, msg)
-                        }
-                      }
-
-                      /**
-                        * Send some JavaScript to execute on the client side
-                        * @param value
-                        */
-                      def send(value: JsCmd): Unit = {
-                        if (!done_?) {
-                          ca ! value
-                        }
-                      }
-
-                      /**
-                        * Send some javascript to execute on the client side
-                        * @param value
-                        */
-                      def send(value: JsExp): Unit = {
-                        if (!done_?) {
-                          ca ! value
-                        }
-                      }
-
-                      def send(value: JValue) {
-                        if (!done_?) {
-                          ca ! ItemMsg(guid, value)
-                        }
-                      }
-                    })
-                  } catch {
-                    case e: Exception => ca ! FailMsg(guid, e.getMessage)
+              case SimpleRoundTrip(_, func) =>
+                try {
+                  func.asInstanceOf[Function1[Any, Any]](reified) match {
+                    case jsCmd: JsCmd => ca ! jsCmd
+                    case jsExp: JsExp => ca ! jsExp
+                    case v => ca ! ItemMsg(guid, fixIt(v))
                   }
-              }
-            })
+                  ca ! DoneMsg(guid)
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
+
+              case HandledRoundTrip(_, func) =>
+                try {
+                  func.asInstanceOf[Function2[Any,
+                                              RoundTripHandlerFunc,
+                                              Unit]](reified,
+                                                     new RoundTripHandlerFunc {
+                                                       @volatile private var done_? =
+                                                         false
+                                                       def done() {
+                                                         if (!done_?) {
+                                                           done_? = true
+                                                           ca ! DoneMsg(guid)
+                                                         }
+                                                       }
+
+                                                       def failure(
+                                                           msg: String) {
+                                                         if (!done_?) {
+                                                           done_? = true
+                                                           ca ! FailMsg(guid,
+                                                                        msg)
+                                                         }
+                                                       }
+
+                                                       /**
+                                                         * Send some JavaScript to execute on the client side
+                                                         * @param value
+                                                         */
+                                                       def send(value: JsCmd)
+                                                         : Unit = {
+                                                         if (!done_?) {
+                                                           ca ! value
+                                                         }
+                                                       }
+
+                                                       /**
+                                                         * Send some javascript to execute on the client side
+                                                         * @param value
+                                                         */
+                                                       def send(value: JsExp)
+                                                         : Unit = {
+                                                         if (!done_?) {
+                                                           ca ! value
+                                                         }
+                                                       }
+
+                                                       def send(
+                                                           value: JValue) {
+                                                         if (!done_?) {
+                                                           ca ! ItemMsg(guid,
+                                                                        value)
+                                                         }
+                                                       }
+                                                     })
+                } catch {
+                  case e: Exception => ca ! FailMsg(guid, e.getMessage)
+                }
+            }
+          })
         })
 
         _Noop
@@ -3096,7 +3094,7 @@ private object SnippetNode {
       case elm: Elem => {
           for {
             SnippetInformation(snippetName, lift) <- snippetInformationForElement(
-                elm)
+                                                        elm)
           } yield {
             val (par, nonLift) = liftAttrsAndParallel(elm.attributes)
             val newElm = new Elem(elm.prefix,
@@ -3105,15 +3103,10 @@ private object SnippetNode {
                                   elm.scope,
                                   elm.minimizeEmpty,
                                   elm.child: _*)
-            (newElm,
-             newElm,
-             par ||
-             (lift.find {
-                   case up: UnprefixedAttribute if up.key == "parallel" => true
-                   case _ => false
-                 }.flatMap(up => AsBoolean.unapply(up.value.text)) getOrElse false),
-             lift,
-             snippetName)
+            (newElm, newElm, par || (lift.find {
+                  case up: UnprefixedAttribute if up.key == "parallel" => true
+                  case _ => false
+                }.flatMap(up => AsBoolean.unapply(up.value.text)) getOrElse false), lift, snippetName)
           }
         }
 

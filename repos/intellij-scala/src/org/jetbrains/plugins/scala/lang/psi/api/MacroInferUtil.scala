@@ -31,18 +31,16 @@ object MacroInferUtil {
       def withCheck(functionName: String,
                     classFqn: String,
                     typeEval: () => Option[ScType]): Checker = {
-        withCheck(
-            () =>
-              {
-            if (f.name != functionName) None
+        withCheck(() => {
+          if (f.name != functionName) None
+          else {
+            val clazz = f.containingClass
+            if (clazz == null) None
             else {
-              val clazz = f.containingClass
-              if (clazz == null) None
-              else {
-                if (clazz.qualifiedName != classFqn) None
-                else typeEval()
-              }
+              if (clazz.qualifiedName != classFqn) None
+              else typeEval()
             }
+          }
         })
       }
 

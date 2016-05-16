@@ -124,7 +124,7 @@ sealed case class Reporter(client: Scribe[Future],
                            serviceName: String,
                            statsReceiver: StatsReceiver = NullStatsReceiver,
                            private val sourceAddress: Option[String] = Some(
-                                 InetAddress.getLoopbackAddress.getHostName),
+                               InetAddress.getLoopbackAddress.getHostName),
                            private val clientAddress: Option[String] = None)
     extends Monitor {
 

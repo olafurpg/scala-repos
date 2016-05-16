@@ -48,8 +48,7 @@ object ComparingUtil {
       !areClassesEquivalent(clazz1, clazz2) &&
       !(clazz1.isInheritor(clazz2, true) || clazz2.isInheritor(clazz1, true))
 
-    areUnrelatedClasses &&
-    (oneFinal || twoNonTraitsOrInterfaces ||
+    areUnrelatedClasses && (oneFinal || twoNonTraitsOrInterfaces ||
         sealedAndAllChildrenAreIrreconcilable)
   }
 

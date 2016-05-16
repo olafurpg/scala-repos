@@ -40,7 +40,8 @@ import org.apache.spark.sql.{Row, SQLContext}
 @Since("1.3.0")
 class ChiSqSelectorModel @Since("1.3.0")(
     @Since("1.3.0") val selectedFeatures: Array[Int])
-    extends VectorTransformer with Saveable {
+    extends VectorTransformer
+    with Saveable {
 
   require(isSorted(selectedFeatures), "Array has to be sorted asc")
 
@@ -136,8 +137,7 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
     def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(
-          render(
+      val metadata = compact(render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))

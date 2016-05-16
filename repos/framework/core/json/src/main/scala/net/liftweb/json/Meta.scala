@@ -70,8 +70,8 @@ private[json] object Meta {
       def countOptionals(args: List[Arg]) =
         args.foldLeft(0)((n, x) => if (x.optional) n + 1 else n)
       def score(args: List[Arg]) =
-        args.foldLeft(0)(
-            (s, arg) => if (names.contains(arg.path)) s + 1 else -100)
+        args.foldLeft(0)((s, arg) =>
+              if (names.contains(arg.path)) s + 1 else -100)
 
       if (choices.isEmpty) None
       else {
@@ -81,8 +81,10 @@ private[json] object Meta {
               val newScore = score(c.args)
               if (newScore == best._2) {
                 if (countOptionals(c.args) < countOptionals(best._1.args))
-                  (c, newScore) else best
-              } else if (newScore > best._2) (c, newScore) else best
+                  (c, newScore)
+                else best
+              } else if (newScore > best._2) (c, newScore)
+              else best
           }
         Some(best._1)
       }
@@ -180,9 +182,9 @@ private[json] object Meta {
           val raw = java.lang.reflect.Array
             .newInstance(rawClassOf(aType.getGenericComponentType), 0: Int)
             .getClass
-            (Col(TypeInfo(raw, None),
-                 fieldMapping(aType.getGenericComponentType)._1),
-             false)
+          (Col(TypeInfo(raw, None),
+               fieldMapping(aType.getGenericComponentType)._1),
+           false)
         case raw: Class[_] =>
           if (primitive_?(raw)) (Value(raw), false)
           else if (raw.isArray)

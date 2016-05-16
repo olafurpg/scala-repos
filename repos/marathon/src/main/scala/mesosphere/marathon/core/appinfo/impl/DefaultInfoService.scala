@@ -12,7 +12,8 @@ import scala.collection.mutable
 private[appinfo] class DefaultInfoService(groupManager: GroupManager,
                                           appRepository: AppRepository,
                                           newBaseData: () => AppInfoBaseData)
-    extends AppInfoService with GroupInfoService {
+    extends AppInfoService
+    with GroupInfoService {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] val log = LoggerFactory.getLogger(getClass)

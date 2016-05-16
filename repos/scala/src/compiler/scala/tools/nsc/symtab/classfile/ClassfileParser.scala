@@ -534,8 +534,8 @@ abstract class ClassfileParser {
   def addEnclosingTParams(clazz: Symbol) {
     var sym = clazz.owner
     while (sym.isClass && !sym.isModuleClass) {
-      for (t <- sym.tpe.typeArgs) classTParams = classTParams +
-      (t.typeSymbol.name -> t.typeSymbol)
+      for (t <- sym.tpe.typeArgs) classTParams =
+        classTParams + (t.typeSymbol.name -> t.typeSymbol)
 
       sym = sym.owner
     }
@@ -746,7 +746,7 @@ abstract class ClassfileParser {
           tpe
         case ARRAY_TAG =>
           while ('0' <= sig.charAt(index) &&
-          sig.charAt(index) <= '9') index += 1
+                 sig.charAt(index) <= '9') index += 1
           var elemtp = sig2type(tparams, skiptvs)
           // make unbounded Array[T] where T is a type variable into Array[T with Object]
           // (this is necessary because such arrays have a representation which is incompatible
@@ -933,9 +933,8 @@ abstract class ClassfileParser {
             case pkg =>
               pkg.fullName(File.separatorChar) + File.separator + srcfileLeaf
           }
-          srcfile0 = settings.outputDirs
-            .srcFilesFor(in.file, srcpath)
-            .find(_.exists)
+          srcfile0 =
+            settings.outputDirs.srcFilesFor(in.file, srcpath).find(_.exists)
         case tpnme.CodeATTR =>
           if (sym.owner.isInterface) {
             sym setFlag JAVA_DEFAULTMETHOD
@@ -1017,7 +1016,8 @@ abstract class ClassfileParser {
           // The "bytes: String" argument of the ScalaSignature attribute is parsed specially so that it is
           // available as an array of bytes (the pickled Scala signature) instead of as a string. The pickled signature
           // is encoded as a string because of limitations in the Java class file format.
-          if ((attrType == ScalaSignatureAnnotation.tpe) && (name == nme.bytes))
+          if ((attrType == ScalaSignatureAnnotation.tpe) &&
+              (name == nme.bytes))
             parseScalaSigBytes match {
               case Some(c) => nvpairs += ((name, c))
               case None => hasError = true
@@ -1245,13 +1245,15 @@ abstract class ClassfileParser {
   }
 
   class TypeParamsType(override val typeParams: List[Symbol])
-      extends LazyType with FlagAgnosticCompleter {
+      extends LazyType
+      with FlagAgnosticCompleter {
     override def complete(sym: Symbol) {
       throw new AssertionError("cyclic type dereferencing")
     }
   }
   class LazyAliasType(alias: Symbol)
-      extends LazyType with FlagAgnosticCompleter {
+      extends LazyType
+      with FlagAgnosticCompleter {
     override def complete(sym: Symbol) {
       sym setInfo createFromClonedSymbols(alias.initialize.typeParams,
                                           alias.tpe)(typeFun)

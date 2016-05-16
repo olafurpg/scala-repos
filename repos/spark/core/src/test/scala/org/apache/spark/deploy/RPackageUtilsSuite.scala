@@ -36,7 +36,9 @@ import org.apache.spark.deploy.SparkSubmitUtils.MavenCoordinate
 import org.apache.spark.util.ResetSystemProperties
 
 class RPackageUtilsSuite
-    extends SparkFunSuite with BeforeAndAfterEach with ResetSystemProperties {
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with ResetSystemProperties {
 
   private val main = MavenCoordinate("a", "b", "c")
   private val dep1 = MavenCoordinate("a", "dep1", "c")
@@ -72,8 +74,8 @@ class RPackageUtilsSuite
   test("pick which jars to unpack using the manifest") {
     val deps = Seq(dep1, dep2).mkString(",")
     IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map(
-          c => new JarFile(getJarPath(c, new File(new URI(repo)))))
+      val jars = Seq(main, dep1, dep2).map(c =>
+            new JarFile(getJarPath(c, new File(new URI(repo)))))
       assert(RPackageUtils.checkManifestForR(jars(0)), "should have R code")
       assert(!RPackageUtils.checkManifestForR(jars(1)),
              "should not have R code")

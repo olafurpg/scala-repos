@@ -146,7 +146,8 @@ object MediaException {
 }
 
 class MediaException(override val delegate: jfxsm.MediaException)
-    extends Exception(delegate) with SFXDelegate[jfxsm.MediaException] {
+    extends Exception(delegate)
+    with SFXDelegate[jfxsm.MediaException] {
 
   /**
     * Retrieves the category into which this error falls.

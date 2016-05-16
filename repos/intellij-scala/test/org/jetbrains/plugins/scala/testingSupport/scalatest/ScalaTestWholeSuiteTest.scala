@@ -7,8 +7,12 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators._
   * @since 11.02.2015.
   */
 trait ScalaTestWholeSuiteTest
-    extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
-    with FunSpecGenerator with FunSuiteGenerator with PropSpecGenerator
+    extends FeatureSpecGenerator
+    with FlatSpecGenerator
+    with FreeSpecGenerator
+    with FunSpecGenerator
+    with FunSuiteGenerator
+    with PropSpecGenerator
     with WordSpecGenerator {
   val featureSpecTestPaths = List(List("[root]",
                                        "FeatureSpecTest",

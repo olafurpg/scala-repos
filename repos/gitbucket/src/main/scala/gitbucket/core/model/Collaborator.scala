@@ -6,7 +6,8 @@ trait CollaboratorComponent extends TemplateComponent { self: Profile =>
   lazy val Collaborators = TableQuery[Collaborators]
 
   class Collaborators(tag: Tag)
-      extends Table[Collaborator](tag, "COLLABORATOR") with BasicTemplate {
+      extends Table[Collaborator](tag, "COLLABORATOR")
+      with BasicTemplate {
     val collaboratorName = column[String]("COLLABORATOR_NAME")
     def * =
       (userName, repositoryName, collaboratorName) <>

@@ -48,7 +48,8 @@ trait BinaryTypedField extends TypedField[Array[Byte]] {
 }
 
 class BinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Array[Byte], OwnerType] with MandatoryTypedField[Array[Byte]]
+    extends Field[Array[Byte], OwnerType]
+    with MandatoryTypedField[Array[Byte]]
     with BinaryTypedField {
 
   def owner = rec
@@ -62,7 +63,8 @@ class BinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalBinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Array[Byte], OwnerType] with OptionalTypedField[Array[Byte]]
+    extends Field[Array[Byte], OwnerType]
+    with OptionalTypedField[Array[Byte]]
     with BinaryTypedField {
 
   def owner = rec

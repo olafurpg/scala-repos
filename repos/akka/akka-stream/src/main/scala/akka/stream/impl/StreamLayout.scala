@@ -612,7 +612,8 @@ private[stream] object VirtualProcessor {
   * it must ensure that we drop the Subscriber reference when `cancel` is invoked.
   */
 private[stream] final class VirtualProcessor[T]
-    extends AtomicReference[AnyRef] with Processor[T, T] {
+    extends AtomicReference[AnyRef]
+    with Processor[T, T] {
   import VirtualProcessor._
   import ReactiveStreamsCompliance._
 
@@ -810,7 +811,8 @@ private[stream] final class VirtualProcessor[T]
   * the use of `Inert.subscriber` as a tombstone.
   */
 private[impl] class VirtualPublisher[T]
-    extends AtomicReference[AnyRef] with Publisher[T] {
+    extends AtomicReference[AnyRef]
+    with Publisher[T] {
   import VirtualProcessor.Inert
   import ReactiveStreamsCompliance._
 

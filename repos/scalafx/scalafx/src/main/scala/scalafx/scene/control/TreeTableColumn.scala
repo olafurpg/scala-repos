@@ -63,7 +63,8 @@ object TreeTableColumn {
     def this(treeTableView: TreeTableView[S],
              treeTableColumn: TreeTableColumn[S, T],
              value: S) =
-      this(new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
+      this(
+          new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
               treeTableView, treeTableColumn, new TreeItem[S](value)))
 
     /**
@@ -225,8 +226,8 @@ object TreeTableColumn {
   *
   */
 class TreeTableColumn[S, T](
-    override val delegate: jfxsc.TreeTableColumn[S, T] = new jfxsc.TreeTableColumn[
-          S, T]())
+    override val delegate: jfxsc.TreeTableColumn[S, T] =
+      new jfxsc.TreeTableColumn[S, T]())
     extends TableColumnBase[jfxsc.TreeItem[S], T](delegate)
     with SFXDelegate[jfxsc.TreeTableColumn[S, T]] {
 
@@ -292,8 +293,7 @@ class TreeTableColumn[S, T](
     */
   def cellValueFactory: ObjectProperty[
       TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
-    ObjectProperty(
-        (features: TreeTableColumn.CellDataFeatures[S, T]) =>
+    ObjectProperty((features: TreeTableColumn.CellDataFeatures[S, T]) =>
           jfxObservableValue2sfx[T](
               delegate.cellValueFactoryProperty.getValue.call(features)))
 

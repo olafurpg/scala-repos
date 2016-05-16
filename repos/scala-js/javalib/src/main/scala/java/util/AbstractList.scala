@@ -5,7 +5,9 @@ import scala.collection.JavaConversions._
 import scala.annotation.tailrec
 
 abstract class AbstractList[E] protected ()
-    extends AbstractCollection[E] with List[E] { self =>
+    extends AbstractCollection[E]
+    with List[E] {
+  self =>
 
   override def add(element: E): Boolean = {
     add(size, element)
@@ -182,7 +184,8 @@ private abstract class AbstractListView[E](
 private class BackedUpListIterator[E](innerIterator: ListIterator[E],
                                       fromIndex: Int,
                                       override protected var end: Int)
-    extends ListIterator[E] with SizeChangeEvent {
+    extends ListIterator[E]
+    with SizeChangeEvent {
 
   def hasNext(): Boolean =
     i < end

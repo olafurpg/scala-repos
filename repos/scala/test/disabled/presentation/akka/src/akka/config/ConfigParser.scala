@@ -10,16 +10,17 @@ package akka.config
 import scala.collection.mutable
 import scala.util.parsing.combinator._
 
-class ConfigParser(
-    var prefix: String = "",
-    map: mutable.Map[String, Any] = mutable.Map.empty[String, Any],
-    importer: Importer)
+class ConfigParser(var prefix: String = "",
+                   map: mutable.Map[String, Any] =
+                     mutable.Map.empty[String, Any],
+                   importer: Importer)
     extends RegexParsers {
   val sections = mutable.Stack[String]()
 
   def createPrefix = {
-    prefix = if (sections.isEmpty) ""
-    else sections.toList.reverse.mkString("", ".", ".")
+    prefix =
+      if (sections.isEmpty) ""
+      else sections.toList.reverse.mkString("", ".", ".")
   }
 
   override val whiteSpace = """(\s+|#[^\n]*\n)+""".r

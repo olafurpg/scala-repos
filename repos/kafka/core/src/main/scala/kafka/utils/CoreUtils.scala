@@ -189,10 +189,9 @@ object CoreUtils extends Logging {
     if ("".equals(str)) return map
     val keyVals = str
       .split("\\s*,\\s*")
-      .map(s =>
-            {
-          val lio = s.lastIndexOf(":")
-          (s.substring(0, lio).trim, s.substring(lio + 1).trim)
+      .map(s => {
+        val lio = s.lastIndexOf(":")
+        (s.substring(0, lio).trim, s.substring(lio + 1).trim)
       })
     keyVals.toMap
   }
@@ -284,8 +283,8 @@ object CoreUtils extends Logging {
        * encode the C1 codes, but we do to be safe.
        */
       case c
-          if
-          ((c >= '\u0000' && c <= '\u001f') || (c >= '\u007f' && c <= '\u009f')) =>
+          if ((c >= '\u0000' && c <= '\u001f') ||
+              (c >= '\u007f' && c <= '\u009f')) =>
         "\\u%04x".format(c: Int)
       case c => c
     }.mkString

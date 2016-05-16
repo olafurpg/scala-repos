@@ -24,7 +24,8 @@ object BaseTypes {
             td.superTypes.flatMap(tp =>
                   if (!notAll)
                     BaseTypes.get(tp, notAll, visitedAliases = visitedAliases) ++ Seq(
-                        tp) else Seq(tp)))
+                        tp)
+                  else Seq(tp)))
       case ScDesignatorType(c: PsiClass) =>
         reduce(
             c.getSuperTypes.flatMap { p =>
@@ -60,8 +61,8 @@ object BaseTypes {
           ScDesignatorType(ta: ScTypeAliasDefinition), args) =>
         if (visitedAliases.contains(ta)) return Seq.empty
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters.map(
-                tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+            ta.typeParameters.map(tp =>
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         BaseTypes.get(
             genericSubst.subst(ta.aliasedType.getOrElse(return Seq.empty)),
@@ -71,8 +72,8 @@ object BaseTypes {
         val ta = p.actualElement.asInstanceOf[ScTypeAliasDefinition]
         if (visitedAliases.contains(ta)) return Seq.empty
         val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-            ta.typeParameters
-              .map(tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+            ta.typeParameters.map(tp =>
+                  (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
             args)
         val s = p.actualSubst.followed(genericSubst)
         BaseTypes.get(s.subst(ta.aliasedType.getOrElse(return Seq.empty)),
@@ -85,8 +86,9 @@ object BaseTypes {
               if (!notAll)
                 BaseTypes.get(p.substitutor.subst(tp),
                               notAll,
-                              visitedAliases = visitedAliases) ++ Seq(
-                    p.substitutor.subst(tp)) else Seq(p.substitutor.subst(tp))
+                              visitedAliases =
+                                visitedAliases) ++ Seq(p.substitutor.subst(tp))
+              else Seq(p.substitutor.subst(tp))
             })
           case Some(clazz) =>
             val s = p.substitutor

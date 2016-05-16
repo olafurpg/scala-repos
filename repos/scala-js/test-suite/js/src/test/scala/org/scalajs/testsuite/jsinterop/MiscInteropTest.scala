@@ -59,7 +59,7 @@ class MiscInteropTest {
   }
 
   @Test def js_constructorTag_T_for_native_classes(): Unit = {
-    def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
+    def test[T <: js.Any: js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
     test[js.RegExp](js.Dynamic.global.RegExp)
@@ -68,7 +68,7 @@ class MiscInteropTest {
   }
 
   @Test def js_constructorTag_T_for_Scala_js_defined_JS_classes(): Unit = {
-    def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
+    def test[T <: js.Any: js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
     val concreteCtor =

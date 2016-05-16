@@ -43,8 +43,7 @@ object ValidationTest extends SpecLite {
   "show" in {
     import syntax.show._
     Validation.success[String, Int](0).shows must_=== ("Success(0)")
-    Validation.failure[String, Int]("fail").shows must_===
-    ("Failure(\"fail\")")
+    Validation.failure[String, Int]("fail").shows must_=== ("Failure(\"fail\")")
   }
 
   "ap2" should {
@@ -54,7 +53,7 @@ object ValidationTest extends SpecLite {
       val fail2 = Failure("2").toValidationNel
       val f = (_: Int) + (_: Int)
       Apply[ValidationNel[String, ?]].ap2(fail1, fail2)(Success(f)).shows must_===
-      ("""Failure(["1","2"])""")
+        ("""Failure(["1","2"])""")
     }
   }
 
@@ -65,7 +64,7 @@ object ValidationTest extends SpecLite {
       val fail2 = Failure("2").toValidationNel
       val f = (_: Int) + (_: Int)
       Apply[ValidationNel[String, ?]].apply2(fail1, fail2)(f).shows must_===
-      ("""Failure(["1","2"])""")
+        ("""Failure(["1","2"])""")
     }
   }
 
@@ -73,20 +72,16 @@ object ValidationTest extends SpecLite {
     import syntax.show._
     "accumulate failures in order" in {
       val fail1 = Validation.failure[String, Int]("1").toValidationNel
-      val fail2 = Validation
-        .failure[String, Int]("2")
-        .toValidationNel
+      val fail2 = Validation.failure[String, Int]("2").toValidationNel
 
-        (fail1 findSuccess fail2).shows must_=== ("""Failure(["1","2"])""")
+      (fail1 findSuccess fail2).shows must_=== ("""Failure(["1","2"])""")
     }
 
     "return first success" in {
       val succ = Validation.success[String, Int](1).toValidationNel
-      val fail = Validation
-        .failure[String, Int]("2")
-        .toValidationNel
+      val fail = Validation.failure[String, Int]("2").toValidationNel
 
-        (succ findSuccess fail).shows must_=== (succ.shows)
+      (succ findSuccess fail).shows must_=== (succ.shows)
       (fail findSuccess succ).shows must_=== (succ.shows)
     }
   }
@@ -99,13 +94,13 @@ object ValidationTest extends SpecLite {
         (_.parseInt.leftMap(_.toString) excepting {
               case i if i < 0 => errmsg(i)
             })) must_===
-    (List(1.success[String], 2.success[String], 3.success[String]))
+      (List(1.success[String], 2.success[String], 3.success[String]))
 
     (List("1", "-2", "3") map
         (_.parseInt.leftMap(_.toString) excepting {
               case i if i < 0 => errmsg(i)
             })) must_===
-    (List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
+      (List(1.success[String], errmsg(-2).failure[Int], 3.success[String]))
 
     implicit val ShowAny: Show[Any] = Show.showA;
     implicit val EqualAny: Equal[Any] = Equal.equalA
@@ -119,16 +114,16 @@ object ValidationTest extends SpecLite {
         (_.parseInt.leftMap(_.toString) excepting {
               case i if i < 0 => errmsgA(i)
             })) must_===
-    (List(1.success[Any], errmsgA(-2).failure[Int], 3.success[Any]))
+      (List(1.success[Any], errmsgA(-2).failure[Int], 3.success[Any]))
   }
 
   "ensure" in {
     import syntax.std.string._
     import syntax.validation._
     List("1", "2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===
-    (List(1.success[String], 2.success[String]))
+      (List(1.success[String], 2.success[String]))
     List("1", "-2") map (_.parseInt.leftMap(_.toString).ensure("Fail")(_ >= 0)) must_===
-    (List(1.success[String], "Fail".failure[Int]))
+      (List(1.success[String], "Fail".failure[Int]))
   }
 
   "toMaybe" ! forAll { x: Validation[String, Int] =>
@@ -137,16 +132,16 @@ object ValidationTest extends SpecLite {
   }
 
   object instances {
-    def show[E : Show, A : Show] = Show[Validation[E, A]]
-    def equal[E : Equal, A : Equal] = Equal[Validation[E, A]]
-    def order[E : Order, A : Order] = Order[Validation[E, A]]
-    def semigroup[E : Semigroup, A : Semigroup] = Semigroup[Validation[E, A]]
-    def applicative[E : Semigroup] = Applicative[Validation[E, ?]]
-    def traverse[E : Semigroup] = Traverse[Validation[E, ?]]
-    def plus[E : Semigroup] = Plus[Validation[E, ?]]
+    def show[E: Show, A: Show] = Show[Validation[E, A]]
+    def equal[E: Equal, A: Equal] = Equal[Validation[E, A]]
+    def order[E: Order, A: Order] = Order[Validation[E, A]]
+    def semigroup[E: Semigroup, A: Semigroup] = Semigroup[Validation[E, A]]
+    def applicative[E: Semigroup] = Applicative[Validation[E, ?]]
+    def traverse[E: Semigroup] = Traverse[Validation[E, ?]]
+    def plus[E: Semigroup] = Plus[Validation[E, ?]]
     def bitraverse = Bitraverse[Validation]
 
     // checking absence of ambiguity
-    def equal[E : Order, A : Order] = Equal[Validation[E, A]]
+    def equal[E: Order, A: Order] = Equal[Validation[E, A]]
   }
 }

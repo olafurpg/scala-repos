@@ -36,8 +36,7 @@ object ScalaCSRFActionSpec extends CSRFCommonSpecs {
         handleResponse: (WSResponse) => T) =
       withServer(configuration) {
         case _ =>
-          csrfAddToken(
-              Action { implicit req =>
+          csrfAddToken(Action { implicit req =>
             CSRF.getToken.map { token =>
               Results.Ok(token.value)
             } getOrElse Results.NotFound

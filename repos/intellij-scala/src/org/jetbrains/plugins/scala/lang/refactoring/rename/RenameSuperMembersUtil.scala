@@ -210,8 +210,8 @@ object RenameSuperMembersUtil {
     }
     val classToElement = elements.flatMap(elementWithContainingClass).toMap
     val classes = classToElement.keys
-    val maxClasses = classes.filter(
-        maxClass => !classes.exists(maxClass.isInheritor(_, /*deep = */ true)))
+    val maxClasses = classes.filter(maxClass =>
+          !classes.exists(maxClass.isInheritor(_, /*deep = */ true)))
     maxClasses.flatMap(classToElement.get).toSeq
   }
 }

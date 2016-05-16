@@ -67,10 +67,12 @@ final class RoundRobinRoutingLogic extends RoutingLogic {
 final case class RoundRobinPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[RoundRobinPool] {
+    extends Pool
+    with PoolOverrideUnsetConfig[RoundRobinPool] {
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),

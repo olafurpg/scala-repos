@@ -102,16 +102,16 @@ class EvaluationInstanceSerializer
                       i.copy(evaluationClass = evaluationClass)
                     case JField("engineParamsGeneratorClass",
                                 JString(engineParamsGeneratorClass)) =>
-                      i.copy(
-                          engineParamsGeneratorClass = engineParamsGeneratorClass)
+                      i.copy(engineParamsGeneratorClass =
+                            engineParamsGeneratorClass)
                     case JField("batch", JString(batch)) =>
                       i.copy(batch = batch)
                     case JField("env", env) =>
                       i.copy(
                           env = Extraction.extract[Map[String, String]](env))
                     case JField("sparkConf", sparkConf) =>
-                      i.copy(sparkConf = Extraction
-                              .extract[Map[String, String]](sparkConf))
+                      i.copy(sparkConf =
+                            Extraction.extract[Map[String, String]](sparkConf))
                     case JField("evaluatorResults",
                                 JString(evaluatorResults)) =>
                       i.copy(evaluatorResults = evaluatorResults)
@@ -128,18 +128,16 @@ class EvaluationInstanceSerializer
             case i: EvaluationInstance =>
               JObject(
                   JField("id", JString(i.id)) :: JField(
-                      "status",
-                      JString(i.status)) :: JField(
+                      "status", JString(i.status)) :: JField(
                       "startTime", JString(i.startTime.toString)) :: JField(
                       "endTime",
                       JString(i.endTime.toString)) :: JField(
                       "evaluationClass", JString(i.evaluationClass)) :: JField(
                       "engineParamsGeneratorClass",
                       JString(i.engineParamsGeneratorClass)) :: JField(
-                      "batch", JString(i.batch)) :: JField("env",
-                                                           Extraction
-                                                             .decompose(i.env)(
-                                                               DefaultFormats)) :: JField(
+                      "batch", JString(i.batch)) :: JField(
+                      "env",
+                      Extraction.decompose(i.env)(DefaultFormats)) :: JField(
                       "sparkConf",
                       Extraction.decompose(i.sparkConf)(DefaultFormats)) :: JField(
                       "evaluatorResults",

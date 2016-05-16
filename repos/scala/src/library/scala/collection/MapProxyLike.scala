@@ -22,7 +22,8 @@ package collection
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
 trait MapProxyLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
-    extends MapLike[A, B, This] with IterableProxyLike[(A, B), This] {
+    extends MapLike[A, B, This]
+    with IterableProxyLike[(A, B), This] {
   override def get(key: A): Option[B] = self.get(key)
   override def iterator: Iterator[(A, B)] = self.iterator
   override def +[B1 >: B](kv: (A, B1)): Map[A, B1] = self.+(kv)

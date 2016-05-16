@@ -29,7 +29,9 @@ import org.apache.spark.network.shuffle.{BlockFetchingListener, ShuffleClient}
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
 private[spark] abstract class BlockTransferService
-    extends ShuffleClient with Closeable with Logging {
+    extends ShuffleClient
+    with Closeable
+    with Logging {
 
   /**
     * Initialize the transfer service by giving it the BlockDataManager that can be used to fetch

@@ -41,8 +41,7 @@ trait JValueByteChunkTranscoders {
   implicit def JValueByteChunkTranscoder(implicit M: Monad[Future]) =
     new AsyncHttpTranscoder[JValue, ByteChunk] {
       def apply(req: HttpRequest[JValue]): HttpRequest[ByteChunk] =
-        req.copy(
-            content = req.content.map { (j: JValue) =>
+        req.copy(content = req.content.map { (j: JValue) =>
           Left(j.renderCompact.getBytes("UTF-8"))
         })
 

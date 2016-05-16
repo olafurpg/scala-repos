@@ -83,7 +83,8 @@ private[stream] object ReactiveStreamsCompliance {
 
   @SerialVersionUID(1L)
   final class SignalThrewException(message: String, cause: Throwable)
-      extends IllegalStateException(message, cause) with SpecViolation
+      extends IllegalStateException(message, cause)
+      with SpecViolation
 
   final def tryOnError[T](subscriber: Subscriber[T], error: Throwable): Unit =
     error match {

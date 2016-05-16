@@ -9,14 +9,14 @@ import play.twirl.api.Html
 case class SendTo(userId: String, message: JsObject)
 
 object SendTo {
-  def apply[A : Writes](userId: String, typ: String, data: A): SendTo =
+  def apply[A: Writes](userId: String, typ: String, data: A): SendTo =
     SendTo(userId, Json.obj("t" -> typ, "d" -> data))
 }
 
 case class SendTos(userIds: Set[String], message: JsObject)
 
 object SendTos {
-  def apply[A : Writes](userIds: Set[String], typ: String, data: A): SendTos =
+  def apply[A: Writes](userIds: Set[String], typ: String, data: A): SendTos =
     SendTos(userIds, Json.obj("t" -> typ, "d" -> data))
 }
 

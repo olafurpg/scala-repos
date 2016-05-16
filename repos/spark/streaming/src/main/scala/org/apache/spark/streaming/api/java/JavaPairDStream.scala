@@ -490,15 +490,14 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
   private def convertUpdateStateFunction[S](
       in: JFunction2[JList[V], Optional[S], Optional[S]])
     : (Seq[V], Option[S]) => Option[S] = {
-    val scalaFunc: (Seq[V], Option[S]) => Option[S] = (values, state) =>
-      {
-        val list: JList[V] = values.asJava
-        val scalaState: Optional[S] = JavaUtils.optionToOptional(state)
-        val result: Optional[S] = in.apply(list, scalaState)
-        result.isPresent match {
-          case true => Some(result.get())
-          case _ => None
-        }
+    val scalaFunc: (Seq[V], Option[S]) => Option[S] = (values, state) => {
+      val list: JList[V] = values.asJava
+      val scalaState: Optional[S] = JavaUtils.optionToOptional(state)
+      val result: Optional[S] = in.apply(list, scalaState)
+      result.isPresent match {
+        case true => Some(result.get())
+        case _ => None
+      }
     }
     scalaFunc
   }
@@ -877,7 +876,7 @@ class JavaPairDStream[K, V](val dstream: DStream[(K, V)])(
 }
 
 object JavaPairDStream {
-  implicit def fromPairDStream[K : ClassTag, V : ClassTag](
+  implicit def fromPairDStream[K: ClassTag, V: ClassTag](
       dstream: DStream[(K, V)]): JavaPairDStream[K, V] = {
     new JavaPairDStream[K, V](dstream)
   }
@@ -889,7 +888,7 @@ object JavaPairDStream {
     new JavaPairDStream[K, V](dstream.dstream)
   }
 
-  def scalaToJavaLong[K : ClassTag](
+  def scalaToJavaLong[K: ClassTag](
       dstream: JavaPairDStream[K, Long]): JavaPairDStream[K, jl.Long] = {
     DStream.toPairDStreamFunctions(dstream.dstream).mapValues(jl.Long.valueOf)
   }

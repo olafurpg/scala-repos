@@ -40,25 +40,20 @@ import scala.collection.{Set, mutable}
 class ScImplicitlyConvertible(
     place: PsiElement, placeType: Boolean => Option[ScType]) {
   def this(expr: ScExpression) {
-    this(expr,
-         fromUnder =>
-           {
-             //this code is required, because compiler works in the same way
-             //otherwise we will see strange error messages like:
-             // def foo(x: Map[String, Int]) {}
-             // def foo(x: String) {}
-             // foo(Map(y -> 1)) //Error is here
-             expr
-               .getTypeWithoutImplicits(fromUnderscore = fromUnder)
-               .toOption
-               .map {
-                 case tp =>
-                   ScType.extractDesignatorSingletonType(tp) match {
-                     case Some(res) => res
-                     case _ => tp
-                   }
-               }
-         })
+    this(expr, fromUnder => {
+      //this code is required, because compiler works in the same way
+      //otherwise we will see strange error messages like:
+      // def foo(x: Map[String, Int]) {}
+      // def foo(x: String) {}
+      // foo(Map(y -> 1)) //Error is here
+      expr.getTypeWithoutImplicits(fromUnderscore = fromUnder).toOption.map {
+        case tp =>
+          ScType.extractDesignatorSingletonType(tp) match {
+            case Some(res) => res
+            case _ => tp
+          }
+      }
+    })
   }
 
   import org.jetbrains.plugins.scala.lang.psi.implicits.ScImplicitlyConvertible._
@@ -134,11 +129,11 @@ class ScImplicitlyConvertible(
         case None => typez
       }
       for (obj <- ScalaPsiUtil.collectImplicitObjects(
-          expandedType, place.getProject, place.getResolveScope)) {
+                     expandedType, place.getProject, place.getResolveScope)) {
         processor.processType(obj, place, ResolveState.initial())
       }
       for (res <- processor.candidatesS.map(forMap(_, typez))
-                     if res.condition) {
+           if res.condition) {
         buffer += res
       }
     }
@@ -259,7 +254,7 @@ class ScImplicitlyConvertible(
                   place.getResolveScope,
                   ScalaPsiManager.ClassCategory.TYPE
               )
-          ) collect {
+        ) collect {
           case cl: ScTrait =>
             ScParameterizedType(
                 ScType.designator(cl),
@@ -391,21 +386,19 @@ class ScImplicitlyConvertible(
                     //let's update dependent method types
                     //todo: currently it looks like a hack in the right place, probably whole this class should be
                     //todo: rewritten in more clean and clear way.
-                    val dependentSubst = new ScSubstitutor(
-                        () =>
-                          {
-                        val level = place.scalaLanguageLevelOrDefault
-                        if (level >= Scala_2_10) {
-                          f.paramClauses.clauses.headOption
-                            .map(_.parameters)
-                            .toSeq
-                            .flatten
-                            .map {
-                              case (param: ScParameter) =>
-                                (new Parameter(param), typez)
-                            }
-                            .toMap
-                        } else Map.empty
+                    val dependentSubst = new ScSubstitutor(() => {
+                      val level = place.scalaLanguageLevelOrDefault
+                      if (level >= Scala_2_10) {
+                        f.paramClauses.clauses.headOption
+                          .map(_.parameters)
+                          .toSeq
+                          .flatten
+                          .map {
+                            case (param: ScParameter) =>
+                              (new Parameter(param), typez)
+                          }
+                          .toMap
+                      } else Map.empty
                     })
 
                     def probablyHasDepententMethodTypes: Boolean = {
@@ -425,38 +418,37 @@ class ScImplicitlyConvertible(
                       res
                     }
 
-                    val implicitDependentSubst = new ScSubstitutor(
-                        () =>
-                          {
-                        val level = place.scalaLanguageLevelOrDefault
-                        if (level >= Scala_2_10) {
-                          if (probablyHasDepententMethodTypes) {
-                            val params: Seq[Parameter] =
-                              f.paramClauses.clauses.last.effectiveParameters
-                                .map(param => new Parameter(param))
-                            val (inferredParams, expr, _) = InferUtil
-                              .findImplicits(
-                                params,
-                                None,
-                                place,
-                                check = false,
-                                abstractSubstitutor = subst followed dependentSubst followed unSubst)
-                            inferredParams
-                              .zip(expr)
-                              .map {
-                                case (param: Parameter, expr: Expression) =>
-                                  (param,
-                                   expr
-                                     .getTypeAfterImplicitConversion(
-                                         checkImplicits = true,
-                                         isShape = false,
-                                         None)
-                                     ._1
-                                     .get)
-                              }
-                              .toMap
-                          } else Map.empty
+                    val implicitDependentSubst = new ScSubstitutor(() => {
+                      val level = place.scalaLanguageLevelOrDefault
+                      if (level >= Scala_2_10) {
+                        if (probablyHasDepententMethodTypes) {
+                          val params: Seq[Parameter] =
+                            f.paramClauses.clauses.last.effectiveParameters
+                              .map(param => new Parameter(param))
+                          val (inferredParams, expr, _) = InferUtil
+                            .findImplicits(
+                              params,
+                              None,
+                              place,
+                              check = false,
+                              abstractSubstitutor =
+                                subst followed dependentSubst followed unSubst)
+                          inferredParams
+                            .zip(expr)
+                            .map {
+                              case (param: Parameter, expr: Expression) =>
+                                (param,
+                                 expr
+                                   .getTypeAfterImplicitConversion(
+                                       checkImplicits = true,
+                                       isShape = false,
+                                       None)
+                                   ._1
+                                   .get)
+                            }
+                            .toMap
                         } else Map.empty
+                      } else Map.empty
                     })
 
                     //todo: pass implicit parameters
@@ -570,8 +562,9 @@ class ScImplicitlyConvertible(
             case b: ScBindingPattern =>
               ScalaPsiUtil.nameContext(b) match {
                 case d: ScDeclaredElementsHolder
-                    if (d.isInstanceOf[ScValue] || d.isInstanceOf[ScVariable]) &&
-                    d.asInstanceOf[ScModifierListOwner]
+                    if (d.isInstanceOf[ScValue] ||
+                        d.isInstanceOf[ScVariable]) && d
+                      .asInstanceOf[ScModifierListOwner]
                       .hasModifierProperty("implicit") =>
                   if (!ResolveUtils.isAccessible(
                           d.asInstanceOf[ScMember], getPlace)) return true
@@ -659,10 +652,11 @@ object ScImplicitlyConvertible {
         if (function == commonContext) return false
         else {
           var functionContext: PsiElement = function
-          while (functionContext.getContext != commonContext) functionContext = functionContext.getContext
+          while (functionContext.getContext != commonContext) functionContext =
+            functionContext.getContext
           var placeContext: PsiElement = place
-          while (placeContext.getContext != commonContext) placeContext = placeContext
-            .getContext
+          while (placeContext.getContext != commonContext) placeContext =
+            placeContext.getContext
           (functionContext, placeContext) match {
             case (functionContext: ScalaPsiElement,
                   placeContext: ScalaPsiElement) =>

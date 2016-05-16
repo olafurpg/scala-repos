@@ -59,7 +59,8 @@ abstract class Reifier extends States with Phases with Errors with Utils {
           reifyTrace("reifying = ")(
               if (settings.Xshowtrees || settings.XshowtreesCompact ||
                   settings.XshowtreesStringified)
-                "\n" + nodePrinters.nodeToString(tree).trim else tree.toString)
+                "\n" + nodePrinters.nodeToString(tree).trim
+              else tree.toString)
           reifyTrace("reifee is located at: ")(tree.pos)
           reifyTrace("universe = ")(universe)
           reifyTrace("mirror = ")(mirror)

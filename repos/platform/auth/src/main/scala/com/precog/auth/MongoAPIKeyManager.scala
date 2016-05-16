@@ -135,11 +135,11 @@ object MongoAPIKeyManager extends Logging {
 
     for {
       _ <- db(
-          insert(rootGrant.serialize.asInstanceOf[JObject])
-            .into(grantCollection))
+              insert(rootGrant.serialize.asInstanceOf[JObject])
+                .into(grantCollection))
       _ <- db(
-          insert(rootAPIKeyRecord.serialize.asInstanceOf[JObject])
-            .into(keyCollection))
+              insert(rootAPIKeyRecord.serialize.asInstanceOf[JObject])
+                .into(keyCollection))
     } yield rootAPIKeyRecord
   }
 
@@ -164,7 +164,8 @@ class MongoAPIKeyManager(
     database: Database,
     settings: MongoAPIKeyManagerSettings = MongoAPIKeyManagerSettings.defaults,
     clock: Clock = Clock.System)(implicit val executor: ExecutionContext)
-    extends APIKeyManager[Future] with Logging {
+    extends APIKeyManager[Future]
+    with Logging {
   implicit val M = new FutureMonad(executor)
 
   private implicit val impTimeout = settings.timeout
@@ -249,8 +250,8 @@ class MongoAPIKeyManager(
     }
   }
 
-  private def findAll[A](
-      collection: String)(implicit extract: Extractor[A]): Future[Seq[A]] =
+  private def findAll[A](collection: String)(
+      implicit extract: Extractor[A]): Future[Seq[A]] =
     database { selectAll.from(collection) } map {
       _.map(_.deserialize[A]).toSeq
     }
@@ -335,9 +336,9 @@ class MongoAPIKeyManager(
       case ot @ Some(t) =>
         for {
           _ <- database(insert(t.serialize.asInstanceOf[JObject])
-                .into(settings.deletedAPIKeys))
+                    .into(settings.deletedAPIKeys))
           _ <- database(
-              remove.from(settings.apiKeys).where("apiKey" === apiKey))
+                  remove.from(settings.apiKeys).where("apiKey" === apiKey))
         } yield { ot }
       case None => Future(None)
     }
@@ -346,18 +347,21 @@ class MongoAPIKeyManager(
     for {
       children <- findGrantChildren(gid)
       deletedChildren <- Future.sequence(children map { g =>
-        deleteGrant(g.grantId)
-      }) map { _.flatten }
+                          deleteGrant(g.grantId)
+                        }) map { _.flatten }
       leafOpt <- findGrant(gid)
       result <- leafOpt map { leafGrant =>
-        for {
-          _ <- database(insert(leafGrant.serialize.asInstanceOf[JObject])
-                .into(settings.deletedGrants))
-          _ <- database(remove.from(settings.grants).where("grantId" === gid))
-        } yield { deletedChildren + leafGrant }
-      } getOrElse {
-        Promise successful deletedChildren
-      }
+                 for {
+                   _ <- database(
+                           insert(leafGrant.serialize.asInstanceOf[JObject])
+                             .into(settings.deletedGrants))
+                   _ <- database(remove
+                             .from(settings.grants)
+                             .where("grantId" === gid))
+                 } yield { deletedChildren + leafGrant }
+               } getOrElse {
+                 Promise successful deletedChildren
+               }
     } yield result
   }
 }

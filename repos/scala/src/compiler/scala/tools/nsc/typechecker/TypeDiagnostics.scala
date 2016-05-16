@@ -150,7 +150,8 @@ trait TypeDiagnostics { self: Analyzer =>
         if (member.isSetter) member.getterIn(member.owner) else member
       val flags =
         if (getter.setterIn(member.owner) != NoSymbol)
-          DEFERRED.toLong | MUTABLE else DEFERRED
+          DEFERRED.toLong | MUTABLE
+        else DEFERRED
 
       getter.owner.newValue(getter.name.toTermName, getter.pos, flags) setInfo getter.tpe.resultType
     }
@@ -264,7 +265,8 @@ trait TypeDiagnostics { self: Analyzer =>
                 }
                 // In these cases the arg is OK and needs no explanation.
                 val conforms =
-                  ((arg =:= reqArg) || ((arg <:< reqArg) && param.isCovariant) ||
+                  ((arg =:= reqArg) ||
+                      ((arg <:< reqArg) && param.isCovariant) ||
                       ((reqArg <:< arg) && param.isContravariant))
                 val invariant = param.variance.isInvariant
 
@@ -297,9 +299,10 @@ trait TypeDiagnostics { self: Analyzer =>
   // being false would do that, but if I return "<suppressed>" under
   // that condition, I see it.
   def foundReqMsg(found: Type, req: Type): String = {
-    def baseMessage = (";\n found   : " + found.toLongString +
-        existentialContext(found) + explainAlias(found) + "\n required: " +
-        req + existentialContext(req) + explainAlias(req))
+    def baseMessage =
+      (";\n found   : " + found.toLongString + existentialContext(found) +
+          explainAlias(found) + "\n required: " + req +
+          existentialContext(req) + explainAlias(req))
     (withDisambiguation(Nil, found, req)(baseMessage) + explainVariance(
             found, req) + explainAnyVsAnyRef(found, req))
   }
@@ -308,11 +311,11 @@ trait TypeDiagnostics { self: Analyzer =>
     val clazz = if (sym.isModuleClass) sym.companionClass else sym
     val caseString =
       if (clazz.isCaseClass && (clazz isSubClass ptSym))
-        (clazz.caseFieldAccessors map (_ => "_") // could use the actual param names here
+        (clazz.caseFieldAccessors map (_ =>
+                  "_") // could use the actual param names here
             mkString (s"`case ${clazz.name}(", ",", ")`"))
       else
-        "`case _: " +
-        (clazz.typeParams match {
+        "`case _: " + (clazz.typeParams match {
               case Nil => "" + clazz.name
               case xs =>
                 xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
@@ -480,17 +483,18 @@ trait TypeDiagnostics { self: Analyzer =>
         def defnSymbols = defnTrees.toList map (_.symbol)
         def localVars = defnSymbols filter (t => t.isLocalToBlock && t.isVar)
 
-        def qualifiesTerm(sym: Symbol) = ((sym.isModule ||
-                sym.isMethod || sym.isPrivateLocal || sym.isLocalToBlock) &&
-            !nme.isLocalName(sym.name) && !sym.isParameter &&
-            !sym.isParamAccessor // could improve this, but it's a pain
-            &&
-            !sym.isEarlyInitialized // lots of false positives in the way these are encoded
-            && !(sym.isGetter && sym.accessed.isEarlyInitialized))
+        def qualifiesTerm(sym: Symbol) =
+          ((sym.isModule || sym.isMethod || sym.isPrivateLocal ||
+                  sym.isLocalToBlock) && !nme.isLocalName(sym.name) &&
+              !sym.isParameter &&
+              !sym.isParamAccessor // could improve this, but it's a pain
+              &&
+              !sym.isEarlyInitialized // lots of false positives in the way these are encoded
+              && !(sym.isGetter && sym.accessed.isEarlyInitialized))
         def qualifiesType(sym: Symbol) = !sym.isDefinedInPackage
-        def qualifies(sym: Symbol) = ((sym ne null) &&
-            (sym.isTerm && qualifiesTerm(sym) || sym.isType &&
-                qualifiesType(sym)))
+        def qualifies(sym: Symbol) =
+          ((sym ne null) && (sym.isTerm && qualifiesTerm(sym) || sym.isType &&
+                  qualifiesType(sym)))
 
         override def traverse(t: Tree): Unit = {
           t match {
@@ -503,7 +507,7 @@ trait TypeDiagnostics { self: Analyzer =>
           // definition of the class being referenced.
           if (t.tpe ne null) {
             for (tp <- t.tpe; if !treeTypes(tp) &&
-                      !currentOwner.ownerChain.contains(tp.typeSymbol)) {
+                 !currentOwner.ownerChain.contains(tp.typeSymbol)) {
               tp match {
                 case NoType | NoPrefix =>
                 case NullaryMethodType(_) =>
@@ -521,19 +525,20 @@ trait TypeDiagnostics { self: Analyzer =>
           }
           super.traverse(t)
         }
-        def isUnusedType(m: Symbol): Boolean = (m.isType &&
-            !m.isTypeParameterOrSkolem // would be nice to improve this
-            && (m.isPrivate || m.isLocalToBlock) && !(treeTypes.exists(
-                tp => tp exists (t => t.typeSymbolDirect == m))))
-        def isUnusedTerm(m: Symbol): Boolean = ((m.isTerm) &&
-            (m.isPrivate || m.isLocalToBlock) && !targets(m) &&
-            !(m.name == nme.WILDCARD) // e.g. val _ = foo
-            && !ignoreNames(m.name.toTermName) // serialization methods
-            &&
-            !isConstantType(m.info.resultType) // subject to constant inlining
-            &&
-            !treeTypes.exists(_ contains m) // e.g. val a = new Foo ; new a.Bar
-            )
+        def isUnusedType(m: Symbol): Boolean =
+          (m.isType &&
+              !m.isTypeParameterOrSkolem // would be nice to improve this
+              && (m.isPrivate || m.isLocalToBlock) && !(treeTypes.exists(tp =>
+                    tp exists (t => t.typeSymbolDirect == m))))
+        def isUnusedTerm(m: Symbol): Boolean =
+          ((m.isTerm) && (m.isPrivate || m.isLocalToBlock) && !targets(m) &&
+              !(m.name == nme.WILDCARD) // e.g. val _ = foo
+              && !ignoreNames(m.name.toTermName) // serialization methods
+              &&
+              !isConstantType(m.info.resultType) // subject to constant inlining
+              &&
+              !treeTypes.exists(_ contains m) // e.g. val a = new Foo ; new a.Bar
+              )
         def unusedTypes = defnTrees.toList filter (t => isUnusedType(t.symbol))
         def unusedTerms = defnTrees.toList filter (v => isUnusedTerm(v.symbol))
         // local vars which are never set, except those already returned in unused

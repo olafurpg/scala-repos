@@ -34,7 +34,9 @@ import org.apache.spark.util.Utils
   * A test suite that tests various Parquet queries.
   */
 class ParquetQuerySuite
-    extends QueryTest with ParquetTest with SharedSQLContext {
+    extends QueryTest
+    with ParquetTest
+    with SharedSQLContext {
   import testImplicits._
 
   test("simple select queries") {

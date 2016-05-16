@@ -15,15 +15,27 @@ import org.scalatra.{NoContent, UnprocessableEntity, Created}
 import scala.collection.JavaConverters._
 
 class ApiController
-    extends ApiControllerBase with RepositoryService with AccountService
-    with ProtectedBranchService with IssuesService with LabelsService
-    with PullRequestService with CommitStatusService
-    with RepositoryCreationService with HandleCommentService
-    with WebHookService with WebHookPullRequestService
-    with WebHookIssueCommentService with WikiService with ActivityService
-    with OwnerAuthenticator with UsersAuthenticator
-    with GroupManagerAuthenticator with ReferrerAuthenticator
-    with ReadableUsersAuthenticator with CollaboratorsAuthenticator
+    extends ApiControllerBase
+    with RepositoryService
+    with AccountService
+    with ProtectedBranchService
+    with IssuesService
+    with LabelsService
+    with PullRequestService
+    with CommitStatusService
+    with RepositoryCreationService
+    with HandleCommentService
+    with WebHookService
+    with WebHookPullRequestService
+    with WebHookIssueCommentService
+    with WikiService
+    with ActivityService
+    with OwnerAuthenticator
+    with UsersAuthenticator
+    with GroupManagerAuthenticator
+    with ReferrerAuthenticator
+    with ReadableUsersAuthenticator
+    with CollaboratorsAuthenticator
 
 trait ApiControllerBase extends ControllerBase {
   self: RepositoryService with AccountService with ProtectedBranchService with IssuesService with LabelsService with PullRequestService with CommitStatusService with RepositoryCreationService with HandleCommentService with OwnerAuthenticator with UsersAuthenticator with GroupManagerAuthenticator with ReferrerAuthenticator with ReadableUsersAuthenticator with CollaboratorsAuthenticator =>
@@ -111,9 +123,10 @@ trait ApiControllerBase extends ControllerBase {
     import gitbucket.core.api._
     (for {
       branch <- params.get("branch")
-                   if repository.branchList.find(_ == branch).isDefined
+      if repository.branchList.find(_ == branch).isDefined
       protection <- extractFromJsonBody[
-          ApiBranchProtection.EnablingAndDisabling].map(_.protection)
+                       ApiBranchProtection.EnablingAndDisabling]
+                     .map(_.protection)
     } yield {
       if (protection.enabled) {
         enableBranchProtection(
@@ -174,9 +187,9 @@ trait ApiControllerBase extends ControllerBase {
         .filter(_ =>
               isEditable(
                   issue.userName, issue.repositoryName, issue.openedUserName))
-        (issue, id) <- handleComment(issue, Some(body), repository, action)
+      (issue, id) <- handleComment(issue, Some(body), repository, action)
       issueComment <- getComment(
-          repository.owner, repository.name, id.toString())
+                         repository.owner, repository.name, id.toString())
     } yield {
       JsonFormat(ApiComment(issueComment,
                             RepositoryName(repository),
@@ -190,8 +203,7 @@ trait ApiControllerBase extends ControllerBase {
     * List all labels for this repository
     * https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
     */
-  get("/api/v3/repos/:owner/:repository/labels")(
-      referrersOnly { repository =>
+  get("/api/v3/repos/:owner/:repository/labels")(referrersOnly { repository =>
     JsonFormat(getLabels(repository.owner, repository.name).map { label =>
       ApiLabel(label, RepositoryName(repository))
     })
@@ -316,7 +328,7 @@ trait ApiControllerBase extends ControllerBase {
       (for {
         issueId <- params("id").toIntOpt
         (issue, pullRequest) <- getPullRequest(
-            repository.owner, repository.name, issueId)
+                                   repository.owner, repository.name, issueId)
         users = getAccountsByUserNames(Set(repository.owner,
                                            pullRequest.requestUserName,
                                            issue.openedUserName),
@@ -368,8 +380,7 @@ trait ApiControllerBase extends ControllerBase {
   /**
     * https://developer.github.com/v3/repos/#get
     */
-  get("/api/v3/repos/:owner/:repository")(
-      referrersOnly { repository =>
+  get("/api/v3/repos/:owner/:repository")(referrersOnly { repository =>
     JsonFormat(ApiRepository(
             repository, ApiUser(getAccountByUserName(repository.owner).get)))
   })

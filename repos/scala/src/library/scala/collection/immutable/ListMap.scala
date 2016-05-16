@@ -64,8 +64,10 @@ object ListMap extends ImmutableMapFactory[ListMap] {
     "The semantics of immutable collections makes inheriting from ListMap error-prone.",
     "2.11.0")
 class ListMap[A, +B]
-    extends AbstractMap[A, B] with Map[A, B]
-    with MapLike[A, B, ListMap[A, B]] with Serializable {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, ListMap[A, B]]
+    with Serializable {
 
   override def empty = ListMap.empty
 
@@ -149,7 +151,8 @@ class ListMap[A, +B]
   @SerialVersionUID(-6453056603889598734L)
   protected class Node[B1 >: B](override protected val key: A,
                                 override protected val value: B1)
-      extends ListMap[A, B1] with Serializable {
+      extends ListMap[A, B1]
+      with Serializable {
 
     /** Returns the number of mappings in this map.
       *
@@ -191,7 +194,8 @@ class ListMap[A, +B]
 
     @tailrec private def get0(cur: ListMap[A, B1], k: A): Option[B1] =
       if (k == cur.key) Some(cur.value)
-      else if (cur.next.nonEmpty) get0(cur.next, k) else None
+      else if (cur.next.nonEmpty) get0(cur.next, k)
+      else None
 
     override def contains(key: A): Boolean = contains0(this, key)
 

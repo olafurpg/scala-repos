@@ -6,7 +6,7 @@ import scala.reflect.runtime.universe._
 // 3) unpickling works okay even we unpickle the same symbol a lot of times
 
 object Test extends App {
-  def foo[T : TypeTag](x: T) = typeOf[T].toString
+  def foo[T: TypeTag](x: T) = typeOf[T].toString
   val n = 1000
   val rng = new scala.util.Random()
   val types = List(() => typeOf[java.lang.reflect.Method],

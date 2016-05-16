@@ -43,16 +43,19 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.util.{Clock, ManualClock, Utils}
 
 class ApplicationCacheSuite
-    extends SparkFunSuite with Logging with MockitoSugar with Matchers {
+    extends SparkFunSuite
+    with Logging
+    with MockitoSugar
+    with Matchers {
 
   /**
     * subclass with access to the cache internals
     * @param retainedApplications number of retained applications
     */
-  class TestApplicationCache(
-      operations: ApplicationCacheOperations = new StubCacheOperations(),
-      retainedApplications: Int,
-      clock: Clock = new ManualClock(0))
+  class TestApplicationCache(operations: ApplicationCacheOperations =
+                               new StubCacheOperations(),
+                             retainedApplications: Int,
+                             clock: Clock = new ManualClock(0))
       extends ApplicationCache(operations, retainedApplications, clock) {
 
     def cache(): LoadingCache[CacheKey, CacheEntry] = appCache
@@ -82,8 +85,8 @@ class ApplicationCacheSuite
       getAppUICount += 1
       instances
         .get(CacheKey(appId, attemptId))
-        .map(
-            e => LoadedAppUI(e.ui, updateProbe(appId, attemptId, e.probeTime)))
+        .map(e =>
+              LoadedAppUI(e.ui, updateProbe(appId, attemptId, e.probeTime)))
     }
 
     override def attachSparkUI(appId: String,
@@ -122,8 +125,7 @@ class ApplicationCacheSuite
                     ui: SparkUI,
                     completed: Boolean,
                     timestamp: Long): Unit = {
-      instances +=
-      (CacheKey(appId, attemptId) -> new CacheEntry(
+      instances += (CacheKey(appId, attemptId) -> new CacheEntry(
               ui,
               completed,
               updateProbe(appId, attemptId, timestamp),

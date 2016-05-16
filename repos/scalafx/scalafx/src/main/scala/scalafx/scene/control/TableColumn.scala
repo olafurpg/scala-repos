@@ -200,8 +200,8 @@ object TableColumn {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableColumn.html]].
   */
 class TableColumn[S, T](
-    override val delegate: jfxsc.TableColumn[S, T] = new jfxsc.TableColumn[
-          S, T]())
+    override val delegate: jfxsc.TableColumn[S, T] =
+      new jfxsc.TableColumn[S, T]())
     extends TableColumnBase[S, T](delegate)
     with SFXDelegate[jfxsc.TableColumn[S, T]] {
 
@@ -215,8 +215,7 @@ class TableColumn[S, T](
     * The cell factory for all cells in this column.
     */
   def cellFactory: ObjectProperty[TableColumn[S, T] => TableCell[S, T]] =
-    ObjectProperty(
-        (column: TableColumn[S, T]) =>
+    ObjectProperty((column: TableColumn[S, T]) =>
           new TableCell(delegate.cellFactoryProperty.getValue.call(column)))
   def cellFactory_=(f: TableColumn[S, T] => TableCell[S, T]) {
     delegate.cellFactoryProperty.setValue(

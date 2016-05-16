@@ -33,14 +33,14 @@ abstract class LambdaLift extends InfoTransform {
 
   /** Each scala.runtime.*Ref class has a static method `create(value)` that simply instantiates the Ref to carry that value. */
   private lazy val refCreateMethod: Map[Symbol, Symbol] = {
-    mapFrom(allRefClasses.toList)(
-        x => getMemberMethod(x.companionModule, nme.create))
+    mapFrom(allRefClasses.toList)(x =>
+          getMemberMethod(x.companionModule, nme.create))
   }
 
   /** Quite frequently a *Ref is initialized with its zero (e.g., null, 0.toByte, etc.) Method `zero()` of *Ref class encapsulates that pattern. */
   private lazy val refZeroMethod: Map[Symbol, Symbol] = {
-    mapFrom(allRefClasses.toList)(
-        x => getMemberMethod(x.companionModule, nme.zero))
+    mapFrom(allRefClasses.toList)(x =>
+          getMemberMethod(x.companionModule, nme.zero))
   }
 
   def transformInfo(sym: Symbol, tp: Type): Type =
@@ -221,7 +221,7 @@ abstract class LambdaLift extends InfoTransform {
       do {
         changedFreeVars = false
         for ((caller, callees) <- called; callee <- callees;
-        fvs <- free get callee; fv <- fvs) markFree(fv, caller)
+             fvs <- free get callee; fv <- fvs) markFree(fv, caller)
       } while (changedFreeVars)
 
       def renameSym(sym: Symbol) {
@@ -251,7 +251,8 @@ abstract class LambdaLift extends InfoTransform {
           //         package - subclass might have the same name), avoids a VerifyError in the case
           //         that a sub-class happens to lifts out a method with the *same* name.
           if (originalName.isTermName && calledFromInner(sym))
-            newTermNameCached(nonAnon(sym.enclClass.fullName('$')) +
+            newTermNameCached(
+                nonAnon(sym.enclClass.fullName('$')) +
                 nme.EXPAND_SEPARATOR_STRING + name)
           else name
         }
@@ -381,8 +382,8 @@ abstract class LambdaLift extends InfoTransform {
                                           free = paramSyms,
                                           original = sym.info.params),
                                   sym.info.resultType)))
-            copyDefDef(tree)(vparamss = List(
-                      addFree(sym, free = paramDefs, original = vparams)))
+            copyDefDef(tree)(vparamss =
+                  List(addFree(sym, free = paramDefs, original = vparams)))
           }
 
         case ClassDef(_, _, _, _) =>
@@ -391,8 +392,8 @@ abstract class LambdaLift extends InfoTransform {
 
           if (freeParamDefs.isEmpty) tree
           else
-            deriveClassDef(tree)(
-                impl => deriveTemplate(impl)(_ ::: freeParamDefs))
+            deriveClassDef(tree)(impl =>
+                  deriveTemplate(impl)(_ ::: freeParamDefs))
 
         case _ => tree
       }
@@ -507,7 +508,8 @@ abstract class LambdaLift extends InfoTransform {
               val elemTree =
                 typer typed Select(tree1 setType sym.tpe, nme.elem)
               if (elemTree.tpe.typeSymbol != tp.typeSymbol)
-                gen.mkAttributedCast(elemTree, tp) else elemTree
+                gen.mkAttributedCast(elemTree, tp)
+              else elemTree
             } else tree1
         case Block(stats, expr0) =>
           val (lzyVals, rest) =
@@ -569,7 +571,8 @@ abstract class LambdaLift extends InfoTransform {
       sym: Symbol, free: List[A], original: List[A]): List[A] = {
     val prependFree =
       (!sym.isConstructor // this condition is redundant for now. It will be needed if we remove the second condition in 2.12.x
-          && (settings.Ydelambdafy.value == "method" && sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
+          && (settings.Ydelambdafy.value == "method" &&
+              sym.isDelambdafyTarget) // SI-8359 Makes the lambda body a viable as the target MethodHandle for a call to LambdaMetafactory
           )
     if (prependFree) free ::: original
     else original ::: free

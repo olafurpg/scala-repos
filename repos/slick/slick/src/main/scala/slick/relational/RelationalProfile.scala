@@ -14,8 +14,10 @@ import scala.reflect.ClassTag
   * of SQL (or any other text-based language for executing statements).
   * It requires a relational table structure as its basic model of data. */
 trait RelationalProfile
-    extends BasicProfile with RelationalTableComponent
-    with RelationalSequenceComponent with RelationalTypesComponent
+    extends BasicProfile
+    with RelationalTableComponent
+    with RelationalSequenceComponent
+    with RelationalTypesComponent
     with RelationalActionComponent {
   self: RelationalProfile =>
 
@@ -40,11 +42,11 @@ trait RelationalProfile
 
     @deprecated(
         "Use an explicit conversion to an Option column with `.?`", "3.0")
-    implicit def columnToOptionColumn[T : BaseTypedType](
+    implicit def columnToOptionColumn[T: BaseTypedType](
         c: Rep[T]): Rep[Option[T]] = c.?
-    implicit def valueToConstColumn[T : TypedType](v: T): LiteralColumn[T] =
+    implicit def valueToConstColumn[T: TypedType](v: T): LiteralColumn[T] =
       new LiteralColumn[T](v)
-    implicit def columnToOrdered[T : TypedType](c: Rep[T]): ColumnOrdered[T] =
+    implicit def columnToOrdered[T: TypedType](c: Rep[T]): ColumnOrdered[T] =
       ColumnOrdered[T](c, Ordering())
     implicit def tableQueryToTableQueryExtensionMethods[
         T <: RelationalProfile#Table[_], U](
@@ -99,8 +101,8 @@ trait RelationalProfile
         Rep[P] => Query[T, U, Seq], Rep[P], P, Query[T, U, Seq], Seq[U]] = {
       import self.api._
       Compiled { (p: Rep[P]) =>
-        (q: Query[T, U, Seq]).filter(
-            table => Library.==.column[Boolean](f(table).toNode, p.toNode))
+        (q: Query[T, U, Seq]).filter(table =>
+              Library.==.column[Boolean](f(table).toNode, p.toNode))
       }
     }
   }
@@ -114,7 +116,7 @@ trait RelationalProfile
       val mp: MappedProjection[T, P]) {
     def fastPath(
         fpf: (TypeMappingResultConverter[M, T, _] => SimpleFastPathResultConverter[
-            M, T])): MappedProjection[T, P] = mp.genericFastPath {
+                  M, T])): MappedProjection[T, P] = mp.genericFastPath {
       case tm @ TypeMappingResultConverter(
           _: ProductResultConverter[_, _], _, _) =>
         fpf(tm.asInstanceOf[TypeMappingResultConverter[M, T, _]])
@@ -231,7 +233,7 @@ trait RelationalSequenceComponent { self: RelationalProfile =>
   }
 
   object Sequence {
-    def apply[T : TypedType : Integral](name: String) =
+    def apply[T: TypedType: Integral](name: String) =
       new Sequence[T](name, None, None, None, None, false)
   }
 }
@@ -243,7 +245,7 @@ trait RelationalTypesComponent { self: RelationalProfile =>
   val MappedColumnType: MappedColumnTypeFactory
 
   trait MappedColumnTypeFactory {
-    def base[T : ClassTag, U : BaseColumnType](
+    def base[T: ClassTag, U: BaseColumnType](
         tmap: T => U, tcomap: U => T): BaseColumnType[T]
 
     protected[this] def assertNonNullType(t: BaseColumnType[_]): Unit =

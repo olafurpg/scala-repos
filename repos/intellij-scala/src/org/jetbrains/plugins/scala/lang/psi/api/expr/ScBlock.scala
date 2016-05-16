@@ -29,7 +29,8 @@ import scala.collection.mutable
   * Author: ilyas, alefas
   */
 trait ScBlock
-    extends ScExpression with ScDeclarationSequenceHolder
+    extends ScExpression
+    with ScDeclarationSequenceHolder
     with ScImportsHolder {
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
@@ -205,13 +206,14 @@ trait ScBlock
   }
 
   private def leastClassType(t: ScTemplateDefinition): ScType = {
-    val (holders, aliases): (Seq[ScDeclaredElementsHolder],
-    Seq[ScTypeAlias]) = t.extendsBlock.templateBody match {
-      case Some(b: ScTemplateBody) =>
-        // jzaugg: Without these type annotations, a class cast exception occured above. I'm not entirely sure why.
-        (b.holders: Seq[ScDeclaredElementsHolder], b.aliases: Seq[ScTypeAlias])
-      case None => (Seq.empty, Seq.empty)
-    }
+    val (holders, aliases): (Seq[ScDeclaredElementsHolder], Seq[ScTypeAlias]) =
+      t.extendsBlock.templateBody match {
+        case Some(b: ScTemplateBody) =>
+          // jzaugg: Without these type annotations, a class cast exception occured above. I'm not entirely sure why.
+          (b.holders: Seq[ScDeclaredElementsHolder],
+           b.aliases: Seq[ScTypeAlias])
+        case None => (Seq.empty, Seq.empty)
+      }
 
     val superTypes = t.extendsBlock.superTypes
     if (superTypes.length > 1 || !holders.isEmpty || !aliases.isEmpty) {

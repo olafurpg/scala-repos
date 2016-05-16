@@ -43,10 +43,10 @@ object ServiceHandlerUtil {
     HttpResponse[JValue](
         HttpStatus(NotFound), content = Some(JString(message)))
 
-  def ok[A : Decomposer](content: Option[A]): HttpResponse[JValue] =
+  def ok[A: Decomposer](content: Option[A]): HttpResponse[JValue] =
     HttpResponse[JValue](OK, content = content.map(_.serialize))
 
-  def created[A : Decomposer](content: Option[A]): HttpResponse[JValue] =
+  def created[A: Decomposer](content: Option[A]): HttpResponse[JValue] =
     HttpResponse[JValue](Created, content = content.map(_.serialize))
 
   def noContent: HttpResponse[JValue] =
@@ -54,9 +54,9 @@ object ServiceHandlerUtil {
 
   def serverError(
       message: String, details: Option[String] = None): HttpResponse[JValue] =
-    HttpResponse(
-        HttpStatus(InternalServerError, message),
-        content = Some(jobject(jfield("error", details getOrElse message))))
+    HttpResponse(HttpStatus(InternalServerError, message),
+                 content =
+                   Some(jobject(jfield("error", details getOrElse message))))
 }
 
 // vim: set ts=4 sw=4 et:

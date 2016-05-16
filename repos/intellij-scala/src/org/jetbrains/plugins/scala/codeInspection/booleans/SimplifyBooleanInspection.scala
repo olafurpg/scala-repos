@@ -75,8 +75,7 @@ object SimplifyBooleanUtil {
         ScalaPsiElementFactory.createExpressionWithContextFromText(
             expr.getText, expr.getContext, expr)
       val children = getScExprChildren(exprCopy)
-      children.foreach(
-          child =>
+      children.foreach(child =>
             exprCopy.getNode.replaceChild(
                 child.getNode, simplify(child, isTopLevel = false).getNode))
       simplifyTrivially(exprCopy)

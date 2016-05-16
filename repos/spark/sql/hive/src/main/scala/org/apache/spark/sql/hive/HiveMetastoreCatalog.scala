@@ -65,26 +65,26 @@ private[hive] object HiveSerDe {
   def sourceToSerDe(source: String, hiveConf: HiveConf): Option[HiveSerDe] = {
     val serdeMap = Map(
         "sequencefile" -> HiveSerDe(
-            inputFormat = Option(
-                  "org.apache.hadoop.mapred.SequenceFileInputFormat"),
-            outputFormat = Option(
-                  "org.apache.hadoop.mapred.SequenceFileOutputFormat")),
+            inputFormat =
+              Option("org.apache.hadoop.mapred.SequenceFileInputFormat"),
+            outputFormat =
+              Option("org.apache.hadoop.mapred.SequenceFileOutputFormat")),
         "rcfile" -> HiveSerDe(
-            inputFormat = Option(
-                  "org.apache.hadoop.hive.ql.io.RCFileInputFormat"),
-            outputFormat = Option(
-                  "org.apache.hadoop.hive.ql.io.RCFileOutputFormat"),
-            serde = Option(
-                  hiveConf.getVar(HiveConf.ConfVars.HIVEDEFAULTRCFILESERDE))),
+            inputFormat =
+              Option("org.apache.hadoop.hive.ql.io.RCFileInputFormat"),
+            outputFormat =
+              Option("org.apache.hadoop.hive.ql.io.RCFileOutputFormat"),
+            serde = Option(hiveConf
+                  .getVar(HiveConf.ConfVars.HIVEDEFAULTRCFILESERDE))),
         "orc" -> HiveSerDe(
-            inputFormat = Option(
-                  "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"),
-            outputFormat = Option(
-                  "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"),
+            inputFormat =
+              Option("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"),
+            outputFormat =
+              Option("org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"),
             serde = Option("org.apache.hadoop.hive.ql.io.orc.OrcSerde")),
         "parquet" -> HiveSerDe(
             inputFormat = Option(
-                  "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
+                "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
             outputFormat = Option(
                   "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"),
             serde = Option(
@@ -103,7 +103,8 @@ private[hive] object HiveSerDe {
 // TODO: replace this with o.a.s.sql.hive.HiveCatalog once we merge SQLContext and HiveContext
 private[hive] class HiveMetastoreCatalog(
     val client: HiveClient, hive: HiveContext)
-    extends Catalog with Logging {
+    extends Catalog
+    with Logging {
 
   val conf = hive.conf
 
@@ -201,8 +202,8 @@ private[hive] class HiveMetastoreCatalog(
             options = options)
 
         LogicalRelation(dataSource.resolveRelation(),
-                        metastoreTableIdentifier = Some(
-                              TableIdentifier(in.name, Some(in.database))))
+                        metastoreTableIdentifier =
+                          Some(TableIdentifier(in.name, Some(in.database))))
       }
     }
 
@@ -320,12 +321,12 @@ private[hive] class HiveMetastoreCatalog(
                    tableType = tableType,
                    schema = Nil,
                    storage = CatalogStorageFormat(
-                         locationUri = None,
-                         inputFormat = None,
-                         outputFormat = None,
-                         serde = None,
-                         serdeProperties = options
-                     ),
+                       locationUri = None,
+                       inputFormat = None,
+                       outputFormat = None,
+                       serde = None,
+                       serdeProperties = options
+                   ),
                    properties = tableProperties.toMap)
     }
 
@@ -335,18 +336,21 @@ private[hive] class HiveMetastoreCatalog(
       assert(relation.partitionSchema.isEmpty)
 
       CatalogTable(
-          name = TableIdentifier(tblName, Option(dbName)),
+          name =
+            TableIdentifier(tblName, Option(dbName)),
           tableType = tableType,
           storage = CatalogStorageFormat(
-                locationUri = Some(
-                      relation.location.paths.map(_.toUri.toString).head),
-                inputFormat = serde.inputFormat,
-                outputFormat = serde.outputFormat,
-                serde = serde.serde,
-                serdeProperties = options
-            ),
-          schema = relation.schema.map { f =>
-            CatalogColumn(f.name,
+              locationUri =
+                Some(relation.location.paths.map(_.toUri.toString).head),
+              inputFormat = serde.inputFormat,
+              outputFormat = serde.outputFormat,
+              serde =
+                serde.serde,
+              serdeProperties = options
+          ),
+          schema =
+            relation.schema.map { f =>
+              CatalogColumn(f.name,
                           HiveMetastoreTypes.toMetastoreType(f.dataType))
           },
           properties = tableProperties.toMap,
@@ -534,8 +538,7 @@ private[hive] class HiveMetastoreCatalog(
         // are empty.
         val partitions = metastoreRelation.getHiveQlPartitions().map { p =>
           val location = p.getLocation
-          val values = InternalRow.fromSeq(
-              p.getValues.asScala
+          val values = InternalRow.fromSeq(p.getValues.asScala
                 .zip(partitionColumnDataTypes)
                 .map {
               case (rawValue, dataType) =>
@@ -570,7 +573,8 @@ private[hive] class HiveMetastoreCatalog(
               location = fileCatalog,
               partitionSchema = partitionSchema,
               dataSchema = mergedSchema,
-              bucketSpec = None, // We don't support hive bucketed tables, only ones we write out.
+              bucketSpec =
+                None, // We don't support hive bucketed tables, only ones we write out.
               fileFormat = new DefaultSource(),
               options = parquetOptions)
 
@@ -642,8 +646,8 @@ private[hive] class HiveMetastoreCatalog(
         // Read path
         case relation: MetastoreRelation
             if hive.convertMetastoreParquet &&
-            relation.tableDesc.getSerdeClassName.toLowerCase
-              .contains("parquet") =>
+            relation.tableDesc.getSerdeClassName.toLowerCase.contains(
+                "parquet") =>
           val parquetRelation = convertToParquetRelation(relation)
           SubqueryAlias(
               relation.alias.getOrElse(relation.tableName), parquetRelation)
@@ -718,8 +722,8 @@ private[hive] class HiveMetastoreCatalog(
           val desc =
             if (table.storage.serde.isEmpty) {
               // add default serde
-              table.withNewStorage(serde = Some(
-                        "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"))
+              table.withNewStorage(serde =
+                    Some("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"))
             } else {
               table
             }
@@ -860,7 +864,9 @@ private[hive] case class MetastoreRelation(
     val table: CatalogTable,
     @transient private val client: HiveClient,
     @transient private val sqlContext: SQLContext)
-    extends LeafNode with MultiInstanceRelation with FileRelation {
+    extends LeafNode
+    with MultiInstanceRelation
+    with FileRelation {
 
   override def equals(other: Any): Boolean = other match {
     case relation: MetastoreRelation =>

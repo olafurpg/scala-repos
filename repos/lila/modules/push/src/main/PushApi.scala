@@ -35,15 +35,15 @@ private final class PushApi(
                     },
                     body = s"Your game with ${opponentName(pov)} is over.",
                     payload = Json.obj(
-                          "userId" -> userId,
-                          "userData" -> Json.obj(
-                              "type" -> "gameFinish",
-                              "gameId" -> game.id,
-                              "fullId" -> pov.fullId,
-                              "color" -> pov.color.name,
-                              "fen" -> Forsyth.exportBoard(game.toChess.board),
-                              "lastMove" -> game.castleLastMoveTime.lastMoveString,
-                              "win" -> pov.win))))
+                        "userId" -> userId,
+                        "userData" -> Json.obj(
+                            "type" -> "gameFinish",
+                            "gameId" -> game.id,
+                            "fullId" -> pov.fullId,
+                            "color" -> pov.color.name,
+                            "fen" -> Forsyth.exportBoard(game.toChess.board),
+                            "lastMove" -> game.castleLastMoveTime.lastMoveString,
+                            "win" -> pov.win))))
           }
         }
       }.sequenceFu.void
@@ -55,15 +55,16 @@ private final class PushApi(
         game.player(!move.color).userId ?? { userId =>
           game.pgnMoves.lastOption ?? { sanMove =>
             IfAway(pov) {
-              pushToAll(
-                  userId,
-                  _.move,
-                  PushApi.Data(title = "It's your turn!",
-                               body = s"${opponentName(pov)} played $sanMove",
-                               payload = Json
-                                   .obj("userId" -> userId,
-                                        "userData" -> Json
-                                          .obj("type" -> "gameMove",
+              pushToAll(userId,
+                        _.move,
+                        PushApi
+                          .Data(title = "It's your turn!",
+                                body =
+                                  s"${opponentName(pov)} played $sanMove",
+                                payload =
+                                  Json.obj(
+                                      "userId" -> userId,
+                                      "userData" -> Json.obj("type" -> "gameMove",
                                                "gameId" -> game.id,
                                                "fullId" -> pov.fullId,
                                                "color" -> pov.color.name,
@@ -85,12 +86,13 @@ private final class PushApi(
             dest.id,
             _.challenge.create,
             PushApi.Data(
-                title = s"${lightChallenger.titleName} (${challenger.rating.show}) challenges you!",
+                title =
+                  s"${lightChallenger.titleName} (${challenger.rating.show}) challenges you!",
                 body = describeChallenge(c),
-                payload = Json.obj(
-                      "userId" -> dest.id,
-                      "userData" -> Json.obj("type" -> "challengeCreate",
-                                             "challengeId" -> c.id))))
+                payload =
+                  Json.obj("userId" -> dest.id,
+                           "userData" -> Json.obj("type" -> "challengeCreate",
+                                                  "challengeId" -> c.id))))
       }
     }
   }
@@ -103,13 +105,14 @@ private final class PushApi(
             challenger.id,
             _.challenge.accept,
             PushApi.Data(
-                title = s"${lightJoiner.fold("Anonymous")(_.titleName)} accepts your challenge!",
+                title =
+                  s"${lightJoiner.fold("Anonymous")(_.titleName)} accepts your challenge!",
                 body = describeChallenge(c),
-                payload = Json.obj(
-                      "userId" -> challenger.id,
-                      "userData" -> Json.obj("type" -> "challengeAccept",
-                                             "challengeId" -> c.id,
-                                             "joiner" -> lightJoiner))))
+                payload =
+                  Json.obj("userId" -> challenger.id,
+                           "userData" -> Json.obj("type" -> "challengeAccept",
+                                                  "challengeId" -> c.id,
+                                                  "joiner" -> lightJoiner))))
     }
 
   private type MonitorType = lila.mon.push.send.type => (String => Unit)

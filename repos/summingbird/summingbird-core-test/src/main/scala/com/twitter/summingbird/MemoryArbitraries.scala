@@ -22,19 +22,19 @@ import org.scalacheck.{Gen, Arbitrary}
 import scala.collection.mutable.HashMap
 
 object MemoryArbitraries {
-  implicit def arbSource1[K : Arbitrary]: Arbitrary[Producer[Memory, K]] =
+  implicit def arbSource1[K: Arbitrary]: Arbitrary[Producer[Memory, K]] =
     Arbitrary(
         Gen
           .listOfN(100, Arbitrary.arbitrary[K])
           .map(Producer.source[Memory, K](_)))
-  implicit def arbSource2[
-      K : Arbitrary, V : Arbitrary]: Arbitrary[KeyedProducer[Memory, K, V]] =
+  implicit def arbSource2[K: Arbitrary, V: Arbitrary]
+    : Arbitrary[KeyedProducer[Memory, K, V]] =
     Arbitrary(
         Gen
           .listOfN(100, Arbitrary.arbitrary[(K, V)])
           .map(Producer.source[Memory, (K, V)](_)))
-  implicit def arbService[K : Arbitrary, V : Arbitrary]: Arbitrary[
-      MemoryService[K, V]] =
+  implicit def arbService[K: Arbitrary, V: Arbitrary]
+    : Arbitrary[MemoryService[K, V]] =
     Arbitrary(
         for {
           k <- Gen.listOfN(100, Arbitrary.arbitrary[K])

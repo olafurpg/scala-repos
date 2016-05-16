@@ -463,6 +463,6 @@ trait BoxGenerator {
       exception <- const(Full(new Exception("")))
       chainLen <- choose(1, 5)
       chain <- frequency(
-          (1, listOfN(chainLen, genFailureBox)), (3, const(Nil)))
+                  (1, listOfN(chainLen, genFailureBox)), (3, const(Nil)))
     } yield Failure(msg.mkString, exception, Box(chain.headOption))
 }

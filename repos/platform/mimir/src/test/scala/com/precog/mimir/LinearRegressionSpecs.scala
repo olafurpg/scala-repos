@@ -35,7 +35,8 @@ import java.io.File
 import scalaz._
 
 trait LinearRegressionTestSupport[M[+ _]]
-    extends StdLibEvaluatorStack[M] with RegressionTestSupport[M] {
+    extends StdLibEvaluatorStack[M]
+    with RegressionTestSupport[M] {
 
   import library._
   import dag._
@@ -78,8 +79,10 @@ trait LinearRegressionTestSupport[M[+ _]]
 }
 
 trait LinearRegressionSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LinearRegressionTestSupport[M] with LongIdMemoryDatasetConsumer[M] {
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LinearRegressionTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] {
   self =>
 
   import dag._
@@ -526,4 +529,5 @@ trait LinearRegressionSpecs[M[+ _]]
 }
 
 object LinearRegressionSpecs
-    extends LinearRegressionSpecs[test.YId] with test.YIdInstances
+    extends LinearRegressionSpecs[test.YId]
+    with test.YIdInstances

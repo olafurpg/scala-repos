@@ -179,7 +179,8 @@ import org.apache.spark.util.Utils
   *  setting `spark.ssl.useNodeLocalConf` to `true`.
   */
 private[spark] class SecurityManager(sparkConf: SparkConf)
-    extends Logging with SecretKeyHolder {
+    extends Logging
+    with SecretKeyHolder {
 
   import SecurityManager._
 
@@ -209,8 +210,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   private val secretKey = generateSecretKey()
   logInfo(
       "SecurityManager: authentication " +
-      (if (authOn) "enabled" else "disabled") + "; ui acls " +
-      (if (aclsOn) "enabled" else "disabled") +
+      (if (authOn) "enabled" else "disabled") +
+      "; ui acls " + (if (aclsOn) "enabled" else "disabled") +
       "; users with view permissions: " + viewAcls.toString() +
       "; users with modify permissions: " + modifyAcls.toString())
 
@@ -225,8 +226,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
             val userInfo = getRequestingURL().getUserInfo()
             if (userInfo != null) {
               val parts = userInfo.split(":", 2)
-              passAuth = new PasswordAuthentication(
-                  parts(0), parts(1).toCharArray())
+              passAuth =
+                new PasswordAuthentication(parts(0), parts(1).toCharArray())
             }
             return passAuth
           }

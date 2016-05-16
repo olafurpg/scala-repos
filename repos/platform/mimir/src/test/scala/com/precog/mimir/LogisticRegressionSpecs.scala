@@ -36,7 +36,8 @@ import java.io.File
 import scalaz._
 
 trait LogisticRegressionTestSupport[M[+ _]]
-    extends StdLibEvaluatorStack[M] with RegressionTestSupport[M] {
+    extends StdLibEvaluatorStack[M]
+    with RegressionTestSupport[M] {
   import library._
   import instructions._
   import library._
@@ -90,8 +91,10 @@ trait LogisticRegressionTestSupport[M[+ _]]
 }
 
 trait LogisticRegressionSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with LogisticRegressionTestSupport[M] with LongIdMemoryDatasetConsumer[M] {
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with LogisticRegressionTestSupport[M]
+    with LongIdMemoryDatasetConsumer[M] {
   self =>
 
   import dag._
@@ -533,4 +536,5 @@ trait LogisticRegressionSpecs[M[+ _]]
 }
 
 object LogisticRegressionSpecs
-    extends LogisticRegressionSpecs[test.YId] with test.YIdInstances
+    extends LogisticRegressionSpecs[test.YId]
+    with test.YIdInstances

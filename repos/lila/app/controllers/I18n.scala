@@ -20,28 +20,27 @@ object I18n extends LilaController {
     Form(single("lang" -> text.verifying(env.pool contains _))).bindFromRequest
       .fold(
         _ => notFound,
-        lang =>
-          {
-            ctx.me.filterNot(_.lang contains lang) ?? { me =>
-              lila.user.UserRepo.setLang(me.id, lang)
+        lang => {
+          ctx.me.filterNot(_.lang contains lang) ?? { me =>
+            lila.user.UserRepo.setLang(me.id, lang)
+          }
+        } >> negotiate(html = Redirect {
+          s"${Env.api.Net.Protocol}${lang}.${Env.api.Net.Domain}" + {
+            HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) {
+              str =>
+                try {
+                  val pageUrl = new java.net.URL(str);
+                  val path = pageUrl.getPath
+                  val query = pageUrl.getQuery
+                  if (query == null) path
+                  else path + "?" + query
+                } catch {
+                  case e: java.net.MalformedURLException =>
+                    routes.Lobby.home.url
+                }
             }
-          } >> negotiate(html = Redirect {
-            s"${Env.api.Net.Protocol}${lang}.${Env.api.Net.Domain}" + {
-              HTTPRequest.referer(ctx.req).fold(routes.Lobby.home.url) {
-                str =>
-                  try {
-                    val pageUrl = new java.net.URL(str);
-                    val path = pageUrl.getPath
-                    val query = pageUrl.getQuery
-                    if (query == null) path
-                    else path + "?" + query
-                  } catch {
-                    case e: java.net.MalformedURLException =>
-                      routes.Lobby.home.url
-                  }
-              }
-            }
-          }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)
+          }
+        }.fuccess, api = _ => Ok(Json.obj("lang" -> lang)).fuccess)
     )
   }
 
@@ -87,12 +86,12 @@ object I18n extends LilaController {
     env.context.get map (i -> _) map (_.some)
   }
 
-  private def renderTranslationForm(
-      form: Form[_],
-      info: TransInfo,
-      captcha: Captcha,
-      context: Map[String, String],
-      data: Map[String, String] = Map.empty)(implicit ctx: Context) =
+  private def renderTranslationForm(form: Form[_],
+                                    info: TransInfo,
+                                    captcha: Captcha,
+                                    context: Map[String, String],
+                                    data: Map[String, String] =
+                                      Map.empty)(implicit ctx: Context) =
     html.i18n.translationForm(info,
                               form,
                               env.keys,

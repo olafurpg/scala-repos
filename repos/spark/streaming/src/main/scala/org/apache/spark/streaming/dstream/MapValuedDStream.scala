@@ -23,7 +23,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
 private[streaming] class MapValuedDStream[
-    K : ClassTag, V : ClassTag, U : ClassTag](
+    K: ClassTag, V: ClassTag, U: ClassTag](
     parent: DStream[(K, V)],
     mapValueFunc: V => U
 )

@@ -95,16 +95,14 @@ private[streaming] object MasterFailureTest extends Logging {
     val expectedOutput =
       (1L to numBatches).map(i => (1L to i).sum).map(j => ("a", j))
 
-    val operation = (st: DStream[String]) =>
-      {
-        val updateFunc = (values: Seq[Long], state: Option[Long]) =>
-          {
-            Some(values.foldLeft(0L)(_ + _) + state.getOrElse(0L))
-        }
-        st.flatMap(_.split(" "))
-          .map(x => (x, 1L))
-          .updateStateByKey[Long](updateFunc)
-          .checkpoint(batchDuration * 5)
+    val operation = (st: DStream[String]) => {
+      val updateFunc = (values: Seq[Long], state: Option[Long]) => {
+        Some(values.foldLeft(0L)(_ + _) + state.getOrElse(0L))
+      }
+      st.flatMap(_.split(" "))
+        .map(x => (x, 1L))
+        .updateStateByKey[Long](updateFunc)
+        .checkpoint(batchDuration * 5)
     }
 
     // Run streaming operation with multiple master failures
@@ -116,8 +114,7 @@ private[streaming] object MasterFailureTest extends Logging {
     logInfo("Output, size = " + output.size + "\n" + output)
 
     // Verify whether all the values in the output are among the expected output values
-    output.foreach(
-        o =>
+    output.foreach(o =>
           assert(expectedOutput.contains(o),
                  "Expected value " + o + " not found"))
 
@@ -130,7 +127,7 @@ private[streaming] object MasterFailureTest extends Logging {
     * Tests stream operation with multiple master failures, and verifies whether the
     * final set of output values is as expected or not.
     */
-  def testOperation[T : ClassTag](
+  def testOperation[T: ClassTag](
       directory: String,
       batchDuration: Duration,
       input: Seq[String],
@@ -154,12 +151,9 @@ private[streaming] object MasterFailureTest extends Logging {
     fs.mkdirs(testDir)
 
     // Setup the stream computation with the given operation
-    val ssc = StreamingContext.getOrCreate(
-        checkpointDir.toString,
-        () =>
-          {
-            setupStreams(batchDuration, operation, checkpointDir, testDir)
-        })
+    val ssc = StreamingContext.getOrCreate(checkpointDir.toString, () => {
+      setupStreams(batchDuration, operation, checkpointDir, testDir)
+    })
 
     // Check if setupStream was called to create StreamingContext
     // (and not created from checkpoint file)
@@ -190,7 +184,7 @@ private[streaming] object MasterFailureTest extends Logging {
     * and batch duration. Returns the streaming context and the directory to which
     * files should be written for testing.
     */
-  private def setupStreams[T : ClassTag](
+  private def setupStreams[T: ClassTag](
       batchDuration: Duration,
       operation: DStream[String] => DStream[T],
       checkpointDir: Path,
@@ -214,7 +208,7 @@ private[streaming] object MasterFailureTest extends Logging {
     * Repeatedly starts and kills the streaming context until timed out or
     * the last expected output is generated. Finally, return
     */
-  private def runStreams[T : ClassTag](
+  private def runStreams[T: ClassTag](
       _ssc: StreamingContext,
       lastExpectedOutput: T,
       maxTimeToRun: Long
@@ -257,7 +251,7 @@ private[streaming] object MasterFailureTest extends Logging {
           Thread.sleep(100)
           timeRan = System.currentTimeMillis() - startTime
           isLastOutputGenerated =
-          (output.nonEmpty && output.last == lastExpectedOutput)
+            (output.nonEmpty && output.last == lastExpectedOutput)
           isTimedOut = (timeRan + totalTimeRan > maxTimeToRun)
         }
       } catch {
@@ -295,13 +289,10 @@ private[streaming] object MasterFailureTest extends Logging {
         )
         Thread.sleep(sleepTime)
         // Recreate the streaming context from checkpoint
-        ssc = StreamingContext.getOrCreate(
-            checkpointDir,
-            () =>
-              {
-                throw new Exception("Trying to create new context when it " +
-                    "should be reading from checkpoint file")
-            })
+        ssc = StreamingContext.getOrCreate(checkpointDir, () => {
+          throw new Exception("Trying to create new context when it " +
+              "should be reading from checkpoint file")
+        })
       }
     }
     mergedOutput
@@ -314,7 +305,7 @@ private[streaming] object MasterFailureTest extends Logging {
     * duplicate batch outputs of values from the `output`. As a result, the
     * expected output should not have consecutive batches with the same values as output.
     */
-  private def verifyOutput[T : ClassTag](
+  private def verifyOutput[T: ClassTag](
       output: Seq[T], expectedOutput: Seq[T]) {
     // Verify whether expected outputs do not consecutive batches with same output
     for (i <- 0 until expectedOutput.size - 1) {
@@ -331,8 +322,7 @@ private[streaming] object MasterFailureTest extends Logging {
     // scalastyle:on println
 
     // Match the output with the expected output
-    output.foreach(
-        o =>
+    output.foreach(o =>
           assert(expectedOutput.contains(o),
                  "Expected value " + o + " not found"))
   }
@@ -350,7 +340,8 @@ private[streaming] object MasterFailureTest extends Logging {
   */
 private[streaming] class KillingThread(
     ssc: StreamingContext, maxKillWaitTime: Long)
-    extends Thread with Logging {
+    extends Thread
+    with Logging {
 
   override def run() {
     try {
@@ -384,7 +375,8 @@ private[streaming] class KillingThread(
   */
 private[streaming] class FileGeneratingThread(
     input: Seq[String], testDir: Path, interval: Long)
-    extends Thread with Logging {
+    extends Thread
+    with Logging {
 
   override def run() {
     val localTestDir = Utils.createTempDir()

@@ -173,7 +173,8 @@ trait PostgresProfile extends JdbcProfile {
                 .collect[List[TermSymbol]] { case FwdPath(ss) => ss }
                 .toSet == selNodes.iterator
                 .collect[List[TermSymbol]] { case FwdPath(ss) => ss }
-                .toSet) b"distinct " else super.buildSelectModifiers(c)
+                .toSet) b"distinct "
+          else super.buildSelectModifiers(c)
         case _ => super.buildSelectModifiers(c)
       }
 
@@ -253,14 +254,16 @@ trait PostgresProfile extends JdbcProfile {
             " before update or delete on " + quoteIdentifier(tname) +
             " for each row execute procedure lo_manage(" +
             quoteIdentifier(column.name) + ")"
-        ) else None
+        )
+      else None
 
     def dropLobTrigger(tname: String): Option[String] =
       if (sqlType == "lo")
         Some(
             "drop trigger " + lobTrigger(tname) + " on " + quoteIdentifier(
                 tname)
-        ) else None
+        )
+      else None
   }
 
   class JdbcTypes extends super.JdbcTypes {

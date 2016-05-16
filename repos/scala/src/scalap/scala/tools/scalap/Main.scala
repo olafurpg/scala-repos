@@ -188,7 +188,8 @@ object Main extends Main {
       val settings = new Settings()
 
       arguments getArgument opts.classPathImplType foreach settings.YclasspathImpl.tryToSetFromPropertyValue
-      settings.YdisableFlatCpCaching.value = arguments contains opts.disableFlatClassPathCaching
+      settings.YdisableFlatCpCaching.value =
+        arguments contains opts.disableFlatClassPathCaching
       settings.Ylogcp.value = arguments contains opts.logClassPath
 
       val path = createClassPath(cpArg, settings)
@@ -229,7 +230,8 @@ object Main extends Main {
                               DefaultJavaContext)
         }
       case _ =>
-        settings.classpath.value = "." // include '.' in the default classpath SI-6669
+        settings.classpath.value =
+          "." // include '.' in the default classpath SI-6669
         PathResolverFactory.create(settings).result
     }
 }

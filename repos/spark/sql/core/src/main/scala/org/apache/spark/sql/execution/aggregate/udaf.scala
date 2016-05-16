@@ -214,7 +214,8 @@ private[sql] class MutableAggregationBufferImpl(
     toScalaConverters: Array[Any => Any],
     bufferOffset: Int,
     var underlyingBuffer: MutableRow)
-    extends MutableAggregationBuffer with BufferSetterGetterUtils {
+    extends MutableAggregationBuffer
+    with BufferSetterGetterUtils {
 
   private[this] val offsets: Array[Int] = {
     val newOffsets = new Array[Int](length)
@@ -276,7 +277,8 @@ private[sql] class InputAggregationBuffer private[sql](
     toScalaConverters: Array[Any => Any],
     bufferOffset: Int,
     var underlyingInputBuffer: InternalRow)
-    extends Row with BufferSetterGetterUtils {
+    extends Row
+    with BufferSetterGetterUtils {
 
   private[this] val offsets: Array[Int] = {
     val newOffsets = new Array[Int](length)
@@ -327,7 +329,9 @@ private[sql] case class ScalaUDAF(children: Seq[Expression],
                                   udaf: UserDefinedAggregateFunction,
                                   mutableAggBufferOffset: Int = 0,
                                   inputAggBufferOffset: Int = 0)
-    extends ImperativeAggregate with NonSQLExpression with Logging {
+    extends ImperativeAggregate
+    with NonSQLExpression
+    with Logging {
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =

@@ -9,7 +9,8 @@ import scala.util.control.NoStackTrace
 
 object SwitchableLoggedBehaviorSpec {
   object TestException
-      extends AkkaException("Test exception") with NoStackTrace
+      extends AkkaException("Test exception")
+      with NoStackTrace
 }
 
 class SwitchableLoggedBehaviorSpec extends AkkaSpec with DefaultTimeout {

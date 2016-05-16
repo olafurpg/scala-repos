@@ -14,7 +14,8 @@ trait IssueCommentComponent extends TemplateComponent { self: Profile =>
   }
 
   class IssueComments(tag: Tag)
-      extends Table[IssueComment](tag, "ISSUE_COMMENT") with IssueTemplate {
+      extends Table[IssueComment](tag, "ISSUE_COMMENT")
+      with IssueTemplate {
     val commentId = column[Int]("COMMENT_ID", O AutoInc)
     val action = column[String]("ACTION")
     val commentedUserName = column[String]("COMMENTED_USER_NAME")
@@ -58,7 +59,8 @@ trait CommitCommentComponent extends TemplateComponent { self: Profile =>
   }
 
   class CommitComments(tag: Tag)
-      extends Table[CommitComment](tag, "COMMIT_COMMENT") with CommitTemplate {
+      extends Table[CommitComment](tag, "COMMIT_COMMENT")
+      with CommitTemplate {
     val commentId = column[Int]("COMMENT_ID", O AutoInc)
     val commentedUserName = column[String]("COMMENTED_USER_NAME")
     val content = column[String]("CONTENT")

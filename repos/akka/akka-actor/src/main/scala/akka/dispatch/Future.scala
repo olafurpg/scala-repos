@@ -78,7 +78,8 @@ object ExecutionContexts {
     * non-throwing in order to save a round-trip to the thread pool.
     */
   private[akka] object sameThreadExecutionContext
-      extends ExecutionContext with BatchingExecutor {
+      extends ExecutionContext
+      with BatchingExecutor {
     override protected def unbatchedExecute(runnable: Runnable): Unit =
       runnable.run()
     override protected def resubmitOnBlock: Boolean =

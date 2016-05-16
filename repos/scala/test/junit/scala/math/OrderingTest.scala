@@ -11,7 +11,7 @@ class OrderingTest {
   /* Test for SI-9077 */
   @Test
   def testReverseOrdering {
-    def check[T : Ordering](t1: T, t2: T): Unit = {
+    def check[T: Ordering](t1: T, t2: T): Unit = {
       val O = Ordering[T]
       val R = O.reverse
       assertEquals(O.min(t1, t2), R.max(t1, t2))
@@ -38,7 +38,7 @@ class OrderingTest {
       assertEquals(O.mkOrderingOps(t1).min(t2), R.mkOrderingOps(t1).max(t2))
       assertEquals(O.mkOrderingOps(t1).max(t2), R.mkOrderingOps(t1).min(t2))
     }
-    def checkAll[T : Ordering](ts: T*): Unit = {
+    def checkAll[T: Ordering](ts: T*): Unit = {
       for (t1 <- ts; t2 <- ts) check(t1, t2)
     }
     checkAll[Unit](())

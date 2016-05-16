@@ -13,7 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * @author Alexander.Podkhalyuzin 
   */
 class ScConstrBlockImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstrBlock {
+    extends ScalaPsiElementImpl(node)
+    with ScConstrBlock {
   override def toString: String = "ConstructorBlock"
 
   override def accept(visitor: ScalaElementVisitor) {

@@ -79,7 +79,7 @@ class FilteredBuffer[E](override val delegate: jfxct.FilteredList[E])
   def this(source: ObservableBuffer[E], predicate: (_ >: E) => Boolean) =
     this(
         delegate = new jfxct.FilteredList[E](
-              source.delegate, new ju.function.Predicate[E] {
+            source.delegate, new ju.function.Predicate[E] {
       override def test(t: E): Boolean = predicate(t)
     }))
 

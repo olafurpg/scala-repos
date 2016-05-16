@@ -44,7 +44,8 @@ class ExecutorClassLoader(conf: SparkConf,
                           classUri: String,
                           parent: ClassLoader,
                           userClassPathFirst: Boolean)
-    extends ClassLoader with Logging {
+    extends ClassLoader
+    with Logging {
   val uri = new URI(classUri)
   val directory = uri.getPath
 

@@ -19,7 +19,8 @@ trait ReportHandler {
 }
 
 class PresentationReporter(handler: ReportHandler)
-    extends Reporter with PositionBackCompat {
+    extends Reporter
+    with PositionBackCompat {
 
   val log = LoggerFactory.getLogger(classOf[PresentationReporter])
   private var enabled = true

@@ -112,7 +112,8 @@ object TellOnlyBenchmark {
   }
 
   case class UnboundedDroppingMailbox()
-      extends MailboxType with ProducesMessageQueue[DroppingMessageQueue] {
+      extends MailboxType
+      with ProducesMessageQueue[DroppingMessageQueue] {
 
     def this(settings: ActorSystem.Settings, config: Config) = this()
 

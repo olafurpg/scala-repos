@@ -30,7 +30,9 @@ import org.apache.spark.util.ManualClock
   * Test add and remove behavior of ExecutorAllocationManager.
   */
 class ExecutorAllocationManagerSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfter {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfter {
 
   import ExecutorAllocationManager._
   import ExecutorAllocationManagerSuite._

@@ -47,7 +47,9 @@ import org.apache.spark.sql.types._
   *    data type is nullable.
   */
 class ParquetFilterSuite
-    extends QueryTest with ParquetTest with SharedSQLContext {
+    extends QueryTest
+    with ParquetTest
+    with SharedSQLContext {
 
   private def checkFilterPredicate(df: DataFrame,
                                    predicate: Predicate,

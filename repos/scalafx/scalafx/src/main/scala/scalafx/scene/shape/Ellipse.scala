@@ -45,7 +45,8 @@ object Ellipse {
 }
 
 class Ellipse(override val delegate: jfxss.Ellipse = new jfxss.Ellipse())
-    extends Shape(delegate) with SFXDelegate[jfxss.Ellipse] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Ellipse] {
   def centerX: DoubleProperty = delegate.centerXProperty
   def centerX_=(v: Double) {
     centerX() = v

@@ -70,15 +70,15 @@ private[spark] class ShuffleMapTask(
     val (rdd, dep) = ser.deserialize[(RDD[_], ShuffleDependency[_, _, _])](
         ByteBuffer.wrap(taskBinary.value),
         Thread.currentThread.getContextClassLoader)
-    _executorDeserializeTime = System.currentTimeMillis() -
-    deserializeStartTime
+    _executorDeserializeTime =
+      System.currentTimeMillis() - deserializeStartTime
 
     metrics = Some(context.taskMetrics)
     var writer: ShuffleWriter[Any, Any] = null
     try {
       val manager = SparkEnv.get.shuffleManager
-      writer = manager.getWriter[Any, Any](
-          dep.shuffleHandle, partitionId, context)
+      writer =
+        manager.getWriter[Any, Any](dep.shuffleHandle, partitionId, context)
       writer.write(rdd
             .iterator(partition, context)
             .asInstanceOf[Iterator[_ <: Product2[Any, Any]]])

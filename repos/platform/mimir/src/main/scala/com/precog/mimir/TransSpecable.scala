@@ -30,7 +30,8 @@ import scalaz.std.option._
 import scalaz.syntax.monadPlus._
 
 trait TransSpecableModule[M[+ _]]
-    extends TransSpecModule with TableModule[M]
+    extends TransSpecModule
+    with TableModule[M]
     with EvaluatorMethodsModule[M] {
   import dag._
   import library._
@@ -89,13 +90,13 @@ trait TransSpecableModule[M[+ _]]
         def binOp(node: Join)(leftParent: Boolean,
                               rightParent: => Boolean,
                               op: BinaryOperation) = leftParent && rightParent
-        def Filter(node: dag.Filter)(
-            leftParent: Boolean, rightParent: => Boolean) =
+        def Filter(
+            node: dag.Filter)(leftParent: Boolean, rightParent: => Boolean) =
           leftParent && rightParent
         def WrapArray(node: Operate)(parent: Boolean) = parent
         def Op1(node: Operate)(parent: Boolean, op: UnaryOperation) = parent
-        def Cond(
-            node: dag.Cond)(pred: Boolean, left: Boolean, right: Boolean) =
+        def Cond(node: dag.Cond)(
+            pred: Boolean, left: Boolean, right: Boolean) =
           pred && left && right
         def Const(node: dag.Const)(under: Boolean) = under
         def unmatched(node: DepGraph) = false
@@ -145,7 +146,8 @@ trait TransSpecableModule[M[+ _]]
               leftMap(_) { target =>
             val inner = trans.Equal(target, transRValue(value, target))
             if (invert)
-              op1ForUnOp(Comp).spec(MorphContext(ctx, node))(inner) else inner
+              op1ForUnOp(Comp).spec(MorphContext(ctx, node))(inner)
+            else inner
           })
 
         def WrapObject(node: Join)(parent: N[S], field: String) =
@@ -175,7 +177,8 @@ trait TransSpecableModule[M[+ _]]
 
         def Map1Left(node: Join)(
             parent: N[S], op: Op2F2, graph: DepGraph, value: RValue) =
-          parent.flatMap(leftMap(_) { target =>
+          parent.flatMap(
+              leftMap(_) { target =>
             value match {
               case cv: CValue =>
                 trans.Map1(target, op.f2(MorphContext(ctx, node)).applyr(cv))
@@ -187,7 +190,8 @@ trait TransSpecableModule[M[+ _]]
 
         def Map1Right(node: Join)(
             parent: N[S], op: Op2F2, graph: DepGraph, value: RValue) =
-          parent.flatMap(leftMap(_) { target =>
+          parent.flatMap(
+              leftMap(_) { target =>
             value match {
               case cv: CValue =>
                 trans.Map1(target, op.f2(MorphContext(ctx, node)).applyl(cv))

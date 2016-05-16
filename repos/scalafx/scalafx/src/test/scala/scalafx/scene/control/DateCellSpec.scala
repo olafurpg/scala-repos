@@ -40,4 +40,5 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class DateCellSpec
     extends SimpleSFXDelegateSpec[jfxsc.DateCell, DateCell](
-        classOf[jfxsc.DateCell], classOf[DateCell]) with RunOnApplicationThread
+        classOf[jfxsc.DateCell], classOf[DateCell])
+    with RunOnApplicationThread

@@ -31,7 +31,7 @@ class GCDTest extends FunSuite with Checkers {
       d <- arbitrary[Long] if d != 0
     } yield Rational(n, d))
 
-  def testGcd[A : EuclideanRing : IsReal : NumberTag](x: A, y: A): Boolean = {
+  def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = spire.math.gcd(x, y)
       val x0 = x /~ den

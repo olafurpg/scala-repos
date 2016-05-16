@@ -41,7 +41,8 @@ object TextInputControl {
 }
 
 abstract class TextInputControl(override val delegate: jfxsc.TextInputControl)
-    extends Control(delegate) with SFXDelegate[jfxsc.TextInputControl] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TextInputControl] {
 
   /**
     * The anchor of the text selection.

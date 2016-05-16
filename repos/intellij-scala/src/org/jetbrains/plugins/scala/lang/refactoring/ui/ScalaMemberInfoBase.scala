@@ -32,8 +32,10 @@ abstract class ScalaMemberInfoBase[Member <: PsiElement](member: Member)
           overrides = java.lang.Boolean.FALSE
         case Some(m) if m.getLanguage.isInstanceOf[JavaLanguage] =>
           //for java only
-          overrides = if (!m.hasModifierProperty(PsiModifier.ABSTRACT))
-            java.lang.Boolean.TRUE else java.lang.Boolean.FALSE
+          overrides =
+            if (!m.hasModifierProperty(PsiModifier.ABSTRACT))
+              java.lang.Boolean.TRUE
+            else java.lang.Boolean.FALSE
         case _ => overrides = null
       }
       isStatic = containingClass match {
@@ -42,8 +44,8 @@ abstract class ScalaMemberInfoBase[Member <: PsiElement](member: Member)
         case _ => method.hasModifierProperty(PsiModifier.STATIC)
       }
     case clazz: ScTypeDefinition =>
-      displayName = ScalaElementPresentation.getTypeDefinitionPresentableText(
-          clazz)
+      displayName =
+        ScalaElementPresentation.getTypeDefinitionPresentableText(clazz)
       isStatic = clazz.containingClass.isInstanceOf[ScObject]
       overrides = null
     case ta: ScTypeAlias =>

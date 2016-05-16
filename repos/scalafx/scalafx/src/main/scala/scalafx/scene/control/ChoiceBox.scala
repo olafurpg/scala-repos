@@ -60,7 +60,8 @@ object ChoiceBox {
   */
 class ChoiceBox[J <: Any](
     override val delegate: jfxsc.ChoiceBox[J] = new jfxsc.ChoiceBox[J])
-    extends Control(delegate) with SFXDelegate[jfxsc.ChoiceBox[J]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ChoiceBox[J]] {
 
   /**
     * Create a new ChoiceBox with the given set of items.

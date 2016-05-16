@@ -196,5 +196,6 @@ sealed case class WebColor(name: String, color: Color) {
     * Verifies if a determined color is equivalent to color represented by this WebColor.
     */
   def sameColor(c: Color) =
-    ((c.red == color.red) && (c.green == color.green) && (c.blue == color.blue))
+    ((c.red == color.red) && (c.green == color.green) &&
+        (c.blue == color.blue))
 }

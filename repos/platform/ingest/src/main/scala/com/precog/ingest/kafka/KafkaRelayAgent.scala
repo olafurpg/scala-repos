@@ -95,19 +95,20 @@ object KafkaRelayAgent extends Logging {
 
 /** An independent agent that will consume records using the specified consumer,
   * augment them with record identities, then send them with the specified producer. */
-final class KafkaRelayAgent(
-    permissionsFinder: PermissionsFinder[Future],
-    eventIdSeq: EventIdSequence,
-    consumer: SimpleConsumer,
-    localTopic: String,
-    producer: Producer[String, Message],
-    centralTopic: String,
-    maxMessageSize: Int,
-    bufferSize: Int = 1024 * 1024,
-    retryDelay: Long = 5000L,
-    maxDelay: Double = 100.0,
-    waitCountFactor: Int = 25)(implicit executor: ExecutionContext)
-    extends Runnable with Logging {
+final class KafkaRelayAgent(permissionsFinder: PermissionsFinder[Future],
+                            eventIdSeq: EventIdSequence,
+                            consumer: SimpleConsumer,
+                            localTopic: String,
+                            producer: Producer[String, Message],
+                            centralTopic: String,
+                            maxMessageSize: Int,
+                            bufferSize: Int = 1024 * 1024,
+                            retryDelay: Long = 5000L,
+                            maxDelay: Double = 100.0,
+                            waitCountFactor: Int =
+                              25)(implicit executor: ExecutionContext)
+    extends Runnable
+    with Logging {
 
   logger.info("Allocating KafkaRelayAgent, hash = " + hashCode)
 

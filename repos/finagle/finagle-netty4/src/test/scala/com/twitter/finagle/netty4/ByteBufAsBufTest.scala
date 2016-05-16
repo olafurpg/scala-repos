@@ -12,7 +12,8 @@ import org.scalatest.{OneInstancePerTest, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
 class ByteBufAsBufTest
-    extends FunSuite with GeneratorDrivenPropertyChecks
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
     with OneInstancePerTest {
 
   val bytes = Array[Byte](1, 2, 3, 4)

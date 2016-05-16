@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author ilyas
   */
 class ScStableReferenceElementPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScStableReferenceElementPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScStableReferenceElementPattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

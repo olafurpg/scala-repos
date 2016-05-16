@@ -31,7 +31,9 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SQLTestUtils
 
 class BucketedWriteSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   test("bucketed by non-existing column") {
@@ -132,11 +134,10 @@ class BucketedWriteSuite
       // values, and make sure it equals to the expected bucket id that inferred from file name.
       val qe = readBack.select(bucketCols.map(col): _*).queryExecution
       val rows = qe.toRdd.map(_.copy()).collect()
-      val getBucketId =
-        UnsafeProjection.create(HashPartitioning(
-                                    qe.analyzed.output,
-                                    numBuckets).partitionIdExpression :: Nil,
-                                qe.analyzed.output)
+      val getBucketId = UnsafeProjection.create(
+          HashPartitioning(qe.analyzed.output,
+                           numBuckets).partitionIdExpression :: Nil,
+          qe.analyzed.output)
 
       for (row <- rows) {
         val actualBucketId = getBucketId(row).getInt(0)

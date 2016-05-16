@@ -71,8 +71,8 @@ object Namer {
 
     private[this] object InetPath {
       def unapply(path: Path): Option[(Address, Path)] = path match {
-        case Path.Utf8(
-            "$", "inet", host, IntegerString(port), residual @ _ *) =>
+        case Path
+              .Utf8("$", "inet", host, IntegerString(port), residual @ _ *) =>
           Some(
               (Address(new InetSocketAddress(host, port)),
                Path.Utf8(residual: _*)))
@@ -177,8 +177,8 @@ object Namer {
       trees: Seq[Weighted[Name]]
   ): Activity[NameTree[Name.Bound]] = {
 
-    val weightedTreeVars: Seq[Var[
-            Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map {
+    val weightedTreeVars: Seq[
+        Var[Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map {
       case Weighted(w, t) =>
         val treesAct: Activity[NameTree[Name.Bound]] =
           bind(lookup, depth, Some(w))(t)

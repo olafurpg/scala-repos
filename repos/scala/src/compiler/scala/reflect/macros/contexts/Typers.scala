@@ -40,8 +40,7 @@ trait Typers { self: Context =>
       callsiteTyper.silent(
           _.typed(universe.duplicateAndKeepPositions(tree), mode, pt),
           reportAmbiguousErrors = false)
-    withWrapping(tree)(
-        wrappedTree =>
+    withWrapping(tree)(wrappedTree =>
           withContext(typecheckInternal(wrappedTree) match {
         case universe.analyzer.SilentResultValue(result) =>
           macroLogVerbose(result)
@@ -61,15 +60,15 @@ trait Typers { self: Context =>
     macroLogVerbose(
         "inferring implicit value of type %s, macros = %s".format(
             pt, !withMacrosDisabled))
-    universe.analyzer.inferImplicit(universe.EmptyTree,
-                                    pt,
-                                    false,
-                                    callsiteTyper.context,
-                                    silent,
-                                    withMacrosDisabled,
-                                    pos,
-                                    (pos,
-                                    msg) => throw TypecheckException(pos, msg))
+    universe.analyzer.inferImplicit(
+        universe.EmptyTree,
+        pt,
+        false,
+        callsiteTyper.context,
+        silent,
+        withMacrosDisabled,
+        pos,
+        (pos, msg) => throw TypecheckException(pos, msg))
   }
 
   def inferImplicitView(tree: Tree,
@@ -84,15 +83,15 @@ trait Typers { self: Context =>
     val viewTpe = universe.appliedType(
         universe.definitions.FunctionClass(1).toTypeConstructor,
         List(from, to))
-    universe.analyzer.inferImplicit(tree,
-                                    viewTpe,
-                                    true,
-                                    callsiteTyper.context,
-                                    silent,
-                                    withMacrosDisabled,
-                                    pos,
-                                    (pos,
-                                    msg) => throw TypecheckException(pos, msg))
+    universe.analyzer.inferImplicit(
+        tree,
+        viewTpe,
+        true,
+        callsiteTyper.context,
+        silent,
+        withMacrosDisabled,
+        pos,
+        (pos, msg) => throw TypecheckException(pos, msg))
   }
 
   def resetLocalAttrs(tree: Tree): Tree =

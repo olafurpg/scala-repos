@@ -10,7 +10,7 @@ import Prop._
 trait FlatMapTests[F[_]] extends ApplyTests[F] {
   def laws: FlatMapLaws[F]
 
-  def flatMap[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def flatMap[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

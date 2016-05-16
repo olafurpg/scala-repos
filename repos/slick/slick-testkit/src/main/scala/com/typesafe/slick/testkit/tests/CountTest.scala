@@ -43,8 +43,11 @@ class CountTest extends AsyncTest[RelationalTestDB] {
 
     for {
       _ <- (categories.schema ++ posts.schema).create
-      _ <- categories ++= Seq(
-          (1, "Scala"), (2, "JVM"), (3, "Java"), (4, "Erlang"), (5, "Haskell"))
+      _ <- categories ++= Seq((1, "Scala"),
+                              (2, "JVM"),
+                              (3, "Java"),
+                              (4, "Erlang"),
+                              (5, "Haskell"))
       _ <- posts ++= Seq((1, "Shiny features", 1), (2, "HotSpot", 2))
       joinedQuery = for {
         c <- categories
@@ -84,8 +87,8 @@ class CountTest extends AsyncTest[RelationalTestDB] {
         (for {
           a <- as if a.id === 1L
           l <- Query((for {
-            b <- bs if b.aId === a.id
-          } yield b).length)
+                b <- bs if b.aId === a.id
+              } yield b).length)
         } yield
           (a, l)).result.named("joinLength").map(_ shouldBe Seq((1L, 2))),
         (for {
@@ -93,7 +96,7 @@ class CountTest extends AsyncTest[RelationalTestDB] {
         } yield (a.id, b.map(_.data))).length.result
           .named("outerJoinLength")
           .map(_ shouldBe 3)
-      )
+    )
   }
 
   def testTableCount = {

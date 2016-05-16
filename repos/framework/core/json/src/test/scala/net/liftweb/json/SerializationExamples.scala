@@ -339,8 +339,7 @@ object CustomSerializerExamples extends Specification {
           case JArray(xs) =>
             val t = ptype.getOrElse(
                 throw new MappingException("parameterized type not known"))
-            xs.map(
-                  x =>
+            xs.map(x =>
                     Extraction.extract(x,
                                        TypeInfo(t.getActualTypeArguments()(0)
                                                   .asInstanceOf[Class[_]],

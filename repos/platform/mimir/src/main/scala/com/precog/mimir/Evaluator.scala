@@ -66,10 +66,16 @@ trait EvaluatorConfig extends IdSourceConfig {
 }
 
 trait EvaluatorModule[M[+ _]]
-    extends CrossOrdering with Memoizer with TypeInferencer with CondRewriter
-    with JoinOptimizerModule[M] with OpFinderModule[M]
-    with StaticInlinerModule[M] with ReductionFinderModule[M]
-    with TransSpecableModule[M] with PredicatePullupsModule[M]
+    extends CrossOrdering
+    with Memoizer
+    with TypeInferencer
+    with CondRewriter
+    with JoinOptimizerModule[M]
+    with OpFinderModule[M]
+    with StaticInlinerModule[M]
+    with ReductionFinderModule[M]
+    with TransSpecableModule[M]
+    with PredicatePullupsModule[M]
     with TableModule[M] // Remove this explicit dep!
     with TableLibModule[M] {
 
@@ -82,8 +88,12 @@ trait EvaluatorModule[M[+ _]]
 
   abstract class EvaluatorLike[N[+ _]](
       N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
-      extends OpFinder with ReductionFinder with StaticInliner
-      with JoinOptimizer with PredicatePullups with YggConfigComponent {
+      extends OpFinder
+      with ReductionFinder
+      with StaticInliner
+      with JoinOptimizer
+      with PredicatePullups
+      with YggConfigComponent {
 
     type YggConfig <: EvaluatorConfig
 
@@ -212,7 +222,7 @@ trait EvaluatorModule[M[+ _]]
                 }
                 _ <- monadState.gets(identity)
                 subSpec <- resolveLowLevelGroup(
-                    resultTargetTable, reducedTarget, forest, splits)
+                              resultTargetTable, reducedTarget, forest, splits)
               } yield {
                 // TODO FIXME if the target has forcing points, targetTrans is insufficient
                 val Some(trans) = mkTransSpec(target, reducedTarget, ctx)
@@ -242,17 +252,17 @@ trait EvaluatorModule[M[+ _]]
         case UnionBucketSpec(left, right) =>
           for {
             leftRes <- resolveLowLevelGroup(
-                commonTable, commonGraph, left, splits)
+                          commonTable, commonGraph, left, splits)
             rightRes <- resolveLowLevelGroup(
-                commonTable, commonGraph, right, splits)
+                           commonTable, commonGraph, right, splits)
           } yield GroupKeySpecOr(leftRes, rightRes)
 
         case IntersectBucketSpec(left, right) =>
           for {
             leftRes <- resolveLowLevelGroup(
-                commonTable, commonGraph, left, splits)
+                          commonTable, commonGraph, left, splits)
             rightRes <- resolveLowLevelGroup(
-                commonTable, commonGraph, right, splits)
+                           commonTable, commonGraph, right, splits)
           } yield GroupKeySpecAnd(leftRes, rightRes)
 
         case UnfixedSolution(id, solution) =>
@@ -302,9 +312,10 @@ trait EvaluatorModule[M[+ _]]
                 for {
                   pending <- f(graph)
                   _ <- monadState.modify { state =>
-                    state.copy(assume = state.assume +
-                          (graph -> (pending.table, pending.sort)))
-                  }
+                        state.copy(assume =
+                              state.assume +
+                              (graph -> (pending.table, pending.sort)))
+                      }
                 } yield pending
               }
 
@@ -327,20 +338,18 @@ trait EvaluatorModule[M[+ _]]
         def get0(pt: PendingTable): (TransSpec1, DepGraph) =
           (pt.trans, pt.graph)
 
-        def set0(pt: PendingTable,
-                 tg: (TransSpec1,
-                 DepGraph)): StateT[N, EvaluatorState, PendingTable] = {
+        def set0(pt: PendingTable, tg: (TransSpec1, DepGraph))
+          : StateT[N, EvaluatorState, PendingTable] = {
           for {
             _ <- monadState.modify { state =>
-              state.copy(
-                  assume = state.assume + (tg._2 -> (pt.table, pt.sort)))
-            }
+                  state.copy(
+                      assume = state.assume + (tg._2 -> (pt.table, pt.sort)))
+                }
           } yield pt.copy(trans = tg._1, graph = tg._2)
         }
 
-        def init0(
-            tg: (TransSpec1,
-            DepGraph)): StateT[N, EvaluatorState, PendingTable] =
+        def init0(tg: (TransSpec1, DepGraph))
+          : StateT[N, EvaluatorState, PendingTable] =
           memoized(tg._2, evalNotTransSpecable)
 
         /**
@@ -418,11 +427,11 @@ trait EvaluatorModule[M[+ _]]
           }
         }
 
-        def join(graph: DepGraph,
-                 left: DepGraph,
-                 right: DepGraph,
-                 joinSort: JoinSort)(
-            spec: (TransSpec2, TransSpec2) => TransSpec2)
+        def join(
+            graph: DepGraph,
+            left: DepGraph,
+            right: DepGraph,
+            joinSort: JoinSort)(spec: (TransSpec2, TransSpec2) => TransSpec2)
           : StateT[N, EvaluatorState, PendingTable] = {
 
           import JoinOrder._
@@ -496,7 +505,8 @@ trait EvaluatorModule[M[+ _]]
               case (lSorted, rSorted) =>
                 val hint = Some(
                     if (lSorted) LeftOrder
-                    else if (rSorted) RightOrder else KeyOrder)
+                    else if (rSorted) RightOrder
+                    else KeyOrder)
                 Table.join(leftResult, rightResult, hint)(
                     leftKeySpec, rightKeySpec, joinSpec)
             }
@@ -696,9 +706,9 @@ trait EvaluatorModule[M[+ _]]
               for {
                 pendingTable <- prepareEval(parent, splits)
                 back <- transState liftM mn(
-                    mor(pendingTable.table.transform(
-                            liftToValues(pendingTable.trans)),
-                        MorphContext(ctx, graph)))
+                           mor(pendingTable.table.transform(
+                                   liftToValues(pendingTable.trans)),
+                               MorphContext(ctx, graph)))
               } yield {
                 PendingTable(back,
                              graph,
@@ -843,17 +853,18 @@ trait EvaluatorModule[M[+ _]]
                     trans.WrapObject(Leaf(Source), paths.Value.name))
 
                 wrapped <- transState liftM table map {
-                  _.transform(valueWrapped)
-                }
+                            _.transform(valueWrapped)
+                          }
                 rvalue <- transState liftM result.map(reduction.extractValue)
 
                 _ <- monadState.modify { state =>
-                  state.copy(
-                      assume = state.assume +
-                        (m -> (wrapped, IdentityOrder.empty)),
-                      reductions = state.reductions + (m -> rvalue)
-                  )
-                }
+                      state.copy(
+                          assume =
+                            state.assume +
+                            (m -> (wrapped, IdentityOrder.empty)),
+                          reductions = state.reductions + (m -> rvalue)
+                      )
+                    }
               } yield {
                 PendingTable(
                     wrapped, graph, TransSpec1.Id, IdentityOrder(graph))
@@ -864,9 +875,10 @@ trait EvaluatorModule[M[+ _]]
                 pendingTable <- prepareEval(parent, splits)
                 liftedTrans = liftToValues(pendingTable.trans)
                 result <- transState liftM mn(
-                    red(pendingTable.table.transform(
-                            DerefObjectStatic(liftedTrans, paths.Value)),
-                        MorphContext(ctx, graph)))
+                             red(pendingTable.table.transform(
+                                     DerefObjectStatic(liftedTrans,
+                                                       paths.Value)),
+                                 MorphContext(ctx, graph)))
                 wrapped = result transform buildConstantWrapSpec(Leaf(Source))
               } yield
                 PendingTable(
@@ -886,18 +898,19 @@ trait EvaluatorModule[M[+ _]]
                 state <- monadState.gets(identity)
                 grouping2 <- transState liftM grouping
                 result <- transState liftM mn(
-                    Table.merge(grouping2) { (key, map) =>
-                  val splits2 = splits + (id -> (map andThen mn))
-                  val rewritten = params.foldLeft(child) {
-                    case (child, param) =>
-                      val subKey = key \ param.id.toString
-                      replaceNode(child, param, Const(subKey)(param.loc))
-                  }
+                             Table.merge(grouping2) { (key, map) =>
+                           val splits2 = splits + (id -> (map andThen mn))
+                           val rewritten = params.foldLeft(child) {
+                             case (child, param) =>
+                               val subKey = key \ param.id.toString
+                               replaceNode(
+                                   child, param, Const(subKey)(param.loc))
+                           }
 
-                  val back =
-                    fullEval(rewritten, splits2, id :: splits.keys.toList)
-                  back.eval(state)
-                })
+                           val back = fullEval(
+                               rewritten, splits2, id :: splits.keys.toList)
+                           back.eval(state)
+                         })
               } yield {
                 result.transform(idSpec)
               }
@@ -916,8 +929,8 @@ trait EvaluatorModule[M[+ _]]
                     liftedTrans, paths.Value)
 
                 truthiness <- transState liftM mn(
-                    predTable.reduce(Forall reducer MorphContext(ctx, graph))(
-                        Forall.monoid))
+                                 predTable.reduce(Forall reducer MorphContext(
+                                         ctx, graph))(Forall.monoid))
 
                 assertion = if (truthiness getOrElse false) {
                   N.point(())
@@ -940,8 +953,8 @@ trait EvaluatorModule[M[+ _]]
             case IUI(union, left, right) =>
               // TODO: Get rid of ValueSorts.
               for {
-                pair <- zip(
-                    prepareEval(left, splits), prepareEval(right, splits))
+                pair <- zip(prepareEval(left, splits),
+                            prepareEval(right, splits))
                 (leftPending, rightPending) = pair
 
                 keyValueSpec = TransSpec1.PruneToKeyValue
@@ -976,8 +989,8 @@ trait EvaluatorModule[M[+ _]]
             // TODO unify with IUI
             case Diff(left, right) =>
               for {
-                pair <- zip(
-                    prepareEval(left, splits), prepareEval(right, splits))
+                pair <- zip(prepareEval(left, splits),
+                            prepareEval(right, splits))
                 (leftPending, rightPending) = pair
 
                 leftTable = leftPending.table.transform(
@@ -1177,9 +1190,9 @@ trait EvaluatorModule[M[+ _]]
       * Returns all forcing points in the graph, ordered topologically.
       */
     @tailrec
-    private[this] def listStagingPoints(
-        queue: Queue[DepGraph],
-        acc: List[dag.StagingPoint] = Nil): List[dag.StagingPoint] = {
+    private[this] def listStagingPoints(queue: Queue[DepGraph],
+                                        acc: List[dag.StagingPoint] =
+                                          Nil): List[dag.StagingPoint] = {
       def listParents(spec: BucketSpec): Set[DepGraph] = spec match {
         case UnionBucketSpec(left, right) =>
           listParents(left) ++ listParents(right)

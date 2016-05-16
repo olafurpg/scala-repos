@@ -97,8 +97,9 @@ import org.saddle.mat.MatCols
   * @tparam X Type of elements in the index, for which there must be an implicit Ordering and ST
   * @tparam T Type of elements in the values array, for which there must be an implicit ST
   */
-class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
-    extends NumericOps[Series[X, T]] with Serializable {
+class Series[X: ST: ORD, T: ST](val values: Vec[T], val index: Index[X])
+    extends NumericOps[Series[X, T]]
+    with Serializable {
 
   require(values.length == index.length,
           "Values length %d != index length %d" format
@@ -258,7 +259,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param newIx A new Index
     * @tparam Y Type of elements of new Index
     */
-  def setIndex[Y : ST : ORD](newIx: Index[Y]): Series[Y, T] =
+  def setIndex[Y: ST: ORD](newIx: Index[Y]): Series[Y, T] =
     Series(values, newIx)
 
   /**
@@ -273,7 +274,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param fn The function X => Y with which to map
     * @tparam Y Result type of index, ie Index[Y]
     */
-  def mapIndex[Y : ST : ORD](fn: X => Y): Series[Y, T] =
+  def mapIndex[Y: ST: ORD](fn: X => Y): Series[Y, T] =
     Series(values, index.map(fn))
 
   /**
@@ -529,13 +530,13 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @tparam Y The type of the resulting index
     * @tparam U The type of the resulting values
     */
-  def map[Y : ST : ORD, U : ST](f: ((X, T)) => (Y, U)): Series[Y, U] =
+  def map[Y: ST: ORD, U: ST](f: ((X, T)) => (Y, U)): Series[Y, U] =
     Series(toSeq.map(f): _*)
 
   /**
     * Map and then flatten over the key-value pairs of the Series, resulting in a new Series.
     */
-  def flatMap[Y : ST : ORD, U : ST](
+  def flatMap[Y: ST: ORD, U: ST](
       f: ((X, T)) => Traversable[(Y, U)]): Series[Y, U] =
     Series(toSeq.flatMap(f): _*)
 
@@ -547,7 +548,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param f Function from T to U
     * @tparam U The type of the resulting values
     */
-  def mapValues[U : ST](f: T => U): Series[X, U] = Series(values.map(f), index)
+  def mapValues[U: ST](f: T => U): Series[X, U] = Series(values.map(f), index)
 
   /**
     * Left scan over the values of the Series, as in scala collections library, but
@@ -558,7 +559,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param f Function taking (U, T) to U
     * @tparam U Result type of function
     */
-  def scanLeft[U : ST](init: U)(f: (U, T) => U) =
+  def scanLeft[U: ST](init: U)(f: (U, T) => U) =
     Series(values.scanLeft(init)(f), index)
 
   // safe cast operation
@@ -572,7 +573,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @tparam U Type of other series values
     * @tparam V The result type of the function
     */
-  def joinMap[U : ST, V : ST](other: Series[X, U], how: JoinType = LeftJoin)(
+  def joinMap[U: ST, V: ST](other: Series[X, U], how: JoinType = LeftJoin)(
       f: (T, U) => V): Series[X, V] = {
     val (l, r) = align(other, how)
     Series(VecImpl.zipMap(l.values, r.values)(f), l.index)
@@ -611,7 +612,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param fn Function from X => Y
     * @tparam Y Type of function codomain
     */
-  def groupBy[Y : ST : ORD](fn: X => Y): SeriesGrouper[Y, X, T] =
+  def groupBy[Y: ST: ORD](fn: X => Y): SeriesGrouper[Y, X, T] =
     SeriesGrouper(this.index.map(fn), this)
 
   /**
@@ -621,7 +622,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param ix Index with which to perform grouping
     * @tparam Y Type of elements of ix
     */
-  def groupBy[Y : ST : ORD](ix: Index[Y]): SeriesGrouper[Y, X, T] =
+  def groupBy[Y: ST: ORD](ix: Index[Y]): SeriesGrouper[Y, X, T] =
     SeriesGrouper(ix, this)
 
   /**
@@ -631,7 +632,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param f Function Series[X, T] => B to operate on sliding window
     * @tparam B Result type of function
     */
-  def rolling[B : ST](winSz: Int, f: Series[X, T] => B): Series[X, B] = {
+  def rolling[B: ST](winSz: Int, f: Series[X, T] => B): Series[X, B] = {
     if (winSz <= 0) Series.empty[X, B]
     else {
       val len = values.length
@@ -824,8 +825,8 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param other Other series to align with
     * @param how How to perform the join on the indexes
     */
-  def align[U : ST](other: Series[X, U],
-                    how: JoinType = LeftJoin): (Series[X, T], Series[X, U]) = {
+  def align[U: ST](other: Series[X, U],
+                   how: JoinType = LeftJoin): (Series[X, T], Series[X, U]) = {
     val indexer = this.index.join(other.index, how)
     val lseq = indexer.lTake.map(this.values.take(_)) getOrElse this.values
     val rseq = indexer.rTake.map(other.values.take(_)) getOrElse other.values
@@ -960,14 +961,14 @@ object Series extends BinOpSeries {
     * Enrich Series with basic stats
     * @param s Series[_, T]
     */
-  implicit def seriesToStats[T : Vec2Stats](s: Series[_, T]): VecStats[T] =
+  implicit def seriesToStats[T: Vec2Stats](s: Series[_, T]): VecStats[T] =
     implicitly[Vec2Stats[T]].apply(s.values)
 
   /**
     * Enrich Series with rolling stats
     * @param s Series[_, T]
     */
-  implicit def seriesToRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
+  implicit def seriesToRollingStats[X: ST: ORD, T: Vec2RollingStats: ST](
       s: Series[X, T]): SeriesRollingStats[X, T] =
     SeriesRollingStats[X, T](s)
 
@@ -975,8 +976,7 @@ object Series extends BinOpSeries {
     * Enrich Series with expanding stats
     * @param s Series[_, T]
     */
-  implicit def seriesToExpandingStats[
-      X : ST : ORD, T : Vec2ExpandingStats : ST](
+  implicit def seriesToExpandingStats[X: ST: ORD, T: Vec2ExpandingStats: ST](
       s: Series[X, T]): SeriesExpandingStats[X, T] =
     SeriesExpandingStats[X, T](s)
 
@@ -987,7 +987,7 @@ object Series extends BinOpSeries {
     * @tparam X Type of Index
     * @tparam T Type of values Vec
     */
-  implicit def serToFrame[X : ST : ORD, T : ST](
+  implicit def serToFrame[X: ST: ORD, T: ST](
       s: Series[X, T]): Frame[X, Int, T] = Frame(s)
 
   // some pimped-on logic methods. scala.Function1 is not specialized on
@@ -1008,7 +1008,7 @@ object Series extends BinOpSeries {
     * @tparam X Type of keys
     * @tparam T Type of values
     */
-  def empty[X : ST : ORD, T : ST] =
+  def empty[X: ST: ORD, T: ST] =
     new Series[X, T](Vec.empty[T], Index.empty[X])
 
   /**
@@ -1018,8 +1018,7 @@ object Series extends BinOpSeries {
     * @tparam X Type of keys
     * @tparam T Type of values
     */
-  def apply[X : ST : ORD, T : ST](
-      values: Vec[T], index: Index[X]): Series[X, T] =
+  def apply[X: ST: ORD, T: ST](values: Vec[T], index: Index[X]): Series[X, T] =
     new Series[X, T](values, index)
 
   /**
@@ -1027,7 +1026,7 @@ object Series extends BinOpSeries {
     * @param values a Vec of values
     * @tparam T Type of values
     */
-  def apply[T : ST](values: Vec[T]): Series[Int, T] =
+  def apply[T: ST](values: Vec[T]): Series[Int, T] =
     new Series[Int, T](values, new IndexIntRange(values.length))
 
   /**
@@ -1035,7 +1034,7 @@ object Series extends BinOpSeries {
     * @param values a sequence of values
     * @tparam T Type of values
     */
-  def apply[T : ST](values: T*): Series[Int, T] =
+  def apply[T: ST](values: T*): Series[Int, T] =
     new Series[Int, T](Vec(values: _*), new IndexIntRange(values.length))
 
   /**
@@ -1044,7 +1043,7 @@ object Series extends BinOpSeries {
     * @tparam T Type of value
     * @tparam X Type of key
     */
-  def apply[X : ST : ORD, T : ST](values: (X, T)*): Series[X, T] =
+  def apply[X: ST: ORD, T: ST](values: (X, T)*): Series[X, T] =
     new Series[X, T](
         Vec(values.map(_._2).toArray), Index(values.map(_._1).toArray))
 }

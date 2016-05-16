@@ -125,7 +125,8 @@ private[stat] class StreamingTestResult @Since("1.6.0")(
     @Since("1.6.0") override val statistic: Double,
     @Since("1.6.0") val method: String,
     @Since("1.6.0") override val nullHypothesis: String)
-    extends TestResult[Double] with Serializable {
+    extends TestResult[Double]
+    with Serializable {
 
   override def toString: String = {
     "Streaming test summary:\n" + s"method: $method\n" + super.toString

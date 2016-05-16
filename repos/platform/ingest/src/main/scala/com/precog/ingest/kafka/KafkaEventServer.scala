@@ -49,7 +49,9 @@ import scalaz.syntax.applicative._
 import scalaz.syntax.std.option._
 
 object KafkaEventServer
-    extends BlueEyesServer with EventService with AkkaDefaults {
+    extends BlueEyesServer
+    with EventService
+    with AkkaDefaults {
   val clock = Clock.System
   implicit val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(defaultFutureDispatch)

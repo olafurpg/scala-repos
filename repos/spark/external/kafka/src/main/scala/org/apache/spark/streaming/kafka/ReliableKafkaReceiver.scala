@@ -48,14 +48,15 @@ import org.apache.spark.util.ThreadUtils
   * commit mechanism in Kafka consumer. So setting this configuration manually within kafkaParams
   * will not take effect.
   */
-private[streaming] class ReliableKafkaReceiver[K : ClassTag,
-                                               V : ClassTag,
+private[streaming] class ReliableKafkaReceiver[K: ClassTag,
+                                               V: ClassTag,
                                                U <: Decoder[_]: ClassTag,
                                                T <: Decoder[_]: ClassTag](
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
     storageLevel: StorageLevel)
-    extends Receiver[(K, V)](storageLevel) with Logging {
+    extends Receiver[(K, V)](storageLevel)
+    with Logging {
 
   private val groupId = kafkaParams("group.id")
   private val AUTO_OFFSET_COMMIT = "auto.commit.enable"
@@ -94,8 +95,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     topicPartitionOffsetMap = new mutable.HashMap[TopicAndPartition, Long]
 
     // Initialize the stream block id / offset snapshot hash map.
-    blockOffsetMap = new ConcurrentHashMap[
-        StreamBlockId, Map[TopicAndPartition, Long]]()
+    blockOffsetMap =
+      new ConcurrentHashMap[StreamBlockId, Map[TopicAndPartition, Long]]()
 
     // Initialize the block generator for storing Kafka message.
     blockGenerator = supervisor.createBlockGenerator(new GeneratedBlockHandler)

@@ -35,7 +35,7 @@ class EliminateSerializationSuite extends PlanTest {
       Batch("Serialization", FixedPoint(100), EliminateSerialization) :: Nil
   }
 
-  implicit private def productEncoder[T <: Product : TypeTag] =
+  implicit private def productEncoder[T <: Product: TypeTag] =
     ExpressionEncoder[T]()
   private val func = identity[Iterator[(Int, Int)]] _
   private val func2 = identity[Iterator[OtherTuple]] _

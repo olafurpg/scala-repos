@@ -41,7 +41,7 @@ object TestkitConfig {
       .getObject("defaults")
       .withValue("testkit", testkitConfig.root())
       .toConfig
-      (conf, testkitConfig, defaults, ref)
+    (conf, testkitConfig, defaults, ref)
   }
 
   /** Get a resolved test configuration */

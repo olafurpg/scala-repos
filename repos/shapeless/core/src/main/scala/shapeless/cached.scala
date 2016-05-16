@@ -67,10 +67,11 @@ object CachedMacros {
 
 @macrocompat.bundle
 class CachedMacros(override val c: whitebox.Context)
-    extends LazyMacros(c) with OpenImplicitMacros {
+    extends LazyMacros(c)
+    with OpenImplicitMacros {
   import c.universe._
 
-  def materializeCached[T : WeakTypeTag]: Tree = {
+  def materializeCached[T: WeakTypeTag]: Tree = {
     // Getting the actual type parameter T, using the same trick as Lazy/Strict
     val tpe = openImplicitTpeParam.getOrElse(weakTypeOf[T])
 
@@ -108,7 +109,7 @@ class CachedMacros(override val c: whitebox.Context)
           // https://github.com/fommil/spray-json-shapeless/issues/14.
           val tree = mkImpl[T](
               (tree,
-              actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
+               actualType) => q"_root_.shapeless.Cached[$actualType]($tree)",
               q"null.asInstanceOf[_root_.shapeless.Cached[_root_.scala.Nothing]]"
           )
 

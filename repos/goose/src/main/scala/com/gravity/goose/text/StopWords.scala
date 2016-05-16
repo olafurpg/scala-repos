@@ -52,10 +52,9 @@ object StopWords {
     val overlappingStopWords: List[String] = new ArrayList[String]
 
     candidateWords.foreach(
-        w =>
-          {
-        if (STOP_WORDS.contains(w.toLowerCase))
-          overlappingStopWords.add(w.toLowerCase)
+        w => {
+      if (STOP_WORDS.contains(w.toLowerCase))
+        overlappingStopWords.add(w.toLowerCase)
     })
     ws.setWordCount(candidateWords.length)
     ws.setStopWordCount(overlappingStopWords.size)

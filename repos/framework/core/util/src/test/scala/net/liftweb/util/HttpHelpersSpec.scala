@@ -26,7 +26,10 @@ import HttpHelpers._
   * Systems under specification for HttpHelpers.
   */
 object HttpHelpersSpec
-    extends Specification with HttpHelpers with ListHelpers with StringHelpers
+    extends Specification
+    with HttpHelpers
+    with ListHelpers
+    with StringHelpers
     with XmlMatchers {
   "HttpHelpers Specification".title
 

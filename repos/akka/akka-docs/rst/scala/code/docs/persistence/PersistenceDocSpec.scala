@@ -70,7 +70,8 @@ object PersistenceDocSpec {
       //#recovery-status
     }
     class MyPersistentActor1
-        extends PersistentActor with PersistentActorMethods {
+        extends PersistentActor
+        with PersistentActorMethods {
       //#persistence-id-override
       override def persistenceId = "my-stable-persistence-id"
       //#persistence-id-override
@@ -113,7 +114,8 @@ object PersistenceDocSpec {
     case class MsgConfirmed(deliveryId: Long) extends Evt
 
     class MyPersistentActor(destination: ActorSelection)
-        extends PersistentActor with AtLeastOnceDelivery {
+        extends PersistentActor
+        with AtLeastOnceDelivery {
 
       override def persistenceId: String = "persistence-id"
 
@@ -172,8 +174,8 @@ object PersistenceDocSpec {
       override def recovery =
         Recovery(
             fromSnapshot = SnapshotSelectionCriteria(
-                  maxSequenceNr = 457L,
-                  maxTimestamp = System.currentTimeMillis))
+                maxSequenceNr = 457L,
+                maxTimestamp = System.currentTimeMillis))
       //#snapshot-criteria
 
       //#snapshot-offer

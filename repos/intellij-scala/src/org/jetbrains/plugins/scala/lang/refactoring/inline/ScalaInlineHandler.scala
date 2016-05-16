@@ -48,8 +48,8 @@ class ScalaInlineHandler extends InlineHandler {
       val children = new ArrayBuffer[PsiElement]
       var psiElement = value.getNextSibling
       while (psiElement != null &&
-      (psiElement.getNode.getElementType == ScalaTokenTypes.tSEMICOLON ||
-          psiElement.getText.trim == "")) {
+             (psiElement.getNode.getElementType == ScalaTokenTypes.tSEMICOLON ||
+                 psiElement.getText.trim == "")) {
         children += psiElement
         psiElement = psiElement.getNextSibling
       }

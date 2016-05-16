@@ -59,24 +59,22 @@ object SqlNetworkWordCount {
     val words = lines.flatMap(_.split(" "))
 
     // Convert RDDs of the words DStream to DataFrame and run SQL query
-    words.foreachRDD(
-        (rdd: RDD[String], time: Time) =>
-          {
-        // Get the singleton instance of SQLContext
-        val sqlContext = SQLContextSingleton.getInstance(rdd.sparkContext)
-        import sqlContext.implicits._
+    words.foreachRDD((rdd: RDD[String], time: Time) => {
+      // Get the singleton instance of SQLContext
+      val sqlContext = SQLContextSingleton.getInstance(rdd.sparkContext)
+      import sqlContext.implicits._
 
-        // Convert RDD[String] to RDD[case class] to DataFrame
-        val wordsDataFrame = rdd.map(w => Record(w)).toDF()
+      // Convert RDD[String] to RDD[case class] to DataFrame
+      val wordsDataFrame = rdd.map(w => Record(w)).toDF()
 
-        // Register as table
-        wordsDataFrame.registerTempTable("words")
+      // Register as table
+      wordsDataFrame.registerTempTable("words")
 
-        // Do word count on table using SQL and print it
-        val wordCountsDataFrame = sqlContext.sql(
-            "select word, count(*) as total from words group by word")
-        println(s"========= $time =========")
-        wordCountsDataFrame.show()
+      // Do word count on table using SQL and print it
+      val wordCountsDataFrame = sqlContext.sql(
+          "select word, count(*) as total from words group by word")
+      println(s"========= $time =========")
+      wordCountsDataFrame.show()
     })
 
     ssc.start()

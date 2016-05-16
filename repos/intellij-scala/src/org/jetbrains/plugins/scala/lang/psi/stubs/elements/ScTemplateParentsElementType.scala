@@ -43,8 +43,8 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
     new ScTemplateParentsStubImpl(parentStub,
                                   this,
                                   constr.map(StringRef.fromString),
-                                  psi.typeElementsWithoutConstructor.map(
-                                      te => StringRef.fromString(te.getText)))
+                                  psi.typeElementsWithoutConstructor.map(te =>
+                                        StringRef.fromString(te.getText)))
   }
 
   def deserializeImpl(

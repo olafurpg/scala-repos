@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 @author ven
   */
 abstract class ScalaPsiElementImpl(node: ASTNode)
-    extends ASTWrapperPsiElement(node) with ScalaPsiElement {
+    extends ASTWrapperPsiElement(node)
+    with ScalaPsiElement {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

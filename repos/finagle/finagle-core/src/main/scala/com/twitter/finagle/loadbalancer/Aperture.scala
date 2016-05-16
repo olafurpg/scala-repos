@@ -48,7 +48,9 @@ private class ApertureLoadBandBalancer[Req, Rep](
     protected implicit val timer: Timer,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-    extends Balancer[Req, Rep] with Aperture[Req, Rep] with LoadBand[Req, Rep]
+    extends Balancer[Req, Rep]
+    with Aperture[Req, Rep]
+    with LoadBand[Req, Rep]
     with Updating[Req, Rep] {
 
   protected[this] val maxEffortExhausted =
@@ -268,7 +270,8 @@ private trait LoadBand[Req, Rep] {
   protected case class Node(factory: ServiceFactory[Req, Rep],
                             counter: AtomicInteger,
                             token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+      extends ServiceFactoryProxy[Req, Rep](factory)
+      with NodeT[Req, Rep] {
     type This = Node
 
     def load: Double = counter.get

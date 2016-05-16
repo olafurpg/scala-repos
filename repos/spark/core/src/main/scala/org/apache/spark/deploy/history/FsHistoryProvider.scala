@@ -69,7 +69,8 @@ import org.apache.spark.util.{Clock, SystemClock, ThreadUtils, Utils}
   * maintains this invariant.
   */
 private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
-    extends ApplicationHistoryProvider with Logging {
+    extends ApplicationHistoryProvider
+    with Logging {
 
   def this(conf: SparkConf) = {
     this(conf, new SystemClock())
@@ -519,9 +520,9 @@ private[history] class FsHistoryProvider(conf: SparkConf, clock: Clock)
           appsToRetain += (app.id -> app)
         } else if (toRetain.nonEmpty) {
           appsToRetain +=
-          (app.id -> new FsApplicationHistoryInfo(app.id,
-                                                  app.name,
-                                                  toRetain.toList))
+            (app.id -> new FsApplicationHistoryInfo(app.id,
+                                                    app.name,
+                                                    toRetain.toList))
         }
       }
 

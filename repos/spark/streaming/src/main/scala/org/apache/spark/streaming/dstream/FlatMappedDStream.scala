@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class FlatMappedDStream[T : ClassTag, U : ClassTag](
+private[streaming] class FlatMappedDStream[T: ClassTag, U: ClassTag](
     parent: DStream[T],
     flatMapFunc: T => TraversableOnce[U]
 )

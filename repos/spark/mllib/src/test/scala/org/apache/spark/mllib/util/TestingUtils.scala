@@ -164,14 +164,9 @@ object TestingUtils {
       * Comparison using absolute tolerance.
       */
     def absTol(eps: Double): CompareVectorRightSide =
-      CompareVectorRightSide(
-          (x: Vector, y: Vector, eps: Double) =>
-            {
-              x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
-          },
-          x,
-          eps,
-          ABS_TOL_MSG)
+      CompareVectorRightSide((x: Vector, y: Vector, eps: Double) => {
+        x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
+      }, x, eps, ABS_TOL_MSG)
 
     /**
       * Comparison using relative tolerance. Note that comparing against sparse vector
@@ -179,14 +174,9 @@ object TestingUtils {
       * comparing against zero.
       */
     def relTol(eps: Double): CompareVectorRightSide =
-      CompareVectorRightSide(
-          (x: Vector, y: Vector, eps: Double) =>
-            {
-              x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
-          },
-          x,
-          eps,
-          REL_TOL_MSG)
+      CompareVectorRightSide((x: Vector, y: Vector, eps: Double) => {
+        x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
+      }, x, eps, REL_TOL_MSG)
 
     override def toString: String = x.toString
   }
@@ -241,14 +231,9 @@ object TestingUtils {
       * Comparison using absolute tolerance.
       */
     def absTol(eps: Double): CompareMatrixRightSide =
-      CompareMatrixRightSide(
-          (x: Matrix, y: Matrix, eps: Double) =>
-            {
-              x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
-          },
-          x,
-          eps,
-          ABS_TOL_MSG)
+      CompareMatrixRightSide((x: Matrix, y: Matrix, eps: Double) => {
+        x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
+      }, x, eps, ABS_TOL_MSG)
 
     /**
       * Comparison using relative tolerance. Note that comparing against sparse vector
@@ -256,14 +241,9 @@ object TestingUtils {
       * comparing against zero.
       */
     def relTol(eps: Double): CompareMatrixRightSide =
-      CompareMatrixRightSide(
-          (x: Matrix, y: Matrix, eps: Double) =>
-            {
-              x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
-          },
-          x,
-          eps,
-          REL_TOL_MSG)
+      CompareMatrixRightSide((x: Matrix, y: Matrix, eps: Double) => {
+        x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
+      }, x, eps, REL_TOL_MSG)
 
     override def toString: String = x.toString
   }

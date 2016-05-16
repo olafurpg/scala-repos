@@ -146,8 +146,8 @@ private[http] object FrameHandler {
       ctx.pull()
     }
 
-    private def publishMessagePart(
-        part: MessageDataPart)(implicit ctx: Ctx): SyncDirective =
+    private def publishMessagePart(part: MessageDataPart)(
+        implicit ctx: Ctx): SyncDirective =
       if (part.last) emit(Iterator(part, MessageEnd), ctx, Idle)
       else ctx.push(part)
     private def publishDirectResponse(frame: FrameStart)(
@@ -236,7 +236,8 @@ private[http] object FrameHandler {
     def isMessageEnd: Boolean = true
   }
   final case class PeerClosed(code: Option[Int], reason: String = "")
-      extends MessagePart with BypassEvent {
+      extends MessagePart
+      with BypassEvent {
     def isMessageEnd: Boolean = true
   }
   object PeerClosed {
@@ -251,7 +252,8 @@ private[http] object FrameHandler {
   final case class DirectAnswer(frame: FrameStart) extends BypassEvent
   final case class ActivelyCloseWithCode(
       code: Option[Int], reason: String = "")
-      extends MessagePart with BypassEvent {
+      extends MessagePart
+      with BypassEvent {
     def isMessageEnd: Boolean = true
   }
   case object UserHandlerCompleted extends BypassEvent

@@ -20,8 +20,8 @@ trait ScriptedTest extends Matchers {
 
   class ScriptException(msg: String) extends RuntimeException(msg)
 
-  def toPublisher[In, Out]: (Source[Out, _],
-  ActorMaterializer) ⇒ Publisher[Out] =
+  def toPublisher[In, Out]
+    : (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out] =
     (f, m) ⇒ f.runWith(Sink.asPublisher(false))(m)
 
   object Script {
@@ -112,13 +112,13 @@ trait ScriptedTest extends Matchers {
         .mkString("/")}, remainingOuts=${expectedOutputs.drop(outputCursor).mkString("/")})"
   }
 
-  class ScriptRunner[In, Out, M](op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
-                                 settings: ActorMaterializerSettings,
-                                 script: Script[In, Out],
-                                 maximumOverrun: Int,
-                                 maximumRequest: Int,
-                                 maximumBuffer: Int)(
-      implicit _system: ActorSystem)
+  class ScriptRunner[In, Out, M](
+      op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
+      settings: ActorMaterializerSettings,
+      script: Script[In, Out],
+      maximumOverrun: Int,
+      maximumRequest: Int,
+      maximumBuffer: Int)(implicit _system: ActorSystem)
       extends ChainSetup(op, settings, toPublisher) {
 
     var _debugLog = Vector.empty[String]
@@ -227,12 +227,12 @@ trait ScriptedTest extends Matchers {
     }
   }
 
-  def runScript[In, Out, M](
-      script: Script[In, Out],
-      settings: ActorMaterializerSettings,
-      maximumOverrun: Int = 3,
-      maximumRequest: Int = 3,
-      maximumBuffer: Int = 3)(op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M])(
+  def runScript[In, Out, M](script: Script[In, Out],
+                            settings: ActorMaterializerSettings,
+                            maximumOverrun: Int = 3,
+                            maximumRequest: Int = 3,
+                            maximumBuffer: Int = 3)(
+      op: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M])(
       implicit system: ActorSystem): Unit = {
     new ScriptRunner(
         op, settings, script, maximumOverrun, maximumRequest, maximumBuffer)

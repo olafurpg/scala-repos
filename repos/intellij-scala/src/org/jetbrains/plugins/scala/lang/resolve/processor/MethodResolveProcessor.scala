@@ -82,18 +82,18 @@ class MethodResolveProcessor(
       element match {
         case m: PsiMethod =>
           addResult(
-              new ScalaResolveResult(
-                  m,
-                  s,
-                  getImports(state),
-                  nameShadow,
-                  implicitConversionClass,
-                  implicitFunction = implFunction,
-                  implicitType = implType,
-                  fromType = fromType,
-                  isAccessible = accessible,
-                  isForwardReference = forwardReference,
-                  unresolvedTypeParameters = unresolvedTypeParameters))
+              new ScalaResolveResult(m,
+                                     s,
+                                     getImports(state),
+                                     nameShadow,
+                                     implicitConversionClass,
+                                     implicitFunction = implFunction,
+                                     implicitType = implType,
+                                     fromType = fromType,
+                                     isAccessible = accessible,
+                                     isForwardReference = forwardReference,
+                                     unresolvedTypeParameters =
+                                       unresolvedTypeParameters))
         case cc: ScClass =>
         case o: ScObject if o.isPackageObject =>
         // do not resolve to package object
@@ -116,81 +116,82 @@ class MethodResolveProcessor(
           }.toSeq
           val seq = sigs.map {
             case (m, subst) =>
-              new ScalaResolveResult(
-                  m,
-                  subst,
-                  getImports(state),
-                  nameShadow,
-                  implicitConversionClass,
-                  implicitFunction = implFunction,
-                  implicitType = implType,
-                  fromType = fromType,
-                  parentElement = Some(obj),
-                  isAccessible = accessible && isAccessible(m, ref),
-                  isForwardReference = forwardReference,
-                  unresolvedTypeParameters = unresolvedTypeParameters)
+              new ScalaResolveResult(m,
+                                     subst,
+                                     getImports(state),
+                                     nameShadow,
+                                     implicitConversionClass,
+                                     implicitFunction = implFunction,
+                                     implicitType = implType,
+                                     fromType = fromType,
+                                     parentElement = Some(obj),
+                                     isAccessible =
+                                       accessible && isAccessible(m, ref),
+                                     isForwardReference = forwardReference,
+                                     unresolvedTypeParameters =
+                                       unresolvedTypeParameters)
           }.filter {
             case r => !accessibility || r.isAccessible
           }
           if (seq.nonEmpty) addResults(seq)
           else
             addResult(
-                new ScalaResolveResult(
-                    named,
-                    s,
-                    getImports(state),
-                    nameShadow,
-                    implicitConversionClass,
-                    implicitFunction = implFunction,
-                    implicitType = implType,
-                    isNamedParameter = isNamedParameter,
-                    fromType = fromType,
-                    isAccessible = accessible,
-                    isForwardReference = forwardReference,
-                    unresolvedTypeParameters = unresolvedTypeParameters))
+                new ScalaResolveResult(named,
+                                       s,
+                                       getImports(state),
+                                       nameShadow,
+                                       implicitConversionClass,
+                                       implicitFunction = implFunction,
+                                       implicitType = implType,
+                                       isNamedParameter = isNamedParameter,
+                                       fromType = fromType,
+                                       isAccessible = accessible,
+                                       isForwardReference = forwardReference,
+                                       unresolvedTypeParameters =
+                                         unresolvedTypeParameters))
         case synthetic: ScSyntheticFunction =>
           addResult(
-              new ScalaResolveResult(
-                  synthetic,
-                  s,
-                  getImports(state),
-                  nameShadow,
-                  implicitConversionClass,
-                  implicitFunction = implFunction,
-                  implicitType = implType,
-                  fromType = fromType,
-                  isAccessible = accessible,
-                  isForwardReference = forwardReference,
-                  unresolvedTypeParameters = unresolvedTypeParameters))
+              new ScalaResolveResult(synthetic,
+                                     s,
+                                     getImports(state),
+                                     nameShadow,
+                                     implicitConversionClass,
+                                     implicitFunction = implFunction,
+                                     implicitType = implType,
+                                     fromType = fromType,
+                                     isAccessible = accessible,
+                                     isForwardReference = forwardReference,
+                                     unresolvedTypeParameters =
+                                       unresolvedTypeParameters))
         case pack: PsiPackage =>
           addResult(
-              new ScalaResolveResult(
-                  ScPackageImpl(pack),
-                  s,
-                  getImports(state),
-                  nameShadow,
-                  implicitConversionClass,
-                  implicitFunction = implFunction,
-                  implicitType = implType,
-                  fromType = fromType,
-                  isAccessible = accessible,
-                  isForwardReference = forwardReference,
-                  unresolvedTypeParameters = unresolvedTypeParameters))
+              new ScalaResolveResult(ScPackageImpl(pack),
+                                     s,
+                                     getImports(state),
+                                     nameShadow,
+                                     implicitConversionClass,
+                                     implicitFunction = implFunction,
+                                     implicitType = implType,
+                                     fromType = fromType,
+                                     isAccessible = accessible,
+                                     isForwardReference = forwardReference,
+                                     unresolvedTypeParameters =
+                                       unresolvedTypeParameters))
         case _ =>
           addResult(
-              new ScalaResolveResult(
-                  named,
-                  s,
-                  getImports(state),
-                  nameShadow,
-                  implicitConversionClass,
-                  implicitFunction = implFunction,
-                  implicitType = implType,
-                  isNamedParameter = isNamedParameter,
-                  fromType = fromType,
-                  isAccessible = accessible,
-                  isForwardReference = forwardReference,
-                  unresolvedTypeParameters = unresolvedTypeParameters))
+              new ScalaResolveResult(named,
+                                     s,
+                                     getImports(state),
+                                     nameShadow,
+                                     implicitConversionClass,
+                                     implicitFunction = implFunction,
+                                     implicitType = implType,
+                                     isNamedParameter = isNamedParameter,
+                                     fromType = fromType,
+                                     isAccessible = accessible,
+                                     isForwardReference = forwardReference,
+                                     unresolvedTypeParameters =
+                                       unresolvedTypeParameters))
       }
     }
     true
@@ -415,8 +416,7 @@ object MethodResolveProcessor {
       case method: PsiMethod if method.isConstructor =>
         javaConstructorCompatibility(method)
       case fun: ScFunction
-          if
-          (typeArgElements.isEmpty ||
+          if (typeArgElements.isEmpty ||
               typeArgElements.length == fun.typeParameters.length) &&
           fun.paramClauses.clauses.length == 1 &&
           fun.paramClauses.clauses.head.isImplicit &&
@@ -425,8 +425,7 @@ object MethodResolveProcessor {
         ConformanceExtResult(problems) //special case for cases like Seq.toArray
       //eta expansion
       case fun: ScTypeParametersOwner
-          if
-          (typeArgElements.isEmpty ||
+          if (typeArgElements.isEmpty ||
               typeArgElements.length == fun.typeParameters.length) &&
           argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         fun match {
@@ -437,8 +436,7 @@ object MethodResolveProcessor {
         }
         checkFunction(fun.asInstanceOf[PsiNamedElement])
       case fun: PsiTypeParameterListOwner
-          if
-          (typeArgElements.isEmpty ||
+          if (typeArgElements.isEmpty ||
               typeArgElements.length == fun.getTypeParameters.length) &&
           argumentClauses.isEmpty && fun.isInstanceOf[PsiNamedElement] =>
         checkFunction(fun.asInstanceOf[PsiNamedElement])
@@ -576,8 +574,8 @@ object MethodResolveProcessor {
             if (typeArgElements.nonEmpty &&
                 typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
-              typeParameters.map(
-                  p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              typeParameters.map(p =>
+                    (p.name, ScalaPsiUtil.getPsiElementId(p))),
               typeArgElements)
         } else {
           typeParameters.foldLeft(ScSubstitutor.empty) {
@@ -595,8 +593,8 @@ object MethodResolveProcessor {
             if (typeArgElements.nonEmpty &&
                 typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
-              typeParameters.map(
-                  p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              typeParameters.map(p =>
+                    (p.name, ScalaPsiUtil.getPsiElementId(p))),
               typeArgElements)
         } else {
           typeParameters.foldLeft(ScSubstitutor.empty) {
@@ -611,8 +609,8 @@ object MethodResolveProcessor {
             if (typeArgElements.nonEmpty &&
                 t.typeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
-              t.typeParameters
-                .map(p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              t.typeParameters.map(p =>
+                    (p.name, ScalaPsiUtil.getPsiElementId(p))),
               typeArgElements)
         } else {
           t.typeParameters.foldLeft(ScSubstitutor.empty) {
@@ -627,8 +625,8 @@ object MethodResolveProcessor {
             if (typeArgElements.nonEmpty &&
                 p.getTypeParameters.length == typeArgElements.length) {
           ScalaPsiUtil.genericCallSubstitutor(
-              p.getTypeParameters
-                .map(p => (p.name, ScalaPsiUtil.getPsiElementId(p))),
+              p.getTypeParameters.map(p =>
+                    (p.name, ScalaPsiUtil.getPsiElementId(p))),
               typeArgElements)
         } else {
           p.getTypeParameters.foldLeft(ScSubstitutor.empty) {
@@ -714,8 +712,8 @@ object MethodResolveProcessor {
             r.innerResolveResult match {
               case Some(rr) =>
                 r.copy(innerResolveResult = Some(rr.copy(
-                              problems = pr.problems,
-                              defaultParameterUsed = pr.defaultParameterUsed)))
+                            problems = pr.problems,
+                            defaultParameterUsed = pr.defaultParameterUsed)))
               case _ =>
                 r.copy(problems = pr.problems,
                        defaultParameterUsed = pr.defaultParameterUsed,
@@ -724,29 +722,27 @@ object MethodResolveProcessor {
           }
         }
       } else
-        input.map(
-            r =>
-              {
-            val pr = problemsFor(r, applicationImplicits, proc)
-            r.copy(problems = pr.problems,
-                   defaultParameterUsed = pr.defaultParameterUsed,
-                   resultUndef = Some(pr.undefSubst))
+        input.map(r => {
+          val pr = problemsFor(r, applicationImplicits, proc)
+          r.copy(problems = pr.problems,
+                 defaultParameterUsed = pr.defaultParameterUsed,
+                 resultUndef = Some(pr.undefSubst))
         })
     }
     var mapped = mapper(applicationImplicits = false)
     var filtered =
       mapped.filter(_.isApplicableInternal(withExpectedType = true))
     if (filtered.isEmpty)
-      filtered = mapped.filter(
-          _.isApplicableInternal(withExpectedType = false))
+      filtered =
+        mapped.filter(_.isApplicableInternal(withExpectedType = false))
 
     if (filtered.isEmpty && !noImplicitsForArgs) {
       //check with implicits
       mapped = mapper(applicationImplicits = true)
       filtered = mapped.filter(_.isApplicableInternal(withExpectedType = true))
       if (filtered.isEmpty)
-        filtered = mapped.filter(
-            _.isApplicableInternal(withExpectedType = false))
+        filtered =
+          mapped.filter(_.isApplicableInternal(withExpectedType = false))
     }
 
     val onlyValues = mapped.forall(_.isApplicable())
@@ -756,14 +752,13 @@ object MethodResolveProcessor {
     } else if (!onlyValues) {
       //in this case all values are not applicable
       mapped = mapped.map(
-          r =>
-            {
-          if (r.isApplicable()) {
-            r.innerResolveResult match {
-              case Some(rr) => r.copy(problems = rr.problems)
-              case _ => r
-            }
-          } else r
+          r => {
+        if (r.isApplicable()) {
+          r.innerResolveResult match {
+            case Some(rr) => r.copy(problems = rr.problems)
+            case _ => r
+          }
+        } else r
       })
     }
 
@@ -780,20 +775,19 @@ object MethodResolveProcessor {
       if (filtered.isEmpty) {
         if (enableTupling) {
           val filtered2 = input
-            .filter(r =>
-                  {
-                r.element match {
-                  case fun: ScFun if fun.paramClauses.nonEmpty =>
-                    fun.paramClauses.head.length == 1
-                  case fun: ScFunction if fun.paramClauses.clauses.nonEmpty =>
-                    fun.paramClauses.clauses.head.parameters.length == 1
-                  case p: ScPrimaryConstructor
-                      if p.parameterList.clauses.nonEmpty =>
-                    p.parameterList.clauses.head.parameters.length == 1
-                  case m: PsiMethod =>
-                    m.getParameterList.getParameters.length == 1
-                  case _ => false
-                }
+            .filter(r => {
+              r.element match {
+                case fun: ScFun if fun.paramClauses.nonEmpty =>
+                  fun.paramClauses.head.length == 1
+                case fun: ScFunction if fun.paramClauses.clauses.nonEmpty =>
+                  fun.paramClauses.clauses.head.parameters.length == 1
+                case p: ScPrimaryConstructor
+                    if p.parameterList.clauses.nonEmpty =>
+                  p.parameterList.clauses.head.parameters.length == 1
+                case m: PsiMethod =>
+                  m.getParameterList.getParameters.length == 1
+                case _ => false
+              }
             })
             .map(r => r.copy(tuplingUsed = true))
           if (filtered2.isEmpty)

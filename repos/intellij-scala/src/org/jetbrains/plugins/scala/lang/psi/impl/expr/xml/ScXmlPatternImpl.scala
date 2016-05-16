@@ -20,7 +20,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 21.04.2008
   */
 class ScXmlPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScXmlPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

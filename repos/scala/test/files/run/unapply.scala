@@ -92,11 +92,9 @@ object Mas {
 
 object LisSeqArr {
   def run() {
-    assert(
-        (1, 2) ==
+    assert((1, 2) ==
         ((List(1, 2, 3): Any) match { case List(x, y, _ *) => (x, y) }))
-    assert(
-        (1, 2) ==
+    assert((1, 2) ==
         ((List(1, 2, 3): Any) match { case Seq(x, y, _ *) => (x, y) }))
   }
 }

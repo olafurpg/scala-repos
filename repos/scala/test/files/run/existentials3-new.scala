@@ -58,8 +58,8 @@ object Test {
     println(
         "%s, t=%s, s=%s".format(t, t.asInstanceOf[Product].productPrefix, s))
   }
-  def m[T : TypeTag](x: T) = printTpe(typeOf[T])
-  def m2[T : WeakTypeTag](x: T) = printTpe(implicitly[WeakTypeTag[T]].tpe)
+  def m[T: TypeTag](x: T) = printTpe(typeOf[T])
+  def m2[T: WeakTypeTag](x: T) = printTpe(implicitly[WeakTypeTag[T]].tpe)
 
   // tags do work for f10/g10
   def main(args: Array[String]): Unit = {

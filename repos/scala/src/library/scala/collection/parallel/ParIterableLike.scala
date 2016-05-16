@@ -154,8 +154,10 @@ trait ParIterableLike[+T,
                       +Repr <: ParIterable[T],
                       +Sequential <: Iterable[T] with IterableLike[
                           T, Sequential]]
-    extends GenIterableLike[T, Repr] with CustomParallelizable[T, Repr]
-    with Parallel with HasNewCombiner[T, Repr] {
+    extends GenIterableLike[T, Repr]
+    with CustomParallelizable[T, Repr]
+    with Parallel
+    with HasNewCombiner[T, Repr] {
   self: ParIterableLike[T, Repr, Sequential] =>
 
   @transient
@@ -281,12 +283,10 @@ trait ParIterableLike[+T,
   trait TaskOps[R, Tp] {
     def mapResult[R1](mapping: R => R1): ResultMapping[R, Tp, R1]
     // public method with inaccessible types in parameters
-    def compose[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(
-        resCombiner: (R,
-        R2) => R3): SeqComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]]
-    def parallel[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(
-        resCombiner: (R,
-        R2) => R3): ParComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]]
+    def compose[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(resCombiner: (R, R2) => R3)
+      : SeqComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]]
+    def parallel[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(resCombiner: (R, R2) => R3)
+      : ParComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]]
   }
 
   trait BuilderOps[Elem, To] {
@@ -311,14 +311,14 @@ trait ParIterableLike[+T,
           def map(r: R): R1 = mapping(r)
         }
 
-      def compose[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(
-          resCombiner: (R, R2) => R3) =
+      def compose[R3, R2, Tp2](
+          t2: SSCTask[R2, Tp2])(resCombiner: (R, R2) => R3) =
         new SeqComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]](tsk, t2) {
           def combineResults(fr: R, sr: R2): R3 = resCombiner(fr, sr)
         }
 
-      def parallel[R3, R2, Tp2](t2: SSCTask[R2, Tp2])(
-          resCombiner: (R, R2) => R3) =
+      def parallel[R3, R2, Tp2](
+          t2: SSCTask[R2, Tp2])(resCombiner: (R, R2) => R3) =
         new ParComposite[R, R2, R3, SSCTask[R, Tp], SSCTask[R2, Tp2]](tsk, t2) {
           def combineResults(fr: R, sr: R2): R3 = resCombiner(fr, sr)
         }
@@ -796,8 +796,8 @@ trait ParIterableLike[+T,
     *
     *    @return           a new $coll containing the prefix scan of the elements in this $coll
     */
-  def scan[U >: T, That](z: U)(
-      op: (U, U) => U)(implicit bf: CanBuildFrom[Repr, U, That]): That =
+  def scan[U >: T, That](z: U)(op: (U, U) => U)(
+      implicit bf: CanBuildFrom[Repr, U, That]): That =
     if (bf(repr).isCombiner) {
       if (tasksupport.parallelismLevel > 1) {
         if (size > 0)
@@ -811,16 +811,17 @@ trait ParIterableLike[+T,
               cb =>
                 cb.resultWithTaskSupport
             })
-          }) else setTaskSupport((bf(repr) += z).result(), tasksupport)
+          })
+        else setTaskSupport((bf(repr) += z).result(), tasksupport)
       } else setTaskSupport(seq.scan(z)(op)(bf2seq(bf)), tasksupport)
     } else setTaskSupport(seq.scan(z)(op)(bf2seq(bf)), tasksupport)
 
-  def scanLeft[S, That](z: S)(
-      op: (S, T) => S)(implicit bf: CanBuildFrom[Repr, S, That]) =
+  def scanLeft[S, That](z: S)(op: (S, T) => S)(
+      implicit bf: CanBuildFrom[Repr, S, That]) =
     setTaskSupport(seq.scanLeft(z)(op)(bf2seq(bf)), tasksupport)
 
-  def scanRight[S, That](z: S)(
-      op: (T, S) => S)(implicit bf: CanBuildFrom[Repr, S, That]) =
+  def scanRight[S, That](z: S)(op: (T, S) => S)(
+      implicit bf: CanBuildFrom[Repr, S, That]) =
     setTaskSupport(seq.scanRight(z)(op)(bf2seq(bf)), tasksupport)
 
   /** Takes the longest prefix of elements that satisfy the predicate.
@@ -974,7 +975,7 @@ trait ParIterableLike[+T,
   @deprecated("Use .seq.view instead", "2.11.0")
   def view = seq.view
 
-  override def toArray[U >: T : ClassTag]: Array[U] = {
+  override def toArray[U >: T: ClassTag]: Array[U] = {
     val arr = new Array[U](size)
     copyToArray(arr)
     arr
@@ -1003,12 +1004,12 @@ trait ParIterableLike[+T,
     toParCollection[T, ParSeq[T]](() => ParSeq.newCombiner[T])
 
   override def toSet[U >: T]: immutable.ParSet[U] =
-    toParCollection[U, immutable.ParSet[U]](
-        () => immutable.ParSet.newCombiner[U])
+    toParCollection[U, immutable.ParSet[U]](() =>
+          immutable.ParSet.newCombiner[U])
 
   override def toMap[K, V](implicit ev: T <:< (K, V)): immutable.ParMap[K, V] =
-    toParMap[K, V, immutable.ParMap[K, V]](
-        () => immutable.ParMap.newCombiner[K, V])
+    toParMap[K, V, immutable.ParMap[K, V]](() =>
+          immutable.ParMap.newCombiner[K, V])
 
   override def toVector: Vector[T] = to[Vector]
 
@@ -1211,8 +1212,9 @@ trait ParIterableLike[+T,
     override def merge(that: Min[U]) =
       if (this.result == None) result = that.result
       else if (that.result != None)
-        result = if (ord.lteq(result.get, that.result.get)) result
-        else that.result
+        result =
+          if (ord.lteq(result.get, that.result.get)) result
+          else that.result
     override def requiresStrictSplitters = true
   }
 
@@ -1226,8 +1228,9 @@ trait ParIterableLike[+T,
     override def merge(that: Max[U]) =
       if (this.result == None) result = that.result
       else if (that.result != None)
-        result = if (ord.gteq(result.get, that.result.get)) result
-        else that.result
+        result =
+          if (ord.gteq(result.get, that.result.get)) result
+          else that.result
     override def requiresStrictSplitters = true
   }
 
@@ -1350,8 +1353,8 @@ trait ParIterableLike[+T,
       extends Transformer[Combiner[U, That], Copy[U, That]] {
     @volatile var result: Combiner[U, That] = null
     def leaf(prev: Option[Combiner[U, That]]) =
-      result = pit.copy2builder[U, That, Combiner[U, That]](
-          reuse(prev, cfactory()))
+      result =
+        pit.copy2builder[U, That, Combiner[U, That]](reuse(prev, cfactory()))
     protected[this] def newSubtask(p: IterableSplitter[T]) =
       new Copy[U, That](cfactory, p)
     override def merge(that: Copy[U, That]) =
@@ -1373,8 +1376,8 @@ trait ParIterableLike[+T,
     protected[this] def newSubtask(p: IterableSplitter[T]) =
       new Partition(pred, cbfTrue, cbfFalse, p)
     override def merge(that: Partition[U, This]) =
-      result = (
-          result._1 combine that.result._1, result._2 combine that.result._2)
+      result =
+        (result._1 combine that.result._1, result._2 combine that.result._2)
   }
 
   protected[this] class GroupBy[K, U >: T](
@@ -1464,7 +1467,7 @@ trait ParIterableLike[+T,
       val pits = pit.splitWithSignalling
       val sizes = pits.scanLeft(0)(_ + _.remaining)
       for ((p, untilp) <- pits zip sizes; if untilp + p.remaining >= from ||
-                         untilp <= until) yield {
+           untilp <= until) yield {
         val f = (from max untilp) - untilp
         val u = (until min (untilp + p.remaining)) - untilp
         new Slice(f, u, cbf, p)
@@ -1499,8 +1502,8 @@ trait ParIterableLike[+T,
                     p)
     }
     override def merge(that: SplitAt[U, This]) =
-      result = (
-          result._1 combine that.result._1, result._2 combine that.result._2)
+      result =
+        (result._1 combine that.result._1, result._2 combine that.result._2)
     override def requiresStrictSplitters = true
   }
 
@@ -1543,7 +1546,8 @@ trait ParIterableLike[+T,
         // val lst = pit.toList
         // val pa = mutable.ParArray(lst: _*)
         // val str = "At leaf we will iterate: " + pa.splitter.toList
-        result = pit.span2combiners(pred, cbfBefore(), cbfAfter()) // do NOT reuse old combiners here, lest ye be surprised
+        result =
+          pit.span2combiners(pred, cbfBefore(), cbfAfter()) // do NOT reuse old combiners here, lest ye be surprised
         // println("\nAt leaf result is: " + result)
         if (result._2.size > 0) pit.setIndexFlagIfLesser(pos)
       } else {
@@ -1559,11 +1563,12 @@ trait ParIterableLike[+T,
         new Span(pos + untilp, pred, cbfBefore, cbfAfter, p)
     }
     override def merge(that: Span[U, This]) =
-      result = if (result._2.size == 0) {
-        (result._1 combine that.result._1, that.result._2)
-      } else {
-        (result._1, result._2 combine that.result._1 combine that.result._2)
-      }
+      result =
+        if (result._2.size == 0) {
+          (result._1 combine that.result._1, that.result._2)
+        } else {
+          (result._1, result._2 combine that.result._1 combine that.result._2)
+        }
     override def requiresStrictSplitters = true
   }
 
@@ -1600,8 +1605,8 @@ trait ParIterableLike[+T,
       extends Transformer[Combiner[(U, S), That], ZipAll[U, S, That]] {
     @volatile var result: Result = null
     def leaf(prev: Option[Result]) =
-      result = pit.zipAll2combiner[U, S, That](
-          othpit, thiselem, thatelem, pbf())
+      result =
+        pit.zipAll2combiner[U, S, That](othpit, thiselem, thatelem, pbf())
     protected[this] def newSubtask(p: IterableSplitter[T]) =
       throw new UnsupportedOperationException
     override def split =
@@ -1646,10 +1651,10 @@ trait ParIterableLike[+T,
     override def split = {
       val pits = pit.splitWithSignalling
       for ((p, untilp) <- pits zip pits.scanLeft(0)(_ + _.remaining);
-                             if untilp < len) yield {
-            val plen = p.remaining min (len - untilp)
-            new CopyToArray[U, This](from + untilp, plen, array, p)
-          }
+           if untilp < len) yield {
+        val plen = p.remaining min (len - untilp)
+        new CopyToArray[U, This](from + untilp, plen, array, p)
+      }
     }
     override def requiresStrictSplitters = true
   }

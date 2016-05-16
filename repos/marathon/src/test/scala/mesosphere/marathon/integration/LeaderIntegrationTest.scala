@@ -6,8 +6,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.concurrent.duration._
 
 class LeaderIntegrationTest
-    extends IntegrationFunSuite with MarathonClusterIntegrationTest
-    with GivenWhenThen with Matchers {
+    extends IntegrationFunSuite
+    with MarathonClusterIntegrationTest
+    with GivenWhenThen
+    with Matchers {
 
   test("all nodes return the same leader") {
     Given("a leader has been elected")

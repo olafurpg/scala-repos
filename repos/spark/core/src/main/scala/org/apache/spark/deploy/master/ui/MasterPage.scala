@@ -41,22 +41,17 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
   }
 
   def handleAppKillRequest(request: HttpServletRequest): Unit = {
-    handleKillRequest(
-        request,
-        id =>
-          {
-            parent.master.idToApp.get(id).foreach { app =>
-              parent.master.removeApplication(app, ApplicationState.KILLED)
-            }
-        })
+    handleKillRequest(request, id => {
+      parent.master.idToApp.get(id).foreach { app =>
+        parent.master.removeApplication(app, ApplicationState.KILLED)
+      }
+    })
   }
 
   def handleDriverKillRequest(request: HttpServletRequest): Unit = {
-    handleKillRequest(request,
-                      id =>
-                        {
-                          master.ask[KillDriverResponse](RequestKillDriver(id))
-                      })
+    handleKillRequest(request, id => {
+      master.ask[KillDriverResponse](RequestKillDriver(id))
+    })
   }
 
   private def handleKillRequest(
@@ -211,8 +206,7 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
 
   private def appRow(app: ApplicationInfo): Seq[Node] = {
     val killLink =
-      if (parent.killEnabled &&
-          (app.state == ApplicationState.RUNNING ||
+      if (parent.killEnabled && (app.state == ApplicationState.RUNNING ||
               app.state == ApplicationState.WAITING)) {
         val confirm =
           s"if (window.confirm('Are you sure you want to kill application ${app.id} ?')) " +
@@ -246,8 +240,7 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
 
   private def driverRow(driver: DriverInfo): Seq[Node] = {
     val killLink =
-      if (parent.killEnabled &&
-          (driver.state == DriverState.RUNNING ||
+      if (parent.killEnabled && (driver.state == DriverState.RUNNING ||
               driver.state == DriverState.SUBMITTED ||
               driver.state == DriverState.RELAUNCHING)) {
         val confirm =

@@ -20,7 +20,8 @@ trait MyUnboundedMessageQueueSemantics
 object MyUnboundedMailbox {
   // This is the MessageQueue implementation
   class MyMessageQueue
-      extends MessageQueue with MyUnboundedMessageQueueSemantics {
+      extends MessageQueue
+      with MyUnboundedMessageQueueSemantics {
 
     private final val queue = new ConcurrentLinkedQueue[Envelope]()
 

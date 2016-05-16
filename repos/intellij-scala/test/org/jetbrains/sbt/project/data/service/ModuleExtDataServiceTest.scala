@@ -26,7 +26,8 @@ import scala.collection.JavaConverters._
   * @since 6/9/15.
   */
 class ModuleExtDataServiceTest
-    extends ProjectDataServiceTestCase with UsefulTestCaseHelper {
+    extends ProjectDataServiceTestCase
+    with UsefulTestCaseHelper {
 
   import ExternalSystemDataDsl._
 

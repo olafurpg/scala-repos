@@ -176,7 +176,7 @@ object Sorter {
     tmp
   }
 
-  def anySorter[T : ORD] = new Sorter[T] {
+  def anySorter[T: ORD] = new Sorter[T] {
     def argSorted(arr: Array[T]) = {
       val res = range(0, arr.length)
       val cmp = implicitly[ORD[T]]

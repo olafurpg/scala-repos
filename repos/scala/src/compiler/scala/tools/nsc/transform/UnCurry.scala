@@ -47,8 +47,10 @@ import scala.reflect.internal.util.ListOfNil
   */
 /*</export> */
 abstract class UnCurry
-    extends InfoTransform with scala.reflect.internal.transform.UnCurry
-    with TypingTransformers with ast.TreeDSL {
+    extends InfoTransform
+    with scala.reflect.internal.transform.UnCurry
+    with TypingTransformers
+    with ast.TreeDSL {
   val global: Global // need to repeat here because otherwise last mixin defines global as
   // SymbolTable. If we had DOT this would not be an issue
   import global._ // the global environment
@@ -108,20 +110,21 @@ abstract class UnCurry
     // than spewing stack traces at end users for internal errors. Examples
     // which hit at this point should not be hard to come by, but the immediate
     // motivation can be seen in continuations-neg/t3718.
-    override def transform(tree: Tree): Tree = (try postTransform(
-        mainTransform(tree)) catch {
-      case ex: TypeError =>
-        reporter.error(ex.pos, ex.msg)
-        debugStack(ex)
-        EmptyTree
-    })
+    override def transform(tree: Tree): Tree =
+      (try postTransform(mainTransform(tree)) catch {
+        case ex: TypeError =>
+          reporter.error(ex.pos, ex.msg)
+          debugStack(ex)
+          EmptyTree
+      })
 
     /* Is tree a reference `x` to a call by name parameter that needs to be converted to
      * x.apply()? Note that this is not the case if `x` is used as an argument to another
      * call by name parameter.
      */
-    def isByNameRef(tree: Tree) = (tree.isTerm && (tree.symbol ne null) &&
-        (isByName(tree.symbol)) && !byNameArgs(tree))
+    def isByNameRef(tree: Tree) =
+      (tree.isTerm && (tree.symbol ne null) && (isByName(tree.symbol)) &&
+          !byNameArgs(tree))
 
 // ------- Handling non-local returns -------------------------------------------------
 
@@ -368,7 +371,8 @@ abstract class UnCurry
 
       val args1 =
         if (isVarArgTypes(formals))
-          transformVarargs(formals.last.typeArgs.head) else args
+          transformVarargs(formals.last.typeArgs.head)
+        else args
 
       map2(formals, args1) { (formal, arg) =>
         if (!isByNameParamType(formal)) arg
@@ -447,7 +451,8 @@ abstract class UnCurry
           currentOwner.newMethod(unit.freshTermName("liftedTree"), tree.pos)
         sym.setInfo(MethodType(List(), tree.tpe))
         tree.changeOwner(currentOwner -> sym)
-        localTyper.typedPos(tree.pos)(Block(
+        localTyper.typedPos(tree.pos)(
+            Block(
                 List(DefDef(sym, ListOfNil, tree)),
                 Apply(Ident(sym), Nil)
             ))
@@ -833,8 +838,8 @@ abstract class UnCurry
             dd.symbol.pos,
             "A constructor cannot be annotated with a `varargs` annotation.")
       else {
-        val hasRepeated = mexists(dd.symbol.paramss)(
-            sym => definitions.isRepeatedParamType(sym.tpe))
+        val hasRepeated = mexists(dd.symbol.paramss)(sym =>
+              definitions.isRepeatedParamType(sym.tpe))
         if (!hasRepeated)
           reporter.error(
               dd.symbol.pos,
@@ -847,8 +852,8 @@ abstract class UnCurry
      */
     private def addJavaVarargsForwarders(dd: DefDef, flatdd: DefDef): DefDef = {
       if (!dd.symbol.hasAnnotation(VarargsClass) ||
-          !enteringUncurry(mexists(dd.symbol.paramss)(
-                  sym => definitions.isRepeatedParamType(sym.tpe))))
+          !enteringUncurry(mexists(dd.symbol.paramss)(sym =>
+                    definitions.isRepeatedParamType(sym.tpe))))
         return flatdd
 
       def toArrayType(tp: Type): Type = {
@@ -867,8 +872,8 @@ abstract class UnCurry
       val theTyper = typer.atOwner(dd, currentClass)
       val flatparams = flatdd.symbol.paramss.head
       val isRepeated = enteringUncurry(
-          dd.symbol.info.paramss.flatten
-            .map(sym => definitions.isRepeatedParamType(sym.tpe)))
+          dd.symbol.info.paramss.flatten.map(sym =>
+                definitions.isRepeatedParamType(sym.tpe)))
 
       // create the type
       val forwformals = map2(flatparams, isRepeated) {

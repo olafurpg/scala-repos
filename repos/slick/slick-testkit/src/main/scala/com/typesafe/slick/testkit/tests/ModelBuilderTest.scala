@@ -43,10 +43,19 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
   val posts = TableQuery[Posts]
 
   class DefaultTest(tag: Tag)
-      extends Table[
-          (Boolean, Boolean, Boolean, Option[Boolean], Option[Boolean], Option[
-              Boolean], String, String, String, Option[String], Option[String], Option[
-              String], Option[String])](tag, "default_test") {
+      extends Table[(Boolean,
+                     Boolean,
+                     Boolean,
+                     Option[Boolean],
+                     Option[Boolean],
+                     Option[Boolean],
+                     String,
+                     String,
+                     String,
+                     Option[String],
+                     Option[String],
+                     Option[String],
+                     Option[String])](tag, "default_test") {
     def someBool = column[Boolean]("some_bool")
     def someBoolDefaultTrue =
       column[Boolean]("some_bool_default_true", O.Default(true))
@@ -102,13 +111,34 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
   val noDefaultTest = TableQuery[NoDefaultTest]
 
   class TypeTest(tag: Tag)
-      extends Table[
-          (String, Boolean, Byte, Short, Int, Long, Float, Double, String, java.sql.Date, java.sql.Time, java.sql.Timestamp, java.sql.Blob //,java.sql.Clob
-          , Option[Int], (Option[Boolean], Option[Byte], Option[Short], Option[
-              Int], Option[Long], Option[Float], Option[Double], Option[String], Option[
-              java.sql.Date], Option[java.sql.Time], Option[java.sql.Timestamp], Option[
-              java.sql.Blob] //,Option[java.sql.Clob]
-          ))](tag, "TYPE_TEST") {
+      extends Table[(String,
+                     Boolean,
+                     Byte,
+                     Short,
+                     Int,
+                     Long,
+                     Float,
+                     Double,
+                     String,
+                     java.sql.Date,
+                     java.sql.Time,
+                     java.sql.Timestamp,
+                     java.sql.Blob //,java.sql.Clob
+                     ,
+                     Option[Int],
+                     (Option[Boolean],
+                      Option[Byte],
+                      Option[Short],
+                      Option[Int],
+                      Option[Long],
+                      Option[Float],
+                      Option[Double],
+                      Option[String],
+                      Option[java.sql.Date],
+                      Option[java.sql.Time],
+                      Option[java.sql.Timestamp],
+                      Option[java.sql.Blob] //,Option[java.sql.Clob]
+                     ))](tag, "TYPE_TEST") {
     def `type` = column[String]("type") // <- test escaping of keywords
     def Boolean = column[Boolean]("Boolean", O.Default(true))
     def Byte = column[Byte]("Byte")
@@ -202,26 +232,25 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
     val DBTypePattern = "^[a-zA-Z][a-zA-Z0-9 ]*$".r
 
     for {
-      _ <-
-      (posts.schema ++ categories.schema ++ defaultTest.schema ++ noDefaultTest.schema ++ typeTest.schema).create
+      _ <- (posts.schema ++ categories.schema ++ defaultTest.schema ++ noDefaultTest.schema ++ typeTest.schema).create
       _ <- createModel(ignoreInvalidDefaults = false).map(_.assertConsistency)
       tables <- tdb.profile.defaultTables
       _ <- createModel(Some(tables), ignoreInvalidDefaults = false)
-        .map(_.assertConsistency)
+            .map(_.assertConsistency)
       // checks that createModel filters out foreign keys pointing out
       _ <- createModel(Some(tables.filter(_.name.name.toUpperCase == "POSTS")),
                        ignoreInvalidDefaults = false).map { model =>
-        model.assertConsistency
-        assertEquals(0, model.tables.map(_.foreignKeys.size).sum)
-      }
+            model.assertConsistency
+            assertEquals(0, model.tables.map(_.foreignKeys.size).sum)
+          }
       _ <- createModel(
-          Some(tables.filter(_.name.name.toUpperCase == "CATEGORIES")),
-          ignoreInvalidDefaults = false).map(_.assertConsistency)
+              Some(tables.filter(_.name.name.toUpperCase == "CATEGORIES")),
+              ignoreInvalidDefaults = false).map(_.assertConsistency)
       // checks that assertConsistency fails when manually feeding the model with inconsistent tables
       _ <- createModel(Some(tables), ignoreInvalidDefaults = false).map { m =>
-        Model(m.tables.filter(_.name.table.toUpperCase == "POSTS"))
-          .shouldFail(_.assertConsistency)
-      }
+            Model(m.tables.filter(_.name.table.toUpperCase == "POSTS"))
+              .shouldFail(_.assertConsistency)
+          }
       model <- createModel(ignoreInvalidDefaults = false)
       _ = {
         // check that the model matches the table classes
@@ -247,7 +276,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                   (length, varying)
               }
               .head
-          )
+        )
         //assertEquals( categories.indices.toString, 1, categories.indices.size ) // Removed until made sure all dbs actually produce indices model
         //assertEquals( "IDX_NAME", categories.indices.head.name.get.toUpperCase )
         categories.columns.foreach {
@@ -312,7 +341,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                   (length, varying)
               }
               .head
-          )
+        )
         assertEquals(
             (111, true),
             posts.columns
@@ -324,7 +353,7 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
                   (length, varying)
               }
               .head
-          )
+        )
         posts.columns.foreach {
           _.options.foreach {
             case RelationalProfile.ColumnOption.Length(length, varying) =>
@@ -495,26 +524,32 @@ class ModelBuilderTest extends AsyncTest[JdbcTestDB] {
         assertEquals(true, column("Option_java_sql_Blob").nullable)
       }
       _ <- ifCap(jcap.defaultValueMetaData) {
-        val typeTest = model.tables
-          .filter(_.name.table.toUpperCase == "NO_DEFAULT_TEST")
-          .head
-        def column(name: String) =
-          typeTest.columns.filter(_.name.toUpperCase == name.toUpperCase).head
-        def columnDefault(name: String) =
-          column(name).options.collect {
-            case RelationalProfile.ColumnOption.Default(v) => v
-          }.headOption
+            val typeTest = model.tables
+              .filter(_.name.table.toUpperCase == "NO_DEFAULT_TEST")
+              .head
+            def column(name: String) =
+              typeTest.columns
+                .filter(_.name.toUpperCase == name.toUpperCase)
+                .head
+            def columnDefault(name: String) =
+              column(name).options.collect {
+                case RelationalProfile.ColumnOption.Default(v) => v
+              }.headOption
 
-        ifCapU(jcap.nullableNoDefault) {
-          assertEquals(None, columnDefault("stringOption"))
-        }
-        assertEquals(Some(None), columnDefault("stringOptionDefaultNone"))
+            ifCapU(jcap.nullableNoDefault) {
+              assertEquals(None, columnDefault("stringOption"))
+            }
+            assertEquals(Some(None), columnDefault("stringOptionDefaultNone"))
 
-        DBIO.seq(
-            noDefaultTest.map(_.int) += 1,
-            noDefaultTest.map(_.stringOption).result.head.map(_ shouldBe None)
-        )
-      }
+            DBIO.seq(
+                noDefaultTest.map(_.int) += 1,
+                noDefaultTest
+                  .map(_.stringOption)
+                  .result
+                  .head
+                  .map(_ shouldBe None)
+            )
+          }
     } yield ()
   }
 }

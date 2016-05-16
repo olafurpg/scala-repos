@@ -66,11 +66,11 @@ class ConnectionPoolConfigSpec extends PlaySpecification {
     "use BoneCP when database-specific pool is 'bonecp'" in new WithApplication(
         FakeApplication(
             additionalConfiguration = Map(
-                  "db.default.pool" -> "bonecp",
-                  "db.default.url" -> "jdbc:h2:mem:default",
-                  "db.other.driver" -> "org.h2.Driver",
-                  "db.other.url" -> "jdbc:h2:mem:other"
-              )
+                "db.default.pool" -> "bonecp",
+                "db.default.url" -> "jdbc:h2:mem:default",
+                "db.other.driver" -> "org.h2.Driver",
+                "db.other.url" -> "jdbc:h2:mem:other"
+            )
         )) {
       val db = app.injector.instanceOf[DBApi]
       db.database("default").withConnection { c =>

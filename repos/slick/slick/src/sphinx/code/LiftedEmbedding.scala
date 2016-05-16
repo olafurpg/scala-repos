@@ -334,7 +334,7 @@ object LiftedEmbedding extends App {
           ),
           // "sales" and "total" will use the default value 0:
           coffees.map(c => (c.name, c.supID, c.price)) +=
-          ("Colombian_Decaf", 101, 8.99)
+            ("Colombian_Decaf", 101, 8.99)
       )
 
       // Get the statement without having to specify a value to insert:
@@ -443,8 +443,8 @@ object LiftedEmbedding extends App {
       {
         //#compiled2
         val userPaged = Compiled(
-            (d: ConstColumn[Long],
-            t: ConstColumn[Long]) => users.drop(d).take(t))
+            (d: ConstColumn[Long], t: ConstColumn[Long]) =>
+              users.drop(d).take(t))
 
         val usersAction1 = userPaged(2, 1).result
         val usersAction2 = userPaged(1, 3).result
@@ -484,8 +484,8 @@ object LiftedEmbedding extends App {
       // Use the lifted function in a query to group by day of week
       val q1 = for {
         (dow, q) <- salesPerDay
-          .map(s => (dayOfWeek(s.day), s.count))
-          .groupBy(_._1)
+                     .map(s => (dayOfWeek(s.day), s.count))
+                     .groupBy(_._1)
       } yield (dow, q.map(_._2).sum)
       //#simplefunction1
 
@@ -550,8 +550,8 @@ object LiftedEmbedding extends App {
       case class Pair[A, B](a: A, b: B)
 
       // A Shape implementation for Pair
-      final class PairShape[Level <: ShapeLevel, M <: Pair[_, _], U <: Pair[
-              _, _]: ClassTag, P <: Pair[_, _]](
+      final class PairShape[Level <: ShapeLevel, M <: Pair[_, _],
+          U <: Pair[_, _]: ClassTag, P <: Pair[_, _]](
           val shapes: Seq[Shape[_, _, _, _]])
           extends MappedScalaProductShape[Level, Pair[_, _], M, U, P] {
         def buildValue(elems: IndexedSeq[Any]) = Pair(elems(0), elems(1))

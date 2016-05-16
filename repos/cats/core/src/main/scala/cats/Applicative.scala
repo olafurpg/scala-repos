@@ -59,7 +59,8 @@ trait Applicative[F[_]] extends Apply[F] { self =>
 }
 
 trait CompositeApplicative[F[_], G[_]]
-    extends Applicative[λ[α => F[G[α]]]] with CompositeApply[F, G] {
+    extends Applicative[λ[α => F[G[α]]]]
+    with CompositeApply[F, G] {
 
   implicit def F: Applicative[F]
   implicit def G: Applicative[G]

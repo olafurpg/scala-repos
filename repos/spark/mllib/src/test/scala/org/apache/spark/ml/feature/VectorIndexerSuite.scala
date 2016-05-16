@@ -30,7 +30,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
 class VectorIndexerSuite
-    extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with DefaultReadWriteTest
     with Logging {
 
   import VectorIndexerSuite.FeatureData

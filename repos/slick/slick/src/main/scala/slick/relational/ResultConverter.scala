@@ -46,9 +46,8 @@ trait ResultConverterDomain {
 }
 
 /** An efficient (albeit boxed) ResultConverter for Product/Tuple values. */
-final case class ProductResultConverter[
-    M <: ResultConverterDomain, T <: Product](
-    elementConverters: ResultConverter[M, _]*)
+final case class ProductResultConverter[M <: ResultConverterDomain,
+    T <: Product](elementConverters: ResultConverter[M, _]*)
     extends ResultConverter[M, T] {
   private[this] val cha = elementConverters.to[Array]
   private[this] val len = cha.length
@@ -176,8 +175,7 @@ final case class TypeMappingResultConverter[M <: ResultConverterDomain, T, C](
     super.getDumpInfo.copy(children = Vector(("child", child)))
 }
 
-final case class OptionRebuildingResultConverter[
-    M <: ResultConverterDomain, T](
+final case class OptionRebuildingResultConverter[M <: ResultConverterDomain, T](
     discriminator: ResultConverter[M, Boolean], data: ResultConverter[M, T])
     extends ResultConverter[M, Option[T]] {
   def read(pr: Reader): Option[T] =

@@ -128,7 +128,8 @@ class CompileServerManager(project: Project) extends ProjectComponent {
     val baseActions = Seq(Start, Stop, Separator.getInstance, Configure)
     val actions =
       if (addActions.nonEmpty)
-        (baseActions :+ Separator.getInstance()) ++ addActions else baseActions
+        (baseActions :+ Separator.getInstance()) ++ addActions
+      else baseActions
 
     val group = new DefaultActionGroup(actions: _*)
 
@@ -170,7 +171,8 @@ class CompileServerManager(project: Project) extends ProjectComponent {
   private object Configure
       extends AnAction("&Configure...",
                        "Configure compile server",
-                       AllIcons.General.Settings) with DumbAware {
+                       AllIcons.General.Settings)
+      with DumbAware {
     def actionPerformed(e: AnActionEvent) {
       showCompileServerSettingsDialog()
     }

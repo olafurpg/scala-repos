@@ -140,7 +140,8 @@ object SpnegoAuthenticator {
         _serverPrincipal: String,
         _serverPrincipalType: Oid = JAAS.Krb5PrincipalType
     )
-        extends ClientSource with JAAS {
+        extends ClientSource
+        with JAAS {
       val serverPrincipal =
         manager.createName(_serverPrincipal, _serverPrincipalType)
 
@@ -170,7 +171,8 @@ object SpnegoAuthenticator {
     }
 
     class JAASServerSource(val loginContext: String)
-        extends ServerSource with JAAS {
+        extends ServerSource
+        with JAAS {
       def accept(context: GSSContext, negotiation: Token): Future[Negotiated] =
         pool {
           val token =
@@ -258,7 +260,7 @@ object SpnegoAuthenticator {
       Authenticated.Http(req, context)
   }
 
-  sealed abstract class Client[Req : ReqSupport, Rsp : RspSupport]
+  sealed abstract class Client[Req: ReqSupport, Rsp: RspSupport]
       extends Filter[Req, Rsp, Req, Rsp] {
     val credSrc: Credentials.ClientSource
     val reqs = implicitly[ReqSupport[Req]]
@@ -298,7 +300,7 @@ object SpnegoAuthenticator {
       }
   }
 
-  sealed abstract class Server[Req : ReqSupport, Rsp : RspSupport]
+  sealed abstract class Server[Req: ReqSupport, Rsp: RspSupport]
       extends Filter[Req, Rsp, SpnegoAuthenticator.Authenticated[Req], Rsp] {
     val credSrc: Credentials.ServerSource
     val reqs = implicitly[ReqSupport[Req]]

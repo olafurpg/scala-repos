@@ -52,8 +52,8 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
     override def decompose(results: BenchmarkResults[T]): JValue =
       JObject(
           List(
-              JField(
-                  "timestamp", format.print(new DateTime(DateTimeZone.UTC))),
+              JField("timestamp",
+                     format.print(new DateTime(DateTimeZone.UTC))),
               JField("runs", results.testRuns),
               JField("reps", results.repCount),
               JField("mean", results.meanRepTime),

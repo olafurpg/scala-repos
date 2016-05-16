@@ -63,11 +63,10 @@ trait JettyContainer extends Container {
   def addServlet(servlet: Class[_ <: HttpServlet], path: String) =
     servletContextHandler.addServlet(servlet, path)
 
-  def addFilter(
-      filter: Filter,
-      path: String,
-      dispatches: util.EnumSet[DispatcherType] = DefaultDispatcherTypes)
-    : FilterHolder = {
+  def addFilter(filter: Filter,
+                path: String,
+                dispatches: util.EnumSet[DispatcherType] =
+                  DefaultDispatcherTypes): FilterHolder = {
     val holder = new FilterHolder(filter)
     servletContextHandler.addFilter(holder, path, dispatches)
     holder

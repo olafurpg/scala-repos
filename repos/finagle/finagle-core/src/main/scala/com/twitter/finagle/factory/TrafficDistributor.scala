@@ -21,9 +21,9 @@ private[finagle] object TrafficDistributor {
     * An intermediate representation of the endpoints that a load balancer
     * operates over, capable of being updated.
     */
-  type BalancerEndpoints[Req, Rep] = Var[Activity.State[Set[ServiceFactory[
-                  Req, Rep]]]] with Updatable[Activity.State[Set[
-              ServiceFactory[Req, Rep]]]]
+  type BalancerEndpoints[Req, Rep] =
+    Var[Activity.State[Set[ServiceFactory[Req, Rep]]]] with Updatable[
+        Activity.State[Set[ServiceFactory[Req, Rep]]]]
 
   /**
     * Represents cache entries for load balancer instances. Stores both
@@ -79,7 +79,7 @@ private[finagle] object TrafficDistributor {
       extends ServiceFactory[Req, Rep] {
 
     private[this] val (balancers, drv): (IndexedSeq[ServiceFactory[Req, Rep]],
-    Drv) = {
+                                         Drv) = {
       val tupled = classes.map {
         case WeightClass(b, weight, size) => (b, weight * size)
       }
@@ -274,11 +274,12 @@ private[finagle] class TrafficDistributor[Req, Rep](
   private[this] def updateMeanWeight(
       classes: Iterable[WeightClass[Req, Rep]]): Unit = {
     val size = classes.map(_.size).sum
-    meanWeight = if (size != 0)
-      classes.map { c =>
-        c.weight * c.size
-      }.sum.toFloat / size
-    else 0.0F
+    meanWeight =
+      if (size != 0)
+        classes.map { c =>
+          c.weight * c.size
+        }.sum.toFloat / size
+      else 0.0F
   }
 
   // Translate the stream of weightClasses into a stream of underlying

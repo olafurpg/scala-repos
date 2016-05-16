@@ -77,7 +77,8 @@ final class OneVsRestModel private[ml](
     @Since("1.4.0") override val uid: String,
     @Since("1.4.0") labelMetadata: Metadata,
     @Since("1.4.0") val models: Array[_ <: ClassificationModel[_, _]])
-    extends Model[OneVsRestModel] with OneVsRestParams {
+    extends Model[OneVsRestModel]
+    with OneVsRestParams {
 
   @Since("1.4.0")
   override def transformSchema(schema: StructType): StructType = {
@@ -168,7 +169,8 @@ final class OneVsRestModel private[ml](
 @Since("1.4.0")
 @Experimental
 final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[OneVsRestModel] with OneVsRestParams {
+    extends Estimator[OneVsRestModel]
+    with OneVsRestParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("oneVsRest"))
@@ -201,11 +203,10 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
   override def fit(dataset: DataFrame): OneVsRestModel = {
     // determine number of classes either from metadata if provided, or via computation.
     val labelSchema = dataset.schema($(labelCol))
-    val computeNumClasses: () => Int = () =>
-      {
-        val Row(maxLabelIndex: Double) = dataset.agg(max($(labelCol))).head()
-        // classes are assumed to be numbered from 0,...,maxLabelIndex
-        maxLabelIndex.toInt + 1
+    val computeNumClasses: () => Int = () => {
+      val Row(maxLabelIndex: Double) = dataset.agg(max($(labelCol))).head()
+      // classes are assumed to be numbered from 0,...,maxLabelIndex
+      maxLabelIndex.toInt + 1
     }
     val numClasses = MetadataUtils
       .getNumClasses(labelSchema)

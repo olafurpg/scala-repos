@@ -17,7 +17,9 @@ import scala.collection.mutable.{Set => MSet}
   */
 final class WeakHashSet[A <: AnyRef](
     val initialCapacity: Int, val loadFactor: Double)
-    extends Set[A] with Function1[A, Boolean] with MSet[A] {
+    extends Set[A]
+    with Function1[A, Boolean]
+    with MSet[A] {
 
   import WeakHashSet._
 
@@ -424,8 +426,8 @@ object WeakHashSet {
   val defaultInitialCapacity = 16
   val defaultLoadFactor = .75
 
-  def apply[A <: AnyRef](
-      initialCapacity: Int = WeakHashSet.defaultInitialCapacity,
-      loadFactor: Double = WeakHashSet.defaultLoadFactor) =
+  def apply[A <: AnyRef](initialCapacity: Int =
+                           WeakHashSet.defaultInitialCapacity,
+                         loadFactor: Double = WeakHashSet.defaultLoadFactor) =
     new WeakHashSet[A](initialCapacity, defaultLoadFactor)
 }

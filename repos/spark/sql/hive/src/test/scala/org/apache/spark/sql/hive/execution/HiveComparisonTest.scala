@@ -44,7 +44,9 @@ import org.apache.spark.sql.hive.test.TestHive
   * configured using system properties.
   */
 abstract class HiveComparisonTest
-    extends SparkFunSuite with BeforeAndAfterAll with GivenWhenThen {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with GivenWhenThen {
 
   /**
     * When set, any cache files that result in test failures will be deleted.  Used when the test
@@ -467,7 +469,7 @@ abstract class HiveComparisonTest
           }
           .toSeq
 
-          (queryList, hiveResults, catalystResults).zipped.foreach {
+        (queryList, hiveResults, catalystResults).zipped.foreach {
           case (query, hive, (hiveQuery, catalyst)) =>
             // Check that the results match unless its an EXPLAIN query.
             val preparedHive = prepareAnswer(hiveQuery, hive)

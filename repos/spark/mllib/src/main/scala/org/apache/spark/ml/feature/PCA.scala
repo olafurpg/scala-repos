@@ -34,7 +34,9 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[PCA]] and [[PCAModel]].
   */
 private[feature] trait PCAParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * The number of principal components.
@@ -53,7 +55,9 @@ private[feature] trait PCAParams
   */
 @Experimental
 class PCA(override val uid: String)
-    extends Estimator[PCAModel] with PCAParams with DefaultParamsWritable {
+    extends Estimator[PCAModel]
+    with PCAParams
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("pca"))
 
@@ -113,7 +117,9 @@ object PCA extends DefaultParamsReadable[PCA] {
 class PCAModel private[ml](override val uid: String,
                            val pc: DenseMatrix,
                            val explainedVariance: DenseVector)
-    extends Model[PCAModel] with PCAParams with MLWritable {
+    extends Model[PCAModel]
+    with PCAParams
+    with MLWritable {
 
   import PCAModel._
 

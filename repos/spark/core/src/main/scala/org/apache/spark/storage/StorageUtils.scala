@@ -102,8 +102,8 @@ class StorageStatus(val blockManagerId: BlockManagerId, val maxMem: Long) {
     updateStorageInfo(blockId, blockStatus)
     blockId match {
       case RDDBlockId(rddId, _) =>
-        _rddBlocks
-          .getOrElseUpdate(rddId, new mutable.HashMap)(blockId) = blockStatus
+        _rddBlocks.getOrElseUpdate(rddId, new mutable.HashMap)(blockId) =
+          blockStatus
       case _ =>
         _nonRddBlocks(blockId) = blockStatus
     }

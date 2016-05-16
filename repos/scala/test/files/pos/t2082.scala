@@ -18,7 +18,8 @@ class TestRun extends KeyedMapper[Long, TestRun] with IdPK {
 object TestRun extends TestRun with KeyedMetaMapper[Long, TestRun]
 
 class MetaTestSubject
-    extends TestSubject with KeyedMetaMapper[Long, TestSubject]
+    extends TestSubject
+    with KeyedMetaMapper[Long, TestSubject]
 object TestSubject extends MetaTestSubject
 
 object Main {

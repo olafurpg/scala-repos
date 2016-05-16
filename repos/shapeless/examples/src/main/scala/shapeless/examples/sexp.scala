@@ -122,7 +122,8 @@ package sexp.ast {
   case class InTerm(field: DatabaseField, value: String, text: String = "")
       extends CompressedToken
   case class QualifierToken(text: String, field: DatabaseField)
-      extends ContextualToken with Term
+      extends ContextualToken
+      with Term
 }
 
 /** Example AST with performance problems */

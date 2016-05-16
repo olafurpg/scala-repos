@@ -638,8 +638,8 @@ class BigInteger extends Number with Comparable[BigInteger] {
       val resLength = divisorLen
       var resDigits = new Array[Int](resLength)
       if (resLength == 1) {
-        resDigits(0) = Division.remainderArrayByInt(
-            digits, thisLen, divisor.digits(0))
+        resDigits(0) =
+          Division.remainderArrayByInt(digits, thisLen, divisor.digits(0))
       } else {
         val qLen = thisLen - divisorLen + 1
         resDigits = Division.divide(
@@ -831,20 +831,22 @@ class BigInteger extends Number with Comparable[BigInteger] {
     @inline
     @tailrec
     def loop(): Unit = if (bytesLen > highBytes) {
-      digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-      (byteValues(bytesLen - 2) & 0xFF) << 8 |
-      (byteValues(bytesLen - 3) & 0xFF) << 16 |
-      (byteValues(bytesLen - 4) & 0xFF) << 24
+      digits(i) =
+        (byteValues(bytesLen - 1) & 0xFF) |
+        (byteValues(bytesLen - 2) & 0xFF) << 8 |
+        (byteValues(bytesLen - 3) & 0xFF) << 16 |
+        (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen -= 4
       if (digits(i) != 0) {
         digits(i) = -digits(i)
         firstNonzeroDigit = i
         i += 1
         while (bytesLen > highBytes) {
-          digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-          (byteValues(bytesLen - 2) & 0xFF) << 8 |
-          (byteValues(bytesLen - 3) & 0xFF) << 16 |
-          (byteValues(bytesLen - 4) & 0xFF) << 24
+          digits(i) =
+            (byteValues(bytesLen - 1) & 0xFF) |
+            (byteValues(bytesLen - 2) & 0xFF) << 8 |
+            (byteValues(bytesLen - 3) & 0xFF) << 16 |
+            (byteValues(bytesLen - 4) & 0xFF) << 24
           bytesLen -= 4
           digits(i) = ~digits(i)
           i += 1
@@ -882,10 +884,11 @@ class BigInteger extends Number with Comparable[BigInteger] {
     // Put bytes to the int array starting from the end of the byte array
     var i = 0
     while (bytesLen > highBytes) {
-      digits(i) = (byteValues(bytesLen - 1) & 0xFF) |
-      (byteValues(bytesLen - 2) & 0xFF) << 8 |
-      (byteValues(bytesLen - 3) & 0xFF) << 16 |
-      (byteValues(bytesLen - 4) & 0xFF) << 24
+      digits(i) =
+        (byteValues(bytesLen - 1) & 0xFF) |
+        (byteValues(bytesLen - 2) & 0xFF) << 8 |
+        (byteValues(bytesLen - 3) & 0xFF) << 16 |
+        (byteValues(bytesLen - 4) & 0xFF) << 24
       bytesLen = bytesLen - 4
       i += 1
     }

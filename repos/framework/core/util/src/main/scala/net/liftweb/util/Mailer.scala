@@ -213,8 +213,8 @@ trait Mailer extends SimpleInjector {
     * How to send a message in test mode.  By default, log the message
     */
   lazy val testModeSend: Inject[MimeMessage => Unit] =
-    new Inject[MimeMessage => Unit](
-        (m: MimeMessage) => logger.info("Sending Mime Message: " + m)) {}
+    new Inject[MimeMessage => Unit]((m: MimeMessage) =>
+          logger.info("Sending Mime Message: " + m)) {}
 
   /**
     * How to send a message in staging mode.  By default, use Transport.send(msg)

@@ -106,16 +106,15 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
     val mask = (1 << keys.length) - 1
     val bitmasks: Seq[Int] = setASTs.map {
       case Token("TOK_GROUPING_SETS_EXPRESSION", columns) =>
-        columns.foldLeft(mask)((bitmap, col) =>
-              {
-            val keyIndex = keyMap
-              .find(_._1.treeEquals(col))
-              .map(_._2)
-              .getOrElse(throw new AnalysisException(
-                      s"${col.treeString} doesn't show up in the GROUP BY list"))
-            // 0 means that the column at the given index is a grouping column, 1 means it is not,
-            // so we unset the bit in bitmap.
-            bitmap & ~(1 << (keys.length - 1 - keyIndex))
+        columns.foldLeft(mask)((bitmap, col) => {
+          val keyIndex = keyMap
+            .find(_._1.treeEquals(col))
+            .map(_._2)
+            .getOrElse(throw new AnalysisException(
+                    s"${col.treeString} doesn't show up in the GROUP BY list"))
+          // 0 means that the column at the given index is a grouping column, 1 means it is not,
+          // so we unset the bit in bitmap.
+          bitmap & ~(1 << (keys.length - 1 - keyIndex))
         })
       case _ => sys.error("Expect GROUPING SETS clause")
     }
@@ -239,13 +238,13 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
                                 withWhere)
                     case _ => sys.error("Expect WITH ROLLUP")
                 }),
-                cubeGroupByClause.map(
-                    e => e match {
+                cubeGroupByClause.map(e =>
+                      e match {
                 case Token("TOK_CUBE_GROUPBY", children) =>
-                        Aggregate(Seq(Cube(children.map(nodeToExpr))),
-                                  selectExpressions,
-                                  withWhere)
-                      case _ => sys.error("Expect WITH CUBE") }),
+                          Aggregate(Seq(Cube(children.map(nodeToExpr))),
+                                    selectExpressions,
+                                    withWhere)
+                        case _ => sys.error("Expect WITH CUBE") }),
                 Some(Project(selectExpressions, withWhere))).flatten.head
           }
 
@@ -309,8 +308,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
 
           // Collect all window specifications defined in the WINDOW clause.
           val windowDefinitions =
-            windowClause.map(
-                _.children.collect {
+            windowClause.map(_.children.collect {
               case Token("TOK_WINDOWDEF",
                          Token(windowName, Nil) :: Token("TOK_WINDOWSPEC",
                                                          spec) :: Nil) =>
@@ -574,12 +572,12 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
     val collected = ArrayBuffer[ASTNode]()
     var rest = node
     while (rest match {
-      case Token(pattern(), l :: r :: Nil) =>
-        collected += r
-        rest = l
-        true
-      case _ => false
-    }) {
+             case Token(pattern(), l :: r :: Nil) =>
+               collected += r
+               rest = l
+               true
+             case _ => false
+           }) {
       // do nothing
     }
     collected += rest
@@ -595,7 +593,7 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
   private def balancedTree(
       expr: Seq[Expression],
       f: (Expression,
-      Expression) => Expression): Expression = expr.length match {
+          Expression) => Expression): Expression = expr.length match {
     case 1 => expr.head
     case 2 => f(expr.head, expr(1))
     case l =>
@@ -846,8 +844,8 @@ https://cwiki.apache.org/confluence/display/Hive/Enhanced+Aggregation%2C+Cube%2C
             case "TOK_INTERVAL_MICROSECOND_LITERAL" => "microsecond"
             case _ => noParseRule(s"Interval($name)", e)
           }
-          interval = interval.add(
-              CalendarInterval.fromSingleUnitString(unit, value))
+          interval =
+            interval.add(CalendarInterval.fromSingleUnitString(unit, value))
           updated = true
         case _ =>
       }

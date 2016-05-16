@@ -67,7 +67,7 @@ case class Sketched[K, V](pipe: TypedPipe[(K, V)],
     cogroup(right)(Joiner.hashLeft2)
 }
 
-case class SketchJoined[K : Ordering, V, V2, R](
+case class SketchJoined[K: Ordering, V, V2, R](
     left: Sketched[K, V], right: TypedPipe[(K, V2)], numReducers: Int)(
     joiner: (K, V, Iterable[V2]) => Iterator[R])
     extends MustHaveReducers {

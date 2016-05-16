@@ -44,7 +44,7 @@ object RecordSpec extends Specification {
     val rec = FieldTypeTestRecord.createRecord
     val allExpectedFieldNames: List[String] = (for {
       typeName <- "Binary Boolean Country DateTime Decimal Double Email Enum Int Locale Long PostalCode String Textarea TimeZone JodaTime"
-        .split(" ")
+                   .split(" ")
       flavor <- "mandatory legacyOptional optional".split(" ")
     } yield flavor + typeName + "Field").toList
 

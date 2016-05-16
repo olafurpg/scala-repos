@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScIdListStub
   */
 class ScIdListImpl private (
     stub: StubElement[ScIdList], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScIdList {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScIdList {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScIdListStub) = {
     this(stub, ScalaElementTypes.IDENTIFIER_LIST, null)

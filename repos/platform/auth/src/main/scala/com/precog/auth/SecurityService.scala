@@ -39,7 +39,8 @@ import org.streum.configrity.Configuration
 import scalaz._
 
 trait SecurityService
-    extends BlueEyesServiceBuilder with APIKeyServiceCombinators
+    extends BlueEyesServiceBuilder
+    with APIKeyServiceCombinators
     with PathServiceCombinators {
   case class State(handlers: SecurityServiceHandlers, stoppable: Stoppable)
 

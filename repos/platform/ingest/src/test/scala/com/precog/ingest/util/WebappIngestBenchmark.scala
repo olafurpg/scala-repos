@@ -62,7 +62,8 @@ import org.joda.time.Instant
 import scalaz.NonEmptyList
 
 abstract class IngestProducer(args: Array[String])
-    extends RealisticEventMessage with AkkaDefaults {
+    extends RealisticEventMessage
+    with AkkaDefaults {
 
   lazy val config = loadConfig(args)
 

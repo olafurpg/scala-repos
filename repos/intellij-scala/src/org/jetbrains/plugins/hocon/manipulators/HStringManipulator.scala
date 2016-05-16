@@ -25,9 +25,8 @@ class HStringManipulator extends AbstractElementManipulator[HString] {
     }
 
     val needsQuoting =
-      strType == UnquotedString &&
-      (newContent.isEmpty || newContent.startsWith(" ") ||
-          newContent.endsWith(" ") ||
+      strType == UnquotedString && (newContent.isEmpty ||
+          newContent.startsWith(" ") || newContent.endsWith(" ") ||
           (str.elementType == KeyPart && newContent.contains('.')) ||
           newContent.exists(HoconLexer.ForbiddenChars.contains) ||
           escapedContent != newContent)

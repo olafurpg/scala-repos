@@ -96,7 +96,8 @@ private[std] sealed trait Function1Semigroup[A, B] extends Semigroup[A => B] {
 }
 
 private[std] sealed trait Function1Monoid[A, B]
-    extends Monoid[A => B] with Function1Semigroup[A, B] {
+    extends Monoid[A => B]
+    with Function1Semigroup[A, B] {
   implicit def B: Monoid[B]
 
   override def empty: A => B = _ => B.empty
@@ -108,7 +109,8 @@ private[std] sealed trait Function1SemigroupK
 }
 
 private[std] sealed trait Function1MonoidK
-    extends MonoidK[Lambda[A => A => A]] with Function1SemigroupK {
+    extends MonoidK[Lambda[A => A => A]]
+    with Function1SemigroupK {
   override def empty[A]: A => A = identity[A]
 }
 

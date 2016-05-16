@@ -12,7 +12,10 @@ import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
 class StateMetricsTest
-    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures {
   test("time crashing read call") { testCrashingCall(read = true) }
   test("time crashing write call") { testCrashingCall(read = false) }
 

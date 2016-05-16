@@ -78,15 +78,15 @@ final class RelationApi(coll: Coll,
     fetchFollows(u1, u2) flatMap { _ ?? fetchFollows(u2, u1) }
 
   private val countFollowingCache = AsyncCache[ID, Int](
-      f = userId =>
-          coll.count(BSONDocument("u1" -> userId, "r" -> Follow).some),
+      f =
+        userId => coll.count(BSONDocument("u1" -> userId, "r" -> Follow).some),
       timeToLive = 10 minutes)
 
   def countFollowing(userId: ID) = countFollowingCache(userId)
 
   private val countFollowersCache = AsyncCache[ID, Int](
-      f = userId =>
-          coll.count(BSONDocument("u2" -> userId, "r" -> Follow).some),
+      f =
+        userId => coll.count(BSONDocument("u2" -> userId, "r" -> Follow).some),
       timeToLive = 10 minutes)
 
   def countFollowers(userId: ID) = countFollowersCache(userId)

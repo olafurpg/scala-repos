@@ -52,8 +52,8 @@ object RunResult {
   }
 
   abstract class Aux2 {
-    protected type JA[I <: HList, R, In0 <: HList, Out0 <: HList] = Join.Aux[
-        I, HNil, HNil, R, HNil, In0, Out0]
+    protected type JA[I <: HList, R, In0 <: HList, Out0 <: HList] =
+      Join.Aux[I, HNil, HNil, R, HNil, In0, Out0]
     implicit def forAny[T]: Aux[T, Rule0] = `n/a`
   }
 }

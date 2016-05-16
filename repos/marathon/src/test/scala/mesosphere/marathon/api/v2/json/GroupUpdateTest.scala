@@ -55,11 +55,10 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     val actual = Group(
         PathId.empty,
         groups = Set(
-              Group(
-                  "/test".toPath,
+            Group("/test".toPath,
                   apps = Set(AppDefinition("/test/bla".toPath, Some("foo")))),
-              Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
-          ))
+            Group("/apps".toPath, groups = Set(Group("/apps/foo".toPath)))
+        ))
     val update = GroupUpdate(
         PathId.empty,
         Set.empty[AppDefinition],
@@ -108,13 +107,11 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     val current = Group(
         "/test".toPath,
         groups = Set(
-              Group(
-                  "/test/group1".toPath,
+            Group("/test/group1".toPath,
                   Set(AppDefinition("/test/group1/app1".toPath, Some("foo")))),
-              Group(
-                  "/test/group2".toPath,
+            Group("/test/group2".toPath,
                   Set(AppDefinition("/test/group2/app2".toPath, Some("foo"))))
-          )
+        )
     )
 
     When("A group update is applied")
@@ -170,18 +167,19 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
   test(
       "Relative path of a dependency, should be relative to group and not to the app") {
     Given("A group with two apps. Second app is dependend of first.")
-    val update = GroupUpdate(
-        PathId.empty,
-        Set.empty[AppDefinition],
-        Set(
-            GroupUpdate(
-                "test-group".toPath,
-                Set(AppDefinition("test-app1".toPath, Some("foo")),
-                    AppDefinition("test-app2".toPath,
-                                  Some("foo"),
-                                  dependencies = Set("test-app1".toPath)))
-            )
-        ))
+    val update =
+      GroupUpdate(PathId.empty,
+                  Set.empty[AppDefinition],
+                  Set(
+                      GroupUpdate(
+                          "test-group".toPath,
+                          Set(AppDefinition("test-app1".toPath, Some("foo")),
+                              AppDefinition("test-app2".toPath,
+                                            Some("foo"),
+                                            dependencies =
+                                              Set("test-app1".toPath)))
+                      )
+                  ))
 
     When("The update is performed")
     val result = update(Group.empty, Timestamp.now())

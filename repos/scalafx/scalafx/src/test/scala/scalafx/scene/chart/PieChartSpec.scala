@@ -42,4 +42,5 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class PieChartSpec
     extends SimpleSFXDelegateSpec[jfxsc.PieChart, PieChart](
-        classOf[jfxsc.PieChart], classOf[PieChart]) with RunOnApplicationThread
+        classOf[jfxsc.PieChart], classOf[PieChart])
+    with RunOnApplicationThread

@@ -68,7 +68,8 @@ object WebView {
   * @param delegate A JavaFX WebView. Its default value is a new instance.
   */
 class WebView(override val delegate: jfxsw.WebView = new jfxsw.WebView)
-    extends Parent(delegate) with SFXDelegate[jfxsw.WebView] {
+    extends Parent(delegate)
+    with SFXDelegate[jfxsw.WebView] {
 
   /**
     * Scale factor applied to font.

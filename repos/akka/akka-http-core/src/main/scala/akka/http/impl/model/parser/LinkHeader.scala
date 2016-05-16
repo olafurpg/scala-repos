@@ -35,8 +35,7 @@ private[parser] trait LinkHeader {
   // TODO: support `link-extension`
 
   def `relation-types` =
-    rule(
-        ws('"') ~ oneOrMore(`relation-type`).separatedBy(oneOrMore(SP)) ~>
+    rule(ws('"') ~ oneOrMore(`relation-type`).separatedBy(oneOrMore(SP)) ~>
         (_.mkString(" ")) ~ ws('"') | `relation-type` ~ OWS)
 
   def `relation-type` = rule { `reg-rel-type` | `ext-rel-type` }

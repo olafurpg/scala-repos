@@ -14,8 +14,7 @@ import akka.actor.{ActorRefFactory, ActorSystem}
 /**
   * INTERNAL API
   */
-private[http] abstract class SettingsCompanion[
-    T](protected val prefix: String) {
+private[http] abstract class SettingsCompanion[T](protected val prefix: String) {
   private final val MaxCached = 8
   private[this] var cache = ListMap.empty[ActorSystem, T]
 

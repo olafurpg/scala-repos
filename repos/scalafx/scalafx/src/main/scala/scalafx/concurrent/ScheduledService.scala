@@ -92,7 +92,8 @@ object ScheduledService {
   */
 abstract class ScheduledService[T](
     override val delegate: jfxc.ScheduledService[T])
-    extends Service[T](delegate) with SFXDelegate[jfxc.ScheduledService[T]] {
+    extends Service[T](delegate)
+    with SFXDelegate[jfxc.ScheduledService[T]] {
 
   /**
     * The initial delay between when the ScheduledService is first started, and when it will begin

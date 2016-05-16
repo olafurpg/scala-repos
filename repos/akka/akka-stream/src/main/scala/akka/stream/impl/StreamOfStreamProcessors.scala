@@ -15,14 +15,18 @@ import scala.collection.mutable
 private[akka] object MultiStreamOutputProcessor {
   final case class SubstreamKey(id: Long)
   final case class SubstreamRequestMore(substream: SubstreamKey, demand: Long)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class SubstreamCancel(substream: SubstreamKey)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class SubstreamSubscribe(
       substream: SubstreamKey, subscriber: Subscriber[Any])
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class SubstreamSubscriptionTimeout(substream: SubstreamKey)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 
   class SubstreamSubscription(
       val parent: ActorRef, val substreamKey: SubstreamKey)
@@ -48,7 +52,8 @@ private[akka] object MultiStreamOutputProcessor {
                         actor: ActorRef,
                         pump: Pump,
                         subscriptionTimeout: Cancellable)
-      extends SimpleOutputs(actor, pump) with Publisher[Any] {
+      extends SimpleOutputs(actor, pump)
+      with Publisher[Any] {
     import ReactiveStreamsCompliance._
 
     import SubstreamOutput._
@@ -141,7 +146,8 @@ private[akka] object MultiStreamOutputProcessor {
   * INTERNAL API
   */
 private[akka] trait MultiStreamOutputProcessorLike
-    extends Pump with StreamSubscriptionTimeoutSupport {
+    extends Pump
+    with StreamSubscriptionTimeoutSupport {
   this: Actor with ActorLogging ⇒
 
   import MultiStreamOutputProcessor._
@@ -231,7 +237,8 @@ private[akka] trait MultiStreamOutputProcessorLike
   */
 private[akka] abstract class MultiStreamOutputProcessor(
     _settings: ActorMaterializerSettings)
-    extends ActorProcessorImpl(_settings) with MultiStreamOutputProcessorLike {
+    extends ActorProcessorImpl(_settings)
+    with MultiStreamOutputProcessorLike {
   private var _nextId = 0L
   protected def nextId(): Long = { _nextId += 1; _nextId }
 

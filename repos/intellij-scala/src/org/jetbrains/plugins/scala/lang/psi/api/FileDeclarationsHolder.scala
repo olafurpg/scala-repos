@@ -30,7 +30,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 12/12/12
   */
 trait FileDeclarationsHolder
-    extends PsiElement with ScDeclarationSequenceHolder with ScImportsHolder {
+    extends PsiElement
+    with ScDeclarationSequenceHolder
+    with ScImportsHolder {
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,

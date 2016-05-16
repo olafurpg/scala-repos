@@ -27,10 +27,10 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
         dataSourceParams = PDataSource2.Params(id = 0, en = en, qn = qn),
         preparatorParams = PPreparator1.Params(1),
         algorithmParamsList = Seq(
-              ("PAlgo2", PAlgo2.Params(20)),
-              ("PAlgo2", PAlgo2.Params(21)),
-              ("PAlgo3", PAlgo3.Params(22))
-          ),
+            ("PAlgo2", PAlgo2.Params(20)),
+            ("PAlgo2", PAlgo2.Params(21)),
+            ("PAlgo3", PAlgo3.Params(22))
+        ),
         servingParams = LServing1.Params(3))
 
     val algoCount = engineParams.algorithmParamsList.size
@@ -154,8 +154,8 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
       baseEngineParams.copy(algorithmParamsList = Seq(("", PAlgo2.Params(3))))
     // ep2.dataSource is different from ep0.
     val ep2 = baseEngineParams.copy(
-        dataSourceParams = ("",
-                            new PDataSource4.Params(id = 0, en = en, qn = qn)),
+        dataSourceParams =
+          ("", new PDataSource4.Params(id = 0, en = en, qn = qn)),
         algorithmParamsList = Seq(("", PAlgo2.Params(3))))
 
     val engineEvalDataSet =

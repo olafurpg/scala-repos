@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class FilteredDStream[T : ClassTag](
+private[streaming] class FilteredDStream[T: ClassTag](
     parent: DStream[T],
     filterFunc: T => Boolean
 )

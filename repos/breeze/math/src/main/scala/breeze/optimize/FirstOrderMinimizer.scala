@@ -16,15 +16,15 @@ import FirstOrderMinimizer.ConvergenceCheck
 abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
     val convergenceCheck: ConvergenceCheck[T])(
     implicit space: NormedModule[T, Double])
-    extends Minimizer[T, DF] with SerializableLogging {
+    extends Minimizer[T, DF]
+    with SerializableLogging {
 
   def this(maxIter: Int = -1,
            tolerance: Double = 1E-6,
            fvalMemory: Int = 100,
            relativeTolerance: Boolean = true)(
       implicit space: NormedModule[T, Double]) =
-    this(
-        FirstOrderMinimizer.defaultConvergenceCheck[T](
+    this(FirstOrderMinimizer.defaultConvergenceCheck[T](
             maxIter, tolerance, relativeTolerance, fvalMemory))
 
   /**
@@ -288,7 +288,8 @@ object FirstOrderMinimizer {
 
     override def apply(state: State[T, _, _],
                        info: IndexedSeq[Double]): Option[ConvergenceReason] = {
-      if (info.length >= 2 && (state.adjustedValue - info.max).abs <= tolerance *
+      if (info.length >= 2 &&
+          (state.adjustedValue - info.max).abs <= tolerance *
           (if (relative) state.initialAdjVal else 1.0)) {
         Some(FunctionValuesConverged)
       } else {
@@ -304,11 +305,11 @@ object FirstOrderMinimizer {
     import space.normImpl
     ConvergenceCheck.fromPartialFunction[T] {
       case s: State[T, _, _]
-          if
-          (norm(s.adjustedGradient) <= math.max(tolerance *
-                                                (if (relative) s.adjustedValue
-                                                 else 1.0),
-                                                1E-8)) =>
+          if (norm(s.adjustedGradient) <= math.max(tolerance *
+                                                   (if (relative)
+                                                      s.adjustedValue
+                                                    else 1.0),
+                                                   1E-8)) =>
         GradientConverged
     }
   }
@@ -338,7 +339,8 @@ object FirstOrderMinimizer {
                                            numFailures: Int,
                                            improvementRequirement: Double,
                                            evalFrequency: Int)
-      extends ConvergenceCheck[T] with SerializableLogging {
+      extends ConvergenceCheck[T]
+      with SerializableLogging {
     case class Info(bestValue: Double, numFailures: Int)
 
     override def update(newX: T,
@@ -451,8 +453,9 @@ object FirstOrderMinimizer {
       val r =
         if (useL1) {
           new AdaptiveGradientDescent.L1Regularization[T](
-              regularization, eta = alpha, maxIter = maxIterations)(
-              space, random)
+              regularization,
+              eta = alpha,
+              maxIter = maxIterations)(space, random)
         } else {
           // L2
           new AdaptiveGradientDescent.L2Regularization[T](

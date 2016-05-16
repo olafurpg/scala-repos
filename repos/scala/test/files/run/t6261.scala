@@ -112,9 +112,7 @@ package scala.collection.immutable {
     def validate(x: HashMap[_, _]) {
       x match {
         case m: HashMap.HashTrieMap[_, _] =>
-          require(
-              m.elems.size > 1 ||
-              (m.elems.size == 1 &&
+          require(m.elems.size > 1 || (m.elems.size == 1 &&
                   m.elems(0).isInstanceOf[HashMap.HashTrieMap[_, _]]))
           m.elems.foreach(validate _)
         case m: HashMap.HashMapCollision1[_, _] =>

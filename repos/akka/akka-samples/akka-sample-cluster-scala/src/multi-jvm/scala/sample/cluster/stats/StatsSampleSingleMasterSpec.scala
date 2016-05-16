@@ -76,8 +76,11 @@ class StatsSampleSingleMasterSpecMultiJvmNode3
     extends StatsSampleSingleMasterSpec
 
 abstract class StatsSampleSingleMasterSpec
-    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSingleMasterSpecConfig._
 
@@ -103,12 +106,13 @@ abstract class StatsSampleSingleMasterSpec
 
       Cluster(system).unsubscribe(testActor)
 
-      system.actorOf(ClusterSingletonManager.props(
-                         singletonProps = Props[StatsService],
-                         terminationMessage = PoisonPill,
-                         settings = ClusterSingletonManagerSettings(system)
-                             .withRole("compute")),
-                     name = "statsService")
+      system.actorOf(
+          ClusterSingletonManager.props(
+              singletonProps = Props[StatsService],
+              terminationMessage = PoisonPill,
+              settings =
+                ClusterSingletonManagerSettings(system).withRole("compute")),
+          name = "statsService")
 
       system.actorOf(
           ClusterSingletonProxy.props(

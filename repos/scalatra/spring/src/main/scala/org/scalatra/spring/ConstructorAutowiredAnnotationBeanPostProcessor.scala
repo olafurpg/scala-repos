@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component
 @Component
 class ConstructorAutowiredAnnotationBeanPostProcessor
     extends InstantiationAwareBeanPostProcessorAdapter
-    with org.springframework.core.Ordered with Logging {
+    with org.springframework.core.Ordered
+    with Logging {
 
   logger.error("Configured for Scala constructor support")
 

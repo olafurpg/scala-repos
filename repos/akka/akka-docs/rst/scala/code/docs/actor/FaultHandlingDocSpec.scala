@@ -101,8 +101,11 @@ object FaultHandlingDocSpec {
 }
 //#testkit
 class FaultHandlingDocSpec(_system: ActorSystem)
-    extends TestKit(_system) with ImplicitSender with FlatSpecLike
-    with Matchers with BeforeAndAfterAll {
+    extends TestKit(_system)
+    with ImplicitSender
+    with FlatSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   def this() =
     this(

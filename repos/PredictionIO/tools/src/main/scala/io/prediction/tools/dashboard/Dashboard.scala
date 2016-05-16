@@ -68,13 +68,16 @@ object Dashboard extends Logging with SSLConfiguration {
 }
 
 class DashboardActor(val dc: DashboardConfig)
-    extends Actor with DashboardService {
+    extends Actor
+    with DashboardService {
   def actorRefFactory: ActorContext = context
   def receive: Actor.Receive = runRoute(dashboardRoute)
 }
 
 trait DashboardService
-    extends HttpService with KeyAuthentication with CORSSupport {
+    extends HttpService
+    with KeyAuthentication
+    with CORSSupport {
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
   val dc: DashboardConfig

@@ -1,7 +1,7 @@
 import scala.reflect.runtime.universe._
 
 object Test extends App {
-  def inferredType[T : TypeTag](v: T) = println(typeOf[T])
+  def inferredType[T: TypeTag](v: T) = println(typeOf[T])
 
   trait A
   trait B

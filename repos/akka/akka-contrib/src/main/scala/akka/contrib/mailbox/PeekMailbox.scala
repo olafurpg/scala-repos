@@ -11,7 +11,8 @@ import akka.actor.{ActorContext, ActorRef, ActorSystem, ExtendedActorSystem, Ext
 import akka.dispatch.{Envelope, MailboxType, MessageQueue, UnboundedQueueBasedMessageQueue}
 
 object PeekMailboxExtension
-    extends ExtensionId[PeekMailboxExtension] with ExtensionIdProvider {
+    extends ExtensionId[PeekMailboxExtension]
+    with ExtensionIdProvider {
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new PeekMailboxExtension(s)
 

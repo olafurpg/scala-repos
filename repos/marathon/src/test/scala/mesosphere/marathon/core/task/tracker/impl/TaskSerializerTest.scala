@@ -11,7 +11,10 @@ import org.apache.mesos.{Protos => MesosProtos}
 import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 class TaskSerializerTest
-    extends FunSuite with Mockito with Matchers with GivenWhenThen {
+    extends FunSuite
+    with Mockito
+    with Matchers
+    with GivenWhenThen {
   import scala.collection.JavaConverters._
   val f = new Fixture
 
@@ -188,7 +191,7 @@ class TaskSerializerTest
                 .newBuilder()
                 .setIpAddress("1.2.3.4"))
           .build()
-      )
+    )
     val fullSampleTaskStateWithoutNetworking: Task.LaunchedOnReservation =
       Task.LaunchedOnReservation(
           taskId,
@@ -197,14 +200,14 @@ class TaskSerializerTest
                          attributes = sampleAttributes),
           appVersion = appVersion,
           status = Task.Status(
-                stagedAt = Timestamp(stagedAtLong),
-                startedAt = Some(Timestamp(startedAtLong)),
-                mesosStatus = Some(sampleTaskStatus)
-            ),
+              stagedAt = Timestamp(stagedAtLong),
+              startedAt = Some(Timestamp(startedAtLong)),
+              mesosStatus = Some(sampleTaskStatus)
+          ),
           networking = Task.NoNetworking,
           reservation = Task.Reservation(
-                Seq(LocalVolumeId(appId, "my-volume", "uuid-123")),
-                Task.Reservation.State.Launched)
+              Seq(LocalVolumeId(appId, "my-volume", "uuid-123")),
+              Task.Reservation.State.Launched)
       )
 
     val completeTask = MarathonTask
@@ -280,19 +283,19 @@ class TaskSerializerTest
           .build()
 
       def reservedState =
-        Task
-          .Reserved(
+        Task.Reserved(
             Task.Id(taskId.idString),
             Task.AgentInfo(host = host, agentId = Some(agentId), attributes),
-            reservation = Task.Reservation(
+            reservation =
+              Task.Reservation(
                   localVolumeIds,
                   Task.Reservation.State
                     .New(
-                      Some(
-                          Task.Reservation.Timeout(
+                      Some(Task.Reservation.Timeout(
                               initiated = now,
                               deadline = now + 1.minute,
-                              reason = Task.Reservation.Timeout.Reason.ReservationTimeout))))
+                              reason =
+                                Task.Reservation.Timeout.Reason.ReservationTimeout))))
         )
 
       def launchedEphemeralProto =

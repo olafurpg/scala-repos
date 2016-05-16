@@ -127,7 +127,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getHeaders.get("Content-Type") must_==
-      ("fake/contenttype; charset=utf-8")
+        ("fake/contenttype; charset=utf-8")
     }
 
     "Have form params on POST of content type application/x-www-form-urlencoded" in new WithApplication {
@@ -136,7 +136,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .withBody(Map("param1" -> Seq("value1")))
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
-        (new String(req.getByteData, "UTF-8")) must_== ("param1=value1")
+      (new String(req.getByteData, "UTF-8")) must_== ("param1=value1")
     }
 
     "Have form body on POST of content type text/plain" in new WithApplication {
@@ -148,7 +148,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
 
-        (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD")
+      (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD")
       val headers = req.getHeaders
       headers.get("Content-Length") must beNull
     }
@@ -161,7 +161,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .withBody("HELLO WORLD") // and body is set to string (see #5221)
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
-        (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD") // should result in byte data.
+      (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD") // should result in byte data.
     }
 
     "Have form params on POST of content type application/x-www-form-urlencoded when signed" in new WithApplication {
@@ -196,7 +196,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
 
-        (new String(req.getByteData, "UTF-8")) must be_==("param1=value1") // should result in byte data.
+      (new String(req.getByteData, "UTF-8")) must be_==("param1=value1") // should result in byte data.
 
       val headers = req.getHeaders
       headers.get("Content-Length") must_== ("9001")
@@ -231,7 +231,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getHeaders.get("Content-Type") must_==
-      ("text/plain; charset=US-ASCII")
+        ("text/plain; charset=US-ASCII")
     }
 
     "Only send first content type header if two are sent" in new WithApplication {

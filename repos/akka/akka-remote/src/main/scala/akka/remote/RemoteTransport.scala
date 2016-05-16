@@ -24,7 +24,8 @@ class RemoteTransportException(message: String, cause: Throwable)
   */
 @SerialVersionUID(1L)
 class RemoteTransportExceptionNoStackTrace(message: String, cause: Throwable)
-    extends RemoteTransportException(message, cause) with NoStackTrace
+    extends RemoteTransportException(message, cause)
+    with NoStackTrace
 
 /**
   * INTERNAL API

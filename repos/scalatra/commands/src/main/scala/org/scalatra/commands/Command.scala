@@ -73,12 +73,12 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     _errors = bindings.values.filter(_.isInvalid).toSeq
   }
 
-  implicit def binding2field[T : Manifest : TypeConverterFactory](
+  implicit def binding2field[T: Manifest: TypeConverterFactory](
       field: FieldDescriptor[T]): Field[T] = {
     new Field(bind(field), this)
   }
 
-  implicit def autoBind[T : Manifest : TypeConverterFactory](
+  implicit def autoBind[T: Manifest: TypeConverterFactory](
       fieldName: String): Field[T] =
     bind[T](FieldDescriptor[T](fieldName))
 
@@ -134,45 +134,46 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     : this.type = {
     doBeforeBindingActions()
 
-    bindings = bindings map {
-      case (name, b) =>
-        val tcf = b.typeConverterFactory
-        val cv = typeConverterBuilder(
-            tcf.asInstanceOf[CommandTypeConverterFactory[_]])(data)
-          .asInstanceOf[TypeConverter[I, b.T]]
-        val fieldBinding =
-          Binding(b.field, cv, b.typeConverterFactory)(mi, b.valueManifest)
+    bindings =
+      bindings map {
+        case (name, b) =>
+          val tcf = b.typeConverterFactory
+          val cv = typeConverterBuilder(
+              tcf.asInstanceOf[CommandTypeConverterFactory[_]])(data)
+            .asInstanceOf[TypeConverter[I, b.T]]
+          val fieldBinding =
+            Binding(b.field, cv, b.typeConverterFactory)(mi, b.valueManifest)
 
-        val result = b.field.valueSource match {
-          case ValueSource.Body =>
-            fieldBinding(
-                data
-                  .read(name)
-                  .right
-                  .map(_ map (_.asInstanceOf[fieldBinding.S])))
-          case ValueSource.Header =>
-            val tc: TypeConverter[String, _] = tcf.resolveStringParams
-            val headersBinding =
-              Binding(b.field,
-                      tc.asInstanceOf[TypeConverter[String, b.T]],
-                      tcf)(manifest[String], b.valueManifest)
-            headersBinding(
-                Right(headers.get(name).map(_.asInstanceOf[headersBinding.S])))
-          case ValueSource.Path | ValueSource.Query =>
-            val pv = typeConverterBuilder(
-                tcf.asInstanceOf[CommandTypeConverterFactory[_]])(params)
-              .asInstanceOf[TypeConverter[Seq[String], b.T]]
-            val paramsBinding = Binding(b.field, pv, b.typeConverterFactory)(
-                manifest[Seq[String]], b.valueManifest)
-            paramsBinding(
-                params
-                  .read(name)
-                  .right
-                  .map(_ map (_.asInstanceOf[paramsBinding.S])))
-        }
+          val result = b.field.valueSource match {
+            case ValueSource.Body =>
+              fieldBinding(
+                  data
+                    .read(name)
+                    .right
+                    .map(_ map (_.asInstanceOf[fieldBinding.S])))
+            case ValueSource.Header =>
+              val tc: TypeConverter[String, _] = tcf.resolveStringParams
+              val headersBinding =
+                Binding(b.field,
+                        tc.asInstanceOf[TypeConverter[String, b.T]],
+                        tcf)(manifest[String], b.valueManifest)
+              headersBinding(Right(
+                      headers.get(name).map(_.asInstanceOf[headersBinding.S])))
+            case ValueSource.Path | ValueSource.Query =>
+              val pv = typeConverterBuilder(
+                  tcf.asInstanceOf[CommandTypeConverterFactory[_]])(params)
+                .asInstanceOf[TypeConverter[Seq[String], b.T]]
+              val paramsBinding = Binding(b.field, pv, b.typeConverterFactory)(
+                  manifest[Seq[String]], b.valueManifest)
+              paramsBinding(
+                  params
+                    .read(name)
+                    .right
+                    .map(_ map (_.asInstanceOf[paramsBinding.S])))
+          }
 
-        name -> result
-    }
+          name -> result
+      }
 
     // Defer validation until after all the fields have been bound.
     bindings = bindings map { case (k, v) => k -> v.validate }
@@ -188,8 +189,8 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
   override def toString: String =
     "%s(bindings: [%s])".format(getClass.getName, bindings.mkString(", "))
 
-  private type ExecutorView[S] = (this.type => S) => CommandExecutor[
-      this.type, S]
+  private type ExecutorView[S] =
+    (this.type => S) => CommandExecutor[this.type, S]
   def apply[S](handler: this.type => S)(implicit executor: ExecutorView[S]) =
     handler.execute(this)
   def execute[S](handler: this.type => S)(implicit executor: ExecutorView[S]) =

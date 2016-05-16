@@ -17,7 +17,8 @@ import org.jetbrains.sbt.resolvers.SbtResolverIndexesManager
   * @since 7/17/14.
   */
 abstract class CompletionTestBase
-    extends completion.CompletionTestBase with MockSbt {
+    extends completion.CompletionTestBase
+    with MockSbt {
 
   override def folderPath = super.folderPath + "Sbt/"
   override def testFileExt = ".sbt"

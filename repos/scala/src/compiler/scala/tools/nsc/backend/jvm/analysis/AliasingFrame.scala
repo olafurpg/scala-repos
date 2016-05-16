@@ -646,25 +646,27 @@ object AliasSet {
         val end = xs.length * 64
 
         while (i < end && {
-          val index = i >> 6
-          if (xs(index) == 0l) {
-            // boom. for nullness, this saves 35% of the overall analysis time.
-            i = ((index + 1) << 6) -
-            1 // -1 required because i is incremented in the loop body
-            true
-          } else {
-            val mask = 1l << i
-            // if (mask > xs(index)) we could also advance i to the next value, but that didn't pay off in benchmarks
-            val thisHasI = (xs(index) & mask) != 0l
-            !thisHasI || {
-              val otherHasI =
-                i == notA || i == notB || i == notC || i == notD ||
-                (notXs != null && index < notXs.length && (notXs(index) & mask) != 0l)
-              if (otherHasI) setThisAndOther(i)
-              otherHasI
-            }
-          }
-        }) i += 1
+                 val index = i >> 6
+                 if (xs(index) == 0l) {
+                   // boom. for nullness, this saves 35% of the overall analysis time.
+                   i =
+                     ((index + 1) << 6) -
+                     1 // -1 required because i is incremented in the loop body
+                   true
+                 } else {
+                   val mask = 1l << i
+                   // if (mask > xs(index)) we could also advance i to the next value, but that didn't pay off in benchmarks
+                   val thisHasI = (xs(index) & mask) != 0l
+                   !thisHasI || {
+                     val otherHasI =
+                       i == notA || i == notB || i == notC || i == notD ||
+                       (notXs != null && index < notXs.length &&
+                           (notXs(index) & mask) != 0l)
+                     if (otherHasI) setThisAndOther(i)
+                     otherHasI
+                   }
+                 }
+               }) i += 1
 
         iValid = i < end
         iValid

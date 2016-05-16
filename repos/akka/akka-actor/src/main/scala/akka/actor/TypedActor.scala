@@ -106,7 +106,8 @@ trait TypedActorFactory {
   * This represents the TypedActor Akka Extension, access to the functionality is done through a given ActorSystem.
   */
 object TypedActor
-    extends ExtensionId[TypedActorExtension] with ExtensionIdProvider {
+    extends ExtensionId[TypedActorExtension]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): TypedActorExtension =
     super.get(system)
 
@@ -182,7 +183,8 @@ object TypedActor
           val p = ps(i)
           val s = serialization.findSerializerFor(p)
           val m = if (s.includeManifest) p.getClass else null
-          serializedParameters(i) = (s.identifier, m, s toBinary parameters(i)) //Mutable for the sake of sanity
+          serializedParameters(i) =
+            (s.identifier, m, s toBinary parameters(i)) //Mutable for the sake of sanity
         }
 
         SerializedMethodCall(method.getDeclaringClass,
@@ -466,7 +468,8 @@ object TypedActor
       @transient val extension: TypedActorExtension,
       @transient val actorVar: AtomVar[ActorRef],
       @transient val timeout: Timeout)
-      extends InvocationHandler with Serializable {
+      extends InvocationHandler
+      with Serializable {
 
     def actor = actorVar.get
     @throws(classOf[Throwable])
@@ -591,7 +594,7 @@ object TypedProps {
     *
     * Scala API
     */
-  def apply[T <: AnyRef : ClassTag](): TypedProps[T] =
+  def apply[T <: AnyRef: ClassTag](): TypedProps[T] =
     new TypedProps[T](
         implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
 
@@ -728,7 +731,8 @@ final case class ContextualTypedActorFactory(
 }
 
 class TypedActorExtension(val system: ExtendedActorSystem)
-    extends TypedActorFactory with Extension {
+    extends TypedActorFactory
+    with Extension {
   import TypedActor._ //Import the goodies from the companion object
   protected def actorFactory: ActorRefFactory = system
   protected def typedActor = this

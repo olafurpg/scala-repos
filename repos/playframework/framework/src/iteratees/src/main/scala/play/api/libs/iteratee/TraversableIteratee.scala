@@ -67,8 +67,8 @@ object Traversable {
     }
   }
 
-  def take[M](
-      count: Int)(implicit p: M => scala.collection.TraversableLike[_, M])
+  def take[M](count: Int)(
+      implicit p: M => scala.collection.TraversableLike[_, M])
     : Enumeratee[M, M] = new Enumeratee[M, M] {
 
     def applyOn[A](it: Iteratee[M, A]): Iteratee[M, Iteratee[M, A]] = {
@@ -139,8 +139,8 @@ object Traversable {
     def continue[A](k: K[M, A]) = Cont(step(k))
   }
 
-  def drop[M](
-      count: Int)(implicit p: M => scala.collection.TraversableLike[_, M])
+  def drop[M](count: Int)(
+      implicit p: M => scala.collection.TraversableLike[_, M])
     : Enumeratee[M, M] = new Enumeratee[M, M] {
 
     def applyOn[A](inner: Iteratee[M, A]): Iteratee[M, Iteratee[M, A]] = {

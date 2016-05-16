@@ -85,13 +85,15 @@ private[sql] object JDBCRelation {
   }
 }
 
-private[sql] case class JDBCRelation(url: String,
-                                     table: String,
-                                     parts: Array[Partition],
-                                     properties: Properties = new Properties(
-                                           ))(
-    @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedFilteredScan with InsertableRelation {
+private[sql] case class JDBCRelation(
+    url: String,
+    table: String,
+    parts: Array[Partition],
+    properties: Properties = new Properties(
+        ))(@transient val sqlContext: SQLContext)
+    extends BaseRelation
+    with PrunedFilteredScan
+    with InsertableRelation {
 
   override val needConversion: Boolean = false
 

@@ -107,7 +107,8 @@ object PathTransition extends AnimationStatics {
   */
 class PathTransition(
     override val delegate: jfxa.PathTransition = new jfxa.PathTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.PathTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.PathTransition] {
 
   /**
     * $CONSTR

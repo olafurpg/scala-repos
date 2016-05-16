@@ -111,15 +111,15 @@ abstract class IntroduceParameterTestBase
             val data = collectedData.get.copy(
                 paramName = paramName, replaceAll = replaceAllOccurrences)
 
-            val paramInfo =
-              new ScalaParameterInfo(data.paramName,
-                                     -1,
-                                     data.tp,
-                                     project,
-                                     false,
-                                     false,
-                                     data.defaultArg,
-                                     isIntroducedParameter = true)
+            val paramInfo = new ScalaParameterInfo(data.paramName,
+                                                   -1,
+                                                   data.tp,
+                                                   project,
+                                                   false,
+                                                   false,
+                                                   data.defaultArg,
+                                                   isIntroducedParameter =
+                                                     true)
             val descriptor: ScalaMethodDescriptor =
               handler.createMethodDescriptor(data.methodToSearchFor, paramInfo)
             val changeInfo = new ScalaChangeInfo(descriptor.getVisibility,

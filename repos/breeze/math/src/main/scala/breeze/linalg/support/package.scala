@@ -25,8 +25,8 @@ package breeze.linalg
   **/
 package object support {
   type CanMapValues[From, A, B, To] = mapValues.Impl2[From, A => B, To]
-  type CanMapActiveValues[From, A, B, To] = mapActiveValues.Impl2[
-      From, A => B, To]
+  type CanMapActiveValues[From, A, B, To] =
+    mapActiveValues.Impl2[From, A => B, To]
 
   val CanMapValues: mapValues.type = mapValues
 }

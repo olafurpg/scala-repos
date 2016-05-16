@@ -52,7 +52,7 @@ class MoreAnyRefs {
 
 @deprecated("Suppress warnings", since = "2.11")
 object Test {
-  def returnTypes[T : Manifest] =
+  def returnTypes[T: Manifest] =
     (manifest[T].runtimeClass.getMethods.toList filter
         (_.getName startsWith "f") sortBy (_.getName) map
         (m => m.getName + ": " + m.getGenericReturnType.toString))

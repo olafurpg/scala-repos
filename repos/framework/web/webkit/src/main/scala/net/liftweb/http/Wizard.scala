@@ -35,8 +35,8 @@ object WizardRules extends Factory with FormVendor {
   private def m[T](implicit man: Manifest[T]): Manifest[T] = man
 
   val allTemplatePath: FactoryMaker[List[String]] =
-    new FactoryMaker[List[String]](
-        () => List("templates-hidden", "wizard-all")) {}
+    new FactoryMaker[List[String]](() =>
+          List("templates-hidden", "wizard-all")) {}
 
   private object currentWizards extends SessionVar[Set[String]](Set())
 
@@ -185,12 +185,10 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
       if (!ajaxForms_?) {
         val localSnapshot = createSnapshot
         // val notices = S.getAllNotices
-        S.seeOther(S.uri,
-                   () =>
-                     {
-                       // S.appendNotices(notices)
-                       localSnapshot.restore
-                   })
+        S.seeOther(S.uri, () => {
+          // S.appendNotices(notices)
+          localSnapshot.restore
+        })
       }
     }
 
@@ -261,22 +259,19 @@ trait Wizard extends StatefulSnippet with Factory with ScreenWizardRendered {
         theScreen.screenBottom, // screenBottom: Box[Elem],
         wizardBottom, //wizardBottom: Box[Elem],
         nextId ->
-        (() =>
-              {
-                this.nextScreen()
-                // if (currentScreen.isEmpty) S.seeOther(Referer.is)
+        (() => {
+              this.nextScreen()
+              // if (currentScreen.isEmpty) S.seeOther(Referer.is)
             }), // nextId: (String, () => Unit),
         Full(
             prevId ->
-            (() =>
-                  {
-                this.prevScreen
+            (() => {
+              this.prevScreen
             })), // prevId: Box[(String, () => Unit)],
         cancelId ->
-        (() =>
-              {
-                WizardRules.deregisterWizardSession(CurrentSession.is);
-                redirectBack()
+        (() => {
+              WizardRules.deregisterWizardSession(CurrentSession.is);
+              redirectBack()
             }), //cancelId: (String, () => Unit),
         theScreen,
         ajaxForms_?)

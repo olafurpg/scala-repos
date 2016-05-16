@@ -106,7 +106,8 @@ private[camel] class ConsumerConfig(
     val replyTimeout: FiniteDuration,
     val autoAck: Boolean,
     val onRouteDefinition: RouteDefinition ⇒ ProcessorDefinition[_])
-    extends NoSerializationVerificationNeeded with scala.Serializable
+    extends NoSerializationVerificationNeeded
+    with scala.Serializable
 
 private[camel] object ConsumerConfig {
   def apply(activationTimeout: FiniteDuration,

@@ -10,7 +10,7 @@ import Prop._
 trait MonadFilterTests[F[_]] extends MonadTests[F] {
   def laws: MonadFilterLaws[F]
 
-  def monadFilter[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def monadFilter[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

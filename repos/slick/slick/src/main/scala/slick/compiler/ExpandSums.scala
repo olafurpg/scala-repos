@@ -93,8 +93,7 @@ class ExpandSums extends Phase {
               val ifEmpty2 = silentCast(ifDefined.nodeType.structural, ifEmpty)
               if (left == Disc1) ifDefined
               else
-                IfThenElse(
-                    ConstArray(
+                IfThenElse(ConstArray(
                         Library.Not.typed[Boolean](pred), ifDefined, ifEmpty2))
           }
           n2.infer()
@@ -215,7 +214,7 @@ class ExpandSums extends Phase {
           case Ref(s) if s == sym => sideInCondition
         }, bottomUp = true)
         .infer()
-        (extend, on2, createDisc)
+      (extend, on2, createDisc)
     }
 
     // Translate the join depending on JoinType and Option type

@@ -216,8 +216,9 @@ trait Checkable { self: Analyzer =>
   private object CheckabilityChecker {
 
     /** Are these symbols classes with no subclass relationship? */
-    def areUnrelatedClasses(sym1: Symbol, sym2: Symbol) = (sym1.isClass &&
-        sym2.isClass && !(sym1 isSubClass sym2) && !(sym2 isSubClass sym1))
+    def areUnrelatedClasses(sym1: Symbol, sym2: Symbol) =
+      (sym1.isClass && sym2.isClass && !(sym1 isSubClass sym2) &&
+          !(sym2 isSubClass sym1))
 
     /** Are all children of these symbols pairwise irreconcilable? */
     def allChildrenAreIrreconcilable(sym1: Symbol, sym2: Symbol) =
@@ -294,14 +295,14 @@ trait Checkable { self: Analyzer =>
 
     def isUncheckable(P0: Type) = !isCheckable(P0)
 
-    def isCheckable(P0: Type): Boolean = (uncheckedOk(P0) ||
-        (P0.widen match {
-              case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
-                false
-              case RefinedType(_, decls) if !decls.isEmpty => false
-              case RefinedType(parents, _) => parents forall isCheckable
-              case p => new CheckabilityChecker(AnyTpe, p) isCheckable
-            }))
+    def isCheckable(P0: Type): Boolean =
+      (uncheckedOk(P0) || (P0.widen match {
+                case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
+                  false
+                case RefinedType(_, decls) if !decls.isEmpty => false
+                case RefinedType(parents, _) => parents forall isCheckable
+                case p => new CheckabilityChecker(AnyTpe, p) isCheckable
+              }))
 
     /** TODO: much better error positions.
       *  Kind of stuck right now because they just pass us the one tree.

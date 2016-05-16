@@ -51,23 +51,27 @@ import scalaz.std.anyVal._
 import scalaz.std.list._
 import scalaz.syntax.traverse._
 
-final class NIHDBPerfTestRunner[T](
-    val timer: Timer[T],
-    val apiKey: APIKey,
-    val optimize: Boolean,
-    _rootDir: Option[File],
-    testTimeout: Duration = Duration(120, "seconds"))
+final class NIHDBPerfTestRunner[T](val timer: Timer[T],
+                                   val apiKey: APIKey,
+                                   val optimize: Boolean,
+                                   _rootDir: Option[File],
+                                   testTimeout: Duration = Duration(
+                                       120, "seconds"))
     extends EvaluatingPerfTestRunner[Future, T]
-    with SecureVFSModule[Future, Slice] with ActorVFSModule
+    with SecureVFSModule[Future, Slice]
+    with ActorVFSModule
     with VFSColumnarTableModule
-    with XLightWebHttpClientModule[Future] with NIHDBIngestSupport {
+    with XLightWebHttpClientModule[Future]
+    with NIHDBIngestSupport {
   self =>
   // with StandaloneActorProjectionSystem
   // with SliceColumnarTableModule[Future, Array[Byte]] { self =>
 
   trait NIHDBPerfTestRunnerConfig
-      extends BaseConfig with EvaluatingPerfTestRunnerConfig
-      with BlockStoreColumnarTableModuleConfig with EvaluatorConfig
+      extends BaseConfig
+      with EvaluatingPerfTestRunnerConfig
+      with BlockStoreColumnarTableModuleConfig
+      with EvaluatorConfig
 
   implicit val actorSystem = ActorSystem("NIHDBPerfTestRunner")
   implicit val M = new UnsafeFutureComonad(actorSystem.dispatcher, testTimeout)

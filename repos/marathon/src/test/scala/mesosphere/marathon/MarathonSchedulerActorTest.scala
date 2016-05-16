@@ -36,8 +36,12 @@ import scala.concurrent.{ExecutionContext, Promise, Future}
 import scala.concurrent.duration._
 
 class MarathonSchedulerActorTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Matchers with ImplicitSender with test.Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
+    with Matchers
+    with ImplicitSender
+    with test.Mockito {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -593,8 +597,8 @@ class MarathonSchedulerActorTest
               hcManager,
               system.eventStream
           ))
-    historyActorProps = Props(
-        new HistoryActor(system.eventStream, taskFailureEventRepository))
+    historyActorProps =
+      Props(new HistoryActor(system.eventStream, taskFailureEventRepository))
     schedulerActions = ref =>
       new SchedulerActions(repo,
                            groupRepo,

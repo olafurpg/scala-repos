@@ -121,12 +121,12 @@ private[sql] object StatFunctions extends Logging {
     *              (excluding the head buffer)
     * @param headSampled a buffer of latest samples seen so far
     */
-  class QuantileSummaries(
-      val compressThreshold: Int,
-      val relativeError: Double,
-      val sampled: ArrayBuffer[Stats] = ArrayBuffer.empty,
-      private[stat] var count: Long = 0L,
-      val headSampled: ArrayBuffer[Double] = ArrayBuffer.empty)
+  class QuantileSummaries(val compressThreshold: Int,
+                          val relativeError: Double,
+                          val sampled: ArrayBuffer[Stats] = ArrayBuffer.empty,
+                          private[stat] var count: Long = 0L,
+                          val headSampled: ArrayBuffer[Double] =
+                            ArrayBuffer.empty)
       extends Serializable {
 
     import QuantileSummaries._
@@ -169,7 +169,7 @@ private[sql] object StatFunctions extends Logging {
         val currentSample = sorted(opsIdx)
         // Add all the samples before the next observation.
         while (sampleIdx < sampled.size &&
-        sampled(sampleIdx).value <= currentSample) {
+               sampled(sampleIdx).value <= currentSample) {
           newSamples.append(sampled(sampleIdx))
           sampleIdx += 1
         }
@@ -210,9 +210,9 @@ private[sql] object StatFunctions extends Logging {
       val inserted = this.withHeadBufferInserted
       assert(inserted.headSampled.isEmpty)
       assert(inserted.count == count + headSampled.size)
-      val compressed = compressImmut(
-          inserted.sampled,
-          mergeThreshold = 2 * relativeError * inserted.count)
+      val compressed = compressImmut(inserted.sampled,
+                                     mergeThreshold =
+                                       2 * relativeError * inserted.count)
       new QuantileSummaries(
           compressThreshold, relativeError, compressed, inserted.count)
     }
@@ -422,15 +422,11 @@ private[sql] object StatFunctions extends Logging {
     df.select(columns: _*)
       .queryExecution
       .toRdd
-      .aggregate(new CovarianceCounter)(
-          seqOp = (counter, row) =>
-              {
-              counter.add(row.getDouble(0), row.getDouble(1))
-          },
-          combOp = (baseCounter, other) =>
-              {
-              baseCounter.merge(other)
-          })
+      .aggregate(new CovarianceCounter)(seqOp = (counter, row) => {
+        counter.add(row.getDouble(0), row.getDouble(1))
+      }, combOp = (baseCounter, other) => {
+        baseCounter.merge(other)
+      })
   }
 
   /**

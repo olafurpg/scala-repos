@@ -83,10 +83,10 @@ trait PerfTestSuite extends Logging {
       pred: (List[String], PerfTest) => Boolean): Option[Tree[PerfTest]] =
     selectTest(test, pred)
 
-  protected def run[M[+ _], T : MetricSpace](test: Tree[PerfTest] = test,
-                                             runner: PerfTestRunner[M, T],
-                                             runs: Int = 60,
-                                             outliers: Double = 0.05) = {
+  protected def run[M[+ _], T: MetricSpace](test: Tree[PerfTest] = test,
+                                            runner: PerfTestRunner[M, T],
+                                            runs: Int = 60,
+                                            outliers: Double = 0.05) = {
     val tails = (runs * (outliers / 2)).toInt
 
     runner.runAll(test, runs) {
@@ -148,8 +148,7 @@ trait PerfTestSuite extends Logging {
               val delta =
                 BaselineComparisons.compareWithBaseline(result, baseline)
 
-              withPrinter(
-                  _.println(config.format match {
+              withPrinter(_.println(config.format match {
                 case OutputFormat.Legible =>
                   delta.toPrettyString
 
@@ -191,9 +190,9 @@ trait PerfTestSuite extends Logging {
     * Selects a test based on paths, using select to determine which sub-trees
     * should be included.
     */
-  private def selectTest(test: Tree[PerfTest],
-                         select: (List[String],
-                         PerfTest) => Boolean): Option[Tree[PerfTest]] = {
+  private def selectTest(
+      test: Tree[PerfTest],
+      select: (List[String], PerfTest) => Boolean): Option[Tree[PerfTest]] = {
 
     @tailrec
     def find(loc: TreeLoc[PerfTest],

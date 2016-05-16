@@ -18,11 +18,10 @@ class LeastSquaresTest extends WordSpec with Matchers {
     "handle trickier case" in {
       val a = new DenseMatrix[Double](100, 2)
       val b = new DenseVector(new Array[Double](100))
-      cfor(0)(i => i < 100, i => i + 1)(i =>
-            {
-          a.update(i, 0, i)
-          a.update(i, 1, 1)
-          b.update(i, 2 * i + 5 + math.random * 0.01)
+      cfor(0)(i => i < 100, i => i + 1)(i => {
+        a.update(i, 0, i)
+        a.update(i, 1, 1)
+        b.update(i, 2 * i + 5 + math.random * 0.01)
       })
       val result = leastSquares(a, b)
       assert(norm(result.coefficients - DenseVector(2.0, 5.0)) < 1e-2,

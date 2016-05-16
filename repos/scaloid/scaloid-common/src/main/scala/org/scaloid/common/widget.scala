@@ -431,11 +431,11 @@ class SArrayAdapter[V <: android.view.View, T <: AnyRef](
 
 object SArrayAdapter {
 
-  def apply[T <: AnyRef : Manifest](items: T*)(
+  def apply[T <: AnyRef: Manifest](items: T*)(
       implicit context: Context): SArrayAdapter[TextView, T] =
     new SArrayAdapter[TextView, T](java.util.Arrays.asList[T](items: _*))
 
-  def apply[T <: AnyRef : Manifest](textViewResourceId: Int, items: T*)(
+  def apply[T <: AnyRef: Manifest](textViewResourceId: Int, items: T*)(
       implicit context: Context): SArrayAdapter[TextView, T] =
     new SArrayAdapter[TextView, T](
         java.util.Arrays.asList(items: _*), textViewResourceId)
@@ -760,7 +760,8 @@ trait TraitListView[This <: android.widget.ListView]
   */
 class SListView()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.ListView(context) with TraitListView[SListView] {
+    extends android.widget.ListView(context)
+    with TraitListView[SListView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -812,7 +813,8 @@ trait TraitEditText[This <: android.widget.EditText]
   */
 class SEditText()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.EditText(context) with TraitEditText[SEditText] {
+    extends android.widget.EditText(context)
+    with TraitEditText[SEditText] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -1124,7 +1126,8 @@ trait TraitImageView[This <: android.widget.ImageView]
   */
 class SImageView()(implicit context: android.content.Context,
                    parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.ImageView(context) with TraitImageView[SImageView] {
+    extends android.widget.ImageView(context)
+    with TraitImageView[SImageView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -1753,7 +1756,8 @@ trait TraitTabHost[This <: android.widget.TabHost]
   */
 class STabHost()(implicit context: android.content.Context,
                  parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.TabHost(context) with TraitTabHost[STabHost] {
+    extends android.widget.TabHost(context)
+    with TraitTabHost[STabHost] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -2160,7 +2164,8 @@ trait TraitRatingBar[This <: android.widget.RatingBar]
   */
 class SRatingBar()(implicit context: android.content.Context,
                    parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.RatingBar(context) with TraitRatingBar[SRatingBar] {
+    extends android.widget.RatingBar(context)
+    with TraitRatingBar[SRatingBar] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -2200,8 +2205,7 @@ class RichExpandableListAdapter[This <: android.widget.ExpandableListAdapter](
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/widget/ExpandableListAdapter.html android.widget.ExpandableListAdapter]]`. This contains several property accessors.
   */
-trait TraitExpandableListAdapter[
-    This <: android.widget.ExpandableListAdapter] {
+trait TraitExpandableListAdapter[This <: android.widget.ExpandableListAdapter] {
 
   def basis: This
 
@@ -2364,7 +2368,8 @@ trait TraitSpinner[This <: android.widget.Spinner]
   */
 class SSpinner()(implicit context: android.content.Context,
                  parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.Spinner(context) with TraitSpinner[SSpinner] {
+    extends android.widget.Spinner(context)
+    with TraitSpinner[SSpinner] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -2541,7 +2546,8 @@ trait TraitGridView[This <: android.widget.GridView]
   */
 class SGridView()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.GridView(context) with TraitGridView[SGridView] {
+    extends android.widget.GridView(context)
+    with TraitGridView[SGridView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -3339,8 +3345,7 @@ class RichHeaderViewListAdapter[This <: android.widget.HeaderViewListAdapter](
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/widget/HeaderViewListAdapter.html android.widget.HeaderViewListAdapter]]`. This contains several property accessors.
   */
-trait TraitHeaderViewListAdapter[
-    This <: android.widget.HeaderViewListAdapter] {
+trait TraitHeaderViewListAdapter[This <: android.widget.HeaderViewListAdapter] {
 
   def basis: This
 
@@ -3447,7 +3452,7 @@ trait TraitShareActionProvider[This <: android.widget.ShareActionProvider]
   @inline
   def onShareTargetSelected(
       f: (android.widget.ShareActionProvider,
-      android.content.Intent) => Boolean): This = {
+          android.content.Intent) => Boolean): This = {
     basis.setOnShareTargetSelectedListener(
         new android.widget.ShareActionProvider.OnShareTargetSelectedListener {
       def onShareTargetSelected(
@@ -3465,7 +3470,7 @@ trait TraitShareActionProvider[This <: android.widget.ShareActionProvider]
     })
     basis
   }
-  @inline def setShareIntent[T : ClassTag](implicit context: Context): Unit =
+  @inline def setShareIntent[T: ClassTag](implicit context: Context): Unit =
     basis.setShareIntent(SIntent[T])
 }
 
@@ -3880,7 +3885,7 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
   @inline
   def onChildClick(
       f: (android.widget.ExpandableListView, android.view.View, Int, Int,
-      Long) => Boolean): This = {
+          Long) => Boolean): This = {
     basis.setOnChildClickListener(
         new android.widget.ExpandableListView.OnChildClickListener {
       def onChildClick(p1: android.widget.ExpandableListView,
@@ -3907,7 +3912,7 @@ trait TraitExpandableListView[This <: android.widget.ExpandableListView]
   @inline
   def onGroupClick(
       f: (android.widget.ExpandableListView, android.view.View, Int,
-      Long) => Boolean): This = {
+          Long) => Boolean): This = {
     basis.setOnGroupClickListener(
         new android.widget.ExpandableListView.OnGroupClickListener {
       def onGroupClick(p1: android.widget.ExpandableListView,
@@ -4451,7 +4456,7 @@ trait TraitAbsListView[This <: android.widget.AbsListView]
     basis
   }
   @inline
-  def setRemoteViewsAdapter[T : ClassTag](implicit context: Context): Unit =
+  def setRemoteViewsAdapter[T: ClassTag](implicit context: Context): Unit =
     basis.setRemoteViewsAdapter(SIntent[T])
 }
 
@@ -4595,7 +4600,8 @@ trait TraitSeekBar[This <: android.widget.SeekBar]
   */
 class SSeekBar()(implicit context: android.content.Context,
                  parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.SeekBar(context) with TraitSeekBar[SSeekBar] {
+    extends android.widget.SeekBar(context)
+    with TraitSeekBar[SSeekBar] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -4707,7 +4713,8 @@ trait TraitToast[This <: android.widget.Toast] {
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/widget/Toast.html android.widget.Toast]]`.
   */
 class SToast()(implicit context: android.content.Context)
-    extends android.widget.Toast(context) with TraitToast[SToast] {
+    extends android.widget.Toast(context)
+    with TraitToast[SToast] {
 
   def basis = this
 }
@@ -4751,7 +4758,8 @@ trait TraitStackView[This <: android.widget.StackView]
   */
 class SStackView()(implicit context: android.content.Context,
                    parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.StackView(context) with TraitStackView[SStackView] {
+    extends android.widget.StackView(context)
+    with TraitStackView[SStackView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -4791,8 +4799,7 @@ class RichZoomButtonsController[This <: android.widget.ZoomButtonsController](
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/widget/ZoomButtonsController.html android.widget.ZoomButtonsController]]`. This contains several property accessors.
   */
-trait TraitZoomButtonsController[
-    This <: android.widget.ZoomButtonsController] {
+trait TraitZoomButtonsController[This <: android.widget.ZoomButtonsController] {
 
   def basis: This
 
@@ -5918,7 +5925,7 @@ trait TraitListPopupWindow[This <: android.widget.ListPopupWindow] {
 
   @inline
   def onItemClick[U](f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+                         Long) => U): This = {
     basis.setOnItemClickListener(
         new android.widget.AdapterView.OnItemClickListener {
       def onItemClick(p1: android.widget.AdapterView[_],
@@ -5943,7 +5950,7 @@ trait TraitListPopupWindow[This <: android.widget.ListPopupWindow] {
   @inline
   def onItemSelected[U](
       f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+          Long) => U): This = {
     basis.setOnItemSelectedListener(
         new android.widget.AdapterView.OnItemSelectedListener {
       def onItemSelected(p1: android.widget.AdapterView[_],
@@ -7277,7 +7284,8 @@ trait TraitButton[This <: android.widget.Button] extends TraitTextView[This] {}
   */
 class SButton()(implicit context: android.content.Context,
                 parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.Button(context) with TraitButton[SButton] {
+    extends android.widget.Button(context)
+    with TraitButton[SButton] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -7334,7 +7342,8 @@ trait TraitCheckBox[This <: android.widget.CheckBox]
   */
 class SCheckBox()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.CheckBox(context) with TraitCheckBox[SCheckBox] {
+    extends android.widget.CheckBox(context)
+    with TraitCheckBox[SCheckBox] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -7466,7 +7475,8 @@ trait TraitTableRow[This <: android.widget.TableRow]
   */
 class STableRow()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.TableRow(context) with TraitTableRow[STableRow] {
+    extends android.widget.TableRow(context)
+    with TraitTableRow[STableRow] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -7628,7 +7638,8 @@ trait TraitTabWidget[This <: android.widget.TabWidget]
   */
 class STabWidget()(implicit context: android.content.Context,
                    parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.TabWidget(context) with TraitTabWidget[STabWidget] {
+    extends android.widget.TabWidget(context)
+    with TraitTabWidget[STabWidget] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -7833,7 +7844,8 @@ trait TraitVideoView[This <: android.widget.VideoView]
   */
 class SVideoView()(implicit context: android.content.Context,
                    parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.VideoView(context) with TraitVideoView[SVideoView] {
+    extends android.widget.VideoView(context)
+    with TraitVideoView[SVideoView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -7998,7 +8010,7 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
 
   @inline
   def onItemClick[U](f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+                         Long) => U): This = {
     basis.setOnItemClickListener(
         new android.widget.AdapterView.OnItemClickListener {
       def onItemClick(p1: android.widget.AdapterView[_],
@@ -8023,7 +8035,7 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
   @inline
   def onItemLongClick(
       f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => Boolean): This = {
+          Long) => Boolean): This = {
     basis.setOnItemLongClickListener(
         new android.widget.AdapterView.OnItemLongClickListener {
       def onItemLongClick(p1: android.widget.AdapterView[_],
@@ -8048,7 +8060,7 @@ trait TraitAdapterView[This <: android.widget.AdapterView[_]]
   @inline
   def onItemSelected[U](
       f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+          Long) => U): This = {
     basis.setOnItemSelectedListener(
         new android.widget.AdapterView.OnItemSelectedListener {
       def onItemSelected(p1: android.widget.AdapterView[_],
@@ -8925,7 +8937,8 @@ trait TraitGallery[This <: android.widget.Gallery]
 @deprecated("", "")
 class SGallery()(implicit context: android.content.Context,
                  parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.Gallery(context) with TraitGallery[SGallery] {
+    extends android.widget.Gallery(context)
+    with TraitGallery[SGallery] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -9256,7 +9269,7 @@ trait TraitAdapterViewAnimator[This <: android.widget.AdapterViewAnimator]
   }
 
   @inline
-  def setRemoteViewsAdapter[T : ClassTag](implicit context: Context): Unit =
+  def setRemoteViewsAdapter[T: ClassTag](implicit context: Context): Unit =
     basis.setRemoteViewsAdapter(SIntent[T])
 }
 
@@ -10564,7 +10577,7 @@ trait TraitTextView[This <: android.widget.TextView] extends TraitView[This] {
 
   @inline
   def onEditorAction(f: (android.widget.TextView, Int,
-      android.view.KeyEvent) => Boolean): This = {
+                         android.view.KeyEvent) => Boolean): This = {
     basis.setOnEditorActionListener(
         new android.widget.TextView.OnEditorActionListener {
       def onEditorAction(
@@ -10616,7 +10629,8 @@ trait TraitTextView[This <: android.widget.TextView] extends TraitView[This] {
   */
 class STextView()(implicit context: android.content.Context,
                   parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.TextView(context) with TraitTextView[STextView] {
+    extends android.widget.TextView(context)
+    with TraitTextView[STextView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -10890,7 +10904,8 @@ trait TraitScroller[This <: android.widget.Scroller] {
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/widget/Scroller.html android.widget.Scroller]]`.
   */
 class SScroller()(implicit context: android.content.Context)
-    extends android.widget.Scroller(context) with TraitScroller[SScroller] {
+    extends android.widget.Scroller(context)
+    with TraitScroller[SScroller] {
 
   def basis = this
 }
@@ -11236,7 +11251,7 @@ trait TraitAutoCompleteTextView[This <: android.widget.AutoCompleteTextView]
 
   @inline
   def onItemClick[U](f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+                         Long) => U): This = {
     basis.setOnItemClickListener(
         new android.widget.AdapterView.OnItemClickListener {
       def onItemClick(p1: android.widget.AdapterView[_],
@@ -11261,7 +11276,7 @@ trait TraitAutoCompleteTextView[This <: android.widget.AutoCompleteTextView]
   @inline
   def onItemSelected[U](
       f: (android.widget.AdapterView[_], android.view.View, Int,
-      Long) => U): This = {
+          Long) => U): This = {
     basis.setOnItemSelectedListener(
         new android.widget.AdapterView.OnItemSelectedListener {
       def onItemSelected(p1: android.widget.AdapterView[_],
@@ -11560,7 +11575,8 @@ trait TraitSwitch[This <: android.widget.Switch]
   */
 class SSwitch()(implicit context: android.content.Context,
                 parentVGroup: TraitViewGroup[_] = null)
-    extends android.widget.Switch(context) with TraitSwitch[SSwitch] {
+    extends android.widget.Switch(context)
+    with TraitSwitch[SSwitch] {
 
   def basis = this
   override val parentViewGroup = parentVGroup
@@ -11641,7 +11657,7 @@ object SVerticalLayout {
   }
 }
 
-abstract class TextViewCompanion[T <: TextView : ClassTag] {
+abstract class TextViewCompanion[T <: TextView: ClassTag] {
   def create[LP <: ViewGroupLayoutParams[_, T]]()(
       implicit context: Context, defaultLayoutParam: T => LP): T
 
@@ -11680,7 +11696,7 @@ abstract class TextViewCompanion[T <: TextView : ClassTag] {
   }
 }
 
-abstract class ImageViewCompanion[T <: ImageView : ClassTag] {
+abstract class ImageViewCompanion[T <: ImageView: ClassTag] {
   def create[LP <: ViewGroupLayoutParams[_, T]]()(
       implicit context: Context, defaultLayoutParam: T => LP): T
 
@@ -12613,7 +12629,7 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
   @inline
   def onGesture[U](
       f: (android.gesture.GestureOverlayView,
-      android.view.MotionEvent) => U): This = {
+          android.view.MotionEvent) => U): This = {
     basis.addOnGestureListener(
         new android.gesture.GestureOverlayView.OnGestureListener {
       def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12646,7 +12662,7 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
   @inline
   def onGestureCancelled[U](
       f: (android.gesture.GestureOverlayView,
-      android.view.MotionEvent) => U): This = {
+          android.view.MotionEvent) => U): This = {
     basis.addOnGestureListener(
         new android.gesture.GestureOverlayView.OnGestureListener {
       def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12681,7 +12697,7 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
   @inline
   def onGestureEnded[U](
       f: (android.gesture.GestureOverlayView,
-      android.view.MotionEvent) => U): This = {
+          android.view.MotionEvent) => U): This = {
     basis.addOnGestureListener(
         new android.gesture.GestureOverlayView.OnGestureListener {
       def onGesture(p1: android.gesture.GestureOverlayView,
@@ -12714,7 +12730,7 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
   @inline
   def onGesturePerformed[U](
       f: (android.gesture.GestureOverlayView,
-      android.gesture.Gesture) => U): This = {
+          android.gesture.Gesture) => U): This = {
     basis.addOnGesturePerformedListener(
         new android.gesture.GestureOverlayView.OnGesturePerformedListener {
       def onGesturePerformed(p1: android.gesture.GestureOverlayView,
@@ -12735,7 +12751,7 @@ trait TraitGestureOverlayView[This <: android.gesture.GestureOverlayView]
   @inline
   def onGestureStarted[U](
       f: (android.gesture.GestureOverlayView,
-      android.view.MotionEvent) => U): This = {
+          android.view.MotionEvent) => U): This = {
     basis.addOnGestureListener(
         new android.gesture.GestureOverlayView.OnGestureListener {
       def onGesture(p1: android.gesture.GestureOverlayView,
@@ -13100,9 +13116,8 @@ trait TraitWebView[This <: android.webkit.WebView]
   @inline
   def onDownloadStart[U](
       f: (java.lang.String, java.lang.String, java.lang.String,
-      java.lang.String, Long) => U): This = {
-    basis.setDownloadListener(
-        new android.webkit.DownloadListener {
+          java.lang.String, Long) => U): This = {
+    basis.setDownloadListener(new android.webkit.DownloadListener {
       def onDownloadStart(p1: java.lang.String,
                           p2: java.lang.String,
                           p3: java.lang.String,
@@ -13113,8 +13128,7 @@ trait TraitWebView[This <: android.webkit.WebView]
   }
 
   @inline def onDownloadStart[U](f: => U): This = {
-    basis.setDownloadListener(
-        new android.webkit.DownloadListener {
+    basis.setDownloadListener(new android.webkit.DownloadListener {
       def onDownloadStart(p1: java.lang.String,
                           p2: java.lang.String,
                           p3: java.lang.String,
@@ -13170,7 +13184,8 @@ trait TraitWebView[This <: android.webkit.WebView]
   */
 class SWebView()(implicit context: android.content.Context,
                  parentVGroup: TraitViewGroup[_] = null)
-    extends android.webkit.WebView(context) with TraitWebView[SWebView] {
+    extends android.webkit.WebView(context)
+    with TraitWebView[SWebView] {
 
   def basis = this
   override val parentViewGroup = parentVGroup

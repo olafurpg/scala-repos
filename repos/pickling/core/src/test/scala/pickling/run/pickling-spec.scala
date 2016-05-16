@@ -59,227 +59,235 @@ object PicklingJsonSpec extends Properties("pickling-json") {
   import json._
   import PicklingSpec._
 
-  property("UnpickleOps") = Prop forAll { (x: String) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.value.unpickle[String]
-    x1 == x
-  }
+  property("UnpickleOps") =
+    Prop forAll { (x: String) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.value.unpickle[String]
+      x1 == x
+    }
 
   // subsumes test base.scala
-  property("Base") = Prop forAll { (b: Base) =>
-    val pickle: JSONPickle = b.pickle
-    val b1 = pickle.unpickle[Base]
-    b1.toString == b.toString
-  }
+  property("Base") =
+    Prop forAll { (b: Base) =>
+      val pickle: JSONPickle = b.pickle
+      val b1 = pickle.unpickle[Base]
+      b1.toString == b.toString
+    }
 
-  property("CaseBase") = Prop forAll { (x: CaseBase) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[CaseBase]
-    x1 == x
-  }
+  property("CaseBase") =
+    Prop forAll { (x: CaseBase) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[CaseBase]
+      x1 == x
+    }
 
   def emptyOrUnicode(s: String) =
     s == "" || s.exists(_.toInt > 255)
 
   /* The following two tests subsume test tuple2-primitive.scala */
 
-  property("(String, Int)") = Prop forAll { (p: (String, Int)) =>
-    if (emptyOrUnicode(p._1)) true //FIXME
-    else {
-      val pickle: JSONPickle = p.pickle
-      val p1 = pickle.unpickle[(String, Int)]
-      p1 == p
+  property("(String, Int)") =
+    Prop forAll { (p: (String, Int)) =>
+      if (emptyOrUnicode(p._1)) true //FIXME
+      else {
+        val pickle: JSONPickle = p.pickle
+        val p1 = pickle.unpickle[(String, Int)]
+        p1 == p
+      }
     }
-  }
 
-  property("(String, Int, String)") = Prop forAll {
-    (t: (String, Int, String)) =>
+  property("(String, Int, String)") =
+    Prop forAll { (t: (String, Int, String)) =>
       if (emptyOrUnicode(t._1) || emptyOrUnicode(t._3)) true //FIXME
       else {
         val pickle: JSONPickle = t.pickle
         val t1 = pickle.unpickle[(String, Int, String)]
         t1 == t
       }
-  }
+    }
 
-  property("(Int, (String, Int), Int)") = Prop forAll {
-    (t: (Int, (String, Int), Int)) =>
+  property("(Int, (String, Int), Int)") =
+    Prop forAll { (t: (Int, (String, Int), Int)) =>
       if (emptyOrUnicode(t._2._1)) true //FIXME
       else {
         val pickle: JSONPickle = t.pickle
         val t1 = pickle.unpickle[(Int, (String, Int), Int)]
         t1 == t
       }
-  }
+    }
 
   // subsumes test option-primitive.scala
-  property("Option[Int]") = Prop forAll { (opt: Option[Int]) =>
-    val pickle: JSONPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[Int]]
-    opt1 == opt
-  }
+  property("Option[Int]") =
+    Prop forAll { (opt: Option[Int]) =>
+      val pickle: JSONPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[Int]]
+      opt1 == opt
+    }
 
-  property("Option[String]") = Prop forAll { (opt: Option[String]) =>
-    val pickle: JSONPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[String]]
-    opt1 == opt
-  }
+  property("Option[String]") =
+    Prop forAll { (opt: Option[String]) =>
+      val pickle: JSONPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[String]]
+      opt1 == opt
+    }
 
-  property("(Option[String], String)") = Prop forAll {
-    (t: (Option[String], String)) =>
+  property("(Option[String], String)") =
+    Prop forAll { (t: (Option[String], String)) =>
       if (emptyOrUnicode(t._2)) true //FIXME
       else {
         val pickle: JSONPickle = t.pickle
         val t1 = pickle.unpickle[(Option[String], String)]
         t1 == t
       }
-  }
+    }
 
-  property("Option[Option[Int]]") = Prop forAll { (opt: Option[Option[Int]]) =>
-    val pickle: JSONPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[Option[Int]]]
-    opt1 == opt
-  }
+  property("Option[Option[Int]]") =
+    Prop forAll { (opt: Option[Option[Int]]) =>
+      val pickle: JSONPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[Option[Int]]]
+      opt1 == opt
+    }
 
-  property("Option[CaseBase]") = Prop forAll { (opt: Option[CaseBase]) =>
-    val pickle: JSONPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[CaseBase]]
-    opt1 == opt
-  }
+  property("Option[CaseBase]") =
+    Prop forAll { (opt: Option[CaseBase]) =>
+      val pickle: JSONPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[CaseBase]]
+      opt1 == opt
+    }
 
-  property("Int") = Prop forAll { (x: Int) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Int]
-    x1 == x
-  }
+  property("Int") =
+    Prop forAll { (x: Int) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Int]
+      x1 == x
+    }
 
-  property("String") = Prop forAll { (x: String) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[String]
-    x1 == x
-  }
+  property("String") =
+    Prop forAll { (x: String) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[String]
+      x1 == x
+    }
 
-  property("Long") = Prop forAll { (x: Long) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Long]
-    x1 == x
-  }
+  property("Long") =
+    Prop forAll { (x: Long) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Long]
+      x1 == x
+    }
 
-  property("Short") = Prop forAll { (x: Short) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Short]
-    x1 == x
-  }
+  property("Short") =
+    Prop forAll { (x: Short) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Short]
+      x1 == x
+    }
 
-  property("Boolean") = Prop forAll { (x: Boolean) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Boolean]
-    x1 == x
-  }
+  property("Boolean") =
+    Prop forAll { (x: Boolean) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Boolean]
+      x1 == x
+    }
 
-  property("Byte") = Prop forAll { (x: Byte) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Byte]
-    x1 == x
-  }
+  property("Byte") =
+    Prop forAll { (x: Byte) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Byte]
+      x1 == x
+    }
 
   property("CaseClassIntString") = forAll(
-      (name: String) =>
-        {
-      val p = Person(name, 43)
-      val pickle: JSONPickle = p.pickle
-      val up = pickle.unpickle[Person]
-      p == up
+      (name: String) => {
+    val p = Person(name, 43)
+    val pickle: JSONPickle = p.pickle
+    val up = pickle.unpickle[Person]
+    p == up
   })
 
-  property("case class with Array[Int] field") = Prop forAll {
-    (x: WithIntArray) =>
+  property("case class with Array[Int] field") =
+    Prop forAll { (x: WithIntArray) =>
       val pickle: JSONPickle = x.pickle
       val x1 = pickle.unpickle[WithIntArray]
       x1 == x
       true
-  }
+    }
 
-  property("Char") = Prop forAll { (x: Char) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Char]
-    x1 == x
-  }
+  property("Char") =
+    Prop forAll { (x: Char) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Char]
+      x1 == x
+    }
 
-  property("Float") = Prop forAll { (x: Float) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Float]
-    x1 == x
-  }
+  property("Float") =
+    Prop forAll { (x: Float) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Float]
+      x1 == x
+    }
 
-  property("Double") = Prop forAll { (x: Double) =>
-    val pickle: JSONPickle = x.pickle
-    val x1 = pickle.unpickle[Double]
-    x1 == x
-  }
+  property("Double") =
+    Prop forAll { (x: Double) =>
+      val pickle: JSONPickle = x.pickle
+      val x1 = pickle.unpickle[Double]
+      x1 == x
+    }
 
   property("Array[Byte]") = forAll(
-      (ia: Array[Byte]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Byte]]
-      readArr.sameElements(ia)
+      (ia: Array[Byte]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Byte]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Short]") = forAll(
-      (ia: Array[Short]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Short]]
-      readArr.sameElements(ia)
+      (ia: Array[Short]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Short]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Char]") = forAll(
-      (ia: Array[Char]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Char]]
-      readArr.sameElements(ia)
+      (ia: Array[Char]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Char]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Int]") = forAll(
-      (ia: Array[Int]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Int]]
-      readArr.sameElements(ia)
+      (ia: Array[Int]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Int]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Long]") = forAll(
-      (ia: Array[Long]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Long]]
-      readArr.sameElements(ia)
+      (ia: Array[Long]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Long]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Boolean]") = forAll(
-      (ia: Array[Boolean]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Boolean]]
-      readArr.sameElements(ia)
+      (ia: Array[Boolean]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Boolean]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Float]") = forAll(
-      (ia: Array[Float]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Float]]
-      readArr.sameElements(ia)
+      (ia: Array[Float]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Float]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Double]") = forAll(
-      (ia: Array[Double]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Double]]
-      readArr.sameElements(ia)
+      (ia: Array[Double]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Double]]
+    readArr.sameElements(ia)
   })
 
   /* TODO: disabled because of spurious failures.
@@ -292,26 +300,27 @@ object PicklingJsonSpec extends Properties("pickling-json") {
    */
 
   property("Array[(String, Int)]") = forAll(
-      (ia: Array[(String, Int)]) =>
-        {
-      val pickle: JSONPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[(String, Int)]]
-      readArr.sameElements(ia)
+      (ia: Array[(String, Int)]) => {
+    val pickle: JSONPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[(String, Int)]]
+    readArr.sameElements(ia)
   })
 
-  property("BigDecimal") = Prop forAll { (x: Double) =>
-    val bd = new BigDecimal(x)
-    val pickle: JSONPickle = bd.pickle
-    val x1 = pickle.unpickle[BigDecimal]
-    x1 == bd
-  }
+  property("BigDecimal") =
+    Prop forAll { (x: Double) =>
+      val bd = new BigDecimal(x)
+      val pickle: JSONPickle = bd.pickle
+      val x1 = pickle.unpickle[BigDecimal]
+      x1 == bd
+    }
 
-  property("BigInteger") = Prop forAll { (x: Long) =>
-    val bi = BigInteger.valueOf(x)
-    val pickle: JSONPickle = bi.pickle
-    val x1 = pickle.unpickle[BigInteger]
-    x1 == bi
-  }
+  property("BigInteger") =
+    Prop forAll { (x: Long) =>
+      val bi = BigInteger.valueOf(x)
+      val pickle: JSONPickle = bi.pickle
+      val x1 = pickle.unpickle[BigInteger]
+      x1 == bi
+    }
 
   property("Date") = forAll(randomDates) { (date) =>
     val pickle: JSONPickle = date.pickle
@@ -327,227 +336,235 @@ object PicklingBinarySpec extends Properties("pickling-binary") {
   import binary._
   import PicklingSpec._
 
-  property("UnpickleOps") = Prop forAll { (x: String) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.value.unpickle[String]
-    x1 == x
-  }
+  property("UnpickleOps") =
+    Prop forAll { (x: String) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.value.unpickle[String]
+      x1 == x
+    }
 
   // subsumes test base.scala
-  property("Base") = Prop forAll { (b: Base) =>
-    val pickle: BinaryPickle = b.pickle
-    val b1 = pickle.unpickle[Base]
-    b1.toString == b.toString
-  }
+  property("Base") =
+    Prop forAll { (b: Base) =>
+      val pickle: BinaryPickle = b.pickle
+      val b1 = pickle.unpickle[Base]
+      b1.toString == b.toString
+    }
 
-  property("CaseBase") = Prop forAll { (x: CaseBase) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[CaseBase]
-    x1 == x
-  }
+  property("CaseBase") =
+    Prop forAll { (x: CaseBase) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[CaseBase]
+      x1 == x
+    }
 
   def emptyOrUnicode(s: String) =
     s == "" || s.exists(_.toInt > 255)
 
   /* The following two tests subsume test tuple2-primitive.scala */
 
-  property("(String, Int)") = Prop forAll { (p: (String, Int)) =>
-    if (emptyOrUnicode(p._1)) true //FIXME
-    else {
-      val pickle: BinaryPickle = p.pickle
-      val p1 = pickle.unpickle[(String, Int)]
-      p1 == p
+  property("(String, Int)") =
+    Prop forAll { (p: (String, Int)) =>
+      if (emptyOrUnicode(p._1)) true //FIXME
+      else {
+        val pickle: BinaryPickle = p.pickle
+        val p1 = pickle.unpickle[(String, Int)]
+        p1 == p
+      }
     }
-  }
 
-  property("(String, Int, String)") = Prop forAll {
-    (t: (String, Int, String)) =>
+  property("(String, Int, String)") =
+    Prop forAll { (t: (String, Int, String)) =>
       if (emptyOrUnicode(t._1) || emptyOrUnicode(t._3)) true //FIXME
       else {
         val pickle: BinaryPickle = t.pickle
         val t1 = pickle.unpickle[(String, Int, String)]
         t1 == t
       }
-  }
+    }
 
-  property("(Int, (String, Int), Int)") = Prop forAll {
-    (t: (Int, (String, Int), Int)) =>
+  property("(Int, (String, Int), Int)") =
+    Prop forAll { (t: (Int, (String, Int), Int)) =>
       if (emptyOrUnicode(t._2._1)) true //FIXME
       else {
         val pickle: BinaryPickle = t.pickle
         val t1 = pickle.unpickle[(Int, (String, Int), Int)]
         t1 == t
       }
-  }
+    }
 
   // subsumes test option-primitive.scala
-  property("Option[Int]") = Prop forAll { (opt: Option[Int]) =>
-    val pickle: BinaryPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[Int]]
-    opt1 == opt
-  }
+  property("Option[Int]") =
+    Prop forAll { (opt: Option[Int]) =>
+      val pickle: BinaryPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[Int]]
+      opt1 == opt
+    }
 
-  property("Option[String]") = Prop forAll { (opt: Option[String]) =>
-    val pickle: BinaryPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[String]]
-    opt1 == opt
-  }
+  property("Option[String]") =
+    Prop forAll { (opt: Option[String]) =>
+      val pickle: BinaryPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[String]]
+      opt1 == opt
+    }
 
-  property("(Option[String], String)") = Prop forAll {
-    (t: (Option[String], String)) =>
+  property("(Option[String], String)") =
+    Prop forAll { (t: (Option[String], String)) =>
       if (emptyOrUnicode(t._2)) true //FIXME
       else {
         val pickle: BinaryPickle = t.pickle
         val t1 = pickle.unpickle[(Option[String], String)]
         t1 == t
       }
-  }
+    }
 
-  property("Option[Option[Int]]") = Prop forAll { (opt: Option[Option[Int]]) =>
-    val pickle: BinaryPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[Option[Int]]]
-    opt1 == opt
-  }
+  property("Option[Option[Int]]") =
+    Prop forAll { (opt: Option[Option[Int]]) =>
+      val pickle: BinaryPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[Option[Int]]]
+      opt1 == opt
+    }
 
-  property("Option[CaseBase]") = Prop forAll { (opt: Option[CaseBase]) =>
-    val pickle: BinaryPickle = opt.pickle
-    val opt1 = pickle.unpickle[Option[CaseBase]]
-    opt1 == opt
-  }
+  property("Option[CaseBase]") =
+    Prop forAll { (opt: Option[CaseBase]) =>
+      val pickle: BinaryPickle = opt.pickle
+      val opt1 = pickle.unpickle[Option[CaseBase]]
+      opt1 == opt
+    }
 
-  property("Int") = Prop forAll { (x: Int) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Int]
-    x1 == x
-  }
+  property("Int") =
+    Prop forAll { (x: Int) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Int]
+      x1 == x
+    }
 
-  property("String") = Prop forAll { (x: String) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[String]
-    x1 == x
-  }
+  property("String") =
+    Prop forAll { (x: String) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[String]
+      x1 == x
+    }
 
-  property("Long") = Prop forAll { (x: Long) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Long]
-    x1 == x
-  }
+  property("Long") =
+    Prop forAll { (x: Long) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Long]
+      x1 == x
+    }
 
-  property("Short") = Prop forAll { (x: Short) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Short]
-    x1 == x
-  }
+  property("Short") =
+    Prop forAll { (x: Short) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Short]
+      x1 == x
+    }
 
-  property("Boolean") = Prop forAll { (x: Boolean) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Boolean]
-    x1 == x
-  }
+  property("Boolean") =
+    Prop forAll { (x: Boolean) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Boolean]
+      x1 == x
+    }
 
-  property("Byte") = Prop forAll { (x: Byte) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Byte]
-    x1 == x
-  }
+  property("Byte") =
+    Prop forAll { (x: Byte) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Byte]
+      x1 == x
+    }
 
-  property("Char") = Prop forAll { (x: Char) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Char]
-    x1 == x
-  }
+  property("Char") =
+    Prop forAll { (x: Char) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Char]
+      x1 == x
+    }
 
-  property("Float") = Prop forAll { (x: Float) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Float]
-    x1 == x
-  }
+  property("Float") =
+    Prop forAll { (x: Float) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Float]
+      x1 == x
+    }
 
-  property("Double") = Prop forAll { (x: Double) =>
-    val pickle: BinaryPickle = x.pickle
-    val x1 = pickle.unpickle[Double]
-    x1 == x
-  }
+  property("Double") =
+    Prop forAll { (x: Double) =>
+      val pickle: BinaryPickle = x.pickle
+      val x1 = pickle.unpickle[Double]
+      x1 == x
+    }
 
   property("CaseClassIntString") = forAll(
-      (name: String) =>
-        {
-      val p = Person(name, 43)
-      val pickle: BinaryPickle = p.pickle
-      val up = pickle.unpickle[Person]
-      p == up
+      (name: String) => {
+    val p = Person(name, 43)
+    val pickle: BinaryPickle = p.pickle
+    val up = pickle.unpickle[Person]
+    p == up
   })
 
-  property("case class with Array[Int] field") = Prop forAll {
-    (x: WithIntArray) =>
+  property("case class with Array[Int] field") =
+    Prop forAll { (x: WithIntArray) =>
       val pickle: BinaryPickle = x.pickle
       val x1 = pickle.unpickle[WithIntArray]
       x1 == x
       true
-  }
+    }
 
   property("Array[Byte]") = forAll(
-      (ia: Array[Byte]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Byte]]
-      readArr.sameElements(ia)
+      (ia: Array[Byte]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Byte]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Short]") = forAll(
-      (ia: Array[Short]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Short]]
-      readArr.sameElements(ia)
+      (ia: Array[Short]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Short]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Char]") = forAll(
-      (ia: Array[Char]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Char]]
-      readArr.sameElements(ia)
+      (ia: Array[Char]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Char]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Int]") = forAll(
-      (ia: Array[Int]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Int]]
-      readArr.sameElements(ia)
+      (ia: Array[Int]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Int]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Long]") = forAll(
-      (ia: Array[Long]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Long]]
-      readArr.sameElements(ia)
+      (ia: Array[Long]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Long]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Boolean]") = forAll(
-      (ia: Array[Boolean]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Boolean]]
-      readArr.sameElements(ia)
+      (ia: Array[Boolean]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Boolean]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Float]") = forAll(
-      (ia: Array[Float]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Float]]
-      readArr.sameElements(ia)
+      (ia: Array[Float]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Float]]
+    readArr.sameElements(ia)
   })
 
   property("Array[Double]") = forAll(
-      (ia: Array[Double]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[Double]]
-      readArr.sameElements(ia)
+      (ia: Array[Double]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[Double]]
+    readArr.sameElements(ia)
   })
 
   /* TODO: disabled because of spurious failures.
@@ -560,26 +577,27 @@ object PicklingBinarySpec extends Properties("pickling-binary") {
    */
 
   property("Array[(String, Int)]") = forAll(
-      (ia: Array[(String, Int)]) =>
-        {
-      val pickle: BinaryPickle = ia.pickle
-      val readArr = pickle.unpickle[Array[(String, Int)]]
-      readArr.sameElements(ia)
+      (ia: Array[(String, Int)]) => {
+    val pickle: BinaryPickle = ia.pickle
+    val readArr = pickle.unpickle[Array[(String, Int)]]
+    readArr.sameElements(ia)
   })
 
-  property("BigDecimal") = Prop forAll { (x: Double) =>
-    val bd = new BigDecimal(x)
-    val pickle: BinaryPickle = bd.pickle
-    val x1 = pickle.unpickle[BigDecimal]
-    x1 == bd
-  }
+  property("BigDecimal") =
+    Prop forAll { (x: Double) =>
+      val bd = new BigDecimal(x)
+      val pickle: BinaryPickle = bd.pickle
+      val x1 = pickle.unpickle[BigDecimal]
+      x1 == bd
+    }
 
-  property("BigInteger") = Prop forAll { (x: Long) =>
-    val bi = BigInteger.valueOf(x)
-    val pickle: BinaryPickle = bi.pickle
-    val x1 = pickle.unpickle[BigInteger]
-    x1 == bi
-  }
+  property("BigInteger") =
+    Prop forAll { (x: Long) =>
+      val bi = BigInteger.valueOf(x)
+      val pickle: BinaryPickle = bi.pickle
+      val x1 = pickle.unpickle[BigInteger]
+      x1 == bi
+    }
 
   property("Date") = forAll(randomDates) { (date) =>
     val pickle: BinaryPickle = date.pickle

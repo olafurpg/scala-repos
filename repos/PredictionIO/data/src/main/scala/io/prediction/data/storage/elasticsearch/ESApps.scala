@@ -29,7 +29,8 @@ import org.json4s.native.Serialization.write
 
 /** Elasticsearch implementation of Items. */
 class ESApps(client: Client, config: StorageClientConfig, index: String)
-    extends Apps with Logging {
+    extends Apps
+    with Logging {
   implicit val formats = DefaultFormats.lossless
   private val estype = "apps"
   private val seq = new ESSequences(client, config, index)

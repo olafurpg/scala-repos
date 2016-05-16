@@ -113,7 +113,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
 @SerialVersionUID(1L)
 class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
-    extends Trig[BigDecimal] with Serializable {
+    extends Trig[BigDecimal]
+    with Serializable {
   import spire.math.Real
 
   val bits = Real.digitsToBits(mc.getPrecision + 1)
@@ -170,7 +171,8 @@ trait BigDecimalIsSigned extends Signed[BigDecimal] {
 }
 
 trait BigDecimalIsReal
-    extends IsRational[BigDecimal] with BigDecimalOrder
+    extends IsRational[BigDecimal]
+    with BigDecimalOrder
     with BigDecimalIsSigned {
   def toDouble(x: BigDecimal): Double = x.toDouble
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
@@ -182,7 +184,9 @@ trait BigDecimalIsReal
 
 @SerialVersionUID(0L)
 class BigDecimalAlgebra
-    extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal
+    extends BigDecimalIsField
+    with BigDecimalIsNRoot
+    with BigDecimalIsReal
     with Serializable
 
 trait BigDecimalInstances {

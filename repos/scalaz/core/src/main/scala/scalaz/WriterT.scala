@@ -89,8 +89,8 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   def leftMap[C](f: W => C)(implicit F: Functor[F]): WriterT[F, C, A] =
     bimap(f, identity)
 
-  def bitraverse[G[_], C, D](
-      f: W => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
+  def bitraverse[G[_], C, D](f: W => G[C], g: A => G[D])(
+      implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {
       case (a, b) => G.tuple2(f(a), g(b))
     })(writerT(_))
@@ -321,8 +321,9 @@ sealed abstract class WriterTInstances extends WriterTInstances0 {
 trait WriterTFunctions {
   def writerT[F[_], W, A](v: F[(W, A)]): WriterT[F, W, A] = WriterT(v)
 
-  def writerTU[FAB, AB, A0, B0](fab: FAB)(
-      implicit u1: Unapply[Functor, FAB] { type A = AB }, u2: Unapply2[Bifunctor, AB] {
+  def writerTU[FAB, AB, A0, B0](fab: FAB)(implicit u1: Unapply[Functor, FAB] {
+    type A = AB
+  }, u2: Unapply2[Bifunctor, AB] {
     type A = A0; type B = B0
   }, l: Leibniz.===[AB, (A0, B0)]): WriterT[u1.M, A0, B0] =
     WriterT(l.subst[u1.M](u1(fab)))
@@ -354,7 +355,8 @@ private trait WriterTPlus[F[_], W] extends Plus[WriterT[F, W, ?]] {
 }
 
 private trait WriterTPlusEmpty[F[_], W]
-    extends PlusEmpty[WriterT[F, W, ?]] with WriterTPlus[F, W] {
+    extends PlusEmpty[WriterT[F, W, ?]]
+    with WriterTPlus[F, W] {
   def F: PlusEmpty[F]
 
   override final def empty[A] = WriterT(F.empty)
@@ -367,7 +369,8 @@ private trait WriterTFunctor[F[_], W] extends Functor[WriterT[F, W, ?]] {
 }
 
 private trait WriterTApply[F[_], W]
-    extends Apply[WriterT[F, W, ?]] with WriterTFunctor[F, W] {
+    extends Apply[WriterT[F, W, ?]]
+    with WriterTFunctor[F, W] {
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
@@ -376,14 +379,16 @@ private trait WriterTApply[F[_], W]
 }
 
 private trait WriterTApplicative[F[_], W]
-    extends Applicative[WriterT[F, W, ?]] with WriterTApply[F, W] {
+    extends Applicative[WriterT[F, W, ?]]
+    with WriterTApply[F, W] {
   implicit def F: Applicative[F]
   implicit def W: Monoid[W]
   def point[A](a: => A) = writerT(F.point((W.zero, a)))
 }
 
 private trait WriterTBind[F[_], W]
-    extends Bind[WriterT[F, W, ?]] with WriterTApply[F, W] {
+    extends Bind[WriterT[F, W, ?]]
+    with WriterTApply[F, W] {
   implicit def F: Bind[F]
 
   override final def bind[A, B](fa: WriterT[F, W, A])(
@@ -391,7 +396,8 @@ private trait WriterTBind[F[_], W]
 }
 
 private trait WriterTBindRec[F[_], W]
-    extends BindRec[WriterT[F, W, ?]] with WriterTBind[F, W] {
+    extends BindRec[WriterT[F, W, ?]]
+    with WriterTBind[F, W] {
   implicit def F: BindRec[F]
   implicit def A: Applicative[F]
 
@@ -412,19 +418,22 @@ private trait WriterTBindRec[F[_], W]
 }
 
 private trait WriterTMonad[F[_], W]
-    extends Monad[WriterT[F, W, ?]] with WriterTApplicative[F, W]
+    extends Monad[WriterT[F, W, ?]]
+    with WriterTApplicative[F, W]
     with WriterTBind[F, W] {
   implicit def F: Monad[F]
 }
 
 private trait WriterTMonadPlus[F[_], W]
-    extends MonadPlus[WriterT[F, W, ?]] with WriterTMonad[F, W]
+    extends MonadPlus[WriterT[F, W, ?]]
+    with WriterTMonad[F, W]
     with WriterTPlusEmpty[F, W] {
   def F: MonadPlus[F]
 }
 
 private trait WriterTMonadError[F[_], E, W]
-    extends MonadError[WriterT[F, W, ?], E] with WriterTMonad[F, W] {
+    extends MonadError[WriterT[F, W, ?], E]
+    with WriterTMonad[F, W] {
   implicit def F: MonadError[F, E]
 
   override def handleError[A](fa: WriterT[F, W, A])(f: E => WriterT[F, W, A]) =
@@ -443,7 +452,8 @@ private trait WriterTFoldable[F[_], W]
 }
 
 private trait WriterTTraverse[F[_], W]
-    extends Traverse[WriterT[F, W, ?]] with WriterTFoldable[F, W] {
+    extends Traverse[WriterT[F, W, ?]]
+    with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[F, W, A])(
@@ -458,7 +468,8 @@ private trait WriterTBifunctor[F[_]] extends Bifunctor[WriterT[F, ?, ?]] {
 }
 
 private trait WriterTBitraverse[F[_]]
-    extends Bitraverse[WriterT[F, ?, ?]] with WriterTBifunctor[F] {
+    extends Bitraverse[WriterT[F, ?, ?]]
+    with WriterTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: WriterT[F, A, B])(
@@ -467,7 +478,8 @@ private trait WriterTBitraverse[F[_]]
 }
 
 private trait WriterComonad[W]
-    extends Comonad[Writer[W, ?]] with WriterTFunctor[Id, W] {
+    extends Comonad[Writer[W, ?]]
+    with WriterTFunctor[Id, W] {
   def copoint[A](p: Writer[W, A]): A = p.value
 
   override def cojoin[A](fa: Writer[W, A]): Writer[W, Writer[W, A]] =
@@ -494,7 +506,8 @@ private trait WriterTHoist[W] extends Hoist[λ[(α[_], β) => WriterT[α, W, β]
 }
 
 private trait WriterTMonadListen[F[_], W]
-    extends MonadListen[WriterT[F, W, ?], W] with WriterTMonad[F, W] {
+    extends MonadListen[WriterT[F, W, ?], W]
+    with WriterTMonad[F, W] {
   implicit def F: Monad[F]
   implicit def W: Monoid[W]
 

@@ -26,11 +26,10 @@ class CoronerSpec extends WordSpec with Matchers {
 
     "generate a report if enough time passes" in {
       val (_, report) = captureOutput(
-          out ⇒
-            {
-          val coroner = Coroner.watch(100.milliseconds, "XXXX", out)
-          Await.ready(coroner, 5.seconds)
-          coroner.cancel()
+          out ⇒ {
+        val coroner = Coroner.watch(100.milliseconds, "XXXX", out)
+        Await.ready(coroner, 5.seconds)
+        coroner.cancel()
       })
       report should include("Coroner's Report")
       report should include("XXXX")
@@ -38,23 +37,21 @@ class CoronerSpec extends WordSpec with Matchers {
 
     "not generate a report if cancelled early" in {
       val (_, report) = captureOutput(
-          out ⇒
-            {
-          val coroner = Coroner.watch(60.seconds, "XXXX", out)
-          coroner.cancel()
-          Await.ready(coroner, 1.seconds)
+          out ⇒ {
+        val coroner = Coroner.watch(60.seconds, "XXXX", out)
+        coroner.cancel()
+        Await.ready(coroner, 1.seconds)
       })
       report should ===("")
     }
 
     "display thread counts if enabled" in {
       val (_, report) = captureOutput(
-          out ⇒
-            {
-          val coroner =
-            Coroner.watch(60.seconds, "XXXX", out, displayThreadCounts = true)
-          coroner.cancel()
-          Await.ready(coroner, 1.second)
+          out ⇒ {
+        val coroner =
+          Coroner.watch(60.seconds, "XXXX", out, displayThreadCounts = true)
+        coroner.cancel()
+        Await.ready(coroner, 1.second)
       })
       report should include("Coroner Thread Count starts at ")
       report should include("Coroner Thread Count started at ")

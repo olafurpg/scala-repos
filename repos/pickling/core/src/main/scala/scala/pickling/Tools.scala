@@ -92,8 +92,9 @@ class Tools[C <: Context](val c: C) {
 
   def compileTimeDispatchees(
       tpe: Type, mirror: Mirror, excludeSelf: Boolean): List[Type] = {
-    val subtypes = allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(
-        subtpe => subtpe.typeSymbol != tpe.typeSymbol)
+    val subtypes =
+      allStaticallyKnownConcreteSubclasses(tpe, mirror).filter(subtpe =>
+            subtpe.typeSymbol != tpe.typeSymbol)
     val selfTpe =
       if (isRelevantSubclass(tpe.typeSymbol, tpe.typeSymbol)) List(tpe)
       else Nil
@@ -172,17 +173,16 @@ class Tools[C <: Context](val c: C) {
             // NOTE: only looking for top-level classes!
             val pkgMembers = pkg.typeSignature.members
             pkgMembers foreach
-            (m =>
-                  {
-                    def analyze(m: Symbol): Unit = {
-                      if (m.name.decoded.contains("$")) () // SI-7251
-                      else if (m.isClass)
-                        m.asClass.baseClasses foreach
-                        (bc => updateCache(bc, m))
-                      else if (m.isModule) analyze(m.asModule.moduleClass)
-                      else ()
-                    }
-                    analyze(m)
+            (m => {
+                  def analyze(m: Symbol): Unit = {
+                    if (m.name.decoded.contains("$")) () // SI-7251
+                    else if (m.isClass)
+                      m.asClass.baseClasses foreach
+                      (bc => updateCache(bc, m))
+                    else if (m.isModule) analyze(m.asModule.moduleClass)
+                    else ()
+                  }
+                  analyze(m)
                 })
             def recurIntoPackage(pkg: Symbol) = {
               pkg.name.toString != "_root_" &&
@@ -216,25 +216,24 @@ class Tools[C <: Context](val c: C) {
       }
       // NOTE: need to order the list: children first, parents last
       // otherwise pattern match which uses this list might work funnily
-      val subSyms = unsorted.distinct.sortWith(
-          (c1, c2) => c1.asClass.baseClasses.contains(c2))
+      val subSyms = unsorted.distinct.sortWith((c1, c2) =>
+            c1.asClass.baseClasses.contains(c2))
       val subTpes = subSyms
         .map(_.asClass)
-        .map(subSym =>
-              {
-            def tparamNames(sym: TypeSymbol) =
-              sym.typeParams.map(_.name.toString)
-            // val tparamsMatch = subSym.typeParams.nonEmpty && tparamNames(baseSym) == tparamNames(subSym)
-            val tparamsMatch =
-              subSym.typeParams.nonEmpty &&
-              tparamNames(baseSym).length == tparamNames(subSym).length
-            val targsAreConcrete =
-              baseTargs.nonEmpty && baseTargs.forall(_.typeSymbol.isClass)
-            // NOTE: this is an extremely naïve heuristics
-            // see http://groups.google.com/group/scala-internals/browse_thread/thread/3a43a6364b97b521 for more information
-            if (tparamsMatch && targsAreConcrete)
-              appliedType(subSym.toTypeConstructor, baseTargs)
-            else existentialAbstraction(subSym.typeParams, subSym.toType)
+        .map(subSym => {
+          def tparamNames(sym: TypeSymbol) =
+            sym.typeParams.map(_.name.toString)
+          // val tparamsMatch = subSym.typeParams.nonEmpty && tparamNames(baseSym) == tparamNames(subSym)
+          val tparamsMatch =
+            subSym.typeParams.nonEmpty &&
+            tparamNames(baseSym).length == tparamNames(subSym).length
+          val targsAreConcrete =
+            baseTargs.nonEmpty && baseTargs.forall(_.typeSymbol.isClass)
+          // NOTE: this is an extremely naïve heuristics
+          // see http://groups.google.com/group/scala-internals/browse_thread/thread/3a43a6364b97b521 for more information
+          if (tparamsMatch && targsAreConcrete)
+            appliedType(subSym.toTypeConstructor, baseTargs)
+          else existentialAbstraction(subSym.typeParams, subSym.toType)
         })
       subTpes
     }

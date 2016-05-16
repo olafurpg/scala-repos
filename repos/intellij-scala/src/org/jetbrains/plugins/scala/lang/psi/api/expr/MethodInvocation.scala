@@ -124,9 +124,9 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     * This method useful in case if you want to update some polymorphic type
     * according to method call expected type
     */
-  def updateAccordingToExpectedType(
-      nonValueType: TypeResult[ScType],
-      check: Boolean = false): TypeResult[ScType] = {
+  def updateAccordingToExpectedType(nonValueType: TypeResult[ScType],
+                                    check: Boolean =
+                                      false): TypeResult[ScType] = {
     InferUtil.updateAccordingToExpectedType(nonValueType,
                                             fromImplicitParameters = false,
                                             filterTypeParams = false,
@@ -193,19 +193,20 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
     }
 
     def tuplizyCase(exprs: Seq[Expression])(
-        fun: (Seq[Expression]) => (ScType, scala.Seq[ApplicabilityProblem],
-        Seq[(Parameter, ScExpression)], Seq[(Parameter, ScType)])): ScType = {
+        fun: (Seq[Expression]) => (ScType,
+                                   scala.Seq[ApplicabilityProblem],
+                                   Seq[(Parameter, ScExpression)],
+                                   Seq[(Parameter, ScType)])): ScType = {
       val c = fun(exprs)
       def tail: ScType = {
         setApplicabilityProblemsVar(c._2)
         setMatchedParametersVar(c._3)
         val dependentSubst = new ScSubstitutor(
-            () =>
-              {
-            this.scalaLanguageLevel match {
-              case Some(level) if level < Scala_2_10 => Map.empty
-              case _ => c._4.toMap
-            }
+            () => {
+          this.scalaLanguageLevel match {
+            case Some(level) if level < Scala_2_10 => Map.empty
+            case _ => c._4.toMap
+          }
         })
         dependentSubst.subst(c._1)
       }
@@ -220,12 +221,11 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
               setApplicabilityProblemsVar(cd._2)
               setMatchedParametersVar(cd._3)
               val dependentSubst = new ScSubstitutor(
-                  () =>
-                    {
-                  this.scalaLanguageLevel match {
-                    case Some(level) if level < Scala_2_10 => Map.empty
-                    case _ => cd._4.toMap
-                  }
+                  () => {
+                this.scalaLanguageLevel match {
+                  case Some(level) if level < Scala_2_10 => Map.empty
+                  case _ => cd._4.toMap
+                }
               })
               dependentSubst.subst(cd._1)
             }
@@ -316,13 +316,12 @@ trait MethodInvocation extends ScExpression with ScalaPsiElement {
               val str = ScalaPsiManager
                 .instance(getProject)
                 .getCachedClass(getResolveScope, "java.lang.String")
-              val stringType = str
-                .map(ScType.designator(_))
-                .getOrElse(types.Any)
-                (res.map(tp =>
-                       ScTupleType(Seq(stringType, tp))(
-                           getProject, getResolveScope)),
-                 imports)
+              val stringType =
+                str.map(ScType.designator(_)).getOrElse(types.Any)
+              (res.map(tp =>
+                     ScTupleType(Seq(stringType, tp))(getProject,
+                                                      getResolveScope)),
+               imports)
             }
           }
         }

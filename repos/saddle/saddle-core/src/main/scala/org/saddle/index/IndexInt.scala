@@ -100,7 +100,7 @@ class IndexInt(keys: Vec[Int]) extends Index[Int] {
     else -(binarySearch(keys, t) + 1)
   }
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: Int => B): Index[B] =
     Index(VecImpl.map(keys)(f).toArray)
 

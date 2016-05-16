@@ -30,8 +30,8 @@ trait PathReads {
     at(path)(reads)
 
   def at[A](path: JsPath)(implicit reads: Reads[A]): Reads[A] =
-    Reads[A](
-        js => path.asSingleJsResult(js).flatMap(reads.reads(_).repath(path)))
+    Reads[A](js =>
+          path.asSingleJsResult(js).flatMap(reads.reads(_).repath(path)))
 
   /**
     * Reads a Option[T] search optional or nullable field at JsPath (field not found or null is None
@@ -65,8 +65,8 @@ trait PathReads {
   def jsPick[A <: JsValue](path: JsPath)(implicit reads: Reads[A]): Reads[A] =
     at(path)(reads)
 
-  def jsPickBranch[A <: JsValue](path: JsPath)(
-      implicit reads: Reads[A]): Reads[JsObject] =
+  def jsPickBranch[A <: JsValue](
+      path: JsPath)(implicit reads: Reads[A]): Reads[JsObject] =
     Reads[JsObject](
         js =>
           path
@@ -80,8 +80,8 @@ trait PathReads {
     Reads[JsObject](json => JsSuccess(JsPath.createObj(path -> a)))
 
   def jsCopyTo[A <: JsValue](path: JsPath)(reads: Reads[A]) =
-    Reads[JsObject](
-        js => reads.reads(js).map(js => JsPath.createObj(path -> js)))
+    Reads[JsObject](js =>
+          reads.reads(js).map(js => JsPath.createObj(path -> js)))
 
   def jsUpdate[A <: JsValue](path: JsPath)(reads: Reads[A]) =
     Reads[JsObject](js =>
@@ -183,8 +183,8 @@ trait ConstraintReads {
   def verifying[A](cond: A => Boolean)(implicit rds: Reads[A]) =
     filter[A](ValidationError("error.invalid"))(cond)(rds)
 
-  def verifyingIf[A](
-      cond: A => Boolean)(subreads: Reads[_])(implicit rds: Reads[A]) =
+  def verifyingIf[A](cond: A => Boolean)(
+      subreads: Reads[_])(implicit rds: Reads[A]) =
     Reads[A] { js =>
       rds.reads(js).flatMap { t =>
         (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
@@ -238,11 +238,11 @@ trait PathWrites {
                   js.asOpt[JsObject]
                     .map(obj => obj.deepMerge(wrs.writes(obj))))
             .getOrElse(JsNull)
-        )
+      )
     }
 
-  def pure[A](
-      path: JsPath, fixed: => A)(implicit wrs: Writes[A]): OWrites[JsValue] =
+  def pure[A](path: JsPath, fixed: => A)(
+      implicit wrs: Writes[A]): OWrites[JsValue] =
     OWrites[JsValue] { js =>
       JsPath.createObj(path -> wrs.writes(fixed))
     }

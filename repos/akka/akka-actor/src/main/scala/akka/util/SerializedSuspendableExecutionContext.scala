@@ -34,7 +34,9 @@ private[akka] object SerializedSuspendableExecutionContext {
   */
 private[akka] final class SerializedSuspendableExecutionContext(
     throughput: Int)(val context: ExecutionContext)
-    extends AbstractNodeQueue[Runnable] with Runnable with ExecutionContext {
+    extends AbstractNodeQueue[Runnable]
+    with Runnable
+    with ExecutionContext {
   import SerializedSuspendableExecutionContext._
   require(
       throughput > 0,

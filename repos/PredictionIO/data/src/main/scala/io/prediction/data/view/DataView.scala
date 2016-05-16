@@ -55,7 +55,7 @@ object DataView {
     * @return a DataFrame of events
     */
   @Experimental
-  def create[E <: Product : TypeTag : ClassTag](
+  def create[E <: Product: TypeTag: ClassTag](
       appName: String,
       channelName: Option[String] = None,
       startTime: Option[DateTime] = None,

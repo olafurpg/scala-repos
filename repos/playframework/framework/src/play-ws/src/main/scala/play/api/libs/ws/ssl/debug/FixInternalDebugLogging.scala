@@ -25,8 +25,10 @@ object FixInternalDebugLogging {
         "play.api.libs.ws.ssl.debug.FixInternalDebugLogging.MonkeyPatchInternalSslDebugAction")
 
     val initialResource = foldRuntime(
-        older = "/javax/net/ssl/SSLContext.class", // in 1.6 the JSSE classes are in rt.jar
-        newer = "/sun/security/ssl/Debug.class" // in 1.7 the JSSE classes are in jsse.jar
+        older =
+          "/javax/net/ssl/SSLContext.class", // in 1.6 the JSSE classes are in rt.jar
+        newer =
+          "/sun/security/ssl/Debug.class" // in 1.7 the JSSE classes are in jsse.jar
     )
 
     val debugClassName = foldRuntime(
@@ -64,7 +66,7 @@ object FixInternalDebugLogging {
 
       var isPatched = false
       for (debugClass <- findClasses;
-      debugField <- debugClass.getDeclaredFields) {
+           debugField <- debugClass.getDeclaredFields) {
         if (isValidField(debugField, debugType)) {
           logger.debug(s"run: patching $debugClass with $debugValue")
           monkeyPatchField(debugField, debugValue)

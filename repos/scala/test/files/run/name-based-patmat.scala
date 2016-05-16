@@ -30,7 +30,8 @@ package p0 {
 
 package p1 {
   class Triple(val x: Any)
-      extends AnyRef with Product3[String, String, String] {
+      extends AnyRef
+      with Product3[String, String, String] {
     private def s = "" + x
     override def canEqual(x: Any) = this eq x.asInstanceOf[AnyRef]
     def isEmpty = false

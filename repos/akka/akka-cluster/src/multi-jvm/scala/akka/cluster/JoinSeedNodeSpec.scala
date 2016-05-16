@@ -30,7 +30,8 @@ class JoinSeedNodeMultiJvmNode4 extends JoinSeedNodeSpec
 class JoinSeedNodeMultiJvmNode5 extends JoinSeedNodeSpec
 
 abstract class JoinSeedNodeSpec
-    extends MultiNodeSpec(JoinSeedNodeMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(JoinSeedNodeMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import JoinSeedNodeMultiJvmSpec._
 

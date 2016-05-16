@@ -58,7 +58,9 @@ private[akka] class TLSActor(settings: ActorMaterializerSettings,
                              closing: TLSClosing,
                              hostInfo: Option[(String, Int)],
                              tracing: Boolean)
-    extends Actor with ActorLogging with Pump {
+    extends Actor
+    with ActorLogging
+    with Pump {
 
   import TLSActor._
 

@@ -53,7 +53,7 @@ trait ScalaClassLoader extends JClassLoader {
     tryToInitializeClass[AnyRef](path).map(_.newInstance()).orNull
 
   /** Create an instance with ctor args, or invoke errorFn before throwing. */
-  def create[T <: AnyRef : ClassTag](path: String, errorFn: String => Unit)(
+  def create[T <: AnyRef: ClassTag](path: String, errorFn: String => Unit)(
       args: AnyRef*): T = {
     def fail(msg: String) = error(msg, new IllegalArgumentException(msg))
     def error(msg: String, e: Throwable) = { errorFn(msg); throw e }
@@ -70,8 +70,7 @@ trait ScalaClassLoader extends JClassLoader {
                 })
           if (maybes.size == 1) maybes.head
           else
-            fail(
-                s"Constructor must accept arg list (${args map
+            fail(s"Constructor must accept arg list (${args map
             (_.getClass.getName) mkString ", "}): ${path}")
         }
         (ctor.newInstance(args: _*)).asInstanceOf[T]
@@ -145,7 +144,8 @@ object ScalaClassLoader {
   }
 
   class URLClassLoader(urls: Seq[URL], parent: JClassLoader)
-      extends JURLClassLoader(urls.toArray, parent) with ScalaClassLoader
+      extends JURLClassLoader(urls.toArray, parent)
+      with ScalaClassLoader
       with HasClassPath {
 
     private var classloaderURLs: Seq[URL] = urls

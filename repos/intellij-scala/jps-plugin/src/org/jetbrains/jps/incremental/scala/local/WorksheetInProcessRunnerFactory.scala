@@ -80,8 +80,10 @@ class WorksheetInProcessRunnerFactory {
             new String(buffer.array(), 0, buffer.position()))
         buffer.clear()
         val encode = Base64Converter.encode(event.toBytes)
-        out.write(if (standalone && !encode.endsWith("="))
-              (encode + "=").getBytes else encode.getBytes)
+        out.write(
+            if (standalone && !encode.endsWith("="))
+              (encode + "=").getBytes
+            else encode.getBytes)
       }
     }
 

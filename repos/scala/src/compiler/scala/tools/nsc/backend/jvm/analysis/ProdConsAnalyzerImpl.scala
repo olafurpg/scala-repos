@@ -82,16 +82,14 @@ trait ProdConsAnalyzerImpl {
   def consumersOfValueAt(
       insn: AbstractInsnNode, slot: Int): Set[AbstractInsnNode] = {
     producersForValueAt(insn, slot).flatMap(
-        prod =>
-          {
-        val outputNumber = outputValueSlots(prod).indexOf(slot)
-        _consumersOfOutputsFrom
-          .get(prod)
-          .map(v =>
-                {
-              v(outputNumber)
-          })
-          .getOrElse(Set.empty)
+        prod => {
+      val outputNumber = outputValueSlots(prod).indexOf(slot)
+      _consumersOfOutputsFrom
+        .get(prod)
+        .map(v => {
+          v(outputNumber)
+        })
+        .getOrElse(Set.empty)
     })
   }
 
@@ -248,10 +246,8 @@ trait ProdConsAnalyzerImpl {
     }
 
     if (isLoad(copyOp)) {
-      val slot = copyOp
-        .asInstanceOf[VarInsnNode]
-        .`var`
-        (frame.getLocal(slot), slot)
+      val slot = copyOp.asInstanceOf[VarInsnNode].`var`
+      (frame.getLocal(slot), slot)
     } else if (isStore(copyOp)) {
       stackValue(0)
     } else

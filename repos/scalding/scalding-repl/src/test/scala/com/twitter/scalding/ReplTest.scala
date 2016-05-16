@@ -183,8 +183,8 @@ class ReplTest extends WordSpec {
         assert(out === helloRef.flatMap(_.split("\\s+")))
       }
       "tuple" in {
-        assert(hello.map(l => (l, l.length)).toList === helloRef.map(
-                l => (l, l.length)))
+        assert(hello.map(l => (l, l.length)).toList === helloRef.map(l =>
+                  (l, l.length)))
       }
     }
   }

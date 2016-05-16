@@ -204,7 +204,8 @@ trait SingletonProductArgs extends Dynamic {
 
 @macrocompat.bundle
 class ProductMacros(val c: whitebox.Context)
-    extends SingletonTypeUtils with NatMacroDefns {
+    extends SingletonTypeUtils
+    with NatMacroDefns {
   import c.universe._
   import internal.constantType
 
@@ -229,7 +230,8 @@ class ProductMacros(val c: whitebox.Context)
 
     val meth = lhsTpe.member(methodName).asMethod
 
-    if (!meth.paramLists.isEmpty && (meth.paramLists(0) forall (_.isImplicit))) {
+    if (!meth.paramLists.isEmpty &&
+        (meth.paramLists(0) forall (_.isImplicit))) {
       val typeParamsTree = mkProductNatTypeParamsImpl(args)
       q""" $lhs.$methodName[${typeParamsTree}] """
     } else {
@@ -284,8 +286,8 @@ class ProductMacros(val c: whitebox.Context)
 
   def mkProductNatTypeParamsImpl(args: Seq[Tree]): Tree = {
     args
-      .foldRight((tq"_root_.shapeless.HNil", tq"_root_.shapeless.HNil"): (Tree,
-          Tree)) {
+      .foldRight(
+          (tq"_root_.shapeless.HNil", tq"_root_.shapeless.HNil"): (Tree, Tree)) {
         case (NatLiteral(n), (accTpt, _)) =>
           val neTpt = mkNatTpt(n)
           (tq"""_root_.shapeless.::[$neTpt, $accTpt]""",

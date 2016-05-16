@@ -20,7 +20,9 @@ import play.api.test.Helpers.{GET => GET_REQUEST, _}
 import play.api.Application
 
 trait ExampleSpecification
-    extends Specification with DefaultAwaitTimeout with FutureAwaits
+    extends Specification
+    with DefaultAwaitTimeout
+    with FutureAwaits
     with Results
 
 class ScalaFunctionalTestSpec extends ExampleSpecification {

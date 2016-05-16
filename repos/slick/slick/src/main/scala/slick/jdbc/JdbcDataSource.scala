@@ -61,10 +61,10 @@ trait JdbcDataSourceFactory {
 }
 
 /** A JdbcDataSource for a `DataSource` */
-class DataSourceJdbcDataSource(
-    val ds: DataSource,
-    val keepAliveConnection: Boolean,
-    val connectionPreparer: ConnectionPreparer = null)
+class DataSourceJdbcDataSource(val ds: DataSource,
+                               val keepAliveConnection: Boolean,
+                               val connectionPreparer: ConnectionPreparer =
+                                 null)
     extends JdbcDataSource {
   private[this] var openedKeepAliveConnection: Connection = null
 

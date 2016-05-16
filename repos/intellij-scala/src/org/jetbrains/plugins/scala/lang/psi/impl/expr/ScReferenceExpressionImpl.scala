@@ -36,7 +36,8 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.{CompletionProcessor, 
   * Date: 06.03.2008
   */
 class ScReferenceExpressionImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ResolvableReferenceExpression {
+    extends ScalaPsiElementImpl(node)
+    with ResolvableReferenceExpression {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => accept(visitor)
@@ -168,15 +169,13 @@ class ScReferenceExpressionImpl(node: ASTNode)
       filterNotNamedVariants: Boolean): Array[ResolveResult] = {
     doResolve(this,
               new CompletionProcessor(
-                  getKinds(incomplete = true), this, implicits)).filter(
-        r =>
-          {
-        if (filterNotNamedVariants) {
-          r match {
-            case res: ScalaResolveResult => res.isNamedParameter
-            case _ => false
-          }
-        } else true
+                  getKinds(incomplete = true), this, implicits)).filter(r => {
+      if (filterNotNamedVariants) {
+        r match {
+          case res: ScalaResolveResult => res.isNamedParameter
+          case _ => false
+        }
+      } else true
     })
   }
 
@@ -510,7 +509,7 @@ class ScReferenceExpressionImpl(node: ASTNode)
                   for {
                     clazz <- ScalaPsiUtil.drvTemplate(this)
                     qualifier <- convertQualifier(
-                        clazz.getType(TypingContext.empty))
+                                    clazz.getType(TypingContext.empty))
                   } yield qualifier
               }
           }

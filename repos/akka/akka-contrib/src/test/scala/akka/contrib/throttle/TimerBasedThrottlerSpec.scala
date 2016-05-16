@@ -34,8 +34,11 @@ object TimerBasedThrottlerSpec {
 
 @RunWith(classOf[JUnitRunner])
 class TimerBasedThrottlerSpec
-    extends TestKit(ActorSystem("TimerBasedThrottlerSpec")) with ImplicitSender
-    with WordSpecLike with Matchers with BeforeAndAfterAll {
+    extends TestKit(ActorSystem("TimerBasedThrottlerSpec"))
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   import TimerBasedThrottlerSpec._
 

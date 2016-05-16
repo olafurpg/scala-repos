@@ -98,10 +98,7 @@ object InvalidHistoryService extends HistoryServiceWithData {
   def fetchHistory(
       info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
     // all entries below the 10% threshold for past input size
-    Success(
-        Seq(makeHistory(10, 1),
-            makeHistory(10, 1),
-            makeHistory(10, 1)))
+    Success(Seq(makeHistory(10, 1), makeHistory(10, 1), makeHistory(10, 1)))
 }
 
 class EmptyHistoryBasedEstimator extends RatioBasedEstimator {
@@ -121,7 +118,9 @@ class InvalidHistoryBasedEstimator extends RatioBasedEstimator {
 }
 
 class RatioBasedReducerEstimatorTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
   import HipJob._
 
   "Single-step job with ratio-based reducer estimator" should {

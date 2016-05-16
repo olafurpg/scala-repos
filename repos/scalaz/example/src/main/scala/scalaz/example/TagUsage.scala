@@ -93,7 +93,7 @@ object TagUsage extends App {
   val Sorted = Tag.of[Sorted]
 
   // a sort function which will sort then add the Tag
-  def sortList[A : scala.math.Ordering](as: List[A]): List[A] @@ Sorted =
+  def sortList[A: scala.math.Ordering](as: List[A]): List[A] @@ Sorted =
     Sorted(as.sorted)
 
   // now we can define a function which takes lists which are tagged as being sorted

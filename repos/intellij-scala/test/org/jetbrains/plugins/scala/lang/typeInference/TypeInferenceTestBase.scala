@@ -66,7 +66,8 @@ abstract class TypeInferenceTestBase
 
     val addOne =
       if (PsiTreeUtil.getParentOfType(scalaFile.findElementAt(startOffset),
-                                      classOf[ScExpression]) != null) 0 else 1 //for xml tests
+                                      classOf[ScExpression]) != null) 0
+      else 1 //for xml tests
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
         scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
@@ -114,12 +115,10 @@ abstract class TypeInferenceTestBase
           case _ => assertEquals(output, res)
         }
       case Failure(msg, elem) =>
-        assert(assertion = false,
-               msg + " :: " +
-               (elem match {
-                     case Some(x) => x.getText
-                     case None => "empty element"
-                   }))
+        assert(assertion = false, msg + " :: " + (elem match {
+              case Some(x) => x.getText
+              case None => "empty element"
+            }))
     }
   }
 }

@@ -155,7 +155,7 @@ object ScalaPluginUpdater {
       val pluginIdString: String = pluginId.getIdString
       import scala.collection.JavaConversions._
       while (installedPlugins.exists(
-          _.getPluginId.getIdString == pluginIdString)) {
+                 _.getPluginId.getIdString == pluginIdString)) {
         installedPlugins.remove(pluginIdString)
       }
     } catch {
@@ -195,8 +195,7 @@ object ScalaPluginUpdater {
       case Nightly => Some(currentRepo(Nightly))
     }
 
-    url.foreach(
-        u =>
+    url.foreach(u =>
           invokeLater {
         try {
           val resp = XML.load(u)
@@ -223,8 +222,7 @@ object ScalaPluginUpdater {
       val a = ApplicationInfoEx.getInstanceEx.getUpdateUrls.getCheckingUrl
       val info = HttpRequests
         .request(a)
-        .connect(
-            new HttpRequests.RequestProcessor[Option[UpdatesInfo]] {
+        .connect(new HttpRequests.RequestProcessor[Option[UpdatesInfo]] {
           def process(request: HttpRequests.Request) = {
             try {
               Some(new UpdatesInfo(JDOMUtil

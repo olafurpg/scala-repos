@@ -51,7 +51,8 @@ import org.apache.spark.storage.StorageLevel
 @Since("1.2.0")
 class GradientBoostedTrees @Since("1.2.0")(
     private val boostingStrategy: BoostingStrategy)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Method to train a gradient boosting model
@@ -110,8 +111,8 @@ class GradientBoostedTrees @Since("1.2.0")(
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        val remappedValidationInput = validationInput.map(
-            x => new LabeledPoint((x.label * 2) - 1, x.features))
+        val remappedValidationInput = validationInput.map(x =>
+              new LabeledPoint((x.label * 2) - 1, x.features))
         GradientBoostedTrees.boost(remappedInput,
                                    remappedValidationInput,
                                    boostingStrategy,

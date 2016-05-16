@@ -36,7 +36,9 @@ sealed trait ToMonadPlusOps0 {
 }
 
 trait ToMonadPlusOps
-    extends ToMonadPlusOps0 with ToMonadOps with ToApplicativePlusOps {
+    extends ToMonadPlusOps0
+    with ToMonadOps
+    with ToApplicativePlusOps {
   implicit def ToMonadPlusOps[F[_], A](v: F[A])(implicit F0: MonadPlus[F]) =
     new MonadPlusOps[F, A](v)
 
@@ -46,7 +48,8 @@ trait ToMonadPlusOps
 }
 
 trait MonadPlusSyntax[F[_]]
-    extends MonadSyntax[F] with ApplicativePlusSyntax[F] {
+    extends MonadSyntax[F]
+    with ApplicativePlusSyntax[F] {
   implicit def ToMonadPlusOps[A](v: F[A]): MonadPlusOps[F, A] =
     new MonadPlusOps[F, A](v)(MonadPlusSyntax.this.F)
 

@@ -63,7 +63,8 @@ object Analysis {
       val raw = r str "data"
       Analysis(
           id = r str "_id",
-          infos = Info.decodeList(raw, startPly) err s"Invalid analysis data $raw",
+          infos =
+            Info.decodeList(raw, startPly) err s"Invalid analysis data $raw",
           startPly = startPly,
           uid = r strO "uid",
           by = r strO "by",

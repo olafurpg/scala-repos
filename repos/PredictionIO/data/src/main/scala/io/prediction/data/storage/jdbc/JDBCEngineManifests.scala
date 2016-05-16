@@ -23,7 +23,8 @@ import scalikejdbc._
 /** JDBC implementation of [[EngineManifests]] */
 class JDBCEngineManifests(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EngineManifests with Logging {
+    extends EngineManifests
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "enginemanifests")

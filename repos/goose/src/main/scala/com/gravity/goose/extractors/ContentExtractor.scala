@@ -223,9 +223,8 @@ trait ContentExtractor {
           val booster: Float =
             bottomNodesForNegativeScore.asInstanceOf[Float] -
             (numberOfNodes - i).asInstanceOf[Float]
-          boostScore = -math
-            .pow(booster, 2.asInstanceOf[Float])
-            .asInstanceOf[Float]
+          boostScore =
+            -math.pow(booster, 2.asInstanceOf[Float]).asInstanceOf[Float]
           val negscore: Float = math.abs(boostScore) + negativeScoring
           if (negscore > 40) {
             boostScore = 5
@@ -286,7 +285,8 @@ trait ContentExtractor {
             topNode.id + "' class='" + topNode.attr("class") + "' ")
         val text =
           if (topNode.text.trim.length > 100)
-            topNode.text.trim.substring(0, 100) + "..." else topNode.text.trim
+            topNode.text.trim.substring(0, 100) + "..."
+          else topNode.text.trim
         trace(logPrefix + "Text - " + text)
       }
     } catch {
@@ -403,8 +403,9 @@ trait ContentExtractor {
     var currentScore: Int = 0
     try {
       val scoreString: String = node.attr("gravityScore")
-      currentScore = if (string.isNullOrEmpty(scoreString)) 0
-      else Integer.parseInt(scoreString)
+      currentScore =
+        if (string.isNullOrEmpty(scoreString)) 0
+        else Integer.parseInt(scoreString)
     } catch {
       case e: NumberFormatException => {
           currentScore = 0
@@ -424,8 +425,9 @@ trait ContentExtractor {
     var currentScore: Int = 0
     try {
       val countString: String = node.attr("gravityNodes")
-      currentScore = if (string.isNullOrEmpty(countString)) 0
-      else Integer.parseInt(countString)
+      currentScore =
+        if (string.isNullOrEmpty(countString)) 0
+        else Integer.parseInt(countString)
     } catch {
       case e: NumberFormatException => {
           currentScore = 0
@@ -562,13 +564,13 @@ trait ContentExtractor {
       } else {
 
         Some((for {
-          firstParagraph <- potentialParagraphs if
-                           (firstParagraph.text.length() > 0)
+          firstParagraph <- potentialParagraphs
+          if (firstParagraph.text.length() > 0)
           wordStats: WordStats = StopWords.getStopWordCount(
               firstParagraph.text)
           paragraphScore: Int = wordStats.getStopWordCount
-          siblingBaseLineScore: Double = .30 if
-          ((baselineScoreForSiblingParagraphs * siblingBaseLineScore).toDouble < paragraphScore)
+          siblingBaseLineScore: Double = .30
+          if ((baselineScoreForSiblingParagraphs * siblingBaseLineScore).toDouble < paragraphScore)
         } yield {
 
           trace(logPrefix + "This node looks like a good sibling, adding it")
@@ -587,8 +589,10 @@ trait ContentExtractor {
       trace(logPrefix + "SIBLINGCHECK: " + debugNode(currentSibling))
       b += work(currentSibling)
 
-      currentSibling = if (currentSibling != null)
-        currentSibling.previousElementSibling else null
+      currentSibling =
+        if (currentSibling != null)
+          currentSibling.previousElementSibling
+        else null
     }
     b
   }

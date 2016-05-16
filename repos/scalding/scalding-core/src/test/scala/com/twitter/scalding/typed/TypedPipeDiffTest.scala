@@ -105,14 +105,12 @@ class TypedPipeDiffTest extends FunSuite {
 
   test(
       "diffArrayPipesWithoutOrdering works for arrays of objects with no ordering") {
-    val pipe1 = TypedPipe.from(
-        leftArr.map { arr =>
+    val pipe1 = TypedPipe.from(leftArr.map { arr =>
       arr.map { b =>
         new NoOrdering(b.toString)
       }
     })
-    val pipe2 = TypedPipe.from(
-        rightArr.map { arr =>
+    val pipe2 = TypedPipe.from(rightArr.map { arr =>
       arr.map { b =>
         new NoOrdering(b.toString)
       }
@@ -147,7 +145,7 @@ object TypedPipeDiffLaws {
     checkDiff(left.map(_.toSeq), right.map(_.toSeq), diff)
   }
 
-  def diffLaw[T : Ordering : Arbitrary]: Prop = Prop.forAll {
+  def diffLaw[T: Ordering: Arbitrary]: Prop = Prop.forAll {
     (left: List[T], right: List[T]) =>
       val diff = TypedPipe
         .from(left)
@@ -168,7 +166,7 @@ object TypedPipeDiffLaws {
       checkArrayDiff(left, right, diff)
     }
 
-  def diffByGroupLaw[T : Arbitrary]: Prop = Prop.forAll {
+  def diffByGroupLaw[T: Arbitrary]: Prop = Prop.forAll {
     (left: List[T], right: List[T]) =>
       val diff = TypedPipe
         .from(left)

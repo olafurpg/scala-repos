@@ -62,8 +62,8 @@ private[http] class HttpResponseRendererFactory(
     Flow.fromGraph(HttpResponseRenderer)
 
   object HttpResponseRenderer
-      extends GraphStage[FlowShape[
-              ResponseRenderingContext, ResponseRenderingOutput]] {
+      extends GraphStage[
+          FlowShape[ResponseRenderingContext, ResponseRenderingOutput]] {
     val in = Inlet[ResponseRenderingContext]("in")
     val out = Outlet[ResponseRenderingOutput]("out")
     val shape: FlowShape[ResponseRenderingContext, ResponseRenderingOutput] =
@@ -199,7 +199,8 @@ private[http] class HttpResponseRendererFactory(
                         // if the user applied some custom transfer-encoding we need to keep the header
                         render(
                             if (mustRenderTransferEncodingChunkedHeader)
-                              te.withChunked else te)
+                              te.withChunked
+                            else te)
                         renderHeaders(tail,
                                       alwaysClose,
                                       connHeader,
@@ -310,7 +311,8 @@ private[http] class HttpResponseRendererFactory(
 
           def renderContentLengthHeader(contentLength: Long) =
             if (status.allowsEntity)
-              r ~~ `Content-Length` ~~ contentLength ~~ CrLf else r
+              r ~~ `Content-Length` ~~ contentLength ~~ CrLf
+            else r
 
           def byteStrings(entityBytes: ⇒ Source[ByteString, Any])
             : Source[ResponseRenderingOutput, Any] =
@@ -344,9 +346,9 @@ private[http] class HttpResponseRendererFactory(
                                 contentLength))))
 
               case HttpEntity.CloseDelimited(_, data) ⇒
-                renderHeaders(
-                    headers.toList,
-                    alwaysClose = ctx.requestMethod != HttpMethods.HEAD)
+                renderHeaders(headers.toList,
+                              alwaysClose =
+                                ctx.requestMethod != HttpMethods.HEAD)
                 renderEntityContentType(r, entity) ~~ CrLf
                 Streamed(byteStrings(data))
 

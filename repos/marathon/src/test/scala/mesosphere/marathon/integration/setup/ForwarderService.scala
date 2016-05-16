@@ -74,7 +74,9 @@ object ForwarderService {
   }
 
   class ForwarderConf(args: Seq[String])
-      extends ScallopConf(args) with HttpConf with LeaderProxyConf
+      extends ScallopConf(args)
+      with HttpConf
+      with LeaderProxyConf
 
   def startHelloAppProcess(args: String*): Unit = {
     val conf = createConf(args: _*)
@@ -89,13 +91,13 @@ object ForwarderService {
   def startForwarderProcess(forwardToPort: Int, args: String*): Unit = {
     val conf = createConf(args: _*)
 
-    ProcessKeeper.startJavaProcess(
-        s"forwarder_${conf.httpPort()}",
-        heapInMegs = 128,
-        arguments = List(ForwarderService.className,
-                         "forwarder",
-                         forwardToPort.toString) ++ args,
-        upWhen = _.contains("ServerConnector@"))
+    ProcessKeeper.startJavaProcess(s"forwarder_${conf.httpPort()}",
+                                   heapInMegs = 128,
+                                   arguments =
+                                     List(ForwarderService.className,
+                                          "forwarder",
+                                          forwardToPort.toString) ++ args,
+                                   upWhen = _.contains("ServerConnector@"))
   }
 
   def main(args: Array[String]) {
@@ -121,9 +123,9 @@ object ForwarderService {
     log.info(
         s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
     startImpl(conf,
-              new LeaderInfoModule(
-                  elected = false,
-                  leaderHostPort = Some(s"localhost:$forwardToPort")))
+              new LeaderInfoModule(elected = false,
+                                   leaderHostPort =
+                                     Some(s"localhost:$forwardToPort")))
   }
 
   private[this] def createConf(args: String*): ForwarderConf = {
@@ -139,7 +141,8 @@ object ForwarderService {
     val injector = Guice.createInjector(
         new MetricsModule,
         new HttpModule(conf),
-        new ForwarderAppModule(myHostPort = if (conf.disableHttp())
+        new ForwarderAppModule(myHostPort =
+                                 if (conf.disableHttp())
                                    s"localhost:${conf.httpsPort()}"
                                  else s"localhost:${conf.httpPort()}",
                                conf,

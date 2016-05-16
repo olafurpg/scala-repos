@@ -11,9 +11,14 @@ import gitbucket.core.util.{LDAPUtil, Keys, UsersAuthenticator, ReferrerAuthenti
 import io.github.gitbucket.scalatra.forms._
 
 class IndexController
-    extends IndexControllerBase with RepositoryService with ActivityService
-    with AccountService with RepositorySearchService with IssuesService
-    with UsersAuthenticator with ReferrerAuthenticator
+    extends IndexControllerBase
+    with RepositoryService
+    with ActivityService
+    with AccountService
+    with RepositorySearchService
+    with IssuesService
+    with UsersAuthenticator
+    with ReferrerAuthenticator
 
 trait IndexControllerBase extends ControllerBase {
   self: RepositoryService with ActivityService with AccountService with RepositorySearchService with UsersAuthenticator with ReferrerAuthenticator =>
@@ -120,7 +125,7 @@ trait IndexControllerBase extends ControllerBase {
               .filter(!_.isGroupAccount)
               .map(_.userName)
               .toArray)
-      )
+    )
   })
 
   /**

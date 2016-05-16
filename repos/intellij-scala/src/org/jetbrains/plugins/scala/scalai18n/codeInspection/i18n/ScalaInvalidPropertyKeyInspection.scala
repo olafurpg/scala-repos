@@ -98,7 +98,7 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
     def isComputablePropertyExpression(myExpression: ScExpression): Boolean = {
       var expression = myExpression
       while (expression != null &&
-      expression.getParent.isInstanceOf[ScParenthesisedExpr]) {
+             expression.getParent.isInstanceOf[ScParenthesisedExpr]) {
         expression = expression.getParent.asInstanceOf[ScExpression]
       }
       expression != null && expression.getParent.isInstanceOf[ScExpression]

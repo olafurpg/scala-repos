@@ -130,9 +130,9 @@ abstract class GenIncOptimizer private[optimizer](
           if (linkedClass.kind == ClassKind.Interface) getDefaults(encodedName)
           else getClass(encodedName)
 
-        linkedClass.copy(
-            staticMethods = defs(getStaticsNamespace(encodedName)),
-            memberMethods = defs(memberNamespace))
+        linkedClass.copy(staticMethods =
+                           defs(getStaticsNamespace(encodedName)),
+                         memberMethods = defs(memberNamespace))
       }
 
       unit.updated(classDefs = newLinkedClasses, isComplete = true)
@@ -176,8 +176,8 @@ abstract class GenIncOptimizer private[optimizer](
     assert(!batchMode || (statics.isEmpty && defaults.isEmpty))
     if (!batchMode) {
       for {
-        (containerMap, neededLinkedClasses) <- Seq(
-            (statics, neededStatics), (defaults, neededDefaults))
+        (containerMap, neededLinkedClasses) <- Seq((statics, neededStatics),
+                                                   (defaults, neededDefaults))
       } {
         CollOps.retain(containerMap) { (namespaceName, namespace) =>
           CollOps
@@ -516,7 +516,7 @@ abstract class GenIncOptimizer private[optimizer](
       // Inlineable class
       if (updateIsInlineable(linkedClass)) {
         for (method <- methods.values; if isConstructorName(
-                          method.encodedName)) myInterface.tagStaticCallersOf(
+                 method.encodedName)) myInterface.tagStaticCallersOf(
             method.encodedName)
       }
 
@@ -544,9 +544,9 @@ abstract class GenIncOptimizer private[optimizer](
 
     /** UPDATE PASS ONLY. */
     def updateHasElidableModuleAccessor(): Unit = {
-      hasElidableModuleAccessor = isAdHocElidableModuleAccessor(encodedName) ||
-      (isModuleClass &&
-          lookupMethod("init___").exists(isElidableModuleConstructor))
+      hasElidableModuleAccessor =
+        isAdHocElidableModuleAccessor(encodedName) || (isModuleClass &&
+            lookupMethod("init___").exists(isElidableModuleConstructor))
     }
 
     /** UPDATE PASS ONLY. */
@@ -771,7 +771,8 @@ abstract class GenIncOptimizer private[optimizer](
     */
   private[optimizer] abstract class MethodImpl(
       val owner: MethodContainer, val encodedName: String)
-      extends OptimizerCore.MethodImpl with OptimizerCore.AbstractMethodID
+      extends OptimizerCore.MethodImpl
+      with OptimizerCore.AbstractMethodID
       with Unregisterable {
 
     private[this] var _deleted: Boolean = false

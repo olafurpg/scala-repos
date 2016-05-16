@@ -560,16 +560,16 @@ trait LowPrioritySegment {
     type Out = Out0
   }
 
-  implicit def two[P, S, T <: HList]: Aux[
-      P, S, T, Coselect[S] :: Select[Symbol @@ P] :: T] =
+  implicit def two[P, S, T <: HList]
+    : Aux[P, S, T, Coselect[S] :: Select[Symbol @@ P] :: T] =
     new Segment[P, S, T] {
       type Out = Coselect[S] :: Select[Symbol @@ P] :: T
     }
 }
 
 object Segment extends LowPrioritySegment {
-  implicit def one[
-      P, T <: HList]: Aux[P, Nothing, T, Select[Symbol @@ P] :: T] =
+  implicit def one[P, T <: HList]
+    : Aux[P, Nothing, T, Select[Symbol @@ P] :: T] =
     new Segment[P, Nothing, T] {
       type Out = Select[Symbol @@ P] :: T
     }

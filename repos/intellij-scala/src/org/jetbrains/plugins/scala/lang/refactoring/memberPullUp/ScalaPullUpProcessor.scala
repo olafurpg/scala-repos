@@ -145,8 +145,7 @@ class ScalaPullUpProcessor(project: Project,
         val copy = funDef.copy().asInstanceOf[ScFunctionDefinition]
         copy.setModifierProperty("override", value = false)
         Seq(copy.assignment, copy.body).flatten.foreach(_.delete())
-        copy.accept(
-            new ScalaRecursiveElementVisitor() {
+        copy.accept(new ScalaRecursiveElementVisitor() {
           override def visitSimpleTypeElement(te: ScSimpleTypeElement) = {
             val tpe = te.calcType
             te.replace(ScalaPsiElementFactory.createTypeElementFromText(

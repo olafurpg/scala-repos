@@ -10,7 +10,8 @@ package scala
 package runtime
 
 final class RichByte(val self: Byte)
-    extends AnyVal with ScalaWholeNumberProxy[Byte] {
+    extends AnyVal
+    with ScalaWholeNumberProxy[Byte] {
   protected def num = scala.math.Numeric.ByteIsIntegral
   protected def ord = scala.math.Ordering.Byte
 

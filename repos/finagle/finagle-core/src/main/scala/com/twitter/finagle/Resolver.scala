@@ -141,8 +141,7 @@ private[finagle] class InetResolver(
   def toAddr(hp: Seq[HostPortMetadata]): Future[Addr] = {
     val elapsed = Stopwatch.start()
     Future
-      .collectToTry(
-          hp.map {
+      .collectToTry(hp.map {
         case (host, port, meta) =>
           resolveHost(host).map { inetAddrs =>
             inetAddrs.map { inetAddr =>

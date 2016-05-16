@@ -25,7 +25,8 @@ class ALSModel(
     val itemStringIntMap: BiMap[String, Int],
     val items: Map[Int, Item]
 )
-    extends IPersistentModel[ALSAlgorithmParams] with Serializable {
+    extends IPersistentModel[ALSAlgorithmParams]
+    with Serializable {
 
   @transient lazy val itemIntStringMap = itemStringIntMap.inverse
 
@@ -52,8 +53,8 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
     new ALSModel(
         productFeatures = sc.get.objectFile(s"/tmp/${id}/productFeatures"),
         itemStringIntMap = sc.get
-            .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
-            .first,
+          .objectFile[BiMap[String, Int]](s"/tmp/${id}/itemStringIntMap")
+          .first,
         items = sc.get.objectFile[Map[Int, Item]](s"/tmp/${id}/items").first)
   }
 }
@@ -152,10 +153,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         qf
     }.seq.flatten
 
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 

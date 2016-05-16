@@ -16,4 +16,5 @@ class ScIdListStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScIdList](parent, elemType) with ScIdListStub
+    extends StubBaseWrapper[ScIdList](parent, elemType)
+    with ScIdListStub

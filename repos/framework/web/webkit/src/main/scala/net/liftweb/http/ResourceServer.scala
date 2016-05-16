@@ -94,8 +94,8 @@ object ResourceServer {
   def findResourceInClasspath(request: Req, uri: List[String])(
       ): Box[LiftResponse] =
     for {
-      auri <- Full(uri.filter(!_.startsWith(".")))
-        .filter(auri => isAllowed(auri))
+      auri <- Full(uri.filter(!_.startsWith("."))).filter(auri =>
+                   isAllowed(auri))
       rw = baseResourceLocation :: pathRewriter(auri)
       path = rw.mkString("/", "/", "")
       url <- LiftRules.getResource(path)

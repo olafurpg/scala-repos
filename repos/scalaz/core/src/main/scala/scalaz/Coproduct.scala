@@ -42,8 +42,8 @@ final case class Coproduct[F[_], G[_], A](run: F[A] \/ G[A]) {
       implicit F: Foldable1[F], G: Foldable1[G], M: Semigroup[B]): B =
     run.fold(F.foldMap1(_)(f), G.foldMap1(_)(f))
 
-  def foldMapRight1[B](z: A => B)(f: (A, => B) => B)(
-      implicit F: Foldable1[F], G: Foldable1[G]): B =
+  def foldMapRight1[B](z: A => B)(
+      f: (A, => B) => B)(implicit F: Foldable1[F], G: Foldable1[G]): B =
     run.fold(F.foldMapRight1(_)(z)(f), G.foldMapRight1(_)(z)(f))
 
   def traverse[X[_], B](g: A => X[B])(
@@ -224,7 +224,7 @@ private trait CoproductFoldable1[F[_], G[_]]
   implicit def F: Foldable1[F]
   implicit def G: Foldable1[G]
 
-  override final def foldMap1[A, B : Semigroup](fa: Coproduct[F, G, A])(
+  override final def foldMap1[A, B: Semigroup](fa: Coproduct[F, G, A])(
       f: A => B): B =
     fa.foldMap1(f)
 
@@ -247,7 +247,8 @@ private trait CoproductTraverse[F[_], G[_]]
 }
 
 private trait CoproductTraverse1[F[_], G[_]]
-    extends Traverse1[Coproduct[F, G, ?]] with CoproductFoldable1[F, G] {
+    extends Traverse1[Coproduct[F, G, ?]]
+    with CoproductFoldable1[F, G] {
   implicit def F: Traverse1[F]
   implicit def G: Traverse1[G]
 

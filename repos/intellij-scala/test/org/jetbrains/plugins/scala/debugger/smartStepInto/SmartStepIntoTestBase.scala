@@ -13,7 +13,8 @@ import scala.collection.JavaConverters._
 class SmartStepIntoTest extends SmartStepIntoTestBase with ScalaVersion_2_11
 
 class SmartStepIntoTest_212
-    extends SmartStepIntoTestBase with ScalaVersion_2_12 {
+    extends SmartStepIntoTestBase
+    with ScalaVersion_2_12 {
   override def testByNameArgument(): Unit = {
     runDebugger() {
       waitForBreakpoint()

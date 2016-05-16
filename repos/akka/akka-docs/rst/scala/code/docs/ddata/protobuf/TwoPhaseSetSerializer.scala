@@ -15,7 +15,8 @@ import docs.ddata.TwoPhaseSet
 import docs.ddata.protobuf.msg.TwoPhaseSetMessages
 
 class TwoPhaseSetSerializer(val system: ExtendedActorSystem)
-    extends Serializer with SerializationSupport {
+    extends Serializer
+    with SerializationSupport {
 
   override def includeManifest: Boolean = false
 

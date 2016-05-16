@@ -30,7 +30,8 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import scala.collection.mutable
 
 trait ReductionFinderSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification
+    with EvaluatorTestSupport[M] {
 
   import instructions._
   import dag._
@@ -921,4 +922,5 @@ trait ReductionFinderSpecs[M[+ _]]
 }
 
 object ReductionFinderSpecs
-    extends ReductionFinderSpecs[test.YId] with test.YIdInstances
+    extends ReductionFinderSpecs[test.YId]
+    with test.YIdInstances

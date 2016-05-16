@@ -86,7 +86,8 @@ object Entropy extends Impurity {
   * @param numClasses  Number of classes for label.
   */
 private[tree] class EntropyAggregator(numClasses: Int)
-    extends ImpurityAggregator(numClasses) with Serializable {
+    extends ImpurityAggregator(numClasses)
+    with Serializable {
 
   /**
     * Update stats for one (node, feature, bin) with the given label.

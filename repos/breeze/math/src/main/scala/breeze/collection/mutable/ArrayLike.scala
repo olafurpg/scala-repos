@@ -66,7 +66,7 @@ trait ArrayLike[V] {
     */
   def iterator = keysIterator zip valuesIterator
 
-  def toArray[U >: V : ClassTag] = Array.tabulate[U](length)(apply)
+  def toArray[U >: V: ClassTag] = Array.tabulate[U](length)(apply)
 
   def toList = List.tabulate(length)(apply)
 

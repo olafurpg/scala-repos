@@ -60,8 +60,8 @@ final class ModlogApi {
            user,
            Modlog.deletePost,
            details = Some(
-                 author.??(_ + " ") + ip.??(_ + " ") + text.take(140)
-             ))
+               author.??(_ + " ") + ip.??(_ + " ") + text.take(140)
+           ))
   }
 
   def toggleCloseTopic(
@@ -70,8 +70,8 @@ final class ModlogApi {
            none,
            closed ? Modlog.closeTopic | Modlog.openTopic,
            details = Some(
-                 categ + " / " + topic
-             ))
+               categ + " / " + topic
+           ))
   }
 
   def toggleHideTopic(
@@ -80,8 +80,8 @@ final class ModlogApi {
            none,
            hidden ? Modlog.hideTopic | Modlog.showTopic,
            details = Some(
-                 categ + " / " + topic
-             ))
+               categ + " / " + topic
+           ))
   }
 
   def deleteQaQuestion(mod: String, user: String, title: String) = add {

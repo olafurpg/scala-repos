@@ -98,7 +98,8 @@ object CheckBoxTreeTableCell {
     * $SATISFY
     */
   @deprecated(
-      message = "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean]))",
+      message =
+        "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean]))",
       since = "8.0")
   def forTreeTableColumn[S, T](selectedProperty: JCallIntToBool) =
     jfxscc.CheckBoxTreeTableCell.forTreeTableColumn[S, T](selectedProperty)
@@ -125,7 +126,8 @@ object CheckBoxTreeTableCell {
     * $SATISFY
     */
   @deprecated(
-      message = "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean], Boolean))",
+      message =
+        "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean], Boolean))",
       since = "8.0")
   def forTreeTableColumn[S, T](
       selectedProperty: JCallIntToBool, showLabel: Boolean) =
@@ -156,7 +158,8 @@ object CheckBoxTreeTableCell {
     * $SATISFY
     */
   @deprecated(
-      message = "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean], StringConverter[T]))",
+      message =
+        "Use forTreeTableColumn[S, T](Integer => ObservableValue[Boolean, java.lang.Boolean], StringConverter[T]))",
       since = "8.0")
   def forTreeTableColumn[S, T](
       selectedProperty: JCallIntToBool, converter: jfxu.StringConverter[T]) =
@@ -200,8 +203,9 @@ object CheckBoxTreeTableCell {
   * @define URL0 [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/CheckBoxTreeTableCell.html
   * @define ORIGINALDOC Original Documentation]].
   */
-class CheckBoxTreeTableCell[S, T](override val delegate: jfxscc.CheckBoxTreeTableCell[
-        S, T] = new jfxscc.CheckBoxTreeTableCell[S, T])
+class CheckBoxTreeTableCell[S, T](
+    override val delegate: jfxscc.CheckBoxTreeTableCell[S, T] =
+      new jfxscc.CheckBoxTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.CheckBoxTreeTableCell[S, T], T, T]
     with StateSelectableCell[

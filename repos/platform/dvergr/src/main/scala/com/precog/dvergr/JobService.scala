@@ -55,7 +55,8 @@ import scalaz._
 // Job service needs to shutdown whatever at the end.
 
 trait JobService
-    extends BlueEyesServiceBuilder with HttpRequestHandlerCombinators {
+    extends BlueEyesServiceBuilder
+    with HttpRequestHandlerCombinators {
 
   def clock: Clock
 

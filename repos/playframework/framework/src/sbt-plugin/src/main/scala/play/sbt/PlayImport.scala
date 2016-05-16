@@ -21,7 +21,8 @@ object PlayImport {
   def movedExternal(msg: String): ModuleID = {
     System.err.println(msg)
     class ComponentExternalisedException
-        extends RuntimeException(msg) with FeedbackProvidedException
+        extends RuntimeException(msg)
+        with FeedbackProvidedException
     throw new ComponentExternalisedException
   }
 

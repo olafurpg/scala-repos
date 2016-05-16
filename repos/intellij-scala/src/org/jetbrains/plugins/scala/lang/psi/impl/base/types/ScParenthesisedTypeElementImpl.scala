@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScParenthesisedTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParenthesisedTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScParenthesisedTypeElement {
   override def toString: String = "TypeInParenthesis: " + getText
 
   protected def innerType(ctx: TypingContext) = {

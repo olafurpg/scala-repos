@@ -17,7 +17,8 @@ private[team] final class Notifier(
           from = sender,
           to = request.user,
           subject = """You have joined the team %s""".format(team.name),
-          message = """Congratulation, your request to join the team was accepted!
+          message =
+            """Congratulation, your request to join the team was accepted!
 
 Here is the team page: %s""" format url
       )

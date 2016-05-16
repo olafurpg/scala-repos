@@ -56,8 +56,8 @@ class PipeTExtensions(pipe: Pipe, flowDef: FlowDef, mode: Mode)
    *   }
    *  The above sums all the tuples and returns a TypedPipe[Int] which has the total sum.
    */
-  def typed[T, U](
-      fielddef: (Fields, Fields))(fn: TypedPipe[T] => TypedPipe[U])(
+  def typed[T, U](fielddef: (Fields, Fields))(
+      fn: TypedPipe[T] => TypedPipe[U])(
       implicit conv: TupleConverter[T], setter: TupleSetter[U]): Pipe =
     fn(TypedPipe.from(pipe, fielddef._1)(flowDef, mode, conv))
       .toPipe(fielddef._2)(flowDef, mode, setter)

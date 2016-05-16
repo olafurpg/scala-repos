@@ -155,7 +155,8 @@ object ScrollEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ScrollEvent.html]]
   */
 class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ScrollEvent] {
+    extends GestureEvent(delegate)
+    with SFXDelegate[jfxsi.ScrollEvent] {
 
   /**
     * Gets the horizontal scroll amount.

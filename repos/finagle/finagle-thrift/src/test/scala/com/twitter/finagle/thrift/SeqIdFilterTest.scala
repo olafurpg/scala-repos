@@ -13,7 +13,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class SeqIdFilterTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite
+    with MockitoSugar
+    with OneInstancePerTest {
   val protocolFactory = new TBinaryProtocol.Factory()
 
   def mkmsg(tmsg: TMessage, strictWrite: Boolean) = {

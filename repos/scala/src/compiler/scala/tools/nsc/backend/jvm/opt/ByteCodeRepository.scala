@@ -51,7 +51,8 @@ class ByteCodeRepository[BT <: BTypes](
   private val targetSize = 500
 
   private object lruCounter
-      extends AtomicLong(0l) with collection.generic.Clearable {
+      extends AtomicLong(0l)
+      with collection.generic.Clearable {
     def clear(): Unit = { this.set(0l) }
   }
   recordPerRunCache(lruCounter)
@@ -93,12 +94,11 @@ class ByteCodeRepository[BT <: BTypes](
   def classNodeAndSource(internalName: InternalName)
     : Either[ClassNotFound, (ClassNode, Source)] = {
     classNode(internalName) map
-    (n =>
-          {
-            val source =
-              if (compilingClasses contains internalName) CompilationUnit
-              else Classfile
-            (n, source)
+    (n => {
+          val source =
+            if (compilingClasses contains internalName) CompilationUnit
+            else Classfile
+          (n, source)
         })
   }
 
@@ -111,8 +111,8 @@ class ByteCodeRepository[BT <: BTypes](
       val r = parsedClasses.get(internalName) match {
         case Some(l @ Left(_)) => l
         case Some(r @ Right((classNode, _))) =>
-          parsedClasses(internalName) = Right(
-              (classNode, lruCounter.incrementAndGet()))
+          parsedClasses(internalName) =
+            Right((classNode, lruCounter.incrementAndGet()))
           r
         case None =>
           limitCacheSize()
@@ -191,8 +191,8 @@ class ByteCodeRepository[BT <: BTypes](
       : Either[List[ClassNotFound], (MethodNode, InternalName)] =
       parents match {
         case x :: xs =>
-          methodNodeImpl(x).left
-            .flatMap(failed => findInParents(xs, failed ::: failedClasses))
+          methodNodeImpl(x).left.flatMap(failed =>
+                findInParents(xs, failed ::: failedClasses))
         case Nil => Left(failedClasses)
       }
 

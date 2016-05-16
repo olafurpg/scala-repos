@@ -68,7 +68,8 @@ import akka.util.Helpers.ConfigOps
 object ActorDSL extends dsl.Inbox with dsl.Creators {
 
   protected object Extension
-      extends ExtensionId[Extension] with ExtensionIdProvider {
+      extends ExtensionId[Extension]
+      with ExtensionIdProvider {
 
     override def lookup = Extension
 
@@ -82,7 +83,8 @@ object ActorDSL extends dsl.Inbox with dsl.Creators {
   }
 
   protected class Extension(val system: ExtendedActorSystem)
-      extends akka.actor.Extension with InboxExtension {
+      extends akka.actor.Extension
+      with InboxExtension {
 
     private case class MkChild(props: Props, name: String)
         extends NoSerializationVerificationNeeded

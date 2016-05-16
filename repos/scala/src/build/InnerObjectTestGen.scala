@@ -252,7 +252,7 @@ object Test {
   /** Only allow multithreaded tests if not inside a static initializer. */
   private def allowMT(structure: List[Contexts.Value]): Boolean = {
     var nesting = structure
-    while ( (nesting ne Nil) && nesting.head == Object) {
+    while ((nesting ne Nil) && nesting.head == Object) {
       nesting = nesting.tail
     }
     if (nesting ne Nil) !(nesting.head == Val)

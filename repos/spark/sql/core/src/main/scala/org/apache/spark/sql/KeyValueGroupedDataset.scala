@@ -71,7 +71,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def keyAs[L : Encoder]: KeyValueGroupedDataset[L, V] =
+  def keyAs[L: Encoder]: KeyValueGroupedDataset[L, V] =
     new KeyValueGroupedDataset(encoderFor[L],
                                unresolvedVEncoder,
                                queryExecution,
@@ -84,8 +84,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
     * @since 1.6.0
     */
   def keys: Dataset[K] = {
-    Dataset[K](sqlContext,
-               Distinct(Project(groupingAttributes, logicalPlan)))
+    Dataset[K](sqlContext, Distinct(Project(groupingAttributes, logicalPlan)))
   }
 
   /**
@@ -106,7 +105,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def flatMapGroups[U : Encoder](
+  def flatMapGroups[U: Encoder](
       f: (K, Iterator[V]) => TraversableOnce[U]): Dataset[U] = {
     Dataset[U](sqlContext,
                MapGroups(f,
@@ -155,7 +154,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def mapGroups[U : Encoder](f: (K, Iterator[V]) => U): Dataset[U] = {
+  def mapGroups[U: Encoder](f: (K, Iterator[V]) => U): Dataset[U] = {
     val func = (key: K, it: Iterator[V]) => Iterator(f(key, it))
     flatMapGroups(func)
   }
@@ -304,7 +303,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
     *
     * @since 1.6.0
     */
-  def cogroup[U, R : Encoder](other: KeyValueGroupedDataset[K, U])(
+  def cogroup[U, R: Encoder](other: KeyValueGroupedDataset[K, U])(
       f: (K, Iterator[V], Iterator[U]) => TraversableOnce[R]): Dataset[R] = {
     implicit val uEncoder = other.unresolvedVEncoder
     Dataset[R](sqlContext,
@@ -328,7 +327,7 @@ class KeyValueGroupedDataset[K, V] private[sql](
   def cogroup[U, R](other: KeyValueGroupedDataset[K, U],
                     f: CoGroupFunction[K, V, U, R],
                     encoder: Encoder[R]): Dataset[R] = {
-    cogroup(other)((key, left,
-        right) => f.call(key, left.asJava, right.asJava).asScala)(encoder)
+    cogroup(other)((key, left, right) =>
+          f.call(key, left.asJava, right.asJava).asScala)(encoder)
   }
 }

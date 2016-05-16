@@ -45,12 +45,12 @@ class ReplicaFetcherThread(name: String,
                            replicaMgr: ReplicaManager,
                            metrics: Metrics,
                            time: Time)
-    extends AbstractFetcherThread(
-        name = name,
-        clientId = name,
-        sourceBroker = sourceBroker,
-        fetchBackOffMs = brokerConfig.replicaFetchBackoffMs,
-        isInterruptible = false) {
+    extends AbstractFetcherThread(name = name,
+                                  clientId = name,
+                                  sourceBroker = sourceBroker,
+                                  fetchBackOffMs =
+                                    brokerConfig.replicaFetchBackoffMs,
+                                  isInterruptible = false) {
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -335,8 +335,9 @@ class ReplicaFetcherThread(name: String,
     partitionMap.foreach {
       case ((TopicAndPartition(topic, partition), partitionFetchState)) =>
         if (partitionFetchState.isActive)
-          requestMap(new TopicPartition(topic, partition)) = new JFetchRequest.PartitionData(
-              partitionFetchState.offset, fetchSize)
+          requestMap(new TopicPartition(topic, partition)) =
+            new JFetchRequest.PartitionData(
+                partitionFetchState.offset, fetchSize)
     }
 
     new FetchRequest(

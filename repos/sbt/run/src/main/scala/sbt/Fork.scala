@@ -125,8 +125,7 @@ sealed class Fork(val commandName: String, val runnerClass: Option[String]) {
     val boot =
       if (bootJars.isEmpty) None
       else
-        Some(
-            "-Xbootclasspath/a:" +
+        Some("-Xbootclasspath/a:" +
             bootJars.map(_.getAbsolutePath).mkString(File.pathSeparator))
     jvmOptions ++ boot.toList ++ runnerClass.toList ++ arguments
   }

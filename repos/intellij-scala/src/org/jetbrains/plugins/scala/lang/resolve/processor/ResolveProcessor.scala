@@ -59,7 +59,8 @@ object ResolveProcessor {
 class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
                        val ref: PsiElement,
                        val name: String)
-    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[String] {
   @volatile
   private var resolveScope: GlobalSearchScope = null
   def getResolveScope: GlobalSearchScope = {

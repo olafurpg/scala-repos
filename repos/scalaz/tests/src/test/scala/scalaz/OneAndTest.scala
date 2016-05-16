@@ -61,16 +61,15 @@ object OneAndTest extends SpecLite {
   "fold1 on fold1" ! forAll { (ints: OneAnd[NonEmptyList, Int]) =>
     val lst = ints.head :: ints.tail.list
     Foldable[OneAndNel].foldMap(ints)(_ + 1) must_===
-    (lst.count(_ => true) + lst.toList.sum)
+      (lst.count(_ => true) + lst.toList.sum)
     Foldable1[OneAndNel].foldMap1(ints)(_ + 1) must_===
-    (lst.count(_ => true) + lst.toList.sum)
+      (lst.count(_ => true) + lst.toList.sum)
   }
 
   "right fold1 on fold" ! forAll { (ints: OneAnd[List, Int]) =>
     val lst = ints.head :: ints.tail
     val llst = Functor[OneAndList].map(ints)(List(_))
-    Foldable[OneAndList].foldRight(ints, List.empty[Int])(_ :: _) must_===
-    (lst)
+    Foldable[OneAndList].foldRight(ints, List.empty[Int])(_ :: _) must_=== (lst)
     Foldable1[OneAndList].foldRight1(llst)(_ ++ _) must_=== (lst)
   }
 
@@ -82,9 +81,9 @@ object OneAndTest extends SpecLite {
   }
 
   "traverse1 on traverse" ! forAll { (ints: OneAnd[List, Int], f: Int => List[
-      Int]) =>
+                                          Int]) =>
     (Traverse1[OneAndList].traverse1(ints)(f) must_==
-        (Traverse[OneAndList].traverse(ints)(f)))
+          (Traverse[OneAndList].traverse(ints)(f)))
   }
 
   implicit def OneAndNelEqual[A](
@@ -100,7 +99,7 @@ object OneAndTest extends SpecLite {
   "traverse1 on traverse1" ! forAll {
     (ints: OneAnd[NonEmptyList, Int], f: Int => NonEmptyList[Int]) =>
       (Traverse1[OneAndNel].traverse1(ints)(f) must_===
-          (Traverse[OneAndNel].traverse(ints)(f)))
+            (Traverse[OneAndNel].traverse(ints)(f)))
   }
 
   "inequality exists" ! forAll { (a: OneAnd[List, Int]) =>
@@ -111,16 +110,16 @@ object OneAndTest extends SpecLite {
 
   object instances {
     def functor[F[_]: Functor] = Functor[OneAnd[F, ?]]
-    def functorMax[F[_]: MonadPlus : Traverse1] = Functor[OneAnd[F, ?]]
-    def apply[F[_]: Applicative : Plus] = Apply[OneAnd[F, ?]]
+    def functorMax[F[_]: MonadPlus: Traverse1] = Functor[OneAnd[F, ?]]
+    def apply[F[_]: Applicative: Plus] = Apply[OneAnd[F, ?]]
     def applicative[F[_]: ApplicativePlus] = Applicative[OneAnd[F, ?]]
-    def bind[F[_]: Monad : Plus] = Bind[OneAnd[F, ?]]
+    def bind[F[_]: Monad: Plus] = Bind[OneAnd[F, ?]]
     def monad[F[_]: MonadPlus] = Monad[OneAnd[F, ?]]
-    def plus[F[_]: Applicative : Plus] = Plus[OneAnd[F, ?]]
+    def plus[F[_]: Applicative: Plus] = Plus[OneAnd[F, ?]]
     def foldable[F[_]: Foldable] = Foldable1[OneAnd[F, ?]]
     def foldable1[F[_]: Foldable1] = Foldable1[OneAnd[F, ?]]
     def traverse[F[_]: Traverse] = Traverse1[OneAnd[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[OneAnd[F, ?]]
-    def semigroup[F[_]: Applicative : Plus, A] = Semigroup[OneAnd[F, A]]
+    def semigroup[F[_]: Applicative: Plus, A] = Semigroup[OneAnd[F, A]]
   }
 }

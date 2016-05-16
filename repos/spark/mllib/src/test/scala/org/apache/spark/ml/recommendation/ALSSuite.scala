@@ -36,7 +36,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 
 class ALSSuite
-    extends SparkFunSuite with MLlibTestSparkContext with DefaultReadWriteTest
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with DefaultReadWriteTest
     with Logging {
 
   override def beforeAll(): Unit = {
@@ -200,11 +202,10 @@ class ALSSuite
         val dstEncodedIndex = compressed.dstEncodedIndices(j)
         val dstBlockId = encoder.blockId(dstEncodedIndex)
         val dstLocalIndex = encoder.localIndex(dstEncodedIndex)
-        decompressed +=
-        ((compressed.srcIds(i),
-          dstBlockId,
-          dstLocalIndex,
-          compressed.ratings(j)))
+        decompressed += ((compressed.srcIds(i),
+                          dstBlockId,
+                          dstLocalIndex,
+                          compressed.ratings(j)))
         j += 1
       }
       i += 1
@@ -236,7 +237,7 @@ class ALSSuite
     val training = ArrayBuffer.empty[Rating[Int]]
     val test = ArrayBuffer.empty[Rating[Int]]
     for ((userId, userFactor) <- userFactors;
-    (itemId, itemFactor) <- itemFactors) {
+         (itemId, itemFactor) <- itemFactors) {
       val x = random.nextDouble()
       if (x < totalFraction) {
         val rating = blas.sdot(rank, userFactor, 1, itemFactor, 1)
@@ -282,7 +283,7 @@ class ALSSuite
     val training = ArrayBuffer.empty[Rating[Int]]
     val test = ArrayBuffer.empty[Rating[Int]]
     for ((userId, userFactor) <- userFactors;
-    (itemId, itemFactor) <- itemFactors) {
+         (itemId, itemFactor) <- itemFactors) {
       val rating = blas.sdot(rank, userFactor, 1, itemFactor, 1)
       val threshold = if (rating > 0) positiveFraction else negativeFraction
       val observed = random.nextDouble() < threshold
@@ -325,8 +326,8 @@ class ALSSuite
       ids += random.nextInt()
     }
     val width = b - a
-    ids.toSeq.sorted
-      .map(id => (id, Array.fill(rank)(a + random.nextFloat() * width)))
+    ids.toSeq.sorted.map(id =>
+          (id, Array.fill(rank)(a + random.nextFloat() * width)))
   }
 
   /**

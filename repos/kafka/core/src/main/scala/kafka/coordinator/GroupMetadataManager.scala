@@ -55,7 +55,8 @@ class GroupMetadataManager(val brokerId: Int,
                            replicaManager: ReplicaManager,
                            zkUtils: ZkUtils,
                            time: Time)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   /* offsets cache */
   private val offsetsCache = new Pool[GroupTopicPartition, OffsetAndMetadata]
@@ -185,8 +186,8 @@ class GroupMetadataManager(val brokerId: Int,
         partitionFor(group.groupId))
     val message = new Message(
         key = GroupMetadataManager.groupMetadataKey(group.groupId),
-        bytes = GroupMetadataManager.groupMetadataValue(
-              group, groupAssignment),
+        bytes =
+          GroupMetadataManager.groupMetadataValue(group, groupAssignment),
         timestamp = timestamp,
         magicValue = magicValue)
 
@@ -222,30 +223,31 @@ class GroupMetadataManager(val brokerId: Int,
                       Errors.forCode(status.errorCode).exceptionName))
 
         // transform the log append error code to the corresponding the commit status error code
-        responseCode = if (status.errorCode == Errors.UNKNOWN_TOPIC_OR_PARTITION.code) {
-          Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code
-        } else if (status.errorCode == Errors.NOT_LEADER_FOR_PARTITION.code) {
-          Errors.NOT_COORDINATOR_FOR_GROUP.code
-        } else if (status.errorCode == Errors.REQUEST_TIMED_OUT.code) {
-          Errors.REBALANCE_IN_PROGRESS.code
-        } else if (status.errorCode == Errors.MESSAGE_TOO_LARGE.code ||
-                   status.errorCode == Errors.RECORD_LIST_TOO_LARGE.code ||
-                   status.errorCode == Errors.INVALID_FETCH_SIZE.code) {
+        responseCode =
+          if (status.errorCode == Errors.UNKNOWN_TOPIC_OR_PARTITION.code) {
+            Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code
+          } else if (status.errorCode == Errors.NOT_LEADER_FOR_PARTITION.code) {
+            Errors.NOT_COORDINATOR_FOR_GROUP.code
+          } else if (status.errorCode == Errors.REQUEST_TIMED_OUT.code) {
+            Errors.REBALANCE_IN_PROGRESS.code
+          } else if (status.errorCode == Errors.MESSAGE_TOO_LARGE.code ||
+                     status.errorCode == Errors.RECORD_LIST_TOO_LARGE.code ||
+                     status.errorCode == Errors.INVALID_FETCH_SIZE.code) {
 
-          error(
-              "Appending metadata message for group %s generation %d failed due to %s, returning UNKNOWN error code to the client"
-                .format(group.groupId,
-                        generationId,
-                        Errors.forCode(status.errorCode).exceptionName))
+            error(
+                "Appending metadata message for group %s generation %d failed due to %s, returning UNKNOWN error code to the client"
+                  .format(group.groupId,
+                          generationId,
+                          Errors.forCode(status.errorCode).exceptionName))
 
-          Errors.UNKNOWN.code
-        } else {
-          error(
-              "Appending metadata message for group %s generation %d failed due to unexpected error: %s"
-                .format(group.groupId, generationId, status.errorCode))
+            Errors.UNKNOWN.code
+          } else {
+            error(
+                "Appending metadata message for group %s generation %d failed due to unexpected error: %s"
+                  .format(group.groupId, generationId, status.errorCode))
 
-          status.errorCode
-        }
+            status.errorCode
+          }
       }
 
       responseCallback(responseCode)
@@ -287,9 +289,9 @@ class GroupMetadataManager(val brokerId: Int,
           getMessageFormatVersionAndTimestamp(partitionFor(groupId))
         new Message(
             key = GroupMetadataManager.offsetCommitKey(
-                  groupId,
-                  topicAndPartition.topic,
-                  topicAndPartition.partition),
+                groupId,
+                topicAndPartition.topic,
+                topicAndPartition.partition),
             bytes = GroupMetadataManager.offsetCommitValue(offsetAndMetadata),
             timestamp = timestamp,
             magicValue = magicValue
@@ -438,7 +440,7 @@ class GroupMetadataManager(val brokerId: Int,
               val removedGroups = mutable.Set[String]()
 
               while (currOffset < getHighWatermark(offsetsPartition) &&
-              !shuttingDown.get()) {
+                     !shuttingDown.get()) {
                 buffer.clear()
                 val messages = log
                   .read(currOffset, config.loadBufferSize)
@@ -519,7 +521,8 @@ class GroupMetadataManager(val brokerId: Int,
             }
 
             if (!shuttingDown.get())
-              info("Finished loading offsets from %s in %d milliseconds."
+              info(
+                  "Finished loading offsets from %s in %d milliseconds."
                     .format(topicPartition, time.milliseconds() - startMs))
           case None =>
             warn("No log found for " + topicPartition)
@@ -1107,15 +1110,12 @@ object GroupMetadataManager {
 
         val group = new GroupMetadata(groupId, protocolType)
 
-        group.generationId = value
-          .get(GROUP_METADATA_GENERATION_V0)
-          .asInstanceOf[Int]
-        group.leaderId = value
-          .get(GROUP_METADATA_LEADER_V0)
-          .asInstanceOf[String]
-        group.protocol = value
-          .get(GROUP_METADATA_PROTOCOL_V0)
-          .asInstanceOf[String]
+        group.generationId =
+          value.get(GROUP_METADATA_GENERATION_V0).asInstanceOf[Int]
+        group.leaderId =
+          value.get(GROUP_METADATA_LEADER_V0).asInstanceOf[String]
+        group.protocol =
+          value.get(GROUP_METADATA_PROTOCOL_V0).asInstanceOf[String]
 
         value.getArray(GROUP_METADATA_MEMBERS_V0).foreach {
           case memberMetadataObj =>

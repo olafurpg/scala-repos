@@ -85,9 +85,10 @@ class EnsembleAdvancedBarChart extends EnsembleExample {
       name = "Data Series 3"
       // Assign data by mapping x and y values to XYChart.Data
       val prices = Seq(800, 1000, 2000)
-      data = years zip prices map {
-        case (x, y) => XYChart.Data[String, Number](x, y)
-      }
+      data =
+        years zip prices map {
+          case (x, y) => XYChart.Data[String, Number](x, y)
+        }
     }
 
     // Assign data using a helper function

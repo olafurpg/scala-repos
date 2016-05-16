@@ -49,8 +49,8 @@ trait ScalatraParamsImplicits { self: DefaultImplicitConversions =>
       getAs(nameAndFormat._1)(stringToDate(nameAndFormat._2))
     }
 
-    def as[T <: Any](
-        name: String)(implicit tc: TypeConverter[String, T]): Seq[T] =
+    def as[T <: Any](name: String)(
+        implicit tc: TypeConverter[String, T]): Seq[T] =
       getAs[T](name) getOrElse
       (throw new ScalatraException("Key %s could not be found.".format(name)))
 
@@ -77,4 +77,5 @@ trait ScalatraParamsImplicits { self: DefaultImplicitConversions =>
 }
 
 object ScalatraParamsImplicits
-    extends ScalatraParamsImplicits with DefaultImplicitConversions
+    extends ScalatraParamsImplicits
+    with DefaultImplicitConversions

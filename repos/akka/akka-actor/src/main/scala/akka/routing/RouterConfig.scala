@@ -223,7 +223,8 @@ trait Pool extends RouterConfig {
       routeeProps: Props, context: ActorContext): Props =
     if (usePoolDispatcher &&
         routeeProps.dispatcher == Dispatchers.DefaultDispatcherId)
-      routeeProps.withDispatcher("akka.actor.deployment." +
+      routeeProps.withDispatcher(
+          "akka.actor.deployment." +
           context.self.path.elements.drop(1).mkString("/", "/", "") +
           ".pool-dispatcher")
     else routeeProps

@@ -936,7 +936,8 @@ private class PythonAccumulatorParam(
   */
 // scalastyle:off no.finalize
 private[spark] class PythonBroadcast(@transient var path: String)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Read data from disks, then copy it to `out`

@@ -46,7 +46,8 @@ private[remote] final case class RARP(provider: RemoteActorRefProvider)
   * INTERNAL API
   */
 private[remote] object RARP
-    extends ExtensionId[RARP] with ExtensionIdProvider {
+    extends ExtensionId[RARP]
+    with ExtensionIdProvider {
 
   override def lookup() = RARP
 
@@ -108,7 +109,8 @@ private[remote] object Remoting {
       extends NoSerializationVerificationNeeded
 
   private[Remoting] class TransportSupervisor
-      extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      extends Actor
+      with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
     override def supervisorStrategy = OneForOneStrategy() {
       case NonFatal(e) ⇒ Restart
     }
@@ -209,9 +211,10 @@ private[remote] class Remoting(
             throw new RemoteTransportException(
                 "No transport drivers were loaded.", null)
 
-          transportMapping = transports.groupBy {
-            case (transport, _) ⇒ transport.schemeIdentifier
-          } map { case (k, v) ⇒ k -> v.toSet }
+          transportMapping =
+            transports.groupBy {
+              case (transport, _) ⇒ transport.schemeIdentifier
+            } map { case (k, v) ⇒ k -> v.toSet }
 
           defaultAddress = transports.head._2
           addresses = transports.map { _._2 }.toSet
@@ -303,7 +306,8 @@ private[remote] object EndpointManager {
                         senderOption: Option[ActorRef],
                         recipient: RemoteActorRef,
                         seqOpt: Option[SeqNo] = None)
-      extends RemotingCommand with HasSequenceNumber {
+      extends RemotingCommand
+      with HasSequenceNumber {
     override def toString = s"Remote message $senderOption -> $recipient"
 
     // This MUST throw an exception to indicate that we attempted to put a nonsequenced message in one of the
@@ -319,8 +323,9 @@ private[remote] object EndpointManager {
   case object Prune extends NoSerializationVerificationNeeded
   final case class ListensResult(
       addressesPromise: Promise[Seq[(AkkaProtocolTransport, Address)]],
-      results: Seq[(AkkaProtocolTransport, Address, Promise[
-              AssociationEventListener])])
+      results: Seq[(AkkaProtocolTransport,
+                    Address,
+                    Promise[AssociationEventListener])])
       extends NoSerializationVerificationNeeded
   final case class ListensFailure(
       addressesPromise: Promise[Seq[(AkkaProtocolTransport, Address)]],
@@ -479,7 +484,8 @@ private[remote] object EndpointManager {
   * INTERNAL API
   */
 private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import EndpointManager._
   import context.dispatcher
@@ -608,15 +614,16 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
         case NonFatal(e) ⇒ ListensFailure(addressesPromise, e)
       } pipeTo self
     case ListensResult(addressesPromise, results) ⇒
-      transportMapping = results.groupBy {
-        case (_, transportAddress, _) ⇒ transportAddress
-      } map {
-        case (a, t) if t.size > 1 ⇒
-          throw new RemoteTransportException(
-              s"There are more than one transports listening on local address [$a]",
-              null)
-        case (a, t) ⇒ a -> t.head._1
-      }
+      transportMapping =
+        results.groupBy {
+          case (_, transportAddress, _) ⇒ transportAddress
+        } map {
+          case (a, t) if t.size > 1 ⇒
+            throw new RemoteTransportException(
+                s"There are more than one transports listening on local address [$a]",
+                null)
+          case (a, t) ⇒ a -> t.head._1
+        }
       // Register to each transport as listener and collect mapping to addresses
       val transportsAndAddresses =
         results map {
@@ -772,7 +779,9 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
         // The construction of the future for shutdownStatus has to happen after the flushStatus future has been finished
         // so that endpoints are shut down before transports.
         flushStatus ← shutdownAll(endpoints.allEndpoints)(
-            gracefulStop(_, settings.FlushWait, EndpointWriter.FlushAndStop))
+                         gracefulStop(_,
+                                      settings.FlushWait,
+                                      EndpointWriter.FlushAndStop))
         shutdownStatus ← shutdownAll(transportMapping.values)(_.shutdown())
       } yield flushStatus && shutdownStatus) pipeTo sender()
 
@@ -867,8 +876,9 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
     }
   }
 
-  private def listens: Future[Seq[(AkkaProtocolTransport, Address, Promise[
-              AssociationEventListener])]] = {
+  private def listens: Future[Seq[(AkkaProtocolTransport,
+                                   Address,
+                                   Promise[AssociationEventListener])]] = {
     /*
      * Constructs chains of adapters on top of each driver as given in configuration. The resulting structure looks
      * like the following:
@@ -980,8 +990,8 @@ private[remote] class EndpointManager(conf: Config, log: LoggingAdapter)
                                                      AkkaPduProtobufCodec,
                                                      receiveBuffers))
                 .withDeploy(Deploy.local),
-              "reliableEndpointWriter-" + AddressUrlEncoder(remoteAddress) +
-              "-" + endpointId.next()))
+              "reliableEndpointWriter-" +
+              AddressUrlEncoder(remoteAddress) + "-" + endpointId.next()))
     else
       context.watch(
           context.actorOf(

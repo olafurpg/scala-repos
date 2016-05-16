@@ -17,8 +17,7 @@ import scala.concurrent.{Await, Awaitable}
 /**
   * Result of an REST operation.
   */
-case class RestResult[
-    +T](valueGetter: () => T, originalResponse: HttpResponse) {
+case class RestResult[+T](valueGetter: () => T, originalResponse: HttpResponse) {
   def code: Int = originalResponse.status.intValue
   def success: Boolean = code == 200
   lazy val value: T = valueGetter()

@@ -54,7 +54,8 @@ object DailySuffixTsv {
 
 class DailySuffixTsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange)
+    with DelimitedScheme {
   override val fields = fs
 }
 
@@ -71,7 +72,8 @@ class DailySuffixTypedTsv[T](prefix: String)(
     override val mf: Manifest[T],
     override val conv: TupleConverter[T],
     override val tset: TupleSetter[T])
-    extends DailySuffixSource(prefix, dateRange) with TypedDelimited[T]
+    extends DailySuffixSource(prefix, dateRange)
+    with TypedDelimited[T]
 
 object DailySuffixCsv {
   def apply(prefix: String, fs: Fields = Fields.ALL)(
@@ -80,7 +82,8 @@ object DailySuffixCsv {
 
 class DailySuffixCsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange)
+    with DelimitedScheme {
   override val fields = fs
   override val separator = ","
 }

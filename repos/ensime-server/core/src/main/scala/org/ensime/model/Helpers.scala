@@ -126,10 +126,11 @@ trait Helpers { self: Global =>
         prefix + typeShortName(typeSym)
       }
     if (withTpeArgs) {
-      withoutArgs +
-      (if (tpe.typeArgs.size > 0) {
-         "[" + tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") + "]"
-       } else { "" })
+      withoutArgs + (if (tpe.typeArgs.size > 0) {
+                       "[" +
+                       tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") +
+                       "]"
+                     } else { "" })
     } else withoutArgs
   }
 

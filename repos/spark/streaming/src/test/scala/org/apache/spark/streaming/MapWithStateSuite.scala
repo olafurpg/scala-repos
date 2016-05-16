@@ -31,7 +31,9 @@ import org.apache.spark.streaming.dstream.{DStream, InternalMapWithStateDStream,
 import org.apache.spark.util.{ManualClock, Utils}
 
 class MapWithStateSuite
-    extends SparkFunSuite with DStreamCheckpointTester with BeforeAndAfterAll
+    extends SparkFunSuite
+    with DStreamCheckpointTester
+    with BeforeAndAfterAll
     with BeforeAndAfter {
 
   private var sc: SparkContext = null
@@ -169,11 +171,10 @@ class MapWithStateSuite
     )
 
     // state maintains running count, and updated count is returned
-    val mappingFunc = (key: String, value: Option[Int], state: State[Int]) =>
-      {
-        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-        state.update(sum)
-        sum
+    val mappingFunc = (key: String, value: Option[Int], state: State[Int]) => {
+      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+      state.update(sum)
+      sum
     }
 
     testOperation[String, Int, Int](
@@ -213,11 +214,10 @@ class MapWithStateSuite
 
     // state maintains running count, key string doubled and returned
     val mappingFunc = (batchTime: Time, key: String, value: Option[Int],
-    state: State[Int]) =>
-      {
-        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-        state.update(sum)
-        Some(key * 2)
+                       state: State[Int]) => {
+      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+      state.update(sum)
+      Some(key * 2)
     }
 
     testOperation(
@@ -227,17 +227,16 @@ class MapWithStateSuite
   test("mapWithState - type inferencing and class tags") {
 
     // Simple track state function with value as Int, state as Double and mapped type as Double
-    val simpleFunc = (key: String, value: Option[Int], state: State[Double]) =>
-      {
-        0L
+    val simpleFunc = (key: String, value: Option[Int],
+                      state: State[Double]) => {
+      0L
     }
 
     // Advanced track state function with key as String, value as Int, state as Double and
     // mapped type as Double
     val advancedFunc = (time: Time, key: String, value: Option[Int],
-    state: State[Double]) =>
-      {
-        Some(0L)
+                        state: State[Double]) => {
+      Some(0L)
     }
 
     def testTypes(dstream: MapWithStateDStream[_, _, _, _]): Unit = {
@@ -313,12 +312,11 @@ class MapWithStateSuite
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
-    state: State[Int]) =>
-      {
-        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-        val output = (key, sum)
-        state.update(sum)
-        Some(output)
+                       state: State[Int]) => {
+      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+      val output = (key, sum)
+      state.update(sum)
+      Some(output)
     }
 
     testOperation(
@@ -353,12 +351,11 @@ class MapWithStateSuite
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
-    state: State[Int]) =>
-      {
-        val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
-        val output = (key, sum)
-        state.update(sum)
-        None.asInstanceOf[Option[Int]]
+                       state: State[Int]) => {
+      val sum = value.getOrElse(0) + state.getOption.getOrElse(0)
+      val output = (key, sum)
+      state.update(sum)
+      None.asInstanceOf[Option[Int]]
     }
 
     val mapWithStateSpec =
@@ -402,15 +399,14 @@ class MapWithStateSuite
     )
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
-    state: State[Int]) =>
-      {
-        if (state.exists) {
-          state.remove()
-          Some(key)
-        } else {
-          state.update(value.get)
-          None
-        }
+                       state: State[Int]) => {
+      if (state.exists) {
+        state.remove()
+        Some(key)
+      } else {
+        state.update(value.get)
+        None
+      }
     }
 
     testOperation(inputData,
@@ -431,16 +427,15 @@ class MapWithStateSuite
       ) ++ Seq.fill(20)(Seq("a")) // a will continue to stay active
 
     val mappingFunc = (time: Time, key: String, value: Option[Int],
-    state: State[Int]) =>
-      {
-        if (value.isDefined) {
-          state.update(1)
-        }
-        if (state.isTimingOut) {
-          Some(key)
-        } else {
-          None
-        }
+                       state: State[Int]) => {
+      if (value.isDefined) {
+        state.update(1)
+      }
+      if (state.isTimingOut) {
+        Some(key)
+      } else {
+        None
+      }
     }
 
     val (collectedOutputs, collectedStateSnapshots) = getOperationOutput(
@@ -527,10 +522,9 @@ class MapWithStateSuite
       val checkpointDuration = batchDuration * (stateData.size / 2)
 
       val runningCount = (key: String, value: Option[Int],
-      state: State[Int]) =>
-        {
-          state.update(state.getOption().getOrElse(0) + value.getOrElse(0))
-          state.get()
+                          state: State[Int]) => {
+        state.update(state.getOption().getOrElse(0) + value.getOrElse(0))
+        state.get()
       }
 
       val mapWithStateStream = dstream.map { _ -> 1 }
@@ -548,7 +542,7 @@ class MapWithStateSuite
                               stopSparkContextAfterTest = false)
   }
 
-  private def testOperation[K : ClassTag, S : ClassTag, T : ClassTag](
+  private def testOperation[K: ClassTag, S: ClassTag, T: ClassTag](
       input: Seq[Seq[K]],
       mapWithStateSpec: StateSpec[K, Int, S, T],
       expectedOutputs: Seq[Seq[T]],
@@ -562,7 +556,7 @@ class MapWithStateSuite
     assert(expectedStateSnapshots, collectedStateSnapshots, "state snapshots")
   }
 
-  private def getOperationOutput[K : ClassTag, S : ClassTag, T : ClassTag](
+  private def getOperationOutput[K: ClassTag, S: ClassTag, T: ClassTag](
       input: Seq[Seq[K]],
       mapWithStateSpec: StateSpec[K, Int, S, T],
       numBatches: Int

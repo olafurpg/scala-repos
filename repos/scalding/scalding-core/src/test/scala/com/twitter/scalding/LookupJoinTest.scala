@@ -63,7 +63,7 @@ class LookupJoinedTest extends WordSpec with Matchers {
   import Dsl._
   import LookupJoinedTest.genList
 
-  def lookupJoin[T : Ordering, K, V, W](
+  def lookupJoin[T: Ordering, K, V, W](
       in0: Iterable[(T, K, V)], in1: Iterable[(T, K, W)]) = {
     val serv = in1.groupBy(_._2)
     def lookup(t: T, k: K): Option[W] = {
@@ -84,7 +84,7 @@ class LookupJoinedTest extends WordSpec with Matchers {
     }
   }
 
-  def lookupSumJoin[T : Ordering, K, V, W : Semigroup](
+  def lookupSumJoin[T: Ordering, K, V, W: Semigroup](
       in0: Iterable[(T, K, V)], in1: Iterable[(T, K, W)]) = {
     implicit val ord: Ordering[(T, K, W)] = Ordering.by {
       _._1

@@ -23,7 +23,8 @@ object IntBuffer {
 abstract class IntBuffer private[nio](_capacity: Int,
                                       private[nio] val _array: Array[Int],
                                       private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[IntBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[IntBuffer] {
 
   private[nio] type ElementType = Int
   private[nio] type BufferType = IntBuffer

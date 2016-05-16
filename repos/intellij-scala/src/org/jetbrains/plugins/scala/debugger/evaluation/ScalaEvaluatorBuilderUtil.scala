@@ -289,7 +289,7 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
     }
     def binaryEval(operatorName: String,
                    function: (Evaluator,
-                   Evaluator) => Evaluator): Evaluator = {
+                              Evaluator) => Evaluator): Evaluator = {
       if (argEvaluators.length == 1) {
         val eval = qualOpt match {
           case None => new ScalaThisEvaluator()
@@ -313,26 +313,23 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
                        BOXES_RUN_TIME, "equals", rawText, boxed(l, r)))
     }
     def isInstanceOfEval: Evaluator = {
-      unaryEval(
-          "isInstanceOf",
-          eval =>
-            {
-              import org.jetbrains.plugins.scala.lang.psi.types.Nothing
-              val tp = ref.getParent match {
-                case gen: ScGenericCall =>
-                  gen.typeArgs match {
-                    case Some(args) =>
-                      args.typeArgs match {
-                        case Seq(arg) => arg.calcType
-                        case _ => Nothing
-                      }
-                    case None => Nothing
-                  }
-                case _ => Nothing
-              }
-              val jvmName: JVMName = DebuggerUtil.getJVMQualifiedName(tp)
-              new ScalaInstanceofEvaluator(eval, new TypeEvaluator(jvmName))
-          })
+      unaryEval("isInstanceOf", eval => {
+        import org.jetbrains.plugins.scala.lang.psi.types.Nothing
+        val tp = ref.getParent match {
+          case gen: ScGenericCall =>
+            gen.typeArgs match {
+              case Some(args) =>
+                args.typeArgs match {
+                  case Seq(arg) => arg.calcType
+                  case _ => Nothing
+                }
+              case None => Nothing
+            }
+          case _ => Nothing
+        }
+        val jvmName: JVMName = DebuggerUtil.getJVMQualifiedName(tp)
+        new ScalaInstanceofEvaluator(eval, new TypeEvaluator(jvmName))
+      })
     }
 
     def trueEval = expressionFromTextEvaluator("true", ref)
@@ -464,13 +461,12 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
       case gen: ScGenericCall =>
         gen.arguments.head
           .getType(TypingContext.empty)
-          .map(tp =>
-                {
-              ScType.extractClass(tp, Some(ref.getProject)) match {
-                case Some(clazz) =>
-                  DebuggerUtil.getClassJVMName(clazz)
-                case None => null
-              }
+          .map(tp => {
+            ScType.extractClass(tp, Some(ref.getProject)) match {
+              case Some(clazz) =>
+                DebuggerUtil.getClassJVMName(clazz)
+              case None => null
+            }
           })
           .getOrElse(null)
       case _ => null
@@ -506,7 +502,8 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
           exprsForP
             .sortBy(_.getTextRange.getStartOffset)
             .map(_.getText)
-            .mkString(".+=(", ").+=(", ").result()") else ""
+            .mkString(".+=(", ").+=(", ").result()")
+        else ""
       val exprText =
         s"_root_.scala.collection.Seq.newBuilder[$argTypeText]$argsText"
       val newExpr = ScalaPsiElementFactory.createExpressionWithContextFromText(
@@ -1107,7 +1104,8 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
               case m: ScalaMethodEvaluator =>
                 Some(
                     m.copy(_methodName = m.methodName + "_$eq",
-                           argumentEvaluators = Seq(rightEvaluator))) //todo: signature?
+                           argumentEvaluators =
+                             Seq(rightEvaluator))) //todo: signature?
               case ScalaDuplexEvaluator(first, second) =>
                 createAssignEvaluator(first) orElse createAssignEvaluator(
                     second)
@@ -1183,8 +1181,8 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
 
     if (pattern == null || subPattern == null)
       throw new IllegalArgumentException("Patterns should not be null")
-    val nextPatternIndex: Int = pattern.subpatterns.indexWhere(
-        next => next == subPattern || subPattern.parents.contains(next))
+    val nextPatternIndex: Int = pattern.subpatterns.indexWhere(next =>
+          next == subPattern || subPattern.parents.contains(next))
 
     if (pattern == subPattern) exprEval
     else if (nextPatternIndex < 0)
@@ -1438,8 +1436,8 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
         call: ScMethodCall,
         collected: Seq[ScExpression] = Seq.empty,
         tailString: String = "",
-        matchedParameters: Map[Parameter, Seq[ScExpression]] = Map.empty)
-      : Evaluator = {
+        matchedParameters: Map[Parameter, Seq[ScExpression]] =
+          Map.empty): Evaluator = {
       if (call.isApplyOrUpdateCall) {
         if (!call.isUpdateCall) {
           val expr = applyCall(
@@ -1513,8 +1511,7 @@ private[evaluation] trait ScalaEvaluatorBuilderUtil {
   def infixExpressionEvaluator(infix: ScInfixExpr): Evaluator = {
     val operation = infix.operation
     def isUpdate(ref: ScReferenceExpression): Boolean = {
-      ref.refName.endsWith("=") &&
-      (ref.resolve() match {
+      ref.refName.endsWith("=") && (ref.resolve() match {
             case n: PsiNamedElement if n.name + "=" == ref.refName => true
             case _ => false
           })
@@ -2018,8 +2015,8 @@ object ScalaEvaluatorBuilderUtil {
         element match {
           case null => None
           case fun: ScFunction
-              if isLocalFunction(fun) && !fun.parameters.exists(
-                  param => PsiTreeUtil.isAncestor(param, elem, false)) =>
+              if isLocalFunction(fun) && !fun.parameters.exists(param =>
+                    PsiTreeUtil.isAncestor(param, elem, false)) =>
             Some(fun)
           case other if other.getContext != null => inner(other.getContext)
           case _ => None
@@ -2050,8 +2047,8 @@ object ScalaEvaluatorBuilderUtil {
             ScalaPsiUtil.inNameContext(v @ (_: ScVariable | _: ScValue))) =>
           v match {
             case mo: ScModifierListOwner
-                if mo.getModifierList.accessModifier
-                  .exists(am => am.isPrivate && am.isThis) =>
+                if mo.getModifierList.accessModifier.exists(am =>
+                      am.isPrivate && am.isThis) =>
               Some(bp)
             case _ => None
           }

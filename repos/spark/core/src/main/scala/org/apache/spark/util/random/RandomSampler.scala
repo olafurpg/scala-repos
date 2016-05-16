@@ -37,7 +37,9 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 trait RandomSampler[T, U]
-    extends Pseudorandom with Cloneable with Serializable {
+    extends Pseudorandom
+    with Cloneable
+    with Serializable {
 
   /** take a random sample */
   def sample(items: Iterator[T]): Iterator[U]
@@ -146,7 +148,7 @@ class BernoulliCellSampler[T](
   * @tparam T item type
   */
 @DeveloperApi
-class BernoulliSampler[T : ClassTag](fraction: Double)
+class BernoulliSampler[T: ClassTag](fraction: Double)
     extends RandomSampler[T, T] {
 
   /** epsilon slop to avoid failure from floating point jitter */
@@ -184,7 +186,7 @@ class BernoulliSampler[T : ClassTag](fraction: Double)
   * @tparam T item type
   */
 @DeveloperApi
-class PoissonSampler[T : ClassTag](
+class PoissonSampler[T: ClassTag](
     fraction: Double, useGapSamplingIfPossible: Boolean)
     extends RandomSampler[T, T] {
 
@@ -224,7 +226,7 @@ class PoissonSampler[T : ClassTag](
     new PoissonSampler[T](fraction, useGapSamplingIfPossible)
 }
 
-private[spark] class GapSamplingIterator[T : ClassTag](
+private[spark] class GapSamplingIterator[T: ClassTag](
     var data: Iterator[T],
     f: Double,
     rng: Random = RandomSampler.newDefaultRNG,
@@ -282,7 +284,7 @@ private[spark] class GapSamplingIterator[T : ClassTag](
   // work reliably.
 }
 
-private[spark] class GapSamplingReplacementIterator[T : ClassTag](
+private[spark] class GapSamplingReplacementIterator[T: ClassTag](
     var data: Iterator[T],
     f: Double,
     rng: Random = RandomSampler.newDefaultRNG,

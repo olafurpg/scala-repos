@@ -54,8 +54,7 @@ object Routing {
     * Creates a Dispatcher given a routing.
     */
   def dispatcherActor(routing: PF[Any, ActorRef]): ActorRef =
-    actorOf(
-        new Actor with Dispatcher {
+    actorOf(new Actor with Dispatcher {
       def routes = routing
     }).start()
 

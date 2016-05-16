@@ -89,46 +89,50 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
         // avoid overcrowding the diagram:
         //   if there are too many super / sub / implicit nodes, represent
         //   them by on node with a corresponding tooltip
-        superClasses = if (_superClasses.length > settings.docDiagramsMaxNormalClasses.value) {
-          val superClassesTooltip = Some(
-              limitSize(_superClasses.map(_.tpe.name).mkString(", ")))
-          List(
-              NormalNode(textTypeEntity(_superClasses.length + MultiSuffix),
-                         None)(superClassesTooltip))
-        } else _superClasses
+        superClasses =
+          if (_superClasses.length > settings.docDiagramsMaxNormalClasses.value) {
+            val superClassesTooltip = Some(
+                limitSize(_superClasses.map(_.tpe.name).mkString(", ")))
+            List(
+                NormalNode(textTypeEntity(_superClasses.length + MultiSuffix),
+                           None)(superClassesTooltip))
+          } else _superClasses
 
-        subClasses = if (_subClasses.length > settings.docDiagramsMaxNormalClasses.value) {
-          val subClassesTooltip = Some(
-              limitSize(_subClasses.map(_.tpe.name).mkString(", ")))
-          List(
-              NormalNode(textTypeEntity(_subClasses.length + MultiSuffix),
-                         None)(subClassesTooltip))
-        } else _subClasses
+        subClasses =
+          if (_subClasses.length > settings.docDiagramsMaxNormalClasses.value) {
+            val subClassesTooltip = Some(
+                limitSize(_subClasses.map(_.tpe.name).mkString(", ")))
+            List(
+                NormalNode(textTypeEntity(_subClasses.length + MultiSuffix),
+                           None)(subClassesTooltip))
+          } else _subClasses
 
-        incomingImplicits = if (_incomingImplicits.length > settings.docDiagramsMaxImplicitClasses.value) {
-          val incomingImplicitsTooltip = Some(
-              limitSize(_incomingImplicits.map(_.tpe.name).mkString(", ")))
-          List(
-              ImplicitNode(
-                  textTypeEntity(_incomingImplicits.length + MultiSuffix),
-                  None)(incomingImplicitsTooltip))
-        } else _incomingImplicits
+        incomingImplicits =
+          if (_incomingImplicits.length > settings.docDiagramsMaxImplicitClasses.value) {
+            val incomingImplicitsTooltip = Some(
+                limitSize(_incomingImplicits.map(_.tpe.name).mkString(", ")))
+            List(
+                ImplicitNode(
+                    textTypeEntity(_incomingImplicits.length + MultiSuffix),
+                    None)(incomingImplicitsTooltip))
+          } else _incomingImplicits
 
-        outgoingImplicits = if (_outgoingImplicits.length > settings.docDiagramsMaxImplicitClasses.value) {
-          val outgoingImplicitsTooltip = Some(
-              limitSize(_outgoingImplicits.map(_.tpe.name).mkString(", ")))
-          List(
-              ImplicitNode(
-                  textTypeEntity(_outgoingImplicits.length + MultiSuffix),
-                  None)(outgoingImplicitsTooltip))
-        } else _outgoingImplicits
+        outgoingImplicits =
+          if (_outgoingImplicits.length > settings.docDiagramsMaxImplicitClasses.value) {
+            val outgoingImplicitsTooltip = Some(
+                limitSize(_outgoingImplicits.map(_.tpe.name).mkString(", ")))
+            List(
+                ImplicitNode(
+                    textTypeEntity(_outgoingImplicits.length + MultiSuffix),
+                    None)(outgoingImplicitsTooltip))
+          } else _outgoingImplicits
 
         thisNode = _thisNode
         nodes = List()
-        edges = (thisNode -> superClasses) :: subClasses.map(
-            _ -> List(thisNode))
+        edges =
+          (thisNode -> superClasses) :: subClasses.map(_ -> List(thisNode))
         node2Index =
-        (thisNode :: subClasses ::: superClasses ::: incomingImplicits ::: outgoingImplicits).zipWithIndex.toMap
+          (thisNode :: subClasses ::: superClasses ::: incomingImplicits ::: outgoingImplicits).zipWithIndex.toMap
         isInheritanceDiagram = true
         incomingImplicitNodes = incomingImplicits
       case _ =>
@@ -210,19 +214,18 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
       edges.map {
         case (from, tos) =>
           tos
-            .map(to =>
-                  {
-                val id =
-                  "graph" +
-                  counter + "_" + node2Index(to) + "_" + node2Index(from)
-                // the X -> Y edge is inverted twice to keep the diagram flowing the right way
-                // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
-                "node" + node2Index(to) + " -> node" +
-                node2Index(from) + " [id=\"" + cssClass(to, from) +
-                "|" + id + "\", " + "tooltip=\"" + from.name +
-                (if (from.name.endsWith(MultiSuffix)) " are subtypes of "
-                 else " is a subtype of ") + to.name +
-                "\", dir=\"back\", arrowtail=\"empty\"];\n"
+            .map(to => {
+              val id =
+                "graph" +
+                counter + "_" + node2Index(to) + "_" + node2Index(from)
+              // the X -> Y edge is inverted twice to keep the diagram flowing the right way
+              // that is, an edge from node X to Y will result in a dot instruction nodeY -> nodeX [dir="back"]
+              "node" + node2Index(to) + " -> node" + node2Index(from) +
+              " [id=\"" + cssClass(to, from) + "|" + id + "\", " +
+              "tooltip=\"" + from.name + (if (from.name.endsWith(MultiSuffix))
+                                            " are subtypes of "
+                                          else " is a subtype of ") + to.name +
+              "\", dir=\"back\", arrowtail=\"empty\"];\n"
             })
             .mkString
       }.mkString + "}"
@@ -280,8 +283,9 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
       else ""
 
     if (!img.equals("")) {
-      img = "<TD><IMG SCALE=\"TRUE\" SRC=\"" + settings.outdir.value +
-      "/lib/" + img + "\" /></TD>"
+      img =
+        "<TD><IMG SCALE=\"TRUE\" SRC=\"" + settings.outdir.value + "/lib/" +
+        img + "\" /></TD>"
       name = name + " "
     }
     val label =
@@ -426,7 +430,7 @@ class DotDiagramGenerator(settings: doc.Settings, dotRunner: DotRunner)
            * back in the node */
           val kind = getKind(klass)
           if (kind != "")
-            if (( (g \ "a" \ "image").isEmpty)) {
+            if (((g \ "a" \ "image").isEmpty)) {
               DiagramStats.addBrokenImage()
               val xposition = getPosition(g, "x", -22)
               val yposition = getPosition(g, "y", -11.3334)

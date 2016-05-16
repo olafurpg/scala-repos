@@ -75,12 +75,12 @@ object FunctionTest extends SpecLite {
   "fix" ! forAll { (n: Int) =>
     fix[Int](_ => n) must_=== (n)
     (fix[Stream[Int]](ns => n #:: (2 * n) #:: ns).take(4).toList must_===
-        (List(n, 2 * n, n, 2 * n)))
+          (List(n, 2 * n, n, 2 * n)))
   }
 
   object instances {
-    def equal[A, R : Equal] = Equal[() => R]
-    def semigroup[A, R : Semigroup] = Semigroup[A => R]
+    def equal[A, R: Equal] = Equal[() => R]
+    def semigroup[A, R: Semigroup] = Semigroup[A => R]
     def monad0 = Monad[() => ?]
     def traverse0 = Traverse[Function0]
     def bindRec0 = BindRec[Function0]
@@ -94,7 +94,7 @@ object FunctionTest extends SpecLite {
     //    def distributiveByName[A] = Distributive[(=> A) => ?]
 
     def monad1[A] = Monad[A => ?]
-    def comonad1[A : Monoid] = Comonad[A => ?]
+    def comonad1[A: Monoid] = Comonad[A => ?]
     def bindRec1[A] = BindRec[A => ?]
     def zip1[A] = Zip[A => ?]
     def unzip1[A] = Unzip[A => ?]
@@ -103,7 +103,7 @@ object FunctionTest extends SpecLite {
     def arrow1 = Arrow[Function1]
     def choice1 = Choice[Function1]
     def proChoice1 = ProChoice[Function1]
-    def monoid1[A, R : Monoid] = Monoid[A => R]
+    def monoid1[A, R: Monoid] = Monoid[A => R]
 
     def monad2[A, B] = Monad[(A, B) => ?]
     def bindRec2[A, B] = BindRec[(A, B) => ?]
@@ -122,6 +122,6 @@ object FunctionTest extends SpecLite {
       BindRec[(A, B, C, D, E, F, G, H) => ?]
 
     // checking absence of ambiguity
-    def semigroup[A, R : Monoid] = Semigroup[A => R]
+    def semigroup[A, R: Monoid] = Semigroup[A => R]
   }
 }

@@ -20,7 +20,8 @@ trait TupleFieldConverter[+T] extends Converter with Serializable {
   * Parquet tuple converter used to create user defined tuple value from parquet column values
   */
 abstract class ParquetTupleConverter[T]
-    extends GroupConverter with TupleFieldConverter[T] {
+    extends GroupConverter
+    with TupleFieldConverter[T] {
   override def start(): Unit = reset()
   override def end(): Unit = ()
 }
@@ -30,7 +31,8 @@ abstract class ParquetTupleConverter[T]
   * @tparam T primitive types (String, Double, Float, Long, Int, Short, Byte, Boolean)
   */
 trait PrimitiveFieldConverter[T]
-    extends PrimitiveConverter with TupleFieldConverter[T] {
+    extends PrimitiveConverter
+    with TupleFieldConverter[T] {
   val defaultValue: T
   var value: T = defaultValue
 
@@ -104,7 +106,8 @@ trait CollectionConverter[T] {
   */
 abstract class CollectionElementPrimitiveConverter[T](
     val parent: CollectionConverter[T])
-    extends PrimitiveConverter with TupleFieldConverter[T] {
+    extends PrimitiveConverter
+    with TupleFieldConverter[T] {
   val delegate: PrimitiveFieldConverter[T]
 
   override def addBinary(v: Binary) = {
@@ -148,7 +151,8 @@ abstract class CollectionElementPrimitiveConverter[T](
   */
 abstract class CollectionElementGroupConverter[T](
     val parent: CollectionConverter[T])
-    extends GroupConverter with TupleFieldConverter[T] {
+    extends GroupConverter
+    with TupleFieldConverter[T] {
 
   val delegate: TupleFieldConverter[T]
 
@@ -172,7 +176,8 @@ abstract class CollectionElementGroupConverter[T](
   * @tparam T option element type(can be primitive types or nested types)
   */
 abstract class OptionConverter[T]
-    extends TupleFieldConverter[Option[T]] with CollectionConverter[T] {
+    extends TupleFieldConverter[Option[T]]
+    with CollectionConverter[T] {
   var value: Option[T] = None
 
   override def appendValue(v: T): Unit = value = Option(v)
@@ -217,7 +222,8 @@ object ListElement {
   * @tparam T list element type(can be primitive types or nested types)
   */
 abstract class ListConverter[T]
-    extends GroupConverter with TupleFieldConverter[List[T]]
+    extends GroupConverter
+    with TupleFieldConverter[List[T]]
     with CollectionConverter[T] {
 
   var value: List[T] = Nil
@@ -261,7 +267,8 @@ abstract class ListConverter[T]
   * @tparam T list element type(can be primitive types or nested types)
   */
 abstract class SetConverter[T]
-    extends GroupConverter with TupleFieldConverter[Set[T]]
+    extends GroupConverter
+    with TupleFieldConverter[Set[T]]
     with CollectionConverter[T] {
 
   var value: Set[T] = Set()
@@ -296,7 +303,8 @@ abstract class SetConverter[T]
   * @tparam V map value type
   */
 abstract class MapConverter[K, V]
-    extends GroupConverter with TupleFieldConverter[Map[K, V]]
+    extends GroupConverter
+    with TupleFieldConverter[Map[K, V]]
     with CollectionConverter[(K, V)] {
 
   var value: Map[K, V] = Map()

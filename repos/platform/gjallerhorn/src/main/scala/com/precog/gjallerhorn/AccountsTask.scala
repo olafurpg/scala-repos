@@ -27,7 +27,8 @@ import scalaz._
 import specs2._
 
 class AccountsTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
   private val DateTimePattern =
     """[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z""".r
 

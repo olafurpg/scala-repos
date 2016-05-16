@@ -27,7 +27,9 @@ import scala.reflect.ClassTag
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 trait PersistentFSM[S <: FSMState, D, E]
-    extends PersistentActor with PersistentFSMBase[S, D, E] with ActorLogging {
+    extends PersistentActor
+    with PersistentFSMBase[S, D, E]
+    with ActorLogging {
   import akka.persistence.fsm.PersistentFSM._
 
   /**
@@ -91,8 +93,9 @@ trait PersistentFSM[S <: FSMState, D, E]
 
     //Prevent StateChangeEvent persistence when staying in the same state, except when state defines a timeout
     if (nextState.notifies || nextState.timeout.nonEmpty) {
-      eventsToPersist = eventsToPersist :+ StateChangeEvent(
-          nextState.stateName.identifier, nextState.timeout)
+      eventsToPersist =
+        eventsToPersist :+ StateChangeEvent(
+            nextState.stateName.identifier, nextState.timeout)
     }
 
     if (eventsToPersist.isEmpty) {
@@ -231,7 +234,8 @@ object PersistentFSM {
     private implicit val executionContext = context.dispatcher
 
     def schedule(actor: ActorRef, timeout: FiniteDuration): Unit =
-      ref = Some(if (repeat) scheduler.schedule(timeout, timeout, actor, this)
+      ref = Some(
+          if (repeat) scheduler.schedule(timeout, timeout, actor, this)
           else scheduler.scheduleOnce(timeout, actor, this))
 
     def cancel(): Unit =
@@ -371,7 +375,8 @@ object PersistentFSM {
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractPersistentFSM[S <: FSMState, D, E]
-    extends AbstractPersistentFSMBase[S, D, E] with PersistentFSM[S, D, E] {
+    extends AbstractPersistentFSMBase[S, D, E]
+    with PersistentFSM[S, D, E] {
   import java.util.function.Consumer
 
   /**
@@ -405,4 +410,5 @@ abstract class AbstractPersistentFSM[S <: FSMState, D, E]
   */
 abstract class AbstractPersistentLoggingFSM[S <: FSMState, D, E]
     extends AbstractPersistentFSMBase[S, D, E]
-    with LoggingPersistentFSM[S, D, E] with PersistentFSM[S, D, E]
+    with LoggingPersistentFSM[S, D, E]
+    with PersistentFSM[S, D, E]

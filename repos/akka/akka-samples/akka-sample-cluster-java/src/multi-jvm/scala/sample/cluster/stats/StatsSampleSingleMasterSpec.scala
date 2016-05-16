@@ -77,8 +77,11 @@ class StatsSampleSingleMasterSpecMultiJvmNode3
     extends StatsSampleSingleMasterSpec
 
 abstract class StatsSampleSingleMasterSpec
-    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSingleMasterSpecConfig._
 

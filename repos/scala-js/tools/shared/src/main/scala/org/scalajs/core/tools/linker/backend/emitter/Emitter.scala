@@ -200,7 +200,8 @@ final class Emitter private (semantics: Semantics,
 
     if (linkedClass.hasInstances && kind.isClass &&
         linkedClass.hasRuntimeTypeInfo)
-      addTree(classTreeCache.setTypeData.getOrElseUpdate(
+      addTree(
+          classTreeCache.setTypeData.getOrElseUpdate(
               classEmitter.genSetTypeData(linkedClass)))
 
     if (linkedClass.kind.hasModuleAccessor)

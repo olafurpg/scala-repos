@@ -50,7 +50,7 @@ object UserAgentCalculator extends Factory {
       ieMatch = iePattern.pattern.matcher(userAgent)
       findResult = ieMatch.find if findResult
       ieVersionString <- Box.legacyNullTest(ieMatch.group(2)) or Box
-        .legacyNullTest(ieMatch.group(3))
+                          .legacyNullTest(ieMatch.group(3))
       ver <- Helpers.asDouble(ieVersionString)
     } yield ver
 
@@ -237,7 +237,8 @@ final case class NormalParamHolder(name: String, value: String)
 abstract class FileParamHolder(val name: String,
                                val mimeType: String,
                                val fileName: String)
-    extends ParamHolder with Serializable {
+    extends ParamHolder
+    with Serializable {
 
   /**
     * Returns the contents of the uploaded file as a Byte array.
@@ -433,7 +434,8 @@ object Req {
       LiftRules.calculateContextPath() openOr request.contextPath
     val turi =
       if (request.uri.length >= contextPath.length)
-        request.uri.substring(contextPath.length) else ""
+        request.uri.substring(contextPath.length)
+      else ""
     val tmpUri = if (turi.length > 0) turi else "/"
 
     val tmpPath = parsePath(tmpUri)
@@ -467,15 +469,16 @@ object Req {
       val params: List[(String, String)] = for {
         queryString <- request.queryString.toList
         nameVal <- queryString
-          .split("&")
-          .toList
-          .map(_.trim)
-          .filter(_.length > 0)
-          (name, value) <- nameVal.split("=").toList match {
-          case Nil => Empty
-          case n :: v :: _ => Full((urlDecode(n), urlDecode(v)))
-          case n :: _ => Full((urlDecode(n), ""))
-        }
+                    .split("&")
+                    .toList
+                    .map(_.trim)
+                    .filter(_.length > 0)
+        (name, value) <- nameVal.split("=").toList match {
+                          case Nil => Empty
+                          case n :: v :: _ =>
+                            Full((urlDecode(n), urlDecode(v)))
+                          case n :: _ => Full((urlDecode(n), ""))
+                        }
       } yield (name, value)
 
       val names: List[String] = params.map(_._1).distinct
@@ -489,67 +492,63 @@ object Req {
     }
 
     // make this a thunk so it only gets calculated once
-    val paramCalcInfo: AvoidGAL = new AvoidGAL(
-        () =>
-          {
-        // post/put of XML or JSON... eagerly read the stream
-        if ((reqType.post_? || reqType.put_?) && contentType.dmap(false) {
-              _.toLowerCase match {
-                case x =>
-                  x.startsWith("text/xml") ||
-                  x.startsWith("application/xml") ||
-                  x.startsWith("text/json") || x.startsWith("application/json")
-              }
-            }) {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Full(BodyOrInputStream(request.inputStream)))
-          // it's multipart
-        } else if (request.multipartContent_?) {
-          val allInfo = request.extractFiles
+    val paramCalcInfo: AvoidGAL = new AvoidGAL(() => {
+      // post/put of XML or JSON... eagerly read the stream
+      if ((reqType.post_? || reqType.put_?) && contentType.dmap(false) {
+            _.toLowerCase match {
+              case x =>
+                x.startsWith("text/xml") || x.startsWith("application/xml") ||
+                x.startsWith("text/json") || x.startsWith("application/json")
+            }
+          }) {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Full(BodyOrInputStream(request.inputStream)))
+        // it's multipart
+      } else if (request.multipartContent_?) {
+        val allInfo = request.extractFiles
 
-          val normal: List[NormalParamHolder] = allInfo.flatMap {
-            case v: NormalParamHolder => List(v)
-            case _ => Nil
-          }
-
-          val files: List[FileParamHolder] = allInfo.flatMap {
-            case v: FileParamHolder => List(v)
-            case _ => Nil
-          }
-
-          val params = normal.foldLeft(eMap)((a, b) =>
-                a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
-
-          ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
-                        queryStringParam._2 ++ localParams ++ params,
-                        files,
-                        Empty)
-          // it's a GET
-        } else if (reqType.get_?) {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Empty)
-        } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
-                           "application/x-www-form-urlencoded"))) {
-          val params =
-            localParams ++(request.params.sortWith { (s1, s2) =>
-              s1.name < s2.name
-            }).map(n => (n.name, n.values))
-          ParamCalcInfo(request.paramNames, params, Nil, Empty)
-        } else {
-          ParamCalcInfo(queryStringParam._1,
-                        queryStringParam._2 ++ localParams,
-                        Nil,
-                        Full(BodyOrInputStream(request.inputStream)))
+        val normal: List[NormalParamHolder] = allInfo.flatMap {
+          case v: NormalParamHolder => List(v)
+          case _ => Nil
         }
+
+        val files: List[FileParamHolder] = allInfo.flatMap {
+          case v: FileParamHolder => List(v)
+          case _ => Nil
+        }
+
+        val params = normal.foldLeft(eMap)((a, b) =>
+              a + (b.name -> (a.getOrElse(b.name, Nil) ::: List(b.value))))
+
+        ParamCalcInfo((queryStringParam._1 ::: normal.map(_.name)).distinct,
+                      queryStringParam._2 ++ localParams ++ params,
+                      files,
+                      Empty)
+        // it's a GET
+      } else if (reqType.get_?) {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Empty)
+      } else if (contentType.dmap(false)(_.toLowerCase.startsWith(
+                         "application/x-www-form-urlencoded"))) {
+        val params =
+          localParams ++ (request.params.sortWith { (s1, s2) =>
+            s1.name < s2.name
+          }).map(n => (n.name, n.values))
+        ParamCalcInfo(request.paramNames, params, Nil, Empty)
+      } else {
+        ParamCalcInfo(queryStringParam._1,
+                      queryStringParam._2 ++ localParams,
+                      Nil,
+                      Full(BodyOrInputStream(request.inputStream)))
+      }
     })
 
-    val paramCalculator: () => ParamCalcInfo = () =>
-      {
-        paramCalcInfo.thunk
+    val paramCalculator: () => ParamCalcInfo = () => {
+      paramCalcInfo.thunk
     }
 
     val wholePath = rewritten.path.wholePath
@@ -626,7 +625,8 @@ object Req {
     val updated =
       if (hv.startsWith("/") && !hv.startsWith("//") &&
           !LiftRules.excludePathFromContextPathRewriting.vend(hv))
-        contextPath + hv else hv
+        contextPath + hv
+      else hv
 
     Text(
         if (fixURL && rewrite.isDefined && !updated.startsWith("mailto:") &&
@@ -859,7 +859,8 @@ class Req(val path: ParsePath,
           _stateless_? : Boolean,
           private[http] val paramCalculator: () => ParamCalcInfo,
           private[http] val addlParams: Map[String, String])
-    extends HasParams with UserAgentCalculator {
+    extends HasParams
+    with UserAgentCalculator {
   override def toString =
     "Req(" + paramNames + ", " + params + ", " + path + ", " + contextPath +
     ", " + requestType + ", " + contentType + ")"
@@ -1037,7 +1038,8 @@ class Req(val path: ParsePath,
     }
 
   lazy val headers: List[(String, String)] = for (h <- request.headers;
-  p <- h.values) yield (h.name, p)
+                                                  p <- h.values) yield
+    (h.name, p)
 
   def headers(name: String): List[String] =
     headers.filter(_._1.equalsIgnoreCase(name)).map(_._2)
@@ -1138,8 +1140,7 @@ class Req(val path: ParsePath,
           .flatMap(ct => r.findFirstIn(ct).flatMap(r2.findFirstIn))
           .getOrElse("UTF-8")
 
-      body.map(
-          b =>
+      body.map(b =>
             JsonParser.parse(
                 new InputStreamReader(new ByteArrayInputStream(b), charSet)))
     } catch {
@@ -1323,9 +1324,9 @@ class Req(val path: ParsePath,
         uri <- Box.legacyNullTest(request.uri)
         cp <- Box.legacyNullTest(contextPath)
         part <- (request.uri.length >= cp.length) match {
-          case true => Full(request.uri.substring(cp.length))
-          case _ => Empty
-        }
+                 case true => Full(request.uri.substring(cp.length))
+                 case _ => Empty
+               }
       } yield {
         part match {
           case "" => "/"
@@ -1364,7 +1365,8 @@ class Req(val path: ParsePath,
     * The user agent of the browser that sent the request
     */
   lazy val userAgent: Box[String] = for (r <- Box.legacyNullTest(request);
-  uah <- request.header("User-Agent")) yield uah
+                                         uah <- request.header("User-Agent")) yield
+    uah
 
   /**
     * the accept header

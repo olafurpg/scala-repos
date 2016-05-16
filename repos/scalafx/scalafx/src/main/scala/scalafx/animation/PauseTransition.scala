@@ -63,7 +63,8 @@ object PauseTransition extends AnimationStatics {
   */
 class PauseTransition(
     override val delegate: jfxa.PauseTransition = new jfxa.PauseTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.PauseTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.PauseTransition] {
 
   /**
     * The constructor of $PT.

@@ -60,8 +60,8 @@ sealed trait EventMessage {
 }
 
 object EventMessage {
-  type EventMessageExtraction = (APIKey, Path,
-  Authorities => EventMessage) \/ EventMessage
+  type EventMessageExtraction =
+    (APIKey, Path, Authorities => EventMessage) \/ EventMessage
 
   // an instant that's close enough to the start of timestamping for our purposes
   val defaultTimestamp = new Instant(1362465101979L)
@@ -146,7 +146,7 @@ object IngestMessage {
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" ::
     ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
-  implicit def seqExtractor[A : Extractor]: Extractor[Seq[A]] =
+  implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
   val decomposerV1: Decomposer[IngestMessage] =

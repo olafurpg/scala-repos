@@ -81,11 +81,11 @@ abstract class OperationOnCollectionInspectionBase
     def simplificationTypes =
       for {
         (st, idx) <- possibleSimplificationTypes.zipWithIndex
-                        if getSimplificationTypesEnabled(idx)
+        if getSimplificationTypesEnabled(idx)
       } yield st
 
-    simplificationTypes.flatMap(
-        st => st.getSimplifications(expr) ++ st.getSimplification(expr))
+    simplificationTypes.flatMap(st =>
+          st.getSimplifications(expr) ++ st.getSimplification(expr))
   }
 
   def getLikeCollectionClasses: Array[String] =

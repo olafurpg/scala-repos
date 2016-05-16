@@ -24,7 +24,8 @@ import org.apache.thrift.protocol.TProtocolFactory
   */
 @deprecated("Use object ThriftMux", "7.0.0")
 class ThriftMuxServerLike private[finagle](server: ThriftMux.Server)
-    extends Server[Array[Byte], Array[Byte]] with ThriftRichServer
+    extends Server[Array[Byte], Array[Byte]]
+    with ThriftRichServer
     with (Stack.Params => Server[Array[Byte], Array[Byte]]) {
 
   /**
@@ -59,7 +60,7 @@ class ThriftMuxServerLike private[finagle](server: ThriftMux.Server)
     * Create a new ThriftMuxServerLike with `p` added to the
     * parameters used to configure the `muxer`.
     */
-  def configured[P : Stack.Param](p: P): ThriftMuxServerLike =
+  def configured[P: Stack.Param](p: P): ThriftMuxServerLike =
     new ThriftMuxServerLike(server.configured(p))
 
   /**

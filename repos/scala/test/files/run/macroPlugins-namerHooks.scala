@@ -25,8 +25,8 @@ object Test extends DirectTest {
       override def pluginsEnsureCompanionObject(
           namer: Namer,
           cdef: ClassDef,
-          creator: ClassDef => Tree = companionModuleDef(_))
-        : Option[Symbol] = {
+          creator: ClassDef => Tree =
+            companionModuleDef(_)): Option[Symbol] = {
         log(s"ensureCompanionObject($cdef, ...)")
         Some(namer.standardEnsureCompanionObject(cdef, creator))
       }

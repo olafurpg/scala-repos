@@ -8,7 +8,10 @@ import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class OfferOperationFactoryTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("Launch operation succeeds even if principal/role are not set") {
     val f = new Fixture

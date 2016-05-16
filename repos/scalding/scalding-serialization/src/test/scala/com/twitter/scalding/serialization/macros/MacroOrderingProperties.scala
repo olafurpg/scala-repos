@@ -34,7 +34,7 @@ trait LowerPriorityImplicit {
 }
 
 object LawTester {
-  def apply[T : Arbitrary](laws: Iterable[Law[T]]): Prop =
+  def apply[T: Arbitrary](laws: Iterable[Law[T]]): Prop =
     apply(implicitly[Arbitrary[T]].arbitrary, laws)
 
   def apply[T](g: Gen[T], laws: Iterable[Law[T]]): Prop =
@@ -230,7 +230,9 @@ object Container {
   case class InnerCaseClass(e: SetAlias)
 }
 class MacroOrderingProperties
-    extends FunSuite with PropertyChecks with ShouldMatchers
+    extends FunSuite
+    with PropertyChecks
+    with ShouldMatchers
     with LowerPriorityImplicit {
   type SetAlias = Set[Double]
 
@@ -238,12 +240,12 @@ class MacroOrderingProperties
   import Container.arbitraryInnerCaseClass
   import OrderedSerialization.{compare => oBufCompare}
 
-  def gen[T : Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
+  def gen[T: Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
 
-  def arbMap[T : Arbitrary, U](fn: T => U): Arbitrary[U] =
+  def arbMap[T: Arbitrary, U](fn: T => U): Arbitrary[U] =
     Arbitrary(gen[T].map(fn))
 
-  def collectionArb[C[_], T : Arbitrary](
+  def collectionArb[C[_], T: Arbitrary](
       implicit cbf: collection.generic.CanBuildFrom[Nothing, T, C[T]])
     : Arbitrary[C[T]] = Arbitrary {
     gen[List[T]].map { l =>
@@ -297,7 +299,7 @@ class MacroOrderingProperties
     }
   }
 
-  def checkMany[T : Arbitrary](implicit obuf: OrderedSerialization[T]) =
+  def checkMany[T: Arbitrary](implicit obuf: OrderedSerialization[T]) =
     forAll { i: List[(T, T)] =>
       checkManyExplicit(i)
     }
@@ -350,14 +352,14 @@ class MacroOrderingProperties
         "Comparing a and b with ordered bufferables compare after a serialization RT")
   }
 
-  def check[T : Arbitrary](implicit obuf: OrderedSerialization[T]) = {
+  def check[T: Arbitrary](implicit obuf: OrderedSerialization[T]) = {
     Checkers.check(LawTester(OrderedSerialization.allLaws))
     forAll(minSuccessful(500)) { (a: T, b: T) =>
       checkWithInputs(a, b)
     }
   }
 
-  def checkCollisions[T : Arbitrary : OrderedSerialization] = {
+  def checkCollisions[T: Arbitrary: OrderedSerialization] = {
     val ord = implicitly[OrderedSerialization[T]]
 
     val arbInput = Gen.containerOfN[Set, T](100, arb[T]).map(_.toList)

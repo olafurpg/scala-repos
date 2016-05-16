@@ -610,8 +610,7 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
     val sorter = new ExternalSorter[Int, Int, Int](
         context, agg, Some(new HashPartitioner(3)), ord)
-    sorter.insertAll(
-        (0 until size).iterator.map { i =>
+    sorter.insertAll((0 until size).iterator.map { i =>
       (i / 4, i)
     })
     if (withSpilling) {

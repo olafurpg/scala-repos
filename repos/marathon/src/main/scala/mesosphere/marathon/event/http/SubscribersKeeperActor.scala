@@ -9,7 +9,8 @@ import mesosphere.marathon.state.EntityStore
 import scala.concurrent.Future
 
 class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   override def receive: Receive = {
 

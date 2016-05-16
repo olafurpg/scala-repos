@@ -241,23 +241,23 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
 
       mother.children.asJValue mustEqual JArray(
           List(
+              JObject(List(
+                      JField("name", JString("Jack")),
+                      JField("birthdate",
+                             JObject(List(JField(
+                                         "$dt",
+                                         JString(
+                                             "2010-11-02T23:58:00.000Z")))))
+                  )),
               JObject(
                   List(
-                      JField("name", JString("Jack")),
+                      JField("name", JString("Jill")),
                       JField("birthdate",
                              JObject(
                                  List(JField(
                                          "$dt",
                                          JString(
-                                             "2010-11-02T23:58:00.000Z")))))
-                  )),
-              JObject(List(
-                      JField("name", JString("Jill")),
-                      JField(
-                          "birthdate",
-                          JObject(List(JField(
-                                      "$dt",
-                                      JString("2010-11-03T00:08:00.000Z")))))
+                                             "2010-11-03T00:08:00.000Z")))))
                   ))
           ))
       mother.children.toForm must beEmpty
@@ -320,11 +320,11 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
         form foreach { fprime =>
           val f = ("* [name]" #> ".*" & "select *" #>
               (((ns: NodeSeq) =>
-                    ns.filter {
-                      case e: Elem =>
-                        e.attribute("selected").map(_.text) == Some("selected")
-                      case _ => false
-                    }) andThen "* [value]" #> ".*"))(fprime)
+                  ns.filter {
+                    case e: Elem =>
+                      e.attribute("selected").map(_.text) == Some("selected")
+                    case _ => false
+                  }) andThen "* [value]" #> ".*"))(fprime)
           val ret: Boolean = Helpers.compareXml(f, formPattern)
           ret must_== true
         }
@@ -393,11 +393,11 @@ object CustomSerializersSpec extends Specification with MongoTestKit {
         form foreach { fprime =>
           val f = ("* [name]" #> ".*" & "select *" #>
               (((ns: NodeSeq) =>
-                    ns.filter {
-                      case e: Elem =>
-                        e.attribute("selected").map(_.text) == Some("selected")
-                      case _ => false
-                    }) andThen "* [value]" #> ".*"))(fprime)
+                  ns.filter {
+                    case e: Elem =>
+                      e.attribute("selected").map(_.text) == Some("selected")
+                    case _ => false
+                  }) andThen "* [value]" #> ".*"))(fprime)
           val ret: Boolean = Helpers.compareXml(f, formPattern)
           ret must_== true
         }

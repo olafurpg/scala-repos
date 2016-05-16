@@ -6,7 +6,9 @@ import org.ensime.api._
 import org.ensime.util.{EnsimeSpec, EscapingStringInterpolation}
 
 class JerkFormatsSpec
-    extends EnsimeSpec with SprayJsonTestSupport with EnsimeTestData {
+    extends EnsimeSpec
+    with SprayJsonTestSupport
+    with EnsimeTestData {
 
   import JerkFormats._
   import JerkEnvelopeFormats._

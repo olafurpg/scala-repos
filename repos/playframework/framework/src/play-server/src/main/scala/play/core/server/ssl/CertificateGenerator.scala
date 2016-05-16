@@ -25,11 +25,11 @@ object CertificateGenerator {
   /**
     * Generates a certificate using RSA (which is available in 1.6).
     */
-  def generateRSAWithSHA256(keySize: Int = 2048,
-                            from: Instant = Instant.now,
-                            duration: Duration = Days
-                                .days(365)
-                                .toStandardDuration): X509Certificate = {
+  def generateRSAWithSHA256(
+      keySize: Int = 2048,
+      from: Instant = Instant.now,
+      duration: Duration =
+        Days.days(365).toStandardDuration): X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -45,11 +45,11 @@ object CertificateGenerator {
                         AlgorithmId.sha256WithRSAEncryption_oid)
   }
 
-  def generateRSAWithSHA1(keySize: Int = 2048,
-                          from: Instant = Instant.now,
-                          duration: Duration = Days
-                              .days(365)
-                              .toStandardDuration): X509Certificate = {
+  def generateRSAWithSHA1(
+      keySize: Int = 2048,
+      from: Instant = Instant.now,
+      duration: Duration =
+        Days.days(365).toStandardDuration): X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -77,11 +77,11 @@ object CertificateGenerator {
     pemCert
   }
 
-  def generateRSAWithMD5(keySize: Int = 2048,
-                         from: Instant = Instant.now,
-                         duration: Duration = Days
-                             .days(365)
-                             .toStandardDuration): X509Certificate = {
+  def generateRSAWithMD5(
+      keySize: Int = 2048,
+      from: Instant = Instant.now,
+      duration: Duration =
+        Days.days(365).toStandardDuration): X509Certificate = {
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)

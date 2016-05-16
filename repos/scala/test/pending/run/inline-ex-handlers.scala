@@ -226,9 +226,10 @@ object TestInlineHandlersSynchronizedWithStack {
     var result = "hello"
 
     // any exception thrown here will be caught by a default handler that does MONTIOR_EXIT on result :)
-    result = "abc" + result.synchronized {
-      throw MyException(result)
-    }
+    result =
+      "abc" + result.synchronized {
+        throw MyException(result)
+      }
 
     result.length
   }

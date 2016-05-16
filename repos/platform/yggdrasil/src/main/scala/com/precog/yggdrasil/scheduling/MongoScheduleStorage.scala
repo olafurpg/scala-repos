@@ -80,7 +80,8 @@ object MongoScheduleStorage {
 class MongoScheduleStorage private[MongoScheduleStorage](
     mongo: Mongo, database: Database, settings: MongoScheduleStorageSettings)(
     implicit executor: ExecutionContext)
-    extends ScheduleStorage[Future] with Logging {
+    extends ScheduleStorage[Future]
+    with Logging {
   private implicit val M = new FutureMonad(executor)
 
   private implicit val timeout = new Timeout(settings.timeout)
@@ -95,8 +96,7 @@ class MongoScheduleStorage private[MongoScheduleStorage](
     }
 
   private def insertTask(task: ScheduledTask \/ JObject, collection: String) =
-    database(
-        insert(task.valueOr { st =>
+    database(insert(task.valueOr { st =>
       st.serialize.asInstanceOf[JObject]
     }).into(collection))
 
@@ -106,7 +106,7 @@ class MongoScheduleStorage private[MongoScheduleStorage](
         for {
           _ <- insertTask(\/-(taskjv), settings.deletedTasks)
           _ <- database(
-              remove.from(settings.tasks) where (".id" === id.toString))
+                  remove.from(settings.tasks) where (".id" === id.toString))
         } yield {
           taskjv.validated[ScheduledTask].disjunction leftMap { _.message } map {
             Some(_)

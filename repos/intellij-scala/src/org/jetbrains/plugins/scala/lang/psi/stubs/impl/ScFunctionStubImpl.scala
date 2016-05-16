@@ -22,7 +22,8 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScFunction](parent, elemType) with ScFunctionStub {
+    extends StubBaseWrapper[ScFunction](parent, elemType)
+    with ScFunctionStub {
   private var name: StringRef = _
   private var declaration: Boolean = false
   private var annotations: Array[StringRef] = Array[StringRef]()
@@ -96,8 +97,7 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
   def getReturnTypeElement: Option[ScTypeElement] = {
     if (myReturnTypeElement != null) {
       val returnTypeElement = myReturnTypeElement.get
-      if (returnTypeElement != null &&
-          (returnTypeElement.isEmpty ||
+      if (returnTypeElement != null && (returnTypeElement.isEmpty ||
               (returnTypeElement.get.getContext eq getPsi))) {
         return returnTypeElement
       }

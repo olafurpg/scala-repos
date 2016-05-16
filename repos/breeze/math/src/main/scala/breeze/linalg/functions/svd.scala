@@ -179,8 +179,8 @@ object svd extends UFunc {
     SVD(U, S, Vt)
   }
 
-  type OpMulMatrixDenseVector[Mat] = OpMulMatrix.Impl2[
-      Mat, DenseVector[Double], DenseVector[Double]]
+  type OpMulMatrixDenseVector[Mat] =
+    OpMulMatrix.Impl2[Mat, DenseVector[Double], DenseVector[Double]]
 
   /**
     * Implementation of svds for a sparse matrix. The caller provides two operations: mul - matrix

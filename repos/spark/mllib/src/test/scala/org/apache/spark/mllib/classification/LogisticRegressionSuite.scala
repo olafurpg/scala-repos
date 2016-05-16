@@ -54,8 +54,8 @@ object LogisticRegressionSuite {
       if (rnd.nextDouble() < p) 1.0 else 0.0
     }
 
-    val testData = (0 until nPoints).map(
-        i => LabeledPoint(y(i), Vectors.dense(Array(x1(i)))))
+    val testData = (0 until nPoints).map(i =>
+          LabeledPoint(y(i), Vectors.dense(Array(x1(i)))))
     testData
   }
 
@@ -178,7 +178,9 @@ object LogisticRegressionSuite {
 }
 
 class LogisticRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Matchers {
 
   @transient var binaryDataset: RDD[LabeledPoint] = _
 
@@ -437,17 +439,17 @@ class LogisticRegressionSuite
 
     val testRDD1 = sc.parallelize(testData, 2)
 
-    val testRDD2 = sc.parallelize(testData.map(x =>
-                                        LabeledPoint(x.label,
-                                                     Vectors.fromBreeze(
-                                                         x.features.toBreeze * 1.0E3))),
-                                  2)
+    val testRDD2 = sc.parallelize(
+        testData.map(x =>
+              LabeledPoint(x.label,
+                           Vectors.fromBreeze(x.features.toBreeze * 1.0E3))),
+        2)
 
-    val testRDD3 = sc.parallelize(testData.map(x =>
-                                        LabeledPoint(x.label,
-                                                     Vectors.fromBreeze(
-                                                         x.features.toBreeze * 1.0E6))),
-                                  2)
+    val testRDD3 = sc.parallelize(
+        testData.map(x =>
+              LabeledPoint(x.label,
+                           Vectors.fromBreeze(x.features.toBreeze * 1.0E6))),
+        2)
 
     testRDD1.cache()
     testRDD2.cache()
@@ -988,7 +990,8 @@ class LogisticRegressionSuite
 }
 
 class LogisticRegressionClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite
+    with LocalClusterSparkContext {
 
   test(
       "task size should be small in both training and prediction using SGD optimizer") {

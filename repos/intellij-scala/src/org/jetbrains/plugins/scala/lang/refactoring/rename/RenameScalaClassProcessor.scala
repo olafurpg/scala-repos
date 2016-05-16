@@ -27,7 +27,8 @@ import scala.annotation.tailrec
   * Date: 15.09.2009
   */
 class RenameScalaClassProcessor
-    extends RenameJavaClassProcessor with ScalaRenameProcessor {
+    extends RenameJavaClassProcessor
+    with ScalaRenameProcessor {
   override def canProcessElement(element: PsiElement): Boolean = {
     element.isInstanceOf[ScTypeDefinition] ||
     element.isInstanceOf[PsiClassWrapper] || element.isInstanceOf[ScTypeParam]
@@ -175,7 +176,8 @@ class ScalaClassRenameDialog(project: Project,
   }
 
   override def performRename(newName: String) {
-    ScalaApplicationSettings.getInstance().RENAME_COMPANION_MODULE = chbRenameCompanion.isSelected
+    ScalaApplicationSettings.getInstance().RENAME_COMPANION_MODULE =
+      chbRenameCompanion.isSelected
     super.performRename(newName)
     ScalaApplicationSettings.getInstance().RENAME_COMPANION_MODULE = true
   }

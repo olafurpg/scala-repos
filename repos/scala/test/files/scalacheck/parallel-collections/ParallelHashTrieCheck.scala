@@ -45,7 +45,8 @@ abstract class ParallelHashMapCheck[K, V](tp: String)
 
 class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
     extends ParallelHashMapCheck[Int, Int]("Int, Int")
-    with PairOperators[Int, Int] with PairValues[Int, Int] {
+    with PairOperators[Int, Int]
+    with PairValues[Int, Int] {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values
@@ -102,7 +103,9 @@ abstract class ParallelHashSetCheck[T](tp: String)
 }
 
 class IntParallelHashSetCheck(val tasksupport: TaskSupport)
-    extends ParallelHashSetCheck[Int]("Int") with IntOperators with IntValues {
+    extends ParallelHashSetCheck[Int]("Int")
+    with IntOperators
+    with IntValues {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values

@@ -8,7 +8,8 @@ import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
 import org.apache.sshd.server.session.ServerSession
 
 class PublicKeyAuthenticator
-    extends PublickeyAuthenticator with SshKeyService {
+    extends PublickeyAuthenticator
+    with SshKeyService {
 
   override def authenticate(
       username: String, key: PublicKey, session: ServerSession): Boolean = {

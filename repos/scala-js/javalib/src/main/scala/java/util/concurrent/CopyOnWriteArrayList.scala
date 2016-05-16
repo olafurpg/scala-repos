@@ -11,7 +11,10 @@ import java.util._
 
 class CopyOnWriteArrayList[E <: AnyRef] private (
     private var inner: js.Array[E])
-    extends List[E] with RandomAccess with Cloneable with Serializable {
+    extends List[E]
+    with RandomAccess
+    with Cloneable
+    with Serializable {
   self =>
 
   // requiresCopyOnWrite is false if and only if no other object

@@ -24,7 +24,8 @@ import org.apache.spark.storage.TestBlockId
 import org.apache.spark.storage.memory.MemoryStore
 
 class UnifiedMemoryManagerSuite
-    extends MemoryManagerSuite with PrivateMethodTester {
+    extends MemoryManagerSuite
+    with PrivateMethodTester {
   private val dummyBlock = TestBlockId("--")
 
   private val storageFraction: Double = 0.5

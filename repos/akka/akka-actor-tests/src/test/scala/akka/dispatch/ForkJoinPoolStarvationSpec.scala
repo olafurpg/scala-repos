@@ -40,7 +40,8 @@ object ForkJoinPoolStarvationSpec {
 }
 
 class ForkJoinPoolStarvationSpec
-    extends AkkaSpec(ForkJoinPoolStarvationSpec.config) with ImplicitSender {
+    extends AkkaSpec(ForkJoinPoolStarvationSpec.config)
+    with ImplicitSender {
   import ForkJoinPoolStarvationSpec._
 
   val Iterations = 1000

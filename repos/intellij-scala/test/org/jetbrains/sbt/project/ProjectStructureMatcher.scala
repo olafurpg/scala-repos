@@ -23,8 +23,7 @@ trait ProjectStructureMatcher {
 
   def assertProjectsEqual(expected: project, actual: Project): Unit = {
     assertEquals("Project name", expected.name, actual.getName)
-    expected.foreach(sdk)(
-        it =>
+    expected.foreach(sdk)(it =>
           assertEquals(
               "Project SDK",
               it,
@@ -160,8 +159,8 @@ trait ProjectStructureMatcher {
       expected: dependency[_], actual: roots.ExportableOrderEntry): Unit = {
     expected.foreach(isExported)(it =>
           assertEquals("Dependency isExported flag", it, actual.isExported))
-    expected.foreach(scope)(
-        it => assertEquals("Dependency scope", it, actual.getScope))
+    expected.foreach(scope)(it =>
+          assertEquals("Dependency scope", it, actual.getScope))
   }
 
   private def assertProjectLibrariesEqual(project: Project)(

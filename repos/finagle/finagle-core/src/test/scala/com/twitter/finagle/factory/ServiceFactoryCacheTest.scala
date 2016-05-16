@@ -28,8 +28,7 @@ class ServiceFactoryCacheTest extends FunSuite with MockitoSugar {
     news += (i -> (1 + news.getOrElse(i, 0)))
 
     def apply(conn: ClientConnection) =
-      Future.value(
-          new Service[String, String] {
+      Future.value(new Service[String, String] {
         factories = factories + (i -> (factories(i) + 1))
         def apply(req: String) = Future.value(i.toString)
         override def close(deadline: Time) = {

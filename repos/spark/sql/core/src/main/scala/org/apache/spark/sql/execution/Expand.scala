@@ -36,7 +36,8 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
 case class Expand(projections: Seq[Seq[Expression]],
                   output: Seq[Attribute],
                   child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,

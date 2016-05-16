@@ -24,7 +24,9 @@ import scala.collection.mutable
   * @author Tobias Schlatter
   */
 abstract class PrepJSInterop
-    extends plugins.PluginComponent with PrepJSExports with transform.Transform
+    extends plugins.PluginComponent
+    with PrepJSExports
+    with transform.Transform
     with PluginComponent210Compat {
   import PrepJSInterop._
 
@@ -918,7 +920,7 @@ abstract class PrepJSInterop
   private def checkJSNameLiteral(sym: Symbol): Unit = {
     for {
       annot <- sym.getAnnotation(JSNameAnnotation)
-                  if annot.stringArg(0).isEmpty
+      if annot.stringArg(0).isEmpty
     } {
       reporter.error(
           annot.pos, "The argument to JSName must be a literal string")
@@ -1045,8 +1047,7 @@ abstract class PrepJSInterop
     // This method assumes that isJSAny(ddef.symbol.owner) is true
     val sym = ddef.symbol
     val needsFix = {
-      sym.isPrivate &&
-      (wasPublicBeforeTyper(sym) ||
+      sym.isPrivate && (wasPublicBeforeTyper(sym) ||
           (sym.isAccessor && wasPublicBeforeTyper(sym.accessed)))
     }
     if (needsFix) {

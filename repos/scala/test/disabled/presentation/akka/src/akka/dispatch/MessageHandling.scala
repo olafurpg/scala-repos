@@ -264,16 +264,16 @@ abstract class MessageDispatcherConfigurator {
 
     //Apply the following options to the config if they are present in the config
     ThreadPoolConfigDispatcherBuilder(createDispatcher, ThreadPoolConfig())
-      .configure(conf_?(config getInt "keep-alive-time")(
-                     time => _.setKeepAliveTime(Duration(time, TIME_UNIT))),
-                 conf_?(config getDouble "core-pool-size-factor")(
-                     factor => _.setCorePoolSizeFromFactor(factor)),
-                 conf_?(config getDouble "max-pool-size-factor")(
-                     factor => _.setMaxPoolSizeFromFactor(factor)),
-                 conf_?(config getInt "executor-bounds")(
-                     bounds => _.setExecutorBounds(bounds)),
-                 conf_?(config getBool "allow-core-timeout")(
-                     allow => _.setAllowCoreThreadTimeout(allow)),
+      .configure(conf_?(config getInt "keep-alive-time")(time =>
+                       _.setKeepAliveTime(Duration(time, TIME_UNIT))),
+                 conf_?(config getDouble "core-pool-size-factor")(factor =>
+                       _.setCorePoolSizeFromFactor(factor)),
+                 conf_?(config getDouble "max-pool-size-factor")(factor =>
+                       _.setMaxPoolSizeFromFactor(factor)),
+                 conf_?(config getInt "executor-bounds")(bounds =>
+                       _.setExecutorBounds(bounds)),
+                 conf_?(config getBool "allow-core-timeout")(allow =>
+                       _.setAllowCoreThreadTimeout(allow)),
                  conf_?(config getString "rejection-policy" map {
                    case "abort" => new AbortPolicy()
                    case "caller-runs" => new CallerRunsPolicy()

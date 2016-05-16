@@ -25,7 +25,9 @@ trait BindingTemplate { self: Command with TypeConverterFactories =>
 }
 
 trait WithBinding
-    extends Command with TypeConverterFactories with BindingTemplate {
+    extends Command
+    with TypeConverterFactories
+    with BindingTemplate {
 
   val a = upperCaseName
 
@@ -159,8 +161,8 @@ class CommandSpec extends Specification {
         }
 
         afterBinding {
-          _fullname = a.validation.toOption.get + " " +
-          lower.validation.toOption.get
+          _fullname =
+            a.validation.toOption.get + " " + lower.validation.toOption.get
         }
       }
 
@@ -225,10 +227,8 @@ class CommandSupportSpec extends Specification with Mockito {
       val key = page.commandRequestKey[CommandSample]
       var cmd: CommandSample = null
       req.setAttribute(anyString, any[CommandSample]) answers { k =>
-        cmd = k
-          .asInstanceOf[Array[Any]](1)
-          .asInstanceOf[CommandSample]
-          ()
+        cmd = k.asInstanceOf[Array[Any]](1).asInstanceOf[CommandSample]
+        ()
       }
       req.getAttribute(key) returns cmd
 

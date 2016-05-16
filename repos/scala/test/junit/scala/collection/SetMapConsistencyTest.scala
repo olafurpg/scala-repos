@@ -78,7 +78,7 @@ class SetMapConsistencyTest {
     new BoxMutableMap[A, cm.OpenHashMap[A, Int]](
         new cm.OpenHashMap[A, Int], "mutable.OpenHashMap")
 
-  def boxMtm[A : Ordering] =
+  def boxMtm[A: Ordering] =
     new BoxMutableMap[A, cm.TreeMap[A, Int]](
         new cm.TreeMap[A, Int], "mutable.TreeMap")
 
@@ -192,7 +192,7 @@ class SetMapConsistencyTest {
     new BoxImmutableMap[A, ci.ListMap[A, Int]](
         new ci.ListMap[A, Int], "immutable.ListMap")
 
-  def boxItm[A : Ordering] =
+  def boxItm[A: Ordering] =
     new BoxImmutableMap[A, ci.TreeMap[A, Int]](
         new ci.TreeMap[A, Int], "immutable.TreeMap")
 
@@ -237,7 +237,7 @@ class SetMapConsistencyTest {
   def boxMhs[A] =
     new BoxMutableSet[A, cm.HashSet[A]](new cm.HashSet[A], "mutable.HashSet")
 
-  def boxMts[A : Ordering] =
+  def boxMts[A: Ordering] =
     new BoxMutableSet[A, cm.TreeSet[A]](new cm.TreeSet[A], "mutable.TreeSet")
 
   def boxJavaS[A] =
@@ -289,7 +289,7 @@ class SetMapConsistencyTest {
     new BoxImmutableSet[A, ci.ListSet[A]](
         ci.ListSet.empty[A], "mutable.ListSet")
 
-  def boxIts[A : Ordering] =
+  def boxIts[A: Ordering] =
     new BoxImmutableSet[A, ci.TreeSet[A]](
         ci.TreeSet.empty[A], "mutable.TreeSet")
 
@@ -525,8 +525,8 @@ class SetMapConsistencyTest {
       val lm2 = new LongMap[Unit](2000000)
       for (i <- 0 until 1000000) lm2(i) = ()
 
-      lm2.size == 1000000 && (0 to 1100000 by 100000)
-        .forall(i => (lm2 contains i) == i < 1000000)
+      lm2.size == 1000000 &&
+      (0 to 1100000 by 100000).forall(i => (lm2 contains i) == i < 1000000)
     }
 
     lm = LongMap(8L -> 22L, -5L -> 5L, Long.MinValue -> 0L)

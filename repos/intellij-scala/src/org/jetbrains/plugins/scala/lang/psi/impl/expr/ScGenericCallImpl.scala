@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResul
   * Date: 06.03.2008
   */
 class ScGenericCallImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScGenericCall {
+    extends ScalaPsiElementImpl(node)
+    with ScGenericCall {
   override def toString: String = "GenericCall"
 
   /**

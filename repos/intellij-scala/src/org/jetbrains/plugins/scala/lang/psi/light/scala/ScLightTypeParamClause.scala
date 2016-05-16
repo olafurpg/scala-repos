@@ -12,7 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
   */
 class ScLightTypeParamClause(
     tParams: List[TypeParameter], t: ScTypeParamClause)
-    extends LightElement(t.getManager, t.getLanguage) with ScTypeParamClause {
+    extends LightElement(t.getManager, t.getLanguage)
+    with ScTypeParamClause {
   override def getTextByStub: String = t.getTextByStub
 
   override def typeParameters: Seq[ScTypeParam] =

@@ -12,7 +12,8 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 
 object HttpExecutionContextSpec
-    extends Specification with ExecutionSpecification {
+    extends Specification
+    with ExecutionSpecification {
 
   "HttpExecutionContext" should {
 

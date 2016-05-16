@@ -140,5 +140,5 @@ object IO {
   }
 
   @inline
-  private def newBuffer[T : ClassTag] = new Array[T](4096)
+  private def newBuffer[T: ClassTag] = new Array[T](4096)
 }

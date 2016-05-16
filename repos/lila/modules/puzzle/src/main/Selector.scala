@@ -65,7 +65,8 @@ private[puzzle] final class Selector(puzzleColl: Coll,
                        ids: BSONArray,
                        isMate: Boolean): Fu[Option[Puzzle]] =
     puzzleColl
-      .find(mateSelector(isMate) ++ BSONDocument(
+      .find(
+          mateSelector(isMate) ++ BSONDocument(
               Puzzle.BSONFields.id -> BSONDocument("$nin" -> ids),
               Puzzle.BSONFields.rating -> BSONDocument(
                   "$gt" -> BSONInteger(rating - tolerance + decay),

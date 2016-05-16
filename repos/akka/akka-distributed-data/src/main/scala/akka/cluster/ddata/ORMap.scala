@@ -36,7 +36,8 @@ object ORMap {
 final class ORMap[A <: ReplicatedData] private[akka](
     private[akka] val keys: ORSet[String],
     private[akka] val values: Map[String, A])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = ORMap[A]
@@ -242,4 +243,5 @@ object ORMapKey {
 
 @SerialVersionUID(1L)
 final case class ORMapKey[A <: ReplicatedData](_id: String)
-    extends Key[ORMap[A]](_id) with ReplicatedDataSerialization
+    extends Key[ORMap[A]](_id)
+    with ReplicatedDataSerialization

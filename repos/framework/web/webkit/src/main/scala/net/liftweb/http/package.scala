@@ -48,11 +48,10 @@ package object http {
         S.session.map { session =>
           // Capture context now.
           val deferredRender = session.buildDeferredFunction(
-              (resolved: ResolvedType) =>
-                {
-              AsyncRenderComet.completeAsyncRender(
-                  Replace(placeholderId, innerTransform(resolved)(ns).flatten)
-              )
+              (resolved: ResolvedType) => {
+            AsyncRenderComet.completeAsyncRender(
+                Replace(placeholderId, innerTransform(resolved)(ns).flatten)
+            )
           })
 
           // Actually complete the render once the future is fulfilled.

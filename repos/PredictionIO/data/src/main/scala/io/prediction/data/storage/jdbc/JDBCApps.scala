@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Apps]] */
 class JDBCApps(client: String, config: StorageClientConfig, prefix: String)
-    extends Apps with Logging {
+    extends Apps
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "apps")

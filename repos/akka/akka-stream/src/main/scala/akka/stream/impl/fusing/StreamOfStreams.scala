@@ -117,7 +117,9 @@ final class PrefixAndTail[T](n: Int)
   override def initialAttributes = DefaultAttributes.prefixAndTail
 
   private final class PrefixAndTailLogic(_shape: Shape)
-      extends TimerGraphStageLogic(_shape) with OutHandler with InHandler {
+      extends TimerGraphStageLogic(_shape)
+      with OutHandler
+      with InHandler {
 
     private var left = if (n < 0) 0 else n
     private var builder = Vector.newBuilder[T]

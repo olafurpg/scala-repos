@@ -296,7 +296,8 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
 }
 
 class RowMatrixClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite
+    with LocalClusterSparkContext {
 
   var mat: RowMatrix = _
 

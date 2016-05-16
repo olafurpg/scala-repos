@@ -23,7 +23,7 @@ import org.apache.spark.SparkException
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class TransformedDStream[U : ClassTag](
+private[streaming] class TransformedDStream[U: ClassTag](
     parents: Seq[DStream[_]],
     transformFunc: (Seq[RDD[_]], Time) => RDD[U]
 )

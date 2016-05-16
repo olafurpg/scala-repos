@@ -230,8 +230,9 @@ class TextFormatter[V](override val delegate: jfxsc.TextFormatter[V])
     * @param filter The filter that can modify the change.
     */
   def this(filter: (TextFormatter.Change) => TextFormatter.Change) =
-    this(delegate = new jfxsc.TextFormatter(
-              TextFormatter.toUnaryOperator(filter)))
+    this(
+        delegate =
+          new jfxsc.TextFormatter(TextFormatter.toUnaryOperator(filter)))
 
   /**
     * Creates a new Formatter with the provided filter, value converter and default value.

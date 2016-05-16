@@ -63,7 +63,7 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
           .getType(TypingContext.empty)
           .toOption
           .flatMap(ScType.extractClassType(_, Some(getProject)))
-          (refElement, tuple)
+        (refElement, tuple)
     }
   }
 
@@ -74,10 +74,10 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       tp match {
         case Some(tp1) =>
           (for (te <- tp1.allTypeElements;
-          t = te.getType(TypingContext.empty).getOrAny;
-          asPsi = ScType.toPsi(
-              t, getProject, GlobalSearchScope.allScope(getProject))
-              if asPsi.isInstanceOf[PsiClassType]) yield
+                t = te.getType(TypingContext.empty).getOrAny;
+                asPsi = ScType.toPsi(
+                    t, getProject, GlobalSearchScope.allScope(getProject))
+                if asPsi.isInstanceOf[PsiClassType]) yield
             asPsi.asInstanceOf[PsiClassType]).toArray[PsiClassType]
         case _ => PsiClassType.EMPTY_ARRAY
       }
@@ -145,8 +145,8 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
       })
   }
 
-  override def getAllMethodsAndTheirSubstitutors: JList[IPair[
-          PsiMethod, PsiSubstitutor]] = {
+  override def getAllMethodsAndTheirSubstitutors: JList[
+      IPair[PsiMethod, PsiSubstitutor]] = {
     PsiClassImplUtil.getAllWithSubstitutorsByMap(this, MemberType.METHOD)
   }
 
@@ -507,9 +507,9 @@ trait ScTemplateDefinition extends ScNamedElement with PsiClass {
 
   def functionsByName(name: String): Seq[PsiMethod] = {
     (for ((p: PhysicalSignature, _) <- TypeDefinitionMembers
-      .getSignatures(this)
-      .forName(name)
-      ._1) yield
+                                        .getSignatures(this)
+                                        .forName(name)
+                                        ._1) yield
       p.method).++(syntheticMethodsNoOverride.filter(_.name == name))
   }
 

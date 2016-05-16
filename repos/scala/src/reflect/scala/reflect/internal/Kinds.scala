@@ -75,11 +75,12 @@ trait Kinds { self: SymbolTable =>
               countAsString(p.typeParams.length)))
 
     private def buildMessage(
-        xs: List[SymPair], f: (Symbol, Symbol) => String) = (if (xs.isEmpty) ""
-                                                             else
-                                                               xs map f.tupled mkString
-                                                               ("\n", ", ",
-                                                                   ""))
+        xs: List[SymPair], f: (Symbol, Symbol) => String) =
+      (if (xs.isEmpty) ""
+       else
+         xs map f.tupled mkString
+         ("\n", ", ",
+             ""))
 
     def errorMessage(targ: Type, tparam: Symbol): String =
       ((targ + "'s type parameters do not match " + tparam +

@@ -100,16 +100,16 @@ trait Slice { source =>
     val columns: Map[ColumnRef, Column] = {
       val resultColumns = for {
         col <- source.columns collect {
-          case (ref, col) if ref.selector == CPath.Identity => col
-        }
+                case (ref, col) if ref.selector == CPath.Identity => col
+              }
         result <- f(col)
       } yield result
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
           (ColumnRef(CPath.Identity, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+           cols.reduceLeft((c1, c2) =>
+                 Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -128,8 +128,8 @@ trait Slice { source =>
           (ref,
            pairs
              .map(_._2)
-             .reduceLeft(
-                 (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+             .reduceLeft((c1, c2) =>
+                   Column.unionRightSemigroup.append(c1, c2)))
       } toMap
     }
   }
@@ -141,7 +141,7 @@ trait Slice { source =>
       (source.columns).toList sortBy { case (ref, _) => ref.selector }
     val cols = cols0 map { case (_, col) => col }
 
-    def inflate[@spec A : Manifest](cols: Array[Int => A], row: Int) = {
+    def inflate[@spec A: Manifest](cols: Array[Int => A], row: Int) = {
       val as = new Array[A](cols.length)
       var i = 0
       while (i < cols.length) {
@@ -618,16 +618,16 @@ trait Slice { source =>
     val columns: Map[ColumnRef, Column] = {
       val resultColumns = for {
         col <- source.columns collect {
-          case (ref, col) if ref.selector.hasPrefix(from) => col
-        }
+                case (ref, col) if ref.selector.hasPrefix(from) => col
+              }
         result <- f(col)
       } yield result
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
           (ColumnRef(to, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+           cols.reduceLeft((c1, c2) =>
+                 Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -638,19 +638,19 @@ trait Slice { source =>
     val columns: Map[ColumnRef, Column] = {
       val resultColumns = for {
         left <- source.columns collect {
-          case (ref, col) if ref.selector.hasPrefix(froml) => col
-        }
+                 case (ref, col) if ref.selector.hasPrefix(froml) => col
+               }
         right <- source.columns collect {
-          case (ref, col) if ref.selector.hasPrefix(fromr) => col
-        }
+                  case (ref, col) if ref.selector.hasPrefix(fromr) => col
+                }
         result <- f(left, right)
       } yield result
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
           (ColumnRef(to, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+           cols.reduceLeft((c1, c2) =>
+                 Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -780,14 +780,14 @@ trait Slice { source =>
         }
 
         val lastDefined = prevFilter.flatMap { slice =>
-          (slice.size - 1 to 0 by -1)
-            .find(row => slice.columns.values.exists(_.isDefinedAt(row)))
+          (slice.size - 1 to 0 by -1).find(row =>
+                slice.columns.values.exists(_.isDefinedAt(row)))
         }.map {
           (prevFilter.get, _)
         }
 
-        val firstDefined = (0 until filter.size)
-          .find(i => filter.columns.values.exists(_.isDefinedAt(i)))
+        val firstDefined = (0 until filter.size).find(i =>
+              filter.columns.values.exists(_.isDefinedAt(i)))
 
         (lastDefined, firstDefined) match {
           case (Some((prev, i)), Some(j)) => findStraddlingDistinct(prev, i, j)
@@ -966,8 +966,7 @@ trait Slice { source =>
       val columns: Map[ColumnRef, Column] =
         other.columns.foldLeft(source.columns) {
           case (acc, (ref, col)) =>
-            acc +
-            (ref ->
+            acc + (ref ->
                 (acc get ref flatMap { c =>
                       cf.util.UnionRight(c, col)
                     } getOrElse col))
@@ -1766,8 +1765,8 @@ trait Slice { source =>
   def toString(row: Int): Option[String] = {
     (columns.toList.sortBy(_._1) map {
           case (ref, col) =>
-            ref.toString + ": " +
-            (if (col.isDefinedAt(row)) col.strValue(row) else "(undefined)")
+            ref.toString + ": " + (if (col.isDefinedAt(row)) col.strValue(row)
+                                   else "(undefined)")
         }) match {
       case Nil => None
       case l => Some(l.mkString("[", ", ", "]"))
@@ -1977,8 +1976,8 @@ object Slice {
                        into: Map[ColumnRef, ArrayColumn[_]],
                        sliceIndex: Int,
                        sliceSize: Int,
-                       remapPath: Option[JPath => CPath] = None)
-    : Map[ColumnRef, ArrayColumn[_]] = {
+                       remapPath: Option[JPath => CPath] =
+                         None): Map[ColumnRef, ArrayColumn[_]] = {
     jv.flattenWithPath.foldLeft(into) {
       case (acc, (jpath, JUndefined)) => acc
       case (acc, (jpath, v)) =>

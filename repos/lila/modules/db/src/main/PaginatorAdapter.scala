@@ -10,10 +10,10 @@ import reactivemongo.bson._
 
 import lila.common.paginator.AdapterLike
 
-final class Adapter[A : TubeInColl](
-    selector: JsObject,
-    sort: Sort,
-    readPreference: ReadPreference = ReadPreference.primary)
+final class Adapter[A: TubeInColl](selector: JsObject,
+                                   sort: Sort,
+                                   readPreference: ReadPreference =
+                                     ReadPreference.primary)
     extends AdapterLike[A] {
 
   def nbResults: Fu[Int] = $count(selector)
@@ -31,12 +31,12 @@ final class CachedAdapter[A](adapter: AdapterLike[A], val nbResults: Fu[Int])
     adapter.slice(offset, length)
 }
 
-final class BSONAdapter[A : BSONDocumentReader](
-    collection: BSONCollection,
-    selector: BSONDocument,
-    projection: BSONDocument,
-    sort: BSONDocument,
-    readPreference: ReadPreference = ReadPreference.primary)
+final class BSONAdapter[A: BSONDocumentReader](collection: BSONCollection,
+                                               selector: BSONDocument,
+                                               projection: BSONDocument,
+                                               sort: BSONDocument,
+                                               readPreference: ReadPreference =
+                                                 ReadPreference.primary)
     extends AdapterLike[A] {
 
   def nbResults: Fu[Int] = collection.count(Some(selector))

@@ -203,8 +203,7 @@ trait Parsers { self: Quasiquotes =>
       }
 
       override def isTypedParam(tree: Tree) =
-        super.isTypedParam(tree) ||
-        (tree match {
+        super.isTypedParam(tree) || (tree match {
               case Ident(name) if isHole(name) => true
               case _ => false
             })

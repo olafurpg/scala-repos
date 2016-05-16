@@ -142,10 +142,10 @@ object ScalaOIUtil {
     }.flatMap(toClassMember(_, isImplement = true))
   }
 
-  def isProductAbstractMethod(
-      m: PsiMethod,
-      clazz: PsiClass,
-      visited: HashSet[PsiClass] = new HashSet): Boolean = {
+  def isProductAbstractMethod(m: PsiMethod,
+                              clazz: PsiClass,
+                              visited: HashSet[PsiClass] =
+                                new HashSet): Boolean = {
     if (visited.contains(clazz)) return false
     clazz match {
       case td: ScTypeDefinition if td.isCase =>
@@ -197,8 +197,7 @@ object ScalaOIUtil {
       case x: ScFunction if x.isSyntheticCopy => false
       case x if x.containingClass == clazz => false
       case x: PsiModifierListOwner
-          if
-          (x.hasModifierPropertyScala("abstract") &&
+          if (x.hasModifierPropertyScala("abstract") &&
               !x.isInstanceOf[ScFunctionDefinition]) ||
           x.hasModifierPropertyScala("final") =>
         false
@@ -274,7 +273,7 @@ object ScalaOIUtil {
         }
         var flag = false
         for (signe <- clazz.allMethods
-                         if signe.method.containingClass == clazz) {
+             if signe.method.containingClass == clazz) {
           //containingClass == clazz so we sure that this is ScFunction (it is safe cast)
           signe.method match {
             case fun: ScFunction =>
@@ -321,8 +320,8 @@ object ScalaOIUtil {
       case None => return None
     }
     var element: PsiElement = body.getContainingFile.findElementAt(offset)
-    while (element != null &&
-    element.getParent != body) element = element.getParent
+    while (element != null && element.getParent != body) element =
+      element.getParent
 
     element match {
       case member: ScMember => Some(member)

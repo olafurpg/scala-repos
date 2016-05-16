@@ -17,7 +17,8 @@ import javax.inject._
 class PersonController @Inject()(
     repo: PersonRepository, val messagesApi: MessagesApi)(
     implicit ec: ExecutionContext)
-    extends Controller with I18nSupport {
+    extends Controller
+    with I18nSupport {
 
   /**
     * The mapping for the person form.
@@ -47,17 +48,15 @@ class PersonController @Inject()(
         // The error function. We return the index page with the error form, which will render the errors.
         // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
         // a future because the person creation function returns a future.
-        errorForm =>
-          {
-            Future.successful(Ok(views.html.index(errorForm)))
+        errorForm => {
+          Future.successful(Ok(views.html.index(errorForm)))
         },
         // There were no errors in the from, so create the person.
-        person =>
-          {
-            repo.create(person.name, person.age).map { _ =>
-              // If successful, we simply redirect to the index page.
-              Redirect(routes.PersonController.index)
-            }
+        person => {
+          repo.create(person.name, person.age).map { _ =>
+            // If successful, we simply redirect to the index page.
+            Redirect(routes.PersonController.index)
+          }
         }
     )
   }

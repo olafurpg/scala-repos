@@ -508,42 +508,41 @@ private[scalajs] final class ScalaJSClassEmitter(
       val obj = objParam.ref
 
       val createIsStat = {
-        envFieldDef(
-            "is",
-            className,
-            js.Function(List(objParam), js.Return(className match {
-              case Definitions.ObjectClass =>
-                js.BinaryOp(JSBinaryOp.!==, obj, js.Null())
+        envFieldDef("is",
+                    className,
+                    js.Function(List(objParam), js.Return(className match {
+                      case Definitions.ObjectClass =>
+                        js.BinaryOp(JSBinaryOp.!==, obj, js.Null())
 
-              case Definitions.StringClass =>
-                js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                    "string")
+                      case Definitions.StringClass =>
+                        js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
+                            "string")
 
-              case Definitions.RuntimeNothingClass =>
-                // Even null is not an instance of Nothing
-                js.BooleanLiteral(false)
+                      case Definitions.RuntimeNothingClass =>
+                        // Even null is not an instance of Nothing
+                        js.BooleanLiteral(false)
 
-              case _ =>
-                var test = {
-                  genIsScalaJSObject(obj) && genIsClassNameInAncestors(
-                      className, obj DOT "$classData" DOT "ancestors")
-                }
+                      case _ =>
+                        var test = {
+                          genIsScalaJSObject(obj) && genIsClassNameInAncestors(
+                              className, obj DOT "$classData" DOT "ancestors")
+                        }
 
-                if (isAncestorOfString)
-                  test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                          "string"))
-                if (isAncestorOfHijackedNumberClass)
-                  test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                          "number"))
-                if (isAncestorOfBoxedBooleanClass)
-                  test = test ||
-                  (js.UnaryOp(JSUnaryOp.typeof, obj) === js.StringLiteral(
-                          "boolean"))
+                        if (isAncestorOfString)
+                          test =
+                            test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
+                                  .StringLiteral("string"))
+                        if (isAncestorOfHijackedNumberClass)
+                          test =
+                            test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
+                                  .StringLiteral("number"))
+                        if (isAncestorOfBoxedBooleanClass)
+                          test =
+                            test || (js.UnaryOp(JSUnaryOp.typeof, obj) === js
+                                  .StringLiteral("boolean"))
 
-                !(!test)
-            })))
+                        !(!test)
+                    })))
       }
 
       val createAsStat =

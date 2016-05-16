@@ -85,7 +85,8 @@ object Logger {
 
   def apply(cls: Class[_]): Logger =
     if (ranSetup)
-      new WrappedLogger(LoggerFactory.getLogger(loggerNameFor(cls))) else null
+      new WrappedLogger(LoggerFactory.getLogger(loggerNameFor(cls)))
+    else null
   def apply(name: String): Logger =
     if (ranSetup) new WrappedLogger(LoggerFactory.getLogger(name)) else null
 
@@ -161,7 +162,8 @@ trait Logger {
 
   protected def _logger =
     if (Logger.ranSetup)
-      LoggerFactory.getLogger(Logger.loggerNameFor(this.getClass)) else null
+      LoggerFactory.getLogger(Logger.loggerNameFor(this.getClass))
+    else null
 
   def assertLog(assertion: Boolean, msg: => String) = if (assertion) info(msg)
 
@@ -182,8 +184,7 @@ trait Logger {
     if (logger.isTraceEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
-          trace(String.valueOf(msg) + ": " + fmsg: AnyRef,
-                e: Throwable)
+          trace(String.valueOf(msg) + ": " + fmsg: AnyRef, e: Throwable)
         case Failure(fmsg, _, _) => trace(String.valueOf(msg) + ": " + fmsg)
         case _ =>
       }

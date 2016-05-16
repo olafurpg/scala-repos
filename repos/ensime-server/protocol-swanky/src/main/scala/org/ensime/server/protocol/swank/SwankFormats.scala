@@ -28,8 +28,11 @@ case class SwankRPCFormatException(
     extends Exception(msg, cause)
 
 object SwankProtocolConversions
-    extends DefaultSexpProtocol with SymbolAltFormat with OptionAltFormat
-    with FamilyFormats with CamelCaseToDashes {
+    extends DefaultSexpProtocol
+    with SymbolAltFormat
+    with OptionAltFormat
+    with FamilyFormats
+    with CamelCaseToDashes {
   override def skipNilValues: Boolean = true
 }
 

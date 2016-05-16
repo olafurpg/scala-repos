@@ -64,7 +64,7 @@ class ScalaFileNameInspection extends LocalInspectionTool {
     val res = new ArrayBuffer[ProblemDescriptor]
     if (hasProblems) {
       for (clazz <- definitions;
-      scalaClass: ScTypeDefinition = clazz) {
+           scalaClass: ScTypeDefinition = clazz) {
         res += manager.createProblemDescriptor(
             scalaClass.nameId,
             "Class doesn't correspond to file name",

@@ -34,11 +34,10 @@ object Main {
     var hasErrors = false
 
     val client = {
-      val eventHandler = (event: Event) =>
-        {
-          val encode = Base64Converter.encode(event.toBytes)
-          out.write((if (standalone && !encode.endsWith("=")) encode + "="
-                     else encode).getBytes)
+      val eventHandler = (event: Event) => {
+        val encode = Base64Converter.encode(event.toBytes)
+        out.write((if (standalone && !encode.endsWith("=")) encode + "="
+                   else encode).getBytes)
       }
       new EventGeneratingClient(eventHandler, out.checkError) {
         override def error(text: String,

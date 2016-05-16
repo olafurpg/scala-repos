@@ -203,7 +203,8 @@ class FlowMapAsyncUnorderedSpec extends AkkaSpec {
       val p = Source(List("a", "b", "c"))
         .mapAsyncUnordered(4)(elem ⇒
               if (elem == "b")
-                Future.successful(null) else Future.successful(elem))
+                Future.successful(null)
+              else Future.successful(elem))
         .withAttributes(supervisionStrategy(resumingDecider))
         .to(Sink.fromSubscriber(c))
         .run()

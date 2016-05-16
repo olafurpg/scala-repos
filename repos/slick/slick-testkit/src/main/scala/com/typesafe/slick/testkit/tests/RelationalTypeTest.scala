@@ -45,7 +45,7 @@ class RelationalTypeTest extends AsyncTest[RelationalTestDB] {
     )
   }
 
-  private def roundtrip[T : BaseColumnType](tn: String, v: T) = {
+  private def roundtrip[T: BaseColumnType](tn: String, v: T) = {
     class T1(tag: Tag) extends Table[(Int, T, Option[T])](tag, tn) {
       def id = column[Int]("id")
       def data = column[T]("data")

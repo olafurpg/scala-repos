@@ -29,8 +29,11 @@ class JavaCompiler(
     val search: SearchService,
     val vfs: EnsimeVFS
 )
-    extends JavaDocFinding with JavaCompletion with JavaSourceFinding
-    with Helpers with SLF4JLogging {
+    extends JavaDocFinding
+    with JavaCompletion
+    with JavaSourceFinding
+    with Helpers
+    with SLF4JLogging {
 
   private val listener = new JavaDiagnosticListener()
   private val silencer = new SilencedDiagnosticListener()
@@ -125,7 +128,7 @@ class JavaCompiler(
                   tpeMirror
                     .map(_.getKind == TypeKind.EXECUTABLE)
                     .getOrElse(false)
-                ))
+              ))
         }
         path.getLeaf match {
           case t: IdentifierTree => withName(t.getName.toString)
@@ -262,7 +265,8 @@ class JavaCompiler(
     }
 
   private class JavaDiagnosticListener
-      extends DiagnosticListener[JavaFileObject] with ReportHandler {
+      extends DiagnosticListener[JavaFileObject]
+      with ReportHandler {
     def report(diag: Diagnostic[_ <: JavaFileObject]): Unit = {
       reportHandler.reportJavaNotes(
           List(
@@ -288,7 +292,8 @@ class JavaCompiler(
   }
 
   private class SilencedDiagnosticListener
-      extends DiagnosticListener[JavaFileObject] with ReportHandler {
+      extends DiagnosticListener[JavaFileObject]
+      with ReportHandler {
     def report(diag: Diagnostic[_ <: JavaFileObject]): Unit = {}
   }
 }

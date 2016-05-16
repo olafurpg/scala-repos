@@ -159,7 +159,8 @@ case class CannotInstantiateRemoteExceptionDueToRemoteProtocolParsingErrorExcept
 }
 
 abstract class RemoteSupport
-    extends ListenerManagement with RemoteServerModule
+    extends ListenerManagement
+    with RemoteServerModule
     with RemoteClientModule {
 
   lazy val eventHandler: ActorRef = {
@@ -231,7 +232,7 @@ abstract class RemoteSupport
     * </pre>
     */
   @deprecated("Will be removed after 1.1", "1.1")
-  def actorOf[T <: Actor : ClassTag](host: String, port: Int): ActorRef =
+  def actorOf[T <: Actor: ClassTag](host: String, port: Int): ActorRef =
     clientManagedActorOf(
         () => createActorFromClass(classTag[T].erasure), host, port)
 
