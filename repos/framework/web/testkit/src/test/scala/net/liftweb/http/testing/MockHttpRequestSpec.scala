@@ -93,8 +93,8 @@ object MockHttpRequestSpec extends Specification {
     "throw an IllegalArgumentException for an invalid query string" in {
       val testRequest = new MockHttpServletRequest(TEST_URL, "/test")
 
-      (testRequest.queryString = "this=a&&that=b") must throwA[
-          IllegalArgumentException]
+      (testRequest.queryString =
+        "this=a&&that=b") must throwA[IllegalArgumentException]
     }
 
     "properly set a default content type for JSON" in {

@@ -40,8 +40,8 @@ private[spark] class StudentTCacher(confidence: Double) {
       val size = sampleSize.toInt
       if (cache(size) < 0) {
         val tDist = new TDistribution(size - 1)
-        cache(size) = tDist.inverseCumulativeProbability(
-            1 - (1 - confidence) / 2)
+        cache(size) =
+          tDist.inverseCumulativeProbability(1 - (1 - confidence) / 2)
       }
       cache(size)
     }

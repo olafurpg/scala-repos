@@ -83,8 +83,8 @@ class BTypesFromClassfileTest {
 
     val fromSymInterfaces = fromSym.interfaces
     val fromClassFileInterfaces = fromClassfile.interfaces
-    val (matching, other) = fromClassFileInterfaces.partition(
-        x => fromSymInterfaces.exists(_.internalName == x.internalName))
+    val (matching, other) = fromClassFileInterfaces.partition(x =>
+          fromSymInterfaces.exists(_.internalName == x.internalName))
     val chk2 = sameBTypes(fromSym.interfaces, matching, chk1)
     for (redundant <- other) {
       // TODO SD-86 The new trait encoding emits redundant parents in the backend to avoid linkage errors in invokespecial

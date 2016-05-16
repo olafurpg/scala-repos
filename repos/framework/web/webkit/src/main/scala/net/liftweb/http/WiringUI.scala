@@ -132,21 +132,20 @@ object WiringUI {
 
   def history[T](
       cell: Cell[T])(f: (Box[T], T, NodeSeq) => JsCmd): NodeSeq => NodeSeq =
-    in =>
-      {
-        val myElem: Elem = in.find {
-          case e: Elem => true
-          case _ => false
-        }.map(_.asInstanceOf[Elem])
-          .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
+    in => {
+      val myElem: Elem = in.find {
+        case e: Elem => true
+        case _ => false
+      }.map(_.asInstanceOf[Elem])
+        .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
-        addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
+      addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
 
-        new Elem(myElem.prefix,
-                 myElem.label,
-                 myElem.attributes,
-                 myElem.scope,
-                 myElem.minimizeEmpty)
+      new Elem(myElem.prefix,
+               myElem.label,
+               myElem.attributes,
+               myElem.scope,
+               myElem.minimizeEmpty)
     }
 
   /**
@@ -236,7 +235,7 @@ object WiringUI {
     */
   def asText[T](cell: Cell[T],
                 jsEffect: (String, Boolean,
-                JsCmd) => JsCmd): NodeSeq => NodeSeq =
+                           JsCmd) => JsCmd): NodeSeq => NodeSeq =
     in => toNode(in, cell, jsEffect)((t, ns) => Text(t.toString))
 
   /**
@@ -270,11 +269,9 @@ object WiringUI {
       .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
     val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
-    addJsFunc(cell,
-              (t: T, first: Boolean) =>
-                {
-                  jsEffect(id, first, SetHtml(id, f(t, elem.child)))
-              })
+    addJsFunc(cell, (t: T, first: Boolean) => {
+      jsEffect(id, first, SetHtml(id, f(t, elem.child)))
+    })
     elem
   }
 
@@ -300,21 +297,18 @@ object WiringUI {
     */
   def toNode[T](cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
       f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
-    in =>
-      {
-        val myElem: Elem = in.find {
-          case e: Elem => true
-          case _ => false
-        }.map(_.asInstanceOf[Elem])
-          .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
+    in => {
+      val myElem: Elem = in.find {
+        case e: Elem => true
+        case _ => false
+      }.map(_.asInstanceOf[Elem])
+        .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
-        val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
-        addJsFunc(cell,
-                  (t: T, first: Boolean) =>
-                    {
-                      jsEffect(id, first, SetHtml(id, f(t, elem.child)))
-                  })
-        elem
+      val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
+      addJsFunc(cell, (t: T, first: Boolean) => {
+        jsEffect(id, first, SetHtml(id, f(t, elem.child)))
+      })
+      elem
     }
 
   /**
@@ -337,15 +331,14 @@ object WiringUI {
     for {
       sess <- S.session
     } sess.addPostPageJavaScript(
-        () =>
-          {
-        val (value, ct) = trc.get
-        val first = lastTime == 0L
-        if (first || (ct > lastTime && value != lastValue)) {
-          lastValue = value
-          lastTime = ct
-          f(value, first)
-        } else Noop
+        () => {
+      val (value, ct) = trc.get
+      val first = lastTime == 0L
+      if (first || (ct > lastTime && value != lastValue)) {
+        lastValue = value
+        lastTime = ct
+        f(value, first)
+      } else Noop
     })
   }
 
@@ -368,17 +361,15 @@ object WiringUI {
     var lastValue: Box[T] = Empty
     for {
       sess <- S.session
-    } sess.addPostPageJavaScript(
-        () =>
-          {
-        val (value, ct) = trc.get
-        val first = lastTime == 0L
-        if (first || (ct > lastTime && Full(value) != lastValue)) {
-          val oldValue = lastValue
-          lastValue = Full(value)
-          lastTime = ct
-          f(oldValue, value)
-        } else Noop
+    } sess.addPostPageJavaScript(() => {
+      val (value, ct) = trc.get
+      val first = lastTime == 0L
+      if (first || (ct > lastTime && Full(value) != lastValue)) {
+        val oldValue = lastValue
+        lastValue = Full(value)
+        lastTime = ct
+        f(oldValue, value)
+      } else Noop
     })
   }
 }

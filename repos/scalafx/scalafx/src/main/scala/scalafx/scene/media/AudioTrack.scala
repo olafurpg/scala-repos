@@ -38,7 +38,8 @@ object AudioTrack {
 }
 
 class AudioTrack(override val delegate: jfxsm.AudioTrack)
-    extends Track(delegate) with SFXDelegate[jfxsm.AudioTrack] {
+    extends Track(delegate)
+    with SFXDelegate[jfxsm.AudioTrack] {
 
   /**
     * Retrieves the language of the audio track.

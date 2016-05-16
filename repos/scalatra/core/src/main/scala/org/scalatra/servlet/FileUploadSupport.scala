@@ -97,8 +97,7 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
 
   private def isMultipartRequest(req: HttpServletRequest): Boolean = {
     val isPostOrPut = Set("POST", "PUT", "PATCH").contains(req.getMethod)
-    isPostOrPut &&
-    (req.contentType match {
+    isPostOrPut && (req.contentType match {
           case Some(contentType) => contentType.startsWith("multipart/")
           case _ => false
         })
@@ -116,8 +115,7 @@ trait FileUploadSupport extends ServletBase with HasMultipartConfig {
                 val item = FileItem(part)
 
                 if (!(item.isFormField)) {
-                  BodyParams(params.fileParams +
-                             ((
+                  BodyParams(params.fileParams + ((
                                      item.getFieldName,
                                      item +: params.fileParams.getOrElse(
                                          item.getFieldName, List[FileItem]())

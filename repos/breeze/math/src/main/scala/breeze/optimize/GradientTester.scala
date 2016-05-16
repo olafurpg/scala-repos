@@ -54,12 +54,12 @@ object GradientTester extends SerializableLogging {
                         skipZeros: Boolean = false,
                         toString: (K) => String = { (_: K).toString },
                         epsilon: Double = 1e-8,
-                        tolerance: Double = 1E-3)(
-      implicit view2: T <:< NumericOps[T],
-      view: T <:< Tensor[K, Double],
-      copy: CanCopy[T],
-      canNorm: norm.Impl[T, Double],
-      opSub: OpSub.Impl2[T, T, T]): T = {
+                        tolerance: Double =
+                          1E-3)(implicit view2: T <:< NumericOps[T],
+                                view: T <:< Tensor[K, Double],
+                                copy: CanCopy[T],
+                                canNorm: norm.Impl[T, Double],
+                                opSub: OpSub.Impl2[T, T, T]): T = {
     val (fx, trueGrad) = f.calculate(x)
     val xx = copy(x)
     val differences = opSub(x, x)

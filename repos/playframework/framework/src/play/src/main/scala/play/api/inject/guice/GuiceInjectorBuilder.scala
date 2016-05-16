@@ -78,7 +78,9 @@ abstract class GuiceBuilder[Self] protected (environment: Environment,
 
   private def withBinderOption(
       opt: BinderOption, enabled: Boolean = false): Self = {
-    copyBuilder(binderOptions = if (enabled) binderOptions + opt
+    copyBuilder(
+        binderOptions =
+          if (enabled) binderOptions + opt
           else binderOptions - opt)
   }
 

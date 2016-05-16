@@ -38,7 +38,8 @@ class BigDecimalPrecision(num: BigDecimal) {
 }
 
 trait NormalizationHelperModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ReductionLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ReductionLibModule[M] {
 
   trait NormalizationHelperLib extends ColumnarTableLib with ReductionLib {
 

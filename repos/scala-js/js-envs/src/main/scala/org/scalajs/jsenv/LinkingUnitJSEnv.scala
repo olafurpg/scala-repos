@@ -52,7 +52,8 @@ trait LinkingUnitJSEnv extends JSEnv {
     new LoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitLoadedLibs
-      extends LoadedLibs with LinkingUnitJSEnv {
+      extends LoadedLibs
+      with LinkingUnitJSEnv {
     val symbolRequirements: SymbolRequirement =
       LinkingUnitJSEnv.this.symbolRequirements
 

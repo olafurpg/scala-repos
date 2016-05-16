@@ -96,8 +96,8 @@ class DefaultTracingTest extends FunSuite with StringClient with StringServer {
       val client = DefaultClient[String, String](
           name = "theClient",
           endpointer = Bridge[String, String, String, String](
-                Netty3Transporter("theClient", StringClientPipeline),
-                new SerialClientDispatcher(_)),
+              Netty3Transporter("theClient", StringClientPipeline),
+              new SerialClientDispatcher(_)),
           tracer = clientTracer)
 
       val svc = server.serve("localhost:*", Svc)

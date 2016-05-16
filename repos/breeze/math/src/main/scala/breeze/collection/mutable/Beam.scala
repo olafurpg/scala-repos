@@ -27,7 +27,9 @@ import scala.collection.generic._
   * @author dlwh
   */
 class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
-    extends Iterable[T] with IterableLike[T, Beam[T]] with Growable[T] {
+    extends Iterable[T]
+    with IterableLike[T, Beam[T]]
+    with Growable[T] {
   outer =>
   assert(maxSize >= 0)
   protected val queue = new PriorityQueue[T]()(o.reverse)
@@ -66,7 +68,7 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
 }
 
 object Beam {
-  def apply[T : Ordering](maxSize: Int)(xs: T*): Beam[T] =
+  def apply[T: Ordering](maxSize: Int)(xs: T*): Beam[T] =
     new Beam[T](maxSize, xs: _*)
 
   @deprecated("Use Beam(maxSize)(xs) instead", "0.12")
@@ -74,7 +76,7 @@ object Beam {
       implicit ordering: Ordering[T], dummyImplicit: DummyImplicit): Beam[T] =
     new Beam[T](maxSize, xs: _*)
 
-  implicit def canBuildFrom[T : Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
+  implicit def canBuildFrom[T: Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
     new CanBuildFrom[Beam[T], T, Beam[T]] {
       def apply() = sys.error("Sorry, need a max size")
 

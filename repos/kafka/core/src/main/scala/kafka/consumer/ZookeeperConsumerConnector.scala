@@ -83,9 +83,10 @@ private[kafka] object ZookeeperConsumerConnector {
 }
 
 private[kafka] class ZookeeperConsumerConnector(
-    val config: ConsumerConfig,
-    val enableFetcher: Boolean) // for testing only
-    extends ConsumerConnector with Logging with KafkaMetricsGroup {
+    val config: ConsumerConfig, val enableFetcher: Boolean) // for testing only
+    extends ConsumerConnector
+    with Logging
+    with KafkaMetricsGroup {
 
   private val isShuttingDown = new AtomicBoolean(false)
   private val rebalanceLock = new Object
@@ -286,16 +287,15 @@ private[kafka] class ZookeeperConsumerConnector(
     // make a list of (queue,stream) pairs, one pair for each threadId
     val queuesAndStreams = topicThreadIds.values
       .map(threadIdSet =>
-            threadIdSet.map(_ =>
-                  {
-            val queue = new LinkedBlockingQueue[FetchedDataChunk](
-                config.queuedMaxMessages)
-            val stream = new KafkaStream[K, V](queue,
-                                               config.consumerTimeoutMs,
-                                               keyDecoder,
-                                               valueDecoder,
-                                               config.clientId)
-            (queue, stream)
+            threadIdSet.map(_ => {
+          val queue =
+            new LinkedBlockingQueue[FetchedDataChunk](config.queuedMaxMessages)
+          val stream = new KafkaStream[K, V](queue,
+                                             config.consumerTimeoutMs,
+                                             keyDecoder,
+                                             valueDecoder,
+                                             config.clientId)
+          (queue, stream)
         }))
       .flatten
       .toList
@@ -333,7 +333,7 @@ private[kafka] class ZookeeperConsumerConnector(
 
   private def sendShutdownToAllQueues() = {
     for (queue <- topicThreadIdAndQueues.values
-      .toSet[BlockingQueue[FetchedDataChunk]]) {
+                   .toSet[BlockingQueue[FetchedDataChunk]]) {
       debug("Clearing up queue")
       queue.clear()
       queue.put(ZookeeperConsumerConnector.shutdownCommand)
@@ -372,8 +372,7 @@ private[kafka] class ZookeeperConsumerConnector(
 
   def commitOffsets(isAutoCommit: Boolean) {
 
-    val offsetsToCommit = immutable.Map(
-        topicRegistry.flatMap {
+    val offsetsToCommit = immutable.Map(topicRegistry.flatMap {
       case (topic, partitionTopicInfos) =>
         partitionTopicInfos.map {
           case (partition, info) =>
@@ -390,7 +389,8 @@ private[kafka] class ZookeeperConsumerConnector(
       isAutoCommit: Boolean) {
     trace("OffsetMap: %s".format(offsetsToCommit))
     var retriesRemaining =
-      1 + (if (isAutoCommit) 0 else config.offsetsCommitMaxRetries) // no retries for commits from auto-commit
+      1 +
+      (if (isAutoCommit) 0 else config.offsetsCommitMaxRetries) // no retries for commits from auto-commit
     var done = false
     while (!done) {
       val committed =
@@ -505,60 +505,62 @@ private[kafka] class ZookeeperConsumerConnector(
 
       var offsetFetchResponseOpt: Option[OffsetFetchResponse] = None
       while (!isShuttingDown.get && !offsetFetchResponseOpt.isDefined) {
-        offsetFetchResponseOpt = offsetsChannelLock synchronized {
-          ensureOffsetManagerConnected()
-          try {
-            offsetsChannel.send(offsetFetchRequest)
-            val offsetFetchResponse =
-              OffsetFetchResponse.readFrom(offsetsChannel.receive().payload())
-            trace("Offset fetch response: %s.".format(offsetFetchResponse))
+        offsetFetchResponseOpt =
+          offsetsChannelLock synchronized {
+            ensureOffsetManagerConnected()
+            try {
+              offsetsChannel.send(offsetFetchRequest)
+              val offsetFetchResponse = OffsetFetchResponse.readFrom(
+                  offsetsChannel.receive().payload())
+              trace("Offset fetch response: %s.".format(offsetFetchResponse))
 
-            val (leaderChanged, loadInProgress) =
-              offsetFetchResponse.requestInfo.foldLeft(false, false) {
-                case (folded, (topicPartition, offsetMetadataAndError)) =>
-                  (folded._1 ||
-                   (offsetMetadataAndError.error == Errors.NOT_COORDINATOR_FOR_GROUP.code),
-                   folded._2 ||
-                   (offsetMetadataAndError.error == Errors.GROUP_LOAD_IN_PROGRESS.code))
-              }
-
-            if (leaderChanged) {
-              offsetsChannel.disconnect()
-              debug(
-                  "Could not fetch offsets (because offset manager has moved).")
-              None // retry
-            } else if (loadInProgress) {
-              debug(
-                  "Could not fetch offsets (because offset cache is being loaded).")
-              None // retry
-            } else {
-              if (config.dualCommitEnabled) {
-                // if dual-commit is enabled (i.e., if a consumer group is migrating offsets to kafka), then pick the
-                // maximum between offsets in zookeeper and kafka.
-                val kafkaOffsets = offsetFetchResponse.requestInfo
-                val mostRecentOffsets = kafkaOffsets.map {
-                  case (topicPartition, kafkaOffset) =>
-                    val zkOffset =
-                      fetchOffsetFromZooKeeper(topicPartition)._2.offset
-                    val mostRecentOffset = zkOffset.max(kafkaOffset.offset)
-                    (topicPartition,
-                     OffsetMetadataAndError(mostRecentOffset,
-                                            kafkaOffset.metadata,
-                                            Errors.NONE.code))
+              val (leaderChanged, loadInProgress) =
+                offsetFetchResponse.requestInfo.foldLeft(false, false) {
+                  case (folded, (topicPartition, offsetMetadataAndError)) =>
+                    (folded._1 ||
+                     (offsetMetadataAndError.error == Errors.NOT_COORDINATOR_FOR_GROUP.code),
+                     folded._2 ||
+                     (offsetMetadataAndError.error == Errors.GROUP_LOAD_IN_PROGRESS.code))
                 }
-                Some(OffsetFetchResponse(mostRecentOffsets))
-              } else Some(offsetFetchResponse)
+
+              if (leaderChanged) {
+                offsetsChannel.disconnect()
+                debug(
+                    "Could not fetch offsets (because offset manager has moved).")
+                None // retry
+              } else if (loadInProgress) {
+                debug(
+                    "Could not fetch offsets (because offset cache is being loaded).")
+                None // retry
+              } else {
+                if (config.dualCommitEnabled) {
+                  // if dual-commit is enabled (i.e., if a consumer group is migrating offsets to kafka), then pick the
+                  // maximum between offsets in zookeeper and kafka.
+                  val kafkaOffsets = offsetFetchResponse.requestInfo
+                  val mostRecentOffsets = kafkaOffsets.map {
+                    case (topicPartition, kafkaOffset) =>
+                      val zkOffset =
+                        fetchOffsetFromZooKeeper(topicPartition)._2.offset
+                      val mostRecentOffset = zkOffset.max(kafkaOffset.offset)
+                      (topicPartition,
+                       OffsetMetadataAndError(mostRecentOffset,
+                                              kafkaOffset.metadata,
+                                              Errors.NONE.code))
+                  }
+                  Some(OffsetFetchResponse(mostRecentOffsets))
+                } else Some(offsetFetchResponse)
+              }
+            } catch {
+              case e: Exception =>
+                warn(
+                    "Error while fetching offsets from %s:%d. Possible cause: %s"
+                      .format(offsetsChannel.host,
+                              offsetsChannel.port,
+                              e.getMessage))
+                offsetsChannel.disconnect()
+                None // retry
             }
-          } catch {
-            case e: Exception =>
-              warn(
-                  "Error while fetching offsets from %s:%d. Possible cause: %s"
-                    .format(
-                      offsetsChannel.host, offsetsChannel.port, e.getMessage))
-              offsetsChannel.disconnect()
-              None // retry
           }
-        }
 
         if (offsetFetchResponseOpt.isEmpty) {
           debug(
@@ -823,8 +825,9 @@ private[kafka] class ZookeeperConsumerConnector(
         val partitionAssignment =
           globalPartitionAssignment.get(assignmentContext.consumerId)
         val currentTopicRegistry =
-          new Pool[String, Pool[Int, PartitionTopicInfo]](valueFactory = Some(
-                    (topic: String) => new Pool[Int, PartitionTopicInfo]))
+          new Pool[String, Pool[Int, PartitionTopicInfo]](
+              valueFactory = Some((topic: String) =>
+                    new Pool[Int, PartitionTopicInfo]))
 
         // fetch current offsets for all topic-partitions
         val topicPartitions = partitionAssignment.keySet.toSeq
@@ -834,15 +837,13 @@ private[kafka] class ZookeeperConsumerConnector(
         if (isShuttingDown.get || !offsetFetchResponseOpt.isDefined) false
         else {
           val offsetFetchResponse = offsetFetchResponseOpt.get
-          topicPartitions.foreach(
-              topicAndPartition =>
-                {
-              val (topic, partition) = topicAndPartition.asTuple
-              val offset =
-                offsetFetchResponse.requestInfo(topicAndPartition).offset
-              val threadId = partitionAssignment(topicAndPartition)
-              addPartitionTopicInfo(
-                  currentTopicRegistry, partition, topic, offset, threadId)
+          topicPartitions.foreach(topicAndPartition => {
+            val (topic, partition) = topicAndPartition.asTuple
+            val offset =
+              offsetFetchResponse.requestInfo(topicAndPartition).offset
+            val threadId = partitionAssignment(topicAndPartition)
+            addPartitionTopicInfo(
+                currentTopicRegistry, partition, topic, offset, threadId)
           })
 
           /**
@@ -1002,13 +1003,13 @@ private[kafka] class ZookeeperConsumerConnector(
             case e2: Throwable => throw e2
           }
       }
-      val hasPartitionOwnershipFailed = partitionOwnershipSuccessful.foldLeft(
-          0)((sum, decision) => sum + (if (decision) 0 else 1))
+      val hasPartitionOwnershipFailed =
+        partitionOwnershipSuccessful.foldLeft(0)((sum, decision) =>
+              sum + (if (decision) 0 else 1))
       /* even if one of the partition ownership attempt has failed, return false */
       if (hasPartitionOwnershipFailed > 0) {
         // remove all paths that we have owned in ZK
-        successfullyOwnedPartitions.foreach(
-            topicAndPartition =>
+        successfullyOwnedPartitions.foreach(topicAndPartition =>
               deletePartitionOwnershipFromZK(
                   topicAndPartition._1, topicAndPartition._2))
         false
@@ -1042,8 +1043,8 @@ private[kafka] class ZookeeperConsumerConnector(
 
   private def reinitializeConsumer[K, V](
       topicCount: TopicCount,
-      queuesAndStreams: List[
-          (LinkedBlockingQueue[FetchedDataChunk], KafkaStream[K, V])]) {
+      queuesAndStreams: List[(LinkedBlockingQueue[FetchedDataChunk],
+                              KafkaStream[K, V])]) {
 
     val dirs = new ZKGroupDirs(config.groupId)
 
@@ -1097,34 +1098,30 @@ private[kafka] class ZookeeperConsumerConnector(
             topicThreadIds.size, allQueuesAndStreams.size))
     val threadQueueStreamPairs = topicThreadIds.zip(allQueuesAndStreams)
 
-    threadQueueStreamPairs.foreach(
-        e =>
-          {
-        val topicThreadId = e._1
-        val q = e._2._1
-        topicThreadIdAndQueues.put(topicThreadId, q)
-        debug("Adding topicThreadId %s and queue %s to topicThreadIdAndQueues data structure"
-              .format(topicThreadId, q.toString))
-        newGauge(
-            "FetchQueueSize",
-            new Gauge[Int] {
-              def value = q.size
-            },
-            Map("clientId" -> config.clientId,
-                "topic" -> topicThreadId._1,
-                "threadId" -> topicThreadId._2.threadId.toString)
-        )
+    threadQueueStreamPairs.foreach(e => {
+      val topicThreadId = e._1
+      val q = e._2._1
+      topicThreadIdAndQueues.put(topicThreadId, q)
+      debug("Adding topicThreadId %s and queue %s to topicThreadIdAndQueues data structure"
+            .format(topicThreadId, q.toString))
+      newGauge(
+          "FetchQueueSize",
+          new Gauge[Int] {
+            def value = q.size
+          },
+          Map("clientId" -> config.clientId,
+              "topic" -> topicThreadId._1,
+              "threadId" -> topicThreadId._2.threadId.toString)
+      )
     })
 
     val groupedByTopic = threadQueueStreamPairs.groupBy(_._1._1)
-    groupedByTopic.foreach(
-        e =>
-          {
-        val topic = e._1
-        val streams = e._2.map(_._2._2).toList
-        topicStreamsMap += (topic -> streams)
-        debug("adding topic %s and %d streams to map.".format(topic,
-                                                              streams.size))
+    groupedByTopic.foreach(e => {
+      val topic = e._1
+      val streams = e._2.map(_._2._2).toList
+      topicStreamsMap += (topic -> streams)
+      debug(
+          "adding topic %s and %d streams to map.".format(topic, streams.size))
     })
 
     // listener to consumer and partition changes
@@ -1155,16 +1152,15 @@ private[kafka] class ZookeeperConsumerConnector(
           "message streams by filter at most once.")
 
     private val wildcardQueuesAndStreams = (1 to numStreams)
-      .map(e =>
-            {
-          val queue =
-            new LinkedBlockingQueue[FetchedDataChunk](config.queuedMaxMessages)
-          val stream = new KafkaStream[K, V](queue,
-                                             config.consumerTimeoutMs,
-                                             keyDecoder,
-                                             valueDecoder,
-                                             config.clientId)
-          (queue, stream)
+      .map(e => {
+        val queue =
+          new LinkedBlockingQueue[FetchedDataChunk](config.queuedMaxMessages)
+        val stream = new KafkaStream[K, V](queue,
+                                           config.consumerTimeoutMs,
+                                           keyDecoder,
+                                           valueDecoder,
+                                           config.clientId)
+        (queue, stream)
       })
       .toList
 

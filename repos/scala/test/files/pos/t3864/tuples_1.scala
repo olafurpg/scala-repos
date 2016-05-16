@@ -53,8 +53,8 @@ trait Tuples {
   }
 
   implicit def ToTuple15W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N,
-      O)): Tuple15W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O))
+    : Tuple15W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O] =
     new { val value = t }
     with Tuple15W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O]
 
@@ -124,8 +124,8 @@ trait Tuples {
   }
 
   implicit def ToTuple16W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O,
-      P)): Tuple16W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P))
+    : Tuple16W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P] =
     new { val value = t }
     with Tuple16W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P]
 
@@ -215,17 +215,16 @@ trait Tuples {
   }
 
   implicit def ToTuple17W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P,
-      Q)): Tuple17W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q))
+    : Tuple17W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q] =
     new { val value = t }
     with Tuple17W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q]
 
   trait Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
       extends EnrichedType[
           Tuple18[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]] {
-    def fold[Z](
-        f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q,
-        R) => Z): Z = {
+    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q,
+                       R) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -303,8 +302,24 @@ trait Tuples {
                         _15: (O => OO) = identity[O] _,
                         _16: (P => PP) = identity[P] _,
                         _17: (Q => QQ) = identity[Q] _,
-                        _18: (R => RR) = identity[R] _): (AA, BB, CC,
-    DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ, RR) =
+                        _18: (R => RR) = identity[R] _): (AA,
+                                                          BB,
+                                                          CC,
+                                                          DD,
+                                                          EE,
+                                                          FF,
+                                                          GG,
+                                                          HH,
+                                                          II,
+                                                          JJ,
+                                                          KK,
+                                                          LL,
+                                                          MM,
+                                                          NN,
+                                                          OO,
+                                                          PP,
+                                                          QQ,
+                                                          RR) =
       (_1(value._1),
        _2(value._2),
        _3(value._3),
@@ -327,8 +342,8 @@ trait Tuples {
 
   implicit def ToTuple18W[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q,
-      R)): Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R))
+    : Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R] =
     new { val value = t }
     with Tuple18W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R]
 
@@ -336,7 +351,7 @@ trait Tuples {
       extends EnrichedType[
           Tuple19[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]] {
     def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R,
-        S) => Z): Z = {
+                       S) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -418,8 +433,25 @@ trait Tuples {
                         _16: (P => PP) = identity[P] _,
                         _17: (Q => QQ) = identity[Q] _,
                         _18: (R => RR) = identity[R] _,
-                        _19: (S => SS) = identity[S] _): (AA, BB, CC, DD,
-    EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ, RR, SS) =
+                        _19: (S => SS) = identity[S] _): (AA,
+                                                          BB,
+                                                          CC,
+                                                          DD,
+                                                          EE,
+                                                          FF,
+                                                          GG,
+                                                          HH,
+                                                          II,
+                                                          JJ,
+                                                          KK,
+                                                          LL,
+                                                          MM,
+                                                          NN,
+                                                          OO,
+                                                          PP,
+                                                          QQ,
+                                                          RR,
+                                                          SS) =
       (_1(value._1),
        _2(value._2),
        _3(value._3),
@@ -443,16 +475,17 @@ trait Tuples {
 
   implicit def ToTuple19W[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R,
-      S)): Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S))
+    : Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S] =
     new { val value = t }
     with Tuple19W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S]
 
   trait Tuple20W[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
       extends EnrichedType[Tuple20[
               A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]] {
-    def fold[Z](f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
-        T) => Z): Z = {
+    def fold[Z](
+        f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
+               T) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -538,8 +571,26 @@ trait Tuples {
                         _17: (Q => QQ) = identity[Q] _,
                         _18: (R => RR) = identity[R] _,
                         _19: (S => SS) = identity[S] _,
-                        _20: (T => TT) = identity[T] _): (AA, BB,
-    CC, DD, EE, FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ, RR, SS, TT) =
+                        _20: (T => TT) = identity[T] _): (AA,
+                                                          BB,
+                                                          CC,
+                                                          DD,
+                                                          EE,
+                                                          FF,
+                                                          GG,
+                                                          HH,
+                                                          II,
+                                                          JJ,
+                                                          KK,
+                                                          LL,
+                                                          MM,
+                                                          NN,
+                                                          OO,
+                                                          PP,
+                                                          QQ,
+                                                          RR,
+                                                          SS,
+                                                          TT) =
       (_1(value._1),
        _2(value._2),
        _3(value._3),
@@ -574,7 +625,7 @@ trait Tuples {
               A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]] {
     def fold[Z](
         f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
-        U) => Z): Z = {
+               U) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -664,8 +715,27 @@ trait Tuples {
                         _18: (R => RR) = identity[R] _,
                         _19: (S => SS) = identity[S] _,
                         _20: (T => TT) = identity[T] _,
-                        _21: (U => UU) = identity[U] _): (AA, BB, CC, DD, EE,
-    FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ, RR, SS, TT, UU) =
+                        _21: (U => UU) = identity[U] _): (AA,
+                                                          BB,
+                                                          CC,
+                                                          DD,
+                                                          EE,
+                                                          FF,
+                                                          GG,
+                                                          HH,
+                                                          II,
+                                                          JJ,
+                                                          KK,
+                                                          LL,
+                                                          MM,
+                                                          NN,
+                                                          OO,
+                                                          PP,
+                                                          QQ,
+                                                          RR,
+                                                          SS,
+                                                          TT,
+                                                          UU) =
       (_1(value._1),
        _2(value._2),
        _3(value._3),
@@ -698,31 +768,32 @@ trait Tuples {
 
   trait Tuple22W[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
-      extends EnrichedType[Tuple22[A,
-                                   B,
-                                   C,
-                                   D,
-                                   E,
-                                   F,
-                                   G,
-                                   H,
-                                   I,
-                                   J,
-                                   K,
-                                   L,
-                                   M,
-                                   N,
-                                   O,
-                                   P,
-                                   Q,
-                                   R,
-                                   S,
-                                   T,
-                                   U,
-                                   V]] {
+      extends EnrichedType[
+          Tuple22[A,
+                  B,
+                  C,
+                  D,
+                  E,
+                  F,
+                  G,
+                  H,
+                  I,
+                  J,
+                  K,
+                  L,
+                  M,
+                  N,
+                  O,
+                  P,
+                  Q,
+                  R,
+                  S,
+                  T,
+                  U,
+                  V]] {
     def fold[Z](
         f: => (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
-        V) => Z): Z = {
+               V) => Z): Z = {
       import value._;
       f(_1,
         _2,
@@ -816,8 +887,28 @@ trait Tuples {
                         _19: (S => SS) = identity[S] _,
                         _20: (T => TT) = identity[T] _,
                         _21: (U => UU) = identity[U] _,
-                        _22: (V => VV) = identity[V] _): (AA, BB, CC, DD, EE,
-    FF, GG, HH, II, JJ, KK, LL, MM, NN, OO, PP, QQ, RR, SS, TT, UU, VV) =
+                        _22: (V => VV) = identity[V] _): (AA,
+                                                          BB,
+                                                          CC,
+                                                          DD,
+                                                          EE,
+                                                          FF,
+                                                          GG,
+                                                          HH,
+                                                          II,
+                                                          JJ,
+                                                          KK,
+                                                          LL,
+                                                          MM,
+                                                          NN,
+                                                          OO,
+                                                          PP,
+                                                          QQ,
+                                                          RR,
+                                                          SS,
+                                                          TT,
+                                                          UU,
+                                                          VV) =
       (_1(value._1),
        _2(value._2),
        _3(value._3),
@@ -844,9 +935,9 @@ trait Tuples {
 
   implicit def ToTuple22W[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
-      V)): Tuple22W[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V] =
+      t: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V))
+    : Tuple22W[
+        A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V] =
     new { val value = t } with Tuple22W[
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]
 }

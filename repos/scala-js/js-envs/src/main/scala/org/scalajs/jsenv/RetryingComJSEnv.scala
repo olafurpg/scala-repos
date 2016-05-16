@@ -59,7 +59,8 @@ final class RetryingComJSEnv(val baseEnv: ComJSEnv, val maxRetries: Int)
 
   private class RetryingComJSRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends DummyJSRunner with ComJSRunner {
+      extends DummyJSRunner
+      with ComJSRunner {
 
     private[this] val promise = Promise[Unit]
 

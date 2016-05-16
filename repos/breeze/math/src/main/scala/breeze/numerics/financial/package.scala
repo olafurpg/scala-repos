@@ -86,7 +86,8 @@ package object financial {
       val denominator =
         ((1.0 + rate * when.t) / rate) *
         (math.pow(1.0 + rate, numPeriods) - 1.0)
-      -1 * (futureValue + presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
+      -1 * (futureValue +
+          presentValue * math.pow(1.0 + rate, numPeriods)) / denominator
     }
   }
 
@@ -106,15 +107,14 @@ package object financial {
     val principalRemaining = DenseVector.zeros[Double](numPeriods)
     var principal = presentValue
     var interest = presentValue * rate
-    cfor(0)(i => i < numPeriods, i => i + 1)(i =>
-          {
-        val ip = -1 * math.max(interest, 0)
-        interest += ip
-        principal += (pmt - ip)
-        principalRemaining(i) = principal
-        interestPayment(i) = ip
-        principalPayment(i) = pmt - ip
-        interest += (principal + interest) * rate
+    cfor(0)(i => i < numPeriods, i => i + 1)(i => {
+      val ip = -1 * math.max(interest, 0)
+      interest += ip
+      principal += (pmt - ip)
+      principalRemaining(i) = principal
+      interestPayment(i) = ip
+      principalPayment(i) = pmt - ip
+      interest += (principal + interest) * rate
     })
     (principalPayment, interestPayment, principalRemaining)
   }
@@ -187,7 +187,7 @@ package object financial {
 
     val realRes = DenseVector[Double](
         for (c: Complex <- res.toArray
-                              if ((c.im() == 0) && (0 < c.re()))) yield c.re()
+             if ((c.im() == 0) && (0 < c.re()))) yield c.re()
     )
     val rates = realRes.mapValues(v => 1.0 / v - 1.0)
 

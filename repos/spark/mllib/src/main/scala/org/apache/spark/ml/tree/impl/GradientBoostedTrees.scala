@@ -81,8 +81,8 @@ private[ml] object GradientBoostedTrees extends Logging {
         // Map labels to -1, +1 so binary classification can be treated as regression.
         val remappedInput =
           input.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
-        val remappedValidationInput = validationInput.map(
-            x => new LabeledPoint((x.label * 2) - 1, x.features))
+        val remappedValidationInput = validationInput.map(x =>
+              new LabeledPoint((x.label * 2) - 1, x.features))
         GradientBoostedTrees.boost(remappedInput,
                                    remappedValidationInput,
                                    boostingStrategy,

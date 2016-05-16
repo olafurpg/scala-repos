@@ -227,8 +227,8 @@ sealed abstract class LazyTuple4Instances0 {
       implicit def _4 = A4
     }
 
-  implicit def lazyTuple4Functor[A1, A2, A3]: Functor[
-      LazyTuple4[A1, A2, A3, ?]] =
+  implicit def lazyTuple4Functor[A1, A2, A3]
+    : Functor[LazyTuple4[A1, A2, A3, ?]] =
     new LazyTuple4Functor[A1, A2, A3] {}
 
   implicit def lazyTuple4Equal[A1, A2, A3, A4](
@@ -406,7 +406,8 @@ private trait LazyTuple4Show[A1, A2, A3, A4]
 }
 
 private trait LazyTuple2Order[A1, A2]
-    extends Order[LazyTuple2[A1, A2]] with LazyTuple2Equal[A1, A2] {
+    extends Order[LazyTuple2[A1, A2]]
+    with LazyTuple2Equal[A1, A2] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   import Ordering.EQ
@@ -417,7 +418,8 @@ private trait LazyTuple2Order[A1, A2]
     }
 }
 private trait LazyTuple3Order[A1, A2, A3]
-    extends Order[LazyTuple3[A1, A2, A3]] with LazyTuple3Equal[A1, A2, A3] {
+    extends Order[LazyTuple3[A1, A2, A3]]
+    with LazyTuple3Equal[A1, A2, A3] {
   implicit def _1: Order[A1]
   implicit def _2: Order[A2]
   implicit def _3: Order[A3]
@@ -450,7 +452,8 @@ private trait LazyTuple4Order[A1, A2, A3, A4]
 }
 
 private trait LazyTuple2Monoid[A1, A2]
-    extends Monoid[LazyTuple2[A1, A2]] with LazyTuple2Semigroup[A1, A2] {
+    extends Monoid[LazyTuple2[A1, A2]]
+    with LazyTuple2Semigroup[A1, A2] {
   implicit def _1: Monoid[A1]
   implicit def _2: Monoid[A2]
   def zero: LazyTuple2[A1, A2] = LazyTuple2(_1.zero, _2.zero)
@@ -477,7 +480,8 @@ private trait LazyTuple4Monoid[A1, A2, A3, A4]
 // LazyTupleN forms a Monad if the element types other than the last are Monoids.
 
 private trait LazyTuple2Monad[A1]
-    extends Monad[LazyTuple2[A1, ?]] with LazyTuple2Functor[A1] {
+    extends Monad[LazyTuple2[A1, ?]]
+    with LazyTuple2Functor[A1] {
   implicit def _1: Monoid[A1]
   def bind[A, B](fa: LazyTuple2[A1, A])(f: A => LazyTuple2[A1, B]) = {
     val t = f(fa._2)
@@ -487,7 +491,8 @@ private trait LazyTuple2Monad[A1]
   def point[A](a: => A) = lazyTuple2(_1.zero, a)
 }
 private trait LazyTuple3Monad[A1, A2]
-    extends Monad[LazyTuple3[A1, A2, ?]] with LazyTuple3Functor[A1, A2] {
+    extends Monad[LazyTuple3[A1, A2, ?]]
+    with LazyTuple3Functor[A1, A2] {
   implicit def _1: Monoid[A1]
   implicit def _2: Monoid[A2]
   def bind[A, B](fa: LazyTuple3[A1, A2, A])(f: A => LazyTuple3[A1, A2, B]) = {

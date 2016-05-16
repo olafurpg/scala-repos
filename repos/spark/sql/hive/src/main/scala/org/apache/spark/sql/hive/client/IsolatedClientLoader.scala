@@ -110,8 +110,8 @@ private[hive] object IsolatedClientLoader extends Logging {
                                "hive-exec",
                                "hive-common",
                                "hive-serde",
-                               "hive-cli").map(
-          a => s"org.apache.hive:$a:${version.fullVersion}") ++ Seq(
+                               "hive-cli").map(a =>
+            s"org.apache.hive:$a:${version.fullVersion}") ++ Seq(
           "com.google.guava:guava:14.0.1",
           s"org.apache.hadoop:hadoop-client:$hadoopVersion")
 
@@ -165,10 +165,10 @@ private[hive] class IsolatedClientLoader(
     val config: Map[String, String] = Map.empty,
     val isolationOn: Boolean = true,
     val sharesHadoopClasses: Boolean = true,
-    val rootClassLoader: ClassLoader = ClassLoader.getSystemClassLoader.getParent.getParent,
-    val baseClassLoader: ClassLoader = Thread
-        .currentThread()
-        .getContextClassLoader,
+    val rootClassLoader: ClassLoader =
+      ClassLoader.getSystemClassLoader.getParent.getParent,
+    val baseClassLoader: ClassLoader =
+      Thread.currentThread().getContextClassLoader,
     val sharedPrefixes: Seq[String] = Seq.empty,
     val barrierPrefixes: Seq[String] = Seq.empty)
     extends Logging {

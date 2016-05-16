@@ -24,8 +24,10 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class PoissonTest
-    extends FunSuite with Checkers
-    with MomentsTestBase[Int] with ExpFamTest[Poisson, Int] {
+    extends FunSuite
+    with Checkers
+    with MomentsTestBase[Int]
+    with ExpFamTest[Poisson, Int] {
   import org.scalacheck.Arbitrary.arbitrary
   val expFam = Poisson
 

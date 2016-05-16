@@ -325,8 +325,8 @@ object AdminUtils extends Logging {
                                    checkBrokerAvailable)
 
     // check if manual assignment has the right replication factor
-    val unmatchedRepFactorList = newPartitionReplicaList.values.filter(
-        p => (p.size != existingReplicaListForPartitionZero.size))
+    val unmatchedRepFactorList = newPartitionReplicaList.values.filter(p =>
+          (p.size != existingReplicaListForPartitionZero.size))
     if (unmatchedRepFactorList.size != 0)
       throw new AdminOperationException(
           "The replication factor in manual replication assignment " +
@@ -344,11 +344,11 @@ object AdminUtils extends Logging {
         zkUtils, topic, partitionReplicaList, update = true)
   }
 
-  def getManualReplicaAssignment(
-      replicaAssignmentList: String,
-      availableBrokerList: Set[Int],
-      startPartitionId: Int,
-      checkBrokerAvailable: Boolean = true): Map[Int, List[Int]] = {
+  def getManualReplicaAssignment(replicaAssignmentList: String,
+                                 availableBrokerList: Set[Int],
+                                 startPartitionId: Int,
+                                 checkBrokerAvailable: Boolean =
+                                   true): Map[Int, List[Int]] = {
     var partitionList = replicaAssignmentList.split(",")
     val ret = new mutable.HashMap[Int, List[Int]]()
     var partitionId = startPartitionId
@@ -437,8 +437,8 @@ object AdminUtils extends Logging {
     */
   def deleteAllConsumerGroupInfoForTopicInZK(zkUtils: ZkUtils, topic: String) {
     val groups = zkUtils.getAllConsumerGroupsForTopic(topic)
-    groups.foreach(
-        group => deleteConsumerGroupInfoForTopicInZK(zkUtils, group, topic))
+    groups.foreach(group =>
+          deleteConsumerGroupInfoForTopicInZK(zkUtils, group, topic))
   }
 
   def topicExists(zkUtils: ZkUtils, topic: String): Boolean =
@@ -683,16 +683,16 @@ object AdminUtils extends Logging {
       topics: Set[String],
       zkUtils: ZkUtils): Set[MetadataResponse.TopicMetadata] = {
     val cachedBrokerInfo = new mutable.HashMap[Int, Broker]()
-    topics.map(
-        topic => fetchTopicMetadataFromZk(topic, zkUtils, cachedBrokerInfo))
+    topics.map(topic =>
+          fetchTopicMetadataFromZk(topic, zkUtils, cachedBrokerInfo))
   }
 
   private def fetchTopicMetadataFromZk(
       topic: String,
       zkUtils: ZkUtils,
       cachedBrokerInfo: mutable.HashMap[Int, Broker],
-      protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT)
-    : MetadataResponse.TopicMetadata = {
+      protocol: SecurityProtocol =
+        SecurityProtocol.PLAINTEXT): MetadataResponse.TopicMetadata = {
     if (zkUtils.pathExists(getTopicPath(topic))) {
       val topicPartitionAssignment =
         zkUtils.getPartitionAssignmentForTopics(List(topic)).get(topic).get
@@ -730,9 +730,9 @@ object AdminUtils extends Logging {
           try {
             replicaInfo = getBrokerInfoFromCache(
                 zkUtils, cachedBrokerInfo, replicas).map(_.getNode(protocol))
-            isrInfo = getBrokerInfoFromCache(
-                zkUtils, cachedBrokerInfo, inSyncReplicas).map(
-                _.getNode(protocol))
+            isrInfo =
+              getBrokerInfoFromCache(zkUtils, cachedBrokerInfo, inSyncReplicas)
+                .map(_.getNode(protocol))
           } catch {
             case e: Throwable => throw new ReplicaNotAvailableException(e)
           }

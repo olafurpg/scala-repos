@@ -39,7 +39,7 @@ object Tournament extends LilaController {
             } map NoCache
         },
         api = _ =>
-            env.api.fetchVisibleTournaments map { tours =>
+          env.api.fetchVisibleTournaments map { tours =>
             Ok(env scheduleJsonView tours)
         }
     )
@@ -57,24 +57,25 @@ object Tournament extends LilaController {
   def show(id: String) = Open { implicit ctx =>
     val page = getInt("page")
     negotiate(
-        html = repo byId id flatMap {
-          _.fold(tournamentNotFound.fuccess) {
-            tour =>
-              env
-                .version(tour.id)
-                .zip(chatOf(tour))
-                .flatMap {
-                  case (version, chat) =>
-                    env.jsonView(tour, page, ctx.userId, none, version.some) map {
-                      html.tournament.show(tour, _, chat)
-                    }
-                }
-                .map { Ok(_) }
-                .mon(_.http.response.tournament.show.website)
-          }
-        },
+        html =
+          repo byId id flatMap {
+            _.fold(tournamentNotFound.fuccess) {
+              tour =>
+                env
+                  .version(tour.id)
+                  .zip(chatOf(tour))
+                  .flatMap {
+                    case (version, chat) =>
+                      env.jsonView(tour, page, ctx.userId, none, version.some) map {
+                        html.tournament.show(tour, _, chat)
+                      }
+                  }
+                  .map { Ok(_) }
+                  .mon(_.http.response.tournament.show.website)
+            }
+          },
         api = _ =>
-            repo byId id flatMap {
+          repo byId id flatMap {
             case None => NotFound(jsonError("No such tournament")).fuccess
             case Some(tour) => {
                 get("playerInfo").?? { env.api.playerInfo(tour.id, _) } zip getBool(
@@ -142,14 +143,15 @@ object Tournament extends LilaController {
   def join(id: String) = Auth { implicit ctx => implicit me =>
     NoLame {
       negotiate(
-          html = repo enterableById id map {
-            case None => tournamentNotFound
-            case Some(tour) =>
-              env.api.join(tour.id, me)
-              Redirect(routes.Tournament.show(tour.id))
-          },
+          html =
+            repo enterableById id map {
+              case None => tournamentNotFound
+              case Some(tour) =>
+                env.api.join(tour.id, me)
+                Redirect(routes.Tournament.show(tour.id))
+            },
           api = _ =>
-              OptionFuOk(repo enterableById id) { tour =>
+            OptionFuOk(repo enterableById id) { tour =>
               env.api.join(tour.id, me)
               fuccess(Json.obj("ok" -> true))
           }

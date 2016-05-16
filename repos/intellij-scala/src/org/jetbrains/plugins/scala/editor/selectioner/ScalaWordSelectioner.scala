@@ -45,8 +45,8 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
         }
         result.add(new TextRange(start, end))
         def isEmptyChar(c: Char): Boolean = c == ' ' || c == '\n'
-        while (isEmptyChar(ext.getContainingFile.getText.charAt(end - 1))) end = end -
-        1
+        while (isEmptyChar(ext.getContainingFile.getText.charAt(end - 1))) end =
+          end - 1
         if (start <= end) result.add(new TextRange(start, end))
       //case for references
       case x: ScReferenceElement =>
@@ -63,7 +63,7 @@ class ScalaWordSelectioner extends ExtendWordSelectionHandlerBase {
               val ranges = select(qual, editorText, cursorOffset, editor)
                 .toArray(new Array[TextRange](0))
               for (fRange <- ranges
-                                if fRange.getEndOffset == qual.getTextRange.getEndOffset) {
+                   if fRange.getEndOffset == qual.getTextRange.getEndOffset) {
                 //cancatenating ranges
                 val tRange = new TextRange(
                     if (fRange.getStartOffset != fRange.getEndOffset)

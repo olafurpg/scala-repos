@@ -136,8 +136,8 @@ object BasicCommands {
         s.copy(onFailure = None)
       },
       Command.arb(s =>
-            token(Compat.OnFailure, hide = const(true))
-              .flatMap(x => otherCommandParser(s))) { (s, arg) =>
+            token(Compat.OnFailure, hide = const(true)).flatMap(x =>
+                  otherCommandParser(s))) { (s, arg) =>
         s.log.warn(Compat.OnFailureDeprecated)
         s.copy(onFailure = Some(arg))
       },
@@ -169,8 +169,8 @@ object BasicCommands {
   def rebootParser(s: State) = token(Space ~> "full" ^^^ true) ?? false
 
   def call =
-    Command(ApplyCommand, Help.more(ApplyCommand, ApplyDetailed))(
-        _ => callParser) {
+    Command(ApplyCommand, Help.more(ApplyCommand, ApplyDetailed))(_ =>
+          callParser) {
       case (state, (cp, args)) =>
         val parentLoader = getClass.getClassLoader
         state.log.info(
@@ -213,8 +213,8 @@ object BasicCommands {
           s, Watched.Configuration, "Continuous execution not configured.") {
         w =>
           val repeat =
-            ContinuousExecutePrefix +
-            (if (arg.startsWith(" ")) arg else " " + arg)
+            ContinuousExecutePrefix + (if (arg.startsWith(" ")) arg
+                                       else " " + arg)
           Watched.executeContinuously(w, s, arg, repeat)
       }
     }
@@ -253,8 +253,8 @@ object BasicCommands {
   }
 
   def read =
-    Command.make(ReadCommand, Help.more(ReadCommand, ReadDetailed))(
-        s => applyEffect(readParser(s))(doRead(s)))
+    Command.make(ReadCommand, Help.more(ReadCommand, ReadDetailed))(s =>
+          applyEffect(readParser(s))(doRead(s)))
   def readParser(s: State) = {
     val files = (token(Space) ~> fileParser(s.baseDir)).+
     val portAndSuccess = token(OptSpace) ~> Port
@@ -328,8 +328,8 @@ object BasicCommands {
 
   def removeAliases(s: State): State = removeTagged(s, CommandAliasKey)
   def removeAlias(s: State, name: String): State =
-    s.copy(definedCommands = s.definedCommands.filter(
-              c => !isAliasNamed(name, c)))
+    s.copy(definedCommands = s.definedCommands.filter(c =>
+              !isAliasNamed(name, c)))
 
   def removeTagged(s: State, tag: AttributeKey[_]): State =
     s.copy(definedCommands = removeTagged(s.definedCommands, tag))

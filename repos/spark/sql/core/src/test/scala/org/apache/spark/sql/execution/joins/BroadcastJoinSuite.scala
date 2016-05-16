@@ -56,7 +56,7 @@ class BroadcastJoinSuite extends QueryTest with BeforeAndAfterAll {
   /**
     * Test whether the specified broadcast join updates the peak execution memory accumulator.
     */
-  private def testBroadcastJoin[T : ClassTag](
+  private def testBroadcastJoin[T: ClassTag](
       name: String, joinType: String): Unit = {
     AccumulatorSuite.verifyPeakExecutionMemorySet(
         sqlContext.sparkContext, name) {

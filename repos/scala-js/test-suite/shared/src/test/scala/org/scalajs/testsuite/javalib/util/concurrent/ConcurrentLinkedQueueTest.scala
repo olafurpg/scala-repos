@@ -175,7 +175,7 @@ class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory {
   override def implementationName: String =
     "java.util.concurrent.ConcurrentLinkedQueue"
 
-  override def empty[E : ClassTag]: ConcurrentLinkedQueue[E] =
+  override def empty[E: ClassTag]: ConcurrentLinkedQueue[E] =
     new ConcurrentLinkedQueue[E]()
 
   def newFrom[E](coll: ju.Collection[E]): ConcurrentLinkedQueue[E] =

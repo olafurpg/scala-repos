@@ -43,7 +43,7 @@ trait CaseClassPackers extends LowPriorityTuplePackers {
 }
 
 trait LowPriorityTuplePackers extends java.io.Serializable {
-  implicit def genericTuplePacker[T : Manifest] = new ReflectionTuplePacker[T]
+  implicit def genericTuplePacker[T: Manifest] = new ReflectionTuplePacker[T]
 }
 
 /**

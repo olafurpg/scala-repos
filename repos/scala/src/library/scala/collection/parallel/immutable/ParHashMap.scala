@@ -42,8 +42,10 @@ import scala.collection.parallel.Task
 @SerialVersionUID(1L)
 class ParHashMap[K, +V] private[immutable](
     private[this] val trie: HashMap[K, V])
-    extends ParMap[K, V] with GenericParMapTemplate[K, V, ParHashMap]
-    with ParMapLike[K, V, ParHashMap[K, V], HashMap[K, V]] with Serializable {
+    extends ParMap[K, V]
+    with GenericParMapTemplate[K, V, ParHashMap]
+    with ParMapLike[K, V, ParHashMap[K, V], HashMap[K, V]]
+    with Serializable {
   self =>
 
   def this() = this(HashMap.empty[K, V])
@@ -152,8 +154,8 @@ object ParHashMap extends ParMapFactory[ParHashMap] {
   def newCombiner[K, V]: Combiner[(K, V), ParHashMap[K, V]] =
     HashMapCombiner[K, V]
 
-  implicit def canBuildFrom[K, V]: CanCombineFrom[
-      Coll, (K, V), ParHashMap[K, V]] = {
+  implicit def canBuildFrom[K, V]
+    : CanCombineFrom[Coll, (K, V), ParHashMap[K, V]] = {
     new CanCombineFromMap[K, V]
   }
 
@@ -343,8 +345,8 @@ private[parallel] abstract class HashMapCombiner[K, V]
       case htm: HashMap.HashTrieMap[k, v] =>
         var i = 0
         while (i < htm.elems.length) {
-          htm.elems(i) = evaluateCombiners(htm.elems(i))
-            .asInstanceOf[HashMap[k, v]]
+          htm.elems(i) =
+            evaluateCombiners(htm.elems(i)).asInstanceOf[HashMap[k, v]]
           i += 1
         }
         htm.asInstanceOf[HashMap[K, Repr]]

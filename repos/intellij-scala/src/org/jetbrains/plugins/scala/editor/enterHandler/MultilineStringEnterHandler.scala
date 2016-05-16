@@ -47,9 +47,8 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
     val ch1 = text.charAt(caretOffset - 1)
     val ch2 = text.charAt(caretOffset)
 
-    whiteSpaceAfterCaret = text
-      .substring(caretOffset)
-      .takeWhile(c => c == ' ' || c == '\t')
+    whiteSpaceAfterCaret =
+      text.substring(caretOffset).takeWhile(c => c == ' ' || c == '\t')
     document.deleteString(
         caretOffset, caretOffset + whiteSpaceAfterCaret.length)
 
@@ -118,7 +117,7 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
         var i = 0
         def charToCheck = line.charAt(line.length - 1 - i)
         while (i <= line.length - 1 &&
-        (charToCheck == ' ' || charToCheck == '\t')) {
+               (charToCheck == ' ' || charToCheck == '\t')) {
           i += 1
         }
         document.deleteString(nlOffset - i, nlOffset)
@@ -142,13 +141,15 @@ class MultilineStringEnterHandler extends EnterHandlerDelegateAdapter {
       val currentLine = getLineByNumber(prevLineNumber + 1)
       val nextLine =
         if (document.getLineCount > prevLineNumber + 2)
-          getLineByNumber(prevLineNumber + 2) else ""
+          getLineByNumber(prevLineNumber + 2)
+        else ""
 
       def prevLinePrefixAfterDelimiter(offsetInLine: Int): Int =
         if (prevLine.length > offsetInLine)
           prevLine
             .substring(offsetInLine)
-            .prefixLength(c => c == ' ' || c == '\t') else 0
+            .prefixLength(c => c == ' ' || c == '\t')
+        else 0
 
       val wasSingleLine =
         literal.getText.indexOf("\n") == literal.getText.lastIndexOf("\n")

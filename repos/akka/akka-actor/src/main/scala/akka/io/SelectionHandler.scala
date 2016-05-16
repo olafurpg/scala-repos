@@ -91,8 +91,8 @@ private[io] object SelectionHandler {
 
     val selectorPool = context.actorOf(
         props = RandomPool(nrOfSelectors)
-            .props(Props(classOf[SelectionHandler], selectorSettings))
-            .withDeploy(Deploy.local),
+          .props(Props(classOf[SelectionHandler], selectorSettings))
+          .withDeploy(Deploy.local),
         name = "selectors")
 
     final def workerForCommandHandler(
@@ -255,7 +255,8 @@ private[io] object SelectionHandler {
 }
 
 private[io] class SelectionHandler(settings: SelectionHandlerSettings)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import SelectionHandler._
   import settings._
@@ -320,9 +321,9 @@ private[io] class SelectionHandler(settings: SelectionHandlerSettings)
       val newName = sequenceNumber.toString
       sequenceNumber += 1
       val child = context.actorOf(props = cmd
-                                      .childProps(registry)
-                                      .withDispatcher(WorkerDispatcher)
-                                      .withDeploy(Deploy.local),
+                                    .childProps(registry)
+                                    .withDispatcher(WorkerDispatcher)
+                                    .withDeploy(Deploy.local),
                                   name = newName)
       childCount += 1
       if (MaxChannelsPerSelector > 0)

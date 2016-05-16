@@ -42,7 +42,10 @@ import org.apache.spark.streaming.util._
 import org.apache.spark.util.{ManualClock, Utils}
 
 class ReceivedBlockHandlerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with Logging {
 
   import WriteAheadLogBasedBlockHandler._
   import WriteAheadLogSuite._
@@ -388,7 +391,7 @@ class ReceivedBlockHandlerSuite
     */
   private def testBlockStoring(receivedBlockHandler: ReceivedBlockHandler)(
       verifyFunc: (Seq[String], Seq[StreamBlockId],
-      Seq[ReceivedBlockStoreResult]) => Unit) {
+                   Seq[ReceivedBlockStoreResult]) => Unit) {
     val data = Seq.tabulate(100) { _.toString }
 
     def storeAndVerify(blocks: Seq[ReceivedBlock]) {
@@ -408,16 +411,13 @@ class ReceivedBlockHandlerSuite
 
     val blocks = data.grouped(10).toSeq
 
-    storeAndVerify(
-        blocks.map { b =>
+    storeAndVerify(blocks.map { b =>
       IteratorBlock(b.toIterator)
     })
-    storeAndVerify(
-        blocks.map { b =>
+    storeAndVerify(blocks.map { b =>
       ArrayBufferBlock(new ArrayBuffer ++= b)
     })
-    storeAndVerify(
-        blocks.map { b =>
+    storeAndVerify(blocks.map { b =>
       ByteBufferBlock(dataToByteBuffer(b).toByteBuffer)
     })
   }

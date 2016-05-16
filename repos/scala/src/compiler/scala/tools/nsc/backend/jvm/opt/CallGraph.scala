@@ -68,8 +68,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
 
   def addCallsite(callsite: Callsite): Unit = {
     val methodCallsites = callsites(callsite.callsiteMethod)
-    callsites(callsite.callsiteMethod) = methodCallsites +
-    (callsite.callsiteInstruction -> callsite)
+    callsites(callsite.callsiteMethod) =
+      methodCallsites + (callsite.callsiteInstruction -> callsite)
   }
 
   def containsCallsite(callsite: Callsite): Boolean =
@@ -87,8 +87,9 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
 
   def addClosureInstantiation(closureInit: ClosureInstantiation) = {
     val methodClosureInits = closureInstantiations(closureInit.ownerMethod)
-    closureInstantiations(closureInit.ownerMethod) = methodClosureInits +
-    (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
+    closureInstantiations(closureInit.ownerMethod) =
+      methodClosureInits +
+      (closureInit.lambdaMetaFactoryCall.indy -> closureInit)
   }
 
   def addClass(classNode: ClassNode): Unit = {
@@ -147,11 +148,16 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             // skips over unreachable code
             val callee: Either[OptimizerWarning, Callee] = for {
               (method, declarationClass) <- byteCodeRepository.methodNode(
-                  call.owner, call.name, call.desc): Either[
-                  OptimizerWarning, (MethodNode, InternalName)]
+                                               call.owner,
+                                               call.name,
+                                               call.desc): Either[
+                                               OptimizerWarning,
+                                               (MethodNode, InternalName)]
               (declarationClassNode, source) <- byteCodeRepository
-                .classNodeAndSource(declarationClass): Either[
-                  OptimizerWarning, (ClassNode, Source)]
+                                                 .classNodeAndSource(
+                                                   declarationClass): Either[
+                                                   OptimizerWarning,
+                                                   (ClassNode, Source)]
             } yield {
               val declarationClassBType =
                 classBTypeFromClassNode(declarationClassNode)
@@ -190,8 +196,8 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
                 argInfos = argInfos,
                 callsiteStackHeight = a.frameAt(call).getStackSize,
                 receiverKnownNotNull = receiverNotNull,
-                callsitePosition = callsitePositions.getOrElse(call,
-                                                               NoPosition),
+                callsitePosition =
+                  callsitePositions.getOrElse(call, NoPosition),
                 annotatedInline = inlineAnnotatedCallsites(call),
                 annotatedNoInline = noInlineAnnotatedCallsites(call)
             )
@@ -378,14 +384,14 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
           // (2) Final trait methods can be rewritten from the interface to the static implementation
           //     method to enable inlining.
           CallsiteInfo(
-              safeToInline = canInlineFromSource && isStaticallyResolved &&
-                // (1)
+              safeToInline =
+                canInlineFromSource && isStaticallyResolved && // (1)
                 !isAbstract &&
                 !BytecodeUtils.isConstructor(calleeMethodNode) &&
                 !BytecodeUtils.isNativeMethod(calleeMethodNode) &&
                 !BytecodeUtils.hasCallerSensitiveAnnotation(calleeMethodNode),
-              safeToRewrite = canInlineFromSource &&
-                isRewritableTraitCall, // (2)
+              safeToRewrite =
+                canInlineFromSource && isRewritableTraitCall, // (2)
               canInlineFromSource = canInlineFromSource,
               annotatedInline = methodInlineInfo.annotatedInline,
               annotatedNoInline = methodInlineInfo.annotatedNoInline,
@@ -595,15 +601,15 @@ class CallGraph[BT <: BTypes](val btypes: BT) {
             val expectedImplMethodType = {
               val paramTypes =
                 (if (isStatic)
-                   indyParamTypes else indyParamTypes.tail) ++ instantiatedMethodArgTypes
+                   indyParamTypes
+                 else indyParamTypes.tail) ++ instantiatedMethodArgTypes
               Type.getMethodType(
                   instantiatedMethodType.getReturnType, paramTypes: _*)
             }
 
             val isIndyLambda =
               (Type.getType(implMethod.getDesc) == expectedImplMethodType // (1)
-                  &&
-                  (isStatic ||
+                  && (isStatic ||
                       implMethod.getOwner == indyParamTypes(0).getInternalName) // (2)
                   && samMethodType.getArgumentTypes.corresponds(
                       instantiatedMethodArgTypes)((samArgType, instArgType) =>

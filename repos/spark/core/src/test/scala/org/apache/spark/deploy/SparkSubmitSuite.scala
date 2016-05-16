@@ -37,8 +37,11 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
 // Note: this suite mixes in ResetSystemProperties because SparkSubmit.main() sets a bunch
 // of properties that needed to be cleared after tests.
 class SparkSubmitSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach
+    with ResetSystemProperties
+    with Timeouts {
 
   override def beforeEach() {
     super.beforeEach()

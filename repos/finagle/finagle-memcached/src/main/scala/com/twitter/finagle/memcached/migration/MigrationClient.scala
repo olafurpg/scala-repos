@@ -46,7 +46,8 @@ class MigrationClient(
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
 )
-    extends ProxyClient with ZookeeperStateMonitor {
+    extends ProxyClient
+    with ZookeeperStateMonitor {
 
   import MigrationConstants._
 
@@ -70,8 +71,8 @@ class MigrationClient(
           val backendClient = newClient
         }
       case MigrationState.Warming =>
-        proxyClient = new FrontendClient(oldClient) with DarkRead
-        with DarkWrite {
+        proxyClient = new FrontendClient(oldClient)
+        with DarkRead with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Verifying if (config.readRepairFront) =>

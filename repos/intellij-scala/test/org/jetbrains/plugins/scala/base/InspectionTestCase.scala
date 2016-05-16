@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
 /**
   * @author Pavel Fatin
   */
-abstract class InspectionTestCase[T <: LocalInspectionTool : ClassTag]
+abstract class InspectionTestCase[T <: LocalInspectionTool: ClassTag]
     extends SimpleTestCase {
   protected def assertHighlights(
       @Language("Scala") code: String, highlights: Highlight*) {

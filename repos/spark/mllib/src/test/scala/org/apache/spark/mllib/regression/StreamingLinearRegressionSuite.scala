@@ -73,12 +73,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     }
 
     // apply model training to input stream
-    ssc = setupStreams(input,
-                       (inputDStream: DStream[LabeledPoint]) =>
-                         {
-                           model.trainOn(inputDStream)
-                           inputDStream.count()
-                       })
+    ssc = setupStreams(input, (inputDStream: DStream[LabeledPoint]) => {
+      model.trainOn(inputDStream)
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // check accuracy of final parameter estimates
@@ -114,16 +112,12 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
 
     // apply model training to input stream, storing the intermediate results
     // (we add a count to ensure the result is a DStream)
-    ssc = setupStreams(
-        input,
-        (inputDStream: DStream[LabeledPoint]) =>
-          {
-            model.trainOn(inputDStream)
-            inputDStream.foreachRDD(x =>
-                  history.append(
-                      math.abs(model.latestModel().weights(0) - 10.0)))
-            inputDStream.count()
-        })
+    ssc = setupStreams(input, (inputDStream: DStream[LabeledPoint]) => {
+      model.trainOn(inputDStream)
+      inputDStream.foreachRDD(x =>
+            history.append(math.abs(model.latestModel().weights(0) - 10.0)))
+      inputDStream.count()
+    })
     runStreams(ssc, numBatches, numBatches)
 
     // compute change in error
@@ -151,12 +145,9 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     }
 
     // apply model predictions to test stream
-    ssc = setupStreams(
-        testInput,
-        (inputDStream: DStream[LabeledPoint]) =>
-          {
-            model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+    ssc = setupStreams(testInput, (inputDStream: DStream[LabeledPoint]) => {
+      model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
+    })
     // collect the output as (true, estimated) tuples
     val output: Seq[Seq[(Double, Double)]] =
       runStreams(ssc, numBatches, numBatches)
@@ -184,13 +175,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     }
 
     // train and predict
-    ssc = setupStreams(
-        testInput,
-        (inputDStream: DStream[LabeledPoint]) =>
-          {
-            model.trainOn(inputDStream)
-            model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+    ssc = setupStreams(testInput, (inputDStream: DStream[LabeledPoint]) => {
+      model.trainOn(inputDStream)
+      model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
+    })
 
     val output: Seq[Seq[(Double, Double)]] =
       runStreams(ssc, numBatches, numBatches)
@@ -211,13 +199,10 @@ class StreamingLinearRegressionSuite extends SparkFunSuite with TestSuiteBase {
     val numBatches = 10
     val nPoints = 100
     val emptyInput = Seq.empty[Seq[LabeledPoint]]
-    ssc = setupStreams(
-        emptyInput,
-        (inputDStream: DStream[LabeledPoint]) =>
-          {
-            model.trainOn(inputDStream)
-            model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+    ssc = setupStreams(emptyInput, (inputDStream: DStream[LabeledPoint]) => {
+      model.trainOn(inputDStream)
+      model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
+    })
     val output: Seq[Seq[(Double, Double)]] =
       runStreams(ssc, numBatches, numBatches)
   }

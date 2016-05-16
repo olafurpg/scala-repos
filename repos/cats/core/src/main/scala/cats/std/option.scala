@@ -40,8 +40,8 @@ trait OptionInstances extends OptionInstances1 {
         case Some(a) => f(a, lb)
       }
 
-    def traverse[G[_]: Applicative, A, B](fa: Option[A])(
-        f: A => G[B]): G[Option[B]] =
+    def traverse[G[_]: Applicative, A, B](
+        fa: Option[A])(f: A => G[B]): G[Option[B]] =
       fa match {
         case None => Applicative[G].pure(None)
         case Some(a) => Applicative[G].map(f(a))(Some(_))
@@ -99,8 +99,8 @@ private[std] sealed trait OptionInstances1 extends OptionInstances2 {
       implicit ev: PartialOrder[A]): PartialOrder[Option[A]] =
     new PartialOrder[Option[A]] {
       def partialCompare(x: Option[A], y: Option[A]): Double =
-        x.fold(if (y.isDefined) -1.0 else 0.0)(
-            a => y.fold(1.0)(ev.partialCompare(_, a)))
+        x.fold(if (y.isDefined) -1.0 else 0.0)(a =>
+              y.fold(1.0)(ev.partialCompare(_, a)))
     }
 }
 

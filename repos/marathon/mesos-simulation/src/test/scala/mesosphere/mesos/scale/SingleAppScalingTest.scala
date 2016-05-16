@@ -19,8 +19,11 @@ object SingleAppScalingTest {
 }
 
 class SingleAppScalingTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with Matchers
+    with BeforeAndAfter
+    with GivenWhenThen {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 

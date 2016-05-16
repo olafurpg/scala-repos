@@ -63,7 +63,7 @@ object WorksheetDiffSplitters {
       .xyToLogicalPosition(
           new Point(0, editor.getScrollingModel.getVerticalScrollOffset))
       .line
-      (line, editor.getComponent.getHeight / editor.getLineHeight + 1)
+    (line, editor.getComponent.getHeight / editor.getLineHeight + 1)
   }
 
   class SimpleWorksheetSplitter(editor1: Editor,
@@ -71,7 +71,8 @@ object WorksheetDiffSplitters {
                                 private var intervals: Iterable[(Int, Int)],
                                 private var changes: Iterable[(Int, Int)],
                                 prop: Float)
-      extends Splitter(false, prop) with DiffSplitterI {
+      extends Splitter(false, prop)
+      with DiffSplitterI {
     setDividerWidth(30)
     setFirstComponent(editor1.getComponent)
     setSecondComponent(editor2.getComponent)

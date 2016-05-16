@@ -238,7 +238,8 @@ case class Hdfs(strict: Boolean, @transient conf: Configuration)
 
 case class HadoopTest(@transient conf: Configuration,
                       @transient buffers: Source => Option[Buffer[Tuple]])
-    extends HadoopMode with TestMode {
+    extends HadoopMode
+    with TestMode {
 
   // This is a map from source.toString to disk path
   private val writePaths = MMap[Source, String]()
@@ -301,4 +302,5 @@ case class Local(strictSources: Boolean) extends CascadingLocal {
   * Memory only testing for unit tests
   */
 case class Test(buffers: (Source) => Option[Buffer[Tuple]])
-    extends TestMode with CascadingLocal
+    extends TestMode
+    with CascadingLocal

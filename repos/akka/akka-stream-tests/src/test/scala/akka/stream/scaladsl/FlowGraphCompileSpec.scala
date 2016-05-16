@@ -206,8 +206,7 @@ class FlowGraphCompileSpec extends AkkaSpec {
 
     "make it optional to specify flows" in {
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           val merge = b.add(Merge[String](2))
           val bcast = b.add(Broadcast[String](2))
           import GraphDSL.Implicits._

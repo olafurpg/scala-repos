@@ -205,7 +205,7 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
 
 object JavaRDD {
 
-  implicit def fromRDD[T : ClassTag](rdd: RDD[T]): JavaRDD[T] =
+  implicit def fromRDD[T: ClassTag](rdd: RDD[T]): JavaRDD[T] =
     new JavaRDD[T](rdd)
 
   implicit def toRDD[T](rdd: JavaRDD[T]): RDD[T] = rdd.rdd

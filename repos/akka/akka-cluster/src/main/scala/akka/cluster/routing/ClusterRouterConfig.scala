@@ -32,12 +32,12 @@ import scala.collection.immutable
 object ClusterRouterGroupSettings {
   def fromConfig(config: Config): ClusterRouterGroupSettings =
     ClusterRouterGroupSettings(
-        totalInstances = ClusterRouterSettingsBase.getMaxTotalNrOfInstances(
-              config),
+        totalInstances =
+          ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
         routeesPaths = immutableSeq(config.getStringList("routees.paths")),
         allowLocalRoutees = config.getBoolean("cluster.allow-local-routees"),
         useRole = ClusterRouterSettingsBase.useRoleOption(
-              config.getString("cluster.use-role")))
+            config.getString("cluster.use-role")))
 }
 
 /**
@@ -83,13 +83,13 @@ final case class ClusterRouterGroupSettings(
 object ClusterRouterPoolSettings {
   def fromConfig(config: Config): ClusterRouterPoolSettings =
     ClusterRouterPoolSettings(
-        totalInstances = ClusterRouterSettingsBase.getMaxTotalNrOfInstances(
-              config),
-        maxInstancesPerNode = config.getInt(
-              "cluster.max-nr-of-instances-per-node"),
+        totalInstances =
+          ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
+        maxInstancesPerNode =
+          config.getInt("cluster.max-nr-of-instances-per-node"),
         allowLocalRoutees = config.getBoolean("cluster.allow-local-routees"),
         useRole = ClusterRouterSettingsBase.useRoleOption(
-              config.getString("cluster.use-role")))
+            config.getString("cluster.use-role")))
 }
 
 /**
@@ -165,7 +165,8 @@ private[akka] trait ClusterRouterSettingsBase {
 @SerialVersionUID(1L)
 final case class ClusterRouterGroup(
     local: Group, settings: ClusterRouterGroupSettings)
-    extends Group with ClusterRouterConfigBase {
+    extends Group
+    with ClusterRouterConfigBase {
 
   override def paths(system: ActorSystem): immutable.Iterable[String] =
     if (settings.allowLocalRoutees && settings.useRole.isDefined) {
@@ -202,7 +203,8 @@ final case class ClusterRouterGroup(
 @SerialVersionUID(1L)
 final case class ClusterRouterPool(
     local: Pool, settings: ClusterRouterPoolSettings)
-    extends Pool with ClusterRouterConfigBase {
+    extends Pool
+    with ClusterRouterConfigBase {
 
   require(local.resizer.isEmpty,
           "Resizer can't be used together with cluster router")
@@ -283,7 +285,8 @@ private[akka] trait ClusterRouterConfigBase extends RouterConfig {
 private[akka] class ClusterRouterPoolActor(
     supervisorStrategy: SupervisorStrategy,
     val settings: ClusterRouterPoolSettings)
-    extends RouterPoolActor(supervisorStrategy) with ClusterRouterActor {
+    extends RouterPoolActor(supervisorStrategy)
+    with ClusterRouterActor {
 
   override def receive = clusterReceive orElse super.receive
 
@@ -335,7 +338,8 @@ private[akka] class ClusterRouterPoolActor(
   */
 private[akka] class ClusterRouterGroupActor(
     val settings: ClusterRouterGroupSettings)
-    extends RouterActor with ClusterRouterActor {
+    extends RouterActor
+    with ClusterRouterActor {
 
   val group = cell.routerConfig match {
     case x: Group ⇒ x

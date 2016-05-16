@@ -29,7 +29,9 @@ object SchedulerSpec {
 }
 
 trait SchedulerSpec
-    extends BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
+    extends BeforeAndAfterEach
+    with DefaultTimeout
+    with ImplicitSender {
   this: AkkaSpec ⇒
   import system.dispatcher
 
@@ -42,8 +44,7 @@ trait SchedulerSpec
       case object Tock
 
       val tickActor, tickActor2 = system.actorOf(
-          Props(
-              new Actor {
+          Props(new Actor {
         var ticks = 0
         def receive = {
           case Tick ⇒
@@ -336,7 +337,8 @@ trait SchedulerSpec
 }
 
 class LightArrayRevolverSchedulerSpec
-    extends AkkaSpec(SchedulerSpec.testConfRevolver) with SchedulerSpec {
+    extends AkkaSpec(SchedulerSpec.testConfRevolver)
+    with SchedulerSpec {
 
   def collectCancellable(c: Cancellable): Cancellable = c
 
@@ -411,28 +413,29 @@ class LightArrayRevolverSchedulerSpec
     }
 
     "survive vicious enqueueing" in {
-      withScheduler(config = ConfigFactory.parseString(
-                "akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
-        import driver._
-        import system.dispatcher
-        val counter = new AtomicInteger
-        val terminated = future {
-          var rounds = 0
-          while (Try(sched.scheduleOnce(Duration.Zero)(())(localEC)).isSuccess) {
-            Thread.sleep(1)
-            driver.wakeUp(step)
-            rounds += 1
+      withScheduler(config =
+            ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
+        (sched, driver) ⇒
+          import driver._
+          import system.dispatcher
+          val counter = new AtomicInteger
+          val terminated = future {
+            var rounds = 0
+            while (Try(sched.scheduleOnce(Duration.Zero)(())(localEC)).isSuccess) {
+              Thread.sleep(1)
+              driver.wakeUp(step)
+              rounds += 1
+            }
+            rounds
           }
-          rounds
-        }
-        def delay =
-          if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
-        val N = 1000000
-        (1 to N) foreach
-        (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
-        sched.close()
-        Await.result(terminated, 3.seconds.dilated) should be > 10
-        awaitCond(counter.get == N)
+          def delay =
+            if (ThreadLocalRandom.current.nextBoolean) step * 2 else step
+          val N = 1000000
+          (1 to N) foreach
+          (_ ⇒ sched.scheduleOnce(delay)(counter.incrementAndGet()))
+          sched.close()
+          Await.result(terminated, 3.seconds.dilated) should be > 10
+          awaitCond(counter.get == N)
       }
     }
 
@@ -468,31 +471,32 @@ class LightArrayRevolverSchedulerSpec
     }
 
     "correctly wrap around wheel rounds" in {
-      withScheduler(config = ConfigFactory.parseString(
-                "akka.scheduler.ticks-per-wheel=2")) { (sched, driver) ⇒
-        implicit def ec = localEC
-        import driver._
-        val start = step / 2
-        (0 to 3) foreach
-        (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
-        probe.expectNoMsg(step)
-        wakeUp(step)
-        expectWait(step)
-        // the following are no for-comp to see which iteration fails
-        wakeUp(step)
-        probe.expectMsg("hello")
-        expectWait(step)
-        wakeUp(step)
-        probe.expectMsg("hello")
-        expectWait(step)
-        wakeUp(step)
-        probe.expectMsg("hello")
-        expectWait(step)
-        wakeUp(step)
-        probe.expectMsg("hello")
-        expectWait(step)
-        wakeUp(step)
-        expectWait(step)
+      withScheduler(config =
+            ConfigFactory.parseString("akka.scheduler.ticks-per-wheel=2")) {
+        (sched, driver) ⇒
+          implicit def ec = localEC
+          import driver._
+          val start = step / 2
+          (0 to 3) foreach
+          (i ⇒ sched.scheduleOnce(start + step * i, probe.ref, "hello"))
+          probe.expectNoMsg(step)
+          wakeUp(step)
+          expectWait(step)
+          // the following are no for-comp to see which iteration fails
+          wakeUp(step)
+          probe.expectMsg("hello")
+          expectWait(step)
+          wakeUp(step)
+          probe.expectMsg("hello")
+          expectWait(step)
+          wakeUp(step)
+          probe.expectMsg("hello")
+          expectWait(step)
+          wakeUp(step)
+          probe.expectMsg("hello")
+          expectWait(step)
+          wakeUp(step)
+          expectWait(step)
       }
     }
 
@@ -580,8 +584,7 @@ class LightArrayRevolverSchedulerSpec
       override protected def waitNanos(ns: Long): Unit = {
         // println(s"waiting $ns")
         prb.ref ! ns
-        try time +=
-        (lbq.get match {
+        try time += (lbq.get match {
               case q: LinkedBlockingQueue[Long] ⇒ q.take()
               case _ ⇒ 0L
             }) catch {

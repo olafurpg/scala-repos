@@ -48,7 +48,8 @@ import scalaz._
 import scalaz.syntax.comonad._
 
 object MongoAccountManagerSpec
-    extends Specification with RealMongoSpecSupport {
+    extends Specification
+    with RealMongoSpecSupport {
   val timeout = Duration(30, "seconds")
 
   "MongoAccountManager" should {
@@ -85,8 +86,8 @@ object MongoAccountManagerSpec
     }
 
     "move an Account to the deleted collection" in new AccountManager {
-      type Results = (Option[Account], Option[Account],
-      Option[Account]) //, Option[Account])
+      type Results =
+        (Option[Account], Option[Account], Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
@@ -103,8 +104,10 @@ object MongoAccountManagerSpec
     }
 
     "succeed in deleting a previously deleted Account" in new AccountManager {
-      type Results = (Option[Account], Option[Account], Option[Account],
-      Option[Account]) //, Option[Account])
+      type Results = (Option[Account],
+                      Option[Account],
+                      Option[Account],
+                      Option[Account]) //, Option[Account])
 
       (for {
         before <- accountManager.findAccountById(account.accountId)
@@ -125,7 +128,7 @@ object MongoAccountManagerSpec
       (for {
         tokenId <- accountManager.generateResetToken(account)
         resolvedAccount <- accountManager.findAccountByResetToken(
-            account.accountId, tokenId)
+                              account.accountId, tokenId)
       } yield resolvedAccount).copoint must beLike {
         case \/-(resolvedAccount) =>
           resolvedAccount.accountId must_== account.accountId
@@ -135,9 +138,9 @@ object MongoAccountManagerSpec
     "not locate expired password reset tokens" in new AccountManager {
       (for {
         tokenId <- accountManager.generateResetToken(
-            account, (new DateTime).minusMinutes(5))
+                      account, (new DateTime).minusMinutes(5))
         resolvedAccount <- accountManager.findAccountByResetToken(
-            account.accountId, tokenId)
+                              account.accountId, tokenId)
       } yield resolvedAccount).copoint must beLike {
         case -\/(_) => ok
       }

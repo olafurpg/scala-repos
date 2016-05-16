@@ -24,7 +24,9 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{BooleanType, StringType, StructField, StructType}
 
 class ListTablesSuite
-    extends QueryTest with BeforeAndAfter with SharedSQLContext {
+    extends QueryTest
+    with BeforeAndAfter
+    with SharedSQLContext {
   import testImplicits._
 
   private lazy val df = (1 to 10).map(i => (i, s"str$i")).toDF("key", "value")

@@ -45,7 +45,8 @@ class OptionalSnapshotStoreSpec
     # snapshot store plugin is NOT defined, things should still work
     akka.persistence.snapshot-store.local.dir = "target/snapshots-${classOf[
         OptionalSnapshotStoreSpec].getName}/"
-  """)) with ImplicitSender {
+  """))
+    with ImplicitSender {
   import OptionalSnapshotStoreSpec._
 
   system.eventStream.publish(

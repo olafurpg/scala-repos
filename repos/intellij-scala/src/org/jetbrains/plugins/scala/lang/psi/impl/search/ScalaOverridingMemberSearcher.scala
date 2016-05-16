@@ -37,9 +37,9 @@ class MethodImplementationsSearch
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
                                 .getOverridingMethods(namedElement)
-                              //to avoid duplicates with ScalaOverridingMemberSearcher
-                              if !namedElement.isInstanceOf[PsiMethod] ||
-                              !implementation.isInstanceOf[PsiMethod]) {
+             //to avoid duplicates with ScalaOverridingMemberSearcher
+             if !namedElement.isInstanceOf[PsiMethod] ||
+             !implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation)) {
             return false
           }
@@ -63,7 +63,7 @@ class ScalaOverridingMemberSearcher
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
                                 .getOverridingMethods(namedElement)
-                                  if implementation.isInstanceOf[PsiMethod]) {
+             if implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation.asInstanceOf[PsiMethod])) {
             return false
           }
@@ -79,7 +79,7 @@ object ScalaOverridingMemberSearcher {
     val result = new ArrayBuffer[PsiNamedElement]
     inReadAction {
       for (psiMethod <- ScalaOverridingMemberSearcher.search(
-          method, deep = true)) {
+                           method, deep = true)) {
         result += psiMethod
       }
     }
@@ -125,7 +125,7 @@ object ScalaOverridingMemberSearcher {
               if (!deep) return false
             }
             for (td <- inheritor.typeDefinitions if !td.isObject &&
-                      name == td.name) {
+                 name == td.name) {
               buffer += td
               if (!deep) return false
             }

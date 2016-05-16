@@ -42,7 +42,8 @@ class TableColumnCellEditEventSpec[S, T]
     extends SimpleSFXDelegateSpec[jfxsc.TableColumn.CellEditEvent[S, T],
                                   TableColumn.CellEditEvent[S, T]](
         classOf[jfxsc.TableColumn.CellEditEvent[S, T]],
-        classOf[TableColumn.CellEditEvent[S, T]]) with RunOnApplicationThread {
+        classOf[TableColumn.CellEditEvent[S, T]])
+    with RunOnApplicationThread {
 
   override def getJavaClassInstance =
     new jfxsc.TableColumn.CellEditEvent(

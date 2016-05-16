@@ -269,8 +269,7 @@ class AsyncProducerTest {
 
     // Test that the serialize handles seq from a Stream
     val streamedSerializedData = handler.serialize(Stream(produceData: _*))
-    val deserializedStreamData = streamedSerializedData.map(
-        d =>
+    val deserializedStreamData = streamedSerializedData.map(d =>
           new KeyedMessage[String, String](
               d.topic, TestUtils.readString(d.message.payload)))
 
@@ -578,8 +577,7 @@ class AsyncProducerTest {
 
   def messagesToSet(messages: Seq[String]): ByteBufferMessageSet = {
     new ByteBufferMessageSet(NoCompressionCodec,
-                             messages.map(
-                                 m =>
+                             messages.map(m =>
                                    new Message(m.getBytes,
                                                0L,
                                                Message.MagicValue_V1)): _*)

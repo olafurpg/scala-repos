@@ -151,17 +151,15 @@ case class Cast(child: Expression, dataType: DataType)
   // UDFToBoolean
   private[this] def castToBoolean(from: DataType): Any => Any = from match {
     case StringType =>
-      buildCast[UTF8String](_,
-                            s =>
-                              {
-                                if (StringUtils.isTrueString(s)) {
-                                  true
-                                } else if (StringUtils.isFalseString(s)) {
-                                  false
-                                } else {
-                                  null
-                                }
-                            })
+      buildCast[UTF8String](_, s => {
+        if (StringUtils.isTrueString(s)) {
+          true
+        } else if (StringUtils.isFalseString(s)) {
+          false
+        } else {
+          null
+        }
+      })
     case TimestampType =>
       buildCast[Long](_, t => t != 0)
     case DateType =>
@@ -423,34 +421,27 @@ case class Cast(child: Expression, dataType: DataType)
       fromType: DataType, toType: DataType): Any => Any = {
     val elementCast = cast(fromType, toType)
     // TODO: Could be faster?
-    buildCast[ArrayData](_,
-                         array =>
-                           {
-                             val values = new Array[Any](array.numElements())
-                             array.foreach(fromType,
-                                           (i, e) =>
-                                             {
-                                               if (e == null) {
-                                                 values(i) = null
-                                               } else {
-                                                 values(i) = elementCast(e)
-                                               }
-                                           })
-                             new GenericArrayData(values)
-                         })
+    buildCast[ArrayData](_, array => {
+      val values = new Array[Any](array.numElements())
+      array.foreach(fromType, (i, e) => {
+        if (e == null) {
+          values(i) = null
+        } else {
+          values(i) = elementCast(e)
+        }
+      })
+      new GenericArrayData(values)
+    })
   }
 
   private[this] def castMap(from: MapType, to: MapType): Any => Any = {
     val keyCast = castArray(from.keyType, to.keyType)
     val valueCast = castArray(from.valueType, to.valueType)
-    buildCast[MapData](
-        _,
-        map =>
-          {
-            val keys = keyCast(map.keyArray()).asInstanceOf[ArrayData]
-            val values = valueCast(map.valueArray()).asInstanceOf[ArrayData]
-            new ArrayBasedMapData(keys, values)
-        })
+    buildCast[MapData](_, map => {
+      val keys = keyCast(map.keyArray()).asInstanceOf[ArrayData]
+      val values = valueCast(map.valueArray()).asInstanceOf[ArrayData]
+      new ArrayBasedMapData(keys, values)
+    })
   }
 
   private[this] def castStruct(from: StructType, to: StructType): Any => Any = {
@@ -459,20 +450,17 @@ case class Cast(child: Expression, dataType: DataType)
     }
     // TODO: Could be faster?
     val newRow = new GenericMutableRow(from.fields.length)
-    buildCast[InternalRow](
-        _,
-        row =>
-          {
-            var i = 0
-            while (i < row.numFields) {
-              newRow.update(i,
-                            if (row.isNullAt(i)) null
-                            else
-                              castFuncs(i)(row.get(i, from.apply(i).dataType)))
-              i += 1
-            }
-            newRow.copy()
-        })
+    buildCast[InternalRow](_, row => {
+      var i = 0
+      while (i < row.numFields) {
+        newRow.update(i,
+                      if (row.isNullAt(i)) null
+                      else
+                        castFuncs(i)(row.get(i, from.apply(i).dataType)))
+        i += 1
+      }
+      newRow.copy()
+    })
   }
 
   private[this] def cast(from: DataType, to: DataType): Any => Any = to match {
@@ -1101,6 +1089,7 @@ case class Cast(child: Expression, dataType: DataType)
   */
 case class UpCast(
     child: Expression, dataType: DataType, walkedTypePath: Seq[String])
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression
+    with Unevaluable {
   override lazy val resolved = false
 }

@@ -38,13 +38,13 @@ private object Json {
 
   def serialize(o: AnyRef): String = mapper.writeValueAsString(o)
 
-  def deserialize[T : Manifest](value: String): T =
+  def deserialize[T: Manifest](value: String): T =
     mapper.readValue(value, typeReference[T])
 
-  def deserialize[T : Manifest](node: JsonNode): T =
+  def deserialize[T: Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private def typeReference[T : Manifest] = new TypeReference[T] {
+  private def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 
@@ -354,7 +354,9 @@ class MetricsStatsReceiver(
 }
 
 class MetricsExporter(val registry: Metrics)
-    extends JsonExporter(registry) with HttpMuxHandler with MetricsRegistry {
+    extends JsonExporter(registry)
+    with HttpMuxHandler
+    with MetricsRegistry {
   def this() = this(MetricsStatsReceiver.defaultRegistry)
   val pattern = "/admin/metrics.json"
 }

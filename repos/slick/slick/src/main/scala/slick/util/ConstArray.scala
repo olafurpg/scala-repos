@@ -298,7 +298,7 @@ final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
     b.result()
   }
 
-  def toArray[R >: T : ClassTag]: Array[R] = {
+  def toArray[R >: T: ClassTag]: Array[R] = {
     val ar = new Array[R](length)
     System.arraycopy(a, 0, ar, 0, length)
     ar

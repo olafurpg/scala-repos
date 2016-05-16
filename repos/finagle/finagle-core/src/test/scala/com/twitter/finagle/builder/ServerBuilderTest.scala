@@ -18,7 +18,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 @RunWith(classOf[JUnitRunner])
 class ServerBuilderTest
-    extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with MockitoSugar
     with IntegrationBase {
 
   trait ServerBuilderHelper {

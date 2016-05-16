@@ -155,7 +155,7 @@ object Long {
 
     var res = ""
     var value = i
-    while ( (value ^ SignBit) >= divisorXorSignBit) {
+    while ((value ^ SignBit) >= divisorXorSignBit) {
       // unsigned comparison
       val div = divideUnsigned(value, divisor)
       val rem = value - div * divisor // == remainderUnsigned(value, divisor)
@@ -228,7 +228,7 @@ object Long {
        */
       var firstChunkStart = start
       while (firstChunkStart < length &&
-      s.charAt(firstChunkStart) == '0') firstChunkStart += 1
+             s.charAt(firstChunkStart) == '0') firstChunkStart += 1
 
       /* After that, if more than 3 chunks are necessary, it means the value
        * is too large, and does not fit in an unsigned Long.

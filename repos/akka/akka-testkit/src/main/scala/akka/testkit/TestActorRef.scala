@@ -135,7 +135,8 @@ class TestActorRef[T <: Actor](
 object TestActorRef {
 
   private case object InternalGetActor
-      extends AutoReceivedMessage with PossiblyHarmful
+      extends AutoReceivedMessage
+      with PossiblyHarmful
 
   private val number = new AtomicLong
   private[testkit] def randomName: String = {
@@ -143,11 +144,11 @@ object TestActorRef {
     "$" + akka.util.Helpers.base64(l)
   }
 
-  def apply[T <: Actor : ClassTag](factory: ⇒ T)(
+  def apply[T <: Actor: ClassTag](factory: ⇒ T)(
       implicit system: ActorSystem): TestActorRef[T] =
     apply[T](Props(factory), randomName)
 
-  def apply[T <: Actor : ClassTag](factory: ⇒ T, name: String)(
+  def apply[T <: Actor: ClassTag](factory: ⇒ T, name: String)(
       implicit system: ActorSystem): TestActorRef[T] =
     apply[T](Props(factory), name)
 

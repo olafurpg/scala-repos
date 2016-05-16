@@ -28,7 +28,8 @@ object ClusterDomainEventPublisherSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ClusterDomainEventPublisherSpec
     extends AkkaSpec(ClusterDomainEventPublisherSpec.config)
-    with BeforeAndAfterEach with ImplicitSender {
+    with BeforeAndAfterEach
+    with ImplicitSender {
 
   var publisher: ActorRef = _
   val aUp = TestMember(Address("akka.tcp", "sys", "a", 2552), Up)
@@ -62,11 +63,10 @@ class ClusterDomainEventPublisherSpec
     .seen(aUp.uniqueAddress)
   val g7 = Gossip(members = SortedSet(aExiting, bExiting, cUp))
     .seen(aUp.uniqueAddress)
-  val g8 = Gossip(members = SortedSet(aUp, bExiting, cUp, dUp),
-                  overview = GossipOverview(
-                        reachability = Reachability.empty.unreachable(
-                              aUp.uniqueAddress, dUp.uniqueAddress)))
-    .seen(aUp.uniqueAddress)
+  val g8 = Gossip(
+      members = SortedSet(aUp, bExiting, cUp, dUp),
+      overview = GossipOverview(reachability = Reachability.empty.unreachable(
+              aUp.uniqueAddress, dUp.uniqueAddress))).seen(aUp.uniqueAddress)
 
   // created in beforeEach
   var memberSubscriber: TestProbe = _

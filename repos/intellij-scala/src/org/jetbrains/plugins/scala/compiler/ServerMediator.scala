@@ -105,7 +105,8 @@ class ServerMediator(project: Project) extends ProjectComponent {
               }
               val nameForTests =
                 if (outputUrlParts.lastOption.contains("classes"))
-                  "test-classes" else "test"
+                  "test-classes"
+                else "test"
 
               extension.inheritCompilerOutputPath(false)
               extension.setCompilerOutputPathForTests(

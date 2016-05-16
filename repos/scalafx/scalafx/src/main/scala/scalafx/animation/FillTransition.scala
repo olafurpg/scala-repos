@@ -66,7 +66,8 @@ object FillTransition extends AnimationStatics {
   */
 class FillTransition(
     override val delegate: jfxa.FillTransition = new jfxa.FillTransition())
-    extends Transition(delegate) with SFXDelegate[jfxa.FillTransition] {
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.FillTransition] {
 
   /**
     * The constructor of $FT

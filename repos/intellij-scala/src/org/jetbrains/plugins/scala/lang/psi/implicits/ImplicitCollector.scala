@@ -68,8 +68,9 @@ object ImplicitCollector {
       isImplicitConversion: Boolean,
       isExtensionConversion: Boolean,
       searchImplicitsRecursively: Int,
-      predicate: Option[(ScalaResolveResult, ScSubstitutor) => Option[
-              (ScalaResolveResult, ScSubstitutor)]],
+      predicate: Option[(ScalaResolveResult,
+                         ScSubstitutor) => Option[(ScalaResolveResult,
+                                                   ScSubstitutor)]],
       previousRecursionState: Option[RecursionMap])
 }
 
@@ -88,8 +89,9 @@ class ImplicitCollector(
     isImplicitConversion: Boolean,
     isExtensionConversion: Boolean,
     searchImplicitsRecursively: Int = 0,
-    predicate: Option[(ScalaResolveResult, ScSubstitutor) => Option[
-            (ScalaResolveResult, ScSubstitutor)]] = None,
+    predicate: Option[(ScalaResolveResult,
+                       ScSubstitutor) => Option[(ScalaResolveResult,
+                                                 ScSubstitutor)]] = None,
     previousRecursionState: Option[RecursionMap] = None) {
   def this(state: ImplicitState) {
     this(state.place,
@@ -148,7 +150,8 @@ class ImplicitCollector(
               case e: ScTemplateParents => placeCalculated = true
               case m: ScModifierListOwner
                   if m.hasModifierProperty("implicit") =>
-                placeCalculated = true //we need to check that, otherwise we will be outside
+                placeCalculated =
+                  true //we need to check that, otherwise we will be outside
               case _ =>
             }
             if (predicate.isEmpty)
@@ -169,7 +172,7 @@ class ImplicitCollector(
       if (!fullInfo) processor = new ImplicitParametersProcessor(true)
 
       for (obj <- ScalaPsiUtil.collectImplicitObjects(
-          expandedTp, place.getProject, place.getResolveScope)) {
+                     expandedTp, place.getProject, place.getResolveScope)) {
         processor.processType(obj, place, ResolveState.initial())
       }
 
@@ -208,11 +211,11 @@ class ImplicitCollector(
           if (!isPredefPriority && !ResolveUtils.isAccessible(o, getPlace))
             return true
           addResult(
-              new ScalaResolveResult(
-                  o,
-                  subst,
-                  getImports(state),
-                  implicitSearchState = Some(collectorState)))
+              new ScalaResolveResult(o,
+                                     subst,
+                                     getImports(state),
+                                     implicitSearchState =
+                                       Some(collectorState)))
         case param: ScParameter if param.isImplicitParameter =>
           placeCalculated = true
           param match {
@@ -222,11 +225,11 @@ class ImplicitCollector(
             case _ =>
           }
           addResult(
-              new ScalaResolveResult(
-                  param,
-                  subst,
-                  getImports(state),
-                  implicitSearchState = Some(collectorState)))
+              new ScalaResolveResult(param,
+                                     subst,
+                                     getImports(state),
+                                     implicitSearchState =
+                                       Some(collectorState)))
         case f: ScFieldId =>
           val memb = ScalaPsiUtil.getContextOfType(
               f, true, classOf[ScValue], classOf[ScVariable])
@@ -236,11 +239,11 @@ class ImplicitCollector(
               if (!isPredefPriority &&
                   !ResolveUtils.isAccessible(memb, getPlace)) return true
               addResult(
-                  new ScalaResolveResult(
-                      named,
-                      subst,
-                      getImports(state),
-                      implicitSearchState = Some(collectorState)))
+                  new ScalaResolveResult(named,
+                                         subst,
+                                         getImports(state),
+                                         implicitSearchState =
+                                           Some(collectorState)))
             case _ =>
           }
         case patt: ScBindingPattern =>
@@ -252,25 +255,25 @@ class ImplicitCollector(
               if (!isPredefPriority &&
                   !ResolveUtils.isAccessible(memb, getPlace)) return true
               addResult(
-                  new ScalaResolveResult(
-                      named,
-                      subst,
-                      getImports(state),
-                      implicitSearchState = Some(collectorState)))
+                  new ScalaResolveResult(named,
+                                         subst,
+                                         getImports(state),
+                                         implicitSearchState =
+                                           Some(collectorState)))
             case _ =>
           }
         case function: ScFunction
             if function.hasModifierProperty("implicit") =>
           placeCalculated = true
-          if (isPredefPriority ||
-              (ScImplicitlyConvertible.checkFucntionIsEligible(function, place) &&
+          if (isPredefPriority || (ScImplicitlyConvertible
+                    .checkFucntionIsEligible(function, place) &&
                   ResolveUtils.isAccessible(function, getPlace))) {
             addResult(
-                new ScalaResolveResult(
-                    named,
-                    subst,
-                    getImports(state),
-                    implicitSearchState = Some(collectorState)))
+                new ScalaResolveResult(named,
+                                       subst,
+                                       getImports(state),
+                                       implicitSearchState =
+                                         Some(collectorState)))
           }
         case _ =>
       }
@@ -455,24 +458,23 @@ class ImplicitCollector(
                         try {
                           def reportWrong(result: ImplicitResult)
                             : Some[(ScalaResolveResult, ScSubstitutor)] = {
-                            Some(
-                                c.copy(
-                                    problems = Seq(WrongTypeParameterInferred),
-                                    implicitReason = result),
-                                subst)
+                            Some(c.copy(problems =
+                                          Seq(WrongTypeParameterInferred),
+                                        implicitReason = result),
+                                 subst)
                           }
                           def updateImplicitParameters(
                               ): Some[(ScalaResolveResult, ScSubstitutor)] = {
                             val expected = Some(tp)
                             try {
-                              nonValueType = InferUtil
-                                .updateAccordingToExpectedType(
-                                  nonValueType,
-                                  fromImplicitParameters = true,
-                                  filterTypeParams = isImplicitConversion,
-                                  expected,
-                                  place,
-                                  check = true)
+                              nonValueType =
+                                InferUtil.updateAccordingToExpectedType(
+                                    nonValueType,
+                                    fromImplicitParameters = true,
+                                    filterTypeParams = isImplicitConversion,
+                                    expected,
+                                    place,
+                                    check = true)
                             } catch {
                               case e: SafeCheckException =>
                                 return reportWrong(
@@ -482,8 +484,7 @@ class ImplicitCollector(
                             val depth = ScalaProjectSettings
                               .getInstance(place.getProject)
                               .getImplicitParametersSearchDepth
-                            if (lastImplicit.isDefined &&
-                                (depth < 0 ||
+                            if (lastImplicit.isDefined && (depth < 0 ||
                                     searchImplicitsRecursively < depth)) {
                               predicate match {
                                 case Some(predicateFunction)
@@ -494,9 +495,8 @@ class ImplicitCollector(
                                               BadTypeResult))) match {
                                     case (ScFunctionType(rt, _), _) =>
                                       if (predicateFunction(
-                                              c.copy(
-                                                  implicitParameterType = Some(
-                                                        rt)),
+                                              c.copy(implicitParameterType =
+                                                    Some(rt)),
                                               subst).isEmpty)
                                         return reportWrong(
                                             CantFindExtensionMethodResult)
@@ -523,10 +523,10 @@ class ImplicitCollector(
                               if (fullInfo && results.exists(_.exists(
                                           _.name == InferUtil.notFoundParameterName)))
                                 return Some(
-                                    c.copy(
-                                        implicitParameters = results.getOrElse(
-                                              Seq.empty),
-                                        implicitReason = ImplicitParameterNotFoundResult),
+                                    c.copy(implicitParameters =
+                                             results.getOrElse(Seq.empty),
+                                           implicitReason =
+                                             ImplicitParameterNotFoundResult),
                                     subst)
                               val (valueType, typeParams) = inferValueType(
                                   resType)
@@ -537,29 +537,29 @@ class ImplicitCollector(
                                 results.foldLeft(result) {
                                   case (r1: ScalaResolveResult,
                                         r2: ScalaResolveResult) =>
-                                    r1.copy(
-                                        importsUsed = r1.importsUsed ++ r2.importsUsed)
+                                    r1.copy(importsUsed =
+                                          r1.importsUsed ++ r2.importsUsed)
                                 }
                               }
                               Some(addImportsUsed(
-                                       c.copy(implicitParameterType = Some(
-                                                    valueType),
-                                              implicitParameters = results
-                                                  .getOrElse(Seq.empty),
+                                       c.copy(implicitParameterType =
+                                                Some(valueType),
+                                              implicitParameters =
+                                                results.getOrElse(Seq.empty),
                                               implicitReason = OkResult,
-                                              unresolvedTypeParameters = Some(
-                                                    typeParams)),
+                                              unresolvedTypeParameters =
+                                                Some(typeParams)),
                                        results.getOrElse(Seq.empty)),
                                    subst)
                             } else {
                               val (valueType, typeParams) = inferValueType(
                                   nonValueType.getOrElse(
                                       return reportWrong(BadTypeResult)))
-                              Some(c.copy(
-                                       implicitParameterType = Some(valueType),
-                                       implicitReason = OkResult,
-                                       unresolvedTypeParameters = Some(
-                                             typeParams)),
+                              Some(c.copy(implicitParameterType =
+                                            Some(valueType),
+                                          implicitReason = OkResult,
+                                          unresolvedTypeParameters =
+                                            Some(typeParams)),
                                    subst)
                             }
                           }
@@ -567,11 +567,10 @@ class ImplicitCollector(
                           updateImplicitParameters()
                         } catch {
                           case e: SafeCheckException =>
-                            Some(
-                                c.copy(
-                                    problems = Seq(WrongTypeParameterInferred),
-                                    implicitReason = UnhandledResult),
-                                subst)
+                            Some(c.copy(problems =
+                                          Seq(WrongTypeParameterInferred),
+                                        implicitReason = UnhandledResult),
+                                 subst)
                         }
                       }
                     }
@@ -582,20 +581,18 @@ class ImplicitCollector(
                       val coreTypeForTp = coreType(tp)
                       doComputations(
                           coreElement.getOrElse(place),
-                          (tp: Object, searches: Seq[Object]) =>
-                            {
-                              !searches.exists {
-                                case t: ScType if tp.isInstanceOf[ScType] =>
-                                  if (Equivalence
-                                        .equivInner(
-                                            t,
-                                            tp.asInstanceOf[ScType],
-                                            new ScUndefinedSubstitutor(),
-                                            falseUndef = false)
-                                        ._1) true
-                                  else dominates(tp.asInstanceOf[ScType], t)
-                                case _ => false
-                              }
+                          (tp: Object, searches: Seq[Object]) => {
+                            !searches.exists {
+                              case t: ScType if tp.isInstanceOf[ScType] =>
+                                if (Equivalence
+                                      .equivInner(t,
+                                                  tp.asInstanceOf[ScType],
+                                                  new ScUndefinedSubstitutor(),
+                                                  falseUndef = false)
+                                      ._1) true
+                                else dominates(tp.asInstanceOf[ScType], t)
+                              case _ => false
+                            }
                           },
                           coreTypeForTp,
                           compute(),
@@ -700,8 +697,8 @@ class ImplicitCollector(
 
       def mapCandidates(withLocalTypeInference: Boolean)
         : collection.Set[(ScalaResolveResult, ScSubstitutor)] = {
-        var candidatesSeq = candidates.toSeq.filter(
-            c => forMap(c, withLocalTypeInference, checkFast = true).isDefined)
+        var candidatesSeq = candidates.toSeq.filter(c =>
+              forMap(c, withLocalTypeInference, checkFast = true).isDefined)
         val results: ArrayBuffer[(ScalaResolveResult, ScSubstitutor)] =
           new ArrayBuffer[(ScalaResolveResult, ScSubstitutor)]()
         var lastResult: Option[ScalaResolveResult] = None

@@ -68,28 +68,28 @@ case class ConsoleArgs(common: CommonArgs = CommonArgs(),
                        engineInstanceId: Option[String] = None,
                        mainClass: Option[String] = None)
 
-case class CommonArgs(
-    batch: String = "",
-    sparkPassThrough: Seq[String] = Seq(),
-    driverPassThrough: Seq[String] = Seq(),
-    pioHome: Option[String] = None,
-    sparkHome: Option[String] = None,
-    engineId: Option[String] = None,
-    engineVersion: Option[String] = None,
-    engineFactory: Option[String] = None,
-    engineParamsKey: Option[String] = None,
-    evaluation: Option[String] = None,
-    engineParamsGenerator: Option[String] = None,
-    variantJson: File = new File("engine.json"),
-    manifestJson: File = new File("manifest.json"),
-    stopAfterRead: Boolean = false,
-    stopAfterPrepare: Boolean = false,
-    skipSanityCheck: Boolean = false,
-    verbose: Boolean = false,
-    verbosity: Int = 0,
-    sparkKryo: Boolean = false,
-    scratchUri: Option[URI] = None,
-    jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+case class CommonArgs(batch: String = "",
+                      sparkPassThrough: Seq[String] = Seq(),
+                      driverPassThrough: Seq[String] = Seq(),
+                      pioHome: Option[String] = None,
+                      sparkHome: Option[String] = None,
+                      engineId: Option[String] = None,
+                      engineVersion: Option[String] = None,
+                      engineFactory: Option[String] = None,
+                      engineParamsKey: Option[String] = None,
+                      evaluation: Option[String] = None,
+                      engineParamsGenerator: Option[String] = None,
+                      variantJson: File = new File("engine.json"),
+                      manifestJson: File = new File("manifest.json"),
+                      stopAfterRead: Boolean = false,
+                      stopAfterPrepare: Boolean = false,
+                      skipSanityCheck: Boolean = false,
+                      verbose: Boolean = false,
+                      verbosity: Int = 0,
+                      sparkKryo: Boolean = false,
+                      scratchUri: Option[URI] = None,
+                      jsonExtractor: JsonExtractorOption =
+                        JsonExtractorOption.Both)
 
 case class BuildArgs(sbt: Option[File] = None,
                      sbtExtra: Option[String] = None,
@@ -248,8 +248,8 @@ object Console extends Logging {
           }, opt[String]("engine-params-key") action { (x, c) =>
             c.copy(common = c.common.copy(engineParamsKey = Some(x)))
           }, opt[String]("json-extractor") action { (x, c) =>
-            c.copy(common = c.common.copy(
-                      jsonExtractor = JsonExtractorOption.withName(x)))
+            c.copy(common = c.common.copy(jsonExtractor =
+                      JsonExtractorOption.withName(x)))
           } validate { x =>
             if (JsonExtractorOption.values.map(_.toString).contains(x)) {
               success
@@ -279,8 +279,8 @@ object Console extends Logging {
             c.copy(common = c.common.copy(batch = x))
           } text ("Batch label of the run."),
           opt[String]("json-extractor") action { (x, c) =>
-            c.copy(common = c.common.copy(
-                      jsonExtractor = JsonExtractorOption.withName(x)))
+            c.copy(common = c.common.copy(jsonExtractor =
+                      JsonExtractorOption.withName(x)))
           } validate { x =>
             if (JsonExtractorOption.values.map(_.toString).contains(x)) {
               success
@@ -332,8 +332,8 @@ object Console extends Logging {
           }, opt[String]("log-prefix") action { (x, c) =>
             c.copy(deploy = c.deploy.copy(logPrefix = Some(x)))
           }, opt[String]("json-extractor") action { (x, c) =>
-            c.copy(common = c.common.copy(
-                      jsonExtractor = JsonExtractorOption.withName(x)))
+            c.copy(common = c.common.copy(jsonExtractor =
+                      JsonExtractorOption.withName(x)))
           } validate { x =>
             if (JsonExtractorOption.values.map(_.toString).contains(x)) {
               success
@@ -522,8 +522,8 @@ object Console extends Logging {
                 c.copy(app = c.app.copy(name = x))
               }, arg[String]("[<event1> <event2> ...]") unbounded () optional
               () action { (x, c) =>
-                c.copy(accessKey = c.accessKey.copy(
-                          events = c.accessKey.events :+ x))
+                c.copy(accessKey =
+                      c.accessKey.copy(events = c.accessKey.events :+ x))
               }), cmd("list").text("List all access keys of an app.").action {
             (_, c) =>
               c.copy(commands = c.commands :+ "list")
@@ -924,12 +924,11 @@ object Console extends Logging {
     val allJarFiles = jarFiles.map(_.getCanonicalPath)
     val cmd =
       s"${getSparkHome(ca.common.sparkHome)}/bin/spark-submit --jars " +
-      s"${allJarFiles.mkString(",")} " +
-      (if (extraFiles.size > 0) {
-         s"--files ${extraFiles.mkString(",")} "
-       } else {
-         ""
-       }) + "--class " +
+      s"${allJarFiles.mkString(",")} " + (if (extraFiles.size > 0) {
+                                            s"--files ${extraFiles.mkString(",")} "
+                                          } else {
+                                            ""
+                                          }) + "--class " +
       s"${ca.mainClass.get} ${ca.common.sparkPassThrough.mkString(" ")} " +
       coreAssembly(ca.common.pioHome.get) + " " +
       ca.common.driverPassThrough.mkString(" ")

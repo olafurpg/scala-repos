@@ -63,7 +63,7 @@ object ScalaDirUtil {
 
   def skipWhiteSpaceAndComments(lexer: Lexer) {
     while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
-        lexer.getTokenType)) {
+               lexer.getTokenType)) {
       lexer.advance()
     }
   }

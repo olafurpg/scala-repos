@@ -120,7 +120,7 @@ private[math] object Elementary {
 
   def compareArrays(a: Array[Int], b: Array[Int], size: Int): Int = {
     var i: Int = size - 1
-    while ( (i >= 0) && (a(i) == b(i))) {
+    while ((i >= 0) && (a(i) == b(i))) {
       i -= 1
     }
     if (i < 0) BigInteger.EQUALS

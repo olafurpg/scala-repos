@@ -17,7 +17,8 @@ import java.util.{Collections => JCollections, Enumeration => JEnumeration}
   *  @author Lex Spoon
   */
 class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
-    extends ClassLoader(parent) with ScalaClassLoader {
+    extends ClassLoader(parent)
+    with ScalaClassLoader {
   protected def classNameToPath(name: String): String =
     if (name endsWith ".class") name
     else s"${name.replace('.', '/')}.class"

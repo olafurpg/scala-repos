@@ -54,8 +54,8 @@ trait CommitStatusService {
   def getCommitStatus(userName: String, repositoryName: String, id: Int)(
       implicit s: Session): Option[CommitStatus] =
     CommitStatuses
-      .filter(
-          t => t.byPrimaryKey(id) && t.byRepository(userName, repositoryName))
+      .filter(t =>
+            t.byPrimaryKey(id) && t.byRepository(userName, repositoryName))
       .firstOption
 
   def getCommitStatus(

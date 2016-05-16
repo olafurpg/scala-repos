@@ -17,7 +17,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class GroupsResourceTest
-    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
+    extends MarathonSpec
+    with Matchers
+    with Mockito
+    with GivenWhenThen {
   test("dry run update") {
     Given("A real Group Manager with no groups")
     useRealGroupManager()
@@ -261,8 +264,8 @@ class GroupsResourceTest
     auth = new TestAuthFixture
     config = mock[MarathonConf]
     groupManager = mock[GroupManager]
-    groupsResource = new GroupsResource(
-        groupManager, groupInfo, auth.auth, auth.auth, config)
+    groupsResource =
+      new GroupsResource(groupManager, groupInfo, auth.auth, auth.auth, config)
 
     config.zkTimeoutDuration returns 1.second
   }

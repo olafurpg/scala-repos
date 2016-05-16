@@ -37,7 +37,8 @@ import org.junit.experimental.categories.Category
   */
 @Category(Array(classOf[SlowTests]))
 class AllProjectHighlightingTest
-    extends ExternalSystemImportingTestCase with SbtStructureSetup {
+    extends ExternalSystemImportingTestCase
+    with SbtStructureSetup {
   override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
@@ -138,7 +139,7 @@ class AllProjectHighlightingTest
       }
 
       if ((index + 1) * 100 >= (percent + 1) * size) {
-        while ( (index + 1) * 100 >= (percent + 1) * size) percent += 1
+        while ((index + 1) * 100 >= (percent + 1) * size) percent += 1
         println(s"Analyzing... $percent%")
       }
 
@@ -167,8 +168,8 @@ class AllProjectHighlightingTest
     super.setUpInWriteAction()
     val projectDir: File = new File(getRootDir, getTestName(false))
     if (!projectDir.exists()) return
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
-        projectDir)
+    myProjectRoot =
+      LocalFileSystem.getInstance.refreshAndFindFileByIoFile(projectDir)
     setUpSbtLauncherAndStructure(myProject)
   }
 }

@@ -188,10 +188,8 @@ object FastEvalEngineWorkflow {
               }
           }
 
-          val unionAlgoPredicts: RDD[(QX, Seq[P])] = workflow.sc
-            .union(algoPredicts)
-            .groupByKey
-            .mapValues { ps =>
+          val unionAlgoPredicts: RDD[(QX, Seq[P])] =
+            workflow.sc.union(algoPredicts).groupByKey.mapValues { ps =>
               {
                 assert(ps.size == algoCount,
                        "Must have same length as algoCount")
@@ -199,7 +197,7 @@ object FastEvalEngineWorkflow {
                 ps.toSeq.sortBy(_._1).map(_._2)
               }
             }
-            (ex, unionAlgoPredicts)
+          (ex, unionAlgoPredicts)
         }
     }.seq.toMap
 

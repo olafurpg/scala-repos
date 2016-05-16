@@ -19,7 +19,9 @@ import java.util.Locale
   * Abstract journal, optimized for asynchronous, non-blocking writes.
   */
 trait AsyncWriteJournal
-    extends Actor with WriteJournalBase with AsyncRecovery {
+    extends Actor
+    with WriteJournalBase
+    with AsyncRecovery {
   import AsyncWriteJournal._
   import JournalProtocol._
   import context.dispatcher

@@ -44,7 +44,8 @@ object ORMultiMap {
 @SerialVersionUID(1L)
 final class ORMultiMap[A] private[akka](
     private[akka] val underlying: ORMap[ORSet[A]])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   override type T = ORMultiMap[A]
@@ -249,4 +250,5 @@ object ORMultiMapKey {
 
 @SerialVersionUID(1L)
 final case class ORMultiMapKey[A](_id: String)
-    extends Key[ORMultiMap[A]](_id) with ReplicatedDataSerialization
+    extends Key[ORMultiMap[A]](_id)
+    with ReplicatedDataSerialization

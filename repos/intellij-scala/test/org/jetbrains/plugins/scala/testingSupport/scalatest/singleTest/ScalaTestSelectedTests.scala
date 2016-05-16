@@ -7,6 +7,9 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.scopeTest.{WordSpecS
   * @since 22.01.2015.
   */
 trait ScalaTestSelectedTests
-    extends ScalaTestSingleTestTest with Spec2SingleTestTest
-    with FeatureSpecScopeTest with FreeSpecScopeTest with FunSpecScopeTest
+    extends ScalaTestSingleTestTest
+    with Spec2SingleTestTest
+    with FeatureSpecScopeTest
+    with FreeSpecScopeTest
+    with FunSpecScopeTest
     with WordSpecScopeTest {}

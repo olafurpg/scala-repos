@@ -503,7 +503,8 @@ histogram
 }
 
 class TestQueryExecutor(config: Configuration, testShard: TestShard)
-    extends JDBMQueryExecutor with IterableDatasetOpsComponent {
+    extends JDBMQueryExecutor
+    with IterableDatasetOpsComponent {
 
   override type Dataset[A] = IterableDataset[A]
 
@@ -520,18 +521,24 @@ class TestQueryExecutor(config: Configuration, testShard: TestShard)
     val idSource = new FreshAtomicIdSource
 
     object valueSerialization
-        extends SortSerialization[SValue] with SValueRunlengthFormatting
-        with BinarySValueFormatting with ZippedStreamSerialization
+        extends SortSerialization[SValue]
+        with SValueRunlengthFormatting
+        with BinarySValueFormatting
+        with ZippedStreamSerialization
     object eventSerialization
-        extends SortSerialization[SEvent] with SEventRunlengthFormatting
-        with BinarySValueFormatting with ZippedStreamSerialization
+        extends SortSerialization[SEvent]
+        with SEventRunlengthFormatting
+        with BinarySValueFormatting
+        with ZippedStreamSerialization
     object groupSerialization
         extends SortSerialization[(SValue, Identities, SValue)]
-        with GroupRunlengthFormatting with BinarySValueFormatting
+        with GroupRunlengthFormatting
+        with BinarySValueFormatting
         with ZippedStreamSerialization
     object memoSerialization
         extends IncrementalSerialization[(Identities, SValue)]
-        with SEventRunlengthFormatting with BinarySValueFormatting
+        with SEventRunlengthFormatting
+        with BinarySValueFormatting
         with ZippedStreamSerialization
 
     override lazy val flatMapTimeout: Duration = 5000 seconds
@@ -548,7 +555,8 @@ class TestQueryExecutor(config: Configuration, testShard: TestShard)
 }
 
 class TestShard(config: Configuration, dataDir: File)
-    extends ActorYggShard[IterableDataset] with StandaloneActorEcosystem {
+    extends ActorYggShard[IterableDataset]
+    with StandaloneActorEcosystem {
   type YggConfig = ProductionActorConfig
   lazy val yggConfig = new ProductionActorConfig {
     lazy val config = TestShard.this.config

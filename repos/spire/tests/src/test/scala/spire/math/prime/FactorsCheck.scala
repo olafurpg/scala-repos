@@ -18,7 +18,9 @@ import spire.math.ArbitrarySupport._
 import Ordinal._
 
 class FactorsCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   import Factors.{zero, one}
 

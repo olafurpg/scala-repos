@@ -27,8 +27,8 @@ object zipper {
 
     type Aux[Z, Out0] = Right[Z] { type Out = Out0 }
 
-    implicit def right[C, L <: HList, RH, RT <: HList, P]: Aux[
-        Zipper[C, L, RH :: RT, P], Zipper[C, RH :: L, RT, P]] =
+    implicit def right[C, L <: HList, RH, RT <: HList, P]
+      : Aux[Zipper[C, L, RH :: RT, P], Zipper[C, RH :: L, RT, P]] =
       new Right[Zipper[C, L, RH :: RT, P]] {
         type Out = Zipper[C, RH :: L, RT, P]
         def apply(z: Zipper[C, L, RH :: RT, P]) =
@@ -43,8 +43,8 @@ object zipper {
 
     type Aux[Z, Out0] = Left[Z] { type Out = Out0 }
 
-    implicit def left[C, LH, LT <: HList, R <: HList, P]: Aux[
-        Zipper[C, LH :: LT, R, P], Zipper[C, LT, LH :: R, P]] =
+    implicit def left[C, LH, LT <: HList, R <: HList, P]
+      : Aux[Zipper[C, LH :: LT, R, P], Zipper[C, LT, LH :: R, P]] =
       new Left[Zipper[C, LH :: LT, R, P]] {
         type Out = Zipper[C, LT, LH :: R, P]
         def apply(z: Zipper[C, LH :: LT, R, P]) =
@@ -198,9 +198,9 @@ object zipper {
 
     type Aux[Z, Out0] = Down[Z] { type Out = Out0 }
 
-    implicit def hlistDown[C, L <: HList, RH <: HList, RT <: HList, P]: Aux[
-        Zipper[C, L, RH :: RT, P],
-        Zipper[RH, HNil, RH, Some[Zipper[C, L, RH :: RT, P]]]] =
+    implicit def hlistDown[C, L <: HList, RH <: HList, RT <: HList, P]
+      : Aux[Zipper[C, L, RH :: RT, P],
+            Zipper[RH, HNil, RH, Some[Zipper[C, L, RH :: RT, P]]]] =
       new Down[Zipper[C, L, RH :: RT, P]] {
         type Out = Zipper[RH, HNil, RH, Some[Zipper[C, L, RH :: RT, P]]]
         def apply(z: Zipper[C, L, RH :: RT, P]) =
@@ -225,8 +225,8 @@ object zipper {
 
     type Aux[Z, Out0] = Root[Z] { type Out = Out0 }
 
-    implicit def rootRoot[C, L <: HList, R <: HList]: Aux[
-        Zipper[C, L, R, None.type], Zipper[C, L, R, None.type]] =
+    implicit def rootRoot[C, L <: HList, R <: HList]
+      : Aux[Zipper[C, L, R, None.type], Zipper[C, L, R, None.type]] =
       new Root[Zipper[C, L, R, None.type]] {
         type Out = Zipper[C, L, R, None.type]
         def apply(z: Zipper[C, L, R, None.type]) = z
@@ -248,8 +248,8 @@ object zipper {
 
     type Aux[Z, Out0] = Get[Z] { type Out = Out0 }
 
-    implicit def get[C, L <: HList, RH, RT <: HList, P]: Aux[
-        Zipper[C, L, RH :: RT, P], RH] =
+    implicit def get[C, L <: HList, RH, RT <: HList, P]
+      : Aux[Zipper[C, L, RH :: RT, P], RH] =
       new Get[Zipper[C, L, RH :: RT, P]] {
         type Out = RH
         def apply(z: Zipper[C, L, RH :: RT, P]) = z.suffix.head

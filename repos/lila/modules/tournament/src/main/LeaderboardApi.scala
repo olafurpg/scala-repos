@@ -52,7 +52,8 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
 
   private def paginator(
       user: User, page: Int, sort: BSONDocument): Fu[Paginator[TourEntry]] =
-    Paginator(adapter = new BSONAdapter[Entry](
+    Paginator(adapter =
+                new BSONAdapter[Entry](
                     collection = coll,
                     selector = BSONDocument("u" -> user.id),
                     projection = BSONDocument(),

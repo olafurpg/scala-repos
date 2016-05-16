@@ -53,7 +53,7 @@ object Akka {
     * @tparam T The class that implements the actor.
     * @return A provider for the actor.
     */
-  def providerOf[T <: Actor : ClassTag](
+  def providerOf[T <: Actor: ClassTag](
       name: String, props: Props => Props = identity): Provider[ActorRef] =
     new ActorRefProvider(name, props)
 
@@ -86,7 +86,7 @@ object Akka {
     * @tparam T The class that implements the actor.
     * @return A binding for the actor.
     */
-  def bindingOf[T <: Actor : ClassTag](
+  def bindingOf[T <: Actor: ClassTag](
       name: String, props: Props => Props = identity): Binding[ActorRef] =
     bind[ActorRef].qualifiedWith(name).to(providerOf[T](name, props)).eagerly()
 }
@@ -136,7 +136,7 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     *              configuration.
     * @tparam T The class that implements the actor.
     */
-  def bindActor[T <: Actor : ClassTag](
+  def bindActor[T <: Actor: ClassTag](
       name: String, props: Props => Props = identity): Unit = {
     accessBinder
       .bind(classOf[ActorRef])
@@ -194,8 +194,8 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     * @tparam ActorClass The class that implements the actor that the factory creates
     * @tparam FactoryClass The class of the actor factory
     */
-  def bindActorFactory[
-      ActorClass <: Actor : ClassTag, FactoryClass : ClassTag]: Unit = {
+  def bindActorFactory[ActorClass <: Actor: ClassTag, FactoryClass: ClassTag]
+    : Unit = {
     accessBinder.install(
         new FactoryModuleBuilder()
           .implement(classOf[Actor],
@@ -208,7 +208,7 @@ trait AkkaGuiceSupport { self: AbstractModule =>
 /**
   * Provider for creating actor refs
   */
-class ActorRefProvider[T <: Actor : ClassTag](
+class ActorRefProvider[T <: Actor: ClassTag](
     name: String, props: Props => Props)
     extends Provider[ActorRef] {
 

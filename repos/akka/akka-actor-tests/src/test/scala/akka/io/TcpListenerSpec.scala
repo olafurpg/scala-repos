@@ -172,7 +172,8 @@ class TcpListenerSpec extends AkkaSpec("""
       }
 
     private class ListenerParent(pullMode: Boolean)
-        extends Actor with ChannelRegistry {
+        extends Actor
+        with ChannelRegistry {
       val listener = context.actorOf(
           props = Props(classOf[TcpListener],
                         selectorRouter.ref,
@@ -180,7 +181,7 @@ class TcpListenerSpec extends AkkaSpec("""
                         this,
                         bindCommander.ref,
                         Bind(handler.ref, endpoint, 100, Nil, pullMode))
-              .withDeploy(Deploy.local),
+            .withDeploy(Deploy.local),
           name = "test-listener-" + counter.next())
       parent.watch(listener)
       def receive: Receive = {

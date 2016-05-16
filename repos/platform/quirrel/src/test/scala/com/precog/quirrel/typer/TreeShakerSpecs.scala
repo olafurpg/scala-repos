@@ -25,7 +25,9 @@ import org.specs2.mutable.Specification
 import com.codecommit.gll.LineStream
 
 object TreeShakerSpecs
-    extends Specification with StubPhases with TreeShaker
+    extends Specification
+    with StubPhases
+    with TreeShaker
     with RandomLibrarySpec {
   import ast._
 

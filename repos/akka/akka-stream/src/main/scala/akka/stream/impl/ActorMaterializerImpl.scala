@@ -304,7 +304,8 @@ private[akka] class SubFusingActorMaterializerImpl(
   * INTERNAL API
   */
 private[akka] object FlowNames
-    extends ExtensionId[FlowNames] with ExtensionIdProvider {
+    extends ExtensionId[FlowNames]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): FlowNames = super.get(system)
   override def lookup() = FlowNames
   override def createExtension(system: ExtendedActorSystem): FlowNames =
@@ -331,7 +332,8 @@ private[akka] object StreamSupervisor {
   def nextName(): String = actorName.next()
 
   final case class Materialize(props: Props, name: String)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 
   /** Testing purpose */
   case object GetChildren

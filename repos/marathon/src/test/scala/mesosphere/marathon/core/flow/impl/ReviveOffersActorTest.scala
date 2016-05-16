@@ -16,7 +16,9 @@ import rx.lang.scala.subjects.PublishSubject
 import scala.concurrent.duration._
 
 class ReviveOffersActorTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   test("do not do anything") {
     val f = new Fixture()
     When("the actor starts")
@@ -57,9 +59,9 @@ class ReviveOffersActorTest
   }
 
   for (reviveEvent <- Seq(
-      SchedulerReregisteredEvent("somemaster"),
-      SchedulerRegisteredEvent("frameworkid", "somemaster")
-  )) {
+                         SchedulerReregisteredEvent("somemaster"),
+                         SchedulerRegisteredEvent("frameworkid", "somemaster")
+                     )) {
     test(s"revive if offers wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -116,10 +118,10 @@ class ReviveOffersActorTest
   }
 
   for (reviveEvent <- Seq(
-      SchedulerReregisteredEvent("somemaster"),
-      SchedulerRegisteredEvent("frameworkid", "somemaster"),
-      ReviveOffersActor.TimedCheck
-  )) {
+                         SchedulerReregisteredEvent("somemaster"),
+                         SchedulerRegisteredEvent("frameworkid", "somemaster"),
+                         ReviveOffersActor.TimedCheck
+                     )) {
     test(s"DO NOT revive if offers NOT wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -314,7 +316,8 @@ class ReviveOffersActorTest
       val conf = new ReviveOffersConfig {
         override lazy val reviveOffersRepetitions = opt[Int](
             "revive_offers_repetitions",
-            descr = "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
+            descr =
+              "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
             default = Some(repetitions))
       }
       conf.afterInit()

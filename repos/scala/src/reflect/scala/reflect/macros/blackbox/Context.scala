@@ -34,8 +34,16 @@ package blackbox
   *  @see `scala.reflect.macros.whitebox.Context`
   */
 trait Context
-    extends Aliases with Enclosures with Names with Reifiers with FrontEnds
-    with Infrastructure with Typers with Parsers with Evals with ExprUtils
+    extends Aliases
+    with Enclosures
+    with Names
+    with Reifiers
+    with FrontEnds
+    with Infrastructure
+    with Typers
+    with Parsers
+    with Evals
+    with ExprUtils
     with Internals {
 
   /** The compile-time universe. */

@@ -74,7 +74,7 @@ object IngestSystem extends Logging {
       executor: ExecutionContext): Future[Unit] = {
     for {
       _ <- Future(logger.debug(config.logPrefix + " Stopping " + name +
-              " actor within " + config.stopTimeout.duration))
+                  " actor within " + config.stopTimeout.duration))
       b <- gracefulStop(actor, config.stopTimeout.duration)
     } yield {
       logger.debug(
@@ -116,20 +116,22 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
     val initialCheckpoint = loadCheckpoint()
 
     val ingestActor = for (checkpoint <- initialCheckpoint;
-    init <- initIngestActor(ingestActorSystem,
-                            routingActor,
-                            checkpoint,
-                            checkpointCoordination,
-                            permissionsFinder)) yield init
+                           init <- initIngestActor(ingestActorSystem,
+                                                   routingActor,
+                                                   checkpoint,
+                                                   checkpointCoordination,
+                                                   permissionsFinder)) yield
+      init
 
     val stoppable = Stoppable.fromFuture({
       import IngestSystem.actorStop
       logger.info("Stopping bifrost system")
       for {
         _ <- ingestActor map {
-          actorStop(yggConfig, _, "ingestActor")(ingestActorSystem,
-                                                 ingestActorSystem.dispatcher)
-        } getOrElse { Future(())(ingestActorSystem.dispatcher) }
+              actorStop(yggConfig, _, "ingestActor")(
+                  ingestActorSystem,
+                  ingestActorSystem.dispatcher)
+            } getOrElse { Future(())(ingestActorSystem.dispatcher) }
       } yield {
         ingestActorSystem.shutdown()
         logger.info("Shard system stopped.")

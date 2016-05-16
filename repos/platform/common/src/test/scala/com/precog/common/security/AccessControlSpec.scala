@@ -43,30 +43,30 @@ class AccessControlSpec extends Specification {
         apiKeyManager.newStandardAPIKeyRecord(userAccountId)
       val userAPIKey = userAPIKeyRecord.apiKey
 
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/user"),
+                             WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(
           userAPIKey,
           Set(ReducePermission(Path("/user"),
                                WrittenByAccount(userAccountId)))) must beTrue
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/other"),
-                            WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/other"),
+                             WrittenByAccount(userAccountId)))) must beTrue
       hasCapability(
           userAPIKey,
           Set(ReducePermission(Path("/other"),
                                WrittenByAccount(userAccountId)))) must beTrue
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(userAccountId)))) must beTrue
-      hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/"),
+                             WrittenByAccount(userAccountId)))) must beTrue
+      hasCapability(
+          userAPIKey,
+          Set(ReducePermission(Path("/"),
+                               WrittenByAccount(userAccountId)))) must beTrue
     }
 
     "prevent user accounts from reading/reducing others data" in {
@@ -77,10 +77,10 @@ class AccessControlSpec extends Specification {
 
       val otherAccountId = "other"
 
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/user"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
           userAPIKey,
           Set(ReducePermission(Path("/user"),
@@ -93,14 +93,14 @@ class AccessControlSpec extends Specification {
           userAPIKey,
           Set(ReducePermission(Path("/other"),
                                WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReducePermission(Path("/"),
+                               WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "allow user accounts to write/delete any data under their path" in {
@@ -162,10 +162,10 @@ class AccessControlSpec extends Specification {
         apiKeyManager.newStandardAPIKeyRecord(otherAccountId)
       val otherAPIKey = otherAPIKeyRecord.apiKey
 
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/user"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
           userAPIKey,
           Set(ReducePermission(Path("/user"),
@@ -178,14 +178,14 @@ class AccessControlSpec extends Specification {
           userAPIKey,
           Set(ReducePermission(Path("/other"),
                                WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReducePermission(Path("/"),
+                               WrittenByAccount(otherAccountId)))) must beFalse
 
       val readReduceOther = Set[Permission](
           ReadPermission(Path("/other"), WrittenByAccount(otherAccountId)),
@@ -197,10 +197,10 @@ class AccessControlSpec extends Specification {
             None, None, otherAPIKey, readReduceOther, userAPIKey)
         .get
 
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/user"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
       hasCapability(
           userAPIKey,
           Set(ReducePermission(Path("/user"),
@@ -213,14 +213,14 @@ class AccessControlSpec extends Specification {
           userAPIKey,
           Set(ReducePermission(Path("/other"),
                                WrittenByAccount(otherAccountId)))) must beTrue
-      hasCapability(userAPIKey,
-                    Set(ReadPermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
-      hasCapability(userAPIKey,
-                    Set(ReducePermission(
-                            Path("/"),
-                            WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReadPermission(Path("/"),
+                             WrittenByAccount(otherAccountId)))) must beFalse
+      hasCapability(
+          userAPIKey,
+          Set(ReducePermission(Path("/"),
+                               WrittenByAccount(otherAccountId)))) must beFalse
     }
 
     "allow user accounts to write/delete data under another accounts path via a grant" in {
@@ -295,10 +295,10 @@ class AccessControlSpec extends Specification {
           invalidAPIKey,
           Set(DeletePermission(Path("/"), WrittenByAny))) must beFalse
 
-      hasCapability(invalidAPIKey,
-                    Set(ReadPermission(
-                            Path("/user"),
-                            WrittenByAccount(userAccountId)))) must beFalse
+      hasCapability(
+          invalidAPIKey,
+          Set(ReadPermission(Path("/user"),
+                             WrittenByAccount(userAccountId)))) must beFalse
       hasCapability(
           invalidAPIKey,
           Set(ReducePermission(Path("/user"),

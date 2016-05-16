@@ -14,8 +14,12 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
 class HistoryActorTest
-    extends MarathonActorSupport with MarathonSpec with MockitoSugar
-    with BeforeAndAfterAll with Matchers with ImplicitSender {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with MockitoSugar
+    with BeforeAndAfterAll
+    with Matchers
+    with ImplicitSender {
   import org.apache.mesos.Protos.TaskState._
 
   var historyActor: ActorRef = _

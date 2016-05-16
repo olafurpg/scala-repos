@@ -56,7 +56,7 @@ object Hitbox {
     def streamsOnAir(streamers: List[Streamer]) = livestream.flatMap { s =>
       for {
         streamer <- StreamerList.findHitbox(streamers)(s.media_user_name)
-                       if s.media_is_live == "1"
+        if s.media_is_live == "1"
       } yield
         StreamOnAir(streamer = streamer,
                     name = s.media_status,
@@ -80,7 +80,7 @@ object Youtube {
     def streamsOnAir(streamers: List[Streamer]) = items.flatMap { item =>
       for {
         streamer <- StreamerList.findYoutube(streamers)(item.snippet.channelId)
-                       if item.snippet.liveBroadcastContent == "live"
+        if item.snippet.liveBroadcastContent == "live"
       } yield
         StreamOnAir(streamer = streamer,
                     name = item.snippet.title,

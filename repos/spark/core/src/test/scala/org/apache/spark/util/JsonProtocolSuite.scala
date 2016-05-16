@@ -91,8 +91,8 @@ class JsonProtocolSuite extends SparkFunSuite {
                                            hasOutput = true))
     val jobStart = {
       val stageIds = Seq[Int](1, 2, 3, 4)
-      val stageInfos = stageIds.map(
-          x => makeStageInfo(x, x * 200, x * 300, x * 400L, x * 500L))
+      val stageInfos = stageIds.map(x =>
+            makeStageInfo(x, x * 200, x * 300, x * 400L, x * 500L))
       SparkListenerJobStart(10, jobSubmissionTime, stageInfos, properties)
     }
     val jobEnd = SparkListenerJobEnd(20, jobCompletionTime, JobSucceeded)
@@ -133,17 +133,18 @@ class JsonProtocolSuite extends SparkFunSuite {
       SparkListenerExecutorRemoved(executorRemovedTime, "exec2", "test reason")
     val executorMetricsUpdate = {
       // Use custom accum ID for determinism
-      val accumUpdates = makeTaskMetrics(
-          300L,
-          400L,
-          500L,
-          600L,
-          700,
-          800,
-          hasHadoopInput = true,
-          hasOutput = true).accumulatorUpdates().zipWithIndex.map {
-        case (a, i) => a.copy(id = i)
-      }
+      val accumUpdates =
+        makeTaskMetrics(300L,
+                        400L,
+                        500L,
+                        600L,
+                        700,
+                        800,
+                        hasHadoopInput = true,
+                        hasOutput =
+                          true).accumulatorUpdates().zipWithIndex.map {
+          case (a, i) => a.copy(id = i)
+        }
       SparkListenerExecutorMetricsUpdate(
           "exec3", Seq((1L, 2, 3, accumUpdates)))
     }
@@ -722,18 +723,15 @@ private[spark] object JsonProtocolSuite extends Assertions {
             e2: SparkListenerExecutorMetricsUpdate) =>
         assert(e1.execId === e2.execId)
         assertSeqEquals[(Long, Int, Int, Seq[AccumulableInfo])](
-            e1.accumUpdates,
-            e2.accumUpdates,
-            (a, b) =>
-              {
-                val (taskId1, stageId1, stageAttemptId1, updates1) = a
-                val (taskId2, stageId2, stageAttemptId2, updates2) = b
-                assert(taskId1 === taskId2)
-                assert(stageId1 === stageId2)
-                assert(stageAttemptId1 === stageAttemptId2)
-                assertSeqEquals[AccumulableInfo](
-                    updates1, updates2, (a, b) => a.equals(b))
-            })
+            e1.accumUpdates, e2.accumUpdates, (a, b) => {
+          val (taskId1, stageId1, stageAttemptId1, updates1) = a
+          val (taskId2, stageId2, stageAttemptId2, updates2) = b
+          assert(taskId1 === taskId2)
+          assert(stageId1 === stageId2)
+          assert(stageAttemptId1 === stageAttemptId2)
+          assertSeqEquals[AccumulableInfo](
+              updates1, updates2, (a, b) => a.equals(b))
+        })
       case (e1, e2) =>
         assert(e1 === e2)
       case _ => fail("Events don't match in types!")
@@ -1020,11 +1018,11 @@ private[spark] object JsonProtocolSuite extends Assertions {
     taskInfo
   }
 
-  private def makeAccumulableInfo(
-      id: Int,
-      internal: Boolean = false,
-      countFailedValues: Boolean = false,
-      metadata: Option[String] = None): AccumulableInfo =
+  private def makeAccumulableInfo(id: Int,
+                                  internal: Boolean = false,
+                                  countFailedValues: Boolean = false,
+                                  metadata: Option[String] =
+                                    None): AccumulableInfo =
     new AccumulableInfo(id,
                         Some(s"Accumulable$id"),
                         Some(s"delta$id"),
@@ -1081,8 +1079,7 @@ private[spark] object JsonProtocolSuite extends Assertions {
       sw.incRecordsWritten(if (hasRecords) (a + b + c) / 100 else -1)
     }
     // Make at most 6 blocks
-    t.setUpdatedBlockStatuses(
-        (1 to (e % 5 + 1)).map { i =>
+    t.setUpdatedBlockStatuses((1 to (e % 5 + 1)).map { i =>
       (RDDBlockId(e % i, f % i),
        BlockStatus(StorageLevel.MEMORY_AND_DISK_SER_2, a % i, b % i))
     }.toSeq)

@@ -40,8 +40,8 @@ trait CacheApi {
     * @param expiration expiration period in seconds.
     * @param orElse The default function to invoke if the value was not found in cache.
     */
-  def getOrElse[A : ClassTag](
-      key: String, expiration: Duration = Duration.Inf)(orElse: => A): A
+  def getOrElse[A: ClassTag](key: String, expiration: Duration = Duration.Inf)(
+      orElse: => A): A
 
   /**
     * Retrieve a value from the cache for the given type
@@ -49,7 +49,7 @@ trait CacheApi {
     * @param key Item key.
     * @return result as Option[T]
     */
-  def get[T : ClassTag](key: String): Option[T]
+  def get[T: ClassTag](key: String): Option[T]
 }
 
 /**
@@ -122,8 +122,8 @@ object Cache {
     * @param orElse The default function to invoke if the value was not found in cache.
     */
   @deprecated("Inject CacheApi into your component", "2.5.0")
-  def getOrElse[A](key: String, expiration: Int)(orElse: => A)(
-      implicit app: Application, ct: ClassTag[A]): A = {
+  def getOrElse[A](key: String, expiration: Int)(
+      orElse: => A)(implicit app: Application, ct: ClassTag[A]): A = {
     getOrElse(key, intToDuration(expiration))(orElse)
   }
 
@@ -199,7 +199,7 @@ class EhCacheModule extends Module {
           bind[Cached]
             .qualifiedWith(namedCache)
             .to(new NamedCachedProvider(cacheApiKey))
-        )
+      )
     }
 
     Seq(
@@ -306,8 +306,7 @@ class EhCacheApi @Inject()(cache: Ehcache) extends CacheApi {
       .asInstanceOf[Option[T]]
   }
 
-  def getOrElse[A : ClassTag](key: String, expiration: Duration)(
-      orElse: => A) = {
+  def getOrElse[A: ClassTag](key: String, expiration: Duration)(orElse: => A) = {
     get[A](key).getOrElse {
       val value = orElse
       set(key, value, expiration)

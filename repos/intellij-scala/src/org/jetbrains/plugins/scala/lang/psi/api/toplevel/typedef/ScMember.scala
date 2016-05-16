@@ -25,7 +25,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 04.05.2008
   */
 trait ScMember
-    extends ScalaPsiElement with ScModifierListOwner with PsiMember {
+    extends ScalaPsiElement
+    with ScModifierListOwner
+    with PsiMember {
   def getContainingClass: PsiClass = containingClass
 
   def isPrivate: Boolean = hasModifierPropertyScala("private")

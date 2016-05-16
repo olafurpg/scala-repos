@@ -13,7 +13,8 @@ private[tests] trait CoreTestDefs
   /** Ask the presentation compiler for completion at all locations
     * (in all sources) where the defined `marker` is found. */
   class TypeCompletionAction(override val compiler: Global)
-      extends PresentationCompilerTestDef with AskTypeCompletionAt {
+      extends PresentationCompilerTestDef
+      with AskTypeCompletionAt {
 
     override def runTest() {
       askAllSources(TypeCompletionMarker) { pos =>
@@ -39,7 +40,8 @@ private[tests] trait CoreTestDefs
   /** Ask the presentation compiler for completion at all locations
     * (in all sources) where the defined `marker` is found. */
   class ScopeCompletionAction(override val compiler: Global)
-      extends PresentationCompilerTestDef with AskScopeCompletionAt {
+      extends PresentationCompilerTestDef
+      with AskScopeCompletionAt {
 
     override def runTest() {
       askAllSources(ScopeCompletionMarker) { pos =>
@@ -69,7 +71,8 @@ private[tests] trait CoreTestDefs
   /** Ask the presentation compiler for type info at all locations
     * (in all sources) where the defined `marker` is found. */
   class TypeAction(override val compiler: Global)
-      extends PresentationCompilerTestDef with AskTypeAt {
+      extends PresentationCompilerTestDef
+      with AskTypeAt {
 
     override def runTest() {
       askAllSources(TypeMarker) { pos =>
@@ -86,7 +89,8 @@ private[tests] trait CoreTestDefs
   /** Ask the presentation compiler for hyperlink at all locations
     * (in all sources) where the defined `marker` is found. */
   class HyperlinkAction(override val compiler: Global)
-      extends PresentationCompilerTestDef with AskTypeAt
+      extends PresentationCompilerTestDef
+      with AskTypeAt
       with AskTypeCompletionAt {
 
     override def runTest() {

@@ -305,8 +305,8 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
       .take(nrOfMsgToSend)
       .foreach(x ⇒ data.target.get.tell(x.message, x.sender))
 
-    data.copy(
-        queue = queue.drop(nrOfMsgToSend),
-        callsLeftInThisPeriod = data.callsLeftInThisPeriod - nrOfMsgToSend)
+    data.copy(queue = queue.drop(nrOfMsgToSend),
+              callsLeftInThisPeriod =
+                data.callsLeftInThisPeriod - nrOfMsgToSend)
   }
 }

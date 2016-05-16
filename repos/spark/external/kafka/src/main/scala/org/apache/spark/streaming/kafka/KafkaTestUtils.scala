@@ -115,18 +115,13 @@ private[kafka] class KafkaTestUtils extends Logging {
     assert(zkReady, "Zookeeper should be set up beforehand")
 
     // Kafka broker startup
-    Utils.startServiceOnPort(
-        brokerPort,
-        port =>
-          {
-            brokerPort = port
-            brokerConf = new KafkaConfig(brokerConfiguration)
-            server = new KafkaServer(brokerConf)
-            server.startup()
-            (server, port)
-        },
-        new SparkConf(),
-        "KafkaBroker")
+    Utils.startServiceOnPort(brokerPort, port => {
+      brokerPort = port
+      brokerConf = new KafkaConfig(brokerConfiguration)
+      server = new KafkaServer(brokerConf)
+      server.startup()
+      (server, port)
+    }, new SparkConf(), "KafkaBroker")
 
     brokerReady = true
   }
@@ -195,8 +190,8 @@ private[kafka] class KafkaTestUtils extends Logging {
 
   /** Send the array of messages to the Kafka broker */
   def sendMessages(topic: String, messages: Array[String]): Unit = {
-    producer = new Producer[String, String](
-        new ProducerConfig(producerConfiguration))
+    producer =
+      new Producer[String, String](new ProducerConfig(producerConfiguration))
     producer.send(
         messages.map { new KeyedMessage[String, String](topic, _) }: _*)
     producer.close()

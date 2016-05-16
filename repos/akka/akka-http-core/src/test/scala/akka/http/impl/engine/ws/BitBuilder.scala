@@ -45,7 +45,8 @@ final case class Bits(elements: Seq[Bits.BitElement]) {
             val remainingBits = bits - numBits
             val highestNBits = value >> remainingBits
             val lowestNBitMask = (~(0xff << numBits) & 0xff)
-            data(byteIdx) = (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
+            data(byteIdx) =
+              (data(byteIdx) | (highestNBits & lowestNBitMask)).toByte
 
             if (remainingBits > 0)
               rec(byteIdx + 1, 0, Multibit(remainingBits, value) +: rest)

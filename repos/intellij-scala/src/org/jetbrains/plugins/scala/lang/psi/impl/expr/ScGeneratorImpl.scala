@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, _}
   * Date: 07.03.2008
   */
 class ScGeneratorImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScGenerator {
+    extends ScalaPsiElementImpl(node)
+    with ScGenerator {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

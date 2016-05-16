@@ -48,7 +48,8 @@ private[sql] abstract class BaseWriterContainer(
     @transient val relation: WriteRelation,
     @transient private val job: Job,
     isAppend: Boolean)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   protected val dataSchema = relation.dataSchema
 

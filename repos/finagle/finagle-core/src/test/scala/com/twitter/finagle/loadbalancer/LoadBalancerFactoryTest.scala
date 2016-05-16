@@ -15,7 +15,10 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class LoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer with Eventually
+    extends FunSuite
+    with StringClient
+    with StringServer
+    with Eventually
     with IntegrationPatience {
   val echoService = Service.mk[String, String](Future.value(_))
 
@@ -101,7 +104,9 @@ class LoadBalancerFactoryTest
 
 @RunWith(classOf[JUnitRunner])
 class ConcurrentLoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer {
+    extends FunSuite
+    with StringClient
+    with StringServer {
   val echoService = Service.mk[String, String](Future.value(_))
 
   test("makes service factory stack") {

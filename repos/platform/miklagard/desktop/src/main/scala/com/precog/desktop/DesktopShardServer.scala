@@ -36,7 +36,8 @@ import com.precog.bifrost.nihdb.NIHDBQueryExecutorComponent
 import com.precog.standalone.StandaloneShardServer
 
 object DesktopShardServer
-    extends StandaloneShardServer with NIHDBQueryExecutorComponent {
+    extends StandaloneShardServer
+    with NIHDBQueryExecutorComponent {
   val caveatMessage = None
 
   val actorSystem = ActorSystem("desktopExecutorActorSystem")

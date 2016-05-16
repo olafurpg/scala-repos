@@ -99,11 +99,13 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
       clock: Clock,
       storageTimeout: Duration = Duration(30, TimeUnit.SECONDS),
       resourceTimeout: Timeout = Timeout(10, TimeUnit.SECONDS))
-      extends Actor with Logging {
+      extends Actor
+      with Logging {
     import SchedulingActor._
 
-    private[this] final implicit val scheduleOrder: Ordering[
-        (DateTime, ScheduledTask)] = Ordering.by(_._1.getMillis)
+    private[this] final implicit val scheduleOrder: Ordering[(DateTime,
+                                                              ScheduledTask)] =
+      Ordering.by(_._1.getMillis)
 
     private[this] implicit val M: Monad[Future] = new FutureMonad(
         context.dispatcher)
@@ -149,8 +151,8 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
         val delay = Duration(new JodaDuration(new DateTime, head._1).getMillis,
                              TimeUnit.MILLISECONDS)
 
-        scheduledAwake = Some(
-            context.system.scheduler.scheduleOnce(delay, self, WakeForRun))
+        scheduledAwake =
+          Some(context.system.scheduler.scheduleOnce(delay, self, WakeForRun))
       }
     }
 
@@ -209,22 +211,22 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
         implicit val readTimeout = resourceTimeout
 
         // This cannot occur inside a Future, or we would be exposing Actor state outside of this thread
-        running +=
-        ((task.source, task.sink) -> TaskInProgress(task, startedAt))
+        running += ((task.source, task.sink) -> TaskInProgress(task, startedAt))
 
         val execution = for {
           basePath <- EitherT(
-              M point {
-            task.source.prefix \/> invalidState(
-                "Path %s cannot be relativized.".format(task.source.path))
-          })
+                         M point {
+                       task.source.prefix \/> invalidState(
+                           "Path %s cannot be relativized.".format(
+                               task.source.path))
+                     })
           cachingResult <- platform.vfs.executeAndCache(
-              platform,
-              basePath,
-              task.context,
-              QueryOptions(timeout = task.timeout),
-              Some(task.sink),
-              Some(task.taskName))
+                              platform,
+                              basePath,
+                              task.context,
+                              QueryOptions(timeout = task.timeout),
+                              Some(task.sink),
+                              Some(task.taskName))
         } yield cachingResult
 
         execution.fold[Future[PrecogUnit]](
@@ -238,30 +240,29 @@ trait SchedulingActorModule extends SecureVFSModule[Future, Slice] {
                                        0,
                                        Some(failure.toString)): PrecogUnit
             },
-            storedQueryResult =>
-              {
-                consumeStream(0, storedQueryResult.data) map { totalSize =>
-                  ourself ! TaskComplete(task.id, clock.now(), totalSize, None)
-                  PrecogUnit
-                } recoverWith {
-                  case t: Throwable =>
-                    for {
-                      _ <- storedQueryResult.cachingJob.traverse {
-                        jobId =>
-                          jobManager.abort(jobId, t.getMessage) map {
-                            case Right(jobAbortSuccess) =>
-                              ourself ! TaskComplete(
-                                  task.id,
-                                  clock.now(),
-                                  0,
-                                  Option(t.getMessage) orElse Some(
-                                      t.getClass.toString))
-                            case Left(jobAbortFailure) =>
-                              sys.error(jobAbortFailure.toString)
-                          }
-                      }
-                    } yield PrecogUnit
-                }
+            storedQueryResult => {
+              consumeStream(0, storedQueryResult.data) map { totalSize =>
+                ourself ! TaskComplete(task.id, clock.now(), totalSize, None)
+                PrecogUnit
+              } recoverWith {
+                case t: Throwable =>
+                  for {
+                    _ <- storedQueryResult.cachingJob.traverse {
+                          jobId =>
+                            jobManager.abort(jobId, t.getMessage) map {
+                              case Right(jobAbortSuccess) =>
+                                ourself ! TaskComplete(
+                                    task.id,
+                                    clock.now(),
+                                    0,
+                                    Option(t.getMessage) orElse Some(
+                                        t.getClass.toString))
+                              case Left(jobAbortFailure) =>
+                                sys.error(jobAbortFailure.toString)
+                            }
+                        }
+                  } yield PrecogUnit
+              }
             }
         ) flatMap {
           identity[Future[PrecogUnit]]

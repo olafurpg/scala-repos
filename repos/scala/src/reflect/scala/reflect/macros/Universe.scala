@@ -60,13 +60,13 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  Replaces an existing payload of the same type, if exists.
       *  Returns the symbol itself.
       */
-    def updateAttachment[T : ClassTag](
+    def updateAttachment[T: ClassTag](
         symbol: Symbol, attachment: T): symbol.type
 
     /** Update the attachment with the payload of the given class type `T` removed.
       *  Returns the symbol itself.
       */
-    def removeAttachment[T : ClassTag](symbol: Symbol): symbol.type
+    def removeAttachment[T: ClassTag](symbol: Symbol): symbol.type
 
     /** Sets the `owner` of the symbol. */
     def setOwner(symbol: Symbol, newowner: Symbol): symbol.type
@@ -96,12 +96,12 @@ abstract class Universe extends scala.reflect.api.Universe {
       *  Replaces an existing payload of the same type, if exists.
       *  Returns the tree itself.
       */
-    def updateAttachment[T : ClassTag](tree: Tree, attachment: T): tree.type
+    def updateAttachment[T: ClassTag](tree: Tree, attachment: T): tree.type
 
     /** Update the attachment with the payload of the given class type `T` removed.
       *  Returns the tree itself.
       */
-    def removeAttachment[T : ClassTag](tree: Tree): tree.type
+    def removeAttachment[T: ClassTag](tree: Tree): tree.type
 
     /** Sets the `pos` of the tree. Returns the tree itself. */
     def setPos(tree: Tree, newpos: Position): tree.type
@@ -194,11 +194,11 @@ abstract class Universe extends scala.reflect.api.Universe {
           internal.attachments(tree)
 
         /** @see [[internal.updateAttachment]] */
-        def updateAttachment[A : ClassTag](attachment: A): tree.type =
+        def updateAttachment[A: ClassTag](attachment: A): tree.type =
           internal.updateAttachment(tree, attachment)
 
         /** @see [[internal.removeAttachment]] */
-        def removeAttachment[A : ClassTag]: T =
+        def removeAttachment[A: ClassTag]: T =
           internal.removeAttachment[A](tree)
 
         /** @see [[internal.setPos]] */
@@ -240,11 +240,11 @@ abstract class Universe extends scala.reflect.api.Universe {
           internal.attachments(symbol)
 
         /** @see [[internal.updateAttachment]] */
-        def updateAttachment[A : ClassTag](attachment: A): T =
+        def updateAttachment[A: ClassTag](attachment: A): T =
           internal.updateAttachment(symbol, attachment)
 
         /** @see [[internal.removeAttachment]] */
-        def removeAttachment[A : ClassTag]: T =
+        def removeAttachment[A: ClassTag]: T =
           internal.removeAttachment[A](symbol)
 
         /** @see [[internal.setOwner]] */
@@ -383,14 +383,14 @@ abstract class Universe extends scala.reflect.api.Universe {
       @deprecated(
           "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
-      def updateAttachment[T : ClassTag](attachment: T): Symbol =
+      def updateAttachment[T: ClassTag](attachment: T): Symbol =
         internal.updateAttachment[T](symbol, attachment)
 
       /** @see [[InternalMacroApi.removeAttachment]] */
       @deprecated(
           "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
-      def removeAttachment[T : ClassTag]: Symbol =
+      def removeAttachment[T: ClassTag]: Symbol =
         internal.removeAttachment[T](symbol)
 
       /** @see [[InternalMacroApi.setInfo]] */
@@ -434,14 +434,14 @@ abstract class Universe extends scala.reflect.api.Universe {
       @deprecated(
           "Use `internal.updateAttachment` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
-      def updateAttachment[T : ClassTag](attachment: T): Tree =
+      def updateAttachment[T: ClassTag](attachment: T): Tree =
         internal.updateAttachment[T](tree, attachment)
 
       /** @see [[InternalMacroApi.removeAttachment]] */
       @deprecated(
           "Use `internal.removeAttachment` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
-      def removeAttachment[T : ClassTag]: Tree =
+      def removeAttachment[T: ClassTag]: Tree =
         internal.removeAttachment[T](tree)
 
       /** @see [[InternalMacroApi.setPos]] */

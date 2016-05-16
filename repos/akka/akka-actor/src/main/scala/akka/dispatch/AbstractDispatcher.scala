@@ -92,7 +92,8 @@ private[akka] object MessageDispatcher {
 
 abstract class MessageDispatcher(
     val configurator: MessageDispatcherConfigurator)
-    extends AbstractMessageDispatcher with BatchingExecutor
+    extends AbstractMessageDispatcher
+    with BatchingExecutor
     with ExecutionContextExecutor {
 
   import AbstractMessageDispatcher.{inhabitantsOffset, shutdownScheduleOffset}

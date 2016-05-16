@@ -47,7 +47,9 @@ import org.streum.configrity.Configuration
 import scalaz._
 
 object NIHDBShardServer
-    extends BlueEyesServer with ShardService with NIHDBQueryExecutorComponent {
+    extends BlueEyesServer
+    with ShardService
+    with NIHDBQueryExecutorComponent {
   import WebJobManager._
 
   val clock = Clock.System

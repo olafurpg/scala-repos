@@ -97,7 +97,8 @@ object FSM {
     private implicit val executionContext = context.dispatcher
 
     def schedule(actor: ActorRef, timeout: FiniteDuration): Unit =
-      ref = Some(if (repeat) scheduler.schedule(timeout, timeout, actor, this)
+      ref = Some(
+          if (repeat) scheduler.schedule(timeout, timeout, actor, this)
           else scheduler.scheduleOnce(timeout, actor, this))
 
     def cancel(): Unit =

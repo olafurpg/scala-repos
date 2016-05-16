@@ -38,12 +38,13 @@ object Generated {
   private[puzzle] def fenOf(moves: Seq[String]): Try[String] =
     (moves.init.foldLeft(Try(Game(chess.variant.Standard))) {
       case (game, moveStr) =>
-        game flatMap { g =>
-          (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
-                case Uci.Move(orig, dest, prom) =>
-                  g(orig, dest, prom) map (_._1)
-              })
-            .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
+        game flatMap {
+          g =>
+            (Uci.Move(moveStr) toValid s"Invalid UCI move $moveStr" flatMap {
+                  case Uci.Move(orig, dest, prom) =>
+                    g(orig, dest, prom) map (_._1)
+                })
+              .fold(errs => Failure(new Exception(errs.shows)), Success.apply)
         }
     }) map { game =>
       Forsyth >> Forsyth.SituationPlus(game.situation, moves.size / 2)

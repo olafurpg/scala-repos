@@ -26,8 +26,8 @@ private[changeSignature] object ConflictsUtil {
                                 map: ConflictsMap): Unit = {
     change match {
       case sc: ScalaChangeInfo
-          if sc.newParameters.exists(
-              p => p.isByName && p.scType.isInstanceOf[ValType]) =>
+          if sc.newParameters.exists(p =>
+                p.isByName && p.scType.isInstanceOf[ValType]) =>
         val message =
           s"This method has java overriders, by-name parameters of value classes cannot be used."
         map.putValue(info.getElement, message)

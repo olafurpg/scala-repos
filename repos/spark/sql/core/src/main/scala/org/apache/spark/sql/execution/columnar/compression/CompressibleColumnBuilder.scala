@@ -41,7 +41,8 @@ import org.apache.spark.sql.types.AtomicType
   * }}}
   */
 private[columnar] trait CompressibleColumnBuilder[T <: AtomicType]
-    extends ColumnBuilder with Logging {
+    extends ColumnBuilder
+    with Logging {
 
   this: NativeColumnBuilder[T] with WithCompressionSchemes =>
 
@@ -50,11 +51,12 @@ private[columnar] trait CompressibleColumnBuilder[T <: AtomicType]
   abstract override def initialize(
       initialSize: Int, columnName: String, useCompression: Boolean): Unit = {
 
-    compressionEncoders = if (useCompression) {
-      schemes.filter(_.supports(columnType)).map(_.encoder[T](columnType))
-    } else {
-      Seq(PassThrough.encoder(columnType))
-    }
+    compressionEncoders =
+      if (useCompression) {
+        schemes.filter(_.supports(columnType)).map(_.encoder[T](columnType))
+      } else {
+        Seq(PassThrough.encoder(columnType))
+      }
     super.initialize(initialSize, columnName, useCompression)
   }
 

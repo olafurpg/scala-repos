@@ -148,7 +148,7 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
       logInfo(
           "Waiting for all received blocks to be consumed for job generation")
       while (!hasTimedOut &&
-      jobScheduler.receiverTracker.hasUnallocatedBlocks) {
+             jobScheduler.receiverTracker.hasUnallocatedBlocks) {
         Thread.sleep(pollTime)
       }
       logInfo(
@@ -324,8 +324,8 @@ private[streaming] class JobGenerator(jobScheduler: JobScheduler)
 
   /** Perform checkpoint for the give `time`. */
   private def doCheckpoint(time: Time, clearCheckpointDataLater: Boolean) {
-    if (shouldCheckpoint && (time - graph.zeroTime).isMultipleOf(
-            ssc.checkpointDuration)) {
+    if (shouldCheckpoint &&
+        (time - graph.zeroTime).isMultipleOf(ssc.checkpointDuration)) {
       logInfo("Checkpointing graph for time " + time)
       ssc.graph.updateCheckpointData(time)
       checkpointWriter.write(

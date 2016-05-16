@@ -81,12 +81,11 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
       forAll(isDigit)
     }
     "provide an aNumber parser - returning an Int if succeeding" in {
-      val number: String => Boolean = (s: String) =>
-        {
-          aNumber(s) match {
-            case Success(x, y) => s must beMatching("(?s)\\p{Nd}+.*")
-            case _ => true
-          }
+      val number: String => Boolean = (s: String) => {
+        aNumber(s) match {
+          case Success(x, y) => s must beMatching("(?s)\\p{Nd}+.*")
+          case _ => true
+        }
       }
       forAll(number)
     }
@@ -148,7 +147,8 @@ object CombParserHelpersSpec extends Specification with ScalaCheck {
 object AbcdStringGen {
   implicit def abcdString =
     for (len <- choose(4, 4);
-    string <- pick(len, List("a", "b", "c", "d"))) yield string.mkString("")
+         string <- pick(len, List("a", "b", "c", "d"))) yield
+      string.mkString("")
 
   def pickN(n: Int, elems: List[String]) =
     Arbitrary { for (string <- pick(n, elems)) yield string.mkString("") }
@@ -157,11 +157,11 @@ object AbcdStringGen {
 object WhiteStringGen {
   def genWhite =
     for (len <- choose(1, 4);
-    string <- listOfN(len,
-                      frequency((1, Gen.const(" ")),
-                                (1, Gen.const("\t")),
-                                (1, Gen.const("\r")),
-                                (1, Gen.const("\n"))))) yield
+         string <- listOfN(len,
+                           frequency((1, Gen.const(" ")),
+                                     (1, Gen.const("\t")),
+                                     (1, Gen.const("\r")),
+                                     (1, Gen.const("\n"))))) yield
       string.mkString("")
 
   implicit def genWhiteString: Arbitrary[String] =
@@ -173,10 +173,10 @@ object StringWithWhiteGen {
 
   def genStringWithWhite =
     for (len <- choose(1, 4);
-    string <- listOfN(len,
-                      frequency((1, Gen.const("a")),
-                                (2, Gen.const("b")),
-                                (1, genWhite)))) yield string.mkString("")
+         string <- listOfN(len,
+                           frequency((1, Gen.const("a")),
+                                     (2, Gen.const("b")),
+                                     (1, genWhite)))) yield string.mkString("")
 
   implicit def genString: Arbitrary[String] =
     Arbitrary { genStringWithWhite }

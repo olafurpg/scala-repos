@@ -13,7 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMem
   * Date: 22.02.2008
   */
 trait ScClassParameter
-    extends ScParameter with ScModifierListOwner with ScMember {
+    extends ScParameter
+    with ScModifierListOwner
+    with ScMember {
   def isVal: Boolean
   def isVar: Boolean
   def isPrivateThis: Boolean

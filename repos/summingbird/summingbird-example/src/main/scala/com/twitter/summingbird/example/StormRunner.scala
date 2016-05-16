@@ -129,7 +129,7 @@ object StormRunner {
             .set(FlatMapParallelism(80))
             .set(SourceParallelism(16))
             .set(CacheSize(100))
-        )
+      )
       override def graph = wordCount[Storm](spout, storeSupplier)
     }
   }

@@ -200,8 +200,7 @@ object SessionSettings {
   def saveSomeSettings(s: State)(include: ProjectRef => Boolean): State =
     withSettings(s) { session =>
       val newSettings = for ((ref, settings) <- session.append
-                                                   if settings.nonEmpty &&
-                                               include(ref)) yield {
+                             if settings.nonEmpty && include(ref)) yield {
         val (news, olds) = writeSettings(
             ref, settings.toList, session.original, Project.structure(s))
         (ref -> news, olds)
@@ -271,10 +270,8 @@ object SessionSettings {
       ((List[SessionSetting](), adjusted.size + 1) /: newSettings) {
         case ((acc, line), (s, newLines)) =>
           val endLine = line + newLines.size
-          (
-              (s withPos RangePosition(path, LineRange(line, endLine)),
-               newLines) :: acc,
-              endLine + 1)
+          ((s withPos RangePosition(path, LineRange(line, endLine)), newLines) :: acc,
+           endLine + 1)
       }
     (newWithPos.reverse, other ++ oldShifted)
   }
@@ -362,8 +359,8 @@ save, save-all
             "clear-all" ^^^ new Clear(true)) | remove)
 
   lazy val remove =
-    token("remove") ~> token(Space) ~> natSelect.map(
-        ranges => new Remove(ranges))
+    token("remove") ~> token(Space) ~> natSelect.map(ranges =>
+          new Remove(ranges))
 
   def natSelect = rep1sep(token(range, "<range>"), ',')
 

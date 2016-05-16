@@ -42,7 +42,9 @@ object ScatterGatherFirstCompletedSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ScatterGatherFirstCompletedSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec
+    with DefaultTimeout
+    with ImplicitSender {
   import ScatterGatherFirstCompletedSpec._
 
   "Scatter-gather group" must {

@@ -9,10 +9,9 @@ import spire.tests._
 
 class BitStringTest extends SpireTests {
 
-  case class I[A : BitString](
-      b: A, bc: Int, hob: A, lob: A, nlz: Int, ntz: Int)
+  case class I[A: BitString](b: A, bc: Int, hob: A, lob: A, nlz: Int, ntz: Int)
 
-  def testCases[A : BitString](cases: List[I[A]]): Unit =
+  def testCases[A: BitString](cases: List[I[A]]): Unit =
     cases.foreach { expected =>
       val b = expected.b
       val found = I(
@@ -95,8 +94,12 @@ class BitStringTest extends SpireTests {
             0) :: I(65535L, 16, 32768L, 1L, 48, 0) :: I(
             65535L, 16, 32768L, 1L, 48, 0) :: I(
             293859800L, 14, 268435456L, 8L, 35, 3) :: I(
-            2147483647L, 31, 1073741824L, 1L, 33, 0) :: I(
-            2147483648L, 1, 2147483648L, 2147483648L, 32, 31) :: I(4294967295L,
+            2147483647L, 31, 1073741824L, 1L, 33, 0) :: I(2147483648L,
+                                                          1,
+                                                          2147483648L,
+                                                          2147483648L,
+                                                          32,
+                                                          31) :: I(4294967295L,
                                                                    32,
                                                                    2147483648L,
                                                                    1L,
@@ -104,9 +107,9 @@ class BitStringTest extends SpireTests {
                                                                    0) :: Nil)
   }
 
-  def ls[A : BitString](n: A, i: Int): A = n << i
-  def rs[A : BitString](n: A, i: Int): A = n >>> i
-  def srs[A : BitString](n: A, i: Int): A = n >> i
+  def ls[A: BitString](n: A, i: Int): A = n << i
+  def rs[A: BitString](n: A, i: Int): A = n >>> i
+  def srs[A: BitString](n: A, i: Int): A = n >> i
 
   def eval[A](n: A)(f: (A, Int) => A): List[A] =
     List(f(n, 0), f(n, 1), f(n, 3), f(n, 4), f(n, 7))
@@ -138,7 +141,7 @@ class BitStringTest extends SpireTests {
 
 class BitStringCheck extends SpireProperties {
   property("operator mappings") {
-    def byOp[A : BitString](n: A, i: Int): List[A] =
+    def byOp[A: BitString](n: A, i: Int): List[A] =
       List(n << i, n >>> i, n >> i)
 
     def byName[A](n: A, i: Int)(implicit bs: BitString[A]): List[A] =

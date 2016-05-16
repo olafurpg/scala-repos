@@ -9,7 +9,8 @@ package transform
   *  performs peephole optimizations.
   */
 trait PostErasure
-    extends InfoTransform with TypingTransformers
+    extends InfoTransform
+    with TypingTransformers
     with scala.reflect.internal.transform.PostErasure {
   val global: Global
 

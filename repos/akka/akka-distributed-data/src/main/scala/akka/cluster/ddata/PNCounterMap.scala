@@ -30,7 +30,8 @@ object PNCounterMap {
 @SerialVersionUID(1L)
 final class PNCounterMap private[akka](
     private[akka] val underlying: ORMap[PNCounter])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = PNCounterMap
@@ -162,4 +163,5 @@ object PNCounterMapKey {
 
 @SerialVersionUID(1L)
 final case class PNCounterMapKey(_id: String)
-    extends Key[PNCounterMap](_id) with ReplicatedDataSerialization
+    extends Key[PNCounterMap](_id)
+    with ReplicatedDataSerialization

@@ -53,7 +53,8 @@ case class BacktestingResult(
     val daily: Seq[DailyStat],
     val overall: OverallStat
 )
-    extends Serializable with NiceRendering {
+    extends Serializable
+    with NiceRendering {
   override def toString(): String = overall.toString
 
   def toHTML(): String = {

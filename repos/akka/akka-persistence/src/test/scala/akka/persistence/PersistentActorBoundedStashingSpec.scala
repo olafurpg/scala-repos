@@ -67,7 +67,8 @@ class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
           .withFallback(PersistenceSpec.config(
                   "stepping-inmem",
                   "SteppingInMemPersistentActorBoundedStashingSpec",
-                  extraConfig = Some(strategyConfig)))) with BeforeAndAfterEach
+                  extraConfig = Some(strategyConfig))))
+    with BeforeAndAfterEach
     with ImplicitSender {
 
   override def atStartup: Unit = {

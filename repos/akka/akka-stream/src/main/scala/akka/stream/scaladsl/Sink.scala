@@ -259,8 +259,8 @@ object Sink {
     *
     * @see [[#mapAsyncUnordered]]
     */
-  def foreachParallel[T](parallelism: Int)(f: T ⇒ Unit)(
-      implicit ec: ExecutionContext): Sink[T, Future[Done]] =
+  def foreachParallel[T](parallelism: Int)(
+      f: T ⇒ Unit)(implicit ec: ExecutionContext): Sink[T, Future[Done]] =
     Flow[T]
       .mapAsyncUnordered(parallelism)(t ⇒ Future(f(t)))
       .toMat(Sink.ignore)(Keep.right)

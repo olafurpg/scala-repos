@@ -34,7 +34,8 @@ import specs2._
 import scalaz._
 
 class AnalyticsTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
 
   val simpleData = """
     {"a":1,"b":"Tom"}
@@ -51,10 +52,9 @@ class AnalyticsTask(settings: Settings)
           "q" -> query,
           "prefixPath" -> prefixPath
       )
-    val json = JParser
-      .parseFromString(Http(req OK as.String)())
-      .valueOr(throw _)
-      (json \ "jobId").deserialize[String]
+    val json =
+      JParser.parseFromString(Http(req OK as.String)()).valueOr(throw _)
+    (json \ "jobId").deserialize[String]
   }
 
   "analytics web service" should {

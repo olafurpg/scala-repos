@@ -8,10 +8,12 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * 8/5/13
   */
 class VariablesFromPatternsEvaluationTest
-    extends VariablesFromPatternsEvaluationTestBase with ScalaVersion_2_11
+    extends VariablesFromPatternsEvaluationTestBase
+    with ScalaVersion_2_11
 
 class VariablesFromPatternsEvaluationTest_212
-    extends VariablesFromPatternsEvaluationTestBase with ScalaVersion_2_12
+    extends VariablesFromPatternsEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class VariablesFromPatternsEvaluationTestBase
     extends ScalaDebuggerTestCase {

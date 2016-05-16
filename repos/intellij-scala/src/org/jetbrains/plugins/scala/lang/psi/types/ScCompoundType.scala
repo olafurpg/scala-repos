@@ -24,8 +24,9 @@ case class ScCompoundType(components: Seq[ScType],
 
   override def hashCode: Int = {
     if (hash == -1) {
-      hash = components.hashCode() +
-      (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
+      hash =
+        components.hashCode() +
+        (signatureMap.hashCode() * 31 + typesMap.hashCode()) * 31
     }
     hash
   }
@@ -112,17 +113,13 @@ case class ScCompoundType(components: Seq[ScType],
       case _ =>
         def updateTypeParam(tp: TypeParameter): TypeParameter = {
           new TypeParameter(tp.name, tp.typeParams.map(updateTypeParam), {
-            val res = tp
-              .lowerType()
-              .recursiveUpdate(update, visited + this)
-              () =>
-                res
+            val res = tp.lowerType().recursiveUpdate(update, visited + this)
+            () =>
+              res
           }, {
-            val res = tp
-              .upperType()
-              .recursiveUpdate(update, visited + this)
-              () =>
-                res
+            val res = tp.upperType().recursiveUpdate(update, visited + this)
+            () =>
+              res
           }, tp.ptp)
         }
         new ScCompoundType(
@@ -178,14 +175,14 @@ case class ScCompoundType(components: Seq[ScType],
             val res = tp
               .lowerType()
               .recursiveVarianceUpdateModifiable(newData, update, 1)
-              () =>
-                res
+            () =>
+              res
           }, {
             val res = tp
               .upperType()
               .recursiveVarianceUpdateModifiable(newData, update, 1)
-              () =>
-                res
+            () =>
+              res
           }, tp.ptp)
         }
         new ScCompoundType(
@@ -323,29 +320,29 @@ object ScCompoundType {
       decl match {
         case fun: ScFunction =>
           signatureMapVal +=
-          ((new Signature(fun.name,
-                          PhysicalSignature.typesEval(fun),
-                          PhysicalSignature.paramLength(fun),
-                          TypeParameter.fromArray(fun.getTypeParameters),
-                          subst,
-                          fun,
-                          PhysicalSignature.hasRepeatedParam(fun)),
-            fun.returnType.getOrAny))
+            ((new Signature(fun.name,
+                            PhysicalSignature.typesEval(fun),
+                            PhysicalSignature.paramLength(fun),
+                            TypeParameter.fromArray(fun.getTypeParameters),
+                            subst,
+                            fun,
+                            PhysicalSignature.hasRepeatedParam(fun)),
+              fun.returnType.getOrAny))
         case varDecl: ScVariable =>
           for (e <- varDecl.declaredElements) {
             val varType = e.getType(TypingContext.empty)
+            signatureMapVal += ((new Signature(e.name, Seq.empty, 0, subst, e),
+                                 varType.getOrAny))
             signatureMapVal +=
-            ((new Signature(e.name, Seq.empty, 0, subst, e), varType.getOrAny))
-            signatureMapVal +=
-            ((new Signature(
-                  e.name + "_=", Seq(() => varType.getOrAny), 1, subst, e),
-              psi.types.Unit)) //setter
+              ((new Signature(
+                    e.name + "_=", Seq(() => varType.getOrAny), 1, subst, e),
+                psi.types.Unit)) //setter
           }
         case valDecl: ScValue =>
           for (e <- valDecl.declaredElements) {
             val valType = e.getType(TypingContext.empty)
-            signatureMapVal +=
-            ((new Signature(e.name, Seq.empty, 0, subst, e), valType.getOrAny))
+            signatureMapVal += ((new Signature(e.name, Seq.empty, 0, subst, e),
+                                 valType.getOrAny))
           }
       }
     }

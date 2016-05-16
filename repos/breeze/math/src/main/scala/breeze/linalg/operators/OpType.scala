@@ -35,7 +35,7 @@ sealed trait OpType
   */
 sealed trait OpAdd extends OpType
 object OpAdd extends OpAdd with UFunc {
-  implicit def opAddFromSemiring[S : Semiring]: Impl2[S, S, S] =
+  implicit def opAddFromSemiring[S: Semiring]: Impl2[S, S, S] =
     new Impl2[S, S, S] {
       def apply(v: S, v2: S): S = implicitly[Semiring[S]].+(v, v2)
     }
@@ -48,7 +48,7 @@ object OpAdd extends OpAdd with UFunc {
   */
 sealed trait OpSub extends OpType
 object OpSub extends OpSub with UFunc {
-  implicit def opSubFromRing[S : Ring]: Impl2[S, S, S] = new Impl2[S, S, S] {
+  implicit def opSubFromRing[S: Ring]: Impl2[S, S, S] = new Impl2[S, S, S] {
     def apply(v: S, v2: S): S = implicitly[Ring[S]].-(v, v2)
   }
 }
@@ -60,7 +60,7 @@ object OpSub extends OpSub with UFunc {
   */
 sealed trait OpMulScalar extends OpType
 object OpMulScalar extends OpMulScalar with UFunc {
-  implicit def opMulScalarFromSemiring[S : Semiring]: Impl2[S, S, S] =
+  implicit def opMulScalarFromSemiring[S: Semiring]: Impl2[S, S, S] =
     new Impl2[S, S, S] {
       def apply(v: S, v2: S): S = implicitly[Semiring[S]].*(v, v2)
     }
@@ -73,7 +73,7 @@ object OpMulScalar extends OpMulScalar with UFunc {
   */
 sealed trait OpDiv extends OpType
 object OpDiv extends OpDiv with UFunc {
-  implicit def opDivFromField[S : Field]: Impl2[S, S, S] = new Impl2[S, S, S] {
+  implicit def opDivFromField[S: Field]: Impl2[S, S, S] = new Impl2[S, S, S] {
     def apply(v: S, v2: S): S = implicitly[Field[S]]./(v, v2)
   }
 }
@@ -101,7 +101,7 @@ object OpPow extends OpPow with UFunc
   */
 sealed trait OpLT extends OpType
 object OpLT extends OpLT with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = ord.lt(v, v2)
@@ -116,7 +116,7 @@ object OpLT extends OpLT with UFunc {
   */
 sealed trait OpLTE extends OpType
 object OpLTE extends OpLTE with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = ord.lteq(v, v2)
@@ -131,7 +131,7 @@ object OpLTE extends OpLTE with UFunc {
   */
 sealed trait OpGT extends OpType
 object OpGT extends OpGT with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = ord.gt(v, v2)
@@ -146,7 +146,7 @@ object OpGT extends OpGT with UFunc {
   */
 sealed trait OpGTE extends OpType
 object OpGTE extends OpGTE with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = ord.gteq(v, v2)
@@ -161,7 +161,7 @@ object OpGTE extends OpGTE with UFunc {
   */
 sealed trait OpEq extends OpType
 object OpEq extends OpEq with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = ord.equiv(v, v2)
@@ -176,7 +176,7 @@ object OpEq extends OpEq with UFunc {
   */
 sealed trait OpNe extends OpType
 object OpNe extends OpNe with UFunc {
-  implicit def impl2FromOrdering[T : Ordering]: Impl2[T, T, Boolean] = {
+  implicit def impl2FromOrdering[T: Ordering]: Impl2[T, T, Boolean] = {
     val ord = implicitly[Ordering[T]]
     new Impl2[T, T, Boolean] {
       def apply(v: T, v2: T): Boolean = !ord.equiv(v, v2)
@@ -235,7 +235,7 @@ object OpXor extends OpXor with UFunc {
   */
 sealed trait OpNeg extends OpType
 object OpNeg extends OpNeg with UFunc {
-  implicit def ringNegation[S : Ring]: UImpl[OpNeg.this.type, S, S] =
+  implicit def ringNegation[S: Ring]: UImpl[OpNeg.this.type, S, S] =
     new Impl[S, S] {
       def apply(v: S): S = implicitly[Ring[S]].negate(v)
     }
@@ -260,7 +260,7 @@ object OpNot extends OpNot with UFunc with MappingUFunc {
   */
 sealed trait OpMulInner extends OpType
 object OpMulInner extends OpMulInner with UFunc {
-  def opMulInnerFromSemiring[S : Semiring]: OpMulInner.Impl2[S, S, S] =
+  def opMulInnerFromSemiring[S: Semiring]: OpMulInner.Impl2[S, S, S] =
     new Impl2[S, S, S] {
       def apply(v: S, v2: S): S = implicitly[Semiring[S]].*(v, v2)
     }

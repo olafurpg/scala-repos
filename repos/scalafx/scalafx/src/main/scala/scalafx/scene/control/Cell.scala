@@ -40,7 +40,8 @@ object Cell {
 }
 
 class Cell[T](override val delegate: jfxsc.Cell[T] = new jfxsc.Cell[T])
-    extends Labeled(delegate) with SFXDelegate[jfxsc.Cell[T]] {
+    extends Labeled(delegate)
+    with SFXDelegate[jfxsc.Cell[T]] {
 
   /**
     * A property representing whether this cell is allowed to be put into an editing state.

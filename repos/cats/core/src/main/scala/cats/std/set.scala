@@ -29,7 +29,7 @@ trait SetInstances extends algebra.std.SetInstances {
 
   implicit def setMonoid[A]: Monoid[Set[A]] = MonoidK[Set].algebra[A]
 
-  implicit def setShow[A : Show]: Show[Set[A]] = new Show[Set[A]] {
+  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
     def show(fa: Set[A]): String =
       fa.toIterator.map(_.show).mkString("Set(", ", ", ")")
   }

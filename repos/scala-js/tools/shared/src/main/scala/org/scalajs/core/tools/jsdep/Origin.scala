@@ -41,8 +41,8 @@ object Origin {
   implicit object OriginDeserializer extends JSONDeserializer[Origin] {
     def deserialize(x: JSON): Origin = {
       val obj = new JSONObjExtractor(x)
-      new Origin(obj.fld[String]("moduleName"),
-                 obj.fld[String]("configuration"))
+      new Origin(
+          obj.fld[String]("moduleName"), obj.fld[String]("configuration"))
     }
   }
 }

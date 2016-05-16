@@ -35,7 +35,7 @@ object ArrayBuilder {
     *  @return       a new empty array builder.
     */
   @inline
-  def make[T : ClassTag](): ArrayBuilder[T] =
+  def make[T: ClassTag](): ArrayBuilder[T] =
     new ArrayBuilder.generic[T](implicitly[ClassTag[T]].runtimeClass)
 
   /** A generic ArrayBuilder optimized for Scala.js.
@@ -121,7 +121,7 @@ object ArrayBuilder {
   @deprecatedInheritance(
       "ArrayBuilder.ofRef is an internal implementation not intended for subclassing.",
       "2.11.0")
-  class ofRef[T <: AnyRef : ClassTag] extends ArrayBuilder[T] {
+  class ofRef[T <: AnyRef: ClassTag] extends ArrayBuilder[T] {
 
     private var elems: Array[T] = _
     private var capacity: Int = 0

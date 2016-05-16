@@ -49,8 +49,10 @@ object ProgressIndicator {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ProgressIndicator.html]]
   */
 class ProgressIndicator(
-    override val delegate: jfxsc.ProgressIndicator = new jfxsc.ProgressIndicator)
-    extends Control(delegate) with SFXDelegate[jfxsc.ProgressIndicator] {
+    override val delegate: jfxsc.ProgressIndicator =
+      new jfxsc.ProgressIndicator)
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ProgressIndicator] {
 
   /**
     * A flag indicating whether it is possible to determine the progress of the ProgressIndicator.

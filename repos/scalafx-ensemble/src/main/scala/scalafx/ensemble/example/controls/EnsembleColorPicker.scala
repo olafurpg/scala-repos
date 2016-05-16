@@ -36,7 +36,6 @@ import scalafx.scene.layout.{Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
-
 /** A sample that demonstrates the ColorPicker.
   *
   * @see scalafx.scene.control.ColorPicker
@@ -77,15 +76,15 @@ class EnsembleColorPicker extends EnsembleExample {
       hgrow = Priority.Always
       spacing = 50
       children = List(
-        new ToolBar {
-          content = colorPicker
-        },
-        new VBox {
-          alignment = Pos.Center
-          spacing = 20
-          padding = Insets(20)
-          children = Seq(labelColor, buttonColor)
-        }
+          new ToolBar {
+            content = colorPicker
+          },
+          new VBox {
+            alignment = Pos.Center
+            spacing = 20
+            padding = Insets(20)
+            children = Seq(labelColor, buttonColor)
+          }
       )
     }
   }

@@ -52,17 +52,18 @@ import org.apache.spark.streaming.scheduler.rate.RateEstimator
   *  starting point of the stream
   * @param messageHandler function for translating each message into the desired type
   */
-private[streaming] class DirectKafkaInputDStream[K : ClassTag,
-                                                 V : ClassTag,
+private[streaming] class DirectKafkaInputDStream[K: ClassTag,
+                                                 V: ClassTag,
                                                  U <: Decoder[K]: ClassTag,
                                                  T <: Decoder[V]: ClassTag,
-                                                 R : ClassTag](
+                                                 R: ClassTag](
     _ssc: StreamingContext,
     val kafkaParams: Map[String, String],
     val fromOffsets: Map[TopicAndPartition, Long],
     messageHandler: MessageAndMetadata[K, V] => R
 )
-    extends InputDStream[R](_ssc) with Logging {
+    extends InputDStream[R](_ssc)
+    with Logging {
   val maxRetries =
     context.sparkContext.getConf.getInt("spark.streaming.kafka.maxRetries", 1)
 
@@ -202,8 +203,8 @@ private[streaming] class DirectKafkaInputDStream[K : ClassTag,
   private[streaming] class DirectKafkaInputDStreamCheckpointData
       extends DStreamCheckpointData(this) {
     def batchForTime: mutable.HashMap[Time, Array[(String, Int, Long, Long)]] = {
-      data.asInstanceOf[mutable.HashMap[
-              Time, Array[OffsetRange.OffsetRangeTuple]]]
+      data.asInstanceOf[
+          mutable.HashMap[Time, Array[OffsetRange.OffsetRangeTuple]]]
     }
 
     override def update(time: Time) {

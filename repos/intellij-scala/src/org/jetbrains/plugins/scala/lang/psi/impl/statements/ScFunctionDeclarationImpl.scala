@@ -20,7 +20,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
   */
 class ScFunctionDeclarationImpl private (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDeclaration {
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScFunctionDeclaration {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor =>

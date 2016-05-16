@@ -50,8 +50,8 @@ object Tv extends LilaController {
             }
           },
           api = apiVersion =>
-              Env.api.roundApi.watcher(
-                  pov, apiVersion, tv = onTv.some, withOpening = false) map {
+            Env.api.roundApi.watcher(
+                pov, apiVersion, tv = onTv.some, withOpening = false) map {
               Ok(_)
           }
       )

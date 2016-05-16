@@ -116,7 +116,8 @@ private[execution] trait UniqueHashedRelation extends HashedRelation {
   */
 private[joins] class GeneralHashedRelation(private var hashTable: JavaHashMap[
         InternalRow, CompactBuffer[InternalRow]])
-    extends HashedRelation with Externalizable {
+    extends HashedRelation
+    with Externalizable {
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
@@ -138,7 +139,8 @@ private[joins] class GeneralHashedRelation(private var hashTable: JavaHashMap[
   */
 private[joins] class UniqueKeyHashedRelation(
     private var hashTable: JavaHashMap[InternalRow, InternalRow])
-    extends UniqueHashedRelation with Externalizable {
+    extends UniqueHashedRelation
+    with Externalizable {
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
@@ -232,7 +234,9 @@ private[execution] object HashedRelation {
   */
 private[joins] final class UnsafeHashedRelation(
     private var hashTable: JavaHashMap[UnsafeRow, CompactBuffer[UnsafeRow]])
-    extends HashedRelation with KnownSizeEstimation with Externalizable {
+    extends HashedRelation
+    with KnownSizeEstimation
+    with Externalizable {
 
   private[joins] def this() = this(null) // Needed for serialization
 
@@ -391,10 +395,10 @@ private[joins] final class UnsafeHashedRelation(
     // TODO(josh): We won't need this dummy memory manager after future refactorings; revisit
     // during code review
 
-    binaryMap = new BytesToBytesMap(
-        taskMemoryManager,
-        (nKeys * 1.5 + 1).toInt, // reduce hash collision
-        pageSizeBytes)
+    binaryMap =
+      new BytesToBytesMap(taskMemoryManager,
+                          (nKeys * 1.5 + 1).toInt, // reduce hash collision
+                          pageSizeBytes)
 
     var i = 0
     var keyBuffer = new Array[Byte](1024)
@@ -474,7 +478,8 @@ private[joins] trait LongHashedRelation extends HashedRelation {
 
 private[joins] final class GeneralLongHashedRelation(
     private var hashTable: JavaHashMap[Long, CompactBuffer[UnsafeRow]])
-    extends LongHashedRelation with Externalizable {
+    extends LongHashedRelation
+    with Externalizable {
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
@@ -492,7 +497,9 @@ private[joins] final class GeneralLongHashedRelation(
 
 private[joins] final class UniqueLongHashedRelation(
     private var hashTable: JavaHashMap[Long, UnsafeRow])
-    extends UniqueHashedRelation with LongHashedRelation with Externalizable {
+    extends UniqueHashedRelation
+    with LongHashedRelation
+    with Externalizable {
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
@@ -542,7 +549,9 @@ private[joins] final class LongArrayRelation(
     private var sizes: Array[Int],
     private var bytes: Array[Byte]
 )
-    extends UniqueHashedRelation with LongHashedRelation with Externalizable {
+    extends UniqueHashedRelation
+    with LongHashedRelation
+    with Externalizable {
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(0, 0L, null, null, null)

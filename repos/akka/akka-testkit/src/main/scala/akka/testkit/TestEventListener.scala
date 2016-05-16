@@ -43,7 +43,8 @@ object TestEvent {
       new Mute(filter +: filters.to[immutable.Seq])
   }
   final case class Mute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent
+      with NoSerializationVerificationNeeded {
 
     /**
       * Java API: create a Mute command from a list of filters
@@ -55,7 +56,8 @@ object TestEvent {
       new UnMute(filter +: filters.to[immutable.Seq])
   }
   final case class UnMute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent
+      with NoSerializationVerificationNeeded {
 
     /**
       * Java API: create an UnMute command from a list of filters
@@ -180,12 +182,12 @@ object EventFilter {
     * `null` does NOT work (passing `null` disables the
     * source filter).''
     */
-  def apply[A <: Throwable : ClassTag](
-      message: String = null,
-      source: String = null,
-      start: String = "",
-      pattern: String = null,
-      occurrences: Int = Int.MaxValue): EventFilter =
+  def apply[A <: Throwable: ClassTag](message: String = null,
+                                      source: String = null,
+                                      start: String = "",
+                                      pattern: String = null,
+                                      occurrences: Int =
+                                        Int.MaxValue): EventFilter =
     ErrorFilter(implicitly[ClassTag[A]].runtimeClass,
                 Option(source),
                 if (message ne null) Left(message)
@@ -590,9 +592,9 @@ class TestEventListener extends Logging.DefaultLogger {
 
   def removeFilter(filter: EventFilter) {
     @scala.annotation.tailrec
-    def removeFirst(
-        list: List[EventFilter],
-        zipped: List[EventFilter] = Nil): List[EventFilter] = list match {
+    def removeFirst(list: List[EventFilter],
+                    zipped: List[EventFilter] =
+                      Nil): List[EventFilter] = list match {
       case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
       case head :: tail ⇒ removeFirst(tail, head :: zipped)
       case Nil ⇒ filters // filter not found, just return original list

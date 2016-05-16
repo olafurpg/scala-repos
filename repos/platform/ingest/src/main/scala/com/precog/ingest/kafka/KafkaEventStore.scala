@@ -86,12 +86,13 @@ object KafkaEventStore {
   }
 }
 
-class LocalKafkaEventStore(
-    producer: Producer[String, Message],
-    topic: String,
-    maxMessageSize: Int,
-    messagePadding: Int)(implicit executor: ExecutionContext)
-    extends EventStore[Future] with Logging {
+class LocalKafkaEventStore(producer: Producer[String, Message],
+                           topic: String,
+                           maxMessageSize: Int,
+                           messagePadding: Int)(
+    implicit executor: ExecutionContext)
+    extends EventStore[Future]
+    with Logging {
   logger.info(
       "Creating LocalKafkaEventStore for %s with max message size = %d".format(
           topic, maxMessageSize))

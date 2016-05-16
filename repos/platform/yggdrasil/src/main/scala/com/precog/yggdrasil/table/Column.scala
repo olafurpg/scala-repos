@@ -65,7 +65,9 @@ sealed trait Column {
 private[yggdrasil] trait ExtensibleColumn extends Column // TODO: or should we just unseal Column?
 
 trait HomogeneousArrayColumn[@spec(Boolean, Long, Double) A]
-    extends Column with (Int => Array[A]) { self =>
+    extends Column
+    with (Int => Array[A]) {
+  self =>
   def apply(row: Int): Array[A]
 
   def rowEq(row1: Int, row2: Int): Boolean = {
@@ -385,7 +387,8 @@ object Column {
         if (col.isDefinedAt(j)) {
           col.rowCompare(i, j)
         } else 1
-      } else if (col.isDefinedAt(j)) -1 else 0
+      } else if (col.isDefinedAt(j)) -1
+      else 0
     }
 
     def eqv(i: Int, j: Int): Boolean = {
@@ -462,7 +465,7 @@ object Column {
     def apply(row: Int) = v
   }
 
-  @inline def const[@spec(Boolean, Long, Double) A : CValueType](v: Array[A]) =
+  @inline def const[@spec(Boolean, Long, Double) A: CValueType](v: Array[A]) =
     new InfiniteColumn with HomogeneousArrayColumn[A] {
       val tpe = CArrayType(CValueType[A])
       def apply(row: Int) = v

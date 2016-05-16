@@ -162,8 +162,7 @@ object SparkSubmit {
         val proxyUser = UserGroupInformation.createProxyUser(
             args.proxyUser, UserGroupInformation.getCurrentUser())
         try {
-          proxyUser.doAs(
-              new PrivilegedExceptionAction[Unit]() {
+          proxyUser.doAs(new PrivilegedExceptionAction[Unit]() {
             override def run(): Unit = {
               runMain(childArgs,
                       childClasspath,
@@ -381,7 +380,8 @@ object SparkSubmit {
         // If a python file is provided, add it to the child arguments and list of files to deploy.
         // Usage: PythonAppRunner <main python file> <extra python files> [app arguments]
         args.mainClass = "org.apache.spark.deploy.PythonRunner"
-        args.childArgs = ArrayBuffer(args.primaryResource, args.pyFiles) ++ args.childArgs
+        args.childArgs =
+          ArrayBuffer(args.primaryResource, args.pyFiles) ++ args.childArgs
         if (clusterManager != YARN) {
           // The YARN backend distributes the primary file differently, so don't merge it.
           args.files = mergeFileLists(args.files, args.primaryResource)
@@ -730,16 +730,14 @@ object SparkSubmit {
     // Resolve and format python file paths properly before adding them to the PYTHONPATH.
     // The resolving part is redundant in the case of --py-files, but necessary if the user
     // explicitly sets `spark.submit.pyFiles` in his/her default properties file.
-    sysProps
-      .get("spark.submit.pyFiles")
-      .foreach { pyFiles =>
-        val resolvedPyFiles = Utils.resolveURIs(pyFiles)
-        val formattedPyFiles =
-          PythonRunner.formatPaths(resolvedPyFiles).mkString(",")
-        sysProps("spark.submit.pyFiles") = formattedPyFiles
-      }
+    sysProps.get("spark.submit.pyFiles").foreach { pyFiles =>
+      val resolvedPyFiles = Utils.resolveURIs(pyFiles)
+      val formattedPyFiles =
+        PythonRunner.formatPaths(resolvedPyFiles).mkString(",")
+      sysProps("spark.submit.pyFiles") = formattedPyFiles
+    }
 
-      (childArgs, childClasspath, sysProps, childMainClass)
+    (childArgs, childClasspath, sysProps, childMainClass)
   }
 
   /**

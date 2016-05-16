@@ -26,13 +26,12 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
       val (_, serverHostName, serverPort) =
         TestUtils.temporaryServerHostnameAndPort()
 
-      val binding =
-        Http().bindAndHandleSync(r ⇒
-                                   HttpResponse(entity = r.uri.toString.reverse
-                                           .takeWhile(Character.isDigit)
-                                           .reverse),
-                                 serverHostName,
-                                 serverPort)
+      val binding = Http().bindAndHandleSync(
+          r ⇒
+            HttpResponse(entity =
+                  r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+          serverHostName,
+          serverPort)
 
       val N = 100
       val result = Source
@@ -46,7 +45,8 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
         }
         .runFold(0)(_ + _)
 
-      result.futureValue(PatienceConfig(10.seconds)) shouldEqual N * (N + 1) / 2
+      result.futureValue(PatienceConfig(10.seconds)) shouldEqual N * (N +
+          1) / 2
       binding.futureValue.unbind()
     }
 
@@ -54,13 +54,12 @@ class HighLevelOutgoingConnectionSpec extends AkkaSpec {
       val (_, serverHostName, serverPort) =
         TestUtils.temporaryServerHostnameAndPort()
 
-      val binding =
-        Http().bindAndHandleSync(r ⇒
-                                   HttpResponse(entity = r.uri.toString.reverse
-                                           .takeWhile(Character.isDigit)
-                                           .reverse),
-                                 serverHostName,
-                                 serverPort)
+      val binding = Http().bindAndHandleSync(
+          r ⇒
+            HttpResponse(entity =
+                  r.uri.toString.reverse.takeWhile(Character.isDigit).reverse),
+          serverHostName,
+          serverPort)
 
       val connFlow = Http().outgoingConnection(serverHostName, serverPort)
 

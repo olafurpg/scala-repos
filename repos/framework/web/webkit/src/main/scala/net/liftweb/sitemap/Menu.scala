@@ -146,7 +146,8 @@ object Menu extends MenuSingleton {
                          val headMatch: Boolean,
                          val params: List[Loc.LocParam[T]],
                          val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu
+      with BaseMenuable {
     type BuiltType = ParamMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
@@ -294,7 +295,8 @@ object Menu extends MenuSingleton {
                           val headMatch: Boolean,
                           val params: List[Loc.LocParam[T]],
                           val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu
+      with BaseMenuable {
     type BuiltType = ParamsMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
@@ -558,7 +560,8 @@ object Menu extends MenuSingleton {
                  val headMatch: Boolean,
                  val params: List[Loc.LocParam[Unit]],
                  val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu
+      with BaseMenuable {
 
     type BuiltType = Menuable
 
@@ -665,7 +668,8 @@ sealed trait MenuSingleton {
 }
 
 case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
-    extends HasKids with ConvertableToMenu {
+    extends HasKids
+    with ConvertableToMenu {
   lazy val kids: Seq[Menu] = convertableKids.map(_.toMenu)
   private[sitemap] var _parent: Box[HasKids] = Empty
   private[sitemap] var siteMap: SiteMap = _
@@ -685,8 +689,7 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     Menu(loc, f(kids.toList): _*)
 
   private[sitemap] def validate {
-    _parent.foreach(
-        p =>
+    _parent.foreach(p =>
           if (p.isRoot_?)
             throw new SiteMapException(
                 "Menu items with root location (\"/\") cannot have children"))

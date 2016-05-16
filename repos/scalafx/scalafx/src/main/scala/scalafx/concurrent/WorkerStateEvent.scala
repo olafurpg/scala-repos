@@ -115,7 +115,8 @@ object WorkerStateEvent {
   * Wrapper trait for [[http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/WorkerStateEvent.html WorkerStateEvent]] Class.
   */
 class WorkerStateEvent(override val delegate: jfxc.WorkerStateEvent)
-    extends Event(delegate) with SFXDelegate[jfxc.WorkerStateEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxc.WorkerStateEvent] {
 
   /**
     * Create a new WorkerStateEvent.

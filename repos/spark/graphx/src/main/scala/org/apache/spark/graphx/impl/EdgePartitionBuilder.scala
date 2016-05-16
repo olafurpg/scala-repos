@@ -25,8 +25,8 @@ import org.apache.spark.util.collection.{PrimitiveVector, SortDataFormat, Sorter
 
 /** Constructs an EdgePartition from scratch. */
 private[graphx] class EdgePartitionBuilder[
-    @specialized(Long, Int, Double) ED : ClassTag, VD : ClassTag](
-    size: Int = 64) {
+    @specialized(Long, Int, Double) ED: ClassTag,
+    VD: ClassTag](size: Int = 64) {
   private[this] val edges = new PrimitiveVector[Edge[ED]](size)
 
   /** Add a new edge to the partition. */
@@ -87,7 +87,7 @@ private[graphx] class EdgePartitionBuilder[
   * reuse of the local vertex ids. Intended for internal use in EdgePartition only.
   */
 private[impl] class ExistingEdgePartitionBuilder[
-    @specialized(Long, Int, Double) ED : ClassTag, VD : ClassTag](
+    @specialized(Long, Int, Double) ED: ClassTag, VD: ClassTag](
     global2local: GraphXPrimitiveKeyOpenHashMap[VertexId, Int],
     local2global: Array[VertexId],
     vertexAttrs: Array[VD],

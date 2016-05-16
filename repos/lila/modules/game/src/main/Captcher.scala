@@ -73,8 +73,7 @@ private final class Captcher extends Actor {
 
     private def makeCaptcha(
         game: Game, moves: List[String]): OptionT[Fu, Captcha] =
-      optionT(
-          Future {
+      optionT(Future {
         for {
           rewinded ← rewind(game, moves)
           solutions ← solve(rewinded)

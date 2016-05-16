@@ -30,8 +30,8 @@ package scala.test.scaladoc.implicits {
     // implicit3, with two alternatives
     implicit def implicit3alt1[T <: Intermediate[_, _ <: Int]] =
       new Implicit3[T]()
-    implicit def implicit3alt2[
-        T <: Intermediate[_ <: Double, _ <: AnyRef], X] = new Implicit3[T]()
+    implicit def implicit3alt2[T <: Intermediate[_ <: Double, _ <: AnyRef], X] =
+      new Implicit3[T]()
 
     // and our targets
     /** conversion here, with constraints */

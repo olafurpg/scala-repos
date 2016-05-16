@@ -45,7 +45,8 @@ case class PoolState(
   def -(other: PoolState) = PoolState(
       numCollections = this.numCollections - other.numCollections,
       capacity = other.capacity,
-      used = this.used + other.capacity - other.used + other.capacity *
+      used =
+        this.used + other.capacity - other.used + other.capacity *
         (this.numCollections - other.numCollections - 1)
   )
 
@@ -213,11 +214,12 @@ trait Jvm {
   def mainClassName: String = {
     val mainClass = for {
       (_, stack) <- Thread.getAllStackTraces().asScala.find {
-        case (t, s) => t.getName == "main"
-      }
+                     case (t, s) => t.getName == "main"
+                   }
       frame <- stack.reverse.find { elem =>
-        !(elem.getClassName.startsWith("scala.tools.nsc.MainGenericRunner"))
-      }
+                !(elem.getClassName.startsWith(
+                    "scala.tools.nsc.MainGenericRunner"))
+              }
     } yield frame.getClassName
 
     mainClass.getOrElse("unknown")

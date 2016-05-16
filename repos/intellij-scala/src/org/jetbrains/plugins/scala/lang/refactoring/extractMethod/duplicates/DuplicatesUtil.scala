@@ -172,7 +172,8 @@ object DuplicatesUtil {
       .getFoldRegionsAtOffset(editor, textRange.getStartOffset)
     val anyCollapsed: Boolean = foldRegions.exists(!_.isExpanded)
     if (anyCollapsed) {
-      editor.getFoldingModel.runBatchFoldingOperation(new Runnable {
+      editor.getFoldingModel.runBatchFoldingOperation(
+          new Runnable {
         def run() =
           foldRegions.filterNot(_.isExpanded).foreach(_.setExpanded(true))
       })

@@ -34,7 +34,8 @@ class TransitionMultiJvmNode2 extends TransitionSpec
 class TransitionMultiJvmNode3 extends TransitionSpec
 
 abstract class TransitionSpec
-    extends MultiNodeSpec(TransitionMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(TransitionMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import TransitionMultiJvmSpec._

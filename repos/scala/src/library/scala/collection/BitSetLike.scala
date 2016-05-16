@@ -251,7 +251,8 @@ object BitSetLike {
   private[collection] def updateArray(
       elems: Array[Long], idx: Int, w: Long): Array[Long] = {
     var len = elems.length
-    while (len > 0 && (elems(len - 1) == 0L || w == 0L && idx == len - 1)) len -= 1
+    while (len > 0 &&
+           (elems(len - 1) == 0L || w == 0L && idx == len - 1)) len -= 1
     var newlen = len
     if (idx >= newlen && w != 0L) newlen = idx + 1
     val newelems = new Array[Long](newlen)

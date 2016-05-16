@@ -33,7 +33,8 @@ private[streams] trait EnumeratorSubscriptionFactory[T]
   */
 private[streams] final class EnumeratorPublisher[T](
     val enum: Enumerator[T], val emptyElement: Option[T] = None)
-    extends RelaxedPublisher[T] with EnumeratorSubscriptionFactory[T]
+    extends RelaxedPublisher[T]
+    with EnumeratorSubscriptionFactory[T]
 
 private[streams] object EnumeratorSubscription {
 
@@ -91,7 +92,8 @@ private[streams] class EnumeratorSubscription[T, U >: T](
     subr: Subscriber[U],
     onSubscriptionEnded: SubscriptionHandle[U] => Unit)
     extends StateMachine[State[T]](initialState = Requested[T](0, Unattached))
-    with Subscription with SubscriptionHandle[U] {
+    with Subscription
+    with SubscriptionHandle[U] {
 
   // SubscriptionHandle methods
 

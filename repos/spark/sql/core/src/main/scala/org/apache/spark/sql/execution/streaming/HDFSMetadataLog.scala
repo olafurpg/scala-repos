@@ -42,7 +42,7 @@ import org.apache.spark.sql.SQLContext
   * Note: [[HDFSMetadataLog]] doesn't support S3-like file systems as they don't guarantee listing
   * files in a directory always shows the latest files.
   */
-class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
+class HDFSMetadataLog[T: ClassTag](sqlContext: SQLContext, path: String)
     extends MetadataLog[T] {
 
   private val metadataPath = new Path(path)

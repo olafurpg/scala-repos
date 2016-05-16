@@ -8,5 +8,6 @@ object wrap {
       extends DomainLike[C, This]
 
   trait IterableDomain[@specialized(Int) D]
-      extends Domain[D] with IterableDomainLike[D, IterableDomain[D]]
+      extends Domain[D]
+      with IterableDomainLike[D, IterableDomain[D]]
 }

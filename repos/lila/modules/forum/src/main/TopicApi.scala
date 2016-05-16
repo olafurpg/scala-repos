@@ -31,13 +31,13 @@ private[forum] final class TopicApi(
               topic ← optionT(TopicRepo(troll).byTree(categSlug, slug))
             } yield categ -> topic).run
       res ← data ?? {
-        case (categ, topic) =>
-          lila.mon.forum.topic.view()
-          (TopicRepo incViews topic) >>
-          (env.postApi.paginator(topic, page, troll) map {
-                (categ, topic, _).some
-              })
-      }
+             case (categ, topic) =>
+               lila.mon.forum.topic.view()
+               (TopicRepo incViews topic) >>
+               (env.postApi.paginator(topic, page, troll) map {
+                     (categ, topic, _).some
+                   })
+           }
     } yield res
 
   def makeTopic(categ: Categ, data: DataForm.TopicData)(
@@ -59,14 +59,12 @@ private[forum] final class TopicApi(
                              lang = lang map (_.language),
                              number = 1,
                              categId = categ.id)
-        $insert(post) >> $insert(topic withPost post) >> $update(
-            categ withTopic post) >>- (indexer ! InsertPost(post)) >> env.recent.invalidate >>- ctx.userId.?? {
-          userId =>
-            val text = topic.name + " " + post.text
-            shutup ! post.isTeam.fold(
-                lila.hub.actorApi.shutup.RecordTeamForumMessage(userId, text),
-                lila.hub.actorApi.shutup.RecordPublicForumMessage(userId,
-                                                                  text))
+        $insert(post) >> $insert(topic withPost post) >> $update(categ withTopic post) >>- (indexer ! InsertPost(
+                post)) >> env.recent.invalidate >>- ctx.userId.?? { userId =>
+          val text = topic.name + " " + post.text
+          shutup ! post.isTeam.fold(
+              lila.hub.actorApi.shutup.RecordTeamForumMessage(userId, text),
+              lila.hub.actorApi.shutup.RecordPublicForumMessage(userId, text))
         } >>- {
           (ctx.userId ifFalse post.troll) ?? { userId =>
             timeline ! Propagate(ForumPost(
@@ -81,14 +79,16 @@ private[forum] final class TopicApi(
   def paginator(
       categ: Categ, page: Int, troll: Boolean): Fu[Paginator[TopicView]] =
     Paginator(
-        adapter = new Adapter[Topic](
+        adapter =
+          new Adapter[Topic](
               selector = TopicRepo(troll) byCategQuery categ,
               sort = Seq($sort.updatedDesc)
           ) mapFuture { topic =>
-          $find.byId[Post](topic lastPostId troll) map { post =>
-            TopicView(categ, topic, post, env.postApi lastPageOf topic, troll)
-          }
-        },
+            $find.byId[Post](topic lastPostId troll) map { post =>
+              TopicView(
+                  categ, topic, post, env.postApi lastPageOf topic, troll)
+            }
+          },
         currentPage = page,
         maxPerPage = maxPerPage)
 
@@ -119,15 +119,15 @@ private[forum] final class TopicApi(
       nbPostsTroll ← PostRepoTroll countByTopics List(topic)
       lastPostTroll ← PostRepoTroll lastByTopics List(topic)
       _ ← $update(
-          topic.copy(
-              nbPosts = nbPosts,
-              lastPostId = lastPost ?? (_.id),
-              updatedAt = lastPost.fold(topic.updatedAt)(_.createdAt),
-              nbPostsTroll = nbPostsTroll,
-              lastPostIdTroll = lastPostTroll ?? (_.id),
-              updatedAtTroll = lastPostTroll.fold(topic.updatedAtTroll)(
-                    _.createdAt)
-          ))
+             topic.copy(
+                 nbPosts = nbPosts,
+                 lastPostId = lastPost ?? (_.id),
+                 updatedAt = lastPost.fold(topic.updatedAt)(_.createdAt),
+                 nbPostsTroll = nbPostsTroll,
+                 lastPostIdTroll = lastPostTroll ?? (_.id),
+                 updatedAtTroll =
+                   lastPostTroll.fold(topic.updatedAtTroll)(_.createdAt)
+             ))
     } yield ()
 
   def denormalize: Funit =

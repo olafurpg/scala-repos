@@ -22,8 +22,11 @@ object DaemonThreadFactory {
 }
 
 class ScalateFuturesSupportServlet(exec: ExecutorService)
-    extends ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport
-    with FlashMapSupport with FutureSupport {
+    extends ScalatraServlet
+    with ScalateSupport
+    with ScalateUrlGeneratorSupport
+    with FlashMapSupport
+    with FutureSupport {
   protected implicit val executor = ExecutionContext.fromExecutorService(exec)
 
   get("/barf") {
@@ -214,8 +217,7 @@ class ScalateFuturesSupportSpec extends MutableScalatraSpec {
   // Testing the default layouts is going to be hard, but we can at least
   // verify that it's looking in the right place.
   def e5 = get("/layout-strategy") {
-    body must_==
-    (List(
+    body must_== (List(
             "/WEB-INF/templates/layouts/default.mustache",
             "/WEB-INF/templates/layouts/default.ssp",
             "/WEB-INF/templates/layouts/default.scaml",

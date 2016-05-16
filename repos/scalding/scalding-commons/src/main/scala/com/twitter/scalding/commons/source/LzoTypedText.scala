@@ -21,11 +21,11 @@ object LzoTypedText {
    * to get the implicit TypedDescriptor.
    * Then use TypedText.lzoTzv[MyCaseClass]("path")
    */
-  def lzoTsv[T : TypeDescriptor](path: String*): TypedTextDelimited[T] =
+  def lzoTsv[T: TypeDescriptor](path: String*): TypedTextDelimited[T] =
     new FixedLzoTypedText[T](TAB, path: _*)
-  def lzoOsv[T : TypeDescriptor](path: String*): TypedTextDelimited[T] =
+  def lzoOsv[T: TypeDescriptor](path: String*): TypedTextDelimited[T] =
     new FixedLzoTypedText[T](ONE, path: _*)
-  def lzoCsv[T : TypeDescriptor](path: String*): TypedTextDelimited[T] =
+  def lzoCsv[T: TypeDescriptor](path: String*): TypedTextDelimited[T] =
     new FixedLzoTypedText[T](COMMA, path: _*)
 
   def hourlyLzoTsv[T](prefix: String)(
@@ -80,7 +80,8 @@ object LzoTypedText {
 }
 
 trait LzoTypedTextDelimited[T]
-    extends TypedTextDelimited[T] with LocalTapSource {
+    extends TypedTextDelimited[T]
+    with LocalTapSource {
   override def hdfsScheme =
     HadoopSchemeInstance(
         new LzoTextDelimited(typeDescriptor.fields,
@@ -93,25 +94,26 @@ trait LzoTypedTextDelimited[T]
                              safe).asInstanceOf[Scheme[_, _, _, _, _]])
 }
 
-class TimePathLzoTypedText[T](
-    sep: TypedSep, path: String)(implicit dr: DateRange, td: TypeDescriptor[T])
+class TimePathLzoTypedText[T](sep: TypedSep, path: String)(
+    implicit dr: DateRange, td: TypeDescriptor[T])
     extends TimePathedSource(path, dr, DateOps.UTC)
     with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }
 
-class MostRecentLzoTypedText[T](
-    sep: TypedSep, path: String)(implicit dr: DateRange, td: TypeDescriptor[T])
+class MostRecentLzoTypedText[T](sep: TypedSep, path: String)(
+    implicit dr: DateRange, td: TypeDescriptor[T])
     extends MostRecentGoodSource(path, dr, DateOps.UTC)
     with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }
 
-class FixedLzoTypedText[T](sep: TypedSep, path: String*)(
-    implicit td: TypeDescriptor[T])
-    extends FixedPathSource(path: _*) with LzoTypedTextDelimited[T] {
+class FixedLzoTypedText[T](
+    sep: TypedSep, path: String*)(implicit td: TypeDescriptor[T])
+    extends FixedPathSource(path: _*)
+    with LzoTypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }

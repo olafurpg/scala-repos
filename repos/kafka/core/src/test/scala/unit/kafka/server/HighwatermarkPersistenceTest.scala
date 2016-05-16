@@ -37,9 +37,9 @@ class HighwatermarkPersistenceTest {
   val topic = "foo"
   val logManagers =
     configs map { config =>
-      TestUtils.createLogManager(
-          logDirs = config.logDirs.map(new File(_)).toArray,
-          cleanerConfig = CleanerConfig())
+      TestUtils.createLogManager(logDirs =
+                                   config.logDirs.map(new File(_)).toArray,
+                                 cleanerConfig = CleanerConfig())
     }
 
   @After

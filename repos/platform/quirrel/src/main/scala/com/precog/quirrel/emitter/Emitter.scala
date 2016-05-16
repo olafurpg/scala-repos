@@ -29,8 +29,12 @@ import scalaz.{StateT, Id, Bind, Monoid, NonEmptyList => NEL}
 import scalaz.Scalaz._
 
 trait Emitter
-    extends AST with Instructions with Binder with ProvenanceChecker
-    with GroupSolver with Tracer {
+    extends AST
+    with Instructions
+    with Binder
+    with ProvenanceChecker
+    with GroupSolver
+    with Tracer {
 
   import instructions._
   import library._
@@ -216,7 +220,7 @@ trait Emitter
     def emitConstraints(
         expr: Expr, dispatches: Set[ast.Dispatch]): EmitterState = {
       val optState = for (const <- expr.constrainingExpr
-                                      if !(const equalsIgnoreLoc expr)) yield {
+                          if !(const equalsIgnoreLoc expr)) yield {
         if (expr.children exists { _.constrainingExpr == Some(const) }) None
         else {
           Some(emitExpr(const, dispatches) >> emitInstr(Dup) >> emitInstr(
@@ -434,8 +438,8 @@ trait Emitter
 
               val intersection =
                 resolvedProv.possibilities.intersect(resolvedProvAcc)
-              val itx = intersection.filter(
-                  p => p != ValueProvenance && p != NullProvenance)
+              val itx = intersection.filter(p =>
+                    p != ValueProvenance && p != NullProvenance)
 
               emitInstr(if (itx.isEmpty) Map2Cross(op2) else Map2Match(op2))(e)
             }
@@ -475,10 +479,10 @@ trait Emitter
         val e2 = e.copy(subResolve = e.subResolve compose subResolve2)
 
         val (e3, ()) = (reduce(actualStates) >> f(dispatches + expr))(e2)
-        val e4 = e3.copy(formals = params.foldLeft(e3.formals)(
-                  (fs, name) => fs - ((Identifier(Vector(), name), let))))
-        val e5 = e4.copy(marks = params.foldLeft(e4.marks)((fs,
-                  name) => fs - (MarkFormal(Identifier(Vector(), name), let))))
+        val e4 = e3.copy(formals = params.foldLeft(e3.formals)((fs, name) =>
+                  fs - ((Identifier(Vector(), name), let))))
+        val e5 = e4.copy(marks = params.foldLeft(e4.marks)((fs, name) =>
+                  fs - (MarkFormal(Identifier(Vector(), name), let))))
         (e5.copy(subResolve = e.subResolve), ())
       }
     }
@@ -594,8 +598,8 @@ trait Emitter
                     val joinInstr = StateT.apply[Id, Emission, Unit] { e =>
                       val resolved = e.subResolve(provenance)
                       emitInstr(if (resolved == ValueProvenance)
-                            Map2Cross(JoinObject) else Map2Match(JoinObject))(
-                          e)
+                            Map2Cross(JoinObject)
+                          else Map2Match(JoinObject))(e)
                     }
 
                     val joins = Vector.fill(singles.length - 1)(joinInstr)
@@ -635,8 +639,8 @@ trait Emitter
                       val joinInstr = StateT.apply[Id, Emission, Unit] { e =>
                         val resolved = e.subResolve(provenance)
                         emitInstr(if (resolved == ValueProvenance)
-                              Map2Cross(JoinArray) else Map2Match(JoinArray))(
-                            e)
+                              Map2Cross(JoinArray)
+                            else Map2Match(JoinArray))(e)
                       }
 
                       val joins = Vector.fill(singles.length - 1)(joinInstr)

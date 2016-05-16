@@ -51,8 +51,8 @@ object MultiLabelMetricsExample {
     // Individual label stats
     metrics.labels.foreach(label =>
           println(s"Class $label precision = ${metrics.precision(label)}"))
-    metrics.labels.foreach(
-        label => println(s"Class $label recall = ${metrics.recall(label)}"))
+    metrics.labels.foreach(label =>
+          println(s"Class $label recall = ${metrics.recall(label)}"))
     metrics.labels.foreach(label =>
           println(s"Class $label F1-score = ${metrics.f1Measure(label)}"))
 

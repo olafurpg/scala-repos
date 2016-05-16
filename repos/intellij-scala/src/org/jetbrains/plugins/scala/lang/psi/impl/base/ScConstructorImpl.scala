@@ -34,7 +34,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2008
   */
 class ScConstructorImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstructor {
+    extends ScalaPsiElementImpl(node)
+    with ScConstructor {
 
   def typeElement: ScTypeElement =
     findNotNullChildByClass(classOf[ScTypeElement])
@@ -159,8 +160,7 @@ class ScConstructorImpl(node: ASTNode)
                     nonValueType.internalType,
                     Seq(new Parameter(
                             "", None, expected, false, false, false, 0)),
-                    Seq(
-                        new Expression(InferUtil
+                    Seq(new Expression(InferUtil
                               .undefineSubstitutor(nonValueType.typeParameters)
                               .subst(subst.subst(tp).inferValueType))),
                     nonValueType.typeParameters,

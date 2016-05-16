@@ -66,7 +66,7 @@ private[http] object Handshake {
     def websocketUpgrade(
         headers: List[HttpHeader],
         hostHeaderPresent: Boolean): Option[UpgradeToWebSocket] = {
-      def find[T <: HttpHeader : ClassTag]: Option[T] =
+      def find[T <: HttpHeader: ClassTag]: Option[T] =
         headers.collectFirst {
           case t: T ⇒ t
         }
@@ -98,8 +98,8 @@ private[http] object Handshake {
                               Graph[FlowShape[Message, Message], Any]],
               subprotocol: Option[String]): HttpResponse = {
             require(
-                subprotocol.forall(
-                    chosen ⇒ clientSupportedSubprotocols.contains(chosen)),
+                subprotocol.forall(chosen ⇒
+                      clientSupportedSubprotocols.contains(chosen)),
                 s"Tried to choose invalid subprotocol '$subprotocol' which wasn't offered by the client: [${requestedProtocols
                   .mkString(", ")}]")
             buildResponse(key.get, handler, subprotocol)

@@ -72,13 +72,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     consumer0.subscribe(List(topic).asJava)
 
     val assignment = Set(tp, tp2)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == assignment.asJava
-        },
-        s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == assignment.asJava
+    }, s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
 
     // should auto-commit seeked positions before closing
     consumer0.seek(tp, 300)
@@ -104,13 +101,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     consumer0.subscribe(List(topic).asJava)
 
     val assignment = Set(tp, tp2)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == assignment.asJava
-        },
-        s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == assignment.asJava
+    }, s"Expected partitions ${assignment.asJava} but actually got ${consumer0.assignment()}")
 
     // should auto-commit seeked positions before closing
     consumer0.seek(tp, 300)
@@ -173,13 +167,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
                             new TopicPartition(topic1, 0),
                             new TopicPartition(topic1, 1))
 
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment() == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment() == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
 
     val topic4 = "tsomec" // matches subscribed pattern
     TestUtils.createTopic(this.zkUtils, topic4, 2, serverCount, this.servers)
@@ -189,13 +180,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     subscriptions ++=
       Set(new TopicPartition(topic4, 0), new TopicPartition(topic4, 1))
 
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment() == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment() == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
 
     this.consumers(0).unsubscribe()
     assertEquals(0, this.consumers(0).assignment().size)
@@ -223,13 +211,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
                             new TopicPartition(topic1, 0),
                             new TopicPartition(topic1, 1))
 
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment() == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment() == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment()}")
 
     this.consumers(0).unsubscribe()
     assertEquals(0, this.consumers(0).assignment().size)
@@ -266,24 +251,18 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       subscriptions ++ Set(
           new TopicPartition(otherTopic, 0), new TopicPartition(otherTopic, 1))
     this.consumers(0).subscribe(List(topic).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment}")
 
     TestUtils.createTopic(
         this.zkUtils, otherTopic, 2, serverCount, this.servers)
     this.consumers(0).subscribe(List(topic, otherTopic).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment == expandedSubscriptions.asJava
-        },
-        s"Expected partitions ${expandedSubscriptions.asJava} but actually got ${this.consumers(0).assignment}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment == expandedSubscriptions.asJava
+    }, s"Expected partitions ${expandedSubscriptions.asJava} but actually got ${this.consumers(0).assignment}")
   }
 
   @Test
@@ -298,22 +277,16 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     val shrunkenSubscriptions = Set(
         new TopicPartition(topic, 0), new TopicPartition(topic, 1))
     this.consumers(0).subscribe(List(topic, otherTopic).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${this.consumers(0).assignment}")
 
     this.consumers(0).subscribe(List(topic).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            this.consumers(0).poll(50)
-            this.consumers(0).assignment == shrunkenSubscriptions.asJava
-        },
-        s"Expected partitions ${shrunkenSubscriptions.asJava} but actually got ${this.consumers(0).assignment}")
+    TestUtils.waitUntilTrue(() => {
+      this.consumers(0).poll(50)
+      this.consumers(0).assignment == shrunkenSubscriptions.asJava
+    }, s"Expected partitions ${shrunkenSubscriptions.asJava} but actually got ${this.consumers(0).assignment}")
   }
 
   @Test
@@ -550,13 +523,10 @@ class PlaintextConsumerTest extends BaseConsumerTest {
 
     // subscribe to two topics
     consumer0.subscribe(List(topic1, topic2).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == expectedAssignment.asJava
-        },
-        s"Expected partitions ${expectedAssignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == expectedAssignment.asJava
+    }, s"Expected partitions ${expectedAssignment.asJava} but actually got ${consumer0.assignment()}")
 
     // add one more topic with 2 partitions
     val topic3 = "topic3"
@@ -566,23 +536,17 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       expectedAssignment ++ Set(
           new TopicPartition(topic3, 0), new TopicPartition(topic3, 1))
     consumer0.subscribe(List(topic1, topic2, topic3).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == newExpectedAssignment.asJava
-        },
-        s"Expected partitions ${newExpectedAssignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == newExpectedAssignment.asJava
+    }, s"Expected partitions ${newExpectedAssignment.asJava} but actually got ${consumer0.assignment()}")
 
     // remove the topic we just added
     consumer0.subscribe(List(topic1, topic2).asJava)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumer0.poll(50)
-            consumer0.assignment() == expectedAssignment.asJava
-        },
-        s"Expected partitions ${expectedAssignment.asJava} but actually got ${consumer0.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      consumer0.poll(50)
+      consumer0.assignment() == expectedAssignment.asJava
+    }, s"Expected partitions ${expectedAssignment.asJava} but actually got ${consumer0.assignment()}")
 
     consumer0.unsubscribe()
     assertEquals(0, consumer0.assignment().size)
@@ -1047,7 +1011,7 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       topicsToSubscribe: List[String],
       subscriptions: Set[TopicPartition])
     : (Buffer[KafkaConsumer[Array[Byte], Array[Byte]]],
-    Buffer[ConsumerAssignmentPoller]) = {
+       Buffer[ConsumerAssignmentPoller]) = {
     assertTrue(consumerCount <= subscriptions.size)
     val consumerGroup = Buffer[KafkaConsumer[Array[Byte], Array[Byte]]]()
     for (i <- 0 until consumerCount) consumerGroup +=
@@ -1107,15 +1071,11 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       subscriptions: Set[TopicPartition],
       msg: String,
       waitTime: Long = 10000L): Unit = {
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            val assignments = Buffer[Set[TopicPartition]]()
-            consumerPollers.foreach(assignments += _.consumerAssignment())
-            isPartitionAssignmentValid(assignments, subscriptions)
-        },
-        msg,
-        waitTime)
+    TestUtils.waitUntilTrue(() => {
+      val assignments = Buffer[Set[TopicPartition]]()
+      consumerPollers.foreach(assignments += _.consumerAssignment())
+      isPartitionAssignmentValid(assignments, subscriptions)
+    }, msg, waitTime)
   }
 
   def changeConsumerGroupSubscriptionAndValidateAssignment(
@@ -1127,10 +1087,9 @@ class PlaintextConsumerTest extends BaseConsumerTest {
     // since subscribe call to poller does not actually call consumer subscribe right away, wait
     // until subscribe is called on all consumers
     TestUtils.waitUntilTrue(
-        () =>
-          {
-            consumerPollers forall
-            (poller => poller.isSubscribeRequestProcessed())
+        () => {
+          consumerPollers forall
+          (poller => poller.isSubscribeRequestProcessed())
         },
         s"Failed to call subscribe on all consumers in the group for subscription ${subscriptions}",
         1000L)
@@ -1147,12 +1106,9 @@ class PlaintextConsumerTest extends BaseConsumerTest {
       subscriptions: Set[TopicPartition],
       rebalanceListener: ConsumerRebalanceListener): Unit = {
     consumer.subscribe(topicsToSubscribe.asJava, rebalanceListener)
-    TestUtils.waitUntilTrue(
-        () =>
-          {
-            val records = consumer.poll(50)
-            consumer.assignment() == subscriptions.asJava
-        },
-        s"Expected partitions ${subscriptions.asJava} but actually got ${consumer.assignment()}")
+    TestUtils.waitUntilTrue(() => {
+      val records = consumer.poll(50)
+      consumer.assignment() == subscriptions.asJava
+    }, s"Expected partitions ${subscriptions.asJava} but actually got ${consumer.assignment()}")
   }
 }

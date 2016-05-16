@@ -84,7 +84,8 @@ final case class TakenChopsticks(
  * A fsm hakker is an awesome dude or dudette who either thinks about hacking or has to eat ;-)
  */
 class FSMHakker(name: String, left: ActorRef, right: ActorRef)
-    extends Actor with FSM[FSMHakkerState, TakenChopsticks] {
+    extends Actor
+    with FSM[FSMHakkerState, TakenChopsticks] {
 
   //All hakkers start waiting
   startWith(Waiting, TakenChopsticks(None, None))

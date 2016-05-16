@@ -119,7 +119,8 @@ object ClientConnection {
   * This is useful if you want to wrap-but-modify an existing service.
   */
 abstract class ServiceProxy[-Req, +Rep](val self: Service[Req, Rep])
-    extends Service[Req, Rep] with Proxy {
+    extends Service[Req, Rep]
+    with Proxy {
   def apply(request: Req): Future[Rep] = self(request)
   override def close(deadline: Time): Future[Unit] = self.close(deadline)
 
@@ -129,7 +130,9 @@ abstract class ServiceProxy[-Req, +Rep](val self: Service[Req, Rep])
 }
 
 abstract class ServiceFactory[-Req, +Rep]
-    extends (ClientConnection => Future[Service[Req, Rep]]) with Closable { self =>
+    extends (ClientConnection => Future[Service[Req, Rep]])
+    with Closable {
+  self =>
 
   /**
     * Reserve the use of a given service instance. This pins the
@@ -210,7 +213,8 @@ object ServiceFactory {
   * and existing `ServiceFactory`.
   */
 abstract class ServiceFactoryProxy[-Req, +Rep](_self: ServiceFactory[Req, Rep])
-    extends ServiceFactory[Req, Rep] with Proxy {
+    extends ServiceFactory[Req, Rep]
+    with Proxy {
   def self: ServiceFactory[Req, Rep] = _self
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] = self(conn)

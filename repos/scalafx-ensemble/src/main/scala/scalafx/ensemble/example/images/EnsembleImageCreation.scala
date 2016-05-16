@@ -57,8 +57,8 @@ class EnsembleImageCreation extends EnsembleExample {
       smooth = true
     }, new ImageView {
       // image = new Image("/scalafx/ensemble/images/scala-logo.png")
-      image = new Image(
-          "http://www.scala-lang.org/resources/img/scala-logo.png")
+      image =
+        new Image("http://www.scala-lang.org/resources/img/scala-logo.png")
     })
   }
 }

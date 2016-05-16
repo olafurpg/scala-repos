@@ -35,7 +35,7 @@ class SortBasedAggregationIterator(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => (() => MutableProjection),
+                           Seq[Attribute]) => (() => MutableProjection),
     numOutputRows: LongSQLMetric)
     extends AggregationIterator(groupingExpressions,
                                 valueAttributes,

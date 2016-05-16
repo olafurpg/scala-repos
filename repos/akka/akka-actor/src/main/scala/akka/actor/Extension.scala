@@ -149,7 +149,8 @@ trait ExtensionIdProvider {
   *
   */
 abstract class ExtensionKey[T <: Extension](implicit m: ClassTag[T])
-    extends ExtensionId[T] with ExtensionIdProvider {
+    extends ExtensionId[T]
+    with ExtensionIdProvider {
   def this(clazz: Class[T]) = this()(ClassTag(clazz))
 
   override def lookup(): ExtensionId[T] = this

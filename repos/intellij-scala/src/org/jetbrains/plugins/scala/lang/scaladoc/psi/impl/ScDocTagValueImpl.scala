@@ -29,7 +29,8 @@ import scala.collection.mutable.ArrayBuilder
   * Date: 11/23/11
   */
 class ScDocTagValueImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocTagValue
+    extends ScalaPsiElementImpl(node)
+    with ScDocTagValue
     with ScDocReferenceElement {
   def nameId: PsiElement = this
 
@@ -123,8 +124,8 @@ class ScDocTagValueImpl(node: ASTNode)
         params: Seq[ScNamedElement]): Array[ScNamedElement] = {
       val paramsSet =
         (for (tag <- parent.asInstanceOf[ScDocComment].findTagsByName(tagName)
-                        if tag.getValueElement != null &&
-                    tag != getParent) yield tag.getValueElement.getText).toSet
+              if tag.getValueElement != null && tag != getParent) yield
+          tag.getValueElement.getText).toSet
 
       val result = ArrayBuilder.make[ScNamedElement]()
       params

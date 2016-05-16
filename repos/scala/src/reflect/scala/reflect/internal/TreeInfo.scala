@@ -123,8 +123,7 @@ abstract class TreeInfo {
     */
   def isStableMemberOf(
       sym: Symbol, tree: Tree, allowVolatile: Boolean): Boolean =
-    (symOk(sym) &&
-        (!sym.isTerm ||
+    (symOk(sym) && (!sym.isTerm ||
             (sym.isStable && (allowVolatile || !sym.hasVolatileType))) &&
         typeOk(tree.tpe) && (allowVolatile || !hasVolatileType(tree)) &&
         !definitions.isByNameParamType(tree.tpe))
@@ -132,8 +131,7 @@ abstract class TreeInfo {
   private def isStableIdent(tree: Ident, allowVolatile: Boolean): Boolean =
     (symOk(tree.symbol) && tree.symbol.isStable &&
         !definitions.isByNameParamType(tree.tpe) &&
-        !definitions.isByName(tree.symbol) &&
-        (allowVolatile ||
+        !definitions.isByName(tree.symbol) && (allowVolatile ||
             !tree.symbol.hasVolatileType) // TODO SPEC: not required by spec
         )
 
@@ -224,8 +222,8 @@ abstract class TreeInfo {
       }
       def isWarnableSymbol = {
         val sym = tree.symbol
-        (sym == null) || !(sym.isModule ||
-            sym.isLazy || definitions.isByNameParamType(sym.tpe_*)) || {
+        (sym == null) || !(sym.isModule || sym.isLazy ||
+            definitions.isByNameParamType(sym.tpe_*)) || {
           debuglog(
               "'Pure' but side-effecting expression in statement position: " +
               tree)
@@ -624,12 +622,12 @@ abstract class TreeInfo {
   }
 
   /** Does this CaseDef catch Throwable? */
-  def catchesThrowable(cdef: CaseDef) = (cdef.guard.isEmpty &&
-      (unbind(cdef.pat) match {
-            case Ident(nme.WILDCARD) => true
-            case i @ Ident(name) => hasNoSymbol(i)
-            case _ => false
-          }))
+  def catchesThrowable(cdef: CaseDef) =
+    (cdef.guard.isEmpty && (unbind(cdef.pat) match {
+              case Ident(nme.WILDCARD) => true
+              case i @ Ident(name) => hasNoSymbol(i)
+              case _ => false
+            }))
 
   /** Is this CaseDef synthetically generated, e.g. by `MatchTranslation.translateTry`? */
   def isSyntheticCase(cdef: CaseDef) = cdef.pat.exists {
@@ -976,8 +974,7 @@ abstract class TreeInfo {
   }
 
   def isNullaryInvocation(tree: Tree): Boolean =
-    tree.symbol != null && tree.symbol.isMethod &&
-    (tree match {
+    tree.symbol != null && tree.symbol.isMethod && (tree match {
           case TypeApply(fun, _) => isNullaryInvocation(fun)
           case tree: RefTree => true
           case _ => false

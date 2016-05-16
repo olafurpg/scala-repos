@@ -32,7 +32,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimePeriodSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -140,8 +141,7 @@ trait TimePeriodSpecs[M[+ _]]
       val result = testEval(input)
 
       result mustEqual Set(
-          (Vector(),
-           SArray(Vector(SString("1987-12-09T18:33:02.037Z")))))
+          (Vector(), SArray(Vector(SString("1987-12-09T18:33:02.037Z")))))
     }
 
     "compute correct range given different timezones" in {
@@ -158,8 +158,7 @@ trait TimePeriodSpecs[M[+ _]]
       val result = testEval(input)
 
       result mustEqual Set(
-          (Vector(),
-           SArray(Vector(SString("1987-12-09T18:33:02.037+01:00")))))
+          (Vector(), SArray(Vector(SString("1987-12-09T18:33:02.037+01:00")))))
     }
 
     "compute correct range given multiple values" in {

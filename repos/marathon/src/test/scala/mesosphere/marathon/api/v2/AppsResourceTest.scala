@@ -30,7 +30,10 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class AppsResourceTest
-    extends MarathonSpec with MarathonActorSupport with Matchers with Mockito
+    extends MarathonSpec
+    with MarathonActorSupport
+    with Matchers
+    with Mockito
     with GivenWhenThen {
 
   import mesosphere.marathon.api.v2.json.Formats._
@@ -508,13 +511,12 @@ class AppsResourceTest
 
   test("access with limited authorization gives a filtered apps listing") {
     Given("An authorized identity with limited ACL's")
-    auth.authFn = (resource: Any) =>
-      {
-        val id = resource match {
-          case app: AppDefinition => app.id.toString
-          case _ => resource.asInstanceOf[Group].id.toString
-        }
-        id.startsWith("/visible")
+    auth.authFn = (resource: Any) => {
+      val id = resource match {
+        case app: AppDefinition => app.id.toString
+        case _ => resource.asInstanceOf[Group].id.toString
+      }
+      id.startsWith("/visible")
     }
     implicit val identity = auth.identity
     val selector = appsResource.selectAuthorized(AppSelector.forall(Seq.empty))

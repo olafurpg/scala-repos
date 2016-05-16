@@ -22,8 +22,11 @@ import rx.lang.scala.Observer
 import scala.util.Random
 
 class OfferMatcherManagerActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with GivenWhenThen with Mockito {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
 
   test("The list of OfferMatchers is random without precedence") {
     Given("OfferMatcher with num normal matchers")

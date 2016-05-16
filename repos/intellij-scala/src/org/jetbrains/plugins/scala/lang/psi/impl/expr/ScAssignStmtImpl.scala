@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
   * @author Alexander Podkhalyuzin
   */
 class ScAssignStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScAssignStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScAssignStmt {
   override def toString: String = "AssignStatement"
 
   protected override def innerType(ctx: TypingContext) = {

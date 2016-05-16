@@ -21,7 +21,9 @@ import akka.http.impl.util._
 import akka.http.scaladsl.TestUtils.writeAllText
 
 class FileAndResourceDirectivesSpec
-    extends RoutingSpec with Inspectors with Inside {
+    extends RoutingSpec
+    with Inspectors
+    with Inside {
 
   override def testConfigSource =
     "akka.http.routing.range-coalescing-threshold = 1"

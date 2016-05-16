@@ -56,26 +56,23 @@ object StrictForm {
       : FromStrictFormFieldUnmarshaller[T] =
       Unmarshaller.withMaterializer(
           implicit ec ⇒
-            implicit mat ⇒
-              {
-            case FromString(value) ⇒ um.unmarshalString(value)
-            case FromPart(value) ⇒ um.unmarshalPart(value)
+            implicit mat ⇒ {
+          case FromString(value) ⇒ um.unmarshalString(value)
+          case FromPart(value) ⇒ um.unmarshalPart(value)
       })
 
     def unmarshallerFromFSU[T](
         fsu: FromStringUnmarshaller[T]): FromStrictFormFieldUnmarshaller[T] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒
-            implicit mat ⇒
-              {
-            case FromString(value) ⇒ fsu(value)
-            case FromPart(value) ⇒
-              val charsetName = value.entity.contentType
-                .asInstanceOf[ContentType.NonBinary]
-                .charset
-                .nioCharset
-                .name
-              fsu(value.entity.data.decodeString(charsetName))
+      Unmarshaller.withMaterializer(implicit ec ⇒
+            implicit mat ⇒ {
+          case FromString(value) ⇒ fsu(value)
+          case FromPart(value) ⇒
+            val charsetName = value.entity.contentType
+              .asInstanceOf[ContentType.NonBinary]
+              .charset
+              .nioCharset
+              .name
+            fsu(value.entity.data.decodeString(charsetName))
       })
 
     @implicitNotFound(

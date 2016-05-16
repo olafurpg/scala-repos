@@ -52,7 +52,8 @@ object SshServer {
  * git clone ssh://username@host_or_ip:29418/owner/repository_name.git
  */
 class SshServerListener
-    extends ServletContextListener with SystemSettingsService {
+    extends ServletContextListener
+    with SystemSettingsService {
 
   private val logger = LoggerFactory.getLogger(classOf[SshServerListener])
 

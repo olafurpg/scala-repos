@@ -247,7 +247,9 @@ class Consumer extends Actor with ActorLogging with ConsumerBehavior {
 }
 
 class ProducerConsumer
-    extends Actor with ActorLogging with ProducerBehavior
+    extends Actor
+    with ActorLogging
+    with ProducerBehavior
     with ConsumerBehavior {
 
   def receive = producerBehavior.orElse[Any, Unit](consumerBehavior)

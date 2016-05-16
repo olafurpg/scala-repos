@@ -40,7 +40,7 @@ class AggregateFlatClassPathTest {
     override def classes(inPackage: String): Seq[ClassFileEntry] =
       for {
         entriesWrapper <- classesInPackage
-                             if entriesWrapper.inPackage == inPackage
+        if entriesWrapper.inPackage == inPackage
         name <- entriesWrapper.names
       } yield classFileEntry(virtualPath, inPackage, name)
 
@@ -58,7 +58,7 @@ class AggregateFlatClassPathTest {
     override def sources(inPackage: String): Seq[SourceFileEntry] =
       for {
         entriesWrapper <- sourcesInPackage
-                             if entriesWrapper.inPackage == inPackage
+        if entriesWrapper.inPackage == inPackage
         name <- entriesWrapper.names
       } yield sourceFileEntry(virtualPath, inPackage, name)
 

@@ -113,7 +113,7 @@ object ResourceUtil {
                     .newBuilder()
                     .addAllItem(resultSet.asJava))
               .build()
-          )
+        )
       else None
     }
 

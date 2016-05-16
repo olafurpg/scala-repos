@@ -47,9 +47,8 @@ object CanConvolve extends SerializableLogging {
 
   @expand
   @expand.valify
-  implicit def dvT1DConvolve[
-      @expand.args(Int, Long, Float, Double) T]: CanConvolve[
-      DenseVector[T], DenseVector[T], DenseVector[T]] = {
+  implicit def dvT1DConvolve[@expand.args(Int, Long, Float, Double) T]
+    : CanConvolve[DenseVector[T], DenseVector[T], DenseVector[T]] = {
     new CanConvolve[DenseVector[T], DenseVector[T], DenseVector[T]] {
       def apply(data: DenseVector[T],
                 kernel: DenseVector[T],
@@ -184,9 +183,8 @@ object CanConvolve extends SerializableLogging {
 
   @expand
   @expand.valify
-  implicit def dvTKernel1DConvolve[
-      @expand.args(Int, Long, Float, Double) T]: CanConvolve[
-      DenseVector[T], FIRKernel1D[T], DenseVector[T]] = {
+  implicit def dvTKernel1DConvolve[@expand.args(Int, Long, Float, Double) T]
+    : CanConvolve[DenseVector[T], FIRKernel1D[T], DenseVector[T]] = {
     new CanConvolve[DenseVector[T], FIRKernel1D[T], DenseVector[T]] {
       def apply(data: DenseVector[T],
                 kernel: FIRKernel1D[T],
@@ -215,8 +213,8 @@ object CanConvolve extends SerializableLogging {
   @expand
   @expand.valify
   implicit def correlateLoopNoOverhangRangeT[
-      @expand.args(Double, Float, Long) T]: CanCorrelateNoOverhang[
-      DenseVector[T], DenseVector[T], DenseVector[T]] =
+      @expand.args(Double, Float, Long) T]
+    : CanCorrelateNoOverhang[DenseVector[T], DenseVector[T], DenseVector[T]] =
     new CanCorrelateNoOverhang[DenseVector[T], DenseVector[T], DenseVector[T]] {
       def apply(data: DenseVector[T],
                 kernel: DenseVector[T],
@@ -239,15 +237,14 @@ object CanConvolve extends SerializableLogging {
 
         val tempArr = tempRange
           .map(
-              (count: Int) =>
-                {
-                  var ki: Int = 0
-                  var sum = zero
-                  while (ki < kernel.length) {
-                    sum = sum + dataVect(count + ki) * kernelVect(ki)
-                    ki = ki + 1
-                  }
-                  sum
+              (count: Int) => {
+                var ki: Int = 0
+                var sum = zero
+                while (ki < kernel.length) {
+                  sum = sum + dataVect(count + ki) * kernelVect(ki)
+                  ki = ki + 1
+                }
+                sum
               }
           )
           .toArray
@@ -279,15 +276,14 @@ object CanConvolve extends SerializableLogging {
         val tempRange = range.par
         val tempArr = tempRange
           .map(
-              (count: Int) =>
-                {
-                  var ki: Int = 0
-                  var sum = 0L
-                  while (ki < kernel.length) {
-                    sum = sum + dataL(count + ki) * kernelL(ki)
-                    ki = ki + 1
-                  }
-                  sum.toInt
+              (count: Int) => {
+                var ki: Int = 0
+                var sum = 0L
+                while (ki < kernel.length) {
+                  sum = sum + dataL(count + ki) * kernelL(ki)
+                  ki = ki + 1
+                }
+                sum.toInt
               }
           )
           .toArray

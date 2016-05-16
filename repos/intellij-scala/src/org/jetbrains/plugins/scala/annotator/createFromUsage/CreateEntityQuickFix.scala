@@ -108,7 +108,8 @@ abstract class CreateEntityQuickFix(
       val builder = new TemplateBuilderImpl(entity)
 
       for (aType <- entityType;
-      typeElement <- entity.children.findByType(classOf[ScSimpleTypeElement])) {
+           typeElement <- entity.children.findByType(
+                             classOf[ScSimpleTypeElement])) {
         builder.replaceElement(typeElement, aType)
       }
 

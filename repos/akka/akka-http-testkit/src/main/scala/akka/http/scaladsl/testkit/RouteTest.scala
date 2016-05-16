@@ -25,8 +25,10 @@ import akka.http.scaladsl.model.headers.{Upgrade, `Sec-WebSocket-Protocol`, Host
 import FastFuture._
 
 trait RouteTest
-    extends RequestBuilding with WSTestRequestBuilding
-    with RouteTestResultComponent with MarshallingTestUtils {
+    extends RequestBuilding
+    with WSTestRequestBuilding
+    with RouteTestResultComponent
+    with MarshallingTestUtils {
   this: TestFrameworkInterface ⇒
 
   /** Override to supply a custom ActorSystem */
@@ -67,7 +69,7 @@ trait RouteTest
   def response: HttpResponse = result.response
   def responseEntity: HttpEntity = result.entity
   def chunks: immutable.Seq[HttpEntity.ChunkStreamPart] = result.chunks
-  def entityAs[T : FromEntityUnmarshaller : ClassTag](
+  def entityAs[T: FromEntityUnmarshaller: ClassTag](
       implicit timeout: Duration = 1.second): T = {
     def msg(e: Throwable) =
       s"Could not unmarshal entity to type '${implicitly[ClassTag[T]]}' for `entityAs` assertion: $e\n\nResponse was: $responseSafe"
@@ -77,7 +79,7 @@ trait RouteTest
                    .recover[T] { case error ⇒ failTest(msg(error)) },
                  timeout)
   }
-  def responseAs[T : FromResponseUnmarshaller : ClassTag](
+  def responseAs[T: FromResponseUnmarshaller: ClassTag](
       implicit timeout: Duration = 1.second): T = {
     def msg(e: Throwable) =
       s"Could not unmarshal response to type '${implicitly[ClassTag[T]]}' for `responseAs` assertion: $e\n\nResponse was: $responseSafe"
@@ -93,7 +95,7 @@ trait RouteTest
   def charset: HttpCharset =
     charsetOption getOrElse sys.error("Binary entity does not have charset")
   def headers: immutable.Seq[HttpHeader] = response.headers
-  def header[T <: HttpHeader : ClassTag]: Option[T] = response.header[T]
+  def header[T <: HttpHeader: ClassTag]: Option[T] = response.header[T]
   def header(name: String): Option[HttpHeader] =
     response.headers.find(_.is(name.toLowerCase))
   def status: StatusCode = response.status

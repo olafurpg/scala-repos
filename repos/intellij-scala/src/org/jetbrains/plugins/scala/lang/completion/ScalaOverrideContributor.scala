@@ -98,7 +98,7 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
     handleMembers(classMembers,
                   clazz,
                   (classMember,
-                  clazz) => createText(classMember, clazz, full = true),
+                   clazz) => createText(classMember, clazz, full = true),
                   resultSet) { classMember =>
       new MyInsertHandler()
     }
@@ -115,8 +115,8 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
 
     val mlo = Option(
         PsiTreeUtil.getContextOfType(position, classOf[ScModifierListOwner]))
-    if (mlo.isEmpty) return else if (mlo.isDefined &&
-                                     !mlo.get.hasModifierProperty("override"))
+    if (mlo.isEmpty) return
+    else if (mlo.isDefined && !mlo.get.hasModifierProperty("override"))
       return
 
     val classMembers =
@@ -218,7 +218,7 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
   private def handleMembers(classMembers: Iterable[ClassMember],
                             td: ScTemplateDefinition,
                             name: (ClassMember,
-                            ScTemplateDefinition) => String,
+                                   ScTemplateDefinition) => String,
                             resultSet: CompletionResultSet)(
       insertionHandler: ClassMember => InsertHandler[LookupElement]): Unit = {
     classMembers.foreach {

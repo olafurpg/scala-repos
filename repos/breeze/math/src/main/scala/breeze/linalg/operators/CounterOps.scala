@@ -7,7 +7,7 @@ import breeze.generic.UFunc
 import breeze.linalg._
 
 trait CounterOps {
-  implicit def canCopy[K1, V : Zero : Semiring]: CanCopy[Counter[K1, V]] =
+  implicit def canCopy[K1, V: Zero: Semiring]: CanCopy[Counter[K1, V]] =
     new CanCopy[Counter[K1, V]] {
       def apply(t: Counter[K1, V]): Counter[K1, V] = {
         Counter(t.iterator)
@@ -27,8 +27,8 @@ trait CounterOps {
     }
   }
 
-  implicit def addIntoVV[
-      K1, V : Semiring]: OpAdd.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] =
+  implicit def addIntoVV[K1, V: Semiring]
+    : OpAdd.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] =
     new OpAdd.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], b: Counter[K1, V]) {
@@ -38,8 +38,8 @@ trait CounterOps {
       }
     }
 
-  implicit def canAxpy[K1, V : Semiring]: scaleAdd.InPlaceImpl3[
-      Counter[K1, V], V, Counter[K1, V]] =
+  implicit def canAxpy[K1, V: Semiring]
+    : scaleAdd.InPlaceImpl3[Counter[K1, V], V, Counter[K1, V]] =
     new scaleAdd.InPlaceImpl3[Counter[K1, V], V, Counter[K1, V]] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], s: V, b: Counter[K1, V]) {
@@ -49,13 +49,13 @@ trait CounterOps {
       }
     }
 
-  implicit def addVV[K1, V : Semiring : Zero]: OpAdd.Impl2[
-      Counter[K1, V], Counter[K1, V], Counter[K1, V]] = {
+  implicit def addVV[K1, V: Semiring: Zero]
+    : OpAdd.Impl2[Counter[K1, V], Counter[K1, V], Counter[K1, V]] = {
     binaryOpFromBinaryUpdateOp(canCopy, addIntoVV)
   }
 
-  implicit def addIntoVS[
-      K1, V : Semiring]: OpAdd.InPlaceImpl2[Counter[K1, V], V] =
+  implicit def addIntoVS[K1, V: Semiring]
+    : OpAdd.InPlaceImpl2[Counter[K1, V], V] =
     new OpAdd.InPlaceImpl2[Counter[K1, V], V] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], b: V) {
@@ -65,13 +65,13 @@ trait CounterOps {
       }
     }
 
-  implicit def addVS[K1, V : Semiring : Zero]: OpAdd.Impl2[
-      Counter[K1, V], V, Counter[K1, V]] = {
+  implicit def addVS[K1, V: Semiring: Zero]
+    : OpAdd.Impl2[Counter[K1, V], V, Counter[K1, V]] = {
     binaryOpFromBinaryUpdateOp(canCopy, addIntoVS)
   }
 
-  implicit def subIntoVV[
-      K1, V : Ring]: OpSub.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] = {
+  implicit def subIntoVV[K1, V: Ring]
+    : OpSub.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] = {
     new OpSub.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] {
       val field = implicitly[Ring[V]]
       def apply(a: Counter[K1, V], b: Counter[K1, V]) {
@@ -82,12 +82,12 @@ trait CounterOps {
     }
   }
 
-  implicit def subVV[K1, V : Ring : Zero]: OpSub.Impl2[
-      Counter[K1, V], Counter[K1, V], Counter[K1, V]] = {
+  implicit def subVV[K1, V: Ring: Zero]
+    : OpSub.Impl2[Counter[K1, V], Counter[K1, V], Counter[K1, V]] = {
     binaryOpFromBinaryUpdateOp(canCopy, subIntoVV)
   }
 
-  implicit def subIntoVS[K1, V : Ring]: OpSub.InPlaceImpl2[Counter[K1, V], V] =
+  implicit def subIntoVS[K1, V: Ring]: OpSub.InPlaceImpl2[Counter[K1, V], V] =
     new OpSub.InPlaceImpl2[Counter[K1, V], V] {
       val field = implicitly[Ring[V]]
       def apply(a: Counter[K1, V], b: V) {
@@ -97,14 +97,13 @@ trait CounterOps {
       }
     }
 
-  implicit def subVS[
-      K1, V : Ring : Zero]: OpSub.Impl2[Counter[K1, V], V, Counter[K1, V]] = {
+  implicit def subVS[K1, V: Ring: Zero]
+    : OpSub.Impl2[Counter[K1, V], V, Counter[K1, V]] = {
     binaryOpFromBinaryUpdateOp(canCopy, subIntoVS)
   }
 
-  implicit def canMulIntoVV[
-      K2, K1 <: K2, V : Semiring]: OpMulScalar.InPlaceImpl2[
-      Counter[K1, V], Counter[K2, V]] =
+  implicit def canMulIntoVV[K2, K1 <: K2, V: Semiring]
+    : OpMulScalar.InPlaceImpl2[Counter[K1, V], Counter[K2, V]] =
     new OpMulScalar.InPlaceImpl2[Counter[K1, V], Counter[K2, V]] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], b: Counter[K2, V]) {
@@ -128,10 +127,8 @@ trait CounterOps {
     }
   }
 
-  implicit def canMulIntoVS[
-      K2,
-      K1 <: K2,
-      V : Semiring]: OpMulScalar.InPlaceImpl2[Counter[K1, V], V] =
+  implicit def canMulIntoVS[K2, K1 <: K2, V: Semiring]
+    : OpMulScalar.InPlaceImpl2[Counter[K1, V], V] =
     new OpMulScalar.InPlaceImpl2[Counter[K1, V], V] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], b: V) {
@@ -141,10 +138,8 @@ trait CounterOps {
       }
     }
 
-  implicit def canMulIntoVS_M[
-      K2,
-      K1 <: K2,
-      V : Semiring]: OpMulMatrix.InPlaceImpl2[Counter[K1, V], V] =
+  implicit def canMulIntoVS_M[K2, K1 <: K2, V: Semiring]
+    : OpMulMatrix.InPlaceImpl2[Counter[K1, V], V] =
     new OpMulMatrix.InPlaceImpl2[Counter[K1, V], V] {
       val field = implicitly[Semiring[V]]
       def apply(a: Counter[K1, V], b: V) {
@@ -182,8 +177,8 @@ trait CounterOps {
     }
   }
 
-  implicit def canDivIntoVV[
-      K1, V : Field]: OpDiv.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] = {
+  implicit def canDivIntoVV[K1, V: Field]
+    : OpDiv.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] = {
     new OpDiv.InPlaceImpl2[Counter[K1, V], Counter[K1, V]] {
       val field = implicitly[Field[V]]
       def apply(a: Counter[K1, V], b: Counter[K1, V]) {
@@ -224,8 +219,8 @@ trait CounterOps {
     }
   }
 
-  implicit def canDivIntoVS[
-      K1, V : Field]: OpDiv.InPlaceImpl2[Counter[K1, V], V] =
+  implicit def canDivIntoVS[K1, V: Field]
+    : OpDiv.InPlaceImpl2[Counter[K1, V], V] =
     new OpDiv.InPlaceImpl2[Counter[K1, V], V] {
       val field = implicitly[Field[V]]
       def apply(a: Counter[K1, V], b: V) {
@@ -235,8 +230,8 @@ trait CounterOps {
       }
     }
 
-  implicit def canSetIntoVV[
-      K1, K2 <: K1, V]: OpSet.InPlaceImpl2[Counter[K1, V], Counter[K2, V]] =
+  implicit def canSetIntoVV[K1, K2 <: K1, V]
+    : OpSet.InPlaceImpl2[Counter[K1, V], Counter[K2, V]] =
     new OpSet.InPlaceImpl2[Counter[K1, V], Counter[K2, V]] {
       def apply(a: Counter[K1, V], b: Counter[K2, V]) {
         a.data.clear()
@@ -316,7 +311,7 @@ trait CounterOps {
       }
     }
 
-  class CanZipMapValuesCounter[K, V, RV : Zero : Semiring]
+  class CanZipMapValuesCounter[K, V, RV: Zero: Semiring]
       extends CanZipMapValues[Counter[K, V], V, RV, Counter[K, RV]] {
 
     /**Maps all corresponding values from the two collection. */
@@ -329,10 +324,10 @@ trait CounterOps {
     }
   }
 
-  implicit def zipMap[K, V, R : Zero : Semiring] =
+  implicit def zipMap[K, V, R: Zero: Semiring] =
     new CanZipMapValuesCounter[K, V, R]
 
-  class CanZipMapKeyValuesCounter[K, V, RV : Zero : Semiring]
+  class CanZipMapKeyValuesCounter[K, V, RV: Zero: Semiring]
       extends CanZipMapKeyValues[Counter[K, V], K, V, RV, Counter[K, RV]] {
 
     /**Maps all corresponding values from the two collection. */
@@ -351,10 +346,11 @@ trait CounterOps {
     }
   }
 
-  implicit def zipMapKeyValues[K, V, R : Zero : Semiring] =
+  implicit def zipMapKeyValues[K, V, R: Zero: Semiring] =
     new CanZipMapKeyValuesCounter[K, V, R]
 
-  implicit def canTransformValues[L, V]: CanTransformValues[Counter[L, V], V] = {
+  implicit def canTransformValues[L, V]
+    : CanTransformValues[Counter[L, V], V] = {
     new CanTransformValues[Counter[L, V], V] {
       def transform(from: Counter[L, V], fn: (V) => V) {
         for ((k, v) <- from.activeIterator) {

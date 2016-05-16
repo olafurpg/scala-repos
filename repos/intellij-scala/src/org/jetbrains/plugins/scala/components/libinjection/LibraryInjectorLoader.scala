@@ -281,8 +281,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       .flatMap(f => extractLibraryManifest(f))
       .filterNot(jarCache.cache.values().contains)
     val validManifests = parsedManifests.flatMap(verifyManifest)
-    val candidates = validManifests.map(
-        manifest => manifest -> findMatchingInjectors(manifest))
+    val candidates = validManifests.map(manifest =>
+          manifest -> findMatchingInjectors(manifest))
     LOG.trace(s"Found ${candidates.size} new jars with embedded extensions")
     if (candidates.nonEmpty) askUser(candidates)
   }
@@ -303,9 +303,9 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
     getLibraryCacheDir(jarFile).list().nonEmpty
   }
 
-  private def extractLibraryManifest(
-      jar: VirtualFile,
-      skipIncompatible: Boolean = true): Option[JarManifest] = {
+  private def extractLibraryManifest(jar: VirtualFile,
+                                     skipIncompatible: Boolean =
+                                       true): Option[JarManifest] = {
     val manifestFile = Option(
         jar.findFileByRelativePath(s"META-INF/$INJECTOR_MANIFEST_NAME"))
     manifestFile
@@ -347,8 +347,8 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
       libraryManifest: JarManifest): Option[PluginDescriptor] = {
     val curVer =
       ScalaPluginVersionVerifier.getPluginVersion.getOrElse(Version.Snapshot)
-    libraryManifest.pluginDescriptors.find(
-        d => (curVer > d.since && curVer < d.until) || curVer.isSnapshot)
+    libraryManifest.pluginDescriptors.find(d =>
+          (curVer > d.since && curVer < d.until) || curVer.isSnapshot)
   }
 
   private def findMatchingInjectors(
@@ -378,13 +378,12 @@ class LibraryInjectorLoader(val project: Project) extends ProjectComponent {
         .getInstance()
         .findFileByUrl("jar://" + jar.getAbsolutePath + "!/")
       if (root != null) {
-        injectorDescriptor.sources.flatMap(path =>
-              {
-            Option(root.findFileByRelativePath(path)).map { f =>
-              if (f.isDirectory)
-                f.getChildren.filter(!_.isDirectory).map(copyToTmpDir).toSeq
-              else Seq(copyToTmpDir(f))
-            }.getOrElse(Seq.empty)
+        injectorDescriptor.sources.flatMap(path => {
+          Option(root.findFileByRelativePath(path)).map { f =>
+            if (f.isDirectory)
+              f.getChildren.filter(!_.isDirectory).map(copyToTmpDir).toSeq
+            else Seq(copyToTmpDir(f))
+          }.getOrElse(Seq.empty)
         })
       } else {
         Error.noJarFound(jar)

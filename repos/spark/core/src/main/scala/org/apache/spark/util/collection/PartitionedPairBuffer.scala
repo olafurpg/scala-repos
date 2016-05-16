@@ -28,7 +28,8 @@ import org.apache.spark.util.collection.WritablePartitionedPairCollection._
   * The buffer can support up to `1073741823 (2 ^ 30 - 1)` elements.
   */
 private[spark] class PartitionedPairBuffer[K, V](initialCapacity: Int = 64)
-    extends WritablePartitionedPairCollection[K, V] with SizeTracker {
+    extends WritablePartitionedPairCollection[K, V]
+    with SizeTracker {
   import PartitionedPairBuffer._
 
   require(initialCapacity <= MAXIMUM_CAPACITY,

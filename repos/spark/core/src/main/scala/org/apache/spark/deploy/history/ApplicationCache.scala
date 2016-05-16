@@ -518,7 +518,8 @@ private[history] trait ApplicationCacheOperations {
   * the configuration data passed to the servlet is just a string:string map.
   */
 private[history] class ApplicationCacheCheckFilter()
-    extends Filter with Logging {
+    extends Filter
+    with Logging {
 
   import ApplicationCacheCheckFilterRelay._
   var appId: String = _
@@ -623,8 +624,8 @@ private[history] object ApplicationCacheCheckFilterRelay extends Logging {
     * @param cache new cache
     */
   def setApplicationCache(cache: ApplicationCache): Unit = {
-    applicationCache.foreach(
-        c => logWarning(s"Overwriting application cache $c"))
+    applicationCache.foreach(c =>
+          logWarning(s"Overwriting application cache $c"))
     applicationCache = Some(cache)
   }
 

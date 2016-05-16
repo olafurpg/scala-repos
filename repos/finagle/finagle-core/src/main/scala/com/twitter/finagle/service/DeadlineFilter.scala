@@ -97,12 +97,12 @@ object DeadlineFilter {
   * @see The [[https://twitter.github.io/finagle/guide/Servers.html#request-deadline user guide]]
   *      for more details.
   */
-private[finagle] class DeadlineFilter[Req, Rep](
-    tolerance: Duration,
-    rejectPeriod: Duration,
-    maxRejectPercentage: Double,
-    statsReceiver: StatsReceiver,
-    nowMillis: () => Long = Stopwatch.systemMillis)
+private[finagle] class DeadlineFilter[Req, Rep](tolerance: Duration,
+                                                rejectPeriod: Duration,
+                                                maxRejectPercentage: Double,
+                                                statsReceiver: StatsReceiver,
+                                                nowMillis: () => Long =
+                                                  Stopwatch.systemMillis)
     extends SimpleFilter[Req, Rep] {
 
   require(tolerance >= Duration.Zero, "tolerance must be greater than zero")

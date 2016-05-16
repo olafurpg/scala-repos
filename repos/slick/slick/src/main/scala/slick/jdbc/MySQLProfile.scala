@@ -144,7 +144,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
                             RelationalProfile.ColumnOption.Default[_]])
                     .isDefined || sym
                     .flatMap(_.findColumnOption[ColumnOption.PrimaryKey.type])
-                    .isDefined) "VARCHAR(254)" else "TEXT"
+                    .isDefined) "VARCHAR(254)"
+              else "TEXT"
           }
       }
     case _ => super.defaultSqlTypeName(tmd, sym)
@@ -269,9 +270,8 @@ trait MySQLProfile extends JdbcProfile { profile =>
         (if (desc) fromInt(-1) else fromInt(java.lang.Integer.MAX_VALUE))
       val start = seq._start.getOrElse(if (desc) maxValue else minValue)
       val beforeStart = start - increment
-      if (!seq._cycle &&
-          (seq._minValue.isDefined && desc || seq._maxValue.isDefined &&
-              !desc))
+      if (!seq._cycle && (seq._minValue.isDefined && desc ||
+              seq._maxValue.isDefined && !desc))
         throw new SlickException(
             "Sequences with limited size and without CYCLE are not supported by MySQLProfile's sequence emulation")
       val incExpr =
@@ -344,14 +344,16 @@ trait MySQLProfile extends JdbcProfile { profile =>
 
 object MySQLProfile extends MySQLProfile {
   final case class RowNum(sym: AnonSymbol, inc: Boolean)
-      extends NullaryNode with SimplyTypedNode {
+      extends NullaryNode
+      with SimplyTypedNode {
     type Self = RowNum
     def buildType = ScalaBaseType.longType
     def rebuild = copy()
   }
 
   final case class RowNumGen(sym: AnonSymbol, init: Long)
-      extends NullaryNode with SimplyTypedNode {
+      extends NullaryNode
+      with SimplyTypedNode {
     type Self = RowNumGen
     def buildType = ScalaBaseType.longType
     def rebuild = copy()

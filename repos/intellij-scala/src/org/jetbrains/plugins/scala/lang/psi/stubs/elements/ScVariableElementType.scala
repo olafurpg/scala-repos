@@ -30,7 +30,8 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
           .asInstanceOf[ScVariableDefinition]
           .expr
           .map(_.getText)
-          .getOrElse("") else ""
+          .getOrElse("")
+      else ""
     val containerText =
       if (isDecl) psi.asInstanceOf[ScVariableDeclaration].getIdList.getText
       else psi.asInstanceOf[ScVariableDefinition].pList.getText
@@ -61,8 +62,8 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[String](namesLength)
-    for (i <- 0 to (namesLength - 1)) names(i) = StringRef.toString(
-        dataStream.readName)
+    for (i <- 0 to (namesLength - 1)) names(i) =
+      StringRef.toString(dataStream.readName)
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
     val typeText = StringRef.toString(dataStream.readName)
     val bodyText = StringRef.toString(dataStream.readName)

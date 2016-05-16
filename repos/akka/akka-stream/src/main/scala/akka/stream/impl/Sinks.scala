@@ -187,10 +187,9 @@ private[akka] final class ActorSubscriberSink[In](
     extends SinkModule[In, ActorRef](shape) {
 
   override def create(context: MaterializationContext) = {
-    val subscriberRef = ActorMaterializer
-      .downcast(context.materializer)
-      .actorOf(context, props)
-      (akka.stream.actor.ActorSubscriber[In](subscriberRef), subscriberRef)
+    val subscriberRef =
+      ActorMaterializer.downcast(context.materializer).actorOf(context, props)
+    (akka.stream.actor.ActorSubscriber[In](subscriberRef), subscriberRef)
   }
 
   override protected def newInstance(

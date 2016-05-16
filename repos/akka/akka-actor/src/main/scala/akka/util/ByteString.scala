@@ -173,7 +173,8 @@ object ByteString {
   final class ByteString1 private (private val bytes: Array[Byte],
                                    private val startIndex: Int,
                                    val length: Int)
-      extends ByteString with Serializable {
+      extends ByteString
+      with Serializable {
 
     private def this(bytes: Array[Byte]) = this(bytes, 0, bytes.length)
 
@@ -272,7 +273,8 @@ object ByteString {
     // 0: both empty, 1: 2nd empty, 2: 1st empty, 3: neither empty
     def compare(b1: ByteString, b2: ByteString): Int =
       if (b1.isEmpty) if (b2.isEmpty) 0 else 2
-      else if (b2.isEmpty) 1 else 3
+      else if (b2.isEmpty) 1
+      else 3
 
     val SerializationIdentity = 2.toByte
 
@@ -299,7 +301,8 @@ object ByteString {
     */
   final class ByteStrings private (
       private[akka] val bytestrings: Vector[ByteString1], val length: Int)
-      extends ByteString with Serializable {
+      extends ByteString
+      with Serializable {
     if (bytestrings.isEmpty)
       throw new IllegalArgumentException("bytestrings must not be empty")
 
@@ -405,7 +408,8 @@ object ByteString {
   * TODO: Add performance characteristics
   */
 sealed abstract class ByteString
-    extends IndexedSeq[Byte] with IndexedSeqOptimized[Byte, ByteString] {
+    extends IndexedSeq[Byte]
+    with IndexedSeqOptimized[Byte, ByteString] {
   def apply(idx: Int): Byte
   private[akka] def byteStringCompanion: ByteString.Companion
 

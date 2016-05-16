@@ -63,7 +63,10 @@ class SparkILoop(
     protected val out: JPrintWriter,
     val master: Option[String]
 )
-    extends AnyRef with LoopCommands with SparkILoopInit with Logging {
+    extends AnyRef
+    with LoopCommands
+    with SparkILoopInit
+    with Logging {
   def this(in0: BufferedReader, out: JPrintWriter, master: String) =
     this(Some(in0), out, Some(master))
   def this(in0: BufferedReader, out: JPrintWriter) = this(Some(in0), out, None)
@@ -216,8 +219,8 @@ class SparkILoop(
         }
       }
     // work around for Scala bug
-    val totalClassPath = addedJars.foldLeft(settings.classpath.value)(
-        (l, r) => ClassPath.join(l, r))
+    val totalClassPath = addedJars.foldLeft(settings.classpath.value)((l, r) =>
+          ClassPath.join(l, r))
     this.settings.classpath.value = totalClassPath
 
     intp = new SparkILoopInterpreter
@@ -321,8 +324,8 @@ class SparkILoop(
     val offset = history.index - history.size + 1
 
     for ((line, index) <- history.asStrings.zipWithIndex;
-                             if line.toLowerCase contains cmdline) echo(
-            "%d %s".format(index + offset, line))
+         if line.toLowerCase contains cmdline) echo(
+        "%d %s".format(index + offset, line))
   }
 
   private var currentPrompt = Properties.shellPromptString
@@ -378,9 +381,10 @@ class SparkILoop(
       nullary("replay",
               "reset execution and replay all previous commands",
               replay),
-      nullary("reset",
-              "reset the repl to its initial state, forgetting all session entries",
-              resetCommand),
+      nullary(
+          "reset",
+          "reset the repl to its initial state, forgetting all session entries",
+          resetCommand),
       shCommand,
       nullary(
           "silent", "disable/enable automatic printing of results", verbosity),
@@ -762,7 +766,8 @@ class SparkILoop(
       replayCommandStack = Nil
     }
     if (intp.namedDefinedTerms.nonEmpty)
-      echo("Forgetting all expression results and named terms: " +
+      echo(
+          "Forgetting all expression results and named terms: " +
           intp.namedDefinedTerms.mkString(", "))
     if (intp.definedTypes.nonEmpty)
       echo("Forgetting defined types: " + intp.definedTypes.mkString(", "))
@@ -799,10 +804,9 @@ class SparkILoop(
   private def loadCommand(arg: String) = {
     var shouldReplay: Option[String] = None
     withFile(arg)(
-        f =>
-          {
-        interpretAllFrom(f)
-        shouldReplay = Some(":load " + arg)
+        f => {
+      interpretAllFrom(f)
+      shouldReplay = Some(":load " + arg)
     })
     Result(true, shouldReplay)
   }
@@ -815,8 +819,8 @@ class SparkILoop(
       if (f.exists) {
         added = true
         addedClasspath = ClassPath.join(addedClasspath, f.path)
-        totalClasspath = ClassPath.join(
-            settings.classpath.value, addedClasspath)
+        totalClasspath =
+          ClassPath.join(settings.classpath.value, addedClasspath)
         intp.addUrlsToClassPath(f.toURI.toURL)
         sparkContext.addJar(f.toURI.toURL.getPath)
       }
@@ -998,7 +1002,7 @@ class SparkILoop(
   private val u: scala.reflect.runtime.universe.type =
     scala.reflect.runtime.universe
   private val m = u.runtimeMirror(Utils.getSparkClassLoader)
-  private def tagOfStaticClass[T : ClassTag]: u.TypeTag[T] =
+  private def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
     u.TypeTag[T](m, new TypeCreator {
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         m.staticClass(classTag[T].runtimeClass.getName)

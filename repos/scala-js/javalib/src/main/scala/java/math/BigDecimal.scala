@@ -1539,7 +1539,8 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
         // (#bits > 54)
         bits = mantissa.shiftRight(discardedSize).longValue()
         tempBits = bits
-        if (((bits & 1) == 1 && lowestSetBit < discardedSize) || (bits & 3) == 3)
+        if (((bits & 1) == 1 && lowestSetBit < discardedSize) ||
+            (bits & 3) == 3)
           bits += 2
       } else {
         // (#bits <= 54)
@@ -1569,8 +1570,7 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
           tempBits = bits & (-1L >>> (63 + exponent))
           bits >>= (-exponent)
           // To test if after discard bits, a new carry is generated
-          if (((bits & 3) == 3) ||
-              (((bits & 1) == 1) && (tempBits != 0) &&
+          if (((bits & 3) == 3) || (((bits & 1) == 1) && (tempBits != 0) &&
                   (lowestSetBit < discardedSize))) {
             bits += 1
           }
@@ -1655,8 +1655,8 @@ class BigDecimal() extends Number with Comparable[BigDecimal] {
           val tempBD: BigDecimal = new BigDecimal(integerAndFraction(0))
           // If after to add the increment the precision changed, we normalize the size
           if (tempBD.precision() > mcPrecision) {
-            integerAndFraction(0) = integerAndFraction(0).divide(
-                BigInteger.TEN)
+            integerAndFraction(0) =
+              integerAndFraction(0).divide(BigInteger.TEN)
             newScale0 - 1
           } else {
             newScale0

@@ -43,8 +43,8 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
       ((year == afterYear).fold(afterMonth + 1, 1) to (year == until.getYear)
             .fold(until.getMonthOfYear, 12)).map { month =>
         mixedLeaderboard(
-            after = new DateTime(year, month, 1, 0, 0).pp(
-                  "compute mod history"),
+            after =
+              new DateTime(year, month, 1, 0, 0).pp("compute mod history"),
             before = new DateTime(year, month, 1, 0, 0).plusMonths(1).some
         ).map {
           _.headOption.map { champ =>
@@ -64,17 +64,15 @@ final class Gamify(logColl: Coll, reportColl: Coll, historyColl: Coll) {
 
   def leaderboards = leaderboardsCache(true)
 
-  private val leaderboardsCache =
-    AsyncCache
-      .single[Leaderboards](f = mixedLeaderboard(DateTime.now minusDays 1,
-                                                 none) zip mixedLeaderboard(
-                                  DateTime.now minusWeeks 1,
-                                  none) zip mixedLeaderboard(
-                                  DateTime.now minusMonths 1, none) map {
-                              case ((daily, weekly), monthly) =>
-                                Leaderboards(daily, weekly, monthly)
-                            },
-                            timeToLive = 10 seconds)
+  private val leaderboardsCache = AsyncCache.single[Leaderboards](
+      f =
+        mixedLeaderboard(DateTime.now minusDays 1, none) zip mixedLeaderboard(
+            DateTime.now minusWeeks 1,
+            none) zip mixedLeaderboard(DateTime.now minusMonths 1, none) map {
+          case ((daily, weekly), monthly) =>
+            Leaderboards(daily, weekly, monthly)
+        },
+      timeToLive = 10 seconds)
 
   private def mixedLeaderboard(
       after: DateTime, before: Option[DateTime]): Fu[List[ModMixed]] =

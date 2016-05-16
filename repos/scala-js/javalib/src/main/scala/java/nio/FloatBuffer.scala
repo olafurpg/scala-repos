@@ -23,7 +23,8 @@ object FloatBuffer {
 abstract class FloatBuffer private[nio](_capacity: Int,
                                         private[nio] val _array: Array[Float],
                                         private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[FloatBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[FloatBuffer] {
 
   private[nio] type ElementType = Float
   private[nio] type BufferType = FloatBuffer

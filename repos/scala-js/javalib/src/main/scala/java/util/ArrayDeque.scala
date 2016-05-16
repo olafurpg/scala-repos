@@ -3,7 +3,9 @@ package java.util
 import scala.scalajs.js
 
 class ArrayDeque[E] private (private var inner: js.Array[E])
-    extends AbstractCollection[E] with Deque[E] with Cloneable
+    extends AbstractCollection[E]
+    with Deque[E]
+    with Cloneable
     with Serializable {
   self =>
 

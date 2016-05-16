@@ -54,86 +54,86 @@ private[http] object OutgoingConnectionBlueprint {
             log: LoggingAdapter): Http.ClientLayer = {
     import settings._
 
-    val core =
-      BidiFlow.fromGraph(GraphDSL.create() { implicit b ⇒
-        import GraphDSL.Implicits._
+    val core = BidiFlow.fromGraph(GraphDSL.create() { implicit b ⇒
+      import GraphDSL.Implicits._
 
-        val renderingContextCreation = b.add {
-          Flow[HttpRequest] map { request ⇒
+      val renderingContextCreation = b.add {
+        Flow[HttpRequest] map {
+          request ⇒
             val sendEntityTrigger =
               request.headers collectFirst {
                 case headers.Expect.`100-continue` ⇒ Promise[NotUsed]().future
               }
             RequestRenderingContext(request, hostHeader, sendEntityTrigger)
-          }
+        }
+      }
+
+      val bypassFanout =
+        b.add(Broadcast[RequestRenderingContext](2, eagerCancel = true))
+
+      val terminationMerge = b.add(TerminationMerge)
+
+      val requestRendering: Flow[RequestRenderingContext,
+                                 ByteString,
+                                 NotUsed] = {
+        val requestRendererFactory = new HttpRequestRendererFactory(
+            userAgentHeader, requestHeaderSizeHint, log)
+        Flow[RequestRenderingContext]
+          .flatMapConcat(requestRendererFactory.renderToSource)
+          .named("renderer")
+      }
+
+      val bypass =
+        Flow[RequestRenderingContext] map { ctx ⇒
+          HttpResponseParser.ResponseContext(
+              ctx.request.method,
+              ctx.sendEntityTrigger.map(_.asInstanceOf[Promise[Unit]]))
         }
 
-        val bypassFanout =
-          b.add(Broadcast[RequestRenderingContext](2, eagerCancel = true))
+      val responseParsingMerge = b.add {
+        // the initial header parser we initially use for every connection,
+        // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
+        val rootParser = new HttpResponseParser(
+            parserSettings, HttpHeaderParser(parserSettings) {
+          info ⇒
+            if (parserSettings.illegalHeaderWarnings)
+              logParsingError(
+                  info withSummaryPrepended "Illegal response header",
+                  log,
+                  parserSettings.errorLoggingVerbosity)
+        })
+        new ResponseParsingMerge(rootParser)
+      }
 
-        val terminationMerge = b.add(TerminationMerge)
+      val responsePrep = Flow[List[ParserOutput.ResponseOutput]]
+        .mapConcat(ConstantFun.scalaIdentityFunction)
+        .via(new PrepareResponse(parserSettings))
 
-        val requestRendering: Flow[RequestRenderingContext,
-                                   ByteString,
-                                   NotUsed] = {
-          val requestRendererFactory = new HttpRequestRendererFactory(
-              userAgentHeader, requestHeaderSizeHint, log)
-          Flow[RequestRenderingContext]
-            .flatMapConcat(requestRendererFactory.renderToSource)
-            .named("renderer")
-        }
+      val terminationFanout = b.add(Broadcast[HttpResponse](2))
 
-        val bypass =
-          Flow[RequestRenderingContext] map { ctx ⇒
-            HttpResponseParser.ResponseContext(
-                ctx.request.method,
-                ctx.sendEntityTrigger.map(_.asInstanceOf[Promise[Unit]]))
-          }
+      val logger = b.add(MapError[ByteString] {
+        case t ⇒ log.error(t, "Outgoing request stream error"); t
+      }.named("errorLogger"))
+      val wrapTls = b.add(Flow[ByteString].map(SendBytes))
 
-        val responseParsingMerge =
-          b.add {
-            // the initial header parser we initially use for every connection,
-            // will not be mutated, all "shared copy" parsers copy on first-write into the header cache
-            val rootParser = new HttpResponseParser(
-                parserSettings, HttpHeaderParser(parserSettings) { info ⇒
-              if (parserSettings.illegalHeaderWarnings)
-                logParsingError(
-                    info withSummaryPrepended "Illegal response header",
-                    log,
-                    parserSettings.errorLoggingVerbosity)
-            })
-            new ResponseParsingMerge(rootParser)
-          }
+      val collectSessionBytes =
+        b.add(Flow[SslTlsInbound].collect { case s: SessionBytes ⇒ s })
 
-        val responsePrep = Flow[List[ParserOutput.ResponseOutput]]
-          .mapConcat(ConstantFun.scalaIdentityFunction)
-          .via(new PrepareResponse(parserSettings))
+      renderingContextCreation.out ~> bypassFanout.in
+      bypassFanout.out(0) ~> terminationMerge.in0
+      terminationMerge.out ~> requestRendering ~> logger ~> wrapTls
 
-        val terminationFanout = b.add(Broadcast[HttpResponse](2))
+      bypassFanout.out(1) ~> bypass ~> responseParsingMerge.in1
+      collectSessionBytes ~> responseParsingMerge.in0
 
-        val logger = b.add(MapError[ByteString] {
-          case t ⇒ log.error(t, "Outgoing request stream error"); t
-        }.named("errorLogger"))
-        val wrapTls = b.add(Flow[ByteString].map(SendBytes))
+      responseParsingMerge.out ~> responsePrep ~> terminationFanout.in
+      terminationFanout.out(0) ~> terminationMerge.in1
 
-        val collectSessionBytes =
-          b.add(Flow[SslTlsInbound].collect { case s: SessionBytes ⇒ s })
-
-        renderingContextCreation.out ~> bypassFanout.in
-        bypassFanout.out(0) ~> terminationMerge.in0
-        terminationMerge.out ~> requestRendering ~> logger ~> wrapTls
-
-        bypassFanout.out(1) ~> bypass ~> responseParsingMerge.in1
-        collectSessionBytes ~> responseParsingMerge.in0
-
-        responseParsingMerge.out ~> responsePrep ~> terminationFanout.in
-        terminationFanout.out(0) ~> terminationMerge.in1
-
-        BidiShape(renderingContextCreation.in,
-                  wrapTls.out,
-                  collectSessionBytes.in,
-                  terminationFanout.out(1))
-      })
+      BidiShape(renderingContextCreation.in,
+                wrapTls.out,
+                collectSessionBytes.in,
+                terminationFanout.out(1))
+    })
 
     One2OneBidiFlow[HttpRequest, HttpResponse](-1) atop core
   }
@@ -293,8 +293,8 @@ private[http] object OutgoingConnectionBlueprint {
               entity
 
             case StreamedEntityCreator(creator) ⇒
-              entitySource = new SubSourceOutlet[ResponseOutput](
-                  "EntitySource")
+              entitySource =
+                new SubSourceOutlet[ResponseOutput]("EntitySource")
               entitySource.setHandler(substreamHandler)
               setHandler(in, substreamHandler)
               creator(Source.fromGraph(entitySource.source))
@@ -310,8 +310,8 @@ private[http] object OutgoingConnectionBlueprint {
     * 3. Go back to 1.
     */
   private class ResponseParsingMerge(rootParser: HttpResponseParser)
-      extends GraphStage[FanInShape2[
-              SessionBytes, BypassData, List[ResponseOutput]]] {
+      extends GraphStage[
+          FanInShape2[SessionBytes, BypassData, List[ResponseOutput]]] {
     private val dataInput = Inlet[SessionBytes]("data")
     private val bypassInput = Inlet[BypassData]("request")
     private val out = Outlet[List[ResponseOutput]]("out")
@@ -357,24 +357,22 @@ private[http] object OutgoingConnectionBlueprint {
 
         setHandler(out, eagerTerminateOutput)
 
-        val getNextMethod = () ⇒
-          {
-            waitingForMethod = true
-            if (isClosed(bypassInput)) completeStage()
-            else pull(bypassInput)
+        val getNextMethod = () ⇒ {
+          waitingForMethod = true
+          if (isClosed(bypassInput)) completeStage()
+          else pull(bypassInput)
         }
 
-        val getNextData = () ⇒
-          {
-            waitingForMethod = false
-            if (isClosed(dataInput)) completeStage()
-            else pull(dataInput)
+        val getNextData = () ⇒ {
+          waitingForMethod = false
+          if (isClosed(dataInput)) completeStage()
+          else pull(dataInput)
         }
 
         @tailrec
-        def drainParser(
-            current: ResponseOutput,
-            b: ListBuffer[ResponseOutput] = ListBuffer.empty): Unit = {
+        def drainParser(current: ResponseOutput,
+                        b: ListBuffer[ResponseOutput] =
+                          ListBuffer.empty): Unit = {
           def e(output: List[ResponseOutput], andThen: () ⇒ Unit): Unit =
             if (output.nonEmpty) emit(out, output, andThen)
             else andThen()

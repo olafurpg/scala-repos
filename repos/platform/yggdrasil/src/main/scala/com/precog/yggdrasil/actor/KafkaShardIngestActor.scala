@@ -112,8 +112,8 @@ case class FilesystemIngestFailureLog(
   def logFailed(offset: Long,
                 message: EventMessage,
                 lastKnownGood: YggCheckpoint): IngestFailureLog = {
-    copy(failureLog = failureLog +
-           (message -> LogRecord(offset, message, lastKnownGood)),
+    copy(failureLog =
+           failureLog + (message -> LogRecord(offset, message, lastKnownGood)),
          restoreFrom = lastKnownGood min restoreFrom)
   }
 
@@ -201,16 +201,16 @@ object FilesystemIngestFailureLog {
           offset <- jv.validated[Long]("offset")
           msgType <- jv.validated[String]("messageType")
           message <- msgType match {
-            case "ingest" =>
-              jv.validated[EventMessage.EventMessageExtraction]("message")(
-                    IngestMessage.Extractor)
-                .flatMap {
-                  _.map(Success(_))
-                    .getOrElse(Failure(Invalid("Incomplete ingest message")))
-                }
+                      case "ingest" =>
+                        jv.validated[EventMessage.EventMessageExtraction](
+                              "message")(IngestMessage.Extractor)
+                          .flatMap {
+                            _.map(Success(_)).getOrElse(
+                                Failure(Invalid("Incomplete ingest message")))
+                          }
 
-            case "archive" => jv.validated[ArchiveMessage]("message")
-          }
+                      case "archive" => jv.validated[ArchiveMessage]("message")
+                    }
           checkpoint <- jv.validated[YggCheckpoint]("lastKnownGood")
         } yield LogRecord(offset, message, checkpoint)
       }
@@ -279,18 +279,19 @@ abstract class KafkaShardIngestActor(
         // reset failures count here since this state means that we've made forward progress
         totalConsecutiveFailures = 0
 
-        pendingCompletes = pendingCompletes flatMap {
-          // FIXME: Carefully review this logic; previously, the comparison here was being done using "<="
-          // by the serialized JSON representation of the vector clocks (a silent side effect of
-          // the silent implicit conversions to JValue in BlueEyes)
-          case BatchComplete(_, pendingCheckpoint @ YggCheckpoint(_, clock))
-              if clock isDominatedBy checkpoint.messageClock =>
-            handleBatchComplete(pendingCheckpoint)
-            None
+        pendingCompletes =
+          pendingCompletes flatMap {
+            // FIXME: Carefully review this logic; previously, the comparison here was being done using "<="
+            // by the serialized JSON representation of the vector clocks (a silent side effect of
+            // the silent implicit conversions to JValue in BlueEyes)
+            case BatchComplete(_, pendingCheckpoint @ YggCheckpoint(_, clock))
+                if clock isDominatedBy checkpoint.messageClock =>
+              handleBatchComplete(pendingCheckpoint)
+              None
 
-          case stillPending =>
-            Some(stillPending)
-        }
+            case stillPending =>
+              Some(stillPending)
+          }
       }
 
       ingestCache -= checkpoint
@@ -321,9 +322,9 @@ abstract class KafkaShardIngestActor(
         logger.error(
             "Ingest will continue, but query results may be inconsistent until the problem is resolved.")
         for (messages <- ingestCache.get(checkpoint).toSeq;
-        (offset, ingestMessage) <- messages) {
-          failureLog = failureLog.logFailed(
-              offset, ingestMessage, lastCheckpoint)
+             (offset, ingestMessage) <- messages) {
+          failureLog =
+            failureLog.logFailed(offset, ingestMessage, lastCheckpoint)
         }
 
         runningBatches.getAndDecrement
@@ -396,8 +397,8 @@ abstract class KafkaShardIngestActor(
     */
   protected def handleBatchComplete(pendingCheckpoint: YggCheckpoint): Unit
 
-  private def readRemote(fromCheckpoint: YggCheckpoint): Future[Validation[
-          Error, (Vector[(Long, EventMessage)], YggCheckpoint)]] = {
+  private def readRemote(fromCheckpoint: YggCheckpoint): Future[
+      Validation[Error, (Vector[(Long, EventMessage)], YggCheckpoint)]] = {
     // The bifrost ingest actor needs to compute the maximum offset, so it has
     // to traverse the full message set in process; to avoid traversing it
     // twice, we simply read the payload into event messages at this point.
@@ -476,24 +477,24 @@ abstract class KafkaShardIngestActor(
         consumer.fetch(req)
       }
 
-      val eventMessages: List[Validation[
-              Error, (Long, EventMessage.EventMessageExtraction)]] = msTime({
-        t =>
+      val eventMessages: List[
+          Validation[Error, (Long, EventMessage.EventMessageExtraction)]] =
+        msTime({ t =>
           logger.debug("Raw kafka deserialization of %d events in %d ms"
                 .format(rawMessages.size, t))
-      }) {
-        rawMessages.par.map { msgAndOffset =>
-          EventMessageEncoding.read(msgAndOffset.message.payload) map {
-            (msgAndOffset.offset, _)
-          }
-        }.toList
-      }
+        }) {
+          rawMessages.par.map { msgAndOffset =>
+            EventMessageEncoding.read(msgAndOffset.message.payload) map {
+              (msgAndOffset.offset, _)
+            }
+          }.toList
+        }
 
       val batched: Validation[
           Error, Future[(Vector[(Long, EventMessage)], YggCheckpoint)]] =
-        eventMessages.sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                               (Long,
-                               EventMessage.EventMessageExtraction)] map {
+        eventMessages
+          .sequence[({ type λ[α] = Validation[Error, α] })#λ,
+                    (Long, EventMessage.EventMessageExtraction)] map {
           messageSet =>
             val apiKeys: List[(APIKey, Path)] = msTime({ t =>
               logger.debug("Collected api keys from %d messages in %d ms"

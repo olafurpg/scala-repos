@@ -18,7 +18,9 @@ import HttpMethods._
 import Directives._
 
 class ScalatestRouteTestSpec
-    extends FreeSpec with Matchers with ScalatestRouteTest {
+    extends FreeSpec
+    with Matchers
+    with ScalatestRouteTest {
 
   "The ScalatestRouteTest should support" - {
 

@@ -26,7 +26,9 @@ import breeze.numerics._
 
 @RunWith(classOf[JUnitRunner])
 class BernoulliTest
-    extends FunSuite with Checkers with MomentsTestBase[Boolean]
+    extends FunSuite
+    with Checkers
+    with MomentsTestBase[Boolean]
     with ExpFamTest[Bernoulli, Boolean] {
   type Distr = Bernoulli
   val expFam = Bernoulli
@@ -40,8 +42,8 @@ class BernoulliTest
 
   implicit def arbDistr = Arbitrary {
     for (p <- arbitrary[Double].map { x =>
-      math.abs(x) % 1.0 + 1E-4
-    }) yield new Bernoulli(p)
+               math.abs(x) % 1.0 + 1E-4
+             }) yield new Bernoulli(p)
   }
 
   def asDouble(x: Boolean) = I(x)

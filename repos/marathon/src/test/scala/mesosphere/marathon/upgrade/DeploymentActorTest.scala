@@ -25,7 +25,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class DeploymentActorTest
-    extends MarathonSpec with Matchers with BeforeAndAfterAll
+    extends MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
     with MockitoSugar {
 
   var tracker: TaskTracker = _

@@ -40,7 +40,8 @@ import scala.collection.mutable.ArrayBuffer
 class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
                               nodeType: IElementType,
                               node: ASTNode)
-    extends ScTypeDefinitionImpl(stub, nodeType, node) with ScObject
+    extends ScTypeDefinitionImpl(stub, nodeType, node)
+    with ScObject
     with ScTemplateDefinition {
   override def additionalJavaNames: Array[String] = {
     fakeCompanionClass match {
@@ -163,18 +164,17 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         ScalaPsiUtil.getCompanionModule(this) match {
           case Some(c: ScClass) if c.isCase =>
             val res = new ArrayBuffer[PsiMethod]
-            c.getSyntheticMethodsText.foreach(s =>
-                  {
-                try {
-                  val method = ScalaPsiElementFactory.createMethodWithContext(
-                      s, c.getContext, c)
-                  method.setSynthetic(this)
-                  method.syntheticCaseClass = Some(c)
-                  res += method
-                } catch {
-                  case e: Exception =>
-                  //do not add methods with wrong signature
-                }
+            c.getSyntheticMethodsText.foreach(s => {
+              try {
+                val method = ScalaPsiElementFactory.createMethodWithContext(
+                    s, c.getContext, c)
+                method.setSynthetic(this)
+                method.syntheticCaseClass = Some(c)
+                res += method
+              } catch {
+                case e: Exception =>
+                //do not add methods with wrong signature
+              }
             })
             res.toSeq
           case _ => Seq.empty

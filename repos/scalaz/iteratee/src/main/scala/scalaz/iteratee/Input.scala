@@ -114,16 +114,16 @@ sealed abstract class InputInstances {
     new Semigroup[Input[A]] {
       def append(a1: Input[A], a2: => Input[A]): Input[A] = a1.fold(
           empty = a2.fold(
-                empty = emptyInput,
-                el = elInput,
-                eof = eofInput
-            ),
+              empty = emptyInput,
+              el = elInput,
+              eof = eofInput
+          ),
           el = xa =>
-              a2.fold(
-                  empty = elInput(xa),
-                  el = ya => elInput(A.append(xa, ya)),
-                  eof = eofInput
-            ),
+            a2.fold(
+                empty = elInput(xa),
+                el = ya => elInput(A.append(xa, ya)),
+                eof = eofInput
+          ),
           eof = eofInput
       )
     }

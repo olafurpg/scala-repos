@@ -444,7 +444,8 @@ object Utils {
 
   private def power0(x: Int, y: Int): Int =
     if (y == 1) x
-    else if (y % 2 == 0) power0(x * x, y / 2) else x * power0(x, y - 1);
+    else if (y % 2 == 0) power0(x * x, y / 2)
+    else x * power0(x, y - 1);
 
   def power(x: Int, y: Int): Int = (x, y) match {
     case (0, 0) => sys.error("power(0,0)")

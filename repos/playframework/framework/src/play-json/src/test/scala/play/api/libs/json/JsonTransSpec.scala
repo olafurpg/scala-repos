@@ -56,12 +56,11 @@ object JsonTransSpec extends Specification {
     "copy input JSON and update a branch (merge the updated branch with input JSON)" in {
       js.transform(
             (__ \ 'field3).json.update(
-                __.read[JsObject]
-                  .map { o =>
-                    o ++ Json.obj("field33" -> false)
-                  }
-              )
-          )
+                __.read[JsObject].map { o =>
+                  o ++ Json.obj("field33" -> false)
+                }
+            )
+        )
         .get must beEqualTo(
           Json.obj(
               "field1" -> "alpha",
@@ -84,16 +83,16 @@ object JsonTransSpec extends Specification {
       js.transform(
             (__ \ 'field3).json.pickBranch(
                 (__ \ 'field32).json.update(
-                    Reads
-                      .of[JsNumber]
-                      .map { case JsNumber(nb) => JsNumber(nb + 12) }
-                  ) andThen (__ \ 'field31).json.update(
-                    Reads
-                      .of[JsString]
-                      .map { case JsString(s) => JsString(s + "toto") }
-                  )
-              )
-          )
+                    Reads.of[JsNumber].map {
+                      case JsNumber(nb) => JsNumber(nb + 12)
+                    }
+                ) andThen (__ \ 'field31).json.update(
+                    Reads.of[JsString].map {
+                      case JsString(s) => JsString(s + "toto")
+                    }
+                )
+            )
+        )
         .get must beEqualTo(
           Json.obj(
               "field3" -> Json.obj("field31" -> "betatoto", "field32" -> 357)
@@ -159,10 +158,10 @@ object JsonTransSpec extends Specification {
     "copy the full json and update a 2nd-level path and then prune a subbranch" in {
       js.validate(
             (__ \ 'field3 \ 'field32).json.update(
-                Reads
-                  .of[JsNumber]
-                  .map { case JsNumber(nb) => JsNumber(nb + 5) }
-              ) andThen (__ \ 'field4).json.prune
+                Reads.of[JsNumber].map {
+                  case JsNumber(nb) => JsNumber(nb + 5)
+                }
+            ) andThen (__ \ 'field4).json.prune
         )
         .get must beEqualTo(
           Json.obj(
@@ -196,7 +195,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-        ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
+          ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
       }
 
       "when the reader is the wrong type" in {
@@ -207,7 +206,7 @@ object JsonTransSpec extends Specification {
           .left
           .get
           .head must_==
-        ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
+          ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
       }
     }
   }

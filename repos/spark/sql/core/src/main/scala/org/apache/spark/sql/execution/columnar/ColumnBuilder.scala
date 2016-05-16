@@ -99,7 +99,8 @@ private[columnar] abstract class NativeColumnBuilder[T <: AtomicType](
     override val columnStats: ColumnStats,
     override val columnType: NativeColumnType[T])
     extends BasicColumnBuilder[T#InternalType](columnStats, columnType)
-    with NullableColumnBuilder with AllCompressionSchemes
+    with NullableColumnBuilder
+    with AllCompressionSchemes
     with CompressibleColumnBuilder[T]
 
 private[columnar] class BooleanColumnBuilder

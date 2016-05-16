@@ -79,10 +79,12 @@ private[deploy] object DeployMessages {
   sealed trait RegisterWorkerResponse
 
   case class RegisteredWorker(master: RpcEndpointRef, masterWebUiUrl: String)
-      extends DeployMessage with RegisterWorkerResponse
+      extends DeployMessage
+      with RegisterWorkerResponse
 
   case class RegisterWorkerFailed(message: String)
-      extends DeployMessage with RegisterWorkerResponse
+      extends DeployMessage
+      with RegisterWorkerResponse
 
   case object MasterInStandby extends DeployMessage with RegisterWorkerResponse
 

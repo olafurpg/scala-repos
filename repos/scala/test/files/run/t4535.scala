@@ -15,8 +15,7 @@ object Test {
     as push 6
     println(as.reverse)
 
-    println(
-        as map { x =>
+    println(as map { x =>
       x
     })
 

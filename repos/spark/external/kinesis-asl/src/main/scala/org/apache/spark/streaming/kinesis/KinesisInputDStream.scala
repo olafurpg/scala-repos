@@ -29,7 +29,7 @@ import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.receiver.Receiver
 import org.apache.spark.streaming.scheduler.ReceivedBlockInfo
 
-private[kinesis] class KinesisInputDStream[T : ClassTag](
+private[kinesis] class KinesisInputDStream[T: ClassTag](
     _ssc: StreamingContext,
     streamName: String,
     endpointUrl: String,

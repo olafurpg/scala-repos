@@ -76,8 +76,8 @@ case class ScAbstractType(
 
   override def hashCode: Int = {
     if (hash == -1) {
-      hash = (upper.hashCode() * 31 + lower.hashCode()) * 31 +
-      tpt.args.hashCode()
+      hash =
+        (upper.hashCode() * 31 + lower.hashCode()) * 31 + tpt.args.hashCode()
     }
     hash
   }

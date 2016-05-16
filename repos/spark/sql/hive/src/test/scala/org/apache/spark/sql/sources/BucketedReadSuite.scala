@@ -34,7 +34,9 @@ import org.apache.spark.util.Utils
 import org.apache.spark.util.collection.BitSet
 
 class BucketedReadSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import testImplicits._
 
   private val df =
@@ -62,12 +64,11 @@ class BucketedReadSuite
 
         val attrs = table.select("j", "k").queryExecution.analyzed.output
         val checkBucketId = rdd.mapPartitionsWithIndex(
-            (index, rows) =>
-              {
-            val getBucketId = UnsafeProjection.create(
-                HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
-                output)
-            rows.map(row => getBucketId(row).getInt(0) -> index)
+            (index, rows) => {
+          val getBucketId = UnsafeProjection.create(
+              HashPartitioning(attrs, 8).partitionIdExpression :: Nil,
+              output)
+          rows.map(row => getBucketId(row).getInt(0) -> index)
         })
         checkBucketId.collect().foreach(r => assert(r._1 == r._2))
       }
@@ -107,7 +108,8 @@ class BucketedReadSuite
       val checkedResult = rdd.get.execute().mapPartitionsWithIndex {
         case (index, iter) =>
           if (matchedBuckets.get(index % numBuckets) && iter.nonEmpty)
-            Iterator(index) else Iterator()
+            Iterator(index)
+          else Iterator()
       }
       // TODO: These tests are not testing the right columns.
 //      // checking if all the pruned buckets are empty

@@ -8,10 +8,12 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * 8/2/13
   */
 class InAnonFunEvaluationTest
-    extends InAnonFunEvaluationTestBase with ScalaVersion_2_11
+    extends InAnonFunEvaluationTestBase
+    with ScalaVersion_2_11
 
 class InAnonFunEvaluationTest_212
-    extends InAnonFunEvaluationTestBase with ScalaVersion_2_12 {
+    extends InAnonFunEvaluationTestBase
+    with ScalaVersion_2_12 {
   //todo SCL-9139
   override def testPartialFunction(): Unit = {
     runDebugger() {

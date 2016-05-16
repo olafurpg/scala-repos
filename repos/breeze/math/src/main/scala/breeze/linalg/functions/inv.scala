@@ -89,8 +89,8 @@ object pinv extends UFunc with pinvLowPrio {
 
   @expand
   @expand.valify
-  implicit def pinvFromSVD[@expand.args(Float, Double) T]: Impl[
-      DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def pinvFromSVD[@expand.args(Float, Double) T]
+    : Impl[DenseMatrix[T], DenseMatrix[T]] = {
     new Impl[DenseMatrix[T], DenseMatrix[T]] {
       // http://en.wikipedia.org/wiki/Singular_value_decomposition#Applications_of_the_SVD
       override def apply(v: DenseMatrix[T]): DenseMatrix[T] = {

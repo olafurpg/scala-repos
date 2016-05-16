@@ -62,7 +62,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
       })
       .run()
 
-      (leftSubscriber, rightSubscriber)
+    (leftSubscriber, rightSubscriber)
   }
 
   def validateSubscriptionAndComplete(

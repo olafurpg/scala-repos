@@ -33,7 +33,10 @@ import org.apache.spark.ui.SparkUICssErrorHandler
   * Selenium tests for the Spark Streaming Web UI.
   */
 class UISeleniumSuite
-    extends SparkFunSuite with WebBrowser with Matchers with BeforeAndAfterAll
+    extends SparkFunSuite
+    with WebBrowser
+    with Matchers
+    with BeforeAndAfterAll
     with TestSuiteBase {
 
   implicit var webDriver: WebDriver = _

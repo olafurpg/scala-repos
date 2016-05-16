@@ -38,12 +38,12 @@ object CoreWorkflow {
   @transient lazy val evaluationInstances =
     Storage.getMetaDataEvaluationInstances()
 
-  def runTrain[EI, Q, P, A](
-      engine: BaseEngine[EI, Q, P, A],
-      engineParams: EngineParams,
-      engineInstance: EngineInstance,
-      env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      params: WorkflowParams = WorkflowParams()) {
+  def runTrain[EI, Q, P, A](engine: BaseEngine[EI, Q, P, A],
+                            engineParams: EngineParams,
+                            engineInstance: EngineInstance,
+                            env: Map[String, String] =
+                              WorkflowUtils.pioEnvVars,
+                            params: WorkflowParams = WorkflowParams()) {
     logger.debug("Starting SparkContext")
     val mode = "training"
     WorkflowUtils.checkUpgrade(mode, engineInstance.engineFactory)

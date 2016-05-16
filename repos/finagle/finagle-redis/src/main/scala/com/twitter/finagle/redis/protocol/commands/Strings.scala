@@ -6,7 +6,8 @@ import com.twitter.finagle.redis.util._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 case class Append(key: ChannelBuffer, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.APPEND
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.APPEND, key, value))
@@ -182,7 +183,8 @@ object GetRange {
 }
 
 case class GetSet(key: ChannelBuffer, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.GETSET
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.GETSET, key, value))
@@ -274,7 +276,8 @@ object MSetNx extends MultiSetCompanion {
 }
 
 case class PSetEx(key: ChannelBuffer, millis: Long, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.PSETEX
   RequireClientProtocol(millis > 0, "Milliseconds must be greater than 0")
   def toChannelBuffer = {
@@ -306,7 +309,8 @@ case class Set(key: ChannelBuffer,
                ttl: Option[TimeToLive] = None,
                nx: Boolean = false,
                xx: Boolean = false)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.SET
   def toChannelBuffer = RedisCodec.toUnifiedFormat(
       Seq(CommandBytes.SET, key, value) ++
@@ -364,7 +368,7 @@ object Set {
                     run(args.tail.tail,
                         set.copy(
                             ttl = Some(
-                                  InMilliseconds(RequireClientProtocol.safe {
+                                InMilliseconds(RequireClientProtocol.safe {
                           NumberFormat.toLong(BytesToString(bytes))
                         }))))
                 }
@@ -400,7 +404,8 @@ object SetBit {
 }
 
 case class SetEx(key: ChannelBuffer, seconds: Long, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.SETEX
   RequireClientProtocol(seconds > 0, "Seconds must be greater than 0")
   def toChannelBuffer =
@@ -427,7 +432,8 @@ object SetEx {
 }
 
 case class SetNx(key: ChannelBuffer, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.SETNX
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.SETNX, key, value))
@@ -442,7 +448,8 @@ object SetNx {
 }
 
 case class SetRange(key: ChannelBuffer, offset: Int, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.SETRANGE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(

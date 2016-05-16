@@ -377,7 +377,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     */
   final case class CompoundWrite(
       override val head: SimpleWriteCommand, tailCommand: WriteCommand)
-      extends WriteCommand with immutable.Iterable[SimpleWriteCommand] {
+      extends WriteCommand
+      with immutable.Iterable[SimpleWriteCommand] {
 
     def iterator: Iterator[SimpleWriteCommand] =
       new Iterator[SimpleWriteCommand] {
@@ -603,8 +604,8 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
     */
   val manager: ActorRef = {
     system.systemActorOf(props = Props(classOf[TcpManager], this)
-                             .withDispatcher(Settings.ManagementDispatcher)
-                             .withDeploy(Deploy.local),
+                           .withDispatcher(Settings.ManagementDispatcher)
+                           .withDeploy(Deploy.local),
                          name = "IO-TCP")
   }
 

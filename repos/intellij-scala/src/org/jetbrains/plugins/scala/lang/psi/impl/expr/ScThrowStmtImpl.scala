@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScThrowStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScThrowStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScThrowStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

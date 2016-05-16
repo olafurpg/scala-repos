@@ -199,7 +199,8 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                   if (sn.hc == hc && equal(sn.k, k, ct)) {
                     if (GCAS(cn,
                              cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v) else null
+                             ct)) Some(sn.v)
+                    else null
                   } else {
                     val rn = if (cn.gen eq gen) cn else cn.renewed(gen, ct)
                     val nn = rn.updatedAt(pos,
@@ -234,13 +235,15 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                   if (sn.hc == hc && equal(sn.k, k, ct)) {
                     if (GCAS(cn,
                              cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v) else null
+                             ct)) Some(sn.v)
+                    else null
                   } else None
                 case otherv =>
                   if (sn.hc == hc && equal(sn.k, k, ct) && sn.v == otherv) {
                     if (GCAS(cn,
                              cn.updatedAt(pos, new SNode(k, v, hc), gen),
-                             ct)) Some(sn.v) else null
+                             ct)) Some(sn.v)
+                    else null
                   } else None
               }
           }
@@ -371,7 +374,8 @@ private[collection] final class INode[K, V](bn: MainNode[K, V], g: Gen)
                 else null
               }
             case sn: SNode[K, V] =>
-              if (sn.hc == hc && equal(sn.k, k, ct) && (v == null || sn.v == v)) {
+              if (sn.hc == hc && equal(sn.k, k, ct) &&
+                  (v == null || sn.v == v)) {
                 val ncn = cn.removedAt(pos, flag, gen).toContracted(lev)
                 if (GCAS(cn, ncn, ct)) Some(sn.v) else null
               } else None
@@ -487,7 +491,8 @@ private[concurrent] trait KVNode[K, V] {
 
 private[collection] final class SNode[K, V](
     final val k: K, final val v: V, final val hc: Int)
-    extends BasicNode with KVNode[K, V] {
+    extends BasicNode
+    with KVNode[K, V] {
   final def copy = new SNode(k, v, hc)
   final def copyTombed = new TNode(k, v, hc)
   final def copyUntombed = new SNode(k, v, hc)
@@ -498,7 +503,8 @@ private[collection] final class SNode[K, V](
 
 private[collection] final class TNode[K, V](
     final val k: K, final val v: V, final val hc: Int)
-    extends MainNode[K, V] with KVNode[K, V] {
+    extends MainNode[K, V]
+    with KVNode[K, V] {
   final def copy = new TNode(k, v, hc)
   final def copyTombed = new TNode(k, v, hc)
   final def copyUntombed = new SNode(k, v, hc)
@@ -729,7 +735,8 @@ final class TrieMap[K, V] private (
     ef: Equiv[K])
     extends scala.collection.concurrent.Map[K, V]
     with scala.collection.mutable.MapLike[K, V, TrieMap[K, V]]
-    with CustomParallelizable[(K, V), ParTrieMap[K, V]] with Serializable {
+    with CustomParallelizable[(K, V), ParTrieMap[K, V]]
+    with Serializable {
   private var hashingobj =
     if (hashf.isInstanceOf[Hashing.Default[_]]) new TrieMap.MangledHashing[K]
     else hashf

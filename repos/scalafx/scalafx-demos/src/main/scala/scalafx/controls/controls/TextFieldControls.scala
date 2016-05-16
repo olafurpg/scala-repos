@@ -47,9 +47,8 @@ class TextFieldControls(target: TextField)
   chbPrefColumnCount.delegate.selectionModelProperty.addListener(
       new ChangeListener[Any] {
     def changed(observable: ObservableValue[_], oldValue: Any, newValue: Any) {
-      target.prefColumnCount = chbPrefColumnCount.items
-        .get()
-        .get(newValue.toString.toInt)
+      target.prefColumnCount =
+        chbPrefColumnCount.items.get().get(newValue.toString.toInt)
     }
   })
 

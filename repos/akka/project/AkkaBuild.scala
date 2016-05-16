@@ -52,8 +52,8 @@ object AkkaBuild extends Build {
           (Release.releaseDirectory, version) map { (d, v) =>
           val downloads = d / "downloads"
           val archivesPathFinder = downloads * s"*$v.zip"
-          archivesPathFinder.get.map(
-              file => (file -> ("akka/" + file.getName)))
+          archivesPathFinder.get.map(file =>
+                (file -> ("akka/" + file.getName)))
         }
     )
 
@@ -169,14 +169,14 @@ object AkkaBuild extends Build {
       id = "akka-bench-jmh",
       base = file("akka-bench-jmh"),
       dependencies = Seq(
-            actor,
-            http,
-            stream,
-            streamTests,
-            persistence,
-            distributedData,
-            testkit
-        ).map(_ % "compile;compile->test;provided->provided")
+          actor,
+          http,
+          stream,
+          streamTests,
+          persistence,
+          distributedData,
+          testkit
+      ).map(_ % "compile;compile->test;provided->provided")
   ).disablePlugins(ValidatePullRequest)
 
   lazy val protobuf = Project(
@@ -187,8 +187,8 @@ object AkkaBuild extends Build {
   lazy val remote = Project(
       id = "akka-remote",
       base = file("akka-remote"),
-      dependencies = Seq(
-            actor, actorTests % "test->test", testkit % "test->test", protobuf)
+      dependencies =
+        Seq(actor, actorTests % "test->test", testkit % "test->test", protobuf)
   )
 
   lazy val multiNodeTestkit = Project(
@@ -208,16 +208,16 @@ object AkkaBuild extends Build {
     Project(
         id = "akka-cluster",
         base = file("akka-cluster"),
-        dependencies = Seq(
-              remote, remoteTests % "test->test", testkit % "test->test")
+        dependencies =
+          Seq(remote, remoteTests % "test->test", testkit % "test->test")
     ) configs (MultiJvm)
 
   lazy val clusterMetrics =
     Project(
         id = "akka-cluster-metrics",
         base = file("akka-cluster-metrics"),
-        dependencies = Seq(
-              cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
+        dependencies =
+          Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
               slf4j % "test->compile")
     ) configs (MultiJvm)
 
@@ -225,8 +225,8 @@ object AkkaBuild extends Build {
     Project(
         id = "akka-cluster-tools",
         base = file("akka-cluster-tools"),
-        dependencies = Seq(
-              cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
+        dependencies =
+          Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
     ) configs (MultiJvm)
 
   lazy val clusterSharding =
@@ -237,8 +237,8 @@ object AkkaBuild extends Build {
         //      If I only use "provided" here it works, but then we can't run tests.
         //      Scope "test" is alright in the pom.xml, but would have been nicer with
         //      provided.
-        dependencies = Seq(
-              cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
+        dependencies =
+          Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm",
               persistence % "compile;test->provided",
               distributedData % "provided;test",
               clusterTools)
@@ -248,8 +248,8 @@ object AkkaBuild extends Build {
     Project(
         id = "akka-distributed-data-experimental",
         base = file("akka-distributed-data"),
-        dependencies = Seq(
-              cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
+        dependencies =
+          Seq(cluster % "compile->compile;test->test;multi-jvm->multi-jvm")
     ) configs (MultiJvm)
 
   lazy val slf4j = Project(
@@ -404,29 +404,29 @@ object AkkaBuild extends Build {
       id = "akka-docs",
       base = file("akka-docs"),
       dependencies = Seq(
-            actor,
-            testkit % "compile;test->test",
-            remote % "compile;test->test",
-            cluster,
-            clusterMetrics,
-            slf4j,
-            agent,
-            camel,
-            osgi,
-            persistence % "compile;provided->provided;test->test",
-            persistenceTck,
-            persistenceQuery,
-            typed % "compile;test->test",
-            distributedData,
-            stream,
-            streamTestkit % "compile;test->test",
-            http,
-            httpSprayJson,
-            httpJackson,
-            httpXml,
-            httpTests % "compile;test->test",
-            httpTestkit % "compile;test->test"
-        )
+          actor,
+          testkit % "compile;test->test",
+          remote % "compile;test->test",
+          cluster,
+          clusterMetrics,
+          slf4j,
+          agent,
+          camel,
+          osgi,
+          persistence % "compile;provided->provided;test->test",
+          persistenceTck,
+          persistenceQuery,
+          typed % "compile;test->test",
+          distributedData,
+          stream,
+          streamTestkit % "compile;test->test",
+          http,
+          httpSprayJson,
+          httpJackson,
+          httpXml,
+          httpTests % "compile;test->test",
+          httpTestkit % "compile;test->test"
+      )
   )
 
   lazy val contrib =
@@ -446,7 +446,8 @@ object AkkaBuild extends Build {
       id = "akka-samples",
       base = file("akka-samples"),
       // FIXME osgiDiningHakkersSampleMavenTest temporarily removed from aggregate due to #16703
-      aggregate = if (!Sample.CliOptions.aggregateSamples) Nil
+      aggregate =
+        if (!Sample.CliOptions.aggregateSamples) Nil
         else
           Seq(sampleCamelJava,
               sampleCamelScala,
@@ -583,12 +584,13 @@ object AkkaBuild extends Build {
         (resolver,
          Seq(
              otherResolvers := resolver :: publishTo.value.toList,
-             publishM2Configuration := Classpaths.publishConfig(
-                 packagedArtifacts.value,
-                 None,
-                 resolverName = resolver.name,
-                 checksums = checksums.in(publishM2).value,
-                 logging = ivyLoggingLevel.value)
+             publishM2Configuration :=
+               Classpaths.publishConfig(packagedArtifacts.value,
+                                        None,
+                                        resolverName = resolver.name,
+                                        checksums =
+                                          checksums.in(publishM2).value,
+                                        logging = ivyLoggingLevel.value)
          ))
     }
 
@@ -622,7 +624,7 @@ object AkkaBuild extends Build {
                                          "-Xlog-reflective-calls",
                                          "-Xlint"),
         scalacOptions in Compile ++=
-        (if (allWarnings) Seq("-deprecation") else Nil),
+          (if (allWarnings) Seq("-deprecation") else Nil),
         scalacOptions in Test := (scalacOptions in Test).value.filterNot(opt =>
               opt == "-Xlog-reflective-calls" || opt.contains("genjavadoc")),
         // -XDignore.symbol.file suppresses sun.misc.Unsafe warnings
@@ -635,7 +637,7 @@ object AkkaBuild extends Build {
                                         "-Xlint:unchecked",
                                         "-XDignore.symbol.file"),
         javacOptions in compile ++=
-        (if (allWarnings) Seq("-Xlint:deprecation") else Nil),
+          (if (allWarnings) Seq("-Xlint:deprecation") else Nil),
         javacOptions in doc ++= Seq(),
         incOptions := incOptions.value.withNameHashing(true),
         crossVersion := CrossVersion.binary,

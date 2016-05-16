@@ -33,18 +33,17 @@ class IndexScript(universe: doc.Universe) extends Page {
 
             val ary = merged.keys.toList
               .sortBy(_.toLowerCase)
-              .map(key =>
-                    {
-                  val pairs = merged(key).flatMap {
-                    t: DocTemplateEntity =>
-                      Seq(kindToString(t) -> relativeLinkTo(t),
-                          "kind" -> kindToString(t),
-                          "members" -> membersToJSON(t.members.filter(
-                                  !_.isShadowedOrAmbiguousImplicit)),
-                          "shortDescription" -> shortDesc(t))
-                  }
+              .map(key => {
+                val pairs = merged(key).flatMap {
+                  t: DocTemplateEntity =>
+                    Seq(kindToString(t) -> relativeLinkTo(t),
+                        "kind" -> kindToString(t),
+                        "members" -> membersToJSON(t.members.filter(
+                                !_.isShadowedOrAmbiguousImplicit)),
+                        "shortDescription" -> shortDesc(t))
+                }
 
-                  JSONObject(Map(pairs: _*) + ("name" -> key))
+                JSONObject(Map(pairs: _*) + ("name" -> key))
               })
 
             pack.qualifiedName -> JSONArray(ary)
@@ -77,15 +76,13 @@ class IndexScript(universe: doc.Universe) extends Page {
 
   def allPackagesWithTemplates = {
     Map(
-        allPackages.map(
-            (key) =>
-              {
-        key -> key.templates.collect {
-          case t: DocTemplateEntity
-              if !t.isPackage &&
-              !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
-            t
-        }
+        allPackages.map((key) => {
+      key -> key.templates.collect {
+        case t: DocTemplateEntity
+            if !t.isPackage &&
+            !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
+          t
+      }
     }): _*)
   }
 

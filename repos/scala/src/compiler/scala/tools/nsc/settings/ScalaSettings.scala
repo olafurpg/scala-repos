@@ -15,7 +15,9 @@ import scala.collection.mutable
 import scala.language.{implicitConversions, existentials}
 
 trait ScalaSettings
-    extends AbsScalaSettings with StandardScalaSettings with Warnings {
+    extends AbsScalaSettings
+    with StandardScalaSettings
+    with Warnings {
   self: MutableSettings =>
 
   /** Set of settings */

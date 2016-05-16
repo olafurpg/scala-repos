@@ -92,7 +92,7 @@ object Test extends InteractiveTest {
 
     val className = names.head
     for (name <- names;
-    i <- 1 to tags.length) {
+         i <- 1 to tags.length) {
       val newText = text(name, i)
       val source = findSource("Class.scala")
       val batch = new BatchSourceFile(source.file, newText.toCharArray)
@@ -116,7 +116,8 @@ object Test extends InteractiveTest {
                     .decl(TypeName(className))
                   val term = clazz.info.decl(TermName(name))
                   if (term eq NoSymbol) clazz.info.decl(TypeName(name))
-                  else if (term.isAccessor) term.accessed else term
+                  else if (term.isAccessor) term.accessed
+                  else term
                 } else toplevel
               }
 
@@ -156,7 +157,7 @@ object Test extends InteractiveTest {
         .decl(newTermName("p"))
         .info
         .decl(newTypeName("Derived"))
-        (derived, derived.ancestors(0))
+      (derived, derived.ancestors(0))
     }
     val cmt1 = getComment(
         derived,

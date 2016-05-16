@@ -22,8 +22,11 @@ import org.scalatest.{BeforeAndAfter, FunSuite, Tag}
 
 @RunWith(classOf[JUnitRunner])
 class EndToEndTest
-    extends FunSuite with Eventually with IntegrationPatience
-    with BeforeAndAfter with AssertionsForJUnit {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with BeforeAndAfter
+    with AssertionsForJUnit {
 
   var saveBase: Dtab = Dtab.empty
 

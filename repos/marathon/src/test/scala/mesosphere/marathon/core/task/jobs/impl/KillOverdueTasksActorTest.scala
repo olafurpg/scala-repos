@@ -19,7 +19,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class KillOverdueTasksActorTest
-    extends MarathonSpec with GivenWhenThen with marathon.test.Mockito
+    extends MarathonSpec
+    with GivenWhenThen
+    with marathon.test.Mockito
     with ScalaFutures {
   implicit var actorSystem: ActorSystem = _
   var taskTracker: TaskTracker = _

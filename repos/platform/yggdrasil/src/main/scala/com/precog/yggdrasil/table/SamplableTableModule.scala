@@ -139,10 +139,10 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
     }
   }
 
-  private case class RowInserter(
-      size: Int,
-      slice: Slice,
-      cols: mutable.Map[ColumnRef, ArrayColumn[_]] = mutable.Map.empty) {
+  private case class RowInserter(size: Int,
+                                 slice: Slice,
+                                 cols: mutable.Map[ColumnRef, ArrayColumn[_]] =
+                                   mutable.Map.empty) {
     import RowInserter._
 
     def toSlice(maxSize: Int): Slice = Slice(cols.toMap, size min maxSize)

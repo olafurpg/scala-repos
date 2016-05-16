@@ -547,4 +547,5 @@ class CircuitBreaker(
 class CircuitBreakerOpenException(
     val remainingDuration: FiniteDuration,
     message: String = "Circuit Breaker is open; calls are failing fast")
-    extends AkkaException(message) with NoStackTrace
+    extends AkkaException(message)
+    with NoStackTrace

@@ -98,7 +98,8 @@ class ConversionTests {
       new HListSyntax[A, F](a)
 
     val res =
-      (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) => (s * i, d * i)) // Function argument types inferred
+      (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) =>
+            (s * i, d * i)) // Function argument types inferred
 
     assert((res: (String, Double)) == ("aa", 2.6))
   }

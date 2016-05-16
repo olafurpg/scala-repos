@@ -333,9 +333,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Scala EngineParams works using option Json4sNative") {
-    val ep = new EngineParams(
-        dataSourceParams = ("ds", DataSourceParams("dsp")),
-        algorithmParamsList = Seq(("a0", AlgorithmParams("ap"))))
+    val ep =
+      new EngineParams(dataSourceParams = ("ds", DataSourceParams("dsp")),
+                       algorithmParamsList =
+                         Seq(("a0", AlgorithmParams("ap"))))
 
     val json =
       JsonExtractor.engineParamsToJson(JsonExtractorOption.Json4sNative, ep)
@@ -346,10 +347,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Java EngineParams works using option Gson") {
-    val ep = new EngineParams(
-        dataSourceParams = ("ds", new JavaParams("dsp")),
-        algorithmParamsList = Seq(("a0", new JavaParams("ap")),
-                                  ("a1", new JavaParams("ap2"))))
+    val ep = new EngineParams(dataSourceParams = ("ds", new JavaParams("dsp")),
+                              algorithmParamsList =
+                                Seq(("a0", new JavaParams("ap")),
+                                    ("a1", new JavaParams("ap2"))))
 
     val json = JsonExtractor.engineParamsToJson(JsonExtractorOption.Gson, ep)
 
@@ -359,10 +360,10 @@ class JsonExtractorSuite extends FunSuite with Matchers {
   }
 
   test("Serializing Java EngineParams works using option Both") {
-    val ep = new EngineParams(
-        dataSourceParams = ("ds", new JavaParams("dsp")),
-        algorithmParamsList = Seq(("a0", new JavaParams("ap")),
-                                  ("a1", new JavaParams("ap2"))))
+    val ep = new EngineParams(dataSourceParams = ("ds", new JavaParams("dsp")),
+                              algorithmParamsList =
+                                Seq(("a0", new JavaParams("ap")),
+                                    ("a1", new JavaParams("ap2"))))
 
     val json = JsonExtractor.engineParamsToJson(JsonExtractorOption.Both, ep)
 
@@ -380,8 +381,7 @@ private case class ScalaQuery(
     string: String, optional: Option[String], default: String = "default")
 
 private class UpperCaseFormat
-    extends CustomSerializer[ScalaQuery](
-        format =>
+    extends CustomSerializer[ScalaQuery](format =>
           ({
         case JObject(JField("string", JString(string)) :: JField(
             "optional", JString(optional)) :: JField(

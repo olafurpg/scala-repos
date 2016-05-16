@@ -48,15 +48,16 @@ trait Variances { self: SymbolTable =>
     // Flip occurrences of type parameters and parameters, unless
     //  - it's a constructor, or case class factory or extractor
     //  - it's a type parameter of tvar's owner.
-    def shouldFlip(sym: Symbol, tvar: Symbol) = (sym.isParameter &&
-        !(tvar.isTypeParameterOrSkolem && sym.isTypeParameterOrSkolem &&
-            tvar.owner == sym.owner))
+    def shouldFlip(sym: Symbol, tvar: Symbol) =
+      (sym.isParameter && !(tvar.isTypeParameterOrSkolem &&
+              sym.isTypeParameterOrSkolem && tvar.owner == sym.owner))
     // return Bivariant if `sym` is local to a term
     // or is private[this] or protected[this]
     def isLocalOnly(sym: Symbol) =
       !sym.owner.isClass ||
       (sym.isTerm // ?? shouldn't this be sym.owner.isTerm according to the comments above?
-          && (sym.isLocalToThis || sym.isSuperAccessor) // super accessors are implicitly local #4345
+          && (sym.isLocalToThis ||
+              sym.isSuperAccessor) // super accessors are implicitly local #4345
           && !escapedLocals(sym))
 
     private object ValidateVarianceMap extends TypeMap(trackVariance = true) {
@@ -103,8 +104,8 @@ trait Variances { self: SymbolTable =>
         if (!relative.isBivariant) {
           def sym_s = s"$sym (${sym.variance}${sym.locationString})"
           def base_s =
-            s"$base in ${base.owner}" +
-            (if (base.owner.isClass) "" else " in " + base.owner.enclClass)
+            s"$base in ${base.owner}" + (if (base.owner.isClass) ""
+                                         else " in " + base.owner.enclClass)
           log(s"verifying $sym_s is $required at $base_s")
           if (sym.variance != required) issueVarianceError(base, sym, required)
         }
@@ -161,8 +162,9 @@ trait Variances { self: SymbolTable =>
       def sym = tree.symbol
       // No variance check for object-private/protected methods/values.
       // Or constructors, or case class factory or extractor.
-      def skip = (sym == NoSymbol || sym.isLocalToThis ||
-          sym.owner.isConstructor || sym.owner.isCaseApplyOrUnapply)
+      def skip =
+        (sym == NoSymbol || sym.isLocalToThis || sym.owner.isConstructor ||
+            sym.owner.isCaseApplyOrUnapply)
       tree match {
         case defn: MemberDef if skip =>
           debuglog(s"Skipping variance check of ${sym.defString}")

@@ -30,8 +30,10 @@ import com.twitter.scalding.typed.TypedSink
 import scala.collection.JavaConverters._
 
 trait LzoCodec[T]
-    extends FileSource with SingleMappable[T]
-    with TypedSink[T] with LocalTapSource {
+    extends FileSource
+    with SingleMappable[T]
+    with TypedSink[T]
+    with LocalTapSource {
   def injection: Injection[T, Array[Byte]]
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
@@ -70,7 +72,9 @@ trait ErrorThresholdLzoCodec[T] extends ErrorHandlingLzoCodec[T] {
 }
 
 trait LzoProtobuf[T <: Message]
-    extends LocalTapSource with SingleMappable[T] with TypedSink[T] {
+    extends LocalTapSource
+    with SingleMappable[T]
+    with TypedSink[T] {
   def column: Class[_]
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
@@ -80,7 +84,9 @@ trait LzoProtobuf[T <: Message]
 }
 
 trait LzoThrift[T <: TBase[_, _]]
-    extends LocalTapSource with SingleMappable[T] with TypedSink[T] {
+    extends LocalTapSource
+    with SingleMappable[T]
+    with TypedSink[T] {
   def column: Class[_]
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
@@ -90,7 +96,9 @@ trait LzoThrift[T <: TBase[_, _]]
 }
 
 trait LzoText
-    extends LocalTapSource with SingleMappable[String] with TypedSink[String] {
+    extends LocalTapSource
+    with SingleMappable[String]
+    with TypedSink[String] {
   override def setter[U <: String] =
     TupleSetter.asSubSetter[String, U](TupleSetter.singleSetter[String])
   override def hdfsScheme = HadoopSchemeInstance(new LzoTextLine())
@@ -111,8 +119,10 @@ trait LzoTsv extends DelimitedScheme with LocalTapSource {
 }
 
 trait LzoTypedTsv[T]
-    extends DelimitedScheme with Mappable[T]
-    with TypedSink[T] with LocalTapSource {
+    extends DelimitedScheme
+    with Mappable[T]
+    with TypedSink[T]
+    with LocalTapSource {
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
   override def hdfsScheme =

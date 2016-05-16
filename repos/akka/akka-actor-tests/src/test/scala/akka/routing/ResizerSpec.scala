@@ -37,7 +37,8 @@ object ResizerSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ResizerSpec
-    extends AkkaSpec(ResizerSpec.config) with DefaultTimeout
+    extends AkkaSpec(ResizerSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
 
   import akka.routing.ResizerSpec._
@@ -230,8 +231,8 @@ class ResizerSpec
                                    messagesPerResize = 2)
 
       val router = system.actorOf(
-          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer)).props(
-              Props(new Actor {
+          RoundRobinPool(nrOfInstances = 0, resizer = Some(resizer))
+            .props(Props(new Actor {
         def receive = {
           case n: Int if n <= 0 ⇒ // done
           case n: Int ⇒ Thread.sleep((n millis).dilated.toMillis)

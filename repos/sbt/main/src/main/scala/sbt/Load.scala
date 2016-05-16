@@ -159,22 +159,20 @@ object Load {
     } else config
 
   def defaultDelegates: sbt.LoadedBuild => Scope => Seq[Scope] =
-    (lb: sbt.LoadedBuild) =>
-      {
-        val rootProject = getRootProject(lb.units)
-        def resolveRef(project: Reference): ResolvedReference =
-          Scope.resolveReference(lb.root, rootProject, project)
-        Scope.delegates(
-            lb.allProjectRefs,
-            (_: ResolvedProject).configurations.map(c => ConfigKey(c.name)),
-            resolveRef,
-            rootProject,
-            project => projectInherit(lb, project),
-            (project,
-            config) => configInherit(lb, project, config, rootProject),
-            task => task.extend,
-            (project, extra) => Nil
-        )
+    (lb: sbt.LoadedBuild) => {
+      val rootProject = getRootProject(lb.units)
+      def resolveRef(project: Reference): ResolvedReference =
+        Scope.resolveReference(lb.root, rootProject, project)
+      Scope.delegates(
+          lb.allProjectRefs,
+          (_: ResolvedProject).configurations.map(c => ConfigKey(c.name)),
+          resolveRef,
+          rootProject,
+          project => projectInherit(lb, project),
+          (project, config) => configInherit(lb, project, config, rootProject),
+          task => task.extend,
+          (project, extra) => Nil
+      )
     }
   def configInherit(lb: sbt.LoadedBuild,
                     ref: ResolvedReference,
@@ -330,7 +328,7 @@ object Load {
               val ref = ProjectRef(uri, id)
               val defineConfig: Seq[Setting[_]] =
                 for (c <- project.configurations) yield
-                ((configuration in (ref, ConfigKey(c.name))) :== c)
+                  ((configuration in (ref, ConfigKey(c.name))) :== c)
               val builtin: Seq[Setting[_]] =
                 (thisProject :== project) +: (thisProjectRef :== ref) +: defineConfig
               val settings =
@@ -429,10 +427,10 @@ object Load {
            s: State,
            config: sbt.LoadBuildConfiguration): sbt.PartBuild =
     load(file,
-         builtinLoader(
-             s,
-             config.copy(pluginManagement = config.pluginManagement.shift,
-                         extraBuilds = Nil)),
+         builtinLoader(s,
+                       config.copy(pluginManagement =
+                                     config.pluginManagement.shift,
+                                   extraBuilds = Nil)),
          config.extraBuilds.toList)
   def builtinLoader(
       s: State, config: sbt.LoadBuildConfiguration): BuildLoader = {
@@ -505,7 +503,8 @@ object Load {
       references: Map[URI, List[ProjectReference]],
       loaders: BuildLoader,
       builds: Map[URI, sbt.PartBuildUnit]): (Map[URI, List[ProjectReference]],
-  Map[URI, sbt.PartBuildUnit], BuildLoader) =
+                                             Map[URI, sbt.PartBuildUnit],
+                                             BuildLoader) =
     bases match {
       case b :: bs =>
         if (builds contains b) loadAll(bs, references, loaders, builds)
@@ -545,8 +544,8 @@ object Load {
     builds map {
       case (uri, unit) =>
         (uri,
-         unit.resolveRefs(
-             ref => Scope.resolveProjectRef(uri, rootProject, ref)))
+         unit.resolveRefs(ref =>
+               Scope.resolveProjectRef(uri, rootProject, ref)))
     }
   }
   def checkAll(referenced: Map[URI, List[ProjectReference]],
@@ -587,8 +586,8 @@ object Load {
                       unit: sbt.PartBuildUnit,
                       rootProject: URI => String): sbt.LoadedBuildUnit = {
     IO.assertAbsolute(uri)
-    val resolve = (_: Project).resolve(
-        ref => Scope.resolveProjectRef(uri, rootProject, ref))
+    val resolve = (_: Project).resolve(ref =>
+          Scope.resolveProjectRef(uri, rootProject, ref))
     new sbt.LoadedBuildUnit(unit.unit,
                             unit.defined mapValues resolve,
                             unit.rootProjects,
@@ -597,8 +596,8 @@ object Load {
   def projects(unit: sbt.BuildUnit): Seq[Project] = {
     // we don't have the complete build graph loaded, so we don't have the rootProject function yet.
     //  Therefore, we use resolveProjectBuild instead of resolveProjectRef.  After all builds are loaded, we can fully resolve ProjectReferences.
-    val resolveBuild = (_: Project).resolveBuild(
-        ref => Scope.resolveProjectBuild(unit.uri, ref))
+    val resolveBuild = (_: Project).resolveBuild(ref =>
+          Scope.resolveProjectBuild(unit.uri, ref))
     // although the default loader will resolve the project base directory, other loaders may not, so run resolveBase here as well
     unit.definitions.projects
       .map(resolveBuild compose resolveBase(unit.localBase))
@@ -961,8 +960,8 @@ object Load {
       def pluginSettings(f: Plugins) = {
         val included =
           loadedPlugins.detected.plugins.values.filter(f.include) // don't apply the filter to AutoPlugins, only Plugins
-        included.flatMap(
-            p => p.settings.filter(isProjectThis) ++ p.projectSettings)
+        included.flatMap(p =>
+              p.settings.filter(isProjectThis) ++ p.projectSettings)
       }
       // Filter the AutoPlugin settings we included based on which ones are
       // intended in the AddSettings.AutoPlugins filter.
@@ -1088,7 +1087,7 @@ object Load {
                      opts)
         },
             onLoadMessage :=
-            ("Loading project definition from " + baseDirectory.value)
+              ("Loading project definition from " + baseDirectory.value)
         ))
   private[this] def removeEntries(
       cp: Seq[Attributed[File]],
@@ -1103,9 +1102,10 @@ object Load {
       config: sbt.LoadBuildConfiguration): sbt.LoadBuildConfiguration =
     config.copy(
         injectSettings = config.injectSettings.copy(
-              global = autoPluginSettings ++ config.injectSettings.global,
-              project = config.pluginManagement.inject ++ config.injectSettings.project
-          ))
+            global = autoPluginSettings ++ config.injectSettings.global,
+            project =
+              config.pluginManagement.inject ++ config.injectSettings.project
+        ))
   def activateGlobalPlugin(
       config: sbt.LoadBuildConfiguration): sbt.LoadBuildConfiguration =
     config.globalPlugin match {

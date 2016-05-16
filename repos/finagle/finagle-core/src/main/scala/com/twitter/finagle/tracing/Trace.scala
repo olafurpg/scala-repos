@@ -259,8 +259,7 @@ object Trace {
     * trace is sampled
     */
   def isActivelyTracing: Boolean =
-    tracingEnabled &&
-    (id match {
+    tracingEnabled && (id match {
           case TraceId(_, _, _, Some(false), flags) if !flags.isDebug => false
           case TraceId(_, _, _, _, Flags(Flags.Debug)) => true
           case _ =>

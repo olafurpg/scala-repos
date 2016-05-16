@@ -59,7 +59,8 @@ private[hive] class HadoopTableReader(
     @transient private val relation: MetastoreRelation,
     @transient private val sc: HiveContext,
     hiveExtraConf: HiveConf)
-    extends TableReader with Logging {
+    extends TableReader
+    with Logging {
 
   // Hadoop honors "mapred.map.tasks" as hint, but will ignore when mapred.job.tracker is "local".
   // https://hadoop.apache.org/docs/r1.0.4/mapred-default.html
@@ -169,8 +170,8 @@ private[hive] class HadoopTableReader(
               val pathPattern = new Path(pathPatternStr)
               val fs = pathPattern.getFileSystem(sc.hiveconf)
               val matches = fs.globStatus(pathPattern)
-              matches.foreach(
-                  fileStatus => existPathSet += fileStatus.getPath.toString)
+              matches.foreach(fileStatus =>
+                    existPathSet += fileStatus.getPath.toString)
             }
             // convert  /demo/data/year/month/day  to  /demo/data/*/*/*/
             def getPathPatternByPath(parNum: Int, tempPath: Path): String = {

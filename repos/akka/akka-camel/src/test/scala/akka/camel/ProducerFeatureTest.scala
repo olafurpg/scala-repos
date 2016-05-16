@@ -23,7 +23,9 @@ import akka.actor.Status.Failure
   */
 class ProducerFeatureTest
     extends TestKit(ActorSystem("ProducerFeatureTest", AkkaSpec.testConf))
-    with WordSpecLike with BeforeAndAfterAll with BeforeAndAfterEach
+    with WordSpecLike
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
     with Matchers {
 
   import ProducerFeatureTest._
@@ -193,9 +195,9 @@ class ProducerFeatureTest
     }
 
     "15 produce message, forward failure response to a producing target actor and produce response to direct:forward-test-1" in {
-      val target =
-        system.actorOf(Props[ProducingForwardTarget],
-                       name = "15-producer-forwarding-target-failure")
+      val target = system.actorOf(Props[ProducingForwardTarget],
+                                  name =
+                                    "15-producer-forwarding-target-failure")
       val producer = system.actorOf(
           Props(new TestForwarder("direct:producer-test-2", target)),
           name = "15-direct-producer-test-2-forward-failure")
@@ -333,7 +335,8 @@ object ProducerFeatureTest {
   }
 
   class ChildProducer(uri: String, upper: Boolean = false)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     override def oneway = true
 
     var lastSender: Option[ActorRef] = None
@@ -358,7 +361,8 @@ object ProducerFeatureTest {
   }
 
   class TestProducer(uri: String, upper: Boolean = false)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     def endpointUri = uri
 
     override def preRestart(reason: Throwable, message: Option[Any]) {
@@ -376,7 +380,8 @@ object ProducerFeatureTest {
   }
 
   class TestForwarder(uri: String, target: ActorRef)
-      extends Actor with Producer {
+      extends Actor
+      with Producer {
     def endpointUri = uri
 
     override def headersToCopy = Set(CamelMessage.MessageExchangeId, "test")

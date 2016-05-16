@@ -25,7 +25,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class IterativelyReweightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private var instances1: RDD[Instance] = _
   private var instances2: RDD[Instance] = _
@@ -89,18 +90,18 @@ class IterativelyReweightedLeastSquaresSuite
         val eta = math.log(mu / (1.0 - mu))
         Instance(eta, instance.weight, instance.features)
       }
-      val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(newInstances)
-      val irls =
-        new IterativelyReweightedLeastSquares(initial,
-                                              BinomialReweightFunc,
-                                              fitIntercept,
-                                              regParam = 0.0,
-                                              maxIter = 25,
-                                              tol = 1e-8).fit(instances1)
+      val initial = new WeightedLeastSquares(fitIntercept,
+                                             regParam = 0.0,
+                                             standardizeFeatures = false,
+                                             standardizeLabel =
+                                               false).fit(newInstances)
+      val irls = new IterativelyReweightedLeastSquares(initial,
+                                                       BinomialReweightFunc,
+                                                       fitIntercept,
+                                                       regParam = 0.0,
+                                                       maxIter = 25,
+                                                       tol =
+                                                         1e-8).fit(instances1)
       val actual = Vectors.dense(
           irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
@@ -134,18 +135,18 @@ class IterativelyReweightedLeastSquaresSuite
         val eta = math.log(mu)
         Instance(eta, instance.weight, instance.features)
       }
-      val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(newInstances)
-      val irls =
-        new IterativelyReweightedLeastSquares(initial,
-                                              PoissonReweightFunc,
-                                              fitIntercept,
-                                              regParam = 0.0,
-                                              maxIter = 25,
-                                              tol = 1e-8).fit(instances2)
+      val initial = new WeightedLeastSquares(fitIntercept,
+                                             regParam = 0.0,
+                                             standardizeFeatures = false,
+                                             standardizeLabel =
+                                               false).fit(newInstances)
+      val irls = new IterativelyReweightedLeastSquares(initial,
+                                                       PoissonReweightFunc,
+                                                       fitIntercept,
+                                                       regParam = 0.0,
+                                                       maxIter = 25,
+                                                       tol =
+                                                         1e-8).fit(instances2)
       val actual = Vectors.dense(
           irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
@@ -175,11 +176,11 @@ class IterativelyReweightedLeastSquaresSuite
 
     var idx = 0
     for (fitIntercept <- Seq(false, true)) {
-      val initial =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam = 0.0,
-                                 standardizeFeatures = false,
-                                 standardizeLabel = false).fit(instances2)
+      val initial = new WeightedLeastSquares(fitIntercept,
+                                             regParam = 0.0,
+                                             standardizeFeatures = false,
+                                             standardizeLabel =
+                                               false).fit(instances2)
       val irls =
         new IterativelyReweightedLeastSquares(initial,
                                               L1RegressionReweightFunc,

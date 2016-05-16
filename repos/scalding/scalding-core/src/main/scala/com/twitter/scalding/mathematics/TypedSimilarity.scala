@@ -129,7 +129,7 @@ object TypedSimilarity extends Serializable {
   // key: document,
   // value: (word, documentsWithWord)
   // return: Edge of similarity between words measured by documents
-  def exactSetSimilarity[N : Ordering](
+  def exactSetSimilarity[N: Ordering](
       g: Grouped[N, (N, Int)],
       smallpred: N => Boolean,
       bigpred: N => Boolean): TypedPipe[Edge[N, SetSimilarity]] =
@@ -143,7 +143,8 @@ object TypedSimilarity extends Serializable {
                         .flatMap {
                           case ((node1, deg1), (node2, deg2)) =>
                             if (smallpred(node1) && bigpred(node2))
-                              Some(((node1, node2), (1, deg1, deg2))) else None
+                              Some(((node1, node2), (1, deg1, deg2)))
+                            else None
                         }
                         .group,
                       g.reducers)
@@ -163,7 +164,7 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://arxiv.org/pdf/1206.2082v2.pdf
    */
-  def discoCosineSimilarity[N : Ordering](
+  def discoCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Int)],
       bigG: Grouped[N, (N, Int)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
@@ -205,7 +206,7 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://stanford.edu/~rezab/papers/dimsum.pdf
    */
-  def dimsumCosineSimilarity[N : Ordering](
+  def dimsumCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Double, Double)],
       bigG: Grouped[N, (N, Double, Double)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
@@ -214,7 +215,7 @@ object TypedSimilarity extends Serializable {
         smallG
           .cogroup(bigG) {
             (n: N, leftit: Iterator[(N, Double, Double)],
-            rightit: Iterable[(N, Double, Double)]) =>
+             rightit: Iterable[(N, Double, Double)]) =>
               // Use a co-group to ensure this happens in the reducer:
               leftit.flatMap {
                 case (node1, weight1, norm1) =>
@@ -245,8 +246,8 @@ object TypedSimilarity extends Serializable {
   * This algothm is just matrix multiplication done by hand to make it
   * clearer when we do the sampling implementation
   */
-class ExactInCosine[N](
-    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
+class ExactInCosine[N](reducers: Int = -1)(
+    implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
   def apply(graph: TypedPipe[Edge[N, InDegree]],

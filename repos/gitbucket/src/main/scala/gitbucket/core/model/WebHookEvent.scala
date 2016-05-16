@@ -10,7 +10,8 @@ trait WebHookEventComponent extends TemplateComponent { self: Profile =>
       _.name, WebHook.Event.valueOf(_))
 
   class WebHookEvents(tag: Tag)
-      extends Table[WebHookEvent](tag, "WEB_HOOK_EVENT") with BasicTemplate {
+      extends Table[WebHookEvent](tag, "WEB_HOOK_EVENT")
+      with BasicTemplate {
     val url = column[String]("URL")
     val event = column[WebHook.Event]("EVENT")
     def * =

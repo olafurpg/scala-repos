@@ -27,8 +27,12 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class DeploymentManagerTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with BeforeAndAfter with BeforeAndAfterAll with Mockito
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with Mockito
     with ImplicitSender {
 
   var driver: SchedulerDriver = _

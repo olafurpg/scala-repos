@@ -95,7 +95,7 @@ object CodeGenTools {
 
   def checkReport(compiler: Global,
                   allowMessage: StoreReporter#Info => Boolean = _ =>
-                      false): Unit = {
+                    false): Unit = {
     val disallowed =
       reporter(compiler).infos.toList.filter(!allowMessage(_)) // toList prevents an infer-non-wildcard-existential warning.
     if (disallowed.nonEmpty) {
@@ -105,23 +105,22 @@ object CodeGenTools {
     }
   }
 
-  def compile(compiler: Global)(
-      scalaCode: String,
-      javaCode: List[(String, String)] = Nil,
-      allowMessage: StoreReporter#Info => Boolean = _ =>
-          false): List[(String, Array[Byte])] = {
+  def compile(compiler: Global)(scalaCode: String,
+                                javaCode: List[(String, String)] = Nil,
+                                allowMessage: StoreReporter#Info => Boolean =
+                                  _ => false): List[(String, Array[Byte])] = {
     val run = newRun(compiler)
     run.compileSources(
-        makeSourceFile(scalaCode, "unitTestSource.scala") :: javaCode.map(
-            p => makeSourceFile(p._1, p._2)))
+        makeSourceFile(scalaCode, "unitTestSource.scala") :: javaCode.map(p =>
+              makeSourceFile(p._1, p._2)))
     checkReport(compiler, allowMessage)
     getGeneratedClassfiles(compiler.settings.outputDirs.getSingleOutput.get)
   }
 
-  def compileTransformed(
-      compiler: Global)(scalaCode: String,
-                        javaCode: List[(String, String)] = Nil,
-                        beforeBackend: compiler.Tree => compiler.Tree)
+  def compileTransformed(compiler: Global)(
+      scalaCode: String,
+      javaCode: List[(String, String)] = Nil,
+      beforeBackend: compiler.Tree => compiler.Tree)
     : List[(String, Array[Byte])] = {
     compiler.settings.stopBefore.value = "jvm" :: Nil
     val run = newRun(compiler)
@@ -148,12 +147,12 @@ object CodeGenTools {
     * The output directory is a physical directory, I have not figured out if / how it's possible to
     * add a VirtualDirectory to the classpath of a compiler.
     */
-  def compileSeparately(
-      codes: List[String],
-      extraArgs: String = "",
-      allowMessage: StoreReporter#Info => Boolean = _ => false,
-      afterEach: AbstractFile => Unit = _ =>
-          ()): List[(String, Array[Byte])] = {
+  def compileSeparately(codes: List[String],
+                        extraArgs: String = "",
+                        allowMessage: StoreReporter#Info => Boolean = _ =>
+                          false,
+                        afterEach: AbstractFile => Unit = _ =>
+                          ()): List[(String, Array[Byte])] = {
     val outDir = AbstractFile.getDirectory(TempDir.createTempDir())
     val outDirPath = outDir.canonicalPath
     val argsWithOutDir = extraArgs + s" -d $outDirPath -cp $outDirPath"
@@ -172,11 +171,11 @@ object CodeGenTools {
     classfiles
   }
 
-  def compileClassesSeparately(
-      codes: List[String],
-      extraArgs: String = "",
-      allowMessage: StoreReporter#Info => Boolean = _ => false,
-      afterEach: AbstractFile => Unit = _ => ()) = {
+  def compileClassesSeparately(codes: List[String],
+                               extraArgs: String = "",
+                               allowMessage: StoreReporter#Info => Boolean =
+                                 _ => false,
+                               afterEach: AbstractFile => Unit = _ => ()) = {
     readAsmClasses(
         compileSeparately(codes, extraArgs, allowMessage, afterEach))
   }
@@ -189,22 +188,22 @@ object CodeGenTools {
       code: String,
       javaCode: List[(String, String)] = Nil,
       allowMessage: StoreReporter#Info => Boolean = _ =>
-          false): List[ClassNode] = {
+        false): List[ClassNode] = {
     readAsmClasses(compile(compiler)(code, javaCode, allowMessage))
   }
 
-  def compileMethods(
-      compiler: Global)(code: String,
-                        allowMessage: StoreReporter#Info => Boolean = _ =>
-                            false): List[MethodNode] = {
+  def compileMethods(compiler: Global)(
+      code: String,
+      allowMessage: StoreReporter#Info => Boolean =
+        _ => false): List[MethodNode] = {
     compileClasses(compiler)(s"class C { $code }", allowMessage = allowMessage).head.methods.asScala.toList
       .filterNot(_.name == "<init>")
   }
 
-  def singleMethodInstructions(
-      compiler: Global)(code: String,
-                        allowMessage: StoreReporter#Info => Boolean = _ =>
-                            false): List[Instruction] = {
+  def singleMethodInstructions(compiler: Global)(
+      code: String,
+      allowMessage: StoreReporter#Info => Boolean =
+        _ => false): List[Instruction] = {
     val List(m) = compileMethods(compiler)(code, allowMessage = allowMessage)
     instructionsFromMethod(m)
   }

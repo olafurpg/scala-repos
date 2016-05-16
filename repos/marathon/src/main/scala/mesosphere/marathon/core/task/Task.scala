@@ -94,8 +94,8 @@ object Task {
           MarathonTaskStatus.Running(mesosStatus), now)
           if !hasStartedRunning =>
         val updated = copy(
-            status = status.copy(
-                  startedAt = Some(now), mesosStatus = mesosStatus))
+            status =
+              status.copy(startedAt = Some(now), mesosStatus = mesosStatus))
         TaskStateChange.Update(updated)
 
       // case 2: terminal
@@ -194,8 +194,8 @@ object Task {
           MarathonTaskStatus.Running(mesosStatus), now)
           if !hasStartedRunning =>
         val updated = copy(
-            status = status.copy(
-                  startedAt = Some(now), mesosStatus = mesosStatus))
+            status =
+              status.copy(startedAt = Some(now), mesosStatus = mesosStatus))
         TaskStateChange.Update(updated)
 
       // case 2: terminal
@@ -206,7 +206,7 @@ object Task {
                 taskId = taskId,
                 agentInfo = agentInfo,
                 reservation = reservation.copy(
-                      state = Task.Reservation.State.Suspended(timeout = None))
+                    state = Task.Reservation.State.Suspended(timeout = None))
             ))
 
       // case 3: health or state updated

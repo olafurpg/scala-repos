@@ -50,12 +50,10 @@ private[stat] object ChiSqTest extends Logging {
   case class Method(name: String, chiSqFunc: (Double, Double) => Double)
 
   // Pearson's chi-squared test: http://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
-  val PEARSON = new Method("pearson",
-                           (observed: Double, expected: Double) =>
-                             {
-                               val dev = observed - expected
-                               dev * dev / expected
-                           })
+  val PEARSON = new Method("pearson", (observed: Double, expected: Double) => {
+    val dev = observed - expected
+    dev * dev / expected
+  })
 
   // Null hypothesis for the two different types of chi-squared tests to be included in the result.
   object NullHypothesis extends Enumeration {
@@ -82,9 +80,9 @@ private[stat] object ChiSqTest extends Logging {
     * the independence test.
     * Returns an array containing the ChiSquaredTestResult for every feature against the label.
     */
-  def chiSquaredFeatures(
-      data: RDD[LabeledPoint],
-      methodName: String = PEARSON.name): Array[ChiSqTestResult] = {
+  def chiSquaredFeatures(data: RDD[LabeledPoint],
+                         methodName: String =
+                           PEARSON.name): Array[ChiSqTestResult] = {
     val maxCategories = 10000
     val numCols = data.first().features.size
     val results = new Array[ChiSqTestResult](numCols)
@@ -100,8 +98,8 @@ private[stat] object ChiSqTest extends Logging {
       val pairCounts = data.mapPartitions { iter =>
         val distinctLabels = mutable.HashSet.empty[Double]
         val allDistinctFeatures: Map[Int, mutable.HashSet[Double]] =
-          Map((startCol until endCol).map(
-                  col => (col, mutable.HashSet.empty[Double])): _*)
+          Map((startCol until endCol).map(col =>
+                    (col, mutable.HashSet.empty[Double])): _*)
         var i = 1
         iter.flatMap {
           case LabeledPoint(label, features) =>
@@ -154,8 +152,8 @@ private[stat] object ChiSqTest extends Logging {
               val j = labels(label)
               contingency(i, j) += pairCounts((col, feature, label))
           }
-          results(col) = chiSquaredMatrix(
-              Matrices.fromBreeze(contingency), methodName)
+          results(col) =
+            chiSquaredMatrix(Matrices.fromBreeze(contingency), methodName)
       }
       batch += 1
     }

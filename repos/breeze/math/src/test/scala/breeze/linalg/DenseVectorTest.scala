@@ -523,8 +523,8 @@ class DenseVectorTest extends FunSuite with Checkers {
   test("isClose") {
     check((a: DenseVector[Double]) => isClose(a, a))
     check((a: DenseVector[Double], b: DenseVector[Double]) =>
-          isClose(a, b) == zipValues(a, b).forall(
-              (a, b) => (a - b).abs < 1E-8))
+          isClose(a, b) == zipValues(a, b).forall((a, b) =>
+                (a - b).abs < 1E-8))
   }
 
   test("nonfinite") {
@@ -550,8 +550,9 @@ class DenseVectorOps_DoubleTest
     extends DoubleValuedTensorSpaceTestBase[DenseVector[Double], Int] {
   val space = DenseVector.space[Double]
 
-  implicit def genTriple: Arbitrary[
-      (DenseVector[Double], DenseVector[Double], DenseVector[Double])] = {
+  implicit def genTriple: Arbitrary[(DenseVector[Double],
+                                     DenseVector[Double],
+                                     DenseVector[Double])] = {
     val N = 30
     Arbitrary {
       for {
@@ -580,8 +581,9 @@ class DenseVectorOps_IntTest
   val space = DenseVector.space[Int]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (DenseVector[Int], DenseVector[Int], DenseVector[Int])] = {
+  implicit def genTriple: Arbitrary[(DenseVector[Int],
+                                     DenseVector[Int],
+                                     DenseVector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 1000 }
@@ -606,8 +608,9 @@ class DenseVectorOps_ComplexTest
   val space = DenseVector.space[Complex]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (DenseVector[Complex], DenseVector[Complex], DenseVector[Complex])] = {
+  implicit def genTriple: Arbitrary[(DenseVector[Complex],
+                                     DenseVector[Complex],
+                                     DenseVector[Complex])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Complex]
@@ -636,8 +639,9 @@ class DenseVectorOps_FloatTest
   override val TOL: Double = 1E-3
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (DenseVector[Float], DenseVector[Float], DenseVector[Float])] = {
+  implicit def genTriple: Arbitrary[(DenseVector[Float],
+                                     DenseVector[Float],
+                                     DenseVector[Float])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Float].map { _ % 1000 }

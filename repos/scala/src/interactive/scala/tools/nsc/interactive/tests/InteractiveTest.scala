@@ -43,8 +43,12 @@ import scala.collection.mutable.ListBuffer
   *  @author Mirco Dotta
   */
 abstract class InteractiveTest
-    extends AskParse with AskShutdown with AskReload with AskLoadedTyped
-    with PresentationCompilerInstance with CoreTestDefs
+    extends AskParse
+    with AskShutdown
+    with AskReload
+    with AskLoadedTyped
+    with PresentationCompilerInstance
+    with CoreTestDefs
     with InteractiveTestSettings {
   self =>
 

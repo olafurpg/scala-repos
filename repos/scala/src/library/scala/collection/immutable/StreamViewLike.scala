@@ -6,7 +6,9 @@ import generic._
 
 trait StreamViewLike[
     +A, +Coll, +This <: StreamView[A, Coll] with StreamViewLike[A, Coll, This]]
-    extends SeqView[A, Coll] with SeqViewLike[A, Coll, This] { self =>
+    extends SeqView[A, Coll]
+    with SeqViewLike[A, Coll, This] {
+  self =>
 
   override def force[B >: A, That](implicit bf: CanBuildFrom[Coll, B, That]) = {
     self.iterator.toStream.asInstanceOf[That]
@@ -18,7 +20,8 @@ trait StreamViewLike[
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
-      extends super.AbstractTransformed[B] with Transformed[B]
+      extends super.AbstractTransformed[B]
+      with Transformed[B]
 
   trait EmptyView extends Transformed[Nothing] with super.EmptyView
 
@@ -41,7 +44,8 @@ trait StreamViewLike[
   trait Zipped[B] extends super.Zipped[B] with Transformed[(A, B)]
 
   trait ZippedAll[A1 >: A, B]
-      extends super.ZippedAll[A1, B] with Transformed[(A1, B)]
+      extends super.ZippedAll[A1, B]
+      with Transformed[(A1, B)]
 
   trait Reversed extends super.Reversed with Transformed[A]
 

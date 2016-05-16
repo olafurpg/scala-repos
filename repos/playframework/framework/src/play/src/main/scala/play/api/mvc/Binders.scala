@@ -473,7 +473,7 @@ object QueryStringBindable {
   /**
     * QueryString binder for Option.
     */
-  implicit def bindableOption[T : QueryStringBindable] =
+  implicit def bindableOption[T: QueryStringBindable] =
     new QueryStringBindable[Option[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
@@ -494,8 +494,8 @@ object QueryStringBindable {
   /**
     * QueryString binder for Java Optional.
     */
-  implicit def bindableJavaOption[
-      T : QueryStringBindable]: QueryStringBindable[Optional[T]] =
+  implicit def bindableJavaOption[T: QueryStringBindable]
+    : QueryStringBindable[Optional[T]] =
     new QueryStringBindable[Optional[T]] {
       def bind(key: String, params: Map[String, Seq[String]]) = {
         Some(
@@ -520,8 +520,8 @@ object QueryStringBindable {
   /**
     * QueryString binder for Seq
     */
-  implicit def bindableSeq[T : QueryStringBindable]: QueryStringBindable[
-      Seq[T]] = new QueryStringBindable[Seq[T]] {
+  implicit def bindableSeq[T: QueryStringBindable]
+    : QueryStringBindable[Seq[T]] = new QueryStringBindable[Seq[T]] {
     def bind(key: String, params: Map[String, Seq[String]]) =
       bindSeq[T](key, params)
     def unbind(key: String, values: Seq[T]) = unbindSeq(key, values)
@@ -532,24 +532,26 @@ object QueryStringBindable {
   /**
     * QueryString binder for List
     */
-  implicit def bindableList[T : QueryStringBindable]: QueryStringBindable[
-      List[T]] =
+  implicit def bindableList[T: QueryStringBindable]
+    : QueryStringBindable[List[T]] =
     bindableSeq[T].transform(_.toList, _.toSeq)
 
   /**
     * QueryString binder for java.util.List
     */
-  implicit def bindableJavaList[T : QueryStringBindable]: QueryStringBindable[
-      java.util.List[T]] = new QueryStringBindable[java.util.List[T]] {
-    def bind(key: String, params: Map[String, Seq[String]]) =
-      bindSeq[T](key, params).map(_.right.map(_.asJava))
-    def unbind(key: String, values: java.util.List[T]) =
-      unbindSeq(key, values.asScala)
-    override def javascriptUnbind =
-      javascriptUnbindSeq(implicitly[QueryStringBindable[T]].javascriptUnbind)
-  }
+  implicit def bindableJavaList[T: QueryStringBindable]
+    : QueryStringBindable[java.util.List[T]] =
+    new QueryStringBindable[java.util.List[T]] {
+      def bind(key: String, params: Map[String, Seq[String]]) =
+        bindSeq[T](key, params).map(_.right.map(_.asJava))
+      def unbind(key: String, values: java.util.List[T]) =
+        unbindSeq(key, values.asScala)
+      override def javascriptUnbind =
+        javascriptUnbindSeq(
+            implicitly[QueryStringBindable[T]].javascriptUnbind)
+    }
 
-  private def bindSeq[T : QueryStringBindable](
+  private def bindSeq[T: QueryStringBindable](
       key: String,
       params: Map[String, Seq[String]]): Option[Either[String, Seq[T]]] = {
     @tailrec
@@ -585,7 +587,7 @@ object QueryStringBindable {
     }
   }
 
-  private def unbindSeq[T : QueryStringBindable](
+  private def unbindSeq[T: QueryStringBindable](
       key: String, values: Iterable[T]): String = {
     (for (value <- values) yield {
       implicitly[QueryStringBindable[T]].unbind(key, value)

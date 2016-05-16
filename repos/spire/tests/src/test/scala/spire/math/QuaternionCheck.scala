@@ -14,7 +14,9 @@ import Gen._
 import Arbitrary.arbitrary
 
 class QuaternionCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   type H = Quaternion[Real]
   val zero = Quaternion.zero[Real]

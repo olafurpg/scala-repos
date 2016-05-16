@@ -37,8 +37,8 @@ trait HetOrder[@spec(Boolean, Long, Double, AnyRef) A,
 }
 
 trait HetOrderLow {
-  implicit def reverse[
-      @spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](
+  implicit def reverse[@spec(Boolean, Long, Double, AnyRef) A,
+                       @spec(Boolean, Long, Double, AnyRef) B](
       implicit ho: HetOrder[A, B]) = new HetOrder[B, A] {
     def compare(b: B, a: A) = {
       val cmp = ho.compare(a, b)
@@ -66,8 +66,8 @@ object HetOrder extends HetOrderLow {
       NumericComparisons.compare(a, b)
   }
 
-  @inline final def apply[
-      @spec(Boolean, Long, Double, AnyRef) A, @spec(Boolean, Long, Double, AnyRef) B](
+  @inline final def apply[@spec(Boolean, Long, Double, AnyRef) A,
+                          @spec(Boolean, Long, Double, AnyRef) B](
       implicit ho: HetOrder[A, B]) = ho
 }
 

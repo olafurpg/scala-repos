@@ -244,8 +244,7 @@ object AlterTableCommandParser {
         }
         val values = colValues match {
           case Token("TOK_TABCOLVALUE", vals) =>
-            Seq(
-                vals.map { n =>
+            Seq(vals.map { n =>
               cleanAndUnquoteString(n.text)
             })
           case Token("TOK_TABCOLVALUE_PAIR", pairs) =>

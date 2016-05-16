@@ -59,7 +59,8 @@ package mutable {
 
   /* hack-arounds */
   private[mutable] class ExposedArrayBuffer[T]
-      extends ArrayBuffer[T] with Sizing {
+      extends ArrayBuffer[T]
+      with Sizing {
     def internalArray = array
     def setInternalSize(s: Int) = size0 = s
     override def sizeHint(len: Int) = {

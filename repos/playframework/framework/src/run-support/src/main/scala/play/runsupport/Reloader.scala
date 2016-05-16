@@ -117,7 +117,8 @@ object Reloader {
     new NamedURLClassLoader(name, urls, parent)
 
   val createDelegatedResourcesClassLoader: ClassLoaderCreator = (name, urls,
-  parent) => new DelegatedResourcesClassLoader(name, urls, parent)
+                                                                 parent) =>
+    new DelegatedResourcesClassLoader(name, urls, parent)
 
   def assetsClassLoader(allAssets: Seq[(String, File)])(
       parent: ClassLoader): ClassLoader =
@@ -383,11 +384,9 @@ class Reloader(reloadCompile: () => CompileResult,
   @volatile private var watchState: WatchState = WatchState.empty
 
   // Create the watcher, updates the changed boolean when a file has changed.
-  private val watcher = fileWatchService.watch(monitoredFiles,
-                                               () =>
-                                                 {
-                                                   changed = true
-                                               })
+  private val watcher = fileWatchService.watch(monitoredFiles, () => {
+    changed = true
+  })
   private val classLoaderVersion =
     new java.util.concurrent.atomic.AtomicInteger(0)
 

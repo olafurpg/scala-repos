@@ -31,7 +31,9 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 class KafkaStreamSuite
-    extends SparkFunSuite with Eventually with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with Eventually
+    with BeforeAndAfterAll {
   private var ssc: StreamingContext = _
   private var kafkaTestUtils: KafkaTestUtils = _
 

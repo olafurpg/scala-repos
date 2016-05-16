@@ -84,7 +84,8 @@ class Log(val dir: File,
           @volatile var recoveryPoint: Long = 0L,
           scheduler: Scheduler,
           time: Time = SystemTime)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   import kafka.log.Log._
 

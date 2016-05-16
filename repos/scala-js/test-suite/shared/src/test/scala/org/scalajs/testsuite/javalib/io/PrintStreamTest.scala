@@ -14,8 +14,9 @@ import org.junit.Assert._
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
 class PrintStreamTest {
-  private def newPrintStream(autoFlush: Boolean = false)
-    : (MockPrintStream, MockByteArrayOutputStream) = {
+  private def newPrintStream(
+      autoFlush: Boolean =
+        false): (MockPrintStream, MockByteArrayOutputStream) = {
     val bos = new MockByteArrayOutputStream
     val ps = new MockPrintStream(bos, autoFlush)
     (ps, bos)

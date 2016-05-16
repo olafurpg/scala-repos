@@ -78,8 +78,8 @@ abstract class MixinNodes {
       }
       val thisMap: NodesMap = toNodesMap(
           getOrElse(convertedName, new ArrayBuffer))
-      val maps: List[NodesMap] = supersList.map(
-          sup => toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
+      val maps: List[NodesMap] = supersList.map(sup =>
+            toNodesMap(sup.getOrElse(convertedName, new ArrayBuffer)))
       val supers = mergeWithSupers(thisMap, mergeSupers(maps))
       val list = supersList.flatMap(
           _.privatesMap.getOrElse(convertedName, new ArrayBuffer[(T, Node)]))
@@ -125,7 +125,7 @@ abstract class MixinNodes {
     }
 
     private def forAll(): (mutable.HashMap[String, AllNodes],
-    mutable.HashMap[String, AllNodes]) = {
+                           mutable.HashMap[String, AllNodes]) = {
       for (name <- allNames()) forName(name)
       synchronized {
         (calculated, calculatedSupers)
@@ -338,8 +338,9 @@ abstract class MixinNodes {
     var place: Option[PsiElement] = None
     val map = new Map
     val superTypesBuff = new ListBuffer[Map]
-    val (superTypes, subst, thisTypeSubst): (Seq[ScType], ScSubstitutor,
-    ScSubstitutor) = tp match {
+    val (superTypes, subst, thisTypeSubst): (Seq[ScType],
+                                             ScSubstitutor,
+                                             ScSubstitutor) = tp match {
       case cp: ScCompoundType =>
         processRefinement(cp, map, place)
         val thisTypeSubst = compoundThisType match {
@@ -480,9 +481,10 @@ abstract class MixinNodes {
               superClass: PsiClass) = {
     var res: ScSubstitutor = ScSubstitutor.empty
     for (tp <- superClass.getTypeParameters) {
-      res = res bindT
-      ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
-          derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
+      res =
+        res bindT
+        ((tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+            derived.subst(superSubst.subst(ScalaPsiManager.typeVariable(tp))))
     }
     superClass match {
       case td: ScTypeDefinition =>
@@ -591,16 +593,13 @@ object MixinNodes {
           tp +=: buffer
           set += classString(clazz)
         case Some(clazz) if clazz.getTypeParameters.nonEmpty =>
-          val i = buffer.indexWhere(
-              newTp =>
-                {
-              ScType.extractClass(newTp, Some(clazz.getProject)) match {
-                case Some(newClazz)
-                    if ScEquivalenceUtil.areClassesEquivalent(
-                        newClazz, clazz) =>
-                  true
-                case _ => false
-              }
+          val i = buffer.indexWhere(newTp => {
+            ScType.extractClass(newTp, Some(clazz.getProject)) match {
+              case Some(newClazz)
+                  if ScEquivalenceUtil.areClassesEquivalent(newClazz, clazz) =>
+                true
+              case _ => false
+            }
           })
           if (i != -1) {
             val newTp = buffer.apply(i)

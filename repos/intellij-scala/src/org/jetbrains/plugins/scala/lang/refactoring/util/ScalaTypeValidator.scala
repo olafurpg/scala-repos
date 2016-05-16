@@ -102,8 +102,7 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
         buf += ((typeParametr, messageForTypeAliasMember(name)))
         true
       case typeDefinition: ScTypeDefinition =>
-        if ((typeDefinition.getName == name) &&
-            (PsiTreeUtil.getParentOfType(
+        if ((typeDefinition.getName == name) && (PsiTreeUtil.getParentOfType(
                     typeDefinition, classOf[ScFunctionDefinition]) == null)) {
           buf += ((typeDefinition, messageForClassMember(name)))
         }

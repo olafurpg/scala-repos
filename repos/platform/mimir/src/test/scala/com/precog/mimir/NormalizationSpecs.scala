@@ -27,7 +27,8 @@ import com.precog.yggdrasil._
 import scalaz._
 
 trait NormalizationSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -143,4 +144,5 @@ trait NormalizationSpecs[M[+ _]]
 }
 
 object NormalizationSpecs
-    extends NormalizationSpecs[test.YId] with test.YIdInstances
+    extends NormalizationSpecs[test.YId]
+    with test.YIdInstances

@@ -100,7 +100,7 @@ object OrderedSerialization {
   /**
     * This is slow, but always an option. Avoid this if you can, especially for large items
     */
-  def readThenCompare[T : OrderedSerialization](
+  def readThenCompare[T: OrderedSerialization](
       as: InputStream, bs: InputStream): Result =
     try resultFrom {
       val a = Serialization.read[T](as)
@@ -195,7 +195,7 @@ object OrderedSerialization {
       (ordb.lteq(a, b) || ordb.lteq(b, a))
     })
 
-  def allLaws[T : OrderedSerialization]: Iterable[Law[T]] =
+  def allLaws[T: OrderedSerialization]: Iterable[Law[T]] =
     Serialization.allLaws ++ List(compareBinaryMatchesCompare[T],
                                   orderingTransitive[T],
                                   orderingAntisymmetry[T],

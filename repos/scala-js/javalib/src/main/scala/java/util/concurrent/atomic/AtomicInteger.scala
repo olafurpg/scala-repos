@@ -1,7 +1,8 @@
 package java.util.concurrent.atomic
 
 class AtomicInteger(private[this] var value: Int)
-    extends Number with Serializable {
+    extends Number
+    with Serializable {
 
   def this() = this(0)
 

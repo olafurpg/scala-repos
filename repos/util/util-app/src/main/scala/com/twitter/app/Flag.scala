@@ -147,7 +147,7 @@ object Flaggable {
     override def show(file: File) = file.toString
   }
 
-  implicit def ofTuple[T : Flaggable, U : Flaggable]: Flaggable[(T, U)] =
+  implicit def ofTuple[T: Flaggable, U: Flaggable]: Flaggable[(T, U)] =
     new Flaggable[(T, U)] {
       private val tflag = implicitly[Flaggable[T]]
       private val uflag = implicitly[Flaggable[U]]
@@ -166,7 +166,7 @@ object Flaggable {
       }
     }
 
-  private[app] class SetFlaggable[T : Flaggable] extends Flaggable[Set[T]] {
+  private[app] class SetFlaggable[T: Flaggable] extends Flaggable[Set[T]] {
     private val flag = implicitly[Flaggable[T]]
     assert(!flag.default.isDefined)
     override def parse(v: String): Set[T] =
@@ -174,14 +174,14 @@ object Flaggable {
     override def show(set: Set[T]) = set map flag.show mkString ","
   }
 
-  private[app] class SeqFlaggable[T : Flaggable] extends Flaggable[Seq[T]] {
+  private[app] class SeqFlaggable[T: Flaggable] extends Flaggable[Seq[T]] {
     private val flag = implicitly[Flaggable[T]]
     assert(!flag.default.isDefined)
     def parse(v: String): Seq[T] = v.split(",") map flag.parse
     override def show(seq: Seq[T]) = seq map flag.show mkString ","
   }
 
-  private[app] class MapFlaggable[K : Flaggable, V : Flaggable]
+  private[app] class MapFlaggable[K: Flaggable, V: Flaggable]
       extends Flaggable[Map[K, V]] {
     private val kflag = implicitly[Flaggable[K]]
     private val vflag = implicitly[Flaggable[V]]
@@ -212,26 +212,26 @@ object Flaggable {
     }
   }
 
-  implicit def ofSet[T : Flaggable]: Flaggable[Set[T]] = new SetFlaggable[T]
-  implicit def ofSeq[T : Flaggable]: Flaggable[Seq[T]] = new SeqFlaggable[T]
-  implicit def ofMap[K : Flaggable, V : Flaggable]: Flaggable[Map[K, V]] =
+  implicit def ofSet[T: Flaggable]: Flaggable[Set[T]] = new SetFlaggable[T]
+  implicit def ofSeq[T: Flaggable]: Flaggable[Seq[T]] = new SeqFlaggable[T]
+  implicit def ofMap[K: Flaggable, V: Flaggable]: Flaggable[Map[K, V]] =
     new MapFlaggable[K, V]
 
-  implicit def ofJavaSet[T : Flaggable]: Flaggable[JSet[T]] =
+  implicit def ofJavaSet[T: Flaggable]: Flaggable[JSet[T]] =
     new Flaggable[JSet[T]] {
       val setFlaggable = new SetFlaggable[T]
       override def parse(v: String): JSet[T] = setFlaggable.parse(v).asJava
       override def show(set: JSet[T]) = setFlaggable.show(set.asScala.toSet)
     }
 
-  implicit def ofJavaList[T : Flaggable]: Flaggable[JList[T]] =
+  implicit def ofJavaList[T: Flaggable]: Flaggable[JList[T]] =
     new Flaggable[JList[T]] {
       val seqFlaggable = new SeqFlaggable[T]
       override def parse(v: String): JList[T] = seqFlaggable.parse(v).asJava
       override def show(list: JList[T]) = seqFlaggable.show(list.asScala)
     }
 
-  implicit def ofJavaMap[K : Flaggable, V : Flaggable]: Flaggable[JMap[K, V]] = {
+  implicit def ofJavaMap[K: Flaggable, V: Flaggable]: Flaggable[JMap[K, V]] = {
     val mapFlaggable = new MapFlaggable[K, V]
 
     new Flaggable[JMap[K, V]] {
@@ -269,10 +269,10 @@ object Flag {
   *
   * @see [[com.twitter.app.Flags]]
   */
-class Flag[T : Flaggable] private[app](val name: String,
-                                       val help: String,
-                                       defaultOrUsage: Either[() => T, String],
-                                       failFastUntilParsed: Boolean) {
+class Flag[T: Flaggable] private[app](val name: String,
+                                      val help: String,
+                                      defaultOrUsage: Either[() => T, String],
+                                      failFastUntilParsed: Boolean) {
   import com.twitter.app.Flag._
   import java.util.logging._
 
@@ -719,7 +719,7 @@ class Flags(
     * @param default A default value, as a thunk.
     * @param help The help string of the flag.
     */
-  def apply[T : Flaggable](name: String, default: => T, help: String) = {
+  def apply[T: Flaggable](name: String, default: => T, help: String) = {
     val f = new Flag[T](name, help, default, failFastUntilParsed)
     add(f)
     f

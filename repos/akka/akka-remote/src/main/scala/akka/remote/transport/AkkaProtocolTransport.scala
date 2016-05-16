@@ -26,7 +26,8 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 
 @SerialVersionUID(1L)
 class AkkaProtocolException(msg: String, cause: Throwable)
-    extends AkkaException(msg, cause) with OnlyCauseStackTrace {
+    extends AkkaException(msg, cause)
+    with OnlyCauseStackTrace {
   def this(msg: String) = this(msg, null)
 }
 
@@ -338,7 +339,8 @@ private[transport] class ProtocolStateActor(
     private val settings: AkkaProtocolSettings,
     private val codec: AkkaPduCodec,
     private val failureDetector: FailureDetector)
-    extends Actor with FSM[AssociationState, ProtocolStateData]
+    extends Actor
+    with FSM[AssociationState, ProtocolStateData]
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import ProtocolStateActor._

@@ -125,8 +125,8 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
 
   private def sharedAndExternalRootsIn(
       projects: Seq[sbtStructure.ProjectData]): Seq[SharedRoot] = {
-    val projectRoots = projects.flatMap(
-        project => sourceRootsIn(project).map(ProjectRoot(project, _)))
+    val projectRoots = projects.flatMap(project =>
+          sourceRootsIn(project).map(ProjectRoot(project, _)))
 
     // TODO return the message about omitted directories
     val internalSourceDirectories =

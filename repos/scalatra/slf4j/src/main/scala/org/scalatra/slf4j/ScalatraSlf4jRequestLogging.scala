@@ -51,9 +51,8 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       matchedRoute: Option[MatchedRoute])(thunk: ⇒ S)(
       implicit request: HttpServletRequest): S = {
     val originalParams = multiParams
-    request(MultiParamsKey) = originalParams ++ matchedRoute
-      .map(_.multiParams)
-      .getOrElse(Map.empty)
+    request(MultiParamsKey) =
+      originalParams ++ matchedRoute.map(_.multiParams).getOrElse(Map.empty)
     fillMdc()
     try { thunk } finally { request(MultiParamsKey) = originalParams }
   }
@@ -120,10 +119,9 @@ trait ScalatraSlf4jRequestLogging extends ScalatraBase with Handler {
       method: HttpMethod,
       transformers: Seq[_root_.org.scalatra.RouteTransformer],
       action: => Any): Route = {
-    val newAction = () =>
-      {
-        try { logRequest() } catch { case _: Throwable => }
-        action
+    val newAction = () => {
+      try { logRequest() } catch { case _: Throwable => }
+      action
     }
     val route = Route(transformers,
                       newAction,

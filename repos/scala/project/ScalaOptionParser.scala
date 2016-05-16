@@ -82,7 +82,8 @@ object ScalaOptionParser {
       } ++ scalaVersionSettings.map(ScalaVersionSetting))
     val ScalacOpt = sourceFile | UniversalOpt
 
-    val ScalaExtraSettings = oneOf(scalaChoiceSettingNames.map {
+    val ScalaExtraSettings = oneOf(
+        scalaChoiceSettingNames.map {
       case (k, v) => ChoiceSetting(k, v)
     }.toList ++ scalaStringSettingNames.map(StringSetting) ++ scalaBooleanSettingNames
           .map(BooleanSetting))
@@ -105,15 +106,12 @@ object ScalaOptionParser {
                 TokenCompletions.displayOnly("<script|class|object|jar>"))
             .filter(!_.startsWith("-"), x => x)
         val runnableAndArgs = concat(
-            runnable ~ Opt(concat(Space.string ~ repsep(token(StringBasic,
-                                                              TokenCompletions
-                                                                .displayOnly(
-                                                                  "<arg>")),
-                                                        Space)
-                      .map(_.mkString(" ")))))
+            runnable ~ Opt(concat(Space.string ~ repsep(
+                        token(StringBasic,
+                              TokenCompletions.displayOnly("<arg>")),
+                        Space).map(_.mkString(" ")))))
         val options = rep1sep(ScalaOpt, Space).map(_.mkString(" "))
-        Opt(
-            Space ~>
+        Opt(Space ~>
             (options | concat(concat(options ~ Space.string) ~ runnableAndArgs) | runnableAndArgs))
       case "scaladoc" =>
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))

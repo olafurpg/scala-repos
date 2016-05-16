@@ -29,8 +29,10 @@ class ReliableProxyMultiJvmNode1 extends ReliableProxySpec
 class ReliableProxyMultiJvmNode2 extends ReliableProxySpec
 
 class ReliableProxySpec
-    extends MultiNodeSpec(ReliableProxySpec) with STMultiNodeSpec
-    with BeforeAndAfterEach with ImplicitSender {
+    extends MultiNodeSpec(ReliableProxySpec)
+    with STMultiNodeSpec
+    with BeforeAndAfterEach
+    with ImplicitSender {
   import ReliableProxySpec._
   import ReliableProxy._
 

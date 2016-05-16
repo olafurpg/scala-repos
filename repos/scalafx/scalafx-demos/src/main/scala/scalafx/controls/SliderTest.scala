@@ -185,10 +185,11 @@ class SliderControls(target: Slider)
   }
   rdbHorizontal.selected = (target.orientation.get() == Orientation.Horizontal)
   target.orientation.onChange(rdbHorizontal.selected =
-      (target.orientation.get() == Orientation.Horizontal))
+        (target.orientation.get() == Orientation.Horizontal))
   tggOrientation.selectedToggle.onChange {
-    target.orientation = if (rdbHorizontal.selected.get) Orientation.Horizontal
-    else Orientation.Vertical
+    target.orientation =
+      if (rdbHorizontal.selected.get) Orientation.Horizontal
+      else Orientation.Vertical
   }
 
   super.addNode("Value", txfValue)

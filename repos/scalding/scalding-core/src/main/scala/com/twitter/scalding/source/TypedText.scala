@@ -18,13 +18,13 @@ object TypedText {
   val ONE = TypedSep("\u0001")
   val COMMA = TypedSep(",")
 
-  def tsv[T : TypeDescriptor](
+  def tsv[T: TypeDescriptor](
       path: String*): Source with TypedTextDelimited[T] =
     new FixedTypedText[T](TAB, path: _*)
-  def osv[T : TypeDescriptor](
+  def osv[T: TypeDescriptor](
       path: String*): Source with TypedTextDelimited[T] =
     new FixedTypedText[T](ONE, path: _*)
-  def csv[T : TypeDescriptor](
+  def csv[T: TypeDescriptor](
       path: String*): Source with TypedTextDelimited[T] =
     new FixedTypedText[T](COMMA, path: _*)
 
@@ -77,7 +77,9 @@ object TypedText {
 }
 
 trait TypedTextDelimited[T]
-    extends SchemedSource with Mappable[T] with TypedSink[T] {
+    extends SchemedSource
+    with Mappable[T]
+    with TypedSink[T] {
   def typeDescriptor: TypeDescriptor[T]
 
   protected def separator: TypedSep
@@ -130,17 +132,18 @@ class TimePathTypedText[T](
   protected override def separator = sep
 }
 
-class MostRecentTypedText[T](
-    sep: TypedSep, path: String)(implicit dr: DateRange, td: TypeDescriptor[T])
+class MostRecentTypedText[T](sep: TypedSep, path: String)(
+    implicit dr: DateRange, td: TypeDescriptor[T])
     extends MostRecentGoodSource(path, dr, DateOps.UTC)
     with TypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }
 
-class FixedTypedText[T](sep: TypedSep, path: String*)(
-    implicit td: TypeDescriptor[T])
-    extends FixedPathSource(path: _*) with TypedTextDelimited[T] {
+class FixedTypedText[T](
+    sep: TypedSep, path: String*)(implicit td: TypeDescriptor[T])
+    extends FixedPathSource(path: _*)
+    with TypedTextDelimited[T] {
   override def typeDescriptor = td
   protected override def separator = sep
 }

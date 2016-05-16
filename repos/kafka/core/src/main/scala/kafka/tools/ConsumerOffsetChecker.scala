@@ -89,8 +89,8 @@ object ConsumerOffsetChecker extends Logging {
               .offsets
               .head
 
-            val lagString = offsetOpt.map(
-                o => if (o == -1) "unknown" else (logSize - o).toString)
+            val lagString = offsetOpt.map(o =>
+                  if (o == -1) "unknown" else (logSize - o).toString)
             println(
                 "%-15s %-30s %-3s %-15s %-15s %-15s %s".format(
                     group,
@@ -206,8 +206,8 @@ object ConsumerOffsetChecker extends Logging {
           zkUtils.getChildren(groupDirs.consumerGroupDir + "/owners").toList
       }
 
-      topicPidMap = immutable.Map(
-          zkUtils.getPartitionsForTopics(topicList).toSeq: _*)
+      topicPidMap =
+        immutable.Map(zkUtils.getPartitionsForTopics(topicList).toSeq: _*)
       val topicPartitions = topicPidMap.flatMap {
         case (topic, partitionSeq) =>
           partitionSeq.map(TopicAndPartition(topic, _))

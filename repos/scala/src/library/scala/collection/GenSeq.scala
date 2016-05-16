@@ -19,7 +19,9 @@ import generic._
   *  @since 2.9
   */
 trait GenSeq[+A]
-    extends GenSeqLike[A, GenSeq[A]] with GenIterable[A] with Equals
+    extends GenSeqLike[A, GenSeq[A]]
+    with GenIterable[A]
+    with Equals
     with GenericTraversableTemplate[A, GenSeq] {
   def seq: Seq[A]
   override def companion: GenericCompanion[GenSeq] = GenSeq

@@ -12,7 +12,8 @@ import akka.http.impl.util._
 
 final case class ProductVersion(
     product: String = "", version: String = "", comment: String = "")
-    extends jm.headers.ProductVersion with ValueRenderable {
+    extends jm.headers.ProductVersion
+    with ValueRenderable {
   def render[R <: Rendering](r: R): r.type = {
     r ~~ product
     if (!version.isEmpty) r ~~ '/' ~~ version

@@ -16,11 +16,20 @@ import org.apache.commons.io.FileUtils
 import org.scalatra.i18n.Messages
 
 class AccountController
-    extends AccountControllerBase with AccountService with RepositoryService
-    with ActivityService with WikiService with LabelsService with SshKeyService
-    with OneselfAuthenticator with UsersAuthenticator
-    with GroupManagerAuthenticator with ReadableUsersAuthenticator
-    with AccessTokenService with WebHookService with RepositoryCreationService
+    extends AccountControllerBase
+    with AccountService
+    with RepositoryService
+    with ActivityService
+    with WikiService
+    with LabelsService
+    with SshKeyService
+    with OneselfAuthenticator
+    with UsersAuthenticator
+    with GroupManagerAuthenticator
+    with ReadableUsersAuthenticator
+    with AccessTokenService
+    with WebHookService
+    with RepositoryCreationService
 
 trait AccountControllerBase extends AccountManagementControllerBase {
   self: AccountService with RepositoryService with ActivityService with WikiService with LabelsService with SshKeyService with OneselfAuthenticator with UsersAuthenticator with GroupManagerAuthenticator with ReadableUsersAuthenticator with AccessTokenService with WebHookService with RepositoryCreationService =>
@@ -169,7 +178,8 @@ trait AccountControllerBase extends AccountManagementControllerBase {
             gitbucket.core.account.html.repositories(
                 account,
                 if (account.isGroupAccount)
-                  Nil else getGroupsByUserName(userName),
+                  Nil
+                else getGroupsByUserName(userName),
                 getVisibleRepositories(context.loginAccount, Some(userName)),
                 context.loginAccount.exists(x =>
                       members.exists { member =>
@@ -525,7 +535,8 @@ trait AccountControllerBase extends AccountManagementControllerBase {
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
       if (getAccountByUserName(value).isEmpty)
-        Some("User or group does not exist.") else None
+        Some("User or group does not exist.")
+      else None
   }
 
   private def uniqueRepository: Constraint = new Constraint() {
@@ -549,7 +560,8 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               _.split(":") match {
                 case Array(userName, isManager) => isManager.toBoolean
               }
-            }) None else Some("Must select one manager at least.")
+            }) None
+      else Some("Must select one manager at least.")
     }
   }
 

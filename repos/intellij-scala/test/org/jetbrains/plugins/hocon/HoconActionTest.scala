@@ -16,7 +16,8 @@ abstract class HoconActionTest(actionId: String, subpath: String)
   // Code based on AbstractEnterActionTestBase
 
   private class MockDataContext(file: PsiFile, editor: Editor)
-      extends DataContext with DataProvider {
+      extends DataContext
+      with DataProvider {
     def getData(dataId: String): AnyRef =
       if (LangDataKeys.LANGUAGE is dataId) file.getLanguage
       else if (CommonDataKeys.PROJECT is dataId) file.getProject

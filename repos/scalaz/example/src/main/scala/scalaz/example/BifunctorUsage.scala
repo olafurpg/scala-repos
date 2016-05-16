@@ -30,15 +30,15 @@ object BifunctorUsage extends App {
   //
 
   // For a tuple, the result of bimap is obvious:
-  assert(
-      Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _ + 1) ===
+  assert(Bifunctor[Tuple2].bimap(("asdf", 1))(_.toUpperCase, _ + 1) ===
       ("ASDF", 2))
 
   // For sum types, which function is applied depends on what value is present:
   assert(
       Bifunctor[Either].bimap(Left("asdf"): Either[String, Int])(
           _.toUpperCase, _ + 1) === (Left("ASDF")))
-  assert(Bifunctor[Either].bimap(Right(1): Either[String, Int])(
+  assert(
+      Bifunctor[Either].bimap(Right(1): Either[String, Int])(
           _.toUpperCase, _ + 1) === (Right(2)))
 
   assert(

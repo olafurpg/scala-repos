@@ -39,7 +39,9 @@ sealed trait WindowSpec
 case class WindowSpecDefinition(partitionSpec: Seq[Expression],
                                 orderSpec: Seq[SortOrder],
                                 frameSpecification: WindowFrame)
-    extends Expression with WindowSpec with Unevaluable {
+    extends Expression
+    with WindowSpec
+    with Unevaluable {
 
   def validate: Option[String] = frameSpecification match {
     case UnspecifiedFrame =>
@@ -287,7 +289,8 @@ object SpecifiedWindowFrame {
 
 case class UnresolvedWindowExpression(
     child: Expression, windowSpec: WindowSpecReference)
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression
+    with Unevaluable {
 
   override def dataType: DataType =
     throw new UnresolvedException(this, "dataType")
@@ -300,7 +303,8 @@ case class UnresolvedWindowExpression(
 
 case class WindowExpression(
     windowFunction: Expression, windowSpec: WindowSpecDefinition)
-    extends Expression with Unevaluable {
+    extends Expression
+    with Unevaluable {
 
   override def children: Seq[Expression] = windowFunction :: windowSpec :: Nil
 
@@ -327,7 +331,9 @@ trait WindowFunction extends Expression {
   * offset -2, will get the value of x 2 rows back in the partition.
   */
 abstract class OffsetWindowFunction
-    extends Expression with WindowFunction with Unevaluable
+    extends Expression
+    with WindowFunction
+    with Unevaluable
     with ImplicitCastInputTypes {
 
   /**
@@ -446,7 +452,9 @@ case class Lag(input: Expression, offset: Expression, default: Expression)
 }
 
 abstract class AggregateWindowFunction
-    extends DeclarativeAggregate with WindowFunction { self: Product =>
+    extends DeclarativeAggregate
+    with WindowFunction {
+  self: Product =>
   override val frame = SpecifiedWindowFrame(
       RowFrame, UnboundedPreceding, CurrentRow)
   override def dataType: DataType = IntegerType
@@ -542,7 +550,8 @@ case class CumeDist() extends RowNumberLike with SizeBasedWindowFunction {
     usage = """_FUNC_(x) - The NTILE(n) function divides the rows for each window partition
      into 'n' buckets ranging from 1 to at most 'n'.""")
 case class NTile(buckets: Expression)
-    extends RowNumberLike with SizeBasedWindowFunction {
+    extends RowNumberLike
+    with SizeBasedWindowFunction {
   def this() = this(Literal(1))
 
   override def children: Seq[Expression] = Seq(buckets)
@@ -673,8 +682,8 @@ abstract class RankLike extends AggregateWindowFunction {
   *                 change in rank. This is an internal parameter and will be assigned by the
   *                 Analyser.
   */
-@ExpressionDescription(
-    usage = """_FUNC_() -  RANK() computes the rank of a value in a group of values. The result
+@ExpressionDescription(usage =
+      """_FUNC_() -  RANK() computes the rank of a value in a group of values. The result
      is one plus the number of rows preceding or equal to the current row in the
      ordering of the partition. Tie values will produce gaps in the sequence.""")
 case class Rank(children: Seq[Expression]) extends RankLike {
@@ -726,7 +735,8 @@ case class DenseRank(children: Seq[Expression]) extends RankLike {
     usage = """_FUNC_() - PERCENT_RANK() The PercentRank function computes the percentage
      ranking of a value in a group of values.""")
 case class PercentRank(children: Seq[Expression])
-    extends RankLike with SizeBasedWindowFunction {
+    extends RankLike
+    with SizeBasedWindowFunction {
   def this() = this(Nil)
   override def withOrder(order: Seq[Expression]): PercentRank =
     PercentRank(order)

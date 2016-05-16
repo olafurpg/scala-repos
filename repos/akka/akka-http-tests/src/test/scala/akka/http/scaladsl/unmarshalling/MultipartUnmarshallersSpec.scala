@@ -21,7 +21,10 @@ import MediaTypes._
 import HttpCharsets._
 
 class MultipartUnmarshallersSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll with ScalatestUtils {
+    extends FreeSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalatestUtils {
   implicit val system = ActorSystem(getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
   import system.dispatcher
@@ -155,9 +158,9 @@ class MultipartUnmarshallersSpec
             |epilogue and
             |more epilogue""".stripMarginWithNewline("\r\n")))
           .to[Multipart.General] should haveParts(
-            Multipart.General.BodyPart
-              .Strict(HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                                 "first part, implicitly typed")),
+            Multipart.General.BodyPart.Strict(
+                HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                           "first part, implicitly typed")),
             Multipart.General.BodyPart.Strict(
                 HttpEntity(`application/octet-stream`,
                            ByteString("second part, explicitly typed"))))
@@ -181,9 +184,9 @@ class MultipartUnmarshallersSpec
                 `multipart/mixed` withBoundary "12345" withCharset `UTF-8`,
                 content.length,
                 Source(byteStrings))).to[Multipart.General] should haveParts(
-            Multipart.General.BodyPart.Strict(
-                HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                           "first part, implicitly typed")),
+            Multipart.General.BodyPart
+              .Strict(HttpEntity(ContentTypes.`text/plain(UTF-8)`,
+                                 "first part, implicitly typed")),
             Multipart.General.BodyPart.Strict(
                 HttpEntity(`application/octet-stream`,
                            ByteString("second part, explicitly typed"))))
@@ -361,7 +364,8 @@ class MultipartUnmarshallersSpec
       "with a file" in {
         Unmarshal {
           HttpEntity.Default(
-              contentType = `multipart/form-data` withBoundary "XYZABC" withCharset `UTF-8`,
+              contentType =
+                `multipart/form-data` withBoundary "XYZABC" withCharset `UTF-8`,
               contentLength = 1, // not verified during unmarshalling
               data = Source {
                 List(ByteString {

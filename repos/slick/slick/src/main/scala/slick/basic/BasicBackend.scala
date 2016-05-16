@@ -173,8 +173,8 @@ trait BasicBackend { self =>
         case FailureAction(t) => Future.failed(t)
         case FutureAction(f) => f
         case FlatMapAction(base, f, ec) =>
-          runInContext(base, ctx, false, topLevel).flatMap(
-              v => runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
+          runInContext(base, ctx, false, topLevel).flatMap(v =>
+                runInContext(f(v), ctx, streaming, false))(ctx.getEC(ec))
         case AndThenAction(actions) =>
           val last = actions.length - 1
           def run(pos: Int, v: Any): Future[Any] = {
@@ -258,8 +258,8 @@ trait BasicBackend { self =>
                   topLevel)
           } else
             runSynchronousDatabaseAction(
-                a.asInstanceOf[
-                    SynchronousDatabaseAction[R, NoStream, This, _]],
+                a.asInstanceOf[SynchronousDatabaseAction[
+                        R, NoStream, This, _]],
                 ctx,
                 !topLevel)
         case a: DatabaseAction[_, _, _] =>
@@ -336,7 +336,8 @@ trait BasicBackend { self =>
           .execute(new AsyncExecutor.PrioritizedRunnable {
             private[this] def str(l: Long) =
               if (l != Long.MaxValue) l
-              else if (GlobalConfig.unicodeDump) "\u221E" else "oo"
+              else if (GlobalConfig.unicodeDump) "\u221E"
+              else "oo"
 
             def highPriority = highPrio
 
@@ -394,9 +395,10 @@ trait BasicBackend { self =>
                           s"Sent ${str(realDemand)} elements, more available - Performing atomic state transition")
                   }
                   demand = ctx.delivered(demand)
-                  realDemand = if (demand < 0) demand - Long.MinValue
-                  else demand
-                } while ( (state ne null) && realDemand > 0)
+                  realDemand =
+                    if (demand < 0) demand - Long.MinValue
+                    else demand
+                } while ((state ne null) && realDemand > 0)
                 if (debug) {
                   if (state ne null)
                     streamLogger.debug(
@@ -484,7 +486,8 @@ trait BasicBackend { self =>
       subscriber: Subscriber[_],
       protected[BasicBackend] val useSameThread: Boolean,
       database: Database)
-      extends BasicActionContext with StreamingActionContext
+      extends BasicActionContext
+      with StreamingActionContext
       with Subscription {
 
     /** Whether the Subscriber has been signaled with `onComplete` or `onError`. */

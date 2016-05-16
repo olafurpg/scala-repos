@@ -58,8 +58,12 @@ import scala.annotation.migration
   *  undeprecated methods throughout the collections hierarchy.
   */
 trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
-    extends Growable[A] with Shrinkable[A] with Scriptable[A]
-    with Subtractable[A, This] with SeqLike[A, This] with scala.Cloneable {
+    extends Growable[A]
+    with Shrinkable[A]
+    with Scriptable[A]
+    with Subtractable[A, This]
+    with SeqLike[A, This]
+    with scala.Cloneable {
   self: This =>
 
   // Abstract methods from Seq:

@@ -169,7 +169,8 @@ object TLSProtocol {
     * the Scala API adapters are offered below.
     */
   final case class SessionBytes(session: SSLSession, bytes: ByteString)
-      extends SslTlsInbound with scaladsl.ScalaSessionAPI
+      extends SslTlsInbound
+      with scaladsl.ScalaSessionAPI
 
   /**
     * This is the supertype of all messages that the SslTls stage accepts on its

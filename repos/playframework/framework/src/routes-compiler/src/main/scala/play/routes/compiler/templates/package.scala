@@ -108,8 +108,8 @@ package object templates {
             """Param[""" + p.typeName + """]("""" + paramName +
             """", Right(""" + v + """))"""
           }.getOrElse {
-            """params.""" +
-            (if (route.path.has(paramName)) "fromPath" else "fromQuery") +
+            """params.""" + (if (route.path.has(paramName)) "fromPath"
+                             else "fromQuery") +
             """[""" + p.typeName + """]("""" + paramName + """", """ +
             p.default.map("Some(" + _ + ")").getOrElse("None") + """)"""
           }
@@ -284,7 +284,7 @@ package object templates {
   def reverseUniqueConstraints(
       routes: Seq[Route], params: Seq[(Parameter, Int)])(
       block: (Route, String, String,
-      Map[String, String]) => ScalaContent): Seq[ScalaContent] = {
+              Map[String, String]) => ScalaContent): Seq[ScalaContent] = {
     ListMap(
         routes.reverse.map { route =>
       val localNames = reverseLocalNames(route, params)
@@ -316,8 +316,7 @@ package object templates {
     */
   def reverseSignature(routes: Seq[Route]) =
     reverseParameters(routes)
-      .map(
-          p =>
+      .map(p =>
             safeKeyword(p._1.name) + ":" + p._1.typeName + {
           Option(routes.map(_.call.parameters.get(p._2).default).distinct)
             .filter(_.size == 1)
@@ -548,8 +547,8 @@ package object templates {
     routes.groupBy(_.call.controller)
   def groupRoutesByMethod(
       routes: Seq[Route]): Map[(String, Seq[String]), Seq[Route]] =
-    routes.groupBy(
-        r => (r.call.method, r.call.parameters.getOrElse(Nil).map(_.typeName)))
+    routes.groupBy(r =>
+          (r.call.method, r.call.parameters.getOrElse(Nil).map(_.typeName)))
 
   val ob = "{"
   val cb = "}"

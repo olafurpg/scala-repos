@@ -160,8 +160,7 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
       val slices = ParallelCollectionRDD.slice(d, n)
       ("n slices" |: slices.size == n) &&
       ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
-              ",")) &&
-      ("equal sizes" |: slices
+              ",")) && ("equal sizes" |: slices
             .map(_.size)
             .forall(x => x == d.size / n || x == d.size / n + 1))
     }
@@ -181,8 +180,7 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
         ("n slices" |: slices.size == n) &&
         ("all ranges" |: slices.forall(_.isInstanceOf[Range])) &&
         ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
-                ",")) &&
-        ("equal sizes" |: slices
+                ",")) && ("equal sizes" |: slices
               .map(_.size)
               .forall(x => x == d.size / n || x == d.size / n + 1))
     }
@@ -202,8 +200,7 @@ class ParallelCollectionSplitSuite extends SparkFunSuite with Checkers {
         ("n slices" |: slices.size == n) &&
         ("all ranges" |: slices.forall(_.isInstanceOf[Range])) &&
         ("concat to d" |: Seq.concat(slices: _*).mkString(",") == d.mkString(
-                ",")) &&
-        ("equal sizes" |: slices
+                ",")) && ("equal sizes" |: slices
               .map(_.size)
               .forall(x => x == d.size / n || x == d.size / n + 1))
     }

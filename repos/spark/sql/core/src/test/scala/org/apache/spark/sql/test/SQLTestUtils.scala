@@ -44,7 +44,10 @@ import org.apache.spark.util.Utils
   * prone to leaving multiple overlapping [[org.apache.spark.SparkContext]]s in the same JVM.
   */
 private[sql] trait SQLTestUtils
-    extends SparkFunSuite with BeforeAndAfterAll with SQLTestData { self =>
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with SQLTestData {
+  self =>
 
   protected def sparkContext = sqlContext.sparkContext
 

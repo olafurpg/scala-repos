@@ -253,40 +253,34 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
           "src1",
           "CREATE TABLE src1 (key INT, value STRING)".cmd,
           s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv3.txt")}' INTO TABLE src1".cmd),
-      TestTable("srcpart",
-                () =>
-                  {
-                    runSqlHive(
-                        "CREATE TABLE srcpart (key INT, value STRING) PARTITIONED BY (ds STRING, hr STRING)")
-                    for (ds <- Seq("2008-04-08", "2008-04-09");
-                    hr <- Seq("11", "12")) {
-                      runSqlHive(s"""LOAD DATA LOCAL INPATH '${getHiveFile(
-                                    "data/files/kv1.txt")}'
+      TestTable("srcpart", () => {
+        runSqlHive(
+            "CREATE TABLE srcpart (key INT, value STRING) PARTITIONED BY (ds STRING, hr STRING)")
+        for (ds <- Seq("2008-04-08", "2008-04-09");
+             hr <- Seq("11", "12")) {
+          runSqlHive(
+              s"""LOAD DATA LOCAL INPATH '${getHiveFile("data/files/kv1.txt")}'
              |OVERWRITE INTO TABLE srcpart PARTITION (ds='$ds',hr='$hr')
            """.stripMargin)
-                    }
-                }),
-      TestTable(
-          "srcpart1",
-          () =>
-            {
-              runSqlHive(
-                  "CREATE TABLE srcpart1 (key INT, value STRING) PARTITIONED BY (ds STRING, hr INT)")
-              for (ds <- Seq("2008-04-08", "2008-04-09"); hr <- 11 to 12) {
-                runSqlHive(s"""LOAD DATA LOCAL INPATH '${getHiveFile(
-                              "data/files/kv1.txt")}'
+        }
+      }),
+      TestTable("srcpart1",
+                () => {
+                  runSqlHive(
+                      "CREATE TABLE srcpart1 (key INT, value STRING) PARTITIONED BY (ds STRING, hr INT)")
+                  for (ds <- Seq("2008-04-08", "2008-04-09"); hr <- 11 to 12) {
+                    runSqlHive(s"""LOAD DATA LOCAL INPATH '${getHiveFile(
+                                  "data/files/kv1.txt")}'
              |OVERWRITE INTO TABLE srcpart1 PARTITION (ds='$ds',hr='$hr')
            """.stripMargin)
-              }
-          }),
-      TestTable("src_thrift",
-                () =>
-                  {
-                    import org.apache.hadoop.hive.serde2.thrift.ThriftDeserializer
-                    import org.apache.hadoop.mapred.{SequenceFileInputFormat, SequenceFileOutputFormat}
-                    import org.apache.thrift.protocol.TBinaryProtocol
+                  }
+                }),
+      TestTable("src_thrift", () => {
+        import org.apache.hadoop.hive.serde2.thrift.ThriftDeserializer
+        import org.apache.hadoop.mapred.{SequenceFileInputFormat, SequenceFileOutputFormat}
+        import org.apache.thrift.protocol.TBinaryProtocol
 
-                    runSqlHive(s"""
+        runSqlHive(s"""
          |CREATE TABLE src_thrift(fake INT)
          |ROW FORMAT SERDE '${classOf[ThriftDeserializer].getName}'
          |WITH SERDEPROPERTIES(
@@ -298,9 +292,9 @@ class TestHiveContext(sc: SparkContext) extends HiveContext(sc) { self =>
          |OUTPUTFORMAT '${classOf[SequenceFileOutputFormat[_, _]].getName}'
         """.stripMargin)
 
-                    runSqlHive(
-                        s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/complex.seq")}' INTO TABLE src_thrift")
-                }),
+        runSqlHive(
+            s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/complex.seq")}' INTO TABLE src_thrift")
+      }),
       TestTable("serdeins",
                 s"""CREATE TABLE serdeins (key INT, value STRING)
          |ROW FORMAT SERDE '${classOf[LazySimpleSerDe].getCanonicalName}'

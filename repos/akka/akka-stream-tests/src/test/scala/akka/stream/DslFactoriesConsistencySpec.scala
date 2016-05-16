@@ -182,8 +182,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
 
     ignores.foldLeft(false) {
       case (acc, i) ⇒
-        acc ||
-        (i.cls(m.declaringClass) && i.name(m.name) &&
+        acc || (i.cls(m.declaringClass) && i.name(m.name) &&
             i.parameters(m.parameterTypes.length) &&
             i.paramTypes(m.parameterTypes))
     }
@@ -205,7 +204,8 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
   private val curryLikeJava: PartialFunction[Method, Method] = {
     case m if m.parameterTypes.size > 1 ⇒
       m.copy(name = m.name.filter(Character.isLetter),
-             parameterTypes = m.parameterTypes.dropRight(1) :+ classOf[
+             parameterTypes =
+               m.parameterTypes.dropRight(1) :+ classOf[
                    akka.japi.function.Function[_, _]])
     case m ⇒ m
   }

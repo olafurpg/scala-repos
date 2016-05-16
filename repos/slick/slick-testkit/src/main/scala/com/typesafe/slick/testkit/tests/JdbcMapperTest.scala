@@ -99,7 +99,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
         ts.to[Set]
           .result
           .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6)))
-      )
+    )
   }
 
   def testWideMappedEntity = {
@@ -239,7 +239,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
                                  44,
                                  45,
                                  46))
-      )
+    )
   }
 
   def testNestedMappedEntity = {
@@ -380,9 +380,9 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
     case class Pair[A, B](a: A, b: B)
 
     // A Shape that maps Pair to a ProductNode
-    final class PairShape[
-        Level <: ShapeLevel, M <: Pair[_, _], U <: Pair[_, _]: ClassTag, P <: Pair[
-            _, _]](val shapes: Seq[Shape[_, _, _, _]])
+    final class PairShape[Level <: ShapeLevel, M <: Pair[_, _],
+        U <: Pair[_, _]: ClassTag, P <: Pair[_, _]](
+        val shapes: Seq[Shape[_, _, _, _]])
         extends MappedScalaProductShape[Level, Pair[_, _], M, U, P] {
       def buildValue(elems: IndexedSeq[Any]) = Pair(elems(0), elems(1))
       def copy(shapes: Seq[Shape[_ <: ShapeLevel, _, _, _]]) =
@@ -463,7 +463,7 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           .map(_.toSet shouldBe Set(Data(1, true, "a"),
                                     Data(2, false, "c"),
                                     Data(3, false, "b")))
-      )
+    )
   }
 
   def testSingleElement = {
@@ -495,10 +495,10 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
       _ = ares shouldBe "Foo"
       _ <- as.update("Foo")
       _ <- as
-        .map(a => a :: a :: HNil)
-        .result
-        .head
-        .map(_ shouldBe "Foo" :: "Foo" :: HNil)
+            .map(a => a :: a :: HNil)
+            .result
+            .head
+            .map(_ shouldBe "Foo" :: "Foo" :: HNil)
       _ <- bs.schema.create
       _ <- bs += Tuple1("Foo")
       _ <- bs.update(Tuple1("Foo"))
@@ -541,6 +541,6 @@ class JdbcMapperTest extends AsyncTest[JdbcTestDB] {
           .to[Set]
           .result
           .map(_ shouldBe Set(Data(7, 8), Data(9, 10), Data(5, 6)))
-      )
+    )
   }
 }

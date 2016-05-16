@@ -141,11 +141,11 @@ object DecisionTreeExample {
   }
 
   /** Load a dataset from the given path, using the given format */
-  private[ml] def loadData(
-      sqlContext: SQLContext,
-      path: String,
-      format: String,
-      expectedNumFeatures: Option[Int] = None): DataFrame = {
+  private[ml] def loadData(sqlContext: SQLContext,
+                           path: String,
+                           format: String,
+                           expectedNumFeatures: Option[Int] =
+                             None): DataFrame = {
     import sqlContext.implicits._
 
     format match {

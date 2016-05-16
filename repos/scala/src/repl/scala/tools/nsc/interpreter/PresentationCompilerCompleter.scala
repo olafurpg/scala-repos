@@ -100,9 +100,10 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
               .filterNot(shouldHide)
             val memberCompletions =
               camelMatches.map(_.symNameDropLocal.decoded).distinct.sorted
-            def allowCompletion = ((memberCompletions.size == 1) ||
-                CompletionResult.camelMatch(r.name)(r.name.newName(
-                        StringOps.longestCommonPrefix(memberCompletions))))
+            def allowCompletion =
+              ((memberCompletions.size == 1) ||
+                  CompletionResult.camelMatch(r.name)(r.name.newName(
+                          StringOps.longestCommonPrefix(memberCompletions))))
             if (memberCompletions.isEmpty) Completion.NoCandidates
             else if (allowCompletion)
               Candidates(cursor - r.positionDelta, memberCompletions)
@@ -117,12 +118,11 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
             Candidates(cursor - r.positionDelta, memberCompletions)
           }
       }
-      lastCommonPrefixCompletion = if (found != Completion.NoCandidates &&
-                                       buf.length >= found.cursor)
-        Some(
-            buf.substring(0, found.cursor) +
-            StringOps.longestCommonPrefix(found.candidates))
-      else None
+      lastCommonPrefixCompletion =
+        if (found != Completion.NoCandidates && buf.length >= found.cursor)
+          Some(buf.substring(0, found.cursor) +
+              StringOps.longestCommonPrefix(found.candidates))
+        else None
       found
     }
     val buf1 = buf.patch(cursor, Cursor, 0)

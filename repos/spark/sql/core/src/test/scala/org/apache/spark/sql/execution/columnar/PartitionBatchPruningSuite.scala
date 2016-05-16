@@ -25,7 +25,9 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.test.SQLTestData._
 
 class PartitionBatchPruningSuite
-    extends SparkFunSuite with BeforeAndAfterEach with SharedSQLContext {
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with SharedSQLContext {
 
   import testImplicits._
 

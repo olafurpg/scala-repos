@@ -34,7 +34,8 @@ class PhantomJSEnv(
     val autoExit: Boolean = true,
     jettyClassLoader: ClassLoader = null
 )
-    extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
+    extends ExternalJSEnv(addArgs, addEnv)
+    with ComJSEnv {
 
   import PhantomJSEnv._
 
@@ -58,15 +59,18 @@ class PhantomJSEnv(
 
   protected class PhantomRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends ExtRunner(libs, code) with AbstractPhantomRunner
+      extends ExtRunner(libs, code)
+      with AbstractPhantomRunner
 
   protected class AsyncPhantomRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncExtRunner(libs, code) with AbstractPhantomRunner
+      extends AsyncExtRunner(libs, code)
+      with AbstractPhantomRunner
 
   protected class ComPhantomRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncPhantomRunner(libs, code) with ComJSRunner {
+      extends AsyncPhantomRunner(libs, code)
+      with ComJSRunner {
 
     private var mgrIsRunning: Boolean = false
 

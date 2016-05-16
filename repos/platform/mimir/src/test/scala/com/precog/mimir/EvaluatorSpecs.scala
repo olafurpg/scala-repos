@@ -61,8 +61,10 @@ import org.specs2.mutable._
 import blueeyes.json._
 
 trait EvaluatorTestSupport[M[+ _]]
-    extends StdLibEvaluatorStack[M] with EchoHttpClientModule[M]
-    with BaseBlockStoreTestModule[M] with IdSourceScannerModule {
+    extends StdLibEvaluatorStack[M]
+    with EchoHttpClientModule[M]
+    with BaseBlockStoreTestModule[M]
+    with IdSourceScannerModule {
   outer =>
 
   def Evaluator[N[+ _]](N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M) =
@@ -109,54 +111,54 @@ trait EvaluatorTestSupport[M[+ _]]
   trait TableCompanion extends BaseBlockStoreTestTableCompanion {
     override def load(table: Table, apiKey: APIKey, jtpe: JType) = EitherT {
       table.toJson map { events =>
-        val eventsV =
-          events.toStream.traverse[({
-                                     type λ[α] = Validation[ResourceError, α]
-                                   })#λ,
-                                   Stream[JValue]] {
-            case JString(pathStr) =>
-              success {
-                indexLock synchronized {
-                  // block the WHOLE WORLD
-                  val path = Path(pathStr)
+        val eventsV = events.toStream.traverse[({
+                                                 type λ[α] =
+                                                   Validation[ResourceError, α]
+                                               })#λ,
+                                               Stream[JValue]] {
+          case JString(pathStr) =>
+            success {
+              indexLock synchronized {
+                // block the WHOLE WORLD
+                val path = Path(pathStr)
 
-                  val index =
-                    initialIndices get path getOrElse {
-                      initialIndices += (path -> currentIndex)
-                      currentIndex
-                    }
-
-                  val prefix = "filesystem"
-                  val target = path.path
-                    .replaceAll("/$", ".json")
-                    .replaceAll("^/" + prefix, prefix)
-
-                  val src =
-                    if (target startsWith prefix)
-                      io.Source.fromFile(
-                          new File(target.substring(prefix.length)))
-                    else
-                      io.Source.fromInputStream(
-                          getClass.getResourceAsStream(target))
-
-                  val parsed: Stream[JValue] =
-                    src.getLines map JParser.parseUnsafe toStream
-
-                  currentIndex += parsed.length
-
-                  parsed zip (Stream from index) map {
-                    case (value, id) =>
-                      JObject(JField("key", JArray(JNum(id) :: Nil)) :: JField(
-                              "value", value) :: Nil)
+                val index =
+                  initialIndices get path getOrElse {
+                    initialIndices += (path -> currentIndex)
+                    currentIndex
                   }
+
+                val prefix = "filesystem"
+                val target = path.path
+                  .replaceAll("/$", ".json")
+                  .replaceAll("^/" + prefix, prefix)
+
+                val src =
+                  if (target startsWith prefix)
+                    io.Source.fromFile(
+                        new File(target.substring(prefix.length)))
+                  else
+                    io.Source.fromInputStream(
+                        getClass.getResourceAsStream(target))
+
+                val parsed: Stream[JValue] =
+                  src.getLines map JParser.parseUnsafe toStream
+
+                currentIndex += parsed.length
+
+                parsed zip (Stream from index) map {
+                  case (value, id) =>
+                    JObject(JField("key", JArray(JNum(id) :: Nil)) :: JField(
+                            "value", value) :: Nil)
                 }
               }
+            }
 
-            case x =>
-              failure(ResourceError.corrupt(
-                      "Attempted to load JSON as a table from something that wasn't a string: " +
-                      x))
-          }
+          case x =>
+            failure(ResourceError.corrupt(
+                    "Attempted to load JSON as a table from something that wasn't a string: " +
+                    x))
+        }
 
         eventsV.disjunction.map(ss => fromJson(ss.flatten))
       }
@@ -173,7 +175,8 @@ trait EvaluatorTestSupport[M[+ _]]
     new AnyRef // if we were doing this for real: DIE IN A FIRE!!!
 
   class YggConfig
-      extends IdSourceConfig with ColumnarTableModuleConfig
+      extends IdSourceConfig
+      with ColumnarTableModuleConfig
       with BlockStoreColumnarTableModuleConfig {
     val sortBufferSize = 1000
     val sortWorkDir: File = IOUtils.createTmpDir("idsoSpec").unsafePerformIO
@@ -191,7 +194,8 @@ trait EvaluatorTestSupport[M[+ _]]
 }
 
 trait EvaluatorSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -202,11 +206,11 @@ trait EvaluatorSpecs[M[+ _]]
 
   val testAPIKey = "testAPIKey"
 
-  def testEval(
-      graph: DepGraph,
-      path: Path = Path.Root,
-      scriptPath: Path = Path.Root,
-      optimize: Boolean = true)(test: Set[SEvent] => Result): Result = {
+  def testEval(graph: DepGraph,
+               path: Path = Path.Root,
+               scriptPath: Path = Path.Root,
+               optimize: Boolean =
+                 true)(test: Set[SEvent] => Result): Result = {
     val ctx =
       defaultEvaluationContext.copy(basePath = path, scriptPath = scriptPath)
     (consumeEval(graph, ctx, optimize) match {

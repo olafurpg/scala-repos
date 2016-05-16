@@ -164,8 +164,8 @@ trait BaseParsers extends RegexParsers {
 
       if (begin <= c && c <= end) Success(c, in.rest)
       else
-        Failure(verboseString(c) + " not in range " + verboseString(begin) +
-                " - " + verboseString(end),
+        Failure(verboseString(c) + " not in range " +
+                verboseString(begin) + " - " + verboseString(end),
                 in)
     }
   }

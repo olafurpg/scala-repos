@@ -25,7 +25,8 @@ class WrappedTypedArrayShortBufferJSTest extends ShortBufferTest {
   val factory: ShortBufferFactory = new WrappedTypedArrayShortBufferJSFactory
 
   class WrappedTypedArrayShortBufferJSFactory
-      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedTypedArrayBufferFactory {
     def baseWrap(array: Array[Short]): ShortBuffer =
       TypedArrayBuffer.wrap(new Int16Array(array.toJSArray))
   }

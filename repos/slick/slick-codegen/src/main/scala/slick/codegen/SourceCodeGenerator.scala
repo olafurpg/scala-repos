@@ -31,7 +31,8 @@ import slick.util.ConfigExtensionMethods.configExtensionMethods
   * @param model Slick data model for which code should be generated.
   */
 class SourceCodeGenerator(model: m.Model)
-    extends AbstractSourceCodeGenerator(model) with OutputHelpers {
+    extends AbstractSourceCodeGenerator(model)
+    with OutputHelpers {
   // "Tying the knot": making virtual classes concrete
   type Table = TableDef
   def Table = new TableDef(_)

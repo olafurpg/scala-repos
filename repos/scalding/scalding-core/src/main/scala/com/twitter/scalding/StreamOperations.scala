@@ -24,7 +24,8 @@ import cascading.tuple.{Tuple => CTuple, TupleEntry}
   * in each operation.
   */
 trait StreamOperations[+Self <: StreamOperations[Self]]
-    extends Sortable[Self] with java.io.Serializable {
+    extends Sortable[Self]
+    with java.io.Serializable {
 
   /**
     * Corresponds to a Cascading Buffer

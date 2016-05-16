@@ -92,7 +92,8 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
         controller.kafkaController.config,
         metrics)
     channelManager.startup()
-    controller.kafkaController.controllerContext.controllerChannelManager = channelManager
+    controller.kafkaController.controllerContext.controllerChannelManager =
+      channelManager
     channelManager.shrinkBlockingQueue(0)
     channelManager.stopSendThread(0)
     // Spawn a new thread to block on the outgoing channel

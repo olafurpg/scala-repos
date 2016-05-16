@@ -14,7 +14,8 @@ trait ScalaRenameProcessor {
 
   override def setToSearchForTextOccurrences(
       element: PsiElement, enabled: Boolean): Unit = {
-    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES = enabled
+    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES =
+      enabled
   }
 
   override def isToSearchForTextOccurrences(element: PsiElement): Boolean = {

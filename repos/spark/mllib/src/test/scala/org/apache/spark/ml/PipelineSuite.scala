@@ -35,7 +35,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class PipelineSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   abstract class MyModel extends Model[MyModel]
@@ -205,7 +206,8 @@ class PipelineSuite
 
 /** Used to test [[Pipeline]] with [[MLWritable]] stages */
 class WritableStage(override val uid: String)
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   final val intParam: IntParam = new IntParam(this, "intParam", "doc")
 

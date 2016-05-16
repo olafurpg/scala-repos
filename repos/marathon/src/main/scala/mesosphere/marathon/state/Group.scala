@@ -18,7 +18,8 @@ case class Group(id: PathId,
                  groups: Set[Group] = defaultGroups,
                  dependencies: Set[PathId] = defaultDependencies,
                  version: Timestamp = defaultVersion)
-    extends MarathonState[GroupDefinition, Group] with IGroup {
+    extends MarathonState[GroupDefinition, Group]
+    with IGroup {
 
   override def mergeFromProto(msg: GroupDefinition): Group =
     Group.fromProto(msg)
@@ -61,7 +62,8 @@ case class Group(id: PathId,
     val groupId = path.parent
     makeGroup(groupId).update(timestamp) { group =>
       if (group.id == groupId)
-        group.putApplication(fn(group.apps.find(_.id == path))) else group
+        group.putApplication(fn(group.apps.find(_.id == path)))
+      else group
     }
   }
 
@@ -292,11 +294,11 @@ object Group {
             servicePorts =>
               for {
                 existingApp <- group.transitiveApps.toList
-                                  if existingApp.id != app.id // in case of an update, do not compare the app against itself
+                if existingApp.id != app.id // in case of an update, do not compare the app against itself
                 existingServicePort <- existingApp.portMappings.toList.flatten
                                         .map(_.servicePort)
-                                          if existingServicePort != 0 // ignore zero ports, which will be chosen at random
-                                      if servicePorts contains existingServicePort
+                if existingServicePort != 0 // ignore zero ports, which will be chosen at random
+                if servicePorts contains existingServicePort
               } yield
                 RuleViolation(
                     app.id,

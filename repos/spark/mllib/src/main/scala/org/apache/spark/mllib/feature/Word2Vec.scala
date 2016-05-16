@@ -349,9 +349,10 @@ class Word2Vec extends Serializable with Logging {
                 if (wordCount - lastWordCount > 10000) {
                   lwc = wordCount
                   // TODO: discount by iteration?
-                  alpha = learningRate *
-                  (1 - numPartitions * wordCount.toDouble /
-                      (trainWordsCount + 1))
+                  alpha =
+                    learningRate *
+                    (1 - numPartitions * wordCount.toDouble /
+                        (trainWordsCount + 1))
                   if (alpha < learningRate * 0.0001)
                     alpha = learningRate * 0.0001
                   logInfo("wordCount = " + wordCount + ", alpha = " + alpha)
@@ -477,7 +478,8 @@ class Word2Vec extends Serializable with Logging {
 class Word2VecModel private[spark](
     private[spark] val wordIndex: Map[String, Int],
     private[spark] val wordVectors: Array[Float])
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
   private val numWords = wordIndex.size
   // vectorSize: Dimension of each word's vector.

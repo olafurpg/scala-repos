@@ -28,20 +28,18 @@ object Sampling {
       val pivot = a(a.length / 2).srcId
       // 'L'ess, 'E'qual, 'G'reater
       val partitions = a.groupBy(
-          (e: Edge[Int]) =>
-            {
-          if (e.srcId < pivot) 'L'
-          else if (e.srcId > pivot) 'G'
-          else 'E'
+          (e: Edge[Int]) => {
+        if (e.srcId < pivot) 'L'
+        else if (e.srcId > pivot) 'G'
+        else 'E'
       })
 
       var sortedAccumulator: Array[Edge[Int]] = Array()
       List('L', 'E', 'G').foreach(
-          (c: Char) =>
-            {
-          if (partitions.contains(c)) {
-            sortedAccumulator = sortedAccumulator ++ partitions(c)
-          }
+          (c: Char) => {
+        if (partitions.contains(c)) {
+          sortedAccumulator = sortedAccumulator ++ partitions(c)
+        }
       })
       sortedAccumulator
     }
@@ -75,9 +73,8 @@ object Sampling {
         val edgeCandidates = accumulateEdges(e, vertexId)
         val burnCandidate = sc
           .parallelize(edgeCandidates)
-          .filter((e: Edge[Int]) =>
-                {
-              !sampledVertices.contains(e.dstId)
+          .filter((e: Edge[Int]) => {
+            !sampledVertices.contains(e.dstId)
           })
         val burnFraction = numToSample.toDouble / burnCandidate.count.toDouble
         val burnEdges =
@@ -103,8 +100,8 @@ object Sampling {
       sc: SparkContext, graph: Graph[Int, Int], fraction: Double) = {
     val vertices = graph.vertices.sample(false, fraction, Random.nextLong)
     val vertexMap = vertices.collectAsMap()
-    val edges = graph.edges.filter(
-        e => vertexMap.contains(e.srcId) && vertexMap.contains(e.dstId))
+    val edges = graph.edges.filter(e =>
+          vertexMap.contains(e.srcId) && vertexMap.contains(e.dstId))
     val graph2 = Graph(vertices, edges)
     graph2
   }

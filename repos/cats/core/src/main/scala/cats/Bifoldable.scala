@@ -38,8 +38,8 @@ trait CompositeBifoldable[F[_, _], G[_, _]]
   implicit def F: Bifoldable[F]
   implicit def G: Bifoldable[G]
 
-  def bifoldLeft[A, B, C](
-      fab: F[G[A, B], G[A, B]], c: C)(f: (C, A) => C, g: (C, B) => C): C =
+  def bifoldLeft[A, B, C](fab: F[G[A, B], G[A, B]], c: C)(
+      f: (C, A) => C, g: (C, B) => C): C =
     F.bifoldLeft(fab, c)(
         (c: C, gab: G[A, B]) => G.bifoldLeft(gab, c)(f, g),
         (c: C, gab: G[A, B]) => G.bifoldLeft(gab, c)(f, g)

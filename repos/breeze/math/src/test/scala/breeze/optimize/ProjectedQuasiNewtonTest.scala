@@ -26,8 +26,11 @@ import breeze.optimize.proximal.NonlinearMinimizer.Projection
 
 @RunWith(classOf[JUnitRunner])
 class ProjectedQuasiNewtonTest
-    extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    extends PropSpec
+    with PropertyChecks
+    with OptimizeTestBaseTrait
+    with VectorMatchers
+    with Matchers {
 
   property("optimize a simple multivariate gaussian") {
     val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-9)

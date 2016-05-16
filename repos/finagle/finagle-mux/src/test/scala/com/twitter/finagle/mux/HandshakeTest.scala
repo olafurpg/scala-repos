@@ -19,7 +19,9 @@ import scala.collection.immutable.Queue
 
 @RunWith(classOf[JUnitRunner])
 class HandshakeTest
-    extends FunSuite with OneInstancePerTest with MockitoSugar {
+    extends FunSuite
+    with OneInstancePerTest
+    with MockitoSugar {
 
   import Message.{encode => enc, decode => dec}
 
@@ -40,10 +42,9 @@ class HandshakeTest
         trans = clientTransport,
         version = 0x0001,
         headers = Seq.empty,
-        negotiate = (_, trans) =>
-            {
-            clientNegotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          clientNegotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -51,10 +52,9 @@ class HandshakeTest
         trans = serverTransport,
         version = 0x0001,
         headers = identity,
-        negotiate = (_, trans) =>
-            {
-            serverNegotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          serverNegotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -82,9 +82,8 @@ class HandshakeTest
         trans = trans,
         version = 0x0001,
         headers = Seq.empty,
-        negotiate = (_, trans) =>
-            {
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          trans.map(enc, dec)
         }
     )
 
@@ -96,9 +95,8 @@ class HandshakeTest
         trans = trans,
         version = 0x0001,
         headers = identity,
-        negotiate = (_, trans) =>
-            {
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          trans.map(enc, dec)
         }
     )
 
@@ -113,10 +111,9 @@ class HandshakeTest
         trans = clientTransport,
         version = 0x0001,
         headers = Seq.empty,
-        negotiate = (_, trans) =>
-            {
-            throw clientExc
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          throw clientExc
+          trans.map(enc, dec)
         }
     )
 
@@ -125,10 +122,9 @@ class HandshakeTest
         trans = serverTransport,
         version = 0x0001,
         headers = identity,
-        negotiate = (_, trans) =>
-            {
-            throw serverExc
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          throw serverExc
+          trans.map(enc, dec)
         }
     )
 
@@ -155,10 +151,9 @@ class HandshakeTest
         trans = clientTransport,
         version = 0x0001,
         headers = Nil,
-        negotiate = (_, trans) =>
-            {
-            negotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          negotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -180,10 +175,9 @@ class HandshakeTest
         trans = clientTransport,
         version = version,
         headers = headers,
-        negotiate = (_, trans) =>
-            {
-            negotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          negotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -214,10 +208,9 @@ class HandshakeTest
         trans = clientTransport,
         version = 0x0001,
         headers = Seq.empty,
-        negotiate = (_, trans) =>
-            {
-            negotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          negotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -244,10 +237,9 @@ class HandshakeTest
         trans = serverTransport,
         version = version,
         headers = _ => hdrs,
-        negotiate = (_, trans) =>
-            {
-            negotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          negotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -270,10 +262,9 @@ class HandshakeTest
         trans = clientTransport,
         version = clientVersion,
         headers = Seq.empty,
-        negotiate = (_, trans) =>
-            {
-            clientNegotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          clientNegotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -281,10 +272,9 @@ class HandshakeTest
         trans = serverTransport,
         version = serverVersion,
         headers = identity,
-        negotiate = (_, trans) =>
-            {
-            serverNegotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          serverNegotiated = true
+          trans.map(enc, dec)
         }
     )
 
@@ -316,10 +306,9 @@ class HandshakeTest
         trans = serverTransport,
         version = 0x0001,
         headers = identity,
-        negotiate = (_, trans) =>
-            {
-            negotiated = true
-            trans.map(enc, dec)
+        negotiate = (_, trans) => {
+          negotiated = true
+          trans.map(enc, dec)
         }
     )
 

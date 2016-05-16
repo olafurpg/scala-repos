@@ -31,8 +31,8 @@ class FundepMaterializationBundle(val c: Context) {
   import definitions._
   import Flag._
 
-  def impl[T : c.WeakTypeTag, U : c.WeakTypeTag]: c.Expr[FundepMaterialization[
-          T, U]] = {
+  def impl[T: c.WeakTypeTag, U: c.WeakTypeTag]
+    : c.Expr[FundepMaterialization[T, U]] = {
     val sym = c.weakTypeOf[T].typeSymbol
     if (!sym.isClass || !sym.asClass.isCaseClass)
       c.abort(c.enclosingPosition, s"$sym is not a case class")
@@ -114,7 +114,7 @@ object DynamicMaterialization extends LowPriority {
 
 class DynamicMaterializationBundle(val c: Context) {
   import c.universe._
-  def impl[T : c.WeakTypeTag] = {
+  def impl[T: c.WeakTypeTag] = {
     val tpe = weakTypeOf[T]
     if (tpe.members.exists(_.info =:= typeOf[Int]))
       c.abort(

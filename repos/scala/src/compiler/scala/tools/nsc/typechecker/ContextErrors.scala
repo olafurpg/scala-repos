@@ -118,14 +118,15 @@ trait ContextErrors { self: Analyzer =>
     def onlyAny = tp.parents forall (_.typeSymbol == AnyClass)
     def parents_s =
       (if (parents.isEmpty) tp.parents else parents) mkString ", "
-    def what = (if (tp.typeSymbol.isAbstractType) {
-                  val descr =
-                    if (onlyAny) "unbounded"
-                    else "bounded only by " + parents_s
-                  s"$name is $descr, which means AnyRef is not a known parent"
-                } else if (tp.typeSymbol.isAnonOrRefinementClass)
-                  s"the parents of this type ($parents_s) extend Any, not AnyRef"
-                else s"$name extends Any, not AnyRef")
+    def what =
+      (if (tp.typeSymbol.isAbstractType) {
+         val descr =
+           if (onlyAny) "unbounded"
+           else "bounded only by " + parents_s
+         s"$name is $descr, which means AnyRef is not a known parent"
+       } else if (tp.typeSymbol.isAnonOrRefinementClass)
+         s"the parents of this type ($parents_s) extend Any, not AnyRef"
+       else s"$name extends Any, not AnyRef")
     if (isPrimitiveValueType(found) || isTrivialTopType(tp)) ""
     else "\n" + sm"""|Note that $what.
             |Such types can participate in value classes, but instances
@@ -139,7 +140,8 @@ trait ContextErrors { self: Analyzer =>
     def debugDiagnostic = s"(internal diagnostic: $internalMessage)"
     val message =
       if (macroDebugLite || macroDebugVerbose)
-        s"$friendlyMessage $debugDiagnostic" else friendlyMessage
+        s"$friendlyMessage $debugDiagnostic"
+      else friendlyMessage
     // TODO: clean this up! (This is a more explicit version of what the code use to do, to reveal the issue.)
     throw new TypeError(analyzer.lastTreeToTyper.pos, message)
   }
@@ -744,7 +746,8 @@ trait ContextErrors { self: Analyzer =>
           if (meth.isMacro) MacroTooFewArgumentListsMessage
           else
             s"""missing argument list for ${meth.fullLocationString}${if (!meth.isConstructor)
-              advice else ""}"""
+              advice
+            else ""}"""
         issueNormalTypeError(tree, message)
         setError(tree)
       }
@@ -859,13 +862,13 @@ trait ContextErrors { self: Analyzer =>
                       sym0.associatedFile.canonicalPath))
             else if ((sym0.associatedFile ne NoAbstractFile) &&
                      (sym1.associatedFile ne NoAbstractFile))
-              Some(
-                  "conflicting symbols originated in files '%s' and '%s'"
+              Some("conflicting symbols originated in files '%s' and '%s'"
                     .format(sym0.associatedFile.canonicalPath,
                             sym1.associatedFile.canonicalPath))
             else None,
             if (isBug)
-              Some("Note: this may be due to a bug in the compiler involving wildcards in package objects")
+              Some(
+                  "Note: this may be due to a bug in the compiler involving wildcards in package objects")
             else None
         )
         val addendum = addendums.flatten match {
@@ -899,13 +902,15 @@ trait ContextErrors { self: Analyzer =>
       }
 
       case object MacroExpansionException
-          extends Exception with scala.util.control.ControlThrowable
+          extends Exception
+          with scala.util.control.ControlThrowable
 
       protected def macroExpansionError(
           expandee: Tree, msg: String, pos: Position = NoPosition) = {
         def msgForLog =
           if (msg != null && (msg contains "exception during macro expansion"))
-            msg.split(EOL).drop(1).headOption.getOrElse("?") else msg
+            msg.split(EOL).drop(1).headOption.getOrElse("?")
+          else msg
         macroLogLite("macro expansion has failed: %s".format(msgForLog))
         if (msg != null)
           context.error(if (pos.isDefined) pos else expandee.pos, msg) // issueTypeError(PosAndMsgTypeError(..)) won't work => swallows positions
@@ -969,14 +974,13 @@ trait ContextErrors { self: Analyzer =>
               var relevantElements =
                 realex.getStackTrace().take(relevancyThreshold + 1)
               def isMacroInvoker(este: StackTraceElement) =
-                este.isNativeMethod ||
-                (este.getClassName != null &&
+                este.isNativeMethod || (este.getClassName != null &&
                     (este.getClassName contains "fastTrack"))
               var threshold =
                 relevantElements.reverse.indexWhere(isMacroInvoker) + 1
               while (threshold != relevantElements.length &&
-              isMacroInvoker(relevantElements(
-                      relevantElements.length - threshold - 1))) threshold += 1
+                     isMacroInvoker(relevantElements(relevantElements.length -
+                             threshold - 1))) threshold += 1
               relevantElements = relevantElements dropRight threshold
 
               realex.setStackTrace(relevantElements)
@@ -1021,7 +1025,8 @@ trait ContextErrors { self: Analyzer =>
         val expected = "expr or tree"
         val actual =
           if (isUnaffiliatedExpr) "an expr"
-          else if (isUnaffiliatedTree) "a tree" else "unexpected"
+          else if (isUnaffiliatedTree) "a tree"
+          else "unexpected"
         val isPathMismatch =
           expanded != null && (isUnaffiliatedExpr || isUnaffiliatedTree)
         macroExpansionError(
@@ -1083,8 +1088,8 @@ trait ContextErrors { self: Analyzer =>
         // When not buffering (and thus reporting to the user), we shouldn't issue unless `validTargets`,
         // otherwise we report two different errors that trace back to the same root cause,
         // and unless `validTargets`, we don't know for sure the ambiguity is real anyway.
-        val validTargets = !(pre.isErroneous || sym1.isErroneous ||
-            sym2.isErroneous)
+        val validTargets =
+          !(pre.isErroneous || sym1.isErroneous || sym2.isErroneous)
         val ambiguousBuffered = !context.ambiguousErrors
         if (validTargets || ambiguousBuffered)
           context.issueAmbiguousError(
@@ -1242,8 +1247,8 @@ trait ContextErrors { self: Analyzer =>
 
         prefix + "type arguments " + targs.mkString("[", ",", "]") +
         " do not conform to " + tparams.head.owner +
-        "'s type parameter bounds " + (tparams map (_.defString))
-          .mkString("[", ",", "]")
+        "'s type parameter bounds " +
+        (tparams map (_.defString)).mkString("[", ",", "]")
       }
 
       def NotWithinBounds(tree: Tree,
@@ -1522,8 +1527,8 @@ trait ContextErrors { self: Analyzer =>
               sm"""|Note that implicit conversions are not applicable because they are ambiguous:
                     |${coreMsg}are possible conversion functions from $found to $req"""
           }
-          typeErrorMsg(found, req) +
-          (if (explanation == "") "" else "\n" + explanation)
+          typeErrorMsg(found, req) + (if (explanation == "") ""
+                                      else "\n" + explanation)
         }
 
         def treeTypeArgs(annotatedTree: Tree): List[String] =

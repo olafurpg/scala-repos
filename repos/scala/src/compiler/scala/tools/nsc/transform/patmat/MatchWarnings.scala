@@ -34,8 +34,9 @@ trait MatchWarnings { self: PatternMatching =>
       }
       pat match {
         case Bind(name, _) =>
-          context.enclosingContextChain.foldLeft(NoSymbol: Symbol)((res,
-              ctx) => res orElse declarationOfName(ctx.owner.rawInfo, name))
+          context.enclosingContextChain
+            .foldLeft(NoSymbol: Symbol)((res, ctx) =>
+                res orElse declarationOfName(ctx.owner.rawInfo, name))
         case _ => NoSymbol
       }
     }

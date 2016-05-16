@@ -53,7 +53,8 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     def MacroImplWrongNumberOfTypeArgumentsError() = {
       val diagnostic =
         if (macroImpl.typeParams.length > targs.length)
-          "has too few type arguments" else "has too many arguments"
+          "has too few type arguments"
+        else "has too many arguments"
       implRefError(
           s"macro implementation reference $diagnostic for " + treeSymTypeMsg(
               macroImplRef))
@@ -87,8 +88,8 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
 
     private def abbreviateCoreAliases(s: String): String = {
       val coreAliases = List("WeakTypeTag", "Expr", "Tree")
-      coreAliases.foldLeft(s)(
-          (res, x) => res.replace("c.universe." + x, "c." + x))
+      coreAliases.foldLeft(s)((res, x) =>
+            res.replace("c.universe." + x, "c." + x))
     }
 
     private def showMeth(pss: List[List[Symbol]],

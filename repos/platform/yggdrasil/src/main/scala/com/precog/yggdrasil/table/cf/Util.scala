@@ -121,7 +121,7 @@ object util {
   case object NConcat {
 
     // Closest thing we can get to casting an array. This is completely unsafe.
-    private def copyCastArray[A : Manifest](as: Array[_]): Array[A] = {
+    private def copyCastArray[A: Manifest](as: Array[_]): Array[A] = {
       var bs = new Array[A](as.length)
       System.arraycopy(as, 0, bs, 0, as.length)
       bs

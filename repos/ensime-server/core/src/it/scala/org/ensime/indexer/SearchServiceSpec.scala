@@ -10,8 +10,10 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 class SearchServiceSpec
-    extends EnsimeSpec with SharedTestKitFixture
-    with SharedSearchServiceFixture with SearchServiceTestUtils {
+    extends EnsimeSpec
+    with SharedTestKitFixture
+    with SharedSearchServiceFixture
+    with SearchServiceTestUtils {
 
   def original = EnsimeConfigFixture.SimpleTestProject
 

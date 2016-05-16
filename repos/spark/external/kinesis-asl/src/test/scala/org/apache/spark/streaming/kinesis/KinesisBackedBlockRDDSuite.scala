@@ -23,7 +23,9 @@ import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkExcept
 import org.apache.spark.storage.{BlockId, BlockManager, StorageLevel, StreamBlockId}
 
 abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
-    extends KinesisFunSuite with BeforeAndAfterEach with LocalSparkContext {
+    extends KinesisFunSuite
+    with BeforeAndAfterEach
+    with LocalSparkContext {
 
   private val testData = 1 to 8
 
@@ -44,8 +46,8 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
       testUtils = new KPLBasedKinesisTestUtils()
       testUtils.createStream()
 
-      shardIdToDataAndSeqNumbers = testUtils.pushData(
-          testData, aggregate = aggregateTestData)
+      shardIdToDataAndSeqNumbers =
+        testUtils.pushData(testData, aggregate = aggregateTestData)
       require(shardIdToDataAndSeqNumbers.size > 1,
               "Need data to be sent to multiple shards")
 
@@ -295,8 +297,7 @@ abstract class KinesisBackedBlockRDDTests(aggregateTestData: Boolean)
       require(numPartitionsInBM > 0,
               "Some partitions must be in BlockManager for this test")
       rdd.removeBlocks()
-      assert(
-          rdd.map { bytes =>
+      assert(rdd.map { bytes =>
         new String(bytes).toInt
       }.collect().toSet === testData.toSet)
     }

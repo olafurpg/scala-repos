@@ -67,13 +67,11 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
 
   // TODO 2.9 filter out Double.MaxValue.
   test("softmax is approximately associative") {
-    check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+    check(Prop.forAll { (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       softmax(a, softmax(b, c)) =~= softmax(softmax(a, b), c)
     })
-    check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+    check(Prop.forAll { (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       softmax(a, softmax(b, c)) =~= softmax(Array(a, b, c))
     })
@@ -82,7 +80,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
   test("sum distributes over softmax") {
     check(
         Prop.forAll { (a: Double, b: Double, c: Double) =>
-      Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) || (a + softmax(b, c)) =~=
+      Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
+      (a + softmax(b, c)) =~=
       (softmax(a + b, a + c))
     })
   }

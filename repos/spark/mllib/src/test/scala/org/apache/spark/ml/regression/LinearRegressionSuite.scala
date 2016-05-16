@@ -30,7 +30,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row}
 
 class LinearRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   private val seed: Int = 42
@@ -73,17 +74,19 @@ class LinearRegressionSuite
     // as the solver of linear regression in the case of "auto" mode.
     val featureSize = 4100
     datasetWithSparseFeature = sqlContext.createDataFrame(
-        sc.parallelize(
-            LinearDataGenerator.generateLinearInput(
-                intercept = 0.0,
-                weights = Seq.fill(featureSize)(r.nextDouble).toArray,
-                xMean = Seq.fill(featureSize)(r.nextDouble).toArray,
-                xVariance = Seq.fill(featureSize)(r.nextDouble).toArray,
-                nPoints = 200,
-                seed,
-                eps = 0.1,
-                sparsity = 0.7),
-            2))
+        sc.parallelize(LinearDataGenerator.generateLinearInput(
+                           intercept = 0.0,
+                           weights =
+                             Seq.fill(featureSize)(r.nextDouble).toArray,
+                           xMean = Seq.fill(featureSize)(r.nextDouble).toArray,
+                           xVariance = Seq
+                             .fill(featureSize)(r.nextDouble)
+                             .toArray,
+                           nPoints = 200,
+                           seed,
+                           eps = 0.1,
+                           sparsity = 0.7),
+                       2))
 
     /*
        R code:
@@ -794,8 +797,8 @@ class LinearRegressionSuite
         modelNoPredictionCol.summary.predictions.schema.fieldNames
       assert((datasetWithDenseFeature.schema.fieldNames.toSet)
             .subsetOf(modelNoPredictionColFieldNames.toSet))
-      assert(modelNoPredictionColFieldNames.exists(
-              s => s.startsWith("prediction_")))
+      assert(modelNoPredictionColFieldNames.exists(s =>
+                s.startsWith("prediction_")))
 
       // Residuals in [[LinearRegressionResults]] should equal those manually computed
       val expectedResiduals = datasetWithDenseFeature

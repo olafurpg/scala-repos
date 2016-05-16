@@ -19,7 +19,8 @@ import play.doc.{FileRepository, PlayDoc, RenderedPage, PageIndex}
   */
 class DocumentationHandler(
     repo: FileRepository, apiRepo: FileRepository, toClose: Closeable)
-    extends BuildDocHandler with Closeable {
+    extends BuildDocHandler
+    with Closeable {
 
   def this(repo: FileRepository, toClose: Closeable) =
     this(repo, repo, toClose)
@@ -69,7 +70,7 @@ class DocumentationHandler(
                 MimeTypes
                   .forFileName(handle.name)
                   .orElse(Some(ContentTypes.BINARY))
-              ))
+            ))
       }
     }
 
@@ -93,7 +94,7 @@ class DocumentationHandler(
             sendFileInline(repo, path)
               .orElse(sendFileInline(apiRepo, path))
               .getOrElse(NotFound("Resource not found [" + path + "]"))
-          )
+        )
       case wikiPage(page) =>
         Some(
             playDoc.renderPage(page) match {

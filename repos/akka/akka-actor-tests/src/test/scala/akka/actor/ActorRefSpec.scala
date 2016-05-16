@@ -144,8 +144,7 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
 
       EventFilter[ActorInitializationException](occurrences = 1) intercept {
         intercept[akka.actor.ActorInitializationException] {
-          wrap(
-              result ⇒
+          wrap(result ⇒
                 actorOf(Props(new Actor {
               val nested = promiseIntercept(
                   new Actor { def receive = { case _ ⇒ } })(result)
@@ -200,11 +199,9 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
 
       EventFilter[ActorInitializationException](occurrences = 2) intercept {
         intercept[akka.actor.ActorInitializationException] {
-          wrap(
-              result ⇒
-                actorOf(Props(
-                        new FailingInheritingOuterActor(actorOf(Props(
-                                    promiseIntercept(
+          wrap(result ⇒
+                actorOf(Props(new FailingInheritingOuterActor(
+                            actorOf(Props(promiseIntercept(
                                         new FailingInheritingInnerActor)(
                                         result)))))))
         }
@@ -249,8 +246,10 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
       EventFilter[ActorInitializationException](occurrences = 1) intercept {
         intercept[akka.actor.ActorInitializationException] {
           wrap(result ⇒
-                actorOf(Props(new OuterActor(actorOf(Props(promiseIntercept(
-                                        new FailingInheritingInnerActor)(
+                actorOf(
+                    Props(new OuterActor(
+                            actorOf(Props(
+                                    promiseIntercept(new FailingInheritingInnerActor)(
                                         result)))))))
         }
 
@@ -468,19 +467,16 @@ class ActorRefSpec extends AkkaSpec with DefaultTimeout {
     }
 
     "be able to check for existence of children" in {
-      val parent =
-        system.actorOf(Props(new Actor {
+      val parent = system.actorOf(Props(new Actor {
 
-          val child = context.actorOf(
-              Props(new Actor {
-                def receive = { case _ ⇒ }
-              }),
-              "child")
+        val child = context.actorOf(Props(new Actor {
+          def receive = { case _ ⇒ }
+        }), "child")
 
-          def receive = {
-            case name: String ⇒ sender() ! context.child(name).isDefined
-          }
-        }), "parent")
+        def receive = {
+          case name: String ⇒ sender() ! context.child(name).isDefined
+        }
+      }), "parent")
 
       assert(Await.result((parent ? "child"), timeout.duration) === true)
       assert(Await.result((parent ? "whatnot"), timeout.duration) === false)

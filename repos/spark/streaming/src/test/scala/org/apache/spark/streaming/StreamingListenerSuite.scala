@@ -66,11 +66,10 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     batchInfosSubmitted should have size 4
 
     batchInfosSubmitted.asScala.foreach(
-        info =>
-          {
-        info.schedulingDelay should be(None)
-        info.processingDelay should be(None)
-        info.totalDelay should be(None)
+        info => {
+      info.schedulingDelay should be(None)
+      info.processingDelay should be(None)
+      info.totalDelay should be(None)
     })
 
     batchInfosSubmitted.asScala.foreach { info =>
@@ -86,12 +85,11 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     batchInfosStarted should have size 4
 
     batchInfosStarted.asScala.foreach(
-        info =>
-          {
-        info.schedulingDelay should not be None
-        info.schedulingDelay.get should be >= 0L
-        info.processingDelay should be(None)
-        info.totalDelay should be(None)
+        info => {
+      info.schedulingDelay should not be None
+      info.schedulingDelay.get should be >= 0L
+      info.processingDelay should be(None)
+      info.totalDelay should be(None)
     })
 
     batchInfosStarted.asScala.foreach { info =>
@@ -109,14 +107,13 @@ class StreamingListenerSuite extends TestSuiteBase with Matchers {
     val batchInfosCompleted = collector.batchInfosCompleted
     batchInfosCompleted should have size 4
 
-    batchInfosCompleted.asScala.foreach(info =>
-          {
-        info.schedulingDelay should not be None
-        info.processingDelay should not be None
-        info.totalDelay should not be None
-        info.schedulingDelay.get should be >= 0L
-        info.processingDelay.get should be >= 0L
-        info.totalDelay.get should be >= 0L
+    batchInfosCompleted.asScala.foreach(info => {
+      info.schedulingDelay should not be None
+      info.processingDelay should not be None
+      info.totalDelay should not be None
+      info.schedulingDelay.get should be >= 0L
+      info.processingDelay.get should be >= 0L
+      info.totalDelay.get should be >= 0L
     })
 
     batchInfosCompleted.asScala.foreach { info =>
@@ -370,7 +367,8 @@ class OutputOperationInfoCollector extends StreamingListener {
 }
 
 class StreamingListenerSuiteReceiver
-    extends Receiver[Any](StorageLevel.MEMORY_ONLY) with Logging {
+    extends Receiver[Any](StorageLevel.MEMORY_ONLY)
+    with Logging {
   def onStart() {
     Future {
       logInfo("Started receiver and sleeping")

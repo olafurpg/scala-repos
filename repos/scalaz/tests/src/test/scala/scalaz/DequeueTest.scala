@@ -33,8 +33,7 @@ object DequeueTest extends SpecLite {
   }
 
   "toBackIList consistent with Ilist.fromFoldable" ! forAll { (l: List[Int]) ⇒
-    Dequeue.fromFoldable(l).toBackIList must_===
-    (IList.fromFoldable(l.reverse))
+    Dequeue.fromFoldable(l).toBackIList must_=== (IList.fromFoldable(l.reverse))
   }
 
   "snoc works" ! forAll { (l: List[Int]) ⇒

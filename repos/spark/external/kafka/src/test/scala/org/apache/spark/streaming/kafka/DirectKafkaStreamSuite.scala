@@ -43,8 +43,11 @@ import org.apache.spark.streaming.scheduler.rate.RateEstimator
 import org.apache.spark.util.Utils
 
 class DirectKafkaStreamSuite
-    extends SparkFunSuite with BeforeAndAfter with BeforeAndAfterAll
-    with Eventually with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with BeforeAndAfterAll
+    with Eventually
+    with Logging {
   val sparkConf = new SparkConf()
     .setMaster("local[4]")
     .setAppName(this.getClass.getSimpleName)
@@ -444,8 +447,8 @@ class DirectKafkaStreamSuite
       .set("spark.streaming.kafka.maxRatePerPartition", "100")
 
     // Setup the streaming context
-    ssc = new StreamingContext(
-        sparkConf, Milliseconds(batchIntervalMilliseconds))
+    ssc =
+      new StreamingContext(sparkConf, Milliseconds(batchIntervalMilliseconds))
 
     val kafkaStream = withClue("Error creating direct stream") {
       val kc = new KafkaCluster(kafkaParams)

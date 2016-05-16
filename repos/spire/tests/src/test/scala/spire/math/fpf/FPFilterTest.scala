@@ -24,7 +24,9 @@ class FpFilterTest extends FunSuite with Checkers {
   // the exact case, since it'll fail with an Evaluated excetion.
   sealed trait Bad
   implicit object BadField
-      extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
+      extends Field[Bad]
+      with IsReal[Bad]
+      with NRoot[Bad] {
     def zero: Bad = evaluated
     def one: Bad = evaluated
     def negate(a: Bad): Bad = evaluated

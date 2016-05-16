@@ -94,8 +94,7 @@ object TupleConverterImpl {
           PrimitiveBuilder(idx => q"""t.getString($idx)""")
         case tpe if tpe =:= typeOf[String] =>
           // In this case, null is identical to empty, and we always return non-null
-          PrimitiveBuilder(
-              idx =>
+          PrimitiveBuilder(idx =>
                 q"""{val s = t.getString($idx); if (s == null) "" else s}""")
         case tpe if tpe =:= typeOf[Boolean] =>
           PrimitiveBuilder(idx => q"""t.getBoolean($idx)""")
@@ -120,7 +119,8 @@ object TupleConverterImpl {
               OptionBuilder(ev, matchField(innerType))
           }
         case tpe
-            if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
+            if (tpe.typeSymbol.isClass &&
+                tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(tpe, membersOf(tpe).map(matchField))
         case tpe if allowUnknownTypes =>
           PrimitiveBuilder(

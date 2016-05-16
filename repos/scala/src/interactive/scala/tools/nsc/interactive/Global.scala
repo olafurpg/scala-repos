@@ -825,8 +825,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
         tree match {
           case Import(expr, _) =>
             debugLog(
-                "import found" + expr.tpe +
-                (if (expr.tpe == null) "" else " " + expr.tpe.members))
+                "import found" + expr.tpe + (if (expr.tpe == null) ""
+                                             else " " + expr.tpe.members))
           case _ =>
         }
         if (stabilizedType(tree) ne null) {
@@ -1204,7 +1204,7 @@ with ContextTrees with RichCompilationUnits with Picklers {
                              functionType(List(ownerTpe), AnyTpe),
                              isView = true,
                              context0 = context.makeImplicit(
-                                   reportAmbiguousErrors = false)).allImplicits
+                                 reportAmbiguousErrors = false)).allImplicits
       for (view <- applicableViews) {
         val vtree = viewApply(view)
         val vpre = stabilizedType(vtree)
@@ -1226,9 +1226,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
 
     /** Cursor Offset - positionDelta == position of the start of the name */
     def positionDelta: Int
-    def matchingResults(
-        nameMatcher: (Name) => Name => Boolean = entered =>
-            candidate => candidate.startsWith(entered)): List[M] = {
+    def matchingResults(nameMatcher: (Name) => Name => Boolean = entered =>
+          candidate => candidate.startsWith(entered)): List[M] = {
       val enteredName = if (name == nme.ERROR) nme.EMPTY else name
       val matcher = nameMatcher(enteredName)
       results filter { (member: Member) =>
@@ -1273,11 +1272,9 @@ with ContextTrees with RichCompilationUnits with Picklers {
     }
     def camelMatch(entered: Name): Name => Boolean = {
       val enteredS = entered.toString
-      val enteredLowercaseSet = enteredS
-        .toLowerCase()
-        .toSet
+      val enteredLowercaseSet = enteredS.toLowerCase().toSet
 
-        (candidate: Name) =>
+      (candidate: Name) =>
         {
           def candidateChunks = camelComponents(candidate.toString)
           // Loosely based on IntelliJ's autocompletion: the user can just write everything in
@@ -1295,8 +1292,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
                         enteredAlternatives.exists(entered =>
                               lenientMatch(entered.stripPrefix(init),
                                            tail,
-                                           matchCount +
-                                           (if (init.isEmpty) 0 else 1))))
+                                           matchCount + (if (init.isEmpty) 0
+                                                         else 1))))
             }
           }
           val containsAllEnteredChars = {
@@ -1344,8 +1341,8 @@ with ContextTrees with RichCompilationUnits with Picklers {
         def fallback = qualPos.end + 2
         val source = pos.source
         val nameStart: Int = (qualPos.end + 1 until focus1.pos.end)
-          .find(
-              p => source.identifier(source.position(p)).exists(_.length > 0))
+          .find(p =>
+                source.identifier(source.position(p)).exists(_.length > 0))
           .getOrElse(fallback)
         typeCompletions(sel, qual, nameStart, name)
       case Ident(name) =>

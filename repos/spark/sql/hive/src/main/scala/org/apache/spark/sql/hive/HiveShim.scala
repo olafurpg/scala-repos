@@ -162,7 +162,7 @@ private[hive] object HiveShim {
     }
 
     @transient
-    def deserializeObjectByKryo[T : ClassTag](
+    def deserializeObjectByKryo[T: ClassTag](
         kryo: Kryo, in: InputStream, clazz: Class[_]): T = {
       val inp = new Input(in)
       val t: T = kryo.readObject(inp, clazz).asInstanceOf[T]
@@ -264,7 +264,8 @@ private[hive] object HiveShim {
   private[hive] class ShimFileSinkDesc(var dir: String,
                                        var tableInfo: TableDesc,
                                        var compressed: Boolean)
-      extends Serializable with Logging {
+      extends Serializable
+      with Logging {
     var compressCodec: String = _
     var compressType: String = _
     var destTableId: Int = _

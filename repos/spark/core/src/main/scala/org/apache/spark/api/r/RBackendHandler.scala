@@ -36,7 +36,8 @@ import org.apache.spark.util.Utils
   */
 @Sharable
 private[r] class RBackendHandler(server: RBackend)
-    extends SimpleChannelInboundHandler[Array[Byte]] with Logging {
+    extends SimpleChannelInboundHandler[Array[Byte]]
+    with Logging {
 
   override def channelRead0(
       ctx: ChannelHandlerContext, msg: Array[Byte]): Unit = {

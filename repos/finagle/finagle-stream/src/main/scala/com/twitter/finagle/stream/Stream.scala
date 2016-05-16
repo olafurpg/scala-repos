@@ -44,11 +44,11 @@ private[stream] class DelayedReleaseService[Req](
 }
 
 object Stream {
-  def apply[Req : RequestType](): Stream[Req] = new Stream()
-  def get[Req : RequestType](): Stream[Req] = apply()
+  def apply[Req: RequestType](): Stream[Req] = new Stream()
+  def get[Req: RequestType](): Stream[Req] = apply()
 }
 
-class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
+class Stream[Req: RequestType] extends CodecFactory[Req, StreamResponse] {
   def server: Server = Function.const {
     new Codec[Req, StreamResponse] {
       def pipelineFactory = new ChannelPipelineFactory {

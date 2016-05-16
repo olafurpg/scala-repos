@@ -1202,7 +1202,7 @@ class TypedMultiSelfJoinJobTest extends WordSpec with Matchers {
       .typedSink(TypedText.tsv[(Int, Int, Int, Int)]("output")) { outBuf =>
         "correctly do a multi-self-join" in {
           def group(it: Seq[(Int, Int)])(red: (Int,
-                                         Int) => Int): Map[Int, Int] =
+                                               Int) => Int): Map[Int, Int] =
             it.groupBy(_._1)
               .mapValues { kvs =>
                 kvs.map(_._2).reduce(red)
@@ -1484,7 +1484,7 @@ object TypedSketchJoinTestHelper {
       .runHadoop
       .finish
 
-      (sketchResult.toList.sorted, innerResult.toList.sorted)
+    (sketchResult.toList.sorted, innerResult.toList.sorted)
   }
 }
 

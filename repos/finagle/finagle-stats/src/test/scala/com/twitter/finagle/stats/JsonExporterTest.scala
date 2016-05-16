@@ -13,7 +13,9 @@ import scala.util.matching.Regex
 
 @RunWith(classOf[JUnitRunner])
 class JsonExporterTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   // 2015-02-05 20:05:00 +0000
   private val zeroSecs = Time.fromSeconds(1423166700)

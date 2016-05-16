@@ -517,8 +517,8 @@ trait BooleanFunctions {
       implicit M: Applicative[M]): M[Unit] = M.unlessM(cond)(f)
 
   /** A version of `unlessM` that infers the type constructor `M`. */
-  final def unlessMU[MA](cond: Boolean)(
-      f: => MA)(implicit M: Unapply[Applicative, MA]): M.M[Unit] =
+  final def unlessMU[MA](cond: Boolean)(f: => MA)(
+      implicit M: Unapply[Applicative, MA]): M.M[Unit] =
     M.TC.unlessM(cond)(M(f))
 
   /**
@@ -563,16 +563,16 @@ trait BooleanFunctions {
     * Returns the value `a` lifted into the context `M` if `cond` is `true`, otherwise, the empty value
     * for `M`.
     */
-  final def pointOrEmpty[M[_], A](cond: Boolean)(a: => A)(
-      implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+  final def pointOrEmpty[M[_], A](cond: Boolean)(
+      a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (cond) M.point(a) else M0.empty
 
   /**
     * Returns the value `a` lifted into the context `M` if `cond` is `false`, otherwise, the empty value
     * for `M`.
     */
-  final def emptyOrPure[M[_], A](cond: Boolean)(a: => A)(
-      implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
+  final def emptyOrPure[M[_], A](cond: Boolean)(
+      a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A] =
     if (!cond) M.point(a) else M0.empty
 
   final def pointOrEmptyNT[M[_]](

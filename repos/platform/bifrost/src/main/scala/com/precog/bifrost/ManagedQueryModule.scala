@@ -133,8 +133,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       }
     for {
       job <- futureJob map { job =>
-        Some(job)
-      } recover { case _ => None }
+              Some(job)
+            } recover { case _ => None }
       queryStateManager = job map { job =>
         val mgr = JobQueryStateManager(job.id,
                                        yggConfig.clock.now() plus timeout
@@ -220,7 +220,8 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
 
   private final case class JobQueryStateManager(
       jobId: JobId, expiresAt: DateTime)
-      extends JobQueryStateMonad with Logging {
+      extends JobQueryStateMonad
+      with Logging {
     import JobQueryState._
 
     private[this] val cancelled: AtomicBoolean = new AtomicBoolean()

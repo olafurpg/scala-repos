@@ -41,7 +41,9 @@ import org.apache.spark.util.{JsonProtocol, Utils}
   * can be read and deserialized into actual SparkListenerEvents.
   */
 class EventLoggingListenerSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfter
     with Logging {
   import EventLoggingListenerSuite._
 

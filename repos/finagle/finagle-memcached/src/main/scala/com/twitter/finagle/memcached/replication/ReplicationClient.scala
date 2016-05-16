@@ -50,7 +50,8 @@ case class SCasUnique(casUnique: Buf) extends ReplicaCasUnique
 object ReplicationClient {
   def newBaseReplicationClient(
       pools: Seq[Cluster[CacheNode]],
-      clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
+      clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] =
+        None,
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
   ) = {
@@ -70,7 +71,8 @@ object ReplicationClient {
 
   def newSimpleReplicationClient(
       pools: Seq[Cluster[CacheNode]],
-      clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
+      clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] =
+        None,
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
   ) = {
@@ -185,8 +187,8 @@ class BaseReplicationClient(
     : Future[ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
     getsAll(Seq(key)) map { _.values.head }
 
-  def getsAll(keys: Iterable[String]): Future[Map[
-          String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
+  def getsAll(keys: Iterable[String]): Future[
+      Map[String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
     val keySet = keys.toSet
     Future.collect(clients map { _.getsResult(keySet) }) map {
       results: Seq[GetsResult] =>
@@ -230,8 +232,7 @@ class BaseReplicationClient(
           }
         InconsistentReplication(transformed)
       case FailedReplication(fs) =>
-        FailedReplication(
-            fs map { t =>
+        FailedReplication(fs map { t =>
           Throw(t.e)
         })
     }
@@ -440,7 +441,7 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
           case (key, _) =>
             GetsResult(
                 GetResult(failures = Map(key -> SimpleReplicationFailure(
-                              "One or more underlying replica failed gets"))))
+                            "One or more underlying replica failed gets"))))
         }
       GetResult.merged(getsResultSeq.toSeq)
     }

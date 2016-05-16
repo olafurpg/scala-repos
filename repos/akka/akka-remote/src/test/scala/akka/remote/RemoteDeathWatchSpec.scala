@@ -28,7 +28,10 @@ akka {
         port = 0
     }
 }
-""")) with ImplicitSender with DefaultTimeout with DeathWatchSpec {
+"""))
+    with ImplicitSender
+    with DefaultTimeout
+    with DeathWatchSpec {
 
   val other = ActorSystem("other",
                           ConfigFactory

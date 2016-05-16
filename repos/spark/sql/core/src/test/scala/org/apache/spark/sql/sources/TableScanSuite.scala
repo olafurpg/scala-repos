@@ -37,7 +37,8 @@ class SimpleScanSource extends RelationProvider {
 
 case class SimpleScan(
     from: Int, to: Int)(@transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+    extends BaseRelation
+    with TableScan {
 
   override def schema: StructType =
     StructType(StructField("i", IntegerType, nullable = false) :: Nil)
@@ -62,7 +63,8 @@ class AllDataTypesScanSource extends SchemaRelationProvider {
 case class AllDataTypesScan(
     from: Int, to: Int, userSpecifiedSchema: StructType)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+    extends BaseRelation
+    with TableScan {
 
   override def schema: StructType = userSpecifiedSchema
 
@@ -189,55 +191,59 @@ class TableScanSuite extends DataSourceTest with SharedSQLContext {
             "booleanField",
             BooleanType,
             true) :: StructField("ByteField", ByteType, true) :: StructField(
-            "shortField", ShortType, true) :: StructField("int_Field",
-                                                          IntegerType,
-                                                          true) :: StructField(
+            "shortField",
+            ShortType,
+            true) :: StructField("int_Field",
+                                 IntegerType,
+                                 true) :: StructField(
             "longField_:,<>=+/~^",
             LongType,
             true) :: StructField("floatField", FloatType, true) :: StructField(
             "doubleField",
             DoubleType,
-            true) :: StructField("decimalField1",
-                                 DecimalType.USER_DEFAULT,
-                                 true) :: StructField("decimalField2",
-                                                      DecimalType(9, 2),
-                                                      true) :: StructField(
+            true) :: StructField(
+            "decimalField1",
+            DecimalType.USER_DEFAULT,
+            true) :: StructField("decimalField2",
+                                 DecimalType(9, 2),
+                                 true) :: StructField(
             "dateField", DateType, true) :: StructField("timestampField",
                                                         TimestampType,
                                                         true) :: StructField(
-            "varcharField",
-            StringType,
-            true) :: StructField("charField", StringType, true) :: StructField(
-            "arrayFieldSimple", ArrayType(IntegerType), true) :: StructField(
-            "arrayFieldComplex",
-            ArrayType(MapType(
-                    StringType,
-                    StructType(StructField("key", LongType, true) :: Nil))),
-            true) :: StructField("mapFieldSimple",
-                                 MapType(IntegerType, StringType),
-                                 true) :: StructField("mapFieldComplex",
-                                                      MapType(MapType(
-                                                                  StringType,
-                                                                  FloatType),
-                                                              StructType(
-                                                                  StructField(
-                                                                      "key",
-                                                                      LongType,
-                                                                      true) :: Nil)),
-                                                      true) :: StructField(
+            "varcharField", StringType, true) :: StructField(
+            "charField", StringType, true) :: StructField(
+            "arrayFieldSimple",
+            ArrayType(IntegerType),
+            true) :: StructField("arrayFieldComplex",
+                                 ArrayType(MapType(StringType,
+                                                   StructType(StructField(
+                                                           "key",
+                                                           LongType,
+                                                           true) :: Nil))),
+                                 true) :: StructField(
+            "mapFieldSimple",
+            MapType(IntegerType, StringType),
+            true) :: StructField("mapFieldComplex",
+                                 MapType(MapType(StringType,
+                                                 FloatType),
+                                         StructType(StructField("key",
+                                                                LongType,
+                                                                true) :: Nil)),
+                                 true) :: StructField(
             "structFieldSimple",
             StructType(StructField("key", IntegerType, true) :: StructField(
                     "Value", StringType, true) :: Nil),
-            true) :: StructField(
-            "structFieldComplex",
-            StructType(
-                StructField("key", ArrayType(StringType), true) :: StructField(
-                    "Value",
-                    StructType(StructField("value_(2)",
-                                           ArrayType(DateType),
-                                           true) :: Nil),
-                    true) :: Nil),
-            true) :: Nil
+            true) :: StructField("structFieldComplex",
+                                 StructType(StructField("key",
+                                                        ArrayType(StringType),
+                                                        true) :: StructField(
+                                         "Value",
+                                         StructType(
+                                             StructField("value_(2)",
+                                                         ArrayType(DateType),
+                                                         true) :: Nil),
+                                         true) :: Nil),
+                                 true) :: Nil
     )
 
     assert(expectedSchema == caseInsensitiveContext

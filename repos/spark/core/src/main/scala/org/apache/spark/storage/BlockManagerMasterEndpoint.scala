@@ -39,7 +39,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
                                                 val isLocal: Boolean,
                                                 conf: SparkConf,
                                                 listenerBus: LiveListenerBus)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   // Mapping from block manager id to the block manager's information.
   private val blockManagerInfo =
@@ -142,8 +143,8 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
       blockLocations.asScala.keys.flatMap(_.asRDDId).filter(_.rddId == rddId)
     blocks.foreach { blockId =>
       val bms: mutable.HashSet[BlockManagerId] = blockLocations.get(blockId)
-      bms.foreach(
-          bm => blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
+      bms.foreach(bm =>
+            blockManagerInfo.get(bm).foreach(_.removeBlock(blockId)))
       blockLocations.remove(blockId)
     }
 
@@ -409,7 +410,7 @@ private[spark] class BlockManagerMasterEndpoint(override val rpcEnv: RpcEnv,
   private def getExecutorEndpointRef(
       executorId: String): Option[RpcEndpointRef] = {
     for (blockManagerId <- blockManagerIdByExecutor.get(executorId);
-    info <- blockManagerInfo.get(blockManagerId)) yield {
+         info <- blockManagerInfo.get(blockManagerId)) yield {
       info.slaveEndpoint
     }
   }

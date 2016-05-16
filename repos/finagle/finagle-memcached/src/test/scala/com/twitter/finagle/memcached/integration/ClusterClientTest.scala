@@ -24,7 +24,9 @@ import scala.collection.mutable
 
 @RunWith(classOf[JUnitRunner])
 class ClusterClientTest
-    extends FunSuite with BeforeAndAfter with Eventually
+    extends FunSuite
+    with BeforeAndAfter
+    with Eventually
     with IntegrationPatience {
 
   /**

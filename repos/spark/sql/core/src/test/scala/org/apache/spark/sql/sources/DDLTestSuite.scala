@@ -34,9 +34,10 @@ class DDLScanSource extends RelationProvider {
   }
 }
 
-case class SimpleDDLScan(from: Int, to: Int, table: String)(
-    @transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+case class SimpleDDLScan(
+    from: Int, to: Int, table: String)(@transient val sqlContext: SQLContext)
+    extends BaseRelation
+    with TableScan {
 
   override def schema: StructType =
     StructType(

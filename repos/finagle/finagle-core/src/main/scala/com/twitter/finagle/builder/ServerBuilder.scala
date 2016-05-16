@@ -197,7 +197,7 @@ class ServerBuilder[Req, Rep, HasCodec, HasBindTo, HasName] private[builder](
   ): ServerBuilder[Req1, Rep1, HasCodec1, HasBindTo1, HasName1] =
     new ServerBuilder(ps, newServer)
 
-  protected def configured[P : Stack.Param, HasCodec1, HasBindTo1, HasName1](
+  protected def configured[P: Stack.Param, HasCodec1, HasBindTo1, HasName1](
       param: P
   ): ServerBuilder[Req, Rep, HasCodec1, HasBindTo1, HasName1] =
     copy(params + param, mk)

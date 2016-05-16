@@ -249,8 +249,8 @@ object Infos {
           isAbstract = isAbstract,
           isExported = isExported,
           methodsCalled = methodsCalled.toMap.mapValues(_.toList),
-          methodsCalledStatically = methodsCalledStatically.toMap.mapValues(
-                _.toList),
+          methodsCalledStatically =
+            methodsCalledStatically.toMap.mapValues(_.toList),
           staticMethodsCalled = staticMethodsCalled.toMap.mapValues(_.toList),
           instantiatedClasses = instantiatedClasses.toList,
           accessedModules = accessedModules.toList,

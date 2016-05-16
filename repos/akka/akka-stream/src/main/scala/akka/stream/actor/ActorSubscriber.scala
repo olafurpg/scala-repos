@@ -20,11 +20,13 @@ object ActorSubscriber {
     * INTERNAL API
     */
   private[akka] final case class OnSubscribe(subscription: Subscription)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 }
 
 sealed abstract class ActorSubscriberMessage
-    extends DeadLetterSuppression with NoSerializationVerificationNeeded
+    extends DeadLetterSuppression
+    with NoSerializationVerificationNeeded
 
 object ActorSubscriberMessage {
   final case class OnNext(element: Any) extends ActorSubscriberMessage
@@ -275,7 +277,8 @@ trait ActorSubscriber extends Actor {
           context.stop(self)
           s.cancel()
         case _ ⇒
-          _canceled = true // cancel will be signaled once a subscription arrives
+          _canceled =
+            true // cancel will be signaled once a subscription arrives
       }
     }
 
@@ -316,7 +319,8 @@ private[akka] final class ActorSubscriberImpl[T](val impl: ActorRef)
   * Some state must survive restarts.
   */
 private[akka] object ActorSubscriberState
-    extends ExtensionId[ActorSubscriberState] with ExtensionIdProvider {
+    extends ExtensionId[ActorSubscriberState]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): ActorSubscriberState =
     super.get(system)
 
@@ -380,4 +384,5 @@ object AbstractActorSubscriber {
   * @see [[akka.stream.actor.ActorSubscriber]]
   */
 abstract class AbstractActorSubscriber
-    extends AbstractActor with ActorSubscriber
+    extends AbstractActor
+    with ActorSubscriber

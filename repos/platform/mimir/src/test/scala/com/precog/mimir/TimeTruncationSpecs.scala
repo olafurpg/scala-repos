@@ -33,7 +33,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeTruncationSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -1270,4 +1271,5 @@ trait TimeTruncationSpecs[M[+ _]]
 }
 
 object TimeTruncationSpecs
-    extends TimeTruncationSpecs[test.YId] with test.YIdInstances
+    extends TimeTruncationSpecs[test.YId]
+    with test.YIdInstances

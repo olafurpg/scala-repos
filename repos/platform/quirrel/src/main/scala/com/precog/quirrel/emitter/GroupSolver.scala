@@ -32,7 +32,10 @@ import parser._
 import typer._
 
 trait GroupSolver
-    extends AST with GroupFinder with Solver with ProvenanceChecker {
+    extends AST
+    with GroupFinder
+    with Solver
+    with ProvenanceChecker {
   import Function._
 
   import ast._
@@ -100,7 +103,7 @@ trait GroupSolver
               filtered map { solveConstraint(expr, _, sigma, Nil) })
 
           val mergedM = for (forestSpec <- forestSpecM;
-          constrSpec <- constrSpecM) yield
+                             constrSpec <- constrSpecM) yield
             IntersectBucketSpec(forestSpec, constrSpec)
 
           val specM = mergedM orElse forestSpecM orElse constrSpecM
@@ -692,8 +695,7 @@ trait GroupSolver
           b, in, sigma)
 
     case t @ TicVar(_, name)
-        if b.isDefined &&
-        (t.binding == SolveBinding(b.get) ||
+        if b.isDefined && (t.binding == SolveBinding(b.get) ||
             t.binding == FreeBinding(b.get)) => {
         t.binding match {
           case SolveBinding(b2) => Set((Some(b2), name))

@@ -114,8 +114,8 @@ class MergeToComprehensions extends Phase {
             "Merging Distinct into Comprehension:", Ellipsis(n, List(0)))
         val o2 = applyReplacements(o1, replacements1a, c1a)
         val c2 =
-          c1a.copy(distinct = Some(ProductNode(ConstArray(o2)).flatten
-                      .infer())) :@ c1a.nodeType
+          c1a.copy(distinct = Some(
+                  ProductNode(ConstArray(o2)).flatten.infer())) :@ c1a.nodeType
         logger.debug("Merged Distinct into Comprehension:", c2)
         (c2, replacements1a)
 
@@ -138,8 +138,7 @@ class MergeToComprehensions extends Phase {
             case FwdPath(s :: ElementSymbol(1) :: rest) if s == s1 => rest
           }, stopOnMatch = true)
           val isParam =
-            leakedPaths.nonEmpty &&
-            ({
+            leakedPaths.nonEmpty && ({
               logger.debug("Leaked paths to GroupBy keys: " + leakedPaths
                     .map(l => ("_" :: l).mkString("."))
                     .mkString(", "))
@@ -272,7 +271,8 @@ class MergeToComprehensions extends Phase {
                   case _ => p
                 }
             }, bottomUp = true)
-            .infer(scope = Type.Scope(
+            .infer(scope =
+                  Type.Scope(
                       j.leftGen -> l2.nodeType.asCollectionType.elementType) +
                   (j.rightGen -> r2.nodeType.asCollectionType.elementType))
           logger.debug(s"Transformed `on` clause in Join $ls/$rs:", on2)
@@ -312,7 +312,7 @@ class MergeToComprehensions extends Phase {
           // Ensure that the select clause is non-empty
           case Pure(StructNode(ConstArray.empty), _) =>
             c.copy(select = Pure(StructNode(
-                            ConstArray((new AnonSymbol, LiteralNode(1))))))
+                          ConstArray((new AnonSymbol, LiteralNode(1))))))
               .infer()
           case _ => c
         }
@@ -375,12 +375,12 @@ class MergeToComprehensions extends Phase {
   /** Merge the common operations Bind, Filter and CollectionCast into an existing Comprehension.
     * This method is used at different stages of the pipeline. If the Comprehension already contains
     * a Distinct clause, it is pushed into a subquery. */
-  def mergeCommon(
-      rec: (Node, Boolean) => (Comprehension, Replacements),
-      parent: (Node, Boolean) => (Comprehension, Replacements),
-      n: Node,
-      buildBase: Boolean,
-      allowFilter: Boolean = true): (Comprehension, Replacements) = n match {
+  def mergeCommon(rec: (Node, Boolean) => (Comprehension, Replacements),
+                  parent: (Node, Boolean) => (Comprehension, Replacements),
+                  n: Node,
+                  buildBase: Boolean,
+                  allowFilter: Boolean =
+                    true): (Comprehension, Replacements) = n match {
     case Bind(s1, f1, Pure(StructNode(defs1), ts1))
         if !f1.isInstanceOf[GroupBy] =>
       val (c1, replacements1) = rec(f1, true)

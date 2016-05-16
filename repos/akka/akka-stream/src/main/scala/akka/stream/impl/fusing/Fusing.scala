@@ -294,8 +294,8 @@ private[stream] object Fusing {
           if (Debug)
             log(s"dissolving graph module ${m.toString.replace("\n", "\n" + "  " * indent)}")
           val attributes = inheritedAttributes and m.attributes
-          gm.matValIDs.flatMap(
-              sub ⇒ descend(sub, attributes, struct, localGroup, indent + 1))(
+          gm.matValIDs.flatMap(sub ⇒
+                descend(sub, attributes, struct, localGroup, indent + 1))(
               collection.breakOut)
         case gm @ GraphModule(_, oldShape, _, mvids) ⇒
           /*
@@ -415,8 +415,8 @@ private[stream] object Fusing {
             case f: FusedModule ⇒ f.info.downstreams.toSet
             case _ ⇒ m.downstreams.toSet
           }
-          val down = m.subModules.foldLeft(oldDownstreams)(
-              (set, m) ⇒ set -- m.downstreams)
+          val down = m.subModules.foldLeft(oldDownstreams)((set, m) ⇒
+                set -- m.downstreams)
           down.foreach {
             case (start, end) ⇒ struct.wire(start, end, indent)
           }

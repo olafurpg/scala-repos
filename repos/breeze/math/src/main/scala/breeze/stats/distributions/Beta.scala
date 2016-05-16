@@ -31,7 +31,9 @@ import scala.math._
   * @param b the number of pseudo-observations for false
   */
 class Beta(a: Double, b: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   require(a > 0.0)
   require(b > 0.0)
 
@@ -117,8 +119,8 @@ class Beta(a: Double, b: Double)(implicit rand: RandBasis = Rand)
   def variance = (a * b) / ((a + b) * (a + b) * (a + b + 1))
   def mode = (a - 1) / (a + b - 2)
   def entropy =
-    logNormalizer - (a - 1) * digamma(a) - (b - 1) * digamma(b) + (a + b - 2) * digamma(
-        a + b)
+    logNormalizer - (a - 1) * digamma(a) - (b - 1) * digamma(b) +
+    (a + b - 2) * digamma(a + b)
 
   // Probability that x < a <= Y
   override def cdf(x: Double): Double = {

@@ -36,7 +36,7 @@ object MLUtils {
 
   private[mllib] lazy val EPSILON = {
     var eps = 1.0
-    while ( (1.0 + (eps / 2.0)) != 1.0) {
+    while ((1.0 + (eps / 2.0)) != 1.0) {
       eps /= 2.0
     }
     eps
@@ -278,7 +278,7 @@ object MLUtils {
     * element, the validation data, containing a unique 1/kth of the data. Where k=numFolds.
     */
   @Since("1.0.0")
-  def kFold[T : ClassTag](
+  def kFold[T: ClassTag](
       rdd: RDD[T], numFolds: Int, seed: Int): Array[(RDD[T], RDD[T])] = {
     kFold(rdd, numFolds, seed.toLong)
   }
@@ -287,7 +287,7 @@ object MLUtils {
     * Version of [[kFold()]] taking a Long seed.
     */
   @Since("2.0.0")
-  def kFold[T : ClassTag](
+  def kFold[T: ClassTag](
       rdd: RDD[T], numFolds: Int, seed: Long): Array[(RDD[T], RDD[T])] = {
     val numFoldsF = numFolds.toFloat
     (1 to numFolds).map { fold =>

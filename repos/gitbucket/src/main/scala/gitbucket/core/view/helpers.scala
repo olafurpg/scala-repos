@@ -15,7 +15,9 @@ import play.twirl.api.{Html, HtmlFormat}
   * Provides helper methods for Twirl templates.
   */
 object helpers
-    extends AvatarImageProvider with LinkConverter with RequestCache {
+    extends AvatarImageProvider
+    with LinkConverter
+    with RequestCache {
 
   /**
     * Format java.util.Date to "yyyy-MM-dd HH:mm:ss".
@@ -84,7 +86,8 @@ object helpers
     */
   def plural(count: Int, singular: String, plural: String = ""): String =
     if (count == 1) singular
-    else if (plural.isEmpty) singular + "s" else plural
+    else if (plural.isEmpty) singular + "s"
+    else plural
 
   /**
     * Converts Markdown of Wiki pages to HTML.
@@ -141,8 +144,8 @@ object helpers
     * Tests whether the given file is renderable. It's tested by the file extension.
     */
   def isRenderable(fileName: String): Boolean = {
-    PluginRegistry().renderableExtensions
-      .exists(extension => fileName.toLowerCase.endsWith("." + extension))
+    PluginRegistry().renderableExtensions.exists(extension =>
+          fileName.toLowerCase.endsWith("." + extension))
   }
 
   /**

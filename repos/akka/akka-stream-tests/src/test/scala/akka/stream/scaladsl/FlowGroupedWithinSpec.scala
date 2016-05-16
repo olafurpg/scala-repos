@@ -158,8 +158,7 @@ class FlowGroupedWithinSpec extends AkkaSpec with ScriptedTest {
 
     "group evenly" in {
       def script =
-        Script(
-            TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange map { _ ⇒
           val x, y, z = random.nextInt();
           Seq(x, y, z) -> Seq(immutable.Seq(x, y, z))
         }: _*)

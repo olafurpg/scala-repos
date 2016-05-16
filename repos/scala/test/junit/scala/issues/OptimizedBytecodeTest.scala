@@ -342,8 +342,8 @@ class OptimizedBytecodeTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(compiler)(
         code,
-        allowMessage = _.msg.contains(
-              "exception handler declared in the inlined method"))
+        allowMessage =
+          _.msg.contains("exception handler declared in the inlined method"))
     assertInvoke(getSingleMethod(c, "f1a"), "C", "C$$$anonfun$1")
     assertInvoke(getSingleMethod(c, "f1b"), "C", "wrapper1")
     assertInvoke(getSingleMethod(c, "f2a"), "C", "C$$$anonfun$3")

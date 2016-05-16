@@ -150,7 +150,7 @@ class ProcessSpecification extends Properties("Process I/O") {
         .mkString(File.pathSeparator)
     "java -cp " + thisClasspath + " " + command
   }
-  private def getSource[T : Manifest]: String =
+  private def getSource[T: Manifest]: String =
     IO.classLocationFile[T].getAbsolutePath
 }
 private trait SourceTag

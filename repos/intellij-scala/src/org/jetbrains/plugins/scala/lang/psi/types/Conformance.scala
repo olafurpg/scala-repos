@@ -79,7 +79,7 @@ object Conformance {
     val args1Iterator = args1.iterator
     val args2Iterator = args2.iterator
     while (parametersIterator.hasNext && args1Iterator.hasNext &&
-    args2Iterator.hasNext) {
+           args2Iterator.hasNext) {
       val tp = parametersIterator.next()
       val argsPair = (args1Iterator.next(), args2Iterator.next())
       tp match {
@@ -284,7 +284,8 @@ object Conformance {
                                 ScalaPsiManager.ClassCategory.TYPE)
               if (notNullClass != null) {
                 val notNullType = ScDesignatorType(notNullClass)
-                result = (!conforms(notNullType, l), undefinedSubst) //todo: think about undefinedSubst
+                result =
+                  (!conforms(notNullType, l), undefinedSubst) //todo: think about undefinedSubst
               } else {
                 result = (true, undefinedSubst)
               }
@@ -345,8 +346,8 @@ object Conformance {
             }
             val uBound = subst.subst(upper)
             val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-                a.typeParameters
-                  .map(tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+                a.typeParameters.map(tp =>
+                      (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
                 args)
             val s = subst.followed(genericSubst)
             result = conformsInner(l, s.subst(uBound), visited, undefinedSubst)
@@ -362,8 +363,8 @@ object Conformance {
                     return
                 }
                 val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-                    a.typeParameters
-                      .map(tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+                    a.typeParameters.map(tp =>
+                          (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
                     args)
                 result = conformsInner(
                     l, genericSubst.subst(uBound), visited, undefinedSubst)
@@ -640,18 +641,15 @@ object Conformance {
         processor.getResult
       }
 
-      result = (
-          c.components.forall(comp =>
-                {
-              val t = conformsInner(comp, r, HashSet.empty, undefinedSubst)
-              undefinedSubst = t._2
-              t._1
-          }) && c.signatureMap.forall {
-            case (s: Signature, retType) => workWithSignature(s, retType)
-          } && c.typesMap.forall {
-            case (s, sign) => workWithTypeAlias(sign)
-          },
-          undefinedSubst)
+      result = (c.components.forall(comp => {
+        val t = conformsInner(comp, r, HashSet.empty, undefinedSubst)
+        undefinedSubst = t._2
+        t._1
+      }) && c.signatureMap.forall {
+        case (s: Signature, retType) => workWithSignature(s, retType)
+      } && c.typesMap.forall {
+        case (s, sign) => workWithTypeAlias(sign)
+      }, undefinedSubst)
     }
 
     override def visitProjectionType(proj: ScProjectionType) {
@@ -851,8 +849,7 @@ object Conformance {
         case p2: ScParameterizedType =>
           val args = p2.typeArgs
           val des = p2.designator
-          if (args.length == 1 &&
-              (ScType.extractClass(des) match {
+          if (args.length == 1 && (ScType.extractClass(des) match {
                     case Some(q) => q.qualifiedName == "scala.Array"
                     case _ => false
                   })) {
@@ -1073,8 +1070,8 @@ object Conformance {
           }
           val lBound = subst.subst(lower)
           val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-              a.typeParameters.map(
-                  tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              a.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
               args)
           val s = subst.followed(genericSubst)
           result = conformsInner(s.subst(lBound), r, visited, undefinedSubst)
@@ -1098,8 +1095,8 @@ object Conformance {
           }
           val lBound = lower
           val genericSubst = ScalaPsiUtil.typesCallSubstitutor(
-              a.typeParameters.map(
-                  tp => (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
+              a.typeParameters.map(tp =>
+                    (tp.name, ScalaPsiUtil.getPsiElementId(tp))),
               args)
           result = conformsInner(
               genericSubst.subst(lBound), r, visited, undefinedSubst)
@@ -1116,8 +1113,7 @@ object Conformance {
         case _: JavaArrayType =>
           val args = p.typeArgs
           val des = p.designator
-          if (args.length == 1 &&
-              (ScType.extractClass(des) match {
+          if (args.length == 1 && (ScType.extractClass(des) match {
                     case Some(q) => q.qualifiedName == "scala.Array"
                     case _ => false
                   })) {
@@ -1541,8 +1537,7 @@ object Conformance {
               undefinedSubst = t._2
             }
             if (result == null) {
-              val filterFunction: (((String, PsiElement),
-              HashSet[ScType])) => Boolean = {
+              val filterFunction: (((String, PsiElement), HashSet[ScType])) => Boolean = {
                 case (id: (String, PsiElement), types: HashSet[ScType]) =>
                   !tptsMap.values.exists {
                     case tpt: ScTypeParameterType =>
@@ -1793,11 +1788,11 @@ object Conformance {
       val rightVisitor = new ValDesignatorSimplification {
         override def visitUndefinedType(u2: ScUndefinedType) {
           if (u2.level > u.level) {
-            result = (
-                true, undefinedSubst.addUpper((u2.tpt.name, u2.tpt.getId), u))
+            result =
+              (true, undefinedSubst.addUpper((u2.tpt.name, u2.tpt.getId), u))
           } else if (u.level > u2.level) {
-            result = (
-                true, undefinedSubst.addUpper((u2.tpt.name, u2.tpt.getId), u))
+            result =
+              (true, undefinedSubst.addUpper((u2.tpt.name, u2.tpt.getId), u))
           } else {
             result = (true, undefinedSubst)
           }
@@ -1973,12 +1968,12 @@ object Conformance {
     new ConcurrentWeakHashMap[
         (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)]()
 
-  def conformsInner(
-      l: ScType,
-      r: ScType,
-      visited: Set[PsiClass],
-      unSubst: ScUndefinedSubstitutor,
-      checkWeak: Boolean = false): (Boolean, ScUndefinedSubstitutor) = {
+  def conformsInner(l: ScType,
+                    r: ScType,
+                    visited: Set[PsiClass],
+                    unSubst: ScUndefinedSubstitutor,
+                    checkWeak: Boolean =
+                      false): (Boolean, ScUndefinedSubstitutor) = {
     ProgressManager.checkCanceled()
 
     val key = (l, r, checkWeak)

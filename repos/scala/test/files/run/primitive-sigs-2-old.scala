@@ -19,7 +19,7 @@ class Arr {
   //
   // because java inflict's its reference-only generic-arrays on us.
   //
-  def arr4[T : Manifest](xss: Array[Array[T]]): Array[T] = xss map (_.head)
+  def arr4[T: Manifest](xss: Array[Array[T]]): Array[T] = xss map (_.head)
 }
 
 object Test {

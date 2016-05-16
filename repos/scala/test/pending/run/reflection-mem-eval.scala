@@ -20,8 +20,8 @@ object Test extends MemoryTest {
       def foo[T](x: List[T]) = x
       foo(List(new A {}, new B {}))
     """.trim
-    snippet = snippet + "\n" +
-    (List.fill(50)(snippet.split("\n").last) mkString "\n")
+    snippet =
+      snippet + "\n" + (List.fill(50)(snippet.split("\n").last) mkString "\n")
     tb.eval(tb.parse(snippet))
   }
 }

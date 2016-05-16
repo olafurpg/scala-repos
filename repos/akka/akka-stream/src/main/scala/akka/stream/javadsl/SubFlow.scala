@@ -144,8 +144,7 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     */
   def mapConcat[T](
       f: function.Function[Out, java.lang.Iterable[T]]): SubFlow[In, T, Mat] =
-    new SubFlow(
-        delegate.mapConcat { elem ⇒
+    new SubFlow(delegate.mapConcat { elem ⇒
       Util.immutableSeq(f(elem))
     })
 
@@ -381,8 +380,9 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     *
     * '''Cancels when''' downstream cancels
     */
-  def sliding(n: Int, step: Int = 1)
-    : SubFlow[In, java.util.List[Out @uncheckedVariance], Mat] =
+  def sliding(n: Int,
+              step: Int =
+                1): SubFlow[In, java.util.List[Out @uncheckedVariance], Mat] =
     new SubFlow(delegate.sliding(n, step).map(_.asJava)) // TODO optimize to one step
 
   /**

@@ -52,8 +52,11 @@ class RandomForestModel @Since("1.2.0")(
     extends TreeEnsembleModel(algo,
                               trees,
                               Array.fill(trees.length)(1.0),
-                              combiningStrategy = if (algo == Classification)
-                                  Vote else Average) with Saveable {
+                              combiningStrategy =
+                                if (algo == Classification)
+                                  Vote
+                                else Average)
+    with Saveable {
 
   require(trees.forall(_.algo == algo))
 
@@ -126,7 +129,8 @@ class GradientBoostedTreesModel @Since("1.2.0")(
     @Since("1.2.0") override val trees: Array[DecisionTreeModel],
     @Since("1.2.0") override val treeWeights: Array[Double])
     extends TreeEnsembleModel(
-        algo, trees, treeWeights, combiningStrategy = Sum) with Saveable {
+        algo, trees, treeWeights, combiningStrategy = Sum)
+    with Saveable {
 
   require(trees.length == treeWeights.length)
 
@@ -484,8 +488,8 @@ private[tree] object TreeEnsembleModel extends Logging {
         .parallelize(model.trees.zipWithIndex)
         .flatMap {
           case (tree, treeId) =>
-            tree.topNode.subtreeIterator.toSeq
-              .map(node => NodeData(treeId, node))
+            tree.topNode.subtreeIterator.toSeq.map(node =>
+                  NodeData(treeId, node))
         }
         .toDF()
       dataRDD.write.parquet(Loader.dataPath(path))

@@ -23,7 +23,8 @@ package buffer {
   class Vec2 extends ElemType { type Element = Vec2; type Component = Float1 }
 
   abstract class BaseSeq[T <: ElemType, E]
-      extends IndexedSeq[E] with IndexedSeqOptimized[E, IndexedSeq[E]] {
+      extends IndexedSeq[E]
+      with IndexedSeqOptimized[E, IndexedSeq[E]] {
     def length = 1
     def apply(i: Int): E
   }
@@ -42,7 +43,8 @@ package buffer {
   }
 
   class ArrayVec2(val backingSeq: ArrayFloat1)
-      extends GenericSeq[Vec2] with DataArray[Vec2] {
+      extends GenericSeq[Vec2]
+      with DataArray[Vec2] {
     def this() = this(new ArrayFloat1)
     def apply(i: Int): Vec2 = null
   }

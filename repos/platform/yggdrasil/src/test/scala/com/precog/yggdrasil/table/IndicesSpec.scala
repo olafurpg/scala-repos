@@ -56,7 +56,8 @@ import SampleData._
 // TODO: mix in a trait rather than defining Table directly
 
 trait IndicesSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
+    extends ColumnarTableModuleTestSupport[M]
+    with TableModuleSpec[M]
     with IndicesModule[M] {
   spec =>
 

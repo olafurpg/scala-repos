@@ -12,7 +12,8 @@ import akka.pattern.ask
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SupervisorTreeSpec
-    extends AkkaSpec("akka.actor.serialize-messages = off") with ImplicitSender
+    extends AkkaSpec("akka.actor.serialize-messages = off")
+    with ImplicitSender
     with DefaultTimeout {
 
   "In a 3 levels deep supervisor tree (linked in the constructor) we" must {

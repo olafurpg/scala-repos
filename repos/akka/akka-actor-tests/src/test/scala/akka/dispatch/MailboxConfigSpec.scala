@@ -15,7 +15,9 @@ import scala.concurrent.duration._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class MailboxSpec
-    extends AkkaSpec with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends AkkaSpec
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
   def name: String
 
   def factory: MailboxType ⇒ MessageQueue
@@ -141,7 +143,8 @@ abstract class MailboxSpec
     ensureInitialMailboxState(config, q)
 
     EventFilter.warning(
-        pattern = ".*received dead letter from Actor.*MailboxSpec/deadLetters.*",
+        pattern =
+          ".*received dead letter from Actor.*MailboxSpec/deadLetters.*",
         occurrences = (enqueueN - dequeueN)) intercept {
 
       def createProducer(fromNum: Int, toNum: Int): Future[Vector[Envelope]] =
@@ -168,7 +171,7 @@ abstract class MailboxSpec
         var r = Vector[Envelope]()
 
         while (producers.exists(_.isCompleted == false) ||
-        q.hasMessages) Option(q.dequeue) foreach { message ⇒
+               q.hasMessages) Option(q.dequeue) foreach { message ⇒
           r = r :+ message
         }
 

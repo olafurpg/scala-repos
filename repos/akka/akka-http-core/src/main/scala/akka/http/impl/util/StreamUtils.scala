@@ -181,8 +181,8 @@ private[http] object StreamUtils {
     */
   def oneTimeSource[T, Mat](
       other: Source[T, Mat],
-      errorMsg: String = "One time source can only be instantiated once")
-    : Source[T, Mat] = {
+      errorMsg: String =
+        "One time source can only be instantiated once"): Source[T, Mat] = {
     val onlyOnceFlag = new AtomicBoolean(false)
     other.mapMaterializedValue { elem ⇒
       if (onlyOnceFlag.get() || !onlyOnceFlag.compareAndSet(false, true))
@@ -259,7 +259,8 @@ private[http] object StreamUtils {
 
   /** A one time settable cell */
   class OneTimeWriteCell[T <: AnyRef]
-      extends AtomicReference[T] with ReadableCell[T] {
+      extends AtomicReference[T]
+      with ReadableCell[T] {
     def value: T = {
       val value = get()
       require(value != null, "Value wasn't set yet")

@@ -42,7 +42,8 @@ final class RandomForestRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[
         Vector, RandomForestRegressor, RandomForestRegressionModel]
-    with RandomForestParams with TreeRegressorParams {
+    with RandomForestParams
+    with TreeRegressorParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("rfr"))
@@ -146,7 +147,8 @@ final class RandomForestRegressionModel private[ml](
     private val _trees: Array[DecisionTreeRegressionModel],
     override val numFeatures: Int)
     extends PredictionModel[Vector, RandomForestRegressionModel]
-    with TreeEnsembleModel with Serializable {
+    with TreeEnsembleModel
+    with Serializable {
 
   require(
       numTrees > 0, "RandomForestRegressionModel requires at least 1 tree.")

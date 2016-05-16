@@ -108,8 +108,8 @@ object ScalaSyntheticProvider {
         for {
           interface <- interfaces
           traitImpl <- allTraitImpls
-                          if traitImpl.name().stripSuffix("$class") == interface
-                        .name() && !traitImpl.methodsByName(m.name).isEmpty
+          if traitImpl.name().stripSuffix("$class") == interface.name() &&
+          !traitImpl.methodsByName(m.name).isEmpty
         } {
           return true
         }

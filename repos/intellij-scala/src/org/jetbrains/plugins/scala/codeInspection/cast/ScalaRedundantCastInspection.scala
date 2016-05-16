@@ -22,9 +22,9 @@ class ScalaRedundantCastInspection
                   ElementText("."),
                   ElementText("asInstanceOf")) =>
           for (actualType <- left.getType(TypingContext.empty).toOption;
-          typeArgument <- call.arguments.headOption;
-          castType <- typeArgument.getType(TypingContext.empty)
-                         if actualType.equiv(castType)) {
+               typeArgument <- call.arguments.headOption;
+               castType <- typeArgument.getType(TypingContext.empty)
+               if actualType.equiv(castType)) {
 
             val descriptor = {
               val range = new TextRange(left.getTextLength, call.getTextLength)

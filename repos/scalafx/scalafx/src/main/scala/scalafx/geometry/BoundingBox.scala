@@ -37,7 +37,8 @@ object BoundingBox {
 }
 
 class BoundingBox(override val delegate: jfxg.BoundingBox)
-    extends Bounds(delegate) with SFXDelegate[jfxg.BoundingBox] {
+    extends Bounds(delegate)
+    with SFXDelegate[jfxg.BoundingBox] {
 
   /**
     * Creates a new instance of 2D BoundingBox.

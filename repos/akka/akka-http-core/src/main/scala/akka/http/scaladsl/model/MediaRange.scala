@@ -9,7 +9,9 @@ import akka.http.impl.util._
 import akka.http.javadsl.{model ⇒ jm}
 
 sealed abstract class MediaRange
-    extends jm.MediaRange with Renderable with WithQValue[MediaRange] {
+    extends jm.MediaRange
+    with Renderable
+    with WithQValue[MediaRange] {
   def value: String
   def mainType: String
   def params: Map[String, String]
@@ -50,9 +52,9 @@ sealed abstract class MediaRange
 }
 
 object MediaRange {
-  private[http] def splitOffQValue(
-      params: Map[String, String],
-      defaultQ: Float = 1.0f): (Map[String, String], Float) =
+  private[http] def splitOffQValue(params: Map[String, String],
+                                   defaultQ: Float =
+                                     1.0f): (Map[String, String], Float) =
     params.get("q") match {
       case Some(x) ⇒
         (params - "q") ->
@@ -62,7 +64,8 @@ object MediaRange {
 
   private final case class Custom(
       mainType: String, params: Map[String, String], qValue: Float)
-      extends MediaRange with ValueRenderable {
+      extends MediaRange
+      with ValueRenderable {
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
     def matches(mediaType: MediaType) =
       mainType == "*" || mediaType.mainType == mainType
@@ -94,7 +97,8 @@ object MediaRange {
   }
 
   final case class One(mediaType: MediaType, qValue: Float)
-      extends MediaRange with ValueRenderable {
+      extends MediaRange
+      with ValueRenderable {
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
     def mainType = mediaType.mainType
     def params = mediaType.params
@@ -123,7 +127,8 @@ object MediaRange {
 object MediaRanges extends ObjectRegistry[String, MediaRange] {
 
   sealed abstract case class PredefinedMediaRange(value: String)
-      extends MediaRange with LazyValueBytesRenderable {
+      extends MediaRange
+      with LazyValueBytesRenderable {
     val mainType = value takeWhile (_ != '/')
     register(mainType, this)
     def params = Map.empty

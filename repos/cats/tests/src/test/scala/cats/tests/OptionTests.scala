@@ -40,7 +40,7 @@ class OptionTests extends CatsSuite {
 
   test("Kleisli associativity") {
     forAll { (l: Long, f: Long => Option[Int], g: Int => Option[Char],
-    h: Char => Option[String]) =>
+              h: Char => Option[String]) =>
       val isEq = FlatMapLaws[Option].kleisliAssociativity(f, g, h, l)
       isEq.lhs should ===(isEq.rhs)
     }
@@ -48,7 +48,7 @@ class OptionTests extends CatsSuite {
 
   test("Cokleisli associativity") {
     forAll { (l: Option[Long], f: Option[Long] => Int, g: Option[Int] => Char,
-    h: Option[Char] => String) =>
+              h: Option[Char] => String) =>
       val isEq = CoflatMapLaws[Option].cokleisliAssociativity(f, g, h, l)
       isEq.lhs should ===(isEq.rhs)
     }
@@ -56,7 +56,7 @@ class OptionTests extends CatsSuite {
 
   test("applicative composition") {
     forAll { (fa: Option[Int], fab: Option[Int => Long],
-    fbc: Option[Long => Char]) =>
+              fbc: Option[Long => Char]) =>
       val isEq = ApplicativeLaws[Option].applicativeComposition(fa, fab, fbc)
       isEq.lhs should ===(isEq.rhs)
     }

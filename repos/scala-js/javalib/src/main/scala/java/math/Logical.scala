@@ -55,7 +55,7 @@ private[math] object Logical {
             i += 1
           }
         } else {
-          while ( (i < bi.numberLength) && (bi.digits(i) == -1)) {
+          while ((i < bi.numberLength) && (bi.digits(i) == -1)) {
             i += 1
           }
           if (i == bi.numberLength) {
@@ -407,8 +407,9 @@ private[math] object Logical {
           resDigits(i) = ~bi.digits(i) & (that.digits(i) - 1)
         }
       } else {
-        resDigits(i) = if (iThat < iVal) -bi.digits(i) & that.digits(i)
-        else -bi.digits(i) & (that.digits(i) - 1)
+        resDigits(i) =
+          if (iThat < iVal) -bi.digits(i) & that.digits(i)
+          else -bi.digits(i) & (that.digits(i) - 1)
       }
 
       limit = Math.min(bi.numberLength, that.numberLength)
@@ -735,8 +736,8 @@ private[math] object Logical {
         val limit = Math.min(positive.numberLength, negative.numberLength)
         i += 1
         while (i < limit && {
-          digit = positive.digits(i) ^ ~negative.digits(i); digit
-        } == 0) {
+                 digit = positive.digits(i) ^ ~negative.digits(i); digit
+               } == 0) {
           i += 1
         }
         if (digit == 0) {

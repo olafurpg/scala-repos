@@ -77,8 +77,7 @@ object Enumeratee2TTest extends SpecLite {
 
     val consumer = consume[(Int, Int), Id, List]
     val producer = enum1 cross enum2
-    (consumer &= producer).run must_===
-    (List(
+    (consumer &= producer).run must_=== (List(
             (1, 2),
             (1, 3),
             (1, 4),
@@ -109,11 +108,8 @@ object Enumeratee2TTest extends SpecLite {
     }
 
     val consumer = consume[(Int, Int), Id, List]
-    val producer = joinE[Int, Int, Id]
-      .apply(enum1p, enum2p)
-      .apply[Id]
-      (consumer &= producer).run must_===
-    (List(
+    val producer = joinE[Int, Int, Id].apply(enum1p, enum2p).apply[Id]
+    (consumer &= producer).run must_=== (List(
             (1, 1),
             (1, 1),
             (1, 1)

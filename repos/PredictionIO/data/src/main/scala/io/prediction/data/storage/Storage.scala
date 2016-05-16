@@ -72,10 +72,10 @@ trait BaseStorageClient {
   * @group Storage System
   */
 @DeveloperApi
-case class StorageClientConfig(
-    parallel: Boolean = false, // parallelized access (RDD)?
-    test: Boolean = false, // test mode config
-    properties: Map[String, String] = Map())
+case class StorageClientConfig(parallel: Boolean =
+                                 false, // parallelized access (RDD)?
+                               test: Boolean = false, // test mode config
+                               properties: Map[String, String] = Map())
 
 /** :: DeveloperApi ::
   * Thrown when a StorageClient runs into an exceptional condition
@@ -353,8 +353,7 @@ object Storage extends Logging {
     // use appId=0 for testing purpose
     eventsDb.init(0)
     eventsDb.insert(
-        Event(event = "test", entityType = "test", entityId = "test"),
-        0)
+        Event(event = "test", entityType = "test", entityId = "test"), 0)
     eventsDb.remove(0)
     eventsDb.close()
   }
@@ -402,7 +401,7 @@ object Storage extends Logging {
                 "config" -> cm.config.properties
                   .map(t => s"${t._1} -> ${t._2}")
                   .mkString(", ")
-              )
+            )
           }.getOrElse(Map.empty)
       }
   )

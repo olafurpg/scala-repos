@@ -52,13 +52,13 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
         reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
-        (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
+          (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
       }
 
       "from '2011-12-03T10:15:30+01:00[Europe/Paris]' (with time zone)" in {
         reads(JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
           .aka("read date") must_==
-        (JsSuccess(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")))
+          (JsSuccess(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")))
       }
     }
 
@@ -132,9 +132,9 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
       "from a number" in {
         reads(JsNumber(123L)) aka "read date" must beLike {
-          case JsError((
-              _,
-              ValidationError("error.expected.date" :: Nil) :: Nil) :: Nil) =>
+          case JsError(
+              (_,
+               ValidationError("error.expected.date" :: Nil) :: Nil) :: Nil) =>
             ok
         }
       }
@@ -227,13 +227,13 @@ object ReadsSpec extends org.specs2.mutable.Specification {
     "be successfully read with default implicit" >> {
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
         reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
-        (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
+          (JsSuccess(dateTime("2011-12-03T10:15:30+01:00")))
       }
 
       "from '2011-12-03T10:15:30+01:00[Europe/Paris]' (with time zone)" in {
         reads(JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
           .aka("read date") must_==
-        (JsSuccess(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")))
+          (JsSuccess(dateTime("2011-12-03T10:15:30+01:00[Europe/Paris]")))
       }
     }
 
@@ -408,19 +408,19 @@ object ReadsSpec extends org.specs2.mutable.Specification {
 
       "from '2011-12-03T10:15:30+01:00' (with TZ offset)" in {
         reads(JsString("2011-12-03T10:15:30+01:00")) aka "read date" must_==
-        (JsSuccess(Instant.parse("2011-12-03T09:15:30Z")))
+          (JsSuccess(Instant.parse("2011-12-03T09:15:30Z")))
       }
 
       "from '2011-12-03T10:15:30+01:00[Europe/Paris]' (with time zone)" in {
         reads(JsString("2011-12-03T10:15:30+01:00[Europe/Paris]"))
           .aka("read date") must_==
-        (JsSuccess(Instant.parse("2011-12-03T09:15:30Z")))
+          (JsSuccess(Instant.parse("2011-12-03T09:15:30Z")))
       }
 
       "from '2011-12-03T00:00:00+01:00[Europe/Paris]' (with time zone)" in {
         reads(JsString("2011-12-03T00:00:00+01:00[Europe/Paris]"))
           .aka("read date") must_==
-        (JsSuccess(Instant.parse("2011-12-02T23:00:00Z")))
+          (JsSuccess(Instant.parse("2011-12-02T23:00:00Z")))
       }
     }
 

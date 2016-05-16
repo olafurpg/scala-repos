@@ -28,7 +28,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
   */
 class ScFunctionDefinitionImpl protected (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition {
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScFunctionDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScFunctionStub) = {

@@ -38,10 +38,11 @@ class HDFSStateLaws extends WordSpec {
     withTmpDir { path =>
       val startDate: Timestamp = RichDate("2012-12-26T09:45").value
       val numBatches: Long = 10
-      val state = HDFSState(
-          path,
-          startTime = Some(startDate),
-          numBatches = numBatches) //startDate is specified for the first run
+      val state =
+        HDFSState(path,
+                  startTime = Some(startDate),
+                  numBatches =
+                    numBatches) //startDate is specified for the first run
       val preparedState = state.begin
       val requested = preparedState.requested
 
@@ -102,10 +103,10 @@ class HDFSStateLaws extends WordSpec {
   def leftClosedRightOpenInterval(low: Timestamp, high: Timestamp) =
     Interval.leftClosedRightOpen[Timestamp](low, high).right.get
 
-  def shouldNotAcceptInterval(
-      state: WaitingState[Interval[Timestamp]],
-      interval: Interval[Timestamp],
-      message: String = "PreparedState accepted a bad Interval!") = {
+  def shouldNotAcceptInterval(state: WaitingState[Interval[Timestamp]],
+                              interval: Interval[Timestamp],
+                              message: String =
+                                "PreparedState accepted a bad Interval!") = {
     state.begin.willAccept(interval) match {
       case Left(t) => t
       case Right(t) => sys.error(message)

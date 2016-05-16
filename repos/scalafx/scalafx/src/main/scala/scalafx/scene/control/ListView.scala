@@ -49,7 +49,8 @@ object ListView {
   }
 
   class EditEvent[T](override val delegate: jfxsc.ListView.EditEvent[T])
-      extends Event(delegate) with SFXDelegate[jfxsc.ListView.EditEvent[T]] {
+      extends Event(delegate)
+      with SFXDelegate[jfxsc.ListView.EditEvent[T]] {
 
     /**
       * Creates a new EditEvent instance to represent an edit event. This event is used for
@@ -108,7 +109,8 @@ object ListView {
   */
 class ListView[T](
     override val delegate: jfxsc.ListView[T] = new jfxsc.ListView[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.ListView[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ListView[T]] {
 
   /**
     * Creates a default ListView which will stack the contents retrieved from the provided

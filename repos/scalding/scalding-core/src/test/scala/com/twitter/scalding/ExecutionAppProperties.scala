@@ -31,17 +31,17 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
     sys.error(errorMsg)
   }
 
-  property("Non-hadoop random args will all end up in the right bucket") = forAll {
-    (args: Array[String]) =>
+  property("Non-hadoop random args will all end up in the right bucket") =
+    forAll { (args: Array[String]) =>
       val (hadoopArgs, nonHadoop) = ExecutionApp.extractUserHadoopArgs(args)
       val res =
         hadoopArgs.toArray.isEmpty && nonHadoop.toArray.sameElements(args)
       if (!res) debugPrint(args, hadoopArgs, nonHadoop)
       res
-  }
+    }
 
-  property("adding an hadoop lib jars in the middle will extract it right") = forAll {
-    (leftArgs: Array[String], rightArgs: Array[String]) =>
+  property("adding an hadoop lib jars in the middle will extract it right") =
+    forAll { (leftArgs: Array[String], rightArgs: Array[String]) =>
       // in the process of validating the hadoop args we give this to generic options parser
       // as a result this file must exist. the parser enforces this.
       val inputHadoopArgs = Array("-libjars", "/etc/hosts")
@@ -54,10 +54,10 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
         (inputHadoopArgs.sameElements(hadoopArgs.toArray))
       if (!res) debugPrint(totalArgStr, hadoopArgs, nonHadoop)
       res
-  }
+    }
 
-  property("adding an hadoop -D parameter in the middle will extract it right") = forAll {
-    (leftArgs: Array[String], rightArgs: Array[String]) =>
+  property("adding an hadoop -D parameter in the middle will extract it right") =
+    forAll { (leftArgs: Array[String], rightArgs: Array[String]) =>
       val inputHadoopArgs = Array("-Dx.y.z=123")
       val totalArgStr = leftArgs ++ inputHadoopArgs ++ rightArgs
       val (hadoopArgs, nonHadoop) =
@@ -68,5 +68,5 @@ object ExecutionAppProperties extends Properties("ExecutionApp Properties") {
         (inputHadoopArgs.sameElements(hadoopArgs.toArray))
       if (!res) debugPrint(totalArgStr, hadoopArgs, nonHadoop)
       res
-  }
+    }
 }

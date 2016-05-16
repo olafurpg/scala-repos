@@ -507,12 +507,12 @@ class MarathonModule(conf: MarathonConf, http: HttpConf, zk: ZooKeeperClient)
         metrics,
         prefix = "task:",
         newState = () =>
-            MarathonTaskState(
-                MarathonTask
-                  .newBuilder()
-                  .setId(UUID.randomUUID().toString)
-                  .build())
-      )
+          MarathonTaskState(
+              MarathonTask
+                .newBuilder()
+                .setId(UUID.randomUUID().toString)
+                .build())
+    )
   }
 
   @Named(ModuleNames.STORE_EVENT_SUBSCRIBERS)

@@ -8,8 +8,7 @@ trait Iso[T, U] {
 
 object Iso {
   implicit def materializeIso[T, U]: Iso[T, U] = macro impl[T, U]
-  def impl[T : c.WeakTypeTag, U : c.WeakTypeTag](
-      c: Context): c.Expr[Iso[T, U]] = {
+  def impl[T: c.WeakTypeTag, U: c.WeakTypeTag](c: Context): c.Expr[Iso[T, U]] = {
     import c.universe._
     import definitions._
     import Flag._

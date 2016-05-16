@@ -26,13 +26,13 @@ class URITest {
       query: String = null,
       scheme: String = null,
       userInfo: String = null,
-      schemeSpecificPart: String = null)(
-      rawAuthority: String = authority,
-      rawFragment: String = fragment,
-      rawPath: String = path,
-      rawQuery: String = query,
-      rawUserInfo: String = userInfo,
-      rawSchemeSpecificPart: String = schemeSpecificPart): Unit = {
+      schemeSpecificPart: String = null)(rawAuthority: String = authority,
+                                         rawFragment: String = fragment,
+                                         rawPath: String = path,
+                                         rawQuery: String = query,
+                                         rawUserInfo: String = userInfo,
+                                         rawSchemeSpecificPart: String =
+                                           schemeSpecificPart): Unit = {
 
     assertEquals(authority, uri.getAuthority())
     assertEquals(fragment, uri.getFragment())
@@ -63,37 +63,37 @@ class URITest {
   }
 
   @Test def should_parse_absolute_URIs_with_empty_path(): Unit = {
-    expectURI(new URI("http://foo:bar"), true, false)(
-        authority = "foo:bar",
-        path = "",
-        scheme = "http",
-        schemeSpecificPart = "//foo:bar")()
+    expectURI(new URI("http://foo:bar"), true, false)(authority = "foo:bar",
+                                                      path = "",
+                                                      scheme = "http",
+                                                      schemeSpecificPart =
+                                                        "//foo:bar")()
   }
 
   @Test def should_parse_absolute_URIs_with_IPv6(): Unit = {
     val uri = new URI("http://hans@[ffff::0:128.4.5.3]:345/~hans/")
-    expectURI(uri, true, false)(
-        scheme = "http",
-        host = "[ffff::0:128.4.5.3]",
-        userInfo = "hans",
-        port = 345,
-        path = "/~hans/",
-        authority = "hans@[ffff::0:128.4.5.3]:345",
-        schemeSpecificPart = "//hans@[ffff::0:128.4.5.3]:345/~hans/")()
+    expectURI(uri, true, false)(scheme = "http",
+                                host = "[ffff::0:128.4.5.3]",
+                                userInfo = "hans",
+                                port = 345,
+                                path = "/~hans/",
+                                authority = "hans@[ffff::0:128.4.5.3]:345",
+                                schemeSpecificPart =
+                                  "//hans@[ffff::0:128.4.5.3]:345/~hans/")()
   }
 
   @Test def should_parse_absolute_URIs_without_authority(): Unit = {
-    expectURI(new URI("file:/~/calendar"), true, false)(
-        scheme = "file",
-        path = "/~/calendar",
-        schemeSpecificPart = "/~/calendar")()
+    expectURI(new URI("file:/~/calendar"), true, false)(scheme = "file",
+                                                        path = "/~/calendar",
+                                                        schemeSpecificPart =
+                                                          "/~/calendar")()
   }
 
   @Test def should_parse_absolute_URIs_with_empty_authority(): Unit = {
-    expectURI(new URI("file:///~/calendar"), true, false)(
-        scheme = "file",
-        path = "/~/calendar",
-        schemeSpecificPart = "///~/calendar")()
+    expectURI(new URI("file:///~/calendar"), true, false)(scheme = "file",
+                                                          path = "/~/calendar",
+                                                          schemeSpecificPart =
+                                                            "///~/calendar")()
   }
 
   @Test def should_parse_opaque_URIs(): Unit = {
@@ -108,16 +108,17 @@ class URITest {
   }
 
   @Test def should_parse_relative_URIs(): Unit = {
-    expectURI(
-        new URI("docs/guide/collections/designfaq.html#28"), false, false)(
-        path = "docs/guide/collections/designfaq.html",
-        fragment = "28",
-        schemeSpecificPart = "docs/guide/collections/designfaq.html")()
+    expectURI(new URI("docs/guide/collections/designfaq.html#28"),
+              false,
+              false)(path = "docs/guide/collections/designfaq.html",
+                     fragment = "28",
+                     schemeSpecificPart =
+                       "docs/guide/collections/designfaq.html")()
     expectURI(new URI("../../../demo/jfc/SwingSet2/src/SwingSet2.java"),
               false,
-              false)(
-        path = "../../../demo/jfc/SwingSet2/src/SwingSet2.java",
-        schemeSpecificPart = "../../../demo/jfc/SwingSet2/src/SwingSet2.java")()
+              false)(path = "../../../demo/jfc/SwingSet2/src/SwingSet2.java",
+                     schemeSpecificPart =
+                       "../../../demo/jfc/SwingSet2/src/SwingSet2.java")()
   }
 
   @Test def should_parse_relative_URIs_with_IPv4(): Unit = {
@@ -130,10 +131,10 @@ class URITest {
   }
 
   @Test def should_parse_relative_URIs_with_registry_based_authority(): Unit = {
-    expectURI(new URI("//foo:bar"), false, false)(
-        authority = "foo:bar",
-        path = "",
-        schemeSpecificPart = "//foo:bar")()
+    expectURI(new URI("//foo:bar"), false, false)(authority = "foo:bar",
+                                                  path = "",
+                                                  schemeSpecificPart =
+                                                    "//foo:bar")()
   }
 
   @Test def should_parse_relative_URIs_with_escapes(): Unit = {
@@ -155,11 +156,11 @@ class URITest {
   }
 
   @Test def should_parse_relative_URIs_with_query_and_fragment(): Unit = {
-    expectURI(new URI("?query=1#foo"), false, false)(
-        query = "query=1",
-        fragment = "foo",
-        path = "",
-        schemeSpecificPart = "?query=1")()
+    expectURI(new URI("?query=1#foo"), false, false)(query = "query=1",
+                                                     fragment = "foo",
+                                                     path = "",
+                                                     schemeSpecificPart =
+                                                       "?query=1")()
   }
 
   @Test def should_provide_compareTo(): Unit = {
@@ -371,7 +372,8 @@ class URITest {
               false,
               false)(path = "こaんにちは", schemeSpecificPart = "こaんにちは")(
         rawPath = "%e3%81%93a%e3%82%93%e3%81%AB%e3%81%a1%e3%81%af",
-        rawSchemeSpecificPart = "%e3%81%93a%e3%82%93%e3%81%AB%e3%81%a1%e3%81%af")
+        rawSchemeSpecificPart =
+          "%e3%81%93a%e3%82%93%e3%81%AB%e3%81%a1%e3%81%af")
   }
 
   @Test def should_support_toASCIIString(): Unit = {
@@ -386,30 +388,30 @@ class URITest {
   }
 
   @Test def should_replace_when_bad_surrogates_are_present(): Unit = {
-    expectURI(new URI("http://booh/%E3a"), true, false)(
-        scheme = "http",
-        host = "booh",
-        path = "/�a",
-        authority = "booh",
-        schemeSpecificPart = "//booh/�a")(
+    expectURI(new URI("http://booh/%E3a"), true, false)(scheme = "http",
+                                                        host = "booh",
+                                                        path = "/�a",
+                                                        authority = "booh",
+                                                        schemeSpecificPart =
+                                                          "//booh/�a")(
         rawPath = "/%E3a", rawSchemeSpecificPart = "//booh/%E3a")
 
     // lowercase e is kept
-    expectURI(new URI("http://booh/%e3a"), true, false)(
-        scheme = "http",
-        host = "booh",
-        path = "/�a",
-        authority = "booh",
-        schemeSpecificPart = "//booh/�a")(
+    expectURI(new URI("http://booh/%e3a"), true, false)(scheme = "http",
+                                                        host = "booh",
+                                                        path = "/�a",
+                                                        authority = "booh",
+                                                        schemeSpecificPart =
+                                                          "//booh/�a")(
         rawPath = "/%e3a", rawSchemeSpecificPart = "//booh/%e3a")
 
     // %E3%81 is considered as 1 malformed
-    expectURI(new URI("http://booh/%E3%81a"), true, false)(
-        scheme = "http",
-        host = "booh",
-        path = "/�a",
-        authority = "booh",
-        schemeSpecificPart = "//booh/�a")(
+    expectURI(new URI("http://booh/%E3%81a"), true, false)(scheme = "http",
+                                                           host = "booh",
+                                                           path = "/�a",
+                                                           authority = "booh",
+                                                           schemeSpecificPart =
+                                                             "//booh/�a")(
         rawPath = "/%E3%81a", rawSchemeSpecificPart = "//booh/%E3%81a")
 
     if (!executingInJVM) {
@@ -420,9 +422,9 @@ class URITest {
           host = "booh",
           path = "/��a",
           authority = "booh",
-          schemeSpecificPart = "//booh/��a")(
-          rawPath = "/%E3%E3a",
-          rawSchemeSpecificPart = "//booh/%E3%E3a")
+          schemeSpecificPart = "//booh/��a")(rawPath = "/%E3%E3a",
+                                             rawSchemeSpecificPart =
+                                               "//booh/%E3%E3a")
     }
   }
 

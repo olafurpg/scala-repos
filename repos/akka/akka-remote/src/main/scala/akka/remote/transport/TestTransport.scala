@@ -42,8 +42,8 @@ class TestTransport(val localAddress: Address,
 
   private val associationListenerPromise = Promise[AssociationEventListener]()
 
-  private def defaultListen: Future[
-      (Address, Promise[AssociationEventListener])] = {
+  private def defaultListen: Future[(Address,
+                                     Promise[AssociationEventListener])] = {
     registry.registerTransport(this, associationListenerPromise.future)
     Future.successful((localAddress, associationListenerPromise))
   }
@@ -263,10 +263,9 @@ object TestTransport {
       val controlPromise: Promise[Unit] = Promise()
       val originalBehavior = currentBehavior
 
-      push(
-          (params: A) ⇒
+      push((params: A) ⇒
             for (delayed ← controlPromise.future;
-            original ← originalBehavior(params)) yield original)
+                 original ← originalBehavior(params)) yield original)
 
       controlPromise
     }
@@ -330,9 +329,10 @@ object TestTransport {
       * @param listenerPair pair of listeners in initiator, receiver order.
       * @return
       */
-    def remoteListenerRelativeTo(handle: TestAssociationHandle,
-                                 listenerPair: (HandleEventListener,
-                                 HandleEventListener)): HandleEventListener = {
+    def remoteListenerRelativeTo(
+        handle: TestAssociationHandle,
+        listenerPair: (HandleEventListener, HandleEventListener))
+      : HandleEventListener = {
       listenerPair match {
         case (initiator, receiver) ⇒
           if (handle.inbound) initiator else receiver
@@ -422,8 +422,8 @@ object TestTransport {
       * @return
       *   The original entries.
       */
-    def deregisterAssociation(key: (Address,
-        Address)): Option[(HandleEventListener, HandleEventListener)] =
+    def deregisterAssociation(key: (Address, Address))
+      : Option[(HandleEventListener, HandleEventListener)] =
       Option(listenersTable.remove(key))
 
     /**

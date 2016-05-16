@@ -26,7 +26,9 @@ import org.apache.spark.sql.test.SQLTestUtils
   * numerical differences or due semantic differences between Hive and Spark.
   */
 class WindowQuerySuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
 
   override def beforeAll(): Unit = {
     sql("DROP TABLE IF EXISTS part")

@@ -57,7 +57,7 @@ object Util extends Build {
       ),
       resolvers += "twitter repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
-      (CrossVersion.partialVersion(scalaVersion.value) match {
+        (CrossVersion.partialVersion(scalaVersion.value) match {
             case Some((2, 10)) => false
             case _ => true
           }),
@@ -114,7 +114,8 @@ object Util extends Build {
     Project(
         id = "util",
         base = file("."),
-        settings = Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings
+        settings =
+          Defaults.coreDefaultSettings ++ sharedSettings ++ unidocSettings
     ) aggregate
     (utilFunction, utilRegistry, utilCore, utilCodec, utilCollection,
         utilCache, utilReflect, utilLint, utilLogging, utilTest, utilThrift,
@@ -134,7 +135,8 @@ object Util extends Build {
   lazy val utilBenchmark = Project(
       id = "util-benchmark",
       base = file("util-benchmark"),
-      settings = Defaults.coreDefaultSettings ++ sharedSettings ++ JmhPlugin.projectSettings
+      settings =
+        Defaults.coreDefaultSettings ++ sharedSettings ++ JmhPlugin.projectSettings
   ).enablePlugins(JmhPlugin)
     .settings(
         name := "util-benchmark"

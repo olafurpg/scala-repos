@@ -21,9 +21,10 @@ object PairingSystem extends AbstractPairingSystem {
                      ranking: Ranking): Fu[Pairings] = {
     for {
       lastOpponents <- PairingRepo.lastOpponents(
-          tour.id, users.all, Math.min(100, users.size * 4))
+                          tour.id, users.all, Math.min(100, users.size * 4))
       onlyTwoActivePlayers <- (tour.nbPlayers > 20).fold(
-          fuccess(false), PlayerRepo.countActive(tour.id).map(2 ==))
+                                 fuccess(false),
+                                 PlayerRepo.countActive(tour.id).map(2 ==))
       data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
       preps <- if (lastOpponents.hash.isEmpty) evenOrAll(data, users)
               else
@@ -32,8 +33,8 @@ object PairingSystem extends AbstractPairingSystem {
                   case _ => evenOrAll(data, users)
                 }
       pairings <- preps.map { prep =>
-        UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
-      }.sequenceFu
+                   UserRepo.firstGetsWhite(prep.user1.some, prep.user2.some) map prep.toPairing
+                 }.sequenceFu
     } yield pairings
   }.chronometer
     .logIfSlow(500, pairingLogger) { pairings =>
@@ -108,13 +109,15 @@ object PairingSystem extends AbstractPairingSystem {
         pairs.foreach {
           case (a, b) =>
             // lower is better
-            i = i + Math.abs(a.rank - b.rank) * 1000 +
-            Math.abs(a.player.rating - b.player.rating) +
-            justPlayedTogether(a.player.userId, b.player.userId).?? {
-              if (veryMuchJustPlayedTogether(a.player.userId, b.player.userId))
-                9000 * 1000
-              else 8000 * 1000
-            }
+            i =
+              i + Math.abs(a.rank - b.rank) * 1000 +
+              Math.abs(a.player.rating - b.player.rating) +
+              justPlayedTogether(a.player.userId, b.player.userId).?? {
+                if (veryMuchJustPlayedTogether(a.player.userId,
+                                               b.player.userId))
+                  9000 * 1000
+                else 8000 * 1000
+              }
         }
         i
       }

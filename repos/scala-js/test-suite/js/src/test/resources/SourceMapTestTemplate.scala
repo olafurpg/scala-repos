@@ -271,21 +271,19 @@ trait Writer {
 
       /**/
       var first = true
-      kvs.foreach(
-          kv =>
-            {
+      kvs.foreach(kv => {
 
-          /**/
-          val (k, v) = kv
-          if (first) first = false
-          else sb.append(", ")
+        /**/
+        val (k, v) = kv
+        if (first) first = false
+        else sb.append(", ")
 
-          /**/
-          writeToBuffer(JsString(k), sb)
-          sb.append(": ")
+        /**/
+        writeToBuffer(JsString(k), sb)
+        sb.append(": ")
 
-          /**/
-          writeToBuffer(v, sb)
+        /**/
+        writeToBuffer(v, sb)
       })
       sb.append("}")
 
@@ -425,17 +423,18 @@ class Json extends Writer2 {
         /**/
         ch = s.charAt(pos) /**/
         /**/
-        chKind = /***/ if (ch < 255) {
+        chKind =
+          /***/ if (ch < 255) {
 
-          /**/
-          /**/ /***/
-          charKind(ch)
-        } else {
+            /**/
+            /**/ /***/
+            charKind(ch)
+          } else {
 
-          /**/
-          /**/ /***/
-          Other
-        } /**/
+            /**/
+            /**/ /***/
+            Other
+          } /**/
         pos += 1
         if (ch == '\n'.toInt) {
           chLinePos += 1

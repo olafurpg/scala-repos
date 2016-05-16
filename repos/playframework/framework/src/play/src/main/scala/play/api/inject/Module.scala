@@ -66,7 +66,7 @@ abstract class Module {
   /**
     * Create a binding key for the given class.
     */
-  final def bind[T : ClassTag]: BindingKey[T] = play.api.inject.bind[T]
+  final def bind[T: ClassTag]: BindingKey[T] = play.api.inject.bind[T]
 
   /**
     * Create a seq.

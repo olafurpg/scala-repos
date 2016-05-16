@@ -28,7 +28,7 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
     //OPT this method is public so we can do `manual inlining`
     def undoTo(limit: UndoPairs) {
       assertCorrectThread()
-      while ( (log ne limit) && log.nonEmpty) {
+      while ((log ne limit) && log.nonEmpty) {
         val UndoPair(tv, constr) = log.head
         tv.constr = constr
         log = log.tail
@@ -145,9 +145,10 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
 
     def instWithinBounds = instValid && isWithinBounds(inst)
 
-    def isWithinBounds(tp: Type): Boolean = (lobounds.forall(_ <:< tp) &&
-        hibounds.forall(tp <:< _) && (numlo == NoType || (numlo weak_<:< tp)) &&
-        (numhi == NoType || (tp weak_<:< numhi)))
+    def isWithinBounds(tp: Type): Boolean =
+      (lobounds.forall(_ <:< tp) && hibounds.forall(tp <:< _) &&
+          (numlo == NoType || (numlo weak_<:< tp)) &&
+          (numhi == NoType || (tp weak_<:< numhi)))
 
     var inst: Type = NoType // @M reduce visibility?
 
@@ -201,17 +202,15 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
           if (up) tparam.info.bounds.hi else tparam.info.bounds.lo
         //Console.println("solveOne0(tv, tp, v, b)="+(tvar, tparam, variance, bound))
         var cyclic = bound contains tparam
-        foreach3(tvars, tparams, variances)((tvar2, tparam2, variance2) =>
-              {
-            val ok =
-              (tparam2 != tparam) &&
-              ((bound contains tparam2) ||
-                  up && (tparam2.info.bounds.lo =:= tparam.tpeHK) || !up &&
-                  (tparam2.info.bounds.hi =:= tparam.tpeHK))
-            if (ok) {
-              if (tvar2.constr.inst eq null) cyclic = true
-              solveOne(tvar2, tparam2, variance2)
-            }
+        foreach3(tvars, tparams, variances)((tvar2, tparam2, variance2) => {
+          val ok =
+            (tparam2 != tparam) && ((bound contains tparam2) || up &&
+                (tparam2.info.bounds.lo =:= tparam.tpeHK) ||
+                !up && (tparam2.info.bounds.hi =:= tparam.tpeHK))
+          if (ok) {
+            if (tvar2.constr.inst eq null) cyclic = true
+            solveOne(tvar2, tparam2, variance2)
+          }
         })
         if (!cyclic) {
           if (up) {
@@ -245,7 +244,8 @@ private[internal] trait TypeConstraints { self: SymbolTable =>
             }
           }
         }
-        tvar.constr.inst = NoType // necessary because hibounds/lobounds may contain tvar
+        tvar.constr.inst =
+          NoType // necessary because hibounds/lobounds may contain tvar
 
         //println("solving "+tvar+" "+up+" "+(if (up) (tvar.constr.hiBounds) else tvar.constr.loBounds)+((if (up) (tvar.constr.hiBounds) else tvar.constr.loBounds) map (_.widen)))
         val newInst =

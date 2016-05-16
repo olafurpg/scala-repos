@@ -31,7 +31,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
 
 class DecisionTreeClassifierSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import DecisionTreeClassifierSuite.compareAPIs
@@ -46,8 +47,8 @@ class DecisionTreeClassifierSuite
 
   override def beforeAll() {
     super.beforeAll()
-    categoricalDataPointsRDD = sc.parallelize(
-        OldDecisionTreeSuite.generateCategoricalDataPoints())
+    categoricalDataPointsRDD =
+      sc.parallelize(OldDecisionTreeSuite.generateCategoricalDataPoints())
     orderedLabeledPointsWithLabel0RDD = sc.parallelize(
         OldDecisionTreeSuite.generateOrderedLabeledPointsWithLabel0())
     orderedLabeledPointsWithLabel1RDD = sc.parallelize(
@@ -131,7 +132,8 @@ class DecisionTreeClassifierSuite
   test("Multiclass classification stump with unordered categorical features," +
       " with just enough bins") {
     val maxBins =
-      2 * (math.pow(2, 3 - 1).toInt - 1) // just enough bins to allow unordered features
+      2 * (math.pow(2, 3 - 1).toInt -
+          1) // just enough bins to allow unordered features
     val rdd = categoricalDataPointsForMulticlassRDD
     val dt = new DecisionTreeClassifier()
       .setImpurity("Gini")

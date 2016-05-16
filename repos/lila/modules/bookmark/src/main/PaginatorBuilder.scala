@@ -36,8 +36,8 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
                              _ sort sorting skip offset,
                              length.some)(_.asOpt[String])
         games ← lila.game.tube.gameTube |> { implicit t =>
-          $find.byOrderedIds[Game](gameIds)
-        }
+                 $find.byOrderedIds[Game](gameIds)
+               }
       } yield
         games map { g =>
           Bookmark(g, user)

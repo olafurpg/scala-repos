@@ -62,7 +62,8 @@ trait ParSeqLike[
 
   /** Used to iterate elements using indices */
   protected abstract class Elements(start: Int, val end: Int)
-      extends SeqSplitter[T] with BufferedIterator[T] {
+      extends SeqSplitter[T]
+      with BufferedIterator[T] {
     private var i = start
 
     def hasNext = i < end
@@ -399,7 +400,8 @@ trait ParSeqLike[
   }
 
   protected trait Transformer[R, Tp]
-      extends Accessor[R, Tp] with super.Transformer[R, Tp]
+      extends Accessor[R, Tp]
+      with super.Transformer[R, Tp]
 
   protected[this] class SegmentLength(
       pred: T => Boolean, from: Int, protected[this] val pit: SeqSplitter[T])
@@ -443,10 +445,11 @@ trait ParSeqLike[
         new IndexWhere(pred, untilp, p)
     }
     override def merge(that: IndexWhere) =
-      result = if (result == -1) that.result
-      else {
-        if (that.result != -1) result min that.result else result
-      }
+      result =
+        if (result == -1) that.result
+        else {
+          if (that.result != -1) result min that.result else result
+        }
     override def requiresStrictSplitters = true
   }
 
@@ -469,10 +472,11 @@ trait ParSeqLike[
         new LastIndexWhere(pred, untilp, p)
     }
     override def merge(that: LastIndexWhere) =
-      result = if (result == -1) that.result
-      else {
-        if (that.result != -1) result max that.result else result
-      }
+      result =
+        if (result == -1) that.result
+        else {
+          if (that.result != -1) result max that.result else result
+        }
     override def requiresStrictSplitters = true
   }
 
@@ -516,7 +520,8 @@ trait ParSeqLike[
       val fp = pit.remaining / 2
       val sp = pit.remaining - fp
       for ((p, op) <- pit.psplitWithSignalling(fp, sp) zip otherpit
-        .psplitWithSignalling(fp, sp)) yield new SameElements(p, op)
+                       .psplitWithSignalling(fp, sp)) yield
+        new SameElements(p, op)
     }
     override def merge(that: SameElements[U]) = result = result && that.result
     override def requiresStrictSplitters = true
@@ -583,7 +588,8 @@ trait ParSeqLike[
       val fp = pit.remaining / 2
       val sp = pit.remaining - fp
       for ((p, op) <- pit.psplitWithSignalling(fp, sp) zip otherpit
-        .psplitWithSignalling(fp, sp)) yield new Corresponds(corr, p, op)
+                       .psplitWithSignalling(fp, sp)) yield
+        new Corresponds(corr, p, op)
     }
     override def merge(that: Corresponds[S]) = result = result && that.result
     override def requiresStrictSplitters = true

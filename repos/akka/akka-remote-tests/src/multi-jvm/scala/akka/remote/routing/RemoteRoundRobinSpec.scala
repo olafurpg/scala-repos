@@ -74,8 +74,10 @@ class RemoteRoundRobinMultiJvmNode3 extends RemoteRoundRobinSpec
 class RemoteRoundRobinMultiJvmNode4 extends RemoteRoundRobinSpec
 
 class RemoteRoundRobinSpec
-    extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteRoundRobinMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -137,11 +139,11 @@ class RemoteRoundRobinSpec
 
       runOn(fourth) {
         enterBarrier("start")
-        val actor =
-          system.actorOf(RoundRobinPool(nrOfInstances = 1,
-                                        resizer = Some(new TestResizer))
-                           .props(Props[SomeActor]),
-                         "service-hello2")
+        val actor = system.actorOf(
+            RoundRobinPool(nrOfInstances = 1,
+                           resizer =
+                             Some(new TestResizer)).props(Props[SomeActor]),
+            "service-hello2")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         actor ! GetRoutees

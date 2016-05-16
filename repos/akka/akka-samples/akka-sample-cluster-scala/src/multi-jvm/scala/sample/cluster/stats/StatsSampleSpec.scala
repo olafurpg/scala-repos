@@ -75,8 +75,11 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
 
 abstract class StatsSampleSpec
-    extends MultiNodeSpec(StatsSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSpecConfig._
 

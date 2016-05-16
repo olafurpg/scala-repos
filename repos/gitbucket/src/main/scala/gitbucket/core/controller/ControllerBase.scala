@@ -24,9 +24,13 @@ import scala.util.Try
   * Provides generic features for controller implementations.
   */
 abstract class ControllerBase
-    extends ScalatraFilter with ClientSideValidationFormSupport
-    with JacksonJsonSupport with I18nSupport with FlashMapSupport
-    with Validations with SystemSettingsService {
+    extends ScalatraFilter
+    with ClientSideValidationFormSupport
+    with JacksonJsonSupport
+    with I18nSupport
+    with FlashMapSupport
+    with Validations
+    with SystemSettingsService {
 
   implicit val jsonFormats = gitbucket.core.api.JsonFormat.jsonFormats
 
@@ -104,8 +108,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxGet[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxGet[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxGet(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -117,8 +121,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxPost[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxPost[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxPost(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -159,14 +163,14 @@ abstract class ControllerBase
     }
 
   // TODO Scala 2.11
-  override def url(path: String,
-                   params: Iterable[(String, Any)] = Iterable.empty,
-                   includeContextPath: Boolean = true,
-                   includeServletPath: Boolean = true,
-                   absolutize: Boolean = true,
-                   withSessionId: Boolean = true)(
-      implicit request: HttpServletRequest,
-      response: HttpServletResponse): String =
+  override def url(
+      path: String,
+      params: Iterable[(String, Any)] = Iterable.empty,
+      includeContextPath: Boolean = true,
+      includeServletPath: Boolean = true,
+      absolutize: Boolean = true,
+      withSessionId: Boolean = true)(implicit request: HttpServletRequest,
+                                     response: HttpServletResponse): String =
     if (path.startsWith("http")) path
     else baseUrl + super.url(path, params, false, false, false)
 

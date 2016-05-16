@@ -23,7 +23,9 @@ import annotation.tailrec
   *  @version 2.8
   */
 sealed trait List[@specialized +A]
-    extends LinearSeq[A] with Product with GenericTraversableTemplate[A, List]
+    extends LinearSeq[A]
+    with Product
+    with GenericTraversableTemplate[A, List]
     with LinearSeqOptimized[A, List[A]] {
   override def companion: GenericCompanion[List] = List
 
@@ -517,7 +519,7 @@ object List extends SeqFactory[List] {
     val down = step(start) < start
     val b = new ListBuffer[Int]
     var i = start
-    while ( (!up || i < end) && (!down || i > end)) {
+    while ((!up || i < end) && (!down || i > end)) {
       b += i
       val next = step(i)
       if (i == next)

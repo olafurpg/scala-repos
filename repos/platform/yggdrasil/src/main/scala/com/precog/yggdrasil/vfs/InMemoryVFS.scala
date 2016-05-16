@@ -228,88 +228,97 @@ trait InMemoryVFSModule[M[+ _]] extends VFSModule[M, Slice] { moduleSelf =>
       }
 
       IO {
-        data = (events groupBy { case (offset, msg) => msg.path })
-          .foldLeft(data) {
-          case (acc, (path, messages)) =>
-            val currentKey = (path, Version.Current)
-            // We can discard the event IDs for the purposes of this class
-            messages.map(_._2).foldLeft(acc) {
-              case (acc,
-                    IngestMessage(
-                    _, _, writeAs, records, _, _, StreamRef.Append)) =>
-                updated(acc,
-                        acc.get(currentKey),
-                        currentKey,
-                        writeAs,
-                        records.map(_.value))
+        data =
+          (events groupBy { case (offset, msg) => msg.path }).foldLeft(data) {
+            case (acc, (path, messages)) =>
+              val currentKey = (path, Version.Current)
+              // We can discard the event IDs for the purposes of this class
+              messages.map(_._2).foldLeft(acc) {
+                case (acc,
+                      IngestMessage(
+                      _, _, writeAs, records, _, _, StreamRef.Append)) =>
+                  updated(acc,
+                          acc.get(currentKey),
+                          currentKey,
+                          writeAs,
+                          records.map(_.value))
 
-              case (acc,
+                case (
+                    acc,
                     IngestMessage(
                     _, _, writeAs, records, _, _, StreamRef.Create(id, _))) =>
-                val archiveKey = (path, Version.Archived(id))
-                val appendTo = acc
-                  .get(archiveKey)
-                  .orElse(acc.get(currentKey).filter(_.versionId == id))
-                updated(acc,
-                        appendTo,
-                        if (acc.contains(currentKey))
-                          currentKey else archiveKey,
-                        writeAs,
-                        records.map(_.value))
+                  val archiveKey = (path, Version.Archived(id))
+                  val appendTo = acc
+                    .get(archiveKey)
+                    .orElse(acc.get(currentKey).filter(_.versionId == id))
+                  updated(acc,
+                          appendTo,
+                          if (acc.contains(currentKey))
+                            currentKey
+                          else archiveKey,
+                          writeAs,
+                          records.map(_.value))
 
-              case (acc,
+                case (
+                    acc,
                     IngestMessage(
                     _, _, writeAs, records, _, _, StreamRef.Replace(id, _))) =>
-                val archiveKey = (path, Version.Archived(id))
-                acc.get(archiveKey).orElse(acc.get(currentKey)) map {
-                  case rec @ JsonRecord(resource, `id`) =>
-                    // append when it is the same id
-                    rec.resource
-                      .append(NIHDB.Batch(0, records.map(_.value)))
-                      .unsafePerformIO
-                    acc +
-                    ((if (acc.contains(currentKey))
-                        currentKey else archiveKey) -> rec)
+                  val archiveKey = (path, Version.Archived(id))
+                  acc.get(archiveKey).orElse(acc.get(currentKey)) map {
+                    case rec @ JsonRecord(resource, `id`) =>
+                      // append when it is the same id
+                      rec.resource
+                        .append(NIHDB.Batch(0, records.map(_.value)))
+                        .unsafePerformIO
+                      acc + ((if (acc.contains(currentKey))
+                                currentKey
+                              else archiveKey) -> rec)
 
-                  case record =>
-                    // replace when id is not recognized, or when record is binary
+                    case record =>
+                      // replace when id is not recognized, or when record is binary
+                      acc +
+                      ((path, Version.Archived(record.versionId)) -> record) +
+                      (currentKey -> JsonRecord(
+                              Vector(records.map(_.value): _*),
+                              writeAs,
+                              id))
+                  } getOrElse {
+                    // start a new current version
                     acc +
-                    ((path, Version.Archived(record.versionId)) -> record) +
                     (currentKey -> JsonRecord(Vector(records.map(_.value): _*),
                                               writeAs,
                                               id))
-                } getOrElse {
-                  // start a new current version
-                  acc +
-                  (currentKey -> JsonRecord(Vector(records.map(_.value): _*),
-                                            writeAs,
-                                            id))
-                }
+                  }
 
-              case (
-                  acc,
-                  StoreFileMessage(
-                  _, _, writeAs, _, _, content, _, StreamRef.Create(id, _))) =>
-                sys.error("todo")
+                case (acc,
+                      StoreFileMessage(_,
+                                       _,
+                                       writeAs,
+                                       _,
+                                       _,
+                                       content,
+                                       _,
+                                       StreamRef.Create(id, _))) =>
+                  sys.error("todo")
 
-              case (acc,
-                    StoreFileMessage(_,
-                                     _,
-                                     writeAs,
-                                     _,
-                                     _,
-                                     content,
-                                     _,
-                                     StreamRef.Replace(id, _))) =>
-                sys.error("todo")
+                case (acc,
+                      StoreFileMessage(_,
+                                       _,
+                                       writeAs,
+                                       _,
+                                       _,
+                                       content,
+                                       _,
+                                       StreamRef.Replace(id, _))) =>
+                  sys.error("todo")
 
-              case (acc, _: ArchiveMessage) =>
-                acc ++ acc
-                  .get(currentKey)
-                  .map(record =>
-                        (path, Version.Archived(record.versionId)) -> record)
-            }
-        }
+                case (acc, _: ArchiveMessage) =>
+                  acc ++ acc
+                    .get(currentKey)
+                    .map(record =>
+                          (path, Version.Archived(record.versionId)) -> record)
+              }
+          }
       }
     }
 

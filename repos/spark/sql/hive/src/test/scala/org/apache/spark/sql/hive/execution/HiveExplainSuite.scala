@@ -25,7 +25,9 @@ import org.apache.spark.sql.test.SQLTestUtils
   * A set of tests that validates support for Hive Explain command.
   */
 class HiveExplainSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
 
   test("explain extended command") {
     checkExistence(sql(" explain   select * from src where key=123 "),

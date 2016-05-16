@@ -204,7 +204,8 @@ object ActorModelSpec {
 
   def assertCountDown(latch: CountDownLatch, wait: Long, hint: String) {
     if (!latch.await(wait, TimeUnit.MILLISECONDS))
-      fail("Failed to count down within " + wait + " millis (count at " +
+      fail(
+          "Failed to count down within " + wait + " millis (count at " +
           latch.getCount + "). " + hint)
   }
 
@@ -287,7 +288,8 @@ object ActorModelSpec {
 }
 
 abstract class ActorModelSpec(config: String)
-    extends AkkaSpec(config) with DefaultTimeout {
+    extends AkkaSpec(config)
+    with DefaultTimeout {
 
   import ActorModelSpec._
 

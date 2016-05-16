@@ -44,7 +44,9 @@ class MarathonSchedulerActor private (
     leaderInfo: LeaderInfo,
     eventBus: EventStream,
     cancellationTimeout: FiniteDuration = 1.minute)
-    extends Actor with ActorLogging with Stash {
+    extends Actor
+    with ActorLogging
+    with Stash {
   import context.dispatcher
   import mesosphere.marathon.MarathonSchedulerActor._
 
@@ -512,8 +514,8 @@ class SchedulerActions(appRepository: AppRepository,
   def reconcileHealthChecks(): Unit = {
     for {
       apps <- groupRepository
-        .rootGroup()
-        .map(_.map(_.transitiveApps).getOrElse(Set.empty))
+               .rootGroup()
+               .map(_.map(_.transitiveApps).getOrElse(Set.empty))
       app <- apps
     } healthCheckManager.reconcileWith(app.id)
   }

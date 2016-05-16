@@ -66,7 +66,8 @@ private[streaming] case class BlockManagerBasedStoreResult(
   */
 private[streaming] class BlockManagerBasedBlockHandler(
     blockManager: BlockManager, storageLevel: StorageLevel)
-    extends ReceivedBlockHandler with Logging {
+    extends ReceivedBlockHandler
+    with Logging {
 
   def storeBlock(blockId: StreamBlockId,
                  block: ReceivedBlock): ReceivedBlockStoreResult = {
@@ -131,7 +132,8 @@ private[streaming] class WriteAheadLogBasedBlockHandler(
     checkpointDir: String,
     clock: Clock = new SystemClock
 )
-    extends ReceivedBlockHandler with Logging {
+    extends ReceivedBlockHandler
+    with Logging {
 
   private val blockStoreTimeout =
     conf.getInt("spark.streaming.receiver.blockStoreTimeout", 30).seconds

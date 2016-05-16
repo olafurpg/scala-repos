@@ -152,7 +152,9 @@ class LargeTask(stageId: Int)
 }
 
 class TaskSetManagerSuite
-    extends SparkFunSuite with LocalSparkContext with Logging {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Logging {
   import TaskLocality.{ANY, PROCESS_LOCAL, NO_PREF, NODE_LOCAL, RACK_LOCAL}
 
   private val conf = new SparkConf
@@ -251,7 +253,7 @@ class TaskSetManagerSuite
         Seq(TaskLocation("host2", "exec2")),
         Seq(TaskLocation("host1"), TaskLocation("host2", "exec2")),
         Seq() // Last task has no locality prefs
-        )
+    )
     val clock = new ManualClock
     val manager = new TaskSetManager(sched, taskSet, MAX_TASK_FAILURES, clock)
     // First offer host1, exec1: first task should be chosen
@@ -851,8 +853,8 @@ class TaskSetManagerSuite
 
   private def createTaskResult(
       id: Int,
-      accumUpdates: Seq[AccumulableInfo] = Seq.empty[AccumulableInfo])
-    : DirectTaskResult[Int] = {
+      accumUpdates: Seq[AccumulableInfo] =
+        Seq.empty[AccumulableInfo]): DirectTaskResult[Int] = {
     val valueSer = SparkEnv.get.serializer.newInstance()
     new DirectTaskResult[Int](valueSer.serialize(id), accumUpdates)
   }

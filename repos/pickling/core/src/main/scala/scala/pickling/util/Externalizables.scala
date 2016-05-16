@@ -23,7 +23,7 @@ object Externalizables {
     */
   def genOutput[T]: ArrayObjectOutput = macro genOutputImpl[T]
 
-  def genInputImpl[T : c.WeakTypeTag](c: Context)(
+  def genInputImpl[T: c.WeakTypeTag](c: Context)(
       arg: c.Expr[T]): c.Expr[ObjectInput] = {
     import c.universe._
     import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
@@ -137,7 +137,7 @@ object Externalizables {
     c.Expr[ObjectInput](instance)
   }
 
-  def genOutputImpl[T : c.WeakTypeTag](c: Context): c.Expr[ArrayObjectOutput] = {
+  def genOutputImpl[T: c.WeakTypeTag](c: Context): c.Expr[ArrayObjectOutput] = {
     import c.universe._
     import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
 

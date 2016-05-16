@@ -88,7 +88,9 @@ case class UpdateSuccess(path: Path) extends WriteResult
 case class PathChildren(path: Path, children: Set[PathMetadata])
     extends MetadataResult
 case class PathOpFailure(path: Path, error: ResourceError)
-    extends ReadResult with WriteResult with MetadataResult
+    extends ReadResult
+    with WriteResult
+    with MetadataResult
 
 trait ActorVFSModule extends VFSModule[Future, Slice] {
   type Projection = NIHDBProjection
@@ -227,25 +229,27 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         _ = logger.debug("Creating new blob at " + file)
         writeResult <- write(new FileOutputStream(file), 0L, data)
         blobResult <- IOT {
-          writeResult traverse { size =>
-            logger.debug("Write complete on " + file)
-            val metadata =
-              BlobMetadata(mimeType, size, clock.now(), authorities)
-            //val metadataStore = PersistentJValue(versionDir, blobMetadataFilename)
-            //metadataStore.json = metadata.serialize
-            IOUtils.writeToFile(
-                metadata.serialize.renderCompact,
-                new File(versionDir, blobMetadataFilename)) map { _ =>
-              FileBlobResource(file, metadata)
-            }
-          }
-        }
+                       writeResult traverse { size =>
+                         logger.debug("Write complete on " + file)
+                         val metadata = BlobMetadata(
+                             mimeType, size, clock.now(), authorities)
+                         //val metadataStore = PersistentJValue(versionDir, blobMetadataFilename)
+                         //metadataStore.json = metadata.serialize
+                         IOUtils.writeToFile(
+                             metadata.serialize.renderCompact,
+                             new File(versionDir, blobMetadataFilename)) map {
+                           _ =>
+                             FileBlobResource(file, metadata)
+                         }
+                       }
+                     }
       } yield blobResult
     }
   }
 
   case class NIHDBResource(val db: NIHDB)
-      extends ProjectionResource with Logging {
+      extends ProjectionResource
+      with Logging {
     val mimeType: MimeType = FileContent.XQuirrelData
 
     def authorities = db.authorities
@@ -366,9 +370,10 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
         // it's necessary to group by path then traverse since each path will respond to ingest independently.
         // -- a bit of a leak of implementation detail, but that's the actor model for you.
         allResults <- (data groupBy { case (offset, msg) => msg.path }).toStream traverse {
-          case (path, subset) =>
-            (projectionsActor ? IngestData(subset)).mapTo[WriteResult]
-        }
+                       case (path, subset) =>
+                         (projectionsActor ? IngestData(subset))
+                           .mapTo[WriteResult]
+                     }
       } yield {
         val errors: List[ResourceError] =
           allResults.toList collect { case PathOpFailure(_, error) => error }
@@ -436,7 +441,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                          quiescenceTimeout: Duration,
                          maxOpenPaths: Int,
                          clock: Clock)
-      extends Actor with Logging {
+      extends Actor
+      with Logging {
     import com.precog.util.cache._
     import com.precog.util.cache.Cache._
     import com.google.common.cache.RemovalCause
@@ -466,19 +472,22 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
               "Created new path dir for %s : %s".format(path, pathDir))
           vlog <- VersionLog.open(pathDir)
           actorV <- vlog traverse { versionLog =>
-            logger.debug("Creating new PathManagerActor for " + path)
-            context.actorOf(
-                Props(
-                    new PathManagerActor(path,
-                                         VFSPathUtils.versionsSubdir(pathDir),
-                                         versionLog,
-                                         shutdownTimeout,
-                                         quiescenceTimeout,
-                                         clock,
-                                         self))) tap { newActor =>
-              IO { pathActors += (path -> newActor); pathLRU += (path -> ()) }
-            }
-          }
+                     logger.debug("Creating new PathManagerActor for " + path)
+                     context.actorOf(
+                         Props(new PathManagerActor(
+                                 path,
+                                 VFSPathUtils.versionsSubdir(pathDir),
+                                 versionLog,
+                                 shutdownTimeout,
+                                 quiescenceTimeout,
+                                 clock,
+                                 self))) tap { newActor =>
+                       IO {
+                         pathActors += (path -> newActor);
+                         pathLRU += (path -> ())
+                       }
+                     }
+                   }
         } yield {
           actorV valueOr {
             case Extractor.Thrown(t) => throw t
@@ -582,7 +591,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                                quiescenceTimeout: Duration,
                                clock: Clock,
                                routingActor: ActorRef)
-      extends Actor with Logging {
+      extends Actor
+      with Logging {
     context.setReceiveTimeout(quiescenceTimeout)
 
     private[this] implicit def executor: ExecutionContext = context.dispatcher
@@ -642,14 +652,14 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
 
             for {
               resource <- EitherT {
-                openf(dir) flatMap {
-                  _ tap { resourceV =>
-                    IO(resourceV foreach { r =>
-                      versions += (version -> r)
-                    })
-                  }
-                }
-              }
+                           openf(dir) flatMap {
+                             _ tap { resourceV =>
+                               IO(resourceV foreach { r =>
+                                 versions += (version -> r)
+                               })
+                             }
+                           }
+                         }
             } yield resource
         } getOrElse {
           left(IO(Corrupt("No version %s found to exist for resource %s."
@@ -666,30 +676,31 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
       implicit val ioId = NaturalTransformation.refl[IO]
       for {
         _ <- versionLog.addVersion(
-            VersionEntry(version, data.typeName, clock.instant()))
+                VersionEntry(version, data.typeName, clock.instant()))
         created <- data match {
-          case BlobData(bytes, mimeType) =>
-            resourceBuilder.createBlob[IO](
-                versionDir(version),
-                mimeType,
-                writeAs,
-                bytes :: StreamT.empty[IO, Array[Byte]])
+                    case BlobData(bytes, mimeType) =>
+                      resourceBuilder.createBlob[IO](
+                          versionDir(version),
+                          mimeType,
+                          writeAs,
+                          bytes :: StreamT.empty[IO, Array[Byte]])
 
-          case NIHDBData(data) =>
-            resourceBuilder.createNIHDB(versionDir(version), writeAs) flatMap {
-              _ traverse { nihdbr =>
-                nihdbr tap { _.db.insert(data) }
-              }
-            }
-        }
+                    case NIHDBData(data) =>
+                      resourceBuilder.createNIHDB(versionDir(version), writeAs) flatMap {
+                        _ traverse { nihdbr =>
+                          nihdbr tap { _.db.insert(data) }
+                        }
+                      }
+                  }
         _ <- created traverse { resource =>
-          for {
-            _ <- IO { versions += (version -> resource) }
-            _ <- complete.whenM(
-                versionLog.completeVersion(version) >> versionLog.setHead(
-                    version) >> maybeExpireCache(apiKey, resource))
-          } yield PrecogUnit
-        }
+              for {
+                _ <- IO { versions += (version -> resource) }
+                _ <- complete.whenM(
+                        versionLog.completeVersion(version) >> versionLog
+                          .setHead(version) >> maybeExpireCache(apiKey,
+                                                                resource))
+              } yield PrecogUnit
+            }
       } yield {
         created.fold(
             error => PathOpFailure(path, error),
@@ -765,8 +776,8 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                     _ <- resource.append(batch(msg))
                     // FIXME: completeVersion and setHead should be one op
                     _ <- terminal.whenM(
-                        versionLog.completeVersion(streamId) >> versionLog
-                          .setHead(streamId))
+                            versionLog.completeVersion(streamId) >> versionLog
+                              .setHead(streamId))
                   } yield {
                     logger.trace(
                         "Sent insert message for " + msg + " to nihdb")
@@ -862,13 +873,13 @@ trait ActorVFSModule extends VFSModule[Future, Slice] {
                 versionLog.current.map(_.id).getOrElse(UUID.randomUUID())
               for {
                 _ <- persistNIHDB(
-                    canCreate(msg.path, permissions(apiKey), msg.writeAs),
-                    offset,
-                    msg,
-                    streamId,
-                    false)
+                        canCreate(msg.path, permissions(apiKey), msg.writeAs),
+                        offset,
+                        msg,
+                        streamId,
+                        false)
                 _ <- versionLog.completeVersion(streamId) >> versionLog
-                  .setHead(streamId)
+                      .setHead(streamId)
               } yield PrecogUnit
           }
 

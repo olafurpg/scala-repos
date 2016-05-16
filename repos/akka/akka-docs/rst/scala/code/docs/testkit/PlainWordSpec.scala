@@ -14,8 +14,11 @@ import org.scalatest.BeforeAndAfterAll
 
 //#implicit-sender
 class MySpec()
-    extends TestKit(ActorSystem("MySpec")) with ImplicitSender
-    with WordSpecLike with Matchers with BeforeAndAfterAll {
+    extends TestKit(ActorSystem("MySpec"))
+    with ImplicitSender
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
   //#implicit-sender
 
   override def afterAll {

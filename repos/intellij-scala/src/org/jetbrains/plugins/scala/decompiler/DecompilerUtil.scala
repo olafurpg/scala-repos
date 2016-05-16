@@ -76,7 +76,8 @@ object DecompilerUtil {
     if (res == null || res.timeStamp != timeStamp) {
       val readAttribute =
         if (attributesSupported)
-          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file) else null
+          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file)
+        else null
       def updateAttributeAndData() {
         val decompilationResult = decompileInner(file, bytes)
         if (attributesSupported) {

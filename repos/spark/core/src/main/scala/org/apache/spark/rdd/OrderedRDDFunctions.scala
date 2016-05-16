@@ -42,9 +42,10 @@ import org.apache.spark.internal.Logging
   *   rdd.sortByKey()
   * }}}
   */
-class OrderedRDDFunctions[K : Ordering : ClassTag, V : ClassTag, P <: Product2[
-        K, V]: ClassTag] @DeveloperApi()(self: RDD[P])
-    extends Logging with Serializable {
+class OrderedRDDFunctions[K: Ordering: ClassTag, V: ClassTag,
+    P <: Product2[K, V]: ClassTag] @DeveloperApi()(self: RDD[P])
+    extends Logging
+    with Serializable {
   private val ordering = implicitly[Ordering[K]]
 
   /**

@@ -44,7 +44,8 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
                       val referredElement = ref.bind().map(_.getElement)
                       referredElement match {
                         case Some(QualifiedName(FunctionN(n)))
-                            if te.typeArgList.typeArgs.length == (n.toInt + 1) =>
+                            if te.typeArgList.typeArgs.length == (n.toInt +
+                                1) =>
                           holder.registerProblem(
                               holder.getManager.createProblemDescriptor(
                                   te,

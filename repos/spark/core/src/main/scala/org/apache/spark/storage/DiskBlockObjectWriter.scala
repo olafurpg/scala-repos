@@ -43,7 +43,8 @@ private[spark] class DiskBlockObjectWriter(
     // are themselves performing writes. All updates must be relative.
     writeMetrics: ShuffleWriteMetrics,
     val blockId: BlockId = null)
-    extends OutputStream with Logging {
+    extends OutputStream
+    with Logging {
 
   /** The file channel, used for repositioning / truncating the file. */
   private var channel: FileChannel = null

@@ -40,7 +40,8 @@ object ReadOnlyIntegerProperty {
 
 class ReadOnlyIntegerProperty(
     override val delegate: jfxbp.ReadOnlyIntegerProperty)
-    extends NumberExpression(delegate) with ReadOnlyProperty[Int, Number]
+    extends NumberExpression(delegate)
+    with ReadOnlyProperty[Int, Number]
     with SFXDelegate[jfxbp.ReadOnlyIntegerProperty] {
   def this(bean: Object, name: String, value: Int) =
     this(

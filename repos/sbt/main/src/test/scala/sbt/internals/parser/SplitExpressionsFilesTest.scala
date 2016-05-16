@@ -138,8 +138,8 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
         case _ =>
           None
       }
-    removeDoubleSlashReversed(statements.reverse, lineRange)
-      .map(t => (t._1.reverse, t._2))
+    removeDoubleSlashReversed(statements.reverse, lineRange).map(t =>
+          (t._1.reverse, t._2))
   }
 
   def splitLines(file: File,

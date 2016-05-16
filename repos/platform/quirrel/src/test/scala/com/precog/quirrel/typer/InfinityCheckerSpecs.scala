@@ -28,8 +28,12 @@ import org.specs2.mutable.Specification
 import parser._
 
 object InfinityCheckerSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with StaticLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with StaticLibrarySpec {
 
   import ast._
   import library._

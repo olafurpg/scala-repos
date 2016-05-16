@@ -177,9 +177,8 @@ object FromUnsafeProjection {
     */
   def apply(fields: Seq[DataType]): Projection = {
     create(
-        fields.zipWithIndex.map(x =>
-              {
-        new BoundReference(x._2, x._1, true)
+        fields.zipWithIndex.map(x => {
+      new BoundReference(x._2, x._1, true)
     }))
   }
 

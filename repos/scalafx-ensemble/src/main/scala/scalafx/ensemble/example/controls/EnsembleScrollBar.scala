@@ -79,10 +79,9 @@ class EnsembleScrollBar extends EnsembleExample {
     max = xBarWidth - (2 * circleRadius)
     unitIncrement = 20.0
     value.onChange(
-        (_, _, _) =>
-          {
-        xScrollValue = value()
-        circle.relocate(xScrollValue, yScrollValue)
+        (_, _, _) => {
+      xScrollValue = value()
+      circle.relocate(xScrollValue, yScrollValue)
     })
   }
 
@@ -98,10 +97,9 @@ class EnsembleScrollBar extends EnsembleExample {
     visibleAmount = 50
     max = yBarHeight - (2 * circleRadius)
     value.onChange(
-        (_, _, _) =>
-          {
-        yScrollValue = value() + xBarHeight
-        circle.relocate(xScrollValue, yScrollValue)
+        (_, _, _) => {
+      yScrollValue = value() + xBarHeight
+      circle.relocate(xScrollValue, yScrollValue)
     })
     translateX = yBarHeight
     translateY = yBarWidth

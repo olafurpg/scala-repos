@@ -7,10 +7,12 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * Date: 17.10.11
   */
 class ScalaMethodEvaluationTest
-    extends ScalaMethodEvaluationTestBase with ScalaVersion_2_11
+    extends ScalaMethodEvaluationTestBase
+    with ScalaVersion_2_11
 
 class ScalaMethodEvaluationTest_212
-    extends ScalaMethodEvaluationTestBase with ScalaVersion_2_12
+    extends ScalaMethodEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class ScalaMethodEvaluationTestBase extends ScalaDebuggerTestCase {
 

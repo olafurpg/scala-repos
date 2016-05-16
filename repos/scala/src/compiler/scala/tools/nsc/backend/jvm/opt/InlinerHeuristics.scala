@@ -41,85 +41,84 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
     } yield methodNode
 
     compilingMethods
-      .map(methodNode =>
-            {
-          var requests = Set.empty[InlineRequest]
-          callGraph.callsites(methodNode).valuesIterator foreach {
-            case callsite @ Callsite(_,
-                                     _,
-                                     _,
-                                     Right(Callee(callee,
-                                                  calleeDeclClass,
-                                                  safeToInline,
-                                                  _,
-                                                  canInlineFromSource,
-                                                  calleeAnnotatedInline,
-                                                  _,
-                                                  _,
-                                                  callsiteWarning)),
-                                     _,
-                                     _,
-                                     _,
-                                     pos,
-                                     _,
-                                     _) =>
-              inlineRequest(callsite) match {
-                case Some(Right(req)) => requests += req
-                case Some(Left(w)) =>
-                  if ((calleeAnnotatedInline &&
-                          bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
-                      w.emitWarning(compilerSettings)) {
-                    val annotWarn =
-                      if (calleeAnnotatedInline) " is annotated @inline but"
-                      else ""
-                    val msg = s"${BackendReporting.methodSignature(
-                        calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
-                    backendReporting.inlinerWarning(callsite.callsitePosition,
-                                                    msg)
-                  }
+      .map(methodNode => {
+        var requests = Set.empty[InlineRequest]
+        callGraph.callsites(methodNode).valuesIterator foreach {
+          case callsite @ Callsite(_,
+                                   _,
+                                   _,
+                                   Right(Callee(callee,
+                                                calleeDeclClass,
+                                                safeToInline,
+                                                _,
+                                                canInlineFromSource,
+                                                calleeAnnotatedInline,
+                                                _,
+                                                _,
+                                                callsiteWarning)),
+                                   _,
+                                   _,
+                                   _,
+                                   pos,
+                                   _,
+                                   _) =>
+            inlineRequest(callsite) match {
+              case Some(Right(req)) => requests += req
+              case Some(Left(w)) =>
+                if ((calleeAnnotatedInline &&
+                        bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
+                    w.emitWarning(compilerSettings)) {
+                  val annotWarn =
+                    if (calleeAnnotatedInline) " is annotated @inline but"
+                    else ""
+                  val msg = s"${BackendReporting.methodSignature(
+                      calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
+                  backendReporting.inlinerWarning(callsite.callsitePosition,
+                                                  msg)
+                }
 
-                case None =>
-                  if (canInlineFromSource && calleeAnnotatedInline &&
-                      !callsite.annotatedNoInline &&
-                      bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) {
-                    // if the callsite is annotated @inline, we report an inline warning even if the underlying
-                    // reason is, for example, mixed compilation (which has a separate -Yopt-warning flag).
-                    def initMsg =
-                      s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)} is annotated @inline but cannot be inlined"
-                    def warnMsg =
-                      callsiteWarning
-                        .map(" Possible reason:\n" + _)
-                        .getOrElse("")
-                    if (doRewriteTraitCallsite(callsite))
-                      backendReporting.inlinerWarning(
-                          pos,
-                          s"$initMsg: the trait method call could not be rewritten to the static implementation method." +
-                          warnMsg)
-                    else if (!safeToInline)
-                      backendReporting.inlinerWarning(
-                          pos,
-                          s"$initMsg: the method is not final and may be overridden." +
-                          warnMsg)
-                    else
-                      backendReporting.inlinerWarning(pos,
-                                                      s"$initMsg." + warnMsg)
-                  } else if (callsiteWarning.isDefined && callsiteWarning.get
-                               .emitWarning(compilerSettings)) {
-                    // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.
+              case None =>
+                if (canInlineFromSource && calleeAnnotatedInline &&
+                    !callsite.annotatedNoInline &&
+                    bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) {
+                  // if the callsite is annotated @inline, we report an inline warning even if the underlying
+                  // reason is, for example, mixed compilation (which has a separate -Yopt-warning flag).
+                  def initMsg =
+                    s"${BackendReporting.methodSignature(calleeDeclClass.internalName, callee)} is annotated @inline but cannot be inlined"
+                  def warnMsg =
+                    callsiteWarning
+                      .map(" Possible reason:\n" + _)
+                      .getOrElse("")
+                  if (doRewriteTraitCallsite(callsite))
                     backendReporting.inlinerWarning(
                         pos,
-                        s"there was a problem determining if method ${callee.name} can be inlined: \n" +
-                        callsiteWarning.get)
-                  }
-              }
+                        s"$initMsg: the trait method call could not be rewritten to the static implementation method." +
+                        warnMsg)
+                  else if (!safeToInline)
+                    backendReporting.inlinerWarning(
+                        pos,
+                        s"$initMsg: the method is not final and may be overridden." +
+                        warnMsg)
+                  else
+                    backendReporting.inlinerWarning(pos,
+                                                    s"$initMsg." + warnMsg)
+                } else if (callsiteWarning.isDefined &&
+                           callsiteWarning.get.emitWarning(compilerSettings)) {
+                  // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.
+                  backendReporting.inlinerWarning(
+                      pos,
+                      s"there was a problem determining if method ${callee.name} can be inlined: \n" +
+                      callsiteWarning.get)
+                }
+            }
 
-            case Callsite(ins, _, _, Left(warning), _, _, _, pos, _, _) =>
-              if (warning.emitWarning(compilerSettings))
-                backendReporting.inlinerWarning(
-                    pos,
-                    s"failed to determine if ${ins.name} should be inlined:\n$warning")
-          }
-          (methodNode, requests)
+          case Callsite(ins, _, _, Left(warning), _, _, _, pos, _, _) =>
+            if (warning.emitWarning(compilerSettings))
+              backendReporting.inlinerWarning(
+                  pos,
+                  s"failed to determine if ${ins.name} should be inlined:\n$warning")
+        }
+        (methodNode, requests)
       })
       .filterNot(_._2.isEmpty)
       .toMap
@@ -163,8 +162,7 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
         if (callee.safeToInline && !callee.annotatedNoInline &&
             !callsite.annotatedNoInline) {
           def shouldInlineHO =
-            callee.samParamTypes.nonEmpty &&
-            (callee.samParamTypes exists {
+            callee.samParamTypes.nonEmpty && (callee.samParamTypes exists {
                   case (index, _) => callsite.argInfos.contains(index)
                 })
           if (callee.annotatedInline || callsite.annotatedInline ||

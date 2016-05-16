@@ -75,13 +75,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "lobby" boot new Env(
-        config = lila.common.PlayApp loadConfig "lobby",
-        db = lila.db.Env.current,
-        hub = lila.hub.Env.current,
-        onStart = lila.game.Env.current.onStart,
-        blocking = lila.relation.Env.current.api.fetchBlocking,
-        playban = lila.playban.Env.current.api.currentBan _,
-        system = lila.common.PlayApp.system,
-        scheduler = lila.common.PlayApp.scheduler)
+    "lobby" boot new Env(config = lila.common.PlayApp loadConfig "lobby",
+                         db = lila.db.Env.current,
+                         hub = lila.hub.Env.current,
+                         onStart = lila.game.Env.current.onStart,
+                         blocking =
+                           lila.relation.Env.current.api.fetchBlocking,
+                         playban = lila.playban.Env.current.api.currentBan _,
+                         system = lila.common.PlayApp.system,
+                         scheduler = lila.common.PlayApp.scheduler)
 }

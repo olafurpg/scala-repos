@@ -241,9 +241,9 @@ object LDAExample {
       .zipWithIndex()
       .map(_.swap)
 
-      (documents,
-       model.stages(2).asInstanceOf[CountVectorizerModel].vocabulary, // vocabulary
-       documents.map(_._2.numActives).sum().toLong) // total token count
+    (documents,
+     model.stages(2).asInstanceOf[CountVectorizerModel].vocabulary, // vocabulary
+     documents.map(_._2.numActives).sum().toLong) // total token count
   }
 }
 // scalastyle:on println

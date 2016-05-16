@@ -42,7 +42,8 @@ import org.apache.spark.sql.types._
 
 private[hive] class HiveFunctionRegistry(
     underlying: analysis.FunctionRegistry, executionHive: HiveClientImpl)
-    extends analysis.FunctionRegistry with HiveInspectors {
+    extends analysis.FunctionRegistry
+    with HiveInspectors {
 
   def getFunctionInfo(name: String): FunctionInfo = {
     // Hive Registry need current database to lookup function
@@ -161,7 +162,10 @@ private[hive] class HiveFunctionRegistry(
 
 private[hive] case class HiveSimpleUDF(
     name: String, funcWrapper: HiveFunctionWrapper, children: Seq[Expression])
-    extends Expression with HiveInspectors with CodegenFallback with Logging {
+    extends Expression
+    with HiveInspectors
+    with CodegenFallback
+    with Logging {
 
   override def deterministic: Boolean = isUDFDeterministic
 
@@ -227,7 +231,8 @@ private[hive] case class HiveSimpleUDF(
 // Adapter from Catalyst ExpressionResult to Hive DeferredObject
 private[hive] class DeferredObjectAdapter(
     oi: ObjectInspector, dataType: DataType)
-    extends DeferredObject with HiveInspectors {
+    extends DeferredObject
+    with HiveInspectors {
 
   private var func: () => Any = _
   def set(func: () => Any): Unit = {
@@ -239,7 +244,10 @@ private[hive] class DeferredObjectAdapter(
 
 private[hive] case class HiveGenericUDF(
     name: String, funcWrapper: HiveFunctionWrapper, children: Seq[Expression])
-    extends Expression with HiveInspectors with CodegenFallback with Logging {
+    extends Expression
+    with HiveInspectors
+    with CodegenFallback
+    with Logging {
 
   override def nullable: Boolean = true
 
@@ -284,9 +292,8 @@ private[hive] case class HiveGenericUDF(
       val idx = i
       deferredObjects(i)
         .asInstanceOf[DeferredObjectAdapter]
-        .set(() =>
-              {
-            children(idx).eval(input)
+        .set(() => {
+          children(idx).eval(input)
         })
       i += 1
     }
@@ -314,7 +321,9 @@ private[hive] case class HiveGenericUDF(
 private[hive] case class HiveGenericUDTF(name: String,
                                          funcWrapper: HiveFunctionWrapper,
                                          children: Seq[Expression])
-    extends Generator with HiveInspectors with CodegenFallback {
+    extends Generator
+    with HiveInspectors
+    with CodegenFallback {
 
   @transient
   protected lazy val function: GenericUDTF = {
@@ -398,7 +407,8 @@ private[hive] case class HiveUDAFFunction(
     isUDAFBridgeRequired: Boolean = false,
     mutableAggBufferOffset: Int = 0,
     inputAggBufferOffset: Int = 0)
-    extends ImperativeAggregate with HiveInspectors {
+    extends ImperativeAggregate
+    with HiveInspectors {
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =

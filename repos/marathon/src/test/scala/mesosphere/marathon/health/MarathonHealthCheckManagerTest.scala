@@ -24,7 +24,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class MarathonHealthCheckManagerTest
-    extends MarathonSpec with ScalaFutures with Logging
+    extends MarathonSpec
+    with ScalaFutures
+    with Logging
     with MarathonShutdownHookSupport {
 
   var hcManager: MarathonHealthCheckManager = _

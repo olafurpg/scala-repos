@@ -99,7 +99,8 @@ class LoggingStatement(st: Statement) extends Statement {
 /** A wrapper for `java.sql.PreparedStatement` that logs statements and benchmark results
   * to the appropriate [[JdbcBackend]] loggers. */
 class LoggingPreparedStatement(st: PreparedStatement)
-    extends LoggingStatement(st) with PreparedStatement {
+    extends LoggingStatement(st)
+    with PreparedStatement {
   def execute(): Boolean = logged(null, "prepared statement") { st.execute() }
   def executeQuery(): java.sql.ResultSet = logged(null, "prepared query") {
     st.executeQuery()

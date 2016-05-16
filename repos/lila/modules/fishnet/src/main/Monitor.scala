@@ -32,8 +32,7 @@ private final class Monitor(moveDb: MoveDB,
     result.engine.options.threadsInt foreach { monitor.threads(_) }
 
     monitor.totalSecond(sumOf(result.analysis)(_.time) / 1000)
-    monitor.totalMeganode(
-        sumOf(result.analysis) { eval =>
+    monitor.totalMeganode(sumOf(result.analysis) { eval =>
       eval.nodes ifFalse eval.mateFound
     } / 1000000)
     monitor.totalPosition(result.analysis.size)

@@ -459,7 +459,7 @@ object ListFactory {
 }
 
 trait ListFactory extends CollectionFactory {
-  def empty[E : ClassTag]: ju.List[E]
+  def empty[E: ClassTag]: ju.List[E]
 
   /** Sortable using java.util.Collections.sort
     */

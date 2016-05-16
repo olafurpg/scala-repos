@@ -101,10 +101,12 @@ object ByteBufferMessageSet {
         wrapperMessageAndOffset
       val wrapperMessageTimestampOpt: Option[Long] =
         if (wrapperMessage.magic > MagicValue_V0)
-          Some(wrapperMessage.timestamp) else None
+          Some(wrapperMessage.timestamp)
+        else None
       val wrapperMessageTimestampTypeOpt: Option[TimestampType] =
         if (wrapperMessage.magic > MagicValue_V0)
-          Some(wrapperMessage.timestampType) else None
+          Some(wrapperMessage.timestampType)
+        else None
       if (wrapperMessage.payload == null)
         throw new KafkaException(s"Message payload is null: $wrapperMessage")
       val inputStream = new ByteBufferBackedInputStream(wrapperMessage.payload)
@@ -269,7 +271,8 @@ private class OffsetAssigner(offsets: Seq[Long]) {
   *
   */
 class ByteBufferMessageSet(val buffer: ByteBuffer)
-    extends MessageSet with Logging {
+    extends MessageSet
+    with Logging {
   private var shallowValidByteCount = -1
 
   private[kafka] def this(compressionCodec: CompressionCodec,

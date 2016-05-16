@@ -59,9 +59,8 @@ class StochasticAveragedGradientTest extends OptimizeTestBase {
       val result = lbfgs.minimize(BatchDiffFunction.wrap(f), init)
       val ok =
         norm(result :- DenseVector.ones[Double](init.size) * targetValue, 2) / result.size < 3E-3
-      ok ||
-      (throw new RuntimeException("Failed to find optimum for init " + init +
-              " " + result + "  " + targetValue))
+      ok || (throw new RuntimeException("Failed to find optimum for init " +
+              init + " " + result + "  " + targetValue))
     }
 
     check(Prop.forAll(optimizeThis _))

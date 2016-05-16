@@ -54,7 +54,9 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 import org.apache.spark.util.collection.BitSet
 
 private[sql] class DefaultSource
-    extends FileFormat with DataSourceRegister with Logging {
+    extends FileFormat
+    with DataSourceRegister
+    with Logging {
 
   override def shortName(): String = "parquet"
 
@@ -248,16 +250,16 @@ private[sql] class DefaultSource
   private def splitFiles(allFiles: Seq[FileStatus]): FileTypes = {
     // Lists `FileStatus`es of all leaf nodes (files) under all base directories.
     val leaves = allFiles.filter { f =>
-      isSummaryFile(f.getPath) || !(f.getPath.getName.startsWith("_") ||
-          f.getPath.getName.startsWith("."))
+      isSummaryFile(f.getPath) ||
+      !(f.getPath.getName.startsWith("_") || f.getPath.getName.startsWith("."))
     }.toArray.sortBy(_.getPath.toString)
 
     FileTypes(
         data = leaves.filterNot(f => isSummaryFile(f.getPath)),
         metadata = leaves.filter(
-              _.getPath.getName == ParquetFileWriter.PARQUET_METADATA_FILE),
+            _.getPath.getName == ParquetFileWriter.PARQUET_METADATA_FILE),
         commonMetadata = leaves.filter(
-              _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE))
+            _.getPath.getName == ParquetFileWriter.PARQUET_COMMON_METADATA_FILE))
   }
 
   private def isSummaryFile(file: Path): Boolean = {
@@ -303,13 +305,13 @@ private[sql] class DefaultSource
         inputFiles, parquetBlockSize) _
 
     Utils.withDummyCallSite(sqlContext.sparkContext) {
-      new SqlNewHadoopRDD(
-          sqlContext = sqlContext,
-          broadcastedConf = broadcastedConf,
-          initDriverSideJobFuncOpt = Some(setInputPaths),
-          initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
-          inputFormatClass = classOf[ParquetInputFormat[InternalRow]],
-          valueClass = classOf[InternalRow]) {
+      new SqlNewHadoopRDD(sqlContext = sqlContext,
+                          broadcastedConf = broadcastedConf,
+                          initDriverSideJobFuncOpt = Some(setInputPaths),
+                          initLocalJobFuncOpt = Some(initLocalJobFuncOpt),
+                          inputFormatClass =
+                            classOf[ParquetInputFormat[InternalRow]],
+                          valueClass = classOf[InternalRow]) {
 
         val cacheMetadata = useMetadataCache
 

@@ -63,7 +63,8 @@ object TaskTrackerActor {
 private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
                                taskLoader: TaskLoader,
                                taskUpdaterProps: ActorRef => Props)
-    extends Actor with Stash {
+    extends Actor
+    with Stash {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val updaterRef =

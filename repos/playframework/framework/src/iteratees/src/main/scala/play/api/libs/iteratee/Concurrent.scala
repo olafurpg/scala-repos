@@ -246,9 +246,9 @@ object Concurrent {
     * @param timeout The timeout period
     * @param unit the time unit
     */
-  def lazyAndErrIfNotReady[E](
-      timeout: Long,
-      unit: TimeUnit = TimeUnit.MILLISECONDS): Enumeratee[E, E] =
+  def lazyAndErrIfNotReady[E](timeout: Long,
+                              unit: TimeUnit =
+                                TimeUnit.MILLISECONDS): Enumeratee[E, E] =
     new Enumeratee[E, E] {
 
       def applyOn[A](inner: Iteratee[E, A]): Iteratee[E, Iteratee[E, A]] = {
@@ -268,7 +268,7 @@ object Concurrent {
                     case Right(_) =>
                       Error("iteratee is taking too long", other)
                   }(dec)
-              )
+            )
         }
         Cont(step(inner))
       }
@@ -406,56 +406,58 @@ object Concurrent {
     */
   def dropInputIfNotReady[E](
       duration: Long,
-      unit: java.util.concurrent.TimeUnit = java.util.concurrent.TimeUnit.MILLISECONDS)
-    : Enumeratee[E, E] = new Enumeratee[E, E] {
+      unit: java.util.concurrent.TimeUnit =
+        java.util.concurrent.TimeUnit.MILLISECONDS): Enumeratee[E, E] =
+    new Enumeratee[E, E] {
 
-    val busy = scala.concurrent.stm.Ref(false)
-    def applyOn[A](it: Iteratee[E, A]): Iteratee[E, Iteratee[E, A]] = {
+      val busy = scala.concurrent.stm.Ref(false)
+      def applyOn[A](it: Iteratee[E, A]): Iteratee[E, Iteratee[E, A]] = {
 
-      def step(inner: Iteratee[E, A])(
-          in: Input[E]): Iteratee[E, Iteratee[E, A]] = {
+        def step(inner: Iteratee[E, A])(
+            in: Input[E]): Iteratee[E, Iteratee[E, A]] = {
 
-        in match {
-          case Input.EOF =>
-            Done(inner, Input.Empty)
+          in match {
+            case Input.EOF =>
+              Done(inner, Input.Empty)
 
-          case in =>
-            if (!busy.single()) {
-              val readyOrNot: Future[Either[Iteratee[E, Iteratee[E, A]], Unit]] =
-                Future.firstCompletedOf(
-                    Seq(
-                        inner
-                          .pureFold[Iteratee[E, Iteratee[E, A]]] {
-                            case Step.Done(a, e) =>
-                              Done(Done(a, e), Input.Empty)
-                            case Step.Cont(k) =>
-                              Cont { in =>
-                                val next = k(in)
-                                Cont(step(next))
-                              }
-                            case Step.Error(msg, e) =>
-                              Done(Error(msg, e), Input.Empty)
-                          }(dec)
-                          .map(i => { busy.single() = false; Left(i) })(dec),
-                        timeoutFuture(Right(()), duration, unit)
-                    )
-                )(dec)
+            case in =>
+              if (!busy.single()) {
+                val readyOrNot: Future[
+                    Either[Iteratee[E, Iteratee[E, A]], Unit]] =
+                  Future.firstCompletedOf(
+                      Seq(
+                          inner
+                            .pureFold[Iteratee[E, Iteratee[E, A]]] {
+                              case Step.Done(a, e) =>
+                                Done(Done(a, e), Input.Empty)
+                              case Step.Cont(k) =>
+                                Cont { in =>
+                                  val next = k(in)
+                                  Cont(step(next))
+                                }
+                              case Step.Error(msg, e) =>
+                                Done(Error(msg, e), Input.Empty)
+                            }(dec)
+                            .map(i => { busy.single() = false; Left(i) })(dec),
+                          timeoutFuture(Right(()), duration, unit)
+                      )
+                  )(dec)
 
-              Iteratee.flatten(
-                  readyOrNot.map {
-                case Left(ready) =>
-                  Iteratee.flatten(ready.feed(in))
-                case Right(_) =>
-                  busy.single() = true
-                  Cont(step(inner))
-              }(dec))
-            } else Cont(step(inner))
+                Iteratee.flatten(
+                    readyOrNot.map {
+                  case Left(ready) =>
+                    Iteratee.flatten(ready.feed(in))
+                  case Right(_) =>
+                    busy.single() = true
+                    Cont(step(inner))
+                }(dec))
+              } else Cont(step(inner))
+          }
         }
-      }
 
-      Cont(step(it))
+        Cont(step(it))
+      }
     }
-  }
 
   /**
     * Create an enumerator that allows imperative style pushing of input into a single iteratee.
@@ -475,7 +477,7 @@ object Concurrent {
       onStart: Channel[E] => Unit,
       onComplete: => Unit = (),
       onError: (String, Input[E]) => Unit = (_: String, _: Input[E]) =>
-          ())(implicit ec: ExecutionContext) = new Enumerator[E] {
+        ())(implicit ec: ExecutionContext) = new Enumerator[E] {
     implicit val pec = ec.prepare()
 
     import scala.concurrent.stm.Ref
@@ -624,8 +626,8 @@ object Concurrent {
       val interested: List[(Iteratee[E, _], Promise[Iteratee[E, _]])] =
         iteratees.single.swap(List())
 
-      val commitReady: Ref[List[
-              (Int, (Iteratee[E, _], Promise[Iteratee[E, _]]))]] = Ref(List())
+      val commitReady: Ref[
+          List[(Int, (Iteratee[E, _], Promise[Iteratee[E, _]]))]] = Ref(List())
 
       val commitDone: Ref[List[Int]] = Ref(List())
 

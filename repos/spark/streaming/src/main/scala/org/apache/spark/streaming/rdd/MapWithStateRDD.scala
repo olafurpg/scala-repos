@@ -36,8 +36,7 @@ private[streaming] case class MapWithStateRDDRecord[K, S, E](
     var stateMap: StateMap[K, S], var mappedData: Seq[E])
 
 private[streaming] object MapWithStateRDDRecord {
-  def updateRecordWithData[
-      K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
+  def updateRecordWithData[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
       prevRecord: Option[MapWithStateRDDRecord[K, S, E]],
       dataIterator: Iterator[(K, V)],
       mappingFunction: (Time, K, Option[V], State[S]) => Option[E],
@@ -125,7 +124,7 @@ private[streaming] class MapWithStateRDDPartition(
   * @param timeoutThresholdTime The time to indicate which keys are timeout
   */
 private[streaming] class MapWithStateRDD[
-    K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
+    K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
     private var prevStateRDD: RDD[MapWithStateRDDRecord[K, S, E]],
     private var partitionedDataRDD: RDD[(K, V)],
     mappingFunction: (Time, K, Option[V], State[S]) => Option[E],
@@ -170,7 +169,8 @@ private[streaming] class MapWithStateRDD[
         mappingFunction,
         batchTime,
         timeoutThresholdTime,
-        removeTimedoutData = doFullScan // remove timedout data only when full scan is enabled
+        removeTimedoutData =
+          doFullScan // remove timedout data only when full scan is enabled
     )
     Iterator(newRecord)
   }
@@ -194,8 +194,7 @@ private[streaming] class MapWithStateRDD[
 
 private[streaming] object MapWithStateRDD {
 
-  def createFromPairRDD[
-      K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
+  def createFromPairRDD[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
       pairRDD: RDD[(K, S)],
       partitioner: Partitioner,
       updateTime: Time): MapWithStateRDD[K, V, S, E] = {
@@ -221,7 +220,7 @@ private[streaming] object MapWithStateRDD {
         stateRDD, emptyDataRDD, noOpFunc, updateTime, None)
   }
 
-  def createFromRDD[K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
+  def createFromRDD[K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
       rdd: RDD[(K, S, Long)],
       partitioner: Partitioner,
       updateTime: Time): MapWithStateRDD[K, V, S, E] = {

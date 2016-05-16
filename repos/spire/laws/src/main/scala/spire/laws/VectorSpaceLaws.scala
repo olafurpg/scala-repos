@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object VectorSpaceLaws {
-  def apply[V : Eq : Arbitrary, A : Eq : Arbitrary : Predicate] =
+  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] =
     new VectorSpaceLaws[V, A] {
       val scalarLaws = RingLaws[A]
       val vectorLaws = GroupLaws[V]
@@ -65,8 +65,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
               else V.distance(x, y) =!= A.zero),
         "symmetric" → forAll(
             (x: V, y: V) => V.distance(x, y) === V.distance(y, x)),
-        "triangle inequality" → forAll((x: V, y: V,
-            z: V) => V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z)))
+        "triangle inequality" → forAll((x: V, y: V, z: V) =>
+              V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z)))
     )
 
   def normedVectorSpace(
@@ -78,8 +78,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
         parents = Seq(vectorSpace, metricSpace),
         "scalable" → forAll(
             (a: A, v: V) => a.abs * v.norm === (a.abs *: v).norm),
-        "only 1 zero" → forAll(
-            (v: V) =>
+        "only 1 zero" → forAll((v: V) =>
               // This is covered by metricSpace...
               if (v === V.zero) v.norm === Rng[A].zero
               else v.norm > Rng[A].zero)

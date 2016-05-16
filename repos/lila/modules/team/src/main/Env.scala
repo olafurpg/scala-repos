@@ -24,9 +24,9 @@ final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env) {
                              indexer = hub.actor.teamSearch,
                              timeline = hub.actor.timeline)
 
-  lazy val paginator = new PaginatorBuilder(
-      maxPerPage = PaginatorMaxPerPage,
-      maxUserPerPage = PaginatorMaxUserPerPage)
+  lazy val paginator = new PaginatorBuilder(maxPerPage = PaginatorMaxPerPage,
+                                            maxUserPerPage =
+                                              PaginatorMaxUserPerPage)
 
   lazy val cli = new Cli(api)
 

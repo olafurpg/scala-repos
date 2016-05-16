@@ -19,7 +19,8 @@ import scala.reflect.ClassTag
 class BitVector(val data: java.util.BitSet,
                 val length: Int,
                 val enforceLength: Boolean = true)
-    extends Vector[Boolean] with VectorLike[Boolean, BitVector] {
+    extends Vector[Boolean]
+    with VectorLike[Boolean, BitVector] {
   def apply(i: Int): Boolean = {
     if (i < 0 || (i >= length))
       throw new IndexOutOfBoundsException(
@@ -48,8 +49,7 @@ class BitVector(val data: java.util.BitSet,
       var nextReady = true
       var _next = firstBit
       def hasNext: Boolean =
-        (_next >= 0) &&
-        (nextReady || {
+        (_next >= 0) && (nextReady || {
               _next += 1
               _next = data.nextSetBit(_next)
               nextReady = _next >= 0

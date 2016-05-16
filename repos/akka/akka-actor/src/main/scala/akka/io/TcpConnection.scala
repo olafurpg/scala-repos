@@ -26,7 +26,8 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   */
 private[io] abstract class TcpConnection(
     val tcp: TcpExt, val channel: SocketChannel, val pullMode: Boolean)
-    extends Actor with ActorLogging
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import tcp.Settings._
@@ -481,7 +482,8 @@ private[io] abstract class TcpConnection(
                          remaining: Long,
                          ack: Event,
                          tail: WriteCommand)
-      extends PendingWrite with Runnable {
+      extends PendingWrite
+      with Runnable {
 
     def doWrite(info: ConnectionInfo): PendingWrite = {
       tcp.fileIoDispatcher.execute(this)

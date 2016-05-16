@@ -132,7 +132,8 @@ class MultivariateGaussian @Since("1.3.0")(
 
       // calculate the root-pseudo-inverse of the diagonal matrix of singular values
       // by inverting the square root of all non-zero values
-      val pinvS = diag(new DBV(
+      val pinvS = diag(
+          new DBV(
               d.map(v => if (v > tol) math.sqrt(1.0 / v) else 0.0).toArray))
 
       (pinvS * u.t,

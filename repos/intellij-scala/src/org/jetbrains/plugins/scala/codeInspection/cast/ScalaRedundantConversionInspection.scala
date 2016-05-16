@@ -35,8 +35,8 @@ class ScalaRedundantConversionInspection
     target match {
       case f: ScSyntheticFunction if f.name.startsWith("to") =>
         for (leftType <- left.getType(TypingContext.empty);
-        conversionType = f.retType
-            if leftType.equiv(conversionType)) registerProblem(
+             conversionType = f.retType
+             if leftType.equiv(conversionType)) registerProblem(
             element, left, conversionType.presentableText, offset, holder)
       case f: PsiMethod
           if f.getName == "toString" &&
@@ -44,7 +44,7 @@ class ScalaRedundantConversionInspection
           (f.getTypeParameterList == null ||
               f.getTypeParameterList.getTypeParameters.isEmpty) =>
         for (leftType <- left.getType(TypingContext.empty)
-                            if leftType.canonicalText == "_root_.java.lang.String") registerProblem(
+             if leftType.canonicalText == "_root_.java.lang.String") registerProblem(
             element, left, "java.lang.String", offset, holder)
       case _ =>
     }

@@ -37,8 +37,8 @@ sealed class StreamT[M[_], A](val step: M[StreamT.Step[A, StreamT[M, A]]]) {
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap {
-      _ (yieldd = (a,
-           as) => if (p(a)) Yield(a, as filter p) else Skip(as filter p),
+      _ (yieldd =
+           (a, as) => if (p(a)) Yield(a, as filter p) else Skip(as filter p),
          skip = as => Skip(as filter p),
          done = Done)
     }
@@ -214,7 +214,7 @@ sealed abstract class StreamTInstances extends StreamTInstances0 {
   implicit val StreamTHoist: Hoist[StreamT] = new StreamTHoist {}
   implicit def StreamTFoldable[F[_]: Foldable]: Foldable[StreamT[F, ?]] =
     new Foldable[StreamT[F, ?]] with Foldable.FromFoldMap[StreamT[F, ?]] {
-      override def foldMap[A, M : Monoid](s: StreamT[F, A])(f: A => M) =
+      override def foldMap[A, M: Monoid](s: StreamT[F, A])(f: A => M) =
         s.foldMap(f)
     }
 }
@@ -304,7 +304,8 @@ object StreamT extends StreamTInstances {
 //
 
 private trait StreamTInstance1[F[_]]
-    extends Bind[StreamT[F, ?]] with Plus[StreamT[F, ?]] {
+    extends Bind[StreamT[F, ?]]
+    with Plus[StreamT[F, ?]] {
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: StreamT[F, A])(f: A => B) =
@@ -324,14 +325,16 @@ private trait StreamTSemigroup[F[_], A] extends Semigroup[StreamT[F, A]] {
 }
 
 private trait StreamTMonoid[F[_], A]
-    extends Monoid[StreamT[F, A]] with StreamTSemigroup[F, A] {
+    extends Monoid[StreamT[F, A]]
+    with StreamTSemigroup[F, A] {
   implicit def F: Applicative[F]
 
   def zero: StreamT[F, A] = StreamT.empty[F, A]
 }
 
 private trait StreamTMonadPlus[F[_]]
-    extends MonadPlus[StreamT[F, ?]] with StreamTInstance1[F] {
+    extends MonadPlus[StreamT[F, ?]]
+    with StreamTInstance1[F] {
   implicit def F: Applicative[F]
 
   def point[A](a: => A): StreamT[F, A] = a :: StreamT.empty[F, A]
@@ -347,8 +350,8 @@ private trait StreamTHoist extends Hoist[StreamT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): StreamT[G, A] =
     StreamT[G, A](G.map(a)(Yield(_, empty)))
 
-  def hoist[M[_], N[_]](
-      f: M ~> N)(implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
+  def hoist[M[_], N[_]](f: M ~> N)(
+      implicit M: Monad[M]): StreamT[M, ?] ~> StreamT[N, ?] =
     new (StreamT[M, ?] ~> StreamT[N, ?]) {
       def apply[A](a: StreamT[M, A]): StreamT[N, A] =
         StreamT[N, A](

@@ -27,7 +27,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class PowerIterationClusteringSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   import org.apache.spark.mllib.clustering.PowerIterationClustering._
 
@@ -187,8 +188,8 @@ object PowerIterationClusteringSuite extends SparkFunSuite {
   def createModel(sc: SparkContext,
                   k: Int,
                   nPoints: Int): PowerIterationClusteringModel = {
-    val assignments = sc.parallelize((0 until nPoints).map(
-            p => PowerIterationClustering.Assignment(p, Random.nextInt(k))))
+    val assignments = sc.parallelize((0 until nPoints).map(p =>
+              PowerIterationClustering.Assignment(p, Random.nextInt(k))))
     new PowerIterationClusteringModel(k, assignments)
   }
 

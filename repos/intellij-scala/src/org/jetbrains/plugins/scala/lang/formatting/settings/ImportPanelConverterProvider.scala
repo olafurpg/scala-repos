@@ -96,8 +96,8 @@ class ImportPanelConverterProvider
                     settingsValue = new Element("ScalaCodeStyleSettings")
                     value.addContent(settingsValue)
                   }
-                  getElements.foreach(
-                      elem => settingsValue.addContent(elem.clone()))
+                  getElements.foreach(elem =>
+                        settingsValue.addContent(elem.clone()))
                 }
                 JDOMUtil.writeDocument(new Document(root.clone()),
                                        file,

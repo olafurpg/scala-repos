@@ -48,11 +48,10 @@ object Doc {
            prepare(label + " Java API documentation",
                    filterSources(javaSourcesOnly,
                                  (sources: Seq[File], classpath: Seq[File],
-                                 outputDirectory: File, options: Seq[String],
-                                 maxErrors: Int, log: Logger) =>
-                                   {
-                                     // doc.doc
-                                     ???
+                                  outputDirectory: File, options: Seq[String],
+                                  maxErrors: Int, log: Logger) => {
+                                   // doc.doc
+                                   ???
                                  })))
 
   val javaSourcesOnly: File => Boolean = _.getName.endsWith(".java")

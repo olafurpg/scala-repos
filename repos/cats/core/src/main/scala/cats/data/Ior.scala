@@ -134,8 +134,8 @@ sealed abstract class Ior[+A, +B] extends Product with Serializable {
   }
   // scalastyle:on cyclomatic.complexity
 
-  final def ===[AA >: A, BB >: B](
-      that: AA Ior BB)(implicit AA: Eq[AA], BB: Eq[BB]): Boolean =
+  final def ===[AA >: A, BB >: B](that: AA Ior BB)(
+      implicit AA: Eq[AA], BB: Eq[BB]): Boolean =
     fold(
         a => that.fold(a2 => AA.eqv(a, a2), b2 => false, (a2, b2) => false),
         b => that.fold(a2 => false, b2 => BB.eqv(b, b2), (a2, b2) => false),
@@ -160,15 +160,15 @@ object Ior extends IorInstances with IorFunctions {
 }
 
 private[data] sealed abstract class IorInstances extends IorInstances0 {
-  implicit def iorEq[A : Eq, B : Eq]: Eq[A Ior B] = new Eq[A Ior B] {
+  implicit def iorEq[A: Eq, B: Eq]: Eq[A Ior B] = new Eq[A Ior B] {
     def eqv(x: A Ior B, y: A Ior B): Boolean = x === y
   }
 
-  implicit def iorShow[A : Show, B : Show]: Show[A Ior B] = new Show[A Ior B] {
+  implicit def iorShow[A: Show, B: Show]: Show[A Ior B] = new Show[A Ior B] {
     def show(f: A Ior B): String = f.show
   }
 
-  implicit def iorMonad[A : Semigroup]: Monad[A Ior ?] = new Monad[A Ior ?] {
+  implicit def iorMonad[A: Semigroup]: Monad[A Ior ?] = new Monad[A Ior ?] {
     def pure[B](b: B): A Ior B = Ior.right(b)
     def flatMap[B, C](fa: A Ior B)(f: B => A Ior C): A Ior C = fa.flatMap(f)
   }

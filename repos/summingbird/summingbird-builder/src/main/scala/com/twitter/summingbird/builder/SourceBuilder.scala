@@ -60,7 +60,7 @@ object SourceBuilder {
   implicit def sg[T]: Semigroup[SourceBuilder[T]] =
     Semigroup.from(_ ++ _)
 
-  def nextName[T : Manifest]: String =
+  def nextName[T: Manifest]: String =
     "%s_%d".format(manifest[T], nextId.getAndIncrement)
 
   def apply[T](eventSource: EventSource[T], timeOf: T => Date)(
@@ -78,7 +78,7 @@ object SourceBuilder {
   }
 }
 
-case class SourceBuilder[T : Manifest] private (
+case class SourceBuilder[T: Manifest] private (
     @transient node: SourceBuilder.Node[T],
     @transient registrar: IKryoRegistrar,
     id: String,
@@ -86,10 +86,10 @@ case class SourceBuilder[T : Manifest] private (
     extends Serializable {
   import SourceBuilder.{adjust, Node, nextName}
 
-  def map[U : Manifest](fn: T => U): SourceBuilder[U] =
+  def map[U: Manifest](fn: T => U): SourceBuilder[U] =
     copy(node = node.map(fn))
   def filter(fn: T => Boolean): SourceBuilder[T] = copy(node = node.filter(fn))
-  def flatMap[U : Manifest](fn: T => TraversableOnce[U]): SourceBuilder[U] =
+  def flatMap[U: Manifest](fn: T => TraversableOnce[U]): SourceBuilder[U] =
     copy(node = node.flatMap(fn))
 
   /**
@@ -103,7 +103,7 @@ case class SourceBuilder[T : Manifest] private (
       valMf: Manifest[V]): SourceBuilder[(K2, V)] =
     copy(node = node.asInstanceOf[Node[(K1, V)]].flatMapKeys(fn))
 
-  def flatMapBuilder[U : Manifest](
+  def flatMapBuilder[U: Manifest](
       newFlatMapper: FlatMapper[T, U]): SourceBuilder[U] =
     flatMap(newFlatMapper(_))
 
@@ -118,24 +118,22 @@ case class SourceBuilder[T : Manifest] private (
           }
       )
     copy(
-        node = node
-            .either(newNode)
-            .flatMap[T] {
-            case Left(t) => Some(t)
-            case Right(u) => None
-          }
-      )
+        node = node.either(newNode).flatMap[T] {
+          case Left(t) => Some(t)
+          case Right(u) => None
+        }
+    )
   }
 
-  def write(
-      sink: CompoundSink[T])(implicit batcher: Batcher): SourceBuilder[T] =
+  def write(sink: CompoundSink[T])(
+      implicit batcher: Batcher): SourceBuilder[T] =
     copy(
         node = node.write(
-              sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
-              sink.online.map { supplier =>
+            sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
+            sink.online.map { supplier =>
               new StormSink[T] { lazy val toFn = supplier() }
             }
-          )
+        )
     )
 
   def leftJoin[K, V, JoinedValue](service: CompoundService[K, JoinedValue])(
@@ -146,15 +144,15 @@ case class SourceBuilder[T : Manifest] private (
     : SourceBuilder[(K, (V, Option[JoinedValue]))] =
     copy(
         node = node
-            .asInstanceOf[Node[(K, V)]]
-            .leftJoin((
-                    service.offline,
-                    service.online.map {
+          .asInstanceOf[Node[(K, V)]]
+          .leftJoin((
+                  service.offline,
+                  service.online.map {
                 fn: Function0[ReadableStore[K, JoinedValue]] =>
                   ReadableServiceFactory(fn)
               }
-                ))
-      )
+              ))
+    )
 
   /** Set's an Option on all nodes ABOVE this point */
   def set(opt: Any): SourceBuilder[T] =

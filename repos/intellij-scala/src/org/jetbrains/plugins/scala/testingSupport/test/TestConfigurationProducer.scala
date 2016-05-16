@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
   */
 abstract class TestConfigurationProducer(configurationType: ConfigurationType)
     extends RunConfigurationProducer[AbstractTestRunConfiguration](
-        configurationType) with AbstractTestConfigurationProducer {
+        configurationType)
+    with AbstractTestConfigurationProducer {
 
   protected def isObjectInheritor(
       clazz: ScTypeDefinition, fqn: String): Boolean = {

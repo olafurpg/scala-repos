@@ -34,8 +34,8 @@ class WhileFilter extends ElementFilter {
         }
         var text = ""
         if (doStmt == null) {
-          while (parent != null &&
-          !parent.isInstanceOf[ScDoStmt]) parent = parent.getParent
+          while (parent != null && !parent.isInstanceOf[ScDoStmt]) parent =
+            parent.getParent
           if (parent == null) return false
           text = parent.getText
           text = Pattern

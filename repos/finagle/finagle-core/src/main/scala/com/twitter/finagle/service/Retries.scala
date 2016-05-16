@@ -51,9 +51,9 @@ object Retries {
     * @note requeueBackoffs only apply to automatic retries and not to
     *       requests using a [[RetryPolicy]]
     */
-  case class Budget(
-      retryBudget: RetryBudget,
-      requeueBackoffs: Stream[Duration] = Budget.emptyBackoffSchedule) {
+  case class Budget(retryBudget: RetryBudget,
+                    requeueBackoffs: Stream[Duration] =
+                      Budget.emptyBackoffSchedule) {
     def this(retryBudget: RetryBudget) =
       this(retryBudget, Budget.emptyBackoffSchedule)
 
@@ -94,8 +94,8 @@ object Retries {
     * Retries failures that are guaranteed to be safe to retry
     * (see [[RetryPolicy.RetryableWriteException]]).
     */
-  private[finagle] def moduleRequeueable[Req, Rep]: Stackable[ServiceFactory[
-          Req, Rep]] =
+  private[finagle] def moduleRequeueable[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module3[Stats, Budget, HighResTimer, ServiceFactory[Req, Rep]] {
       def role: Stack.Role = Retries.Role
 
@@ -138,8 +138,8 @@ object Retries {
     *       level failures. This is particularly important for codecs that
     *       include exceptions, such as `Thrift`.
     */
-  private[finagle] def moduleWithRetryPolicy[Req, Rep]: Stackable[
-      ServiceFactory[Req, Rep]] =
+  private[finagle] def moduleWithRetryPolicy[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module4[
         Stats,
         Budget,

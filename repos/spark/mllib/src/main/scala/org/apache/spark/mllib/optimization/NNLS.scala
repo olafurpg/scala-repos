@@ -83,7 +83,8 @@ private[spark] object NNLS {
           || (step < 1e-7) // too small or negative
           || (step > 1e40) // too small; almost certainly numerical problems
           || (ndir < 1e-12 * nx) // gradient relatively too small
-          || (ndir < 1e-32) // gradient absolutely too small; numerical issues may lurk
+          ||
+          (ndir < 1e-32) // gradient absolutely too small; numerical issues may lurk
           )
     }
 

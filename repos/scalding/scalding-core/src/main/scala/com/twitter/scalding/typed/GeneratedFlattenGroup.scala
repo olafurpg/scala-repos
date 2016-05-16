@@ -16,15 +16,17 @@ object FlattenGroup {
     (a, b, c)
   }
 
-  class FlattenLeftJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C](nested: KLL[KEY, ((A, B), C)]) {
+  class FlattenLeftJoin3[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
+      nested: KLL[KEY, ((A, B), C)]) {
     def flattenValueTuple: KLL[KEY, (A, B, C)] = nested.mapValues { tup =>
       FlattenGroup.flattenNestedTuple(tup)
     }
   }
 
-  implicit def toFlattenLeftJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C](nested: KLL[KEY, ((A, B), C)]) =
+  implicit def toFlattenLeftJoin3[
+      KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
+      nested: KLL[KEY, ((A, B), C)]) =
     new FlattenLeftJoin3(nested)
 
   def flattenNestedTuple[A, B, C, D](nested: (((A, B), C), D)): (A, B, C, D) = {
@@ -32,15 +34,17 @@ object FlattenGroup {
     (a, b, c, d)
   }
 
-  class FlattenLeftJoin4[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D](nested: KLL[KEY, (((A, B), C), D)]) {
+  class FlattenLeftJoin4[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
+      nested: KLL[KEY, (((A, B), C), D)]) {
     def flattenValueTuple: KLL[KEY, (A, B, C, D)] = nested.mapValues { tup =>
       FlattenGroup.flattenNestedTuple(tup)
     }
   }
 
-  implicit def toFlattenLeftJoin4[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D](nested: KLL[KEY, (((A, B), C), D)]) =
+  implicit def toFlattenLeftJoin4[
+      KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
+      nested: KLL[KEY, (((A, B), C), D)]) =
     new FlattenLeftJoin4(nested)
 
   def flattenNestedTuple[A, B, C, D, E](
@@ -49,8 +53,8 @@ object FlattenGroup {
     (a, b, c, d, e)
   }
 
-  class FlattenLeftJoin5[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E](
+  class FlattenLeftJoin5[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
       nested: KLL[KEY, ((((A, B), C), D), E)]) {
     def flattenValueTuple: KLL[KEY, (A, B, C, D, E)] = nested.mapValues {
       tup =>
@@ -58,9 +62,15 @@ object FlattenGroup {
     }
   }
 
-  implicit def toFlattenLeftJoin5[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E](
-      nested: KLL[KEY, ((((A, B), C), D), E)]) = new FlattenLeftJoin5(nested)
+  implicit def toFlattenLeftJoin5[
+      KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL],
+      A,
+      B,
+      C,
+      D,
+      E](nested: KLL[KEY, ((((A, B), C), D), E)]) =
+    new FlattenLeftJoin5(nested)
 
   def flattenNestedTuple[A, B, C, D, E, F](
       nested: (((((A, B), C), D), E), F)): (A, B, C, D, E, F) = {
@@ -68,18 +78,24 @@ object FlattenGroup {
     (a, b, c, d, e, f)
   }
 
-  class FlattenLeftJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E, F](
-      nested: KLL[KEY, (((((A, B), C), D), E), F)]) {
+  class FlattenLeftJoin6[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E,
+      F](nested: KLL[KEY, (((((A, B), C), D), E), F)]) {
     def flattenValueTuple: KLL[KEY, (A, B, C, D, E, F)] = nested.mapValues {
       tup =>
         FlattenGroup.flattenNestedTuple(tup)
     }
   }
 
-  implicit def toFlattenLeftJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E, F](
-      nested: KLL[KEY, (((((A, B), C), D), E), F)]) =
+  implicit def toFlattenLeftJoin6[
+      KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL],
+      A,
+      B,
+      C,
+      D,
+      E,
+      F](nested: KLL[KEY, (((((A, B), C), D), E), F)]) =
     new FlattenLeftJoin6(nested)
 
   def flattenNestedTuple[A, B, C, D, E, F, G](
@@ -89,50 +105,46 @@ object FlattenGroup {
   }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H](
-      nested: (((((((A, B), C), D), E), F), G),
-      H)): (A, B, C, D, E, F, G, H) = {
+      nested: (((((((A, B), C), D), E), F), G), H))
+    : (A, B, C, D, E, F, G, H) = {
     val (((((((a, b), c), d), e), f), g), h) = nested
     (a, b, c, d, e, f, g, h)
   }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I](
-      nested: ((((((((A, B), C), D), E), F), G), H),
-      I)): (A, B, C, D, E, F, G, H, I) = {
+      nested: ((((((((A, B), C), D), E), F), G), H), I))
+    : (A, B, C, D, E, F, G, H, I) = {
     val ((((((((a, b), c), d), e), f), g), h), i) = nested
     (a, b, c, d, e, f, g, h, i)
   }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J](
-      nested: (((((((((A, B), C), D), E), F), G), H), I),
-      J)): (A, B, C, D, E, F, G, H, I, J) = {
+      nested: (((((((((A, B), C), D), E), F), G), H), I), J))
+    : (A, B, C, D, E, F, G, H, I, J) = {
     val (((((((((a, b), c), d), e), f), g), h), i), j) = nested
     (a, b, c, d, e, f, g, h, i, j)
   }
 
-  def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K](
-      nested: ((((((((((A, B), C), D), E), F), G), H), I), J),
+  def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K](nested: ((((((((((A, B), C), D), E), F), G), H), I), J),
       K)): (A, B, C, D, E, F, G, H, I, J, K) = {
     val ((((((((((a, b), c), d), e), f), g), h), i), j), k) = nested
-    (a, b, c, d, e, f, g, h, i, j, k)
-  }
+    (a, b, c, d, e, f, g, h, i, j, k) }
 
-  def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L](
-      nested: (((((((((((A, B), C), D), E), F), G), H), I), J), K),
+  def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L](nested: (((((((((((A, B), C), D), E), F), G), H), I), J), K),
       L)): (A, B, C, D, E, F, G, H, I, J, K, L) = {
     val (((((((((((a, b), c), d), e), f), g), h), i), j), k), l) = nested
-    (a, b, c, d, e, f, g, h, i, j, k, l)
-  }
+    (a, b, c, d, e, f, g, h, i, j, k, l) }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M](
-      nested: ((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M)): (A, B, C, D, E, F, G, H, I, J, K, L, M) = {
+      nested: ((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M))
+    : (A, B, C, D, E, F, G, H, I, J, K, L, M) = {
     val ((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m)
   }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       nested: (((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) = {
+               N)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) = {
     val (((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n) =
       nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
@@ -140,7 +152,8 @@ object FlattenGroup {
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nested: ((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N), O)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) = {
+                N),
+               O)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) = {
     val ((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o) =
       nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
@@ -148,7 +161,9 @@ object FlattenGroup {
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       nested: (((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N), O), P)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) = {
+                 N),
+                O),
+               P)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) = {
     val (
     ((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
     p) = nested
@@ -156,9 +171,11 @@ object FlattenGroup {
   }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      nested: ((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M), N), O), P),
-      Q)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) = {
+      nested: ((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
+                  N),
+                 O),
+                P),
+               Q)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) = {
     val (
     (((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
      p),
@@ -168,8 +185,12 @@ object FlattenGroup {
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       nested: (((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M), N), O), P), Q),
-      R)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) = {
+                    M),
+                   N),
+                  O),
+                 P),
+                Q),
+               R)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) = {
     val (
     ((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
       p),
@@ -181,8 +202,14 @@ object FlattenGroup {
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       nested: ((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M), N), O), P), Q), R),
-      S)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) = {
+                     M),
+                    N),
+                   O),
+                  P),
+                 Q),
+                R),
+               S))
+    : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) = {
     val (
     (((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
        p),
@@ -195,71 +222,123 @@ object FlattenGroup {
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       nested: (((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M), N), O), P), Q), R), S),
-      T)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) = {
-    val (((((
-            (
-            (((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n),
-            o),
-            p),
-            q),
-           r),
-          s),
-         t) = nested
+                      M),
+                     N),
+                    O),
+                   P),
+                  Q),
+                 R),
+                S),
+               T))
+    : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) = {
+    val (
+    ((((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n),
+         o),
+        p),
+       q),
+      r),
+     s),
+    t) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)
   }
 
   def flattenNestedTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      nested: ((((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K),
-      L), M), N), O), P), Q), R), S), T),
-      U)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) = {
-    val (((((
-            (
-            (
-            (((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n),
-            o),
-            p),
-            q),
-            r),
-           s),
-          t),
-         u) = nested
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S,
+      T,
+      U](nested: ((((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K),
+                           L),
+                          M),
+                         N),
+                        O),
+                       P),
+                      Q),
+                     R),
+                    S),
+                   T),
+                  U))
+    : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) = {
+    val (
+    (((((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n),
+          o),
+         p),
+        q),
+       r),
+      s),
+     t),
+    u) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)
   }
 
   def flattenNestedTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S,
+      T,
+      U,
+      V](
       nested: (((((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K),
       L), M), N), O), P), Q), R), S), T), U), V))
     : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = {
     val (
-    (
-    ((((
+    (((
+      ((
        (
        ((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
        p),
        q),
        r),
       s),
-     t),
-    u),
+      t),
+     u),
     v) = nested
-    (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)
-  }
+    (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v) }
 
   // methods for flattening results of outerJoin
 
   def flattenNestedOptionTuple[A, B, C](
-      nested: (Option[(Option[A], Option[B])],
-      Option[C])): (Option[A], Option[B], Option[C]) = {
+      nested: (Option[(Option[A], Option[B])], Option[C]))
+    : (Option[A], Option[B], Option[C]) = {
     val (rest1, c) = nested
     val (a, b) = rest1.getOrElse(pairOfNones)
     (a, b, c)
   }
 
-  class FlattenOuterJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C](
+  class FlattenOuterJoin3[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
       nested: KLL[KEY, (Option[(Option[A], Option[B])], Option[C])]) {
     def flattenValueTuple: KLL[KEY, (Option[A], Option[B], Option[C])] =
       nested.mapValues { tup =>
@@ -267,25 +346,25 @@ object FlattenGroup {
       }
   }
 
-  implicit def toFlattenOuterJoin3[KEY, KLL[
-          KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
+  implicit def toFlattenOuterJoin3[
+      KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
       nested: KLL[KEY, (Option[(Option[A], Option[B])], Option[C])]) =
     new FlattenOuterJoin3(nested)
 
   def flattenNestedOptionTuple[A, B, C, D](
-      nested: (Option[(Option[(Option[A], Option[B])], Option[C])],
-      Option[D])): (Option[A], Option[B], Option[C], Option[D]) = {
+      nested: (Option[(Option[(Option[A], Option[B])], Option[C])], Option[D]))
+    : (Option[A], Option[B], Option[C], Option[D]) = {
     val (rest1, d) = nested
     val (rest2, c) = rest1.getOrElse(pairOfNones)
     val (a, b) = rest2.getOrElse(pairOfNones)
     (a, b, c, d)
   }
 
-  class FlattenOuterJoin4[
-      KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
+  class FlattenOuterJoin4[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
       nested: KLL[KEY,
                   (Option[(Option[(Option[A], Option[B])], Option[C])],
-                  Option[D])]) {
+                   Option[D])]) {
     def flattenValueTuple: KLL[
         KEY, (Option[A], Option[B], Option[C], Option[D])] = nested.mapValues {
       tup =>
@@ -293,16 +372,17 @@ object FlattenGroup {
     }
   }
 
-  implicit def toFlattenOuterJoin4[KEY, KLL[
-          KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
+  implicit def toFlattenOuterJoin4[
+      KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
       nested: KLL[KEY,
                   (Option[(Option[(Option[A], Option[B])], Option[C])],
-                  Option[D])]) = new FlattenOuterJoin4(nested)
+                   Option[D])]) = new FlattenOuterJoin4(nested)
 
   def flattenNestedOptionTuple[A, B, C, D, E](
-      nested: (Option[
-          (Option[(Option[(Option[A], Option[B])], Option[C])], Option[D])],
-      Option[E])): (Option[A], Option[B], Option[C], Option[D], Option[E]) = {
+      nested: (Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                       Option[D])],
+               Option[E]))
+    : (Option[A], Option[B], Option[C], Option[D], Option[E]) = {
     val (rest1, e) = nested
     val (rest2, d) = rest1.getOrElse(pairOfNones)
     val (rest3, c) = rest2.getOrElse(pairOfNones)
@@ -310,12 +390,12 @@ object FlattenGroup {
     (a, b, c, d, e)
   }
 
-  class FlattenOuterJoin5[KEY, KLL[
-          KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
-      nested: KLL[
-          KEY,
-          (Option[(Option[(Option[(Option[A], Option[B])], Option[C])], Option[
-                  D])], Option[E])]) {
+  class FlattenOuterJoin5[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
+      nested: KLL[KEY,
+                  (Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                           Option[D])],
+                   Option[E])]) {
     def flattenValueTuple: KLL[
         KEY, (Option[A], Option[B], Option[C], Option[D], Option[E])] =
       nested.mapValues { tup =>
@@ -323,16 +403,25 @@ object FlattenGroup {
       }
   }
 
-  implicit def toFlattenOuterJoin5[KEY, KLL[
-          KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
-      nested: KLL[
-          KEY,
-          (Option[(Option[(Option[(Option[A], Option[B])], Option[C])], Option[
-                  D])], Option[E])]) = new FlattenOuterJoin5(nested)
+  implicit def toFlattenOuterJoin5[
+      KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL],
+      A,
+      B,
+      C,
+      D,
+      E](
+      nested: KLL[KEY,
+                  (Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                           Option[D])],
+                   Option[E])]) = new FlattenOuterJoin5(nested)
 
   def flattenNestedOptionTuple[A, B, C, D, E, F](
-      nested: (Option[(Option[(Option[(Option[(Option[A], Option[B])], Option[
-                      C])], Option[D])], Option[E])], Option[F]))
+      nested: (Option[(Option[(Option[(Option[(Option[A], Option[B])],
+                                       Option[C])],
+                               Option[D])],
+                       Option[E])],
+               Option[F]))
     : (Option[A], Option[B], Option[C], Option[D], Option[E], Option[F]) = {
     val (rest1, f) = nested
     val (rest2, e) = rest1.getOrElse(pairOfNones)
@@ -342,34 +431,55 @@ object FlattenGroup {
     (a, b, c, d, e, f)
   }
 
-  class FlattenOuterJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E, F](
-      nested: KLL[KEY,
-                  (Option[
-                      (Option[(Option[(Option[(Option[A], Option[B])], Option[
-                                  C])], Option[D])], Option[E])],
-                  Option[F])]) {
+  class FlattenOuterJoin6[KEY,
+      KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E,
+      F](
+      nested: KLL[
+          KEY,
+          (Option[(Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                           Option[D])],
+                   Option[E])],
+           Option[F])]) {
     def flattenValueTuple: KLL[KEY,
-                               (Option[A], Option[B], Option[C], Option[D],
-                               Option[E], Option[F])] = nested.mapValues {
-      tup =>
-        FlattenGroup.flattenNestedOptionTuple(tup)
+                               (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F])] = nested.mapValues { tup =>
+      FlattenGroup.flattenNestedOptionTuple(tup)
     }
   }
 
-  implicit def toFlattenOuterJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D, E, F](
-      nested: KLL[KEY,
-                  (Option[
-                      (Option[(Option[(Option[(Option[A], Option[B])], Option[
-                                  C])], Option[D])], Option[E])],
-                  Option[F])]) = new FlattenOuterJoin6(nested)
+  implicit def toFlattenOuterJoin6[KEY,
+                                   KLL[KLL_K, +KLL_V] <: KeyedListLike[
+                                       KLL_K, KLL_V, KLL],
+                                   A,
+                                   B,
+                                   C,
+                                   D,
+                                   E,
+                                   F](
+      nested: KLL[
+          KEY,
+          (Option[(Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                           Option[D])],
+                   Option[E])],
+           Option[F])]) = new FlattenOuterJoin6(nested)
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G](
-      nested: (Option[(Option[(Option[
-                  (Option[(Option[(Option[A], Option[B])], Option[C])], Option[
-                      D])], Option[E])], Option[F])], Option[G])): (Option[A],
-  Option[B], Option[C], Option[D], Option[E], Option[F], Option[G]) = {
+      nested: (Option[(Option[(Option[(Option[(Option[(Option[A], Option[B])],
+                                               Option[C])],
+                                       Option[D])],
+                               Option[E])],
+                       Option[F])],
+               Option[G])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G]) = {
     val (rest1, g) = nested
     val (rest2, f) = rest1.getOrElse(pairOfNones)
     val (rest3, e) = rest2.getOrElse(pairOfNones)
@@ -380,11 +490,21 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H](
-      nested: (Option[(Option[(Option[(Option[(Option[
-                          (Option[(Option[A], Option[B])], Option[C])], Option[
-                          D])], Option[E])], Option[F])], Option[G])],
-      Option[H])): (Option[A], Option[B], Option[C],
-  Option[D], Option[E], Option[F], Option[G], Option[H]) = {
+      nested: (Option[(Option[(Option[(Option[(Option[(Option[(Option[A],
+                                                               Option[B])],
+                                                       Option[C])],
+                                               Option[D])],
+                                       Option[E])],
+                               Option[F])],
+                       Option[G])],
+               Option[H])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H]) = {
     val (rest1, h) = nested
     val (rest2, g) = rest1.getOrElse(pairOfNones)
     val (rest3, f) = rest2.getOrElse(pairOfNones)
@@ -396,11 +516,23 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I](
-      nested: (Option[(Option[(Option[(Option[(Option[(Option[(Option[
-                                  (Option[A], Option[B])], Option[C])], Option[
-                              D])], Option[E])], Option[F])], Option[G])], Option[
-              H])], Option[I])): (Option[A], Option[B], Option[C], Option[D],
-  Option[E], Option[F], Option[G], Option[H], Option[I]) = {
+      nested: (Option[(Option[(Option[
+                                   (Option[
+                                        (Option[(Option[(Option[(Option[A], Option[B])], Option[C])],
+                                                 Option[D])],
+                                         Option[E])],
+                                    Option[F])],
+                               Option[G])],
+                       Option[H])],
+               Option[I])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I]) = {
     val (rest1, i) = nested
     val (rest2, h) = rest1.getOrElse(pairOfNones)
     val (rest3, g) = rest2.getOrElse(pairOfNones)
@@ -412,15 +544,28 @@ object FlattenGroup {
     (a, b, c, d, e, f, g, h, i)
   }
 
-  def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J](nested: (Option[(Option[
-              (Option[
-                  (Option[(Option[(Option[
-                              (Option[
-                                  (Option[(Option[A], Option[B])], Option[C])], Option[D])], Option[
-                              E])], Option[F])], Option[G])], Option[H])], Option[
-              I])], Option[J])): (Option[A], Option[B], Option[C], Option[D],
-  Option[E], Option[F], Option[G], Option[H], Option[I], Option[J]) = {
+  def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J](
+      nested: (Option[(Option[(Option[
+                                   (Option[(Option[
+                                                (Option[(Option[
+                                                             (Option[(Option[A], Option[B])],
+                                                              Option[C])],
+                                                         Option[D])],
+                                                 Option[E])],
+                                            Option[F])],
+                                    Option[G])],
+                               Option[H])],
+                       Option[I])],
+               Option[J])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J]) = {
     val (rest1, j) = nested
     val (rest2, i) = rest1.getOrElse(pairOfNones)
     val (rest3, h) = rest2.getOrElse(pairOfNones)
@@ -433,18 +578,35 @@ object FlattenGroup {
     (a, b, c, d, e, f, g, h, i, j)
   }
 
-  def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[(Option[
-                                  (Option[(Option[(Option[A], Option[B])], Option[
-                                          C])], Option[D])], Option[E])], Option[
-                              F])], Option[G])], Option[H])], Option[I])], Option[
-              J])],
-      Option[K])): (Option[A], Option[B], Option[C], Option[D], Option[E],
-  Option[F], Option[G], Option[H], Option[I], Option[J], Option[K]) = {
+  def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K](
+      nested: (Option[
+                   (Option[
+                        (Option[(Option[(Option[(Option[
+                                                     (Option[(Option[
+                                                                  (Option[
+                                                                       (Option[
+                                                                            A],
+                                                                        Option[
+                                                                            B])],
+                                                                   Option[C])],
+                                                              Option[D])],
+                                                      Option[E])],
+                                                 Option[F])],
+                                         Option[G])],
+                                 Option[H])],
+                         Option[I])],
+                    Option[J])],
+               Option[K])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K]) = {
     val (rest1, k) = nested
     val (rest2, j) = rest1.getOrElse(pairOfNones)
     val (rest3, i) = rest2.getOrElse(pairOfNones)
@@ -460,17 +622,35 @@ object FlattenGroup {
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L](
       nested: (Option[
-          (Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[
-                              (Option[(Option[(Option[(Option[
-                                              (Option[A], Option[B])], Option[
-                                              C])], Option[D])], Option[E])], Option[
-                                  F])], Option[G])], Option[H])], Option[I])], Option[
-                  J])], Option[K])], Option[L]))
-    : (Option[A], Option[B], Option[C], Option[D], Option[E], Option[F],
-    Option[G], Option[H], Option[I], Option[J], Option[K], Option[L]) = {
+                   (Option[
+                        (Option[(Option[(Option[(Option[
+                                                     (Option[(Option[
+                                                                  (Option[
+                                                                       (Option[
+                                                                            (Option[A],
+                                                                             Option[B])],
+                                                                        Option[
+                                                                            C])],
+                                                                   Option[D])],
+                                                              Option[E])],
+                                                      Option[F])],
+                                                 Option[G])],
+                                         Option[H])],
+                                 Option[I])],
+                         Option[J])],
+                    Option[K])],
+               Option[L])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K],
+                             Option[L]) = {
     val (rest1, l) = nested
     val (rest2, k) = rest1.getOrElse(pairOfNones)
     val (rest3, j) = rest2.getOrElse(pairOfNones)
@@ -487,16 +667,37 @@ object FlattenGroup {
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M](
       nested: (Option[
-          (Option[
-              (Option[
-                  (Option[(Option[(Option[(Option[
-                                  (Option[(Option[(Option[(Option[(Option[A], Option[
-                                                      B])], Option[C])], Option[
-                                              D])], Option[E])], Option[F])], Option[
-                                  G])], Option[H])], Option[I])], Option[J])], Option[
-                  K])], Option[L])], Option[M])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G],
-  Option[H], Option[I], Option[J], Option[K], Option[L], Option[M]) = {
+                   (Option[(Option[
+                                (Option[(Option[
+                                             (Option[(Option[(Option[
+                                                                  (Option[
+                                                                       (Option[
+                                                                            (Option[(Option[A],
+                                                                                     Option[B])],
+                                                                             Option[C])],
+                                                                        Option[
+                                                                            D])],
+                                                                   Option[E])],
+                                                              Option[F])],
+                                                      Option[G])],
+                                              Option[H])],
+                                         Option[I])],
+                                 Option[J])],
+                            Option[K])],
+                    Option[L])],
+               Option[M])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K],
+                             Option[L],
+                             Option[M]) = {
     val (rest1, m) = nested
     val (rest2, l) = rest1.getOrElse(pairOfNones)
     val (rest3, k) = rest2.getOrElse(pairOfNones)
@@ -513,18 +714,41 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[(Option[(Option[(Option[(Option[
-                                              (Option[(Option[
-                                                      (Option[A], Option[B])], Option[
-                                                      C])], Option[D])], Option[
-                                              E])], Option[F])], Option[G])], Option[
-                                  H])], Option[I])], Option[J])], Option[K])], Option[
-                  L])], Option[M])], Option[N])): (Option[A],
-  Option[B], Option[C], Option[D], Option[E], Option[F], Option[G], Option[H],
-  Option[I], Option[J], Option[K], Option[L], Option[M], Option[N]) = {
+      nested: (Option[
+                   (Option[
+                        (Option[(Option[(Option[(Option[
+                                                     (Option[(Option[
+                                                                  (Option[
+                                                                       (Option[(Option[(Option[(Option[
+                                                                                                    A],
+                                                                                                Option[
+                                                                                                    B])],
+                                                                                        Option[C])],
+                                                                                Option[D])],
+                                                                        Option[
+                                                                            E])],
+                                                                   Option[F])],
+                                                              Option[G])],
+                                                      Option[H])],
+                                                 Option[I])],
+                                         Option[J])],
+                                 Option[K])],
+                         Option[L])],
+                    Option[M])],
+               Option[N])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K],
+                             Option[L],
+                             Option[M],
+                             Option[N]) = {
     val (rest1, n) = nested
     val (rest2, m) = rest1.getOrElse(pairOfNones)
     val (rest3, l) = rest2.getOrElse(pairOfNones)
@@ -543,19 +767,45 @@ object FlattenGroup {
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nested: (Option[
-          (Option[
-              (Option[
-                  (Option[(Option[(Option[(Option[(Option[(Option[
-                                          (Option[
-                                              (Option[
-                                                  (Option[(Option[(Option[A], Option[
-                                                              B])], Option[C])], Option[
-                                                      D])], Option[E])], Option[
-                                              F])], Option[G])], Option[H])], Option[
-                                  I])], Option[J])], Option[K])], Option[L])], Option[
-                  M])], Option[N])], Option[O])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
-  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O]) = {
+                   (Option[
+                        (Option[(Option[(Option[(Option[
+                                                     (Option[(Option[
+                                                                  (Option[
+                                                                       (Option[
+                                                                            (Option[
+                                                                                 (Option[(Option[(Option[A],
+                                                                                                  Option[
+                                                                                                      B])],
+                                                                                          Option[
+                                                                                              C])],
+                                                                                  Option[
+                                                                                      D])],
+                                                                             Option[E])],
+                                                                        Option[
+                                                                            F])],
+                                                                   Option[G])],
+                                                              Option[H])],
+                                                      Option[I])],
+                                                 Option[J])],
+                                         Option[K])],
+                                 Option[L])],
+                         Option[M])],
+                    Option[N])],
+               Option[O])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K],
+                             Option[L],
+                             Option[M],
+                             Option[N],
+                             Option[O]) = {
     val (rest1, o) = nested
     val (rest2, n) = rest1.getOrElse(pairOfNones)
     val (rest3, m) = rest2.getOrElse(pairOfNones)
@@ -574,20 +824,48 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
-      nested: (Option[(Option[
-              (Option[
-                  (Option[(Option[(Option[(Option[(Option[(Option[
-                                          (Option[
-                                              (Option[(Option[(Option[(Option[(Option[
-                                                                  A], Option[B])], Option[
-                                                              C])], Option[D])], Option[
-                                                      E])], Option[F])], Option[
-                                              G])], Option[H])], Option[I])], Option[
-                                  J])], Option[K])], Option[L])], Option[M])], Option[
-                  N])], Option[O])],
-      Option[P])): (Option[A], Option[B], Option[C], Option[D], Option[E],
-  Option[F], Option[G], Option[H], Option[I], Option[J],
-  Option[K], Option[L], Option[M], Option[N], Option[O], Option[P]) = {
+      nested: (Option[
+                   (Option[(Option[
+                                (Option[(Option[
+                                             (Option[(Option[(Option[
+                                                                  (Option[
+                                                                       (Option[
+                                                                            (Option[
+                                                                                 (Option[(Option[
+                                                                                              (Option[(Option[
+                                                                                                           A],
+                                                                                                       Option[B])],
+                                                                                               Option[
+                                                                                                   C])],
+                                                                                          Option[D])],
+                                                                                  Option[E])],
+                                                                             Option[F])],
+                                                                        Option[
+                                                                            G])],
+                                                                   Option[H])],
+                                                              Option[I])],
+                                                      Option[J])],
+                                              Option[K])],
+                                         Option[L])],
+                                 Option[M])],
+                            Option[N])],
+                    Option[O])],
+               Option[P])): (Option[A],
+                             Option[B],
+                             Option[C],
+                             Option[D],
+                             Option[E],
+                             Option[F],
+                             Option[G],
+                             Option[H],
+                             Option[I],
+                             Option[J],
+                             Option[K],
+                             Option[L],
+                             Option[M],
+                             Option[N],
+                             Option[O],
+                             Option[P]) = {
     val (rest1, p) = nested
     val (rest2, o) = rest1.getOrElse(pairOfNones)
     val (rest3, n) = rest2.getOrElse(pairOfNones)
@@ -608,10 +886,11 @@ object FlattenGroup {
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[(Option[(Option[(Option[(Option[
+      nested: (Option[
+                   (Option[(Option[
+                                (Option[
+                                     (Option[
+                                          (Option[(Option[(Option[(Option[(Option[
                                               (Option[(Option[(Option[(Option[(Option[
                                                                   (Option[A], Option[
                                                                       B])], Option[
@@ -640,30 +919,72 @@ object FlattenGroup {
     val (rest14, d) = rest13.getOrElse(pairOfNones)
     val (rest15, c) = rest14.getOrElse(pairOfNones)
     val (a, b) = rest15.getOrElse(pairOfNones)
-    (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
-  }
+    (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) }
 
   def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[(Option[(Option[(Option[(Option[
-                                              (Option[(Option[(Option[(Option[(Option[
-                                                                  (Option[
-                                                                      (Option[
-                                                                          A], Option[
-                                                                          B])], Option[
-                                                                      C])], Option[
-                                                                  D])], Option[
-                                                              E])], Option[F])], Option[
-                                                      G])], Option[H])], Option[
-                                              I])], Option[J])], Option[K])], Option[
-                                  L])], Option[M])], Option[N])], Option[O])], Option[
-                  P])], Option[Q])],
-      Option[R])): (Option[A], Option[B], Option[C], Option[D], Option[E],
-  Option[F], Option[G], Option[H], Option[I], Option[J], Option[K], Option[L],
-  Option[M], Option[N], Option[O], Option[P], Option[Q], Option[R]) = {
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R](nested: (Option[(Option[(Option[
+                                      (Option[(Option[(Option[
+                                                           (Option[
+                                                                (Option[(Option[
+                                                                             (Option[(Option[
+                                                                                          (Option[
+                                                                                               (Option[
+                                                                                                    (Option[(Option[(Option[(Option[A],
+                                                                                                                             Option[B])],
+                                                                                                                     Option[
+                                                                                                                         C])],
+                                                                                                             Option[
+                                                                                                                 D])],
+                                                                                                     Option[
+                                                                                                         E])],
+                                                                                                Option[F])],
+                                                                                           Option[G])],
+                                                                                      Option[H])],
+                                                                              Option[I])],
+                                                                         Option[
+                                                                             J])],
+                                                                 Option[K])],
+                                                            Option[L])],
+                                                       Option[M])],
+                                               Option[N])],
+                                       Option[O])],
+                                  Option[P])],
+                          Option[Q])],
+                  Option[R])): (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F],
+                                Option[G],
+                                Option[H],
+                                Option[I],
+                                Option[J],
+                                Option[K],
+                                Option[L],
+                                Option[M],
+                                Option[N],
+                                Option[O],
+                                Option[P],
+                                Option[Q],
+                                Option[R]) = {
     val (rest1, r) = nested
     val (rest2, q) = rest1.getOrElse(pairOfNones)
     val (rest3, p) = rest2.getOrElse(pairOfNones)
@@ -685,27 +1006,73 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[
-                          (Option[(Option[(Option[(Option[(Option[
-                                              (Option[(Option[(Option[(Option[(Option[
-                                                                  (Option[
-                                                                      (Option[(Option[
-                                                                              A], Option[
-                                                                              B])], Option[
-                                                                          C])], Option[
-                                                                      D])], Option[
-                                                                  E])], Option[
-                                                              F])], Option[G])], Option[
-                                                      H])], Option[I])], Option[
-                                              J])], Option[K])], Option[L])], Option[
-                                  M])], Option[N])], Option[O])], Option[P])], Option[
-                  Q])], Option[R])], Option[S])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
-  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S]) = {
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S](nested: (Option[(Option[(Option[
+                                      (Option[(Option[(Option[
+                                                           (Option[
+                                                                (Option[(Option[
+                                                                             (Option[(Option[
+                                                                                          (Option[
+                                                                                               (Option[
+                                                                                                    (Option[(Option[
+                                                                                                                 (Option[
+                                                                                                                      (Option[(Option[A],
+                                                                                                                               Option[
+                                                                                                                                   B])],
+                                                                                                                       Option[C])],
+                                                                                                                  Option[
+                                                                                                                      D])],
+                                                                                                             Option[E])],
+                                                                                                     Option[F])],
+                                                                                                Option[G])],
+                                                                                           Option[H])],
+                                                                                      Option[I])],
+                                                                              Option[J])],
+                                                                         Option[
+                                                                             K])],
+                                                                 Option[L])],
+                                                            Option[M])],
+                                                       Option[N])],
+                                               Option[O])],
+                                       Option[P])],
+                                  Option[Q])],
+                          Option[R])],
+                  Option[S])): (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F],
+                                Option[G],
+                                Option[H],
+                                Option[I],
+                                Option[J],
+                                Option[K],
+                                Option[L],
+                                Option[M],
+                                Option[N],
+                                Option[O],
+                                Option[P],
+                                Option[Q],
+                                Option[R],
+                                Option[S]) = {
     val (rest1, s) = nested
     val (rest2, r) = rest1.getOrElse(pairOfNones)
     val (rest3, q) = rest2.getOrElse(pairOfNones)
@@ -728,28 +1095,75 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[(Option[(Option[(Option[(Option[
-                                          (Option[
-                                              (Option[(Option[(Option[(Option[(Option[(Option[
-                                                                      (Option[
-                                                                          (Option[
-                                                                              (Option[
-                                                                                  A], Option[
-                                                                                  B])], Option[C])], Option[
-                                                                          D])], Option[
-                                                                      E])], Option[
-                                                                  F])], Option[
-                                                              G])], Option[H])], Option[
-                                                      I])], Option[J])], Option[
-                                              K])], Option[L])], Option[M])], Option[
-                                  N])], Option[O])], Option[P])], Option[Q])], Option[
-                  R])], Option[S])], Option[T])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G],
-  Option[H], Option[I], Option[J], Option[K], Option[L], Option[M], Option[N],
-  Option[O], Option[P], Option[Q], Option[R], Option[S], Option[T]) = {
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S,
+      T](nested: (Option[(Option[(Option[
+                                      (Option[(Option[(Option[
+                                                           (Option[
+                                                                (Option[(Option[
+                                                                             (Option[(Option[
+                                                                                          (Option[
+                                                                                               (Option[
+                                                                                                    (Option[(Option[(Option[(Option[
+                                                                                                                                 (Option[
+                                                                                                                                      (Option[A],
+                                                                                                                                       Option[B])],
+                                                                                                                                  Option[
+                                                                                                                                      C])],
+                                                                                                                             Option[D])],
+                                                                                                                     Option[E])],
+                                                                                                             Option[F])],
+                                                                                                     Option[G])],
+                                                                                                Option[H])],
+                                                                                           Option[I])],
+                                                                                      Option[J])],
+                                                                              Option[K])],
+                                                                         Option[
+                                                                             L])],
+                                                                 Option[M])],
+                                                            Option[N])],
+                                                       Option[O])],
+                                               Option[P])],
+                                       Option[Q])],
+                                  Option[R])],
+                          Option[S])],
+                  Option[T])): (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F],
+                                Option[G],
+                                Option[H],
+                                Option[I],
+                                Option[J],
+                                Option[K],
+                                Option[L],
+                                Option[M],
+                                Option[N],
+                                Option[O],
+                                Option[P],
+                                Option[Q],
+                                Option[R],
+                                Option[S],
+                                Option[T]) = {
     val (rest1, t) = nested
     val (rest2, s) = rest1.getOrElse(pairOfNones)
     val (rest3, r) = rest2.getOrElse(pairOfNones)
@@ -773,27 +1187,82 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[(Option[(Option[(Option[(Option[
-                                          (Option[
-                                              (Option[(Option[(Option[(Option[(Option[
-                                                                  (Option[(Option[
-                                                                          (Option[(Option[(Option[
-                                                                                      A], Option[B])], Option[C])], Option[
-                                                                              D])], Option[
-                                                                          E])], Option[
-                                                                      F])], Option[
-                                                                  G])], Option[
-                                                              H])], Option[I])], Option[
-                                                      J])], Option[K])], Option[
-                                              L])], Option[M])], Option[N])], Option[
-                                  O])], Option[P])], Option[Q])], Option[R])], Option[
-                  S])], Option[T])], Option[U])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
-  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S], Option[T], Option[U]) = {
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S,
+      T,
+      U](nested: (Option[(Option[(Option[
+                                      (Option[(Option[(Option[
+                                                           (Option[
+                                                                (Option[(Option[
+                                                                             (Option[(Option[
+                                                                                          (Option[
+                                                                                               (Option[
+                                                                                                    (Option[(Option[
+                                                                                                                 (Option[
+                                                                                                                      (Option[(Option[
+                                                                                                                                   (Option[(Option[A],
+                                                                                                                                            Option[B])],
+                                                                                                                                    Option[
+                                                                                                                                        C])],
+                                                                                                                               Option[
+                                                                                                                                   D])],
+                                                                                                                       Option[E])],
+                                                                                                                  Option[F])],
+                                                                                                             Option[G])],
+                                                                                                     Option[
+                                                                                                         H])],
+                                                                                                Option[I])],
+                                                                                           Option[J])],
+                                                                                      Option[
+                                                                                          K])],
+                                                                              Option[L])],
+                                                                         Option[
+                                                                             M])],
+                                                                 Option[N])],
+                                                            Option[O])],
+                                                       Option[P])],
+                                               Option[Q])],
+                                       Option[R])],
+                                  Option[S])],
+                          Option[T])],
+                  Option[U])): (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F],
+                                Option[G],
+                                Option[H],
+                                Option[I],
+                                Option[J],
+                                Option[K],
+                                Option[L],
+                                Option[M],
+                                Option[N],
+                                Option[O],
+                                Option[P],
+                                Option[Q],
+                                Option[R],
+                                Option[S],
+                                Option[T],
+                                Option[U]) = {
     val (rest1, u) = nested
     val (rest2, t) = rest1.getOrElse(pairOfNones)
     val (rest3, s) = rest2.getOrElse(pairOfNones)
@@ -818,32 +1287,84 @@ object FlattenGroup {
   }
 
   def flattenNestedOptionTuple[
-      A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
-      nested: (Option[(Option[
-              (Option[(Option[
-                      (Option[(Option[(Option[(Option[(Option[
-                                          (Option[
-                                              (Option[(Option[(Option[(Option[(Option[
-                                                                  (Option[(Option[(Option[
-                                                                              (Option[
-                                                                                  (Option[
-                                                                                      (Option[
-                                                                                          A], Option[
-                                                                                          B])], Option[
-                                                                                      C])], Option[
-                                                                                  D])], Option[
-                                                                              E])], Option[
-                                                                          F])], Option[
-                                                                      G])], Option[
-                                                                  H])], Option[
-                                                              I])], Option[J])], Option[
-                                                      K])], Option[L])], Option[
-                                              M])], Option[N])], Option[O])], Option[
-                                  P])], Option[Q])], Option[R])], Option[S])], Option[
-                  T])], Option[U])], Option[V])): (Option[A], Option[B],
-  Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
-  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S], Option[T], Option[U], Option[V]) = {
+      A,
+      B,
+      C,
+      D,
+      E,
+      F,
+      G,
+      H,
+      I,
+      J,
+      K,
+      L,
+      M,
+      N,
+      O,
+      P,
+      Q,
+      R,
+      S,
+      T,
+      U,
+      V](nested: (Option[(Option[(Option[
+                                      (Option[(Option[(Option[
+                                                           (Option[
+                                                                (Option[(Option[
+                                                                             (Option[(Option[
+                                                                                          (Option[
+                                                                                               (Option[
+                                                                                                    (Option[(Option[
+                                                                                                                 (Option[(Option[(Option[(Option[
+                                                                                                                                              (Option[(Option[A],
+                                                                                                                                                       Option[
+                                                                                                                                                           B])],
+                                                                                                                                               Option[C])],
+                                                                                                                                          Option[
+                                                                                                                                              D])],
+                                                                                                                                  Option[
+                                                                                                                                      E])],
+                                                                                                                          Option[F])],
+                                                                                                                  Option[G])],
+                                                                                                             Option[H])],
+                                                                                                     Option[
+                                                                                                         I])],
+                                                                                                Option[J])],
+                                                                                           Option[K])],
+                                                                                      Option[L])],
+                                                                              Option[M])],
+                                                                         Option[
+                                                                             N])],
+                                                                 Option[O])],
+                                                            Option[P])],
+                                                       Option[Q])],
+                                               Option[R])],
+                                       Option[S])],
+                                  Option[T])],
+                          Option[U])],
+                  Option[V])): (Option[A],
+                                Option[B],
+                                Option[C],
+                                Option[D],
+                                Option[E],
+                                Option[F],
+                                Option[G],
+                                Option[H],
+                                Option[I],
+                                Option[J],
+                                Option[K],
+                                Option[L],
+                                Option[M],
+                                Option[N],
+                                Option[O],
+                                Option[P],
+                                Option[Q],
+                                Option[R],
+                                Option[S],
+                                Option[T],
+                                Option[U],
+                                Option[V]) = {
     val (rest1, v) = nested
     val (rest2, u) = rest1.getOrElse(pairOfNones)
     val (rest3, t) = rest2.getOrElse(pairOfNones)

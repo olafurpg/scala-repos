@@ -64,8 +64,8 @@ class OAuthSpec extends PlaySpecification {
   }
 
   def receiveRequest(
-      makeRequest: (play.libs.ws.WSClient,
-      String) => CompletionStage[_]): (RequestHeader, ByteString, String) = {
+      makeRequest: (play.libs.ws.WSClient, String) => CompletionStage[_])
+    : (RequestHeader, ByteString, String) = {
     val hostUrl = "http://localhost:" + testServerPort
     val promise = Promise[(RequestHeader, ByteString)]()
     val app = GuiceApplicationBuilder().routes {

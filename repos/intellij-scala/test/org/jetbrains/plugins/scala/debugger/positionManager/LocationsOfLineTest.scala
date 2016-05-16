@@ -8,7 +8,8 @@ import org.jetbrains.plugins.scala.debugger.{Loc, ScalaVersion_2_11, ScalaVersio
 class LocationOfLineTest extends LocationsOfLineTestBase with ScalaVersion_2_11
 
 class LocationOfLineTest_212
-    extends LocationsOfLineTestBase with ScalaVersion_2_12 {
+    extends LocationsOfLineTestBase
+    with ScalaVersion_2_12 {
 
   override def testLambdas(): Unit = {
     checkLocationsOfLine(

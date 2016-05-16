@@ -364,7 +364,8 @@ class ServerTest extends FunSuite with MockitoSugar with AssertionsForJUnit {
     val testService = new Service[Request, Response] {
       override def apply(request: Request): Future[Response] = Future.value {
         if (Contexts.local.get(Transport.peerCertCtx) == Some(mockCert))
-          okResponse else failResponse
+          okResponse
+        else failResponse
       }
     }
 

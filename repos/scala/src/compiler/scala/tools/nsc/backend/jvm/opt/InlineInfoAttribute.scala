@@ -134,21 +134,20 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
 
       val numEntries = nextShort()
       val infos = (0 until numEntries)
-        .map(_ =>
-              {
-            val name = nextUTF8()
-            val desc = nextUTF8()
+        .map(_ => {
+          val name = nextUTF8()
+          val desc = nextUTF8()
 
-            val inlineInfo = nextByte()
-            val isFinal = (inlineInfo & 1) != 0
-            val traitMethodWithStaticImplementation = (inlineInfo & 2) != 0
-            val isInline = (inlineInfo & 4) != 0
-            val isNoInline = (inlineInfo & 8) != 0
-            (name + desc,
-             MethodInlineInfo(isFinal,
-                              traitMethodWithStaticImplementation,
-                              isInline,
-                              isNoInline))
+          val inlineInfo = nextByte()
+          val isFinal = (inlineInfo & 1) != 0
+          val traitMethodWithStaticImplementation = (inlineInfo & 2) != 0
+          val isInline = (inlineInfo & 4) != 0
+          val isNoInline = (inlineInfo & 8) != 0
+          (name + desc,
+           MethodInlineInfo(isFinal,
+                            traitMethodWithStaticImplementation,
+                            isInline,
+                            isNoInline))
         })
         .toMap
 

@@ -94,7 +94,7 @@ private[source] class ConfigBinaryConverterProvider[M](
 }
 
 object LzoGenericScheme {
-  def apply[M : ClassTag](conv: BinaryConverter[M]): LzoGenericScheme[M] =
+  def apply[M: ClassTag](conv: BinaryConverter[M]): LzoGenericScheme[M] =
     new LzoGenericScheme(
         conv, implicitly[ClassTag[M]].runtimeClass.asInstanceOf[Class[M]])
 

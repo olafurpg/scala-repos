@@ -41,7 +41,9 @@ object Promise {
     * A detachable [[com.twitter.util.Promise]].
     */
   private class DetachablePromise[A](underlying: Promise[_ <: A])
-      extends Promise[A] with Promise.K[A] with Detachable {
+      extends Promise[A]
+      with Promise.K[A]
+      with Detachable {
     underlying.continue(this)
 
     def detach(): Boolean = underlying.detach(this)
@@ -53,7 +55,8 @@ object Promise {
   }
 
   private class DetachableFuture[A]
-      extends Promise[A] with Promise.Detachable {
+      extends Promise[A]
+      with Promise.Detachable {
     private[this] var detached: Boolean = false
 
     def detach(): Boolean = synchronized {
@@ -195,7 +198,8 @@ object Promise {
 
   /** A future that is chained from a parent promise with a certain depth. */
   private class Chained[A](val parent: Promise[A], val depth: Short)
-      extends Future[A] with Responder[A] {
+      extends Future[A]
+      with Responder[A] {
     if (depth == Short.MaxValue)
       throw new AssertionError("Future chains cannot be longer than 32766!")
 
@@ -325,7 +329,9 @@ object Promise {
   * for details.
   */
 class Promise[A]
-    extends Future[A] with Promise.Responder[A] with Updatable[Try[A]] {
+    extends Future[A]
+    with Promise.Responder[A]
+    with Updatable[Try[A]] {
   import Promise._
 
   protected[util] final def depth = 0

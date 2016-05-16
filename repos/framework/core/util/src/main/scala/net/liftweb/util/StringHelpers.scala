@@ -54,10 +54,9 @@ trait StringHelpers {
     val list = props
       .split(",")
       .toList
-      .map(in =>
-            {
-          val pair = in.roboSplit("=")
-          (pair(0), unquote(pair(1)))
+      .map(in => {
+        val pair = in.roboSplit("=")
+        (pair(0), unquote(pair(1)))
       })
     val map: Map[String, String] = Map.empty
 
@@ -160,7 +159,8 @@ trait StringHelpers {
                      lastLetter: Boolean,
                      lastSymbol: Boolean,
                      out: GoodSB): Unit = {
-    if (pos >= max || pos >= in.length) return else {
+    if (pos >= max || pos >= in.length) return
+    else {
       in.charAt(pos) match {
         case c if Character.isDigit(c) =>
           out.append(c); capify(in, pos + 1, max, false, false, out)

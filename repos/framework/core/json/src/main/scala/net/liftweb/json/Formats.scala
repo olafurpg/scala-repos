@@ -298,12 +298,13 @@ trait DefaultFormats extends Formats {
 }
 
 private[json] class ThreadLocal[A](init: => A)
-    extends java.lang.ThreadLocal[A] with (() => A) {
+    extends java.lang.ThreadLocal[A]
+    with (() => A) {
   override def initialValue = init
   def apply = get
 }
 
-class CustomSerializer[A : Manifest](
+class CustomSerializer[A: Manifest](
     ser: Formats => (PartialFunction[JValue, A], PartialFunction[Any, JValue]))
     extends Serializer[A] {
 

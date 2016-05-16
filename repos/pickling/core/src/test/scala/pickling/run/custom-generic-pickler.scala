@@ -7,7 +7,8 @@ class MyClassPickler[A](implicit val format: PickleFormat,
                         aTypeTag: FastTypeTag[A],
                         aPickler: Pickler[A],
                         aUnpickler: Unpickler[A])
-    extends Pickler[MyClass[A]] with Unpickler[MyClass[A]] {
+    extends Pickler[MyClass[A]]
+    with Unpickler[MyClass[A]] {
 
   private val stringUnpickler = implicitly[Unpickler[String]]
 
@@ -18,11 +19,9 @@ class MyClassPickler[A](implicit val format: PickleFormat,
     builder.putField(
         "myString",
         b => b.beginEntry(picklee.myString, FastTypeTag.String).endEntry())
-    builder.putField("a",
-                     b =>
-                       {
-                         aPickler.pickle(picklee.a, b)
-                     })
+    builder.putField("a", b => {
+      aPickler.pickle(picklee.a, b)
+    })
     builder.endEntry()
   }
 
@@ -41,7 +40,7 @@ class MyClassPickler[A](implicit val format: PickleFormat,
 
 class CustomGenericPicklerTest extends FunSuite {
 
-  implicit def myClassPickler[A : Pickler : Unpickler : FastTypeTag](
+  implicit def myClassPickler[A: Pickler: Unpickler: FastTypeTag](
       implicit pf: PickleFormat) =
     new MyClassPickler
 

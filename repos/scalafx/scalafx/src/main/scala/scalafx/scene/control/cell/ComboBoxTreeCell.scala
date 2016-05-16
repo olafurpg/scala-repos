@@ -160,8 +160,8 @@ object ComboBoxTreeCell {
   * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user.
   */
 class ComboBoxTreeCell[T](
-    override val delegate: jfxscc.ComboBoxTreeCell[T] = new jfxscc.ComboBoxTreeCell[
-          T])
+    override val delegate: jfxscc.ComboBoxTreeCell[T] =
+      new jfxscc.ComboBoxTreeCell[T])
     extends TreeCell[T](delegate)
     with ConvertableCell[jfxscc.ComboBoxTreeCell[T], T, T]
     with ComboBoxEditableCell[jfxscc.ComboBoxTreeCell[T], T]

@@ -17,7 +17,8 @@ class NewScalaWorksheetAction
     extends CreateFromTemplateAction(
         FileTemplateManager
           .getInstance()
-          .getInternalTemplate("Scala Worksheet")) with DumbAware {
+          .getInternalTemplate("Scala Worksheet"))
+    with DumbAware {
   override def update(e: AnActionEvent) {
     super.update(e)
     val module: Module = e.getDataContext

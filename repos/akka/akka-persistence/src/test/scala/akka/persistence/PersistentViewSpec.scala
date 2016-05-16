@@ -186,7 +186,8 @@ object PersistentViewSpec {
 }
 
 abstract class PersistentViewSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import akka.persistence.PersistentViewSpec._
 
   var persistentActor: ActorRef = _
@@ -221,14 +222,14 @@ abstract class PersistentViewSpec(config: Config)
 
   "A persistent view" must {
     "receive past updates from a persistent actor" in {
-      view = system.actorOf(
-          Props(classOf[TestPersistentView], name, viewProbe.ref))
+      view =
+        system.actorOf(Props(classOf[TestPersistentView], name, viewProbe.ref))
       viewProbe.expectMsg("replicated-a-1")
       viewProbe.expectMsg("replicated-b-2")
     }
     "receive live updates from a persistent actor" in {
-      view = system.actorOf(
-          Props(classOf[TestPersistentView], name, viewProbe.ref))
+      view =
+        system.actorOf(Props(classOf[TestPersistentView], name, viewProbe.ref))
       viewProbe.expectMsg("replicated-a-1")
       viewProbe.expectMsg("replicated-b-2")
       persistentActor ! "c"

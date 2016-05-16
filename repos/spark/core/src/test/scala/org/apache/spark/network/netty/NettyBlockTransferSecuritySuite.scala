@@ -38,7 +38,9 @@ import org.apache.spark.network.shuffle.BlockFetchingListener
 import org.apache.spark.storage.{BlockId, ShuffleBlockId}
 
 class NettyBlockTransferSecuritySuite
-    extends SparkFunSuite with MockitoSugar with ShouldMatchers {
+    extends SparkFunSuite
+    with MockitoSugar
+    with ShouldMatchers {
   test("security default off") {
     val conf = new SparkConf().set("spark.app.id", "app-id")
     testConnection(conf, conf) match {

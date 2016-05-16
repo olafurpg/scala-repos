@@ -15,7 +15,7 @@ final class ListOps[A](val self: List[A]) extends AnyVal {
 
   final def zipperEnd: Option[Zipper[A]] = l.zipperEnd(self)
 
-  final def <^>[B : Monoid](f: NonEmptyList[A] => B): B = l.<^>(self)(f)
+  final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = l.<^>(self)(f)
 
   final def takeWhileM[M[_]: Monad](p: A => M[Boolean]): M[List[A]] =
     l.takeWhileM(self)(p)

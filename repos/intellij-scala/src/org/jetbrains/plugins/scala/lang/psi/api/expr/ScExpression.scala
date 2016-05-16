@@ -32,8 +32,10 @@ import scala.collection.{Seq, Set}
   * @author ilyas, Alexander Podkhalyuzin
   */
 trait ScExpression
-    extends ScBlockStatement with PsiAnnotationMemberValue
-    with ImplicitParametersOwner with ScModificationTrackerOwner {
+    extends ScBlockStatement
+    with PsiAnnotationMemberValue
+    with ImplicitParametersOwner
+    with ScModificationTrackerOwner {
   import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression._
 
   /**
@@ -94,13 +96,13 @@ trait ScExpression
 
               val functionType =
                 ScFunctionType(expected, Seq(tp))(getProject, getResolveScope)
-              val results =
-                new ImplicitCollector(ScExpression.this,
-                                      functionType,
-                                      functionType,
-                                      None,
-                                      isImplicitConversion = true,
-                                      isExtensionConversion = false).collect()
+              val results = new ImplicitCollector(ScExpression.this,
+                                                  functionType,
+                                                  functionType,
+                                                  None,
+                                                  isImplicitConversion = true,
+                                                  isExtensionConversion =
+                                                    false).collect()
               if (results.length == 1) {
                 val res = results.head
                 val paramType = InferUtil.extractImplicitParameterType(res)
@@ -120,8 +122,7 @@ trait ScExpression
                       case function1: ScTrait =>
                         ScParameterizedType(
                             ScType.designator(function1),
-                            function1.typeParameters.map(
-                                tp =>
+                            function1.typeParameters.map(tp =>
                                   new ScUndefinedType(
                                       new ScTypeParameterType(
                                           tp, ScSubstitutor.empty),
@@ -158,11 +159,11 @@ trait ScExpression
 
   private def tryConvertToSAM(
       fromUnderscore: Boolean, expected: ScType, tp: ScType) = {
-    def checkForSAM(etaExpansionHappened: Boolean = false)
-      : Option[ExpressionTypeResult] = {
+    def checkForSAM(
+        etaExpansionHappened: Boolean =
+          false): Option[ExpressionTypeResult] = {
       def expectedResult =
-        Some(
-            ExpressionTypeResult(
+        Some(ExpressionTypeResult(
                 Success(expected, Some(this)), Set.empty, None))
       tp match {
         case ScFunctionType(_, params) if ScalaPsiUtil.isSAMEnabled(this) =>
@@ -396,9 +397,9 @@ trait ScExpression
     }
   }
 
-  def getTypeWithoutImplicits(
-      ignoreBaseTypes: Boolean = false,
-      fromUnderscore: Boolean = false): TypeResult[ScType] = {
+  def getTypeWithoutImplicits(ignoreBaseTypes: Boolean = false,
+                              fromUnderscore: Boolean =
+                                false): TypeResult[ScType] = {
     ProgressManager.checkCanceled()
     getTypeWithoutImplicitsImpl(ignoreBaseTypes, fromUnderscore)
   }
@@ -419,8 +420,9 @@ trait ScExpression
       ctx: TypingContext = TypingContext.empty): TypeResult[ScType] =
     getTypeAfterImplicitConversion(ignoreBaseTypes = true).tr
 
-  def getTypeExt(ctx: TypingContext = TypingContext.empty)
-    : ScExpression.ExpressionTypeResult = getTypeAfterImplicitConversion()
+  def getTypeExt(ctx: TypingContext =
+        TypingContext.empty): ScExpression.ExpressionTypeResult =
+    getTypeAfterImplicitConversion()
 
   def getShape(ignoreAssign: Boolean = false): (ScType, String) = {
     this match {
@@ -541,8 +543,8 @@ trait ScExpression
     expectedTypeEx(fromUnderscore).map(_._1)
   }
 
-  def expectedTypeEx(fromUnderscore: Boolean = true)
-    : Option[(ScType, Option[ScTypeElement])] =
+  def expectedTypeEx(fromUnderscore: Boolean =
+        true): Option[(ScType, Option[ScTypeElement])] =
     ExpectedTypes.expectedExprType(this, fromUnderscore)
 
   def expectedTypes(fromUnderscore: Boolean = true): Array[ScType] =
@@ -551,8 +553,8 @@ trait ScExpression
   @CachedMappedWithRecursionGuard(this,
                                   Array.empty[(ScType, Option[ScTypeElement])],
                                   ModCount.getBlockModificationCount)
-  def expectedTypesEx(fromUnderscore: Boolean = true)
-    : Array[(ScType, Option[ScTypeElement])] = {
+  def expectedTypesEx(fromUnderscore: Boolean =
+        true): Array[(ScType, Option[ScTypeElement])] = {
     ExpectedTypes.expectedExprTypes(
         ScExpression.this, fromUnderscore = fromUnderscore)
   }
@@ -586,11 +588,12 @@ trait ScExpression
     *
     * @return implicit conversions, actual value, conversions from the first part, conversions from the second part
     */
-  def getImplicitConversions(
-      fromUnder: Boolean = false,
-      expectedOption: => Option[ScType] = smartExpectedType())
-    : (Seq[PsiNamedElement], Option[PsiNamedElement], Seq[PsiNamedElement],
-    Seq[PsiNamedElement]) = {
+  def getImplicitConversions(fromUnder: Boolean = false,
+                             expectedOption: => Option[ScType] =
+                               smartExpectedType()): (Seq[PsiNamedElement],
+                                                      Option[PsiNamedElement],
+                                                      Seq[PsiNamedElement],
+                                                      Seq[PsiNamedElement]) = {
     val map = new ScImplicitlyConvertible(this).implicitMap(
         fromUnder = fromUnder, args = expectedTypes(fromUnder).toSeq)
     val implicits: Seq[PsiNamedElement] = map.map(_.element)
@@ -614,9 +617,9 @@ trait ScExpression
           case _ => None
         }
       case _ =>
-        getTypeAfterImplicitConversion(
-            expectedOption = expectedOption,
-            fromUnderscore = fromUnder).implicitFunction
+        getTypeAfterImplicitConversion(expectedOption = expectedOption,
+                                       fromUnderscore =
+                                         fromUnder).implicitFunction
     }
     (implicits,
      implicitFunction,
@@ -693,8 +696,8 @@ trait ScExpression
             ResolveState.initial.put(CachesUtil.IMPLICIT_FUNCTION, res.element)
           res.getClazz match {
             case Some(cl: PsiClass) =>
-              state = state.put(
-                  ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY, cl)
+              state =
+                state.put(ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY, cl)
             case _ =>
           }
           applyProc.processType(

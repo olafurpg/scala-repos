@@ -19,8 +19,10 @@ package object scala {
   type NullPointerException = java.lang.NullPointerException
   type ClassCastException = java.lang.ClassCastException
   type IndexOutOfBoundsException = java.lang.IndexOutOfBoundsException
-  type ArrayIndexOutOfBoundsException = java.lang.ArrayIndexOutOfBoundsException
-  type StringIndexOutOfBoundsException = java.lang.StringIndexOutOfBoundsException
+  type ArrayIndexOutOfBoundsException =
+    java.lang.ArrayIndexOutOfBoundsException
+  type StringIndexOutOfBoundsException =
+    java.lang.StringIndexOutOfBoundsException
   type UnsupportedOperationException = java.lang.UnsupportedOperationException
   type IllegalArgumentException = java.lang.IllegalArgumentException
   type NoSuchElementException = java.util.NoSuchElementException

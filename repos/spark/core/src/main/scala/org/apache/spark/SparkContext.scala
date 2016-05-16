@@ -73,7 +73,8 @@ import org.apache.spark.util._
   *   this config overrides the default configs as well as system properties.
   */
 class SparkContext(config: SparkConf)
-    extends Logging with ExecutorAllocationClient {
+    extends Logging
+    with ExecutorAllocationClient {
 
   // The call site where this SparkContext was constructed.
   private val creationSite: CallSite = Utils.getCallSite()
@@ -415,14 +416,15 @@ class SparkContext(config: SparkConf)
       .toSeq
       .flatten
 
-    _eventLogDir = if (isEventLogEnabled) {
-      val unresolvedDir = conf
-        .get("spark.eventLog.dir", EventLoggingListener.DEFAULT_LOG_DIR)
-        .stripSuffix("/")
-      Some(Utils.resolveURI(unresolvedDir))
-    } else {
-      None
-    }
+    _eventLogDir =
+      if (isEventLogEnabled) {
+        val unresolvedDir = conf
+          .get("spark.eventLog.dir", EventLoggingListener.DEFAULT_LOG_DIR)
+          .stripSuffix("/")
+        Some(Utils.resolveURI(unresolvedDir))
+      } else {
+        None
+      }
 
     _eventLogCodec = {
       val compress = _conf.getBoolean("spark.eventLog.compress", false)
@@ -455,26 +457,28 @@ class SparkContext(config: SparkConf)
 
     _statusTracker = new SparkStatusTracker(this)
 
-    _progressBar = if (_conf.getBoolean("spark.ui.showConsoleProgress", true) &&
-                       !log.isInfoEnabled) {
-      Some(new ConsoleProgressBar(this))
-    } else {
-      None
-    }
+    _progressBar =
+      if (_conf.getBoolean("spark.ui.showConsoleProgress", true) &&
+          !log.isInfoEnabled) {
+        Some(new ConsoleProgressBar(this))
+      } else {
+        None
+      }
 
-    _ui = if (conf.getBoolean("spark.ui.enabled", true)) {
-      Some(
-          SparkUI.createLiveUI(this,
-                               _conf,
-                               listenerBus,
-                               _jobProgressListener,
-                               _env.securityManager,
-                               appName,
-                               startTime = startTime))
-    } else {
-      // For tests, do not enable the UI
-      None
-    }
+    _ui =
+      if (conf.getBoolean("spark.ui.enabled", true)) {
+        Some(
+            SparkUI.createLiveUI(this,
+                                 _conf,
+                                 listenerBus,
+                                 _jobProgressListener,
+                                 _env.securityManager,
+                                 appName,
+                                 startTime = startTime))
+      } else {
+        // For tests, do not enable the UI
+        None
+      }
     // Bind the UI before starting the task scheduler to communicate
     // the bound port to the cluster manager properly
     _ui.foreach(_.bind())
@@ -502,7 +506,7 @@ class SparkContext(config: SparkConf)
     for {
       (envKey, propKey) <- Seq(("SPARK_TESTING", "spark.testing"))
       value <- Option(System.getenv(envKey))
-        .orElse(Option(System.getProperty(propKey)))
+                .orElse(Option(System.getProperty(propKey)))
     } {
       executorEnvs(envKey) = value
     }
@@ -542,36 +546,39 @@ class SparkContext(config: SparkConf)
     // So it should start after we get app ID from the task scheduler and set spark.app.id.
     _env.metricsSystem.start()
     // Attach the driver metrics servlet handler to the web ui after the metrics system is started.
-    _env.metricsSystem.getServletHandlers
-      .foreach(handler => ui.foreach(_.attachHandler(handler)))
+    _env.metricsSystem.getServletHandlers.foreach(handler =>
+          ui.foreach(_.attachHandler(handler)))
 
-    _eventLogger = if (isEventLogEnabled) {
-      val logger = new EventLoggingListener(_applicationId,
-                                            _applicationAttemptId,
-                                            _eventLogDir.get,
-                                            _conf,
-                                            _hadoopConfiguration)
-      logger.start()
-      listenerBus.addListener(logger)
-      Some(logger)
-    } else {
-      None
-    }
+    _eventLogger =
+      if (isEventLogEnabled) {
+        val logger = new EventLoggingListener(_applicationId,
+                                              _applicationAttemptId,
+                                              _eventLogDir.get,
+                                              _conf,
+                                              _hadoopConfiguration)
+        logger.start()
+        listenerBus.addListener(logger)
+        Some(logger)
+      } else {
+        None
+      }
 
     // Optionally scale number of executors dynamically based on workload. Exposed for testing.
     val dynamicAllocationEnabled = Utils.isDynamicAllocationEnabled(_conf)
-    _executorAllocationManager = if (dynamicAllocationEnabled) {
-      Some(new ExecutorAllocationManager(this, listenerBus, _conf))
-    } else {
-      None
-    }
+    _executorAllocationManager =
+      if (dynamicAllocationEnabled) {
+        Some(new ExecutorAllocationManager(this, listenerBus, _conf))
+      } else {
+        None
+      }
     _executorAllocationManager.foreach(_.start())
 
-    _cleaner = if (_conf.getBoolean("spark.cleaner.referenceTracking", true)) {
-      Some(new ContextCleaner(this))
-    } else {
-      None
-    }
+    _cleaner =
+      if (_conf.getBoolean("spark.cleaner.referenceTracking", true)) {
+        Some(new ContextCleaner(this))
+      } else {
+        None
+      }
     _cleaner.foreach(_.start())
 
     setupAndStartListenerBus()
@@ -725,7 +732,7 @@ class SparkContext(config: SparkConf)
     * @note avoid using `parallelize(Seq())` to create an empty `RDD`. Consider `emptyRDD` for an
     * RDD with no partitions, or `parallelize(Seq[T]())` for an RDD of `T` with empty partitions.
     */
-  def parallelize[T : ClassTag](
+  def parallelize[T: ClassTag](
       seq: Seq[T], numSlices: Int = defaultParallelism): RDD[T] = withScope {
     assertNotStopped()
     new ParallelCollectionRDD[T](this, seq, numSlices, Map[Int, Seq[String]]())
@@ -761,46 +768,46 @@ class SparkContext(config: SparkConf)
         (safeEnd - safeStart) / step + 1
       }
     }
-    parallelize(0 until numSlices, numSlices).mapPartitionsWithIndex((i, _) =>
-          {
-        val partitionStart = (i * numElements) / numSlices * step + start
-        val partitionEnd = (((i + 1) * numElements) / numSlices) * step + start
-        def getSafeMargin(bi: BigInt): Long =
-          if (bi.isValidLong) {
-            bi.toLong
-          } else if (bi > 0) {
-            Long.MaxValue
-          } else {
-            Long.MinValue
-          }
-        val safePartitionStart = getSafeMargin(partitionStart)
-        val safePartitionEnd = getSafeMargin(partitionEnd)
-
-        new Iterator[Long] {
-          private[this] var number: Long = safePartitionStart
-          private[this] var overflow: Boolean = false
-
-          override def hasNext =
-            if (!overflow) {
-              if (step > 0) {
-                number < safePartitionEnd
-              } else {
-                number > safePartitionEnd
-              }
-            } else false
-
-          override def next() = {
-            val ret = number
-            number += step
-            if (number < ret ^ step < 0) {
-              // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
-              // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
-              // back, we are pretty sure that we have an overflow.
-              overflow = true
-            }
-            ret
-          }
+    parallelize(0 until numSlices, numSlices).mapPartitionsWithIndex(
+        (i, _) => {
+      val partitionStart = (i * numElements) / numSlices * step + start
+      val partitionEnd = (((i + 1) * numElements) / numSlices) * step + start
+      def getSafeMargin(bi: BigInt): Long =
+        if (bi.isValidLong) {
+          bi.toLong
+        } else if (bi > 0) {
+          Long.MaxValue
+        } else {
+          Long.MinValue
         }
+      val safePartitionStart = getSafeMargin(partitionStart)
+      val safePartitionEnd = getSafeMargin(partitionEnd)
+
+      new Iterator[Long] {
+        private[this] var number: Long = safePartitionStart
+        private[this] var overflow: Boolean = false
+
+        override def hasNext =
+          if (!overflow) {
+            if (step > 0) {
+              number < safePartitionEnd
+            } else {
+              number > safePartitionEnd
+            }
+          } else false
+
+        override def next() = {
+          val ret = number
+          number += step
+          if (number < ret ^ step < 0) {
+            // we have Long.MaxValue + Long.MaxValue < Long.MaxValue
+            // and Long.MinValue + Long.MinValue > Long.MinValue, so iff the step causes a step
+            // back, we are pretty sure that we have an overflow.
+            overflow = true
+          }
+          ret
+        }
+      }
     })
   }
 
@@ -808,7 +815,7 @@ class SparkContext(config: SparkConf)
     *
     * This method is identical to `parallelize`.
     */
-  def makeRDD[T : ClassTag](
+  def makeRDD[T: ClassTag](
       seq: Seq[T], numSlices: Int = defaultParallelism): RDD[T] = withScope {
     parallelize(seq, numSlices)
   }
@@ -816,7 +823,7 @@ class SparkContext(config: SparkConf)
   /** Distribute a local Scala collection to form an RDD, with one or more
     * location preferences (hostnames of Spark nodes) for each object.
     * Create a new partition for each collection item. */
-  def makeRDD[T : ClassTag](seq: Seq[(T, Seq[String])]): RDD[T] = withScope {
+  def makeRDD[T: ClassTag](seq: Seq[(T, Seq[String])]): RDD[T] = withScope {
     assertNotStopped()
     val indexToPrefs = seq.zipWithIndex.map(t => (t._2, t._1._2)).toMap
     new ParallelCollectionRDD[T](this, seq.map(_._1), seq.size, indexToPrefs)
@@ -868,9 +875,9 @@ class SparkContext(config: SparkConf)
     *             list of inputs.
     * @param minPartitions A suggestion value of the minimal splitting number for input data.
     */
-  def wholeTextFiles(
-      path: String,
-      minPartitions: Int = defaultMinPartitions): RDD[(String, String)] =
+  def wholeTextFiles(path: String,
+                     minPartitions: Int =
+                       defaultMinPartitions): RDD[(String, String)] =
     withScope {
       assertNotStopped()
       val job = NewHadoopJob.getInstance(hadoopConfiguration)
@@ -919,8 +926,10 @@ class SparkContext(config: SparkConf)
     *             list of inputs.
     * @param minPartitions A suggestion value of the minimal splitting number for input data.
     */
-  def binaryFiles(path: String, minPartitions: Int = defaultMinPartitions)
-    : RDD[(String, PortableDataStream)] = withScope {
+  def binaryFiles(
+      path: String,
+      minPartitions: Int =
+        defaultMinPartitions): RDD[(String, PortableDataStream)] = withScope {
     assertNotStopped()
     val job = NewHadoopJob.getInstance(hadoopConfiguration)
     // Use setInputPaths so that binaryFiles aligns with hadoopFile/textFile in taking
@@ -948,10 +957,10 @@ class SparkContext(config: SparkConf)
     *
     * @return An RDD of data with values, represented as byte arrays
     */
-  def binaryRecords(
-      path: String,
-      recordLength: Int,
-      conf: Configuration = hadoopConfiguration): RDD[Array[Byte]] =
+  def binaryRecords(path: String,
+                    recordLength: Int,
+                    conf: Configuration =
+                      hadoopConfiguration): RDD[Array[Byte]] =
     withScope {
       assertNotStopped()
       conf.setInt(
@@ -994,12 +1003,12 @@ class SparkContext(config: SparkConf)
     * If you plan to directly cache, sort, or aggregate Hadoop writable objects, you should first
     * copy them using a `map` function.
     */
-  def hadoopRDD[K, V](
-      conf: JobConf,
-      inputFormatClass: Class[_ <: InputFormat[K, V]],
-      keyClass: Class[K],
-      valueClass: Class[V],
-      minPartitions: Int = defaultMinPartitions): RDD[(K, V)] = withScope {
+  def hadoopRDD[K, V](conf: JobConf,
+                      inputFormatClass: Class[_ <: InputFormat[K, V]],
+                      keyClass: Class[K],
+                      valueClass: Class[V],
+                      minPartitions: Int =
+                        defaultMinPartitions): RDD[(K, V)] = withScope {
     assertNotStopped()
     // Add necessary security credentials to the JobConf before broadcasting it.
     SparkHadoopUtil.get.addCredentials(conf)
@@ -1015,12 +1024,12 @@ class SparkContext(config: SparkConf)
     * If you plan to directly cache, sort, or aggregate Hadoop writable objects, you should first
     * copy them using a `map` function.
     */
-  def hadoopFile[K, V](
-      path: String,
-      inputFormatClass: Class[_ <: InputFormat[K, V]],
-      keyClass: Class[K],
-      valueClass: Class[V],
-      minPartitions: Int = defaultMinPartitions): RDD[(K, V)] = withScope {
+  def hadoopFile[K, V](path: String,
+                       inputFormatClass: Class[_ <: InputFormat[K, V]],
+                       keyClass: Class[K],
+                       valueClass: Class[V],
+                       minPartitions: Int =
+                         defaultMinPartitions): RDD[(K, V)] = withScope {
     assertNotStopped()
     // A Hadoop configuration can be about 10 KB, which is pretty big, so broadcast it.
     val confBroadcast =
@@ -1234,7 +1243,7 @@ class SparkContext(config: SparkConf)
     * though the nice thing about it is that there's very little effort required to save arbitrary
     * objects.
     */
-  def objectFile[T : ClassTag](
+  def objectFile[T: ClassTag](
       path: String, minPartitions: Int = defaultMinPartitions): RDD[T] =
     withScope {
       assertNotStopped()
@@ -1246,13 +1255,13 @@ class SparkContext(config: SparkConf)
                                         Utils.getContextOrSparkClassLoader))
     }
 
-  protected[spark] def checkpointFile[T : ClassTag](path: String): RDD[T] =
+  protected[spark] def checkpointFile[T: ClassTag](path: String): RDD[T] =
     withScope {
       new ReliableCheckpointRDD[T](this, path)
     }
 
   /** Build the union of a list of RDDs. */
-  def union[T : ClassTag](rdds: Seq[RDD[T]]): RDD[T] = withScope {
+  def union[T: ClassTag](rdds: Seq[RDD[T]]): RDD[T] = withScope {
     val partitioners = rdds.flatMap(_.partitioner).toSet
     if (rdds.forall(_.partitioner.isDefined) && partitioners.size == 1) {
       new PartitionerAwareUnionRDD(this, rdds)
@@ -1262,12 +1271,12 @@ class SparkContext(config: SparkConf)
   }
 
   /** Build the union of a list of RDDs passed as variable-length arguments. */
-  def union[T : ClassTag](first: RDD[T], rest: RDD[T]*): RDD[T] = withScope {
+  def union[T: ClassTag](first: RDD[T], rest: RDD[T]*): RDD[T] = withScope {
     union(Seq(first) ++ rest)
   }
 
   /** Get an RDD that has no partitions or elements. */
-  def emptyRDD[T : ClassTag]: RDD[T] = new EmptyRDD[T](this)
+  def emptyRDD[T: ClassTag]: RDD[T] = new EmptyRDD[T](this)
 
   // Methods for creating shared variables
 
@@ -1328,7 +1337,7 @@ class SparkContext(config: SparkConf)
     * standard mutable collections. So you can use this with mutable Map, Set, etc.
     */
   def accumulableCollection[
-      R <% Growable[T] with TraversableOnce[T] with Serializable : ClassTag, T](
+      R <% Growable[T] with TraversableOnce[T] with Serializable: ClassTag, T](
       initialValue: R): Accumulable[R, T] = {
     val param = new GrowableAccumulableParam[R, T]
     val acc = new Accumulable(initialValue, param)
@@ -1341,7 +1350,7 @@ class SparkContext(config: SparkConf)
     * [[org.apache.spark.broadcast.Broadcast]] object for reading it in distributed functions.
     * The variable will be sent to each cluster only once.
     */
-  def broadcast[T : ClassTag](value: T): Broadcast[T] = {
+  def broadcast[T: ClassTag](value: T): Broadcast[T] = {
     assertNotStopped()
     require(
         !classOf[RDD[_]].isAssignableFrom(classTag[T].runtimeClass),
@@ -1838,10 +1847,10 @@ class SparkContext(config: SparkConf)
     * Run a function on a given set of partitions in an RDD and pass the results to the given
     * handler function. This is the main entry point for all actions in Spark.
     */
-  def runJob[T, U : ClassTag](rdd: RDD[T],
-                              func: (TaskContext, Iterator[T]) => U,
-                              partitions: Seq[Int],
-                              resultHandler: (Int, U) => Unit): Unit = {
+  def runJob[T, U: ClassTag](rdd: RDD[T],
+                             func: (TaskContext, Iterator[T]) => U,
+                             partitions: Seq[Int],
+                             resultHandler: (Int, U) => Unit): Unit = {
     if (stopped.get()) {
       throw new IllegalStateException("SparkContext has been shutdown")
     }
@@ -1864,9 +1873,9 @@ class SparkContext(config: SparkConf)
   /**
     * Run a function on a given set of partitions in an RDD and return the results as an array.
     */
-  def runJob[T, U : ClassTag](rdd: RDD[T],
-                              func: (TaskContext, Iterator[T]) => U,
-                              partitions: Seq[Int]): Array[U] = {
+  def runJob[T, U: ClassTag](rdd: RDD[T],
+                             func: (TaskContext, Iterator[T]) => U,
+                             partitions: Seq[Int]): Array[U] = {
     val results = new Array[U](partitions.size)
     runJob[T, U](rdd, func, partitions, (index, res) => results(index) = res)
     results
@@ -1876,7 +1885,7 @@ class SparkContext(config: SparkConf)
     * Run a job on a given set of partitions of an RDD, but take a function of type
     * `Iterator[T] => U` instead of `(TaskContext, Iterator[T]) => U`.
     */
-  def runJob[T, U : ClassTag](
+  def runJob[T, U: ClassTag](
       rdd: RDD[T], func: Iterator[T] => U, partitions: Seq[Int]): Array[U] = {
     val cleanedFunc = clean(func)
     runJob(rdd,
@@ -1887,7 +1896,7 @@ class SparkContext(config: SparkConf)
   /**
     * Run a job on all partitions in an RDD and return the results in an array.
     */
-  def runJob[T, U : ClassTag](
+  def runJob[T, U: ClassTag](
       rdd: RDD[T], func: (TaskContext, Iterator[T]) => U): Array[U] = {
     runJob(rdd, func, 0 until rdd.partitions.length)
   }
@@ -1895,17 +1904,16 @@ class SparkContext(config: SparkConf)
   /**
     * Run a job on all partitions in an RDD and return the results in an array.
     */
-  def runJob[T, U : ClassTag](rdd: RDD[T], func: Iterator[T] => U): Array[U] = {
+  def runJob[T, U: ClassTag](rdd: RDD[T], func: Iterator[T] => U): Array[U] = {
     runJob(rdd, func, 0 until rdd.partitions.length)
   }
 
   /**
     * Run a job on all partitions in an RDD and pass the results to a handler function.
     */
-  def runJob[T, U : ClassTag](
-      rdd: RDD[T],
-      processPartition: (TaskContext, Iterator[T]) => U,
-      resultHandler: (Int, U) => Unit) {
+  def runJob[T, U: ClassTag](rdd: RDD[T],
+                             processPartition: (TaskContext, Iterator[T]) => U,
+                             resultHandler: (Int, U) => Unit) {
     runJob[T, U](
         rdd, processPartition, 0 until rdd.partitions.length, resultHandler)
   }
@@ -1913,9 +1921,9 @@ class SparkContext(config: SparkConf)
   /**
     * Run a job on all partitions in an RDD and pass the results to a handler function.
     */
-  def runJob[T, U : ClassTag](rdd: RDD[T],
-                              processPartition: Iterator[T] => U,
-                              resultHandler: (Int, U) => Unit) {
+  def runJob[T, U: ClassTag](rdd: RDD[T],
+                             processPartition: Iterator[T] => U,
+                             resultHandler: (Int, U) => Unit) {
     val processFunc = (context: TaskContext, iter: Iterator[T]) =>
       processPartition(iter)
     runJob[T, U](
@@ -1975,11 +1983,10 @@ class SparkContext(config: SparkConf)
     assertNotStopped()
     val callSite = getCallSite()
     var result: MapOutputStatistics = null
-    val waiter = dagScheduler.submitMapStage(
-        dependency,
-        (r: MapOutputStatistics) => { result = r },
-        callSite,
-        localProperties.get)
+    val waiter =
+      dagScheduler.submitMapStage(dependency, (r: MapOutputStatistics) => {
+        result = r
+      }, callSite, localProperties.get)
     new SimpleFutureAction[MapOutputStatistics](waiter, result)
   }
 
@@ -2336,7 +2343,7 @@ object SparkContext extends Logging {
     */
   private[spark] val LEGACY_DRIVER_IDENTIFIER = "<driver>"
 
-  private implicit def arrayToArrayWritable[T <% Writable : ClassTag](
+  private implicit def arrayToArrayWritable[T <% Writable: ClassTag](
       arr: Traversable[T]): ArrayWritable = {
     def anyToWritable[U <% Writable](u: U): Writable = u
 
@@ -2485,9 +2492,8 @@ object SparkContext extends Logging {
         val backend = new SparkDeploySchedulerBackend(
             scheduler, sc, masterUrls)
         scheduler.initialize(backend)
-        backend.shutdownCallback = (backend: SparkDeploySchedulerBackend) =>
-          {
-            localCluster.stop()
+        backend.shutdownCallback = (backend: SparkDeploySchedulerBackend) => {
+          localCluster.stop()
         }
         (backend, scheduler)
 
@@ -2609,7 +2615,7 @@ private[spark] class WritableConverter[T](
 object WritableConverter {
 
   // Helper objects for converting common types to Writable
-  private[spark] def simpleWritableConverter[T, W <: Writable : ClassTag](
+  private[spark] def simpleWritableConverter[T, W <: Writable: ClassTag](
       convert: W => T): WritableConverter[T] = {
     val wClass = classTag[W].runtimeClass.asInstanceOf[Class[W]]
     new WritableConverter[T](_ => wClass, x => convert(x.asInstanceOf[W]))
@@ -2664,7 +2670,7 @@ private[spark] class WritableFactory[T](
 object WritableFactory {
 
   private[spark] def simpleWritableFactory[
-      T : ClassTag, W <: Writable : ClassTag](
+      T: ClassTag, W <: Writable: ClassTag](
       convert: T => W): WritableFactory[T] = {
     val writableClass =
       implicitly[ClassTag[W]].runtimeClass.asInstanceOf[Class[W]]
@@ -2692,7 +2698,7 @@ object WritableFactory {
   implicit def stringWritableFactory: WritableFactory[String] =
     simpleWritableFactory(new Text(_))
 
-  implicit def writableWritableFactory[
-      T <: Writable : ClassTag]: WritableFactory[T] =
+  implicit def writableWritableFactory[T <: Writable: ClassTag]
+    : WritableFactory[T] =
     simpleWritableFactory(w => w)
 }

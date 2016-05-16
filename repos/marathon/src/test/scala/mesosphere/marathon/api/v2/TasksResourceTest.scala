@@ -20,7 +20,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TasksResourceTest
-    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers
+    with Mockito {
 
   test("killTasks") {
     Given("two apps and 1 task each")

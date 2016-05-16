@@ -48,7 +48,9 @@ import immutable.Stream
   *  @define coll iterable collection
   */
 trait IterableLike[+A, +Repr]
-    extends Any with Equals with TraversableLike[A, Repr]
+    extends Any
+    with Equals
+    with TraversableLike[A, Repr]
     with GenIterableLike[A, Repr] {
   self =>
 

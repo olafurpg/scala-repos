@@ -102,7 +102,8 @@ object KafkaServer {
 class KafkaServer(val config: KafkaConfig,
                   time: Time = SystemTime,
                   threadNamePrefix: Option[String] = None)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
   private val startupComplete = new AtomicBoolean(false)
   private val isShuttingDown = new AtomicBoolean(false)
   private val isStartingUp = new AtomicBoolean(false)
@@ -237,12 +238,13 @@ class KafkaServer(val config: KafkaConfig,
         consumerCoordinator.startup()
 
         /* Get the authorizer and initialize it if one is specified.*/
-        authorizer = Option(config.authorizerClassName)
-          .filter(_.nonEmpty)
-          .map { authorizerClassName =>
-            val authZ = CoreUtils.createObject[Authorizer](authorizerClassName)
-            authZ.configure(config.originals())
-            authZ
+        authorizer =
+          Option(config.authorizerClassName).filter(_.nonEmpty).map {
+            authorizerClassName =>
+              val authZ =
+                CoreUtils.createObject[Authorizer](authorizerClassName)
+              authZ.configure(config.originals())
+              authZ
           }
 
         /* start processing requests */

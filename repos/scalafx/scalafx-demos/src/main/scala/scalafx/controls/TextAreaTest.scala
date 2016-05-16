@@ -110,9 +110,8 @@ class TextAreaControls(target: TextArea)
   chbPrefRowCount.delegate.selectionModelProperty.addListener(
       new ChangeListener[Any] {
     def changed(observable: ObservableValue[_], oldValue: Any, newValue: Any) {
-      target.scrollLeft = chbScrollLeft.items
-        .get()
-        .get(newValue.toString.toInt)
+      target.scrollLeft =
+        chbScrollLeft.items.get().get(newValue.toString.toInt)
     }
   })
 

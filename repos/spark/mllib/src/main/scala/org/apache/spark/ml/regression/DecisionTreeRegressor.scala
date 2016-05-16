@@ -48,7 +48,8 @@ final class DecisionTreeRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[
         Vector, DecisionTreeRegressor, DecisionTreeRegressionModel]
-    with DecisionTreeRegressorParams with DefaultParamsWritable {
+    with DecisionTreeRegressorParams
+    with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("dtr"))
@@ -157,7 +158,9 @@ final class DecisionTreeRegressionModel private[ml](
     override val rootNode: Node,
     override val numFeatures: Int)
     extends PredictionModel[Vector, DecisionTreeRegressionModel]
-    with DecisionTreeModel with DecisionTreeRegressorParams with MLWritable
+    with DecisionTreeModel
+    with DecisionTreeRegressorParams
+    with MLWritable
     with Serializable {
 
   /** @group setParam */
@@ -197,8 +200,8 @@ final class DecisionTreeRegressionModel private[ml](
     }
     var output = dataset
     if ($(predictionCol).nonEmpty) {
-      output = output.withColumn(
-          $(predictionCol), predictUDF(col($(featuresCol))))
+      output =
+        output.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
     }
     if (isDefined(varianceCol) && $(varianceCol).nonEmpty) {
       output = output.withColumn(
@@ -292,11 +295,11 @@ object DecisionTreeRegressionModel
   }
 
   /** Convert a model from the old API */
-  private[ml] def fromOld(
-      oldModel: OldDecisionTreeModel,
-      parent: DecisionTreeRegressor,
-      categoricalFeatures: Map[Int, Int],
-      numFeatures: Int = -1): DecisionTreeRegressionModel = {
+  private[ml] def fromOld(oldModel: OldDecisionTreeModel,
+                          parent: DecisionTreeRegressor,
+                          categoricalFeatures: Map[Int, Int],
+                          numFeatures: Int =
+                            -1): DecisionTreeRegressionModel = {
     require(
         oldModel.algo == OldAlgo.Regression,
         s"Cannot convert non-regression DecisionTreeModel (old API) to" +

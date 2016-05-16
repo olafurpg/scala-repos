@@ -13,12 +13,15 @@ import play.api.libs.ws._
 import play.it._
 
 object NettyFormFieldOrderSpec
-    extends FormFieldOrderSpec with NettyIntegrationSpecification
+    extends FormFieldOrderSpec
+    with NettyIntegrationSpecification
 object AkkaHttpFormFieldOrderSpec
-    extends FormFieldOrderSpec with AkkaHttpIntegrationSpecification
+    extends FormFieldOrderSpec
+    with AkkaHttpIntegrationSpecification
 
 trait FormFieldOrderSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   "Play' form URL Decoding " should {
 

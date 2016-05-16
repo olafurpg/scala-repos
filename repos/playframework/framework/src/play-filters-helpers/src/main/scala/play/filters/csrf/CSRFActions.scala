@@ -168,7 +168,7 @@ class CSRFAction(
           .map(_._2)
           .concatSubstreams
           .toMat(Sink.head[Source[ByteString, _]])(Keep.right)
-      ).mapFuture { validatedBodySource =>
+    ).mapFuture { validatedBodySource =>
       action(request).run(validatedBodySource)
     }.recoverWith {
       case NoTokenInBody =>
@@ -411,8 +411,8 @@ object CSRFAction {
                                        config: CSRFConfig,
                                        tokenSigner: CSRFTokenSigner) = {
     val tagToken = request.tags.get(Token.RequestTag)
-    val cookieToken = config.cookieName.flatMap(
-        cookie => request.cookies.get(cookie).map(_.value))
+    val cookieToken = config.cookieName.flatMap(cookie =>
+          request.cookies.get(cookie).map(_.value))
     val sessionToken = request.session.get(config.tokenName)
     cookieToken orElse sessionToken orElse tagToken filter { token =>
       // return None if the token is invalid
@@ -456,7 +456,8 @@ object CSRFAction {
   private[csrf] def tagRequest(
       request: RequestHeader, token: Token): RequestHeader = {
     request.copy(
-        tags = request.tags ++ Map(
+        tags =
+          request.tags ++ Map(
               Token.NameRequestTag -> token.name,
               Token.RequestTag -> token.value
           ))
@@ -532,12 +533,13 @@ object CSRFAction {
         .getToken(request)
         .fold(
             config.cookieName.flatMap { cookie =>
-              request.cookies.get(cookie).map { token =>
-                result.discardingCookies(
-                    DiscardingCookie(cookie,
-                                     domain = Session.domain,
-                                     path = Session.path,
-                                     secure = config.secureCookie))
+              request.cookies.get(cookie).map {
+                token =>
+                  result.discardingCookies(
+                      DiscardingCookie(cookie,
+                                       domain = Session.domain,
+                                       path = Session.path,
+                                       secure = config.secureCookie))
               }
             }.getOrElse {
               result.withSession(result.session(request) - config.tokenName)

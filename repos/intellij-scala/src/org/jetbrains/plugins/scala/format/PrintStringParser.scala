@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
   */
 object PrintStringParser extends StringParser {
   def parse(element: PsiElement) = {
-    extractPrintCall(element).map(
-        p => FormattedStringParser.parseFormatCall(p._1, p._2))
+    extractPrintCall(element).map(p =>
+          FormattedStringParser.parseFormatCall(p._1, p._2))
   }
 
   def extractPrintCall(
@@ -29,8 +29,8 @@ object PrintStringParser extends StringParser {
 
       // System.out.printf("%d", 1)
       case MethodInvocation(
-          PsiReferenceEx.resolve(
-          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
+          PsiReferenceEx
+            .resolve((f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
           isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>

@@ -32,7 +32,8 @@ class BigIntConvertorSpec extends EnsimeSpec {
 }
 
 class BigIntConvertorCheck
-    extends EnsimeSpec with GeneratorDrivenPropertyChecks {
+    extends EnsimeSpec
+    with GeneratorDrivenPropertyChecks {
 
   def positiveIntStream: Arbitrary[Stream[Int]] = Arbitrary {
     Gen.containerOf[Stream, Int](Gen.chooseNum(0, 2 * Short.MaxValue))

@@ -444,8 +444,8 @@ trait Future[+T] extends Awaitable[T] {
     *  @param f       the function to apply to the results of `this` and `that`
     *  @return        a `Future` with the result of the application of `f` to the results of `this` and `that`
     */
-  def zipWith[U, R](that: Future[U])(f: (T, U) => R)(
-      implicit executor: ExecutionContext): Future[R] =
+  def zipWith[U, R](that: Future[U])(
+      f: (T, U) => R)(implicit executor: ExecutionContext): Future[R] =
     flatMap(r1 => that.map(r2 => f(r1, r2)))(internalExecutor)
 
   /** Creates a new future which holds the result of this future if it was completed successfully, or, if not,
@@ -668,9 +668,9 @@ object Future {
     * @param in        the `TraversableOnce` of Futures which will be sequenced
     * @return          the `Future` of the `TraversableOnce` of results
     */
-  def sequence[A, M[X] <: TraversableOnce[X]](in: M[Future[A]])(
-      implicit cbf: CanBuildFrom[M[Future[A]], A, M[A]],
-      executor: ExecutionContext): Future[M[A]] = {
+  def sequence[A, M[X] <: TraversableOnce[X]](
+      in: M[Future[A]])(implicit cbf: CanBuildFrom[M[Future[A]], A, M[A]],
+                        executor: ExecutionContext): Future[M[A]] = {
     in.foldLeft(successful(cbf(in))) { (fr, fa) =>
         for (r <- fr; a <- fa) yield (r += a)
       }
@@ -823,8 +823,8 @@ object Future {
     * @return         the `Future` holding the result of the reduce
     */
   @deprecated("Use Future.reduceLeft instead", "2.12")
-  def reduce[T, R >: T](futures: TraversableOnce[Future[T]])(op: (R, T) => R)(
-      implicit executor: ExecutionContext): Future[R] = {
+  def reduce[T, R >: T](futures: TraversableOnce[Future[T]])(
+      op: (R, T) => R)(implicit executor: ExecutionContext): Future[R] = {
     if (futures.isEmpty)
       failed(
           new NoSuchElementException("reduce attempted on empty collection"))
@@ -873,9 +873,9 @@ object Future {
     * @param fn        the function to apply to the `TraversableOnce` of Futures to produce the results
     * @return          the `Future` of the `TraversableOnce` of results
     */
-  def traverse[A, B, M[X] <: TraversableOnce[X]](in: M[A])(fn: A => Future[B])(
-      implicit cbf: CanBuildFrom[M[A], B, M[B]],
-      executor: ExecutionContext): Future[M[B]] =
+  def traverse[A, B, M[X] <: TraversableOnce[X]](
+      in: M[A])(fn: A => Future[B])(implicit cbf: CanBuildFrom[M[A], B, M[B]],
+                                    executor: ExecutionContext): Future[M[B]] =
     in.foldLeft(successful(cbf(in))) { (fr, a) =>
         val fb = fn(a)
         for (r <- fr; b <- fb) yield (r += b)
@@ -902,7 +902,8 @@ object Future {
   // doesn't need to create defaultExecutionContext as
   // a side effect.
   private[concurrent] object InternalCallbackExecutor
-      extends ExecutionContext with BatchingExecutor {
+      extends ExecutionContext
+      with BatchingExecutor {
     override protected def unbatchedExecute(r: Runnable): Unit =
       r.run()
     override def reportFailure(t: Throwable): Unit =

@@ -7,7 +7,7 @@ class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB] {
 
   def test = {
     def check[T](q: Rep[T], exp: T) = q.result.map(_ shouldBe exp)
-    def checkLit[T : ColumnType](v: T) = check(LiteralColumn(v), v)
+    def checkLit[T: ColumnType](v: T) = check(LiteralColumn(v), v)
     val s = "abcdefghijklmnopqrstuvwxyz"
 
     seq(
@@ -50,8 +50,8 @@ class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB] {
         check(LiteralColumn(1.4).floor, 1.0),
         check(LiteralColumn(-1.5).floor, -2.0),
         check(LiteralColumn(-10.0).sign, -1),
-        Functions.pi.toDegrees.result
-          .map(_.should(r => r > 179.9999 && r < 180.0001)),
+        Functions.pi.toDegrees.result.map(_.should(r =>
+                  r > 179.9999 && r < 180.0001)),
         (Functions.pi.toDegrees.toRadians -
             Functions.pi).abs.result.map(_.should(_ <= 0.00001)),
         check(LiteralColumn(s).substring(3, 5), s.substring(3, 5)),

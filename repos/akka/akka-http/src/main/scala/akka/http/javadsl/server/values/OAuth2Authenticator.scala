@@ -38,7 +38,9 @@ trait OAuth2Credentials {
   * the user as a [[akka.http.javadsl.server.RequestVal]].
   */
 abstract class OAuth2Authenticator[T](val realm: String)
-    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T] {
+    extends AbstractDirective
+    with ExtractionImplBase[T]
+    with RequestVal[T] {
   protected[http] implicit def classTag: ClassTag[T] =
     reflect.classTag[AnyRef].asInstanceOf[ClassTag[T]]
   def authenticate(

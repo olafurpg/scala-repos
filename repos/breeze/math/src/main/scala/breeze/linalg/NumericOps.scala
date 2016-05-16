@@ -169,9 +169,9 @@ trait ImmutableNumericOps[+This] extends Any {
     canSlice(op.apply(repr), a, b)
 
   /** A transposed view of this object, followed by a slice. Sadly frequently necessary. */
-  final def t[TT >: This, That, Slice1, Result](a: Slice1)(
-      implicit op: CanTranspose[TT, That],
-      canSlice: CanSlice[That, Slice1, Result]): Result =
+  final def t[TT >: This, That, Slice1, Result](
+      a: Slice1)(implicit op: CanTranspose[TT, That],
+                 canSlice: CanSlice[That, Slice1, Result]): Result =
     canSlice(op.apply(repr), a)
 }
 
@@ -393,9 +393,8 @@ object NumericOps {
       }
     }
 
-    implicit def binaryUpdateOpFromDVDVOp[
-        V, Op <: OpType](implicit op: UFunc.InPlaceImpl2[
-            Op, DenseVector[V], DenseVector[V]]) = {
+    implicit def binaryUpdateOpFromDVDVOp[V, Op <: OpType](
+        implicit op: UFunc.InPlaceImpl2[Op, DenseVector[V], DenseVector[V]]) = {
       new UFunc.InPlaceImpl2[Op, Array[V], Array[V]] {
         def apply(a: Array[V], b: Array[V]) {
           op(DenseVector(a), DenseVector(b))

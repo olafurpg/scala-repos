@@ -26,7 +26,7 @@ trait Signed[@sp(Double, Float, Int, Long) A] extends Any {
 }
 
 object Signed {
-  implicit def orderedRingIsSigned[A : Order : Ring]: Signed[A] =
+  implicit def orderedRingIsSigned[A: Order: Ring]: Signed[A] =
     new OrderedRingIsSigned[A]
 
   def apply[A](implicit s: Signed[A]): Signed[A] = s

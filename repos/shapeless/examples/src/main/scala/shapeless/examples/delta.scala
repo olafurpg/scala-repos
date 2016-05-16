@@ -31,9 +31,10 @@ object DeltaExamples extends App {
         .delta(8 :: "bar" :: HNil))
   assert(6 :: ("foo", "bar") :: HNil == Foo(2, "foo").delta(Foo(8, "bar")))
   assert(
-      Bar(true, "foo", Some(Bar(true, "bar", None)))
-        .delta(Bar(false, "food", Some(Bar(true, "barf", None)))) == false :: (
-          "foo", "food") :: Inl(
+      Bar(true, "foo", Some(Bar(true, "bar", None))).delta(Bar(
+              false,
+              "food",
+              Some(Bar(true, "barf", None)))) == false :: ("foo", "food") :: Inl(
           Some(true :: ("bar", "barf") :: Inl(None) :: HNil)) :: HNil
   )
 }

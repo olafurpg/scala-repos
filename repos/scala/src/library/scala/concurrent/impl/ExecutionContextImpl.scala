@@ -29,7 +29,8 @@ private[concurrent] object ExecutionContextImpl {
                                    maxThreads: Int,
                                    prefix: String,
                                    uncaught: Thread.UncaughtExceptionHandler)
-      extends ThreadFactory with ForkJoinPool.ForkJoinWorkerThreadFactory {
+      extends ThreadFactory
+      with ForkJoinPool.ForkJoinWorkerThreadFactory {
 
     require(prefix ne null, "DefaultThreadFactory.prefix must be non null")
     require(maxThreads > 0,
@@ -67,7 +68,8 @@ private[concurrent] object ExecutionContextImpl {
             new Thread(new Runnable {
           // We have to decrement the current thread count when the thread exits
           override def run() = try runnable.run() finally deregisterThread()
-        })) else null
+        }))
+      else null
 
     def newThread(fjp: ForkJoinPool): ForkJoinWorkerThread =
       if (reserveThread()) {
@@ -169,10 +171,9 @@ private[concurrent] object ExecutionContextImpl {
     }
   }
 
-  def fromExecutor(
-      e: Executor,
-      reporter: Throwable => Unit = ExecutionContext.defaultReporter)
-    : ExecutionContextImpl =
+  def fromExecutor(e: Executor,
+                   reporter: Throwable => Unit =
+                     ExecutionContext.defaultReporter): ExecutionContextImpl =
     new ExecutionContextImpl(
         Option(e).getOrElse(createDefaultExecutorService(reporter)), reporter)
 

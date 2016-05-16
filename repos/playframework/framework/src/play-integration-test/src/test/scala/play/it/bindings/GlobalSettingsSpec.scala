@@ -18,10 +18,12 @@ import play.mvc.Http
 import play.mvc.Http.Context
 
 object NettyGlobalSettingsSpec
-    extends GlobalSettingsSpec with NettyIntegrationSpecification
+    extends GlobalSettingsSpec
+    with NettyIntegrationSpecification
 
 trait GlobalSettingsSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential

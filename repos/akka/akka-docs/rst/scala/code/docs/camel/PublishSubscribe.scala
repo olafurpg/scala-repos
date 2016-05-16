@@ -23,7 +23,8 @@ object PublishSubscribe {
   }
 
   class PublisherBridge(uri: String, publisher: ActorRef)
-      extends Actor with Consumer {
+      extends Actor
+      with Consumer {
     def endpointUri = uri
 
     def receive = {

@@ -93,7 +93,8 @@ private[spark] class ExternalSorter[K, V, C](
     partitioner: Option[Partitioner] = None,
     ordering: Option[Ordering[K]] = None,
     serializer: Serializer = SparkEnv.get.serializer)
-    extends Logging with Spillable[WritablePartitionedPairCollection[K, C]] {
+    extends Logging
+    with Spillable[WritablePartitionedPairCollection[K, C]] {
 
   override protected[this] def taskMemoryManager: TaskMemoryManager =
     context.taskMemoryManager()
@@ -185,9 +186,8 @@ private[spark] class ExternalSorter[K, V, C](
       val mergeValue = aggregator.get.mergeValue
       val createCombiner = aggregator.get.createCombiner
       var kv: Product2[K, V] = null
-      val update = (hadValue: Boolean, oldValue: C) =>
-        {
-          if (hadValue) mergeValue(oldValue, kv._2) else createCombiner(kv._2)
+      val update = (hadValue: Boolean, oldValue: C) => {
+        if (hadValue) mergeValue(oldValue, kv._2) else createCombiner(kv._2)
       }
       while (records.hasNext) {
         addElementsRead()
@@ -361,7 +361,8 @@ private[spark] class ExternalSorter[K, V, C](
       comparator: Comparator[K]): Iterator[Product2[K, C]] = {
     val bufferedIters = iterators.filter(_.hasNext).map(_.buffered)
     type Iter = BufferedIterator[Product2[K, C]]
-    val heap = new mutable.PriorityQueue[Iter]()(new Ordering[Iter] {
+    val heap = new mutable.PriorityQueue[Iter]()(
+        new Ordering[Iter] {
       // Use the reverse of comparator.compare because PriorityQueue dequeues the max
       override def compare(x: Iter, y: Iter): Int =
         -comparator.compare(x.head._1, y.head._1)
@@ -419,7 +420,7 @@ private[spark] class ExternalSorter[K, V, C](
           combiners += firstPair._2
           val key = firstPair._1
           while (sorted.hasNext &&
-          comparator.compare(sorted.head._1, key) == 0) {
+                 comparator.compare(sorted.head._1, key) == 0) {
             val pair = sorted.next()
             var i = 0
             var foundKey = false
@@ -533,7 +534,7 @@ private[spark] class ExternalSorter[K, V, C](
       */
     private def skipToNextPartition() {
       while (partitionId < numPartitions &&
-      indexInPartition == spill.elementsPerPartition(partitionId)) {
+             indexInPartition == spill.elementsPerPartition(partitionId)) {
         partitionId += 1
         indexInPartition = 0L
       }
@@ -723,8 +724,8 @@ private[spark] class ExternalSorter[K, V, C](
   private def groupByPartition(data: Iterator[((Int, K), C)])
     : Iterator[(Int, Iterator[Product2[K, C]])] = {
     val buffered = data.buffered
-    (0 until numPartitions).iterator
-      .map(p => (p, new IteratorForPartition(p, buffered)))
+    (0 until numPartitions).iterator.map(p =>
+          (p, new IteratorForPartition(p, buffered)))
   }
 
   /**

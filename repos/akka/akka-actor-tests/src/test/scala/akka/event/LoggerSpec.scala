@@ -89,7 +89,8 @@ object LoggerSpec {
   class TestLogger1 extends TestLogger(1)
   class TestLogger2 extends TestLogger(2)
   abstract class TestLogger(qualifier: Int)
-      extends Actor with Logging.StdOutLogger {
+      extends Actor
+      with Logging.StdOutLogger {
     var target: Option[ActorRef] = None
     override def receive: Receive = {
       case InitializeLogger(bus) ⇒

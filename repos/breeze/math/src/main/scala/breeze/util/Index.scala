@@ -134,7 +134,8 @@ trait MutableIndex[T] extends Index[T] {
   * @author dramage
   */
 trait SynchronizedMutableIndex[T]
-    extends MutableIndex[T] with SynchronizedIndex[T] {
+    extends MutableIndex[T]
+    with SynchronizedIndex[T] {
   abstract override def index(t: T) = this synchronized super.index(t)
 }
 
@@ -234,13 +235,13 @@ object Index {
   /** Constructs an empty index. */
   import scala.reflect.ClassTag.{Char => MChar}
   import scala.reflect.OptManifest
-  def apply[T : OptManifest](): MutableIndex[T] =
+  def apply[T: OptManifest](): MutableIndex[T] =
     implicitly[OptManifest[T]] match {
       case _ => new HashIndex[T];
     }
 
   /** Constructs an Index from some iterator. */
-  def apply[T : OptManifest](iterator: Iterator[T]): Index[T] = {
+  def apply[T: OptManifest](iterator: Iterator[T]): Index[T] = {
     val index = Index[T]()
     // read through all iterator now -- don't lazily defer evaluation
     for (element <- iterator) {

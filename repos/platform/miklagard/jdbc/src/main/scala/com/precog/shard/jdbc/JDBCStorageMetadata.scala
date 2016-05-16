@@ -38,9 +38,10 @@ class JDBCStorageMetadataSource(
     new JDBCStorageMetadata(dbMap)
 }
 
-class JDBCStorageMetadata(
-    dbMap: Map[String, String])(implicit asyncContext: ExecutionContext)
-    extends StorageMetadata[Future] with Logging {
+class JDBCStorageMetadata(dbMap: Map[String, String])(
+    implicit asyncContext: ExecutionContext)
+    extends StorageMetadata[Future]
+    with Logging {
   implicit val M = new FutureMonad(asyncContext)
 
   // FIXME: Actually implement these for JDBC

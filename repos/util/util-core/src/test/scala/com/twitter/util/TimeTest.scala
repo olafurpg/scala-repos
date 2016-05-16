@@ -13,7 +13,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import com.twitter.util.TimeConversions._
 
 trait TimeLikeSpec[T <: TimeLike[T]]
-    extends WordSpec with GeneratorDrivenPropertyChecks {
+    extends WordSpec
+    with GeneratorDrivenPropertyChecks {
   val ops: TimeLikeOps[T]
   import ops._
 
@@ -76,7 +77,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
       })
 
       for (ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue);
-      t = fromNanoseconds(ns)) assert(t match {
+           t = fromNanoseconds(ns)) assert(t match {
         case Nanoseconds(`ns`) => true
         case _ => false
       })
@@ -89,7 +90,7 @@ trait TimeLikeSpec[T <: TimeLike[T]]
       })
 
       for (ns <- Seq(Long.MinValue, -1, 0, 1, Long.MaxValue);
-      t = fromNanoseconds(ns)) assert(t match {
+           t = fromNanoseconds(ns)) assert(t match {
         case Finite(`t`) => true
         case _ => false
       })

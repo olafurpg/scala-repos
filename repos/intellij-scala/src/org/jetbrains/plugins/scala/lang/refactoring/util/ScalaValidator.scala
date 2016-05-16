@@ -35,7 +35,7 @@ abstract class ScalaValidator(conflictsReporter: ConflictsReporter,
     val result = MultiMap.createSet[PsiElement, String]()
     for {
       (namedElem, message) <- findConflicts(name, allOcc)
-                                 if namedElem != selectedElement
+      if namedElem != selectedElement
     } {
       result.putValue(namedElem, message)
     }

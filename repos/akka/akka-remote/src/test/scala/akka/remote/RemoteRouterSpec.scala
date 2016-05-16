@@ -165,7 +165,7 @@ class RemoteRouterSpec
           RoundRobinPool(2)
             .props(Props[Echo])
             .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
-                              s"akka.tcp://${sysName}@localhost:${port}")))),
+                            s"akka.tcp://${sysName}@localhost:${port}")))),
           "remote-blub2")
       router.path.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}")
@@ -190,7 +190,7 @@ class RemoteRouterSpec
           RoundRobinPool(2)
             .props(Props[Echo])
             .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
-                              s"akka.tcp://${sysName}@localhost:${port}")))),
+                            s"akka.tcp://${sysName}@localhost:${port}")))),
           "local-blub")
       router.path.address.toString should ===("akka://MasterRemoteRouterSpec")
       val replies = for (i ← 1 to 5) yield {
@@ -215,7 +215,7 @@ class RemoteRouterSpec
           RoundRobinPool(2)
             .props(Props[Echo])
             .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
-                              s"akka.tcp://${sysName}@localhost:${port}")))),
+                            s"akka.tcp://${sysName}@localhost:${port}")))),
           "local-blub2")
       router.path.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}")
@@ -240,7 +240,7 @@ class RemoteRouterSpec
           RoundRobinPool(2)
             .props(Props[Echo])
             .withDeploy(Deploy(scope = RemoteScope(AddressFromURIString(
-                              s"akka.tcp://${sysName}@localhost:${port}")))),
+                            s"akka.tcp://${sysName}@localhost:${port}")))),
           "remote-override")
       router.path.address.toString should ===(
           s"akka.tcp://${sysName}@localhost:${port}")

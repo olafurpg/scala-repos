@@ -13,7 +13,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 class PostToEventStreamStepImplTest
-    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures {
   test("name") {
     new Fixture().step.name should be("postTaskStatusEvent")
   }

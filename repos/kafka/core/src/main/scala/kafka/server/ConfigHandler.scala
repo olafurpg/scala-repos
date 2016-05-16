@@ -40,7 +40,8 @@ trait ConfigHandler {
   */
 class TopicConfigHandler(
     private val logManager: LogManager, kafkaConfig: KafkaConfig)
-    extends ConfigHandler with Logging {
+    extends ConfigHandler
+    with Logging {
 
   def processConfigChanges(topic: String, topicConfig: Properties) {
     // Validate the compatibility of message format version.

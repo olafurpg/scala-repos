@@ -85,7 +85,8 @@ class ClientSessionTest extends FunSuite with MockitoSugar {
 
   testSessionStatus(
       "memcached-dispatcher", {
-        tr: Transport[memcached.protocol.Command, memcached.protocol.Response] =>
+        tr: Transport[
+            memcached.protocol.Command, memcached.protocol.Response] =>
           val cl: MyClient = new MyClient
           val svc = cl.newDisp(tr)
           () =>

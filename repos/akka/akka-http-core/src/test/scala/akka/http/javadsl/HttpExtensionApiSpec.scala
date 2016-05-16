@@ -26,7 +26,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.util.Try
 
 class HttpExtensionApiSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll {
 
   // tries to cover all surface area of javadsl.Http
 

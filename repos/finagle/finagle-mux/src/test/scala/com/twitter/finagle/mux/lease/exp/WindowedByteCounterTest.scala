@@ -10,7 +10,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class WindowedByteCounterTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience {
 
   trait ByteCounterHelper {
     val fakePool = new FakeMemoryPool(

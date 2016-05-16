@@ -220,7 +220,7 @@ private[http] final object HtmlNormalizer {
 
         NodeAndEventJs(
             element.copy(attributes = new UnprefixedAttribute(
-                      "id", generatedId, attributesIncludingEventsAsData)),
+                    "id", generatedId, attributesIncludingEventsAsData)),
             jsForEventAttributes(generatedId, eventAttributes)
         )
       } else {

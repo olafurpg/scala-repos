@@ -6,7 +6,8 @@ import com.twitter.finagle.redis.util._
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 case class ZAdd(key: ChannelBuffer, members: Seq[ZMember])
-    extends StrictKeyCommand with StrictZMembersCommand {
+    extends StrictKeyCommand
+    with StrictZMembersCommand {
   def command = Commands.ZADD
   def toChannelBuffer = {
     val cmds = Seq(CommandBytes.ZADD, key)
@@ -56,7 +57,8 @@ object ZCount {
 }
 
 case class ZIncrBy(key: ChannelBuffer, amount: Double, member: ChannelBuffer)
-    extends StrictKeyCommand with StrictMemberCommand {
+    extends StrictKeyCommand
+    with StrictMemberCommand {
   def command = Commands.ZINCRBY
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(
@@ -184,8 +186,7 @@ case class ZRemRangeByRank(key: ChannelBuffer, start: Long, stop: Long)
     extends StrictKeyCommand {
   def command = Commands.ZREMRANGEBYRANK
   def toChannelBuffer =
-    RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.ZREMRANGEBYRANK, key) ++ Seq(
+    RedisCodec.toUnifiedFormat(Seq(CommandBytes.ZREMRANGEBYRANK, key) ++ Seq(
             StringToChannelBuffer(start.toString),
             StringToChannelBuffer(stop.toString)))
 }
@@ -204,8 +205,7 @@ case class ZRemRangeByScore(key: ChannelBuffer, min: ZInterval, max: ZInterval)
     extends StrictKeyCommand {
   def command = Commands.ZREMRANGEBYSCORE
   def toChannelBuffer =
-    RedisCodec.toUnifiedFormat(
-        Seq(CommandBytes.ZREMRANGEBYSCORE, key) ++ Seq(
+    RedisCodec.toUnifiedFormat(Seq(CommandBytes.ZREMRANGEBYSCORE, key) ++ Seq(
             StringToChannelBuffer(min.toString),
             StringToChannelBuffer(max.toString)))
 }
@@ -283,7 +283,8 @@ object ZRevRank extends ZRankCmdCompanion {
 }
 
 case class ZScore(key: ChannelBuffer, member: ChannelBuffer)
-    extends StrictKeyCommand with StrictMemberCommand {
+    extends StrictKeyCommand
+    with StrictMemberCommand {
   def command = Commands.ZSCORE
   def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.ZSCORE, key, member))
@@ -379,7 +380,8 @@ object ZInterval {
 }
 
 case class ZMember(score: Double, member: ChannelBuffer)
-    extends StrictScoreCommand with StrictMemberCommand {
+    extends StrictScoreCommand
+    with StrictMemberCommand {
   def command = "ZMEMBER"
   override def toChannelBuffer = member
 }

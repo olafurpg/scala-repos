@@ -17,7 +17,8 @@ class NewPackageObjectAction
     extends CreateFromTemplateAction(
         FileTemplateManager
           .getDefaultInstance()
-          .getInternalTemplate("Package Object")) with DumbAware {
+          .getInternalTemplate("Package Object"))
+    with DumbAware {
 
   override def update(e: AnActionEvent) {
     super.update(e)

@@ -24,7 +24,8 @@ private[video] final class Youtube(
         .setMetadata(
             entry.id,
             Metadata(views = ~parseIntOption(entry.statistics.viewCount),
-                     likes = ~parseIntOption(entry.statistics.likeCount) -
+                     likes =
+                       ~parseIntOption(entry.statistics.likeCount) -
                        ~parseIntOption(entry.statistics.dislikeCount),
                      description = entry.snippet.description,
                      duration = Some(entry.contentDetails.seconds),

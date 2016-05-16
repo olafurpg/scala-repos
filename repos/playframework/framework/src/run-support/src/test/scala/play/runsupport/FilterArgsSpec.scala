@@ -11,12 +11,12 @@ object FilterArgsSpec extends Specification {
   val defaultHttpPort = 9000
   val defaultHttpAddress = "0.0.0.0"
 
-  def check(args: String*)(
-      properties: Seq[(String, String)] = Seq.empty,
-      httpPort: Option[Int] = Some(defaultHttpPort),
-      httpsPort: Option[Int] = None,
-      httpAddress: String = defaultHttpAddress,
-      devSettings: Seq[(String, String)] = Seq.empty): Result = {
+  def check(args: String*)(properties: Seq[(String, String)] = Seq.empty,
+                           httpPort: Option[Int] = Some(defaultHttpPort),
+                           httpsPort: Option[Int] = None,
+                           httpAddress: String = defaultHttpAddress,
+                           devSettings: Seq[(String, String)] =
+                             Seq.empty): Result = {
 
     val result = Reloader.filterArgs(
         args, defaultHttpPort, defaultHttpAddress, devSettings)

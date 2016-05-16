@@ -107,26 +107,25 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   def doTest(file: String) {
     references
       .zip(options)
-      .foreach(it =>
-            {
-          it._1 match {
-            case ref: ScReferenceElement =>
-              doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
-            case ref: PsiMultiReference =>
-              val hostReferences = ref.getReferences
-              if (hostReferences.length == 2) {
-                hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
-                  case Some(r: ScReferenceElement) =>
-                    doEachTest(r, it._2)
-                  case _ =>
-                    assert(assertion = false,
-                           message = "Multihost references are not supported")
-                }
-              } else {
-                assert(assertion = false,
-                       message = "Multihost references are not supported")
+      .foreach(it => {
+        it._1 match {
+          case ref: ScReferenceElement =>
+            doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
+          case ref: PsiMultiReference =>
+            val hostReferences = ref.getReferences
+            if (hostReferences.length == 2) {
+              hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
+                case Some(r: ScReferenceElement) =>
+                  doEachTest(r, it._2)
+                case _ =>
+                  assert(assertion = false,
+                         message = "Multihost references are not supported")
               }
-          }
+            } else {
+              assert(assertion = false,
+                     message = "Multihost references are not supported")
+            }
+        }
       })
   }
 
@@ -137,7 +136,8 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
       if (result.isDefined)
         (result.get.element,
          result.get.isAccessible,
-         result.get.isApplicable()) else (null, true, true)
+         result.get.isApplicable())
+      else (null, true, true)
 
     def message = format(getFileAdapter.getText, _: String, lineOf(reference))
 
@@ -222,8 +222,8 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   }
 
   def format(text: String, message: String, line: Int) = {
-    val lines = text.lines.zipWithIndex
-      .map(p => if (p._2 + 1 == line) p._1 + " // " + message else p._1)
+    val lines = text.lines.zipWithIndex.map(p =>
+          if (p._2 + 1 == line) p._1 + " // " + message else p._1)
     "\n\n" + lines.mkString("\n") + "\n"
   }
 }

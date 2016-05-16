@@ -474,8 +474,8 @@ trait AST extends Phases {
 
       case (Let(_, id1, params1, left1, right1),
             Let(_, id2, params2, left2, right2)) =>
-        (id1 == id2) && (params1 == params2) && (left1 equalsIgnoreLoc left2) &&
-        (right1 equalsIgnoreLoc right2)
+        (id1 == id2) && (params1 == params2) &&
+        (left1 equalsIgnoreLoc left2) && (right1 equalsIgnoreLoc right2)
 
       case (Solve(_, constraints1, child1), Solve(_, constraints2, child2)) =>
         {
@@ -688,8 +688,9 @@ trait AST extends Phases {
         left.hashCodeIgnoreLoc + right.hashCodeIgnoreLoc
 
       case d @ Dispatch(_, name, actuals) =>
-        name.hashCode + d.binding.hashCode +
-        (actuals map { _.hashCodeIgnoreLoc } sum)
+        name.hashCode + d.binding.hashCode + (actuals map {
+              _.hashCodeIgnoreLoc
+            } sum)
 
       case Cond(_, pred, left, right) =>
         "if".hashCode + pred.hashCodeIgnoreLoc + "then".hashCode +
@@ -889,7 +890,8 @@ trait AST extends Phases {
 
     final case class Solve(
         loc: LineStream, constraints: Vector[Expr], child: Expr)
-        extends Expr with Node {
+        extends Expr
+        with Node {
       val sym = 'solve
 
       def form =
@@ -921,7 +923,9 @@ trait AST extends Phases {
     }
 
     final case class Import(loc: LineStream, spec: ImportSpec, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'import
       val isPrefix = true
     }
@@ -947,13 +951,15 @@ trait AST extends Phases {
     }
 
     final case class New(loc: LineStream, child: Expr)
-        extends Expr with PrecedenceUnaryNode {
+        extends Expr
+        with PrecedenceUnaryNode {
       val sym = 'new
       val isPrefix = true
     }
 
     final case class Relate(loc: LineStream, from: Expr, to: Expr, in: Expr)
-        extends Expr with Node {
+        extends Expr
+        with Node {
       val sym = 'relate
 
       def form = from ~ 'relate ~ to ~ in
@@ -991,7 +997,8 @@ trait AST extends Phases {
     }
 
     final case class ObjectDef(loc: LineStream, props: Vector[(String, Expr)])
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'object
 
       def values = props map { _._2 }
@@ -1007,7 +1014,8 @@ trait AST extends Phases {
     }
 
     final case class ArrayDef(loc: LineStream, values: Vector[Expr])
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'array
 
       def form = {
@@ -1020,20 +1028,25 @@ trait AST extends Phases {
     }
 
     final case class Descent(loc: LineStream, child: Expr, property: String)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'descent
       val isPrefix = false
     }
 
     final case class MetaDescent(
         loc: LineStream, child: Expr, property: String)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'metaDescent
       val isPrefix = false
     }
 
     final case class Deref(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'deref
 
       override def form = left ~ 'leftBracket ~ right ~ 'rightBracket
@@ -1041,7 +1054,8 @@ trait AST extends Phases {
 
     final case class Dispatch(
         loc: LineStream, name: Identifier, actuals: Vector[Expr])
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'dispatch
 
       def values = actuals
@@ -1064,7 +1078,8 @@ trait AST extends Phases {
     }
 
     final case class Cond(loc: LineStream, pred: Expr, left: Expr, right: Expr)
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'cond
 
       def values = Vector(pred, left, right)
@@ -1075,120 +1090,144 @@ trait AST extends Phases {
     }
 
     final case class Where(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'where
       override val disallowsInfinite = true
     }
 
     final case class With(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'with
       override val disallowsInfinite = true
     }
 
     final case class Union(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'union
     }
 
     final case class Intersect(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'intersect
     }
 
     final case class Difference(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'difference
     }
 
     final case class Add(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'add
     }
 
     final case class Sub(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'sub
     }
 
     final case class Mul(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'mul
     }
 
     final case class Div(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'div
     }
 
     final case class Mod(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'mod
     }
 
     final case class Pow(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'pow
     }
 
     final case class Lt(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'lt
     }
 
     final case class LtEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'lteq
     }
 
     final case class Gt(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'gt
     }
 
     final case class GtEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'gteq
     }
 
     final case class Eq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'eq
       override val disallowsInfinite = true
     }
 
     final case class NotEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'noteq
       override val disallowsInfinite = true
     }
 
     final case class And(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'and
       override val disallowsInfinite = true
     }
 
     final case class Or(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'or
       override val disallowsInfinite = true
     }
 
     final case class Comp(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'comp
       val isPrefix = true
     }
 
     final case class Neg(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'neg
       val isPrefix = true
     }
 
     final case class Paren(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp {
+        extends Expr
+        with UnaryOp {
       val sym = 'paren
       def form = 'leftParen ~ child ~ 'rightParen
       def children = child :: Nil

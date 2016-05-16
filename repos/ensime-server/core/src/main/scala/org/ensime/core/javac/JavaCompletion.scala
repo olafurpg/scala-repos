@@ -207,8 +207,13 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
     //
     def addTypeMembers(tel: TypeElement, relevance: Int): Unit = {
       for (el <- info.getElements().getAllMembers(tel)) {
-        for (info <- filterElement(
-            info, el, prefix, caseSense, false, constructing, relevance)) {
+        for (info <- filterElement(info,
+                                   el,
+                                   prefix,
+                                   caseSense,
+                                   false,
+                                   constructing,
+                                   relevance)) {
           candidates += info
         }
       }
@@ -232,8 +237,13 @@ trait JavaCompletion extends Helpers with SLF4JLogging {
     var s = scope
     while (s != null) {
       for (el <- s.getLocalElements()) {
-        for (info <- filterElement(
-            info, el, prefix, caseSense, false, constructing, relavence)) {
+        for (info <- filterElement(info,
+                                   el,
+                                   prefix,
+                                   caseSense,
+                                   false,
+                                   constructing,
+                                   relavence)) {
           candidates += info
         }
       }

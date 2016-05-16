@@ -34,7 +34,7 @@ import org.apache.spark.storage.RDDBlockId
   * @param rddId the ID of the checkpointed RDD
   * @param numPartitions the number of partitions in the checkpointed RDD
   */
-private[spark] class LocalCheckpointRDD[T : ClassTag](
+private[spark] class LocalCheckpointRDD[T: ClassTag](
     sc: SparkContext, rddId: Int, numPartitions: Int)
     extends CheckpointRDD[T](sc) {
 

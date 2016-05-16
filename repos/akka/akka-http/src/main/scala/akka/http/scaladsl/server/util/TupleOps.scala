@@ -27,7 +27,7 @@ class TupleOps[T](val tuple: T) extends AnyVal {
 }
 
 object TupleOps {
-  implicit def enhanceTuple[T : Tuple](tuple: T): TupleOps[T] =
+  implicit def enhanceTuple[T: Tuple](tuple: T): TupleOps[T] =
     new TupleOps(tuple)
 
   trait AppendOne[P, S] {

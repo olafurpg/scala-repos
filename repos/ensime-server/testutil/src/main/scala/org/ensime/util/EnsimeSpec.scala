@@ -16,8 +16,14 @@ import scala.concurrent.duration._
   * Boilerplate remover and preferred testing style in ENSIME.
   */
 trait EnsimeSpec
-    extends FlatSpec with Matchers with Inside with Retries with Eventually
-    with TryValues with Inspectors with TypeCheckedTripleEquals {
+    extends FlatSpec
+    with Matchers
+    with Inside
+    with Retries
+    with Eventually
+    with TryValues
+    with Inspectors
+    with TypeCheckedTripleEquals {
 
   SLF4JBridgeHandler.removeHandlersForRootLogger()
   SLF4JBridgeHandler.install()

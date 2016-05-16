@@ -93,28 +93,24 @@ package object time {
     def millisOfDay = cast(_millisOfDay)
     def secondOfDay = cast(_secondOfDay)
     def minuteOfDay =
-      cast(
-          getField(
+      cast(getField(
               DateTimeFieldType.minuteOfDay.getField(chrono), isTime = true))
     def clockhourOfDay =
       cast(
           getField(DateTimeFieldType.clockhourOfDay.getField(chrono),
                    isTime = true))
     def hourOfHalfday =
-      cast(
-          getField(
+      cast(getField(
               DateTimeFieldType.hourOfHalfday.getField(chrono), isTime = true))
     def clockhourOfHalfday =
       cast(
           getField(DateTimeFieldType.clockhourOfHalfday.getField(chrono),
                    isTime = true))
     def halfdayOfDay =
-      cast(
-          getField(
+      cast(getField(
               DateTimeFieldType.halfdayOfDay.getField(chrono), isTime = true))
     def hourOfDay =
-      cast(
-          getField(
+      cast(getField(
               DateTimeFieldType.hourOfDay.getField(chrono), isTime = true))
 
     def dayOfWeek =

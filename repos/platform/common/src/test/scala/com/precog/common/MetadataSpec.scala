@@ -30,7 +30,9 @@ import scalaz._
 import scalaz.syntax.semigroup._
 
 class MetadataSpec
-    extends Specification with MetadataGenerators with ScalaCheck {
+    extends Specification
+    with MetadataGenerators
+    with ScalaCheck {
   import Prop._
 
   val sampleSize = 100
@@ -102,7 +104,7 @@ class MetadataSpec
 
     "merge as expected" in check {
       (sample1: List[Map[MetadataType, Metadata]],
-      sample2: List[Map[MetadataType, Metadata]]) =>
+       sample2: List[Map[MetadataType, Metadata]]) =>
         val prepared =
           sample1 zip sample2 map {
             case (s1, s2) => (s1, s2, s1 |+| s2)
@@ -155,16 +157,17 @@ trait MetadataGenerators extends util.ArbitraryJValue {
       BooleanValueStats(count, trueCount)
   def genLongMetadata: Gen[LongValueStats] =
     for (count <- choose(0, 1000); a <- arbLong.arbitrary;
-    b <- arbLong.arbitrary) yield LongValueStats(count, a min b, a max b)
+         b <- arbLong.arbitrary) yield LongValueStats(count, a min b, a max b)
   def genDoubleMetadata: Gen[DoubleValueStats] =
     for (count <- choose(0, 1000); a <- arbDouble.arbitrary;
-    b <- arbDouble.arbitrary) yield DoubleValueStats(count, a min b, a max b)
+         b <- arbDouble.arbitrary) yield
+      DoubleValueStats(count, a min b, a max b)
   def genBigDecimalMetadata: Gen[BigDecimalValueStats] =
     for (count <- choose(0, 1000); a <- arbBigDecimal.arbitrary;
-    b <- arbBigDecimal.arbitrary) yield
+         b <- arbBigDecimal.arbitrary) yield
       BigDecimalValueStats(count, a min b, a max b)
   def genStringMetadata: Gen[StringValueStats] =
     for (count <- choose(0, 1000); a <- arbString.arbitrary;
-    b <- arbString.arbitrary) yield
+         b <- arbString.arbitrary) yield
       StringValueStats(count, Order[String].min(a, b), Order[String].max(a, b))
 }

@@ -34,7 +34,7 @@ trait JavaSourceFinding extends Helpers with SLF4JLogging {
           info.getTrees.getSourcePositions
             .getStartPosition(path.getCompilationUnit, path.getLeaf)
             .toInt
-        )
+      )
     }
   }
 

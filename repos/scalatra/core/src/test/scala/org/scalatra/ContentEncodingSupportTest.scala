@@ -12,12 +12,15 @@ import scala.concurrent.{ExecutionContext, Future}
   * Test servlet using ContentEncodingSupport.
   */
 class ContentEncodingSupportTestServlet
-    extends ScalatraServlet with ContentEncodingSupportAppBase {
+    extends ScalatraServlet
+    with ContentEncodingSupportAppBase {
   implicit protected def executor: ExecutionContext = ExecutionContext.global
 }
 
 trait ContentEncodingSupportAppBase
-    extends ScalatraBase with FutureSupport with ContentEncodingSupport {
+    extends ScalatraBase
+    with FutureSupport
+    with ContentEncodingSupport {
   get("/") {
     Helper.body
   }
@@ -45,7 +48,8 @@ class GZipSupportServletTest
 
 /** Abstract test suite, for any encoding. */
 abstract class ContentEncodingSupportTest(e: ContentEncoding)
-    extends ScalatraFunSuite with Matchers {
+    extends ScalatraFunSuite
+    with Matchers {
   implicit val encoding = e
 
   test("should decode request if Content-Encoding is supported") {

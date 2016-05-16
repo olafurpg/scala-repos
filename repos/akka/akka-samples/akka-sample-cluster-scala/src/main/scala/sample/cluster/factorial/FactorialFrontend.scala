@@ -14,7 +14,8 @@ import scala.concurrent.Await
 
 //#frontend
 class FactorialFrontend(upToN: Int, repeat: Boolean)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   val backend =
     context.actorOf(FromConfig.props(), name = "factorialBackendRouter")

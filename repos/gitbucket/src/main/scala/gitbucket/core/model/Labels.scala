@@ -6,7 +6,8 @@ trait LabelComponent extends TemplateComponent { self: Profile =>
   lazy val Labels = TableQuery[Labels]
 
   class Labels(tag: Tag)
-      extends Table[Label](tag, "LABEL") with LabelTemplate {
+      extends Table[Label](tag, "LABEL")
+      with LabelTemplate {
     override val labelId = column[Int]("LABEL_ID", O AutoInc)
     override val labelName = column[String]("LABEL_NAME")
     val color = column[String]("COLOR")

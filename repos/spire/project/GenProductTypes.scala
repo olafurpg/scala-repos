@@ -28,8 +28,7 @@ object GenProductTypes {
     import tpe._
 
     val parents =
-      ("%s[(%s)]" format (structure, types)) +
-      (parentStructure map { p =>
+      ("%s[(%s)]" format (structure, types)) + (parentStructure map { p =>
             " with %sProduct%d[%s]" format (p, arity, types)
           } getOrElse "")
 
@@ -147,8 +146,7 @@ object GenProductTypes {
     |""".stripMargin
 
   def unifiedTrait(defns: Seq[Definition], start: Int, end: Int): String = {
-    "trait ProductInstances extends " +
-    (defns map { defn =>
+    "trait ProductInstances extends " + (defns map { defn =>
           defn.structure + "ProductInstances"
         } mkString " with ")
   }

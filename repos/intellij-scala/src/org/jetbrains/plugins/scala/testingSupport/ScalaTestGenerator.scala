@@ -322,12 +322,11 @@ object ScalaTestGenerator {
       methods
         .map("it should \"" + _.getMember.getName + "\" in {\n\n}")
         .map(ScalaPsiElementFactory.createExpressionFromText(_, psiManager))
-        .foreach(expr =>
-              {
-            templateBody.addBefore(expr, closingBrace)
-            templateBody.addBefore(
-                ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
-                closingBrace)
+        .foreach(expr => {
+          templateBody.addBefore(expr, closingBrace)
+          templateBody.addBefore(
+              ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
+              closingBrace)
         })
     }
   }
@@ -370,12 +369,11 @@ object ScalaTestGenerator {
       methods
         .map("test(\"test" + _.getMember.getName.capitalize + "\") {\n\n}")
         .map(ScalaPsiElementFactory.createExpressionFromText(_, psiManager))
-        .foreach(expr =>
-              {
-            templateBody.addBefore(expr, closingBrace)
-            templateBody.addBefore(
-                ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
-                closingBrace)
+        .foreach(expr => {
+          templateBody.addBefore(expr, closingBrace)
+          templateBody.addBefore(
+              ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
+              closingBrace)
         })
     }
   }
@@ -388,12 +386,11 @@ object ScalaTestGenerator {
       methods
         .map("property(\"" + _.getMember.getName + " property\"){\n\n}")
         .map(ScalaPsiElementFactory.createExpressionFromText(_, psiManager))
-        .foreach(expr =>
-              {
-            templateBody.addBefore(expr, closingBrace)
-            templateBody.addBefore(
-                ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
-                closingBrace)
+        .foreach(expr => {
+          templateBody.addBefore(expr, closingBrace)
+          templateBody.addBefore(
+              ScalaPsiElementFactory.createNewLine(psiManager, "\n\n"),
+              closingBrace)
         })
     }
   }
@@ -427,8 +424,8 @@ object ScalaTestGenerator {
       if (methods.nonEmpty)
         testNames
           .map(testName => doubleIndent + testName + " $" + testName)
-          .fold("\n" + normalIndentString +
-              "Methods of " + className + " should pass tests:")(_ + "\n" + _)
+          .fold("\n" + normalIndentString + "Methods of " +
+              className + " should pass tests:")(_ + "\n" + _)
       else ""
     val closingBrace = templateBody.getLastChild
     templateBody.addBefore(ScalaPsiElementFactory.createMethodFromText(
@@ -436,8 +433,7 @@ object ScalaTestGenerator {
                                "\n" + normalIndentString + "\"\"\"",
                                psiManager),
                            closingBrace)
-    testNames.map(
-        testName =>
+    testNames.map(testName =>
           templateBody.addBefore(ScalaPsiElementFactory.createMethodFromText(
                                      "def " + testName + " = ok", psiManager),
                                  closingBrace))

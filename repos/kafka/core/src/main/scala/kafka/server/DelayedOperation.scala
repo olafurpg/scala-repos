@@ -112,7 +112,8 @@ abstract class DelayedOperation(delayMs: Long) extends TimerTask with Logging {
   */
 class DelayedOperationPurgatory[T <: DelayedOperation](
     purgatoryName: String, brokerId: Int = 0, purgeInterval: Int = 1000)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   // timeout timer
   private[this] val executor =

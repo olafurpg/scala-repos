@@ -27,7 +27,9 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 // `hive` package is optional in compiling, however, `SQLContext.sql` doesn't
 // support the `cube` or `rollup` yet.
 class HiveDataFrameAnalyticsSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext.implicits._
   import hiveContext.sql
 

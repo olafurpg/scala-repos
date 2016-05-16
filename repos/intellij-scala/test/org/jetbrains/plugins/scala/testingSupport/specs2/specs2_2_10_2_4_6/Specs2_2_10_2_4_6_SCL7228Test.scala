@@ -8,4 +8,5 @@ import org.jetbrains.plugins.scala.testingSupport.specs2.SCL7228Test
   * @since 16.10.2014.
   */
 class Specs2_2_10_2_4_6_SCL7228Test
-    extends SCL7228Test with Specs2_2_10_2_4_6_Base {}
+    extends SCL7228Test
+    with Specs2_2_10_2_4_6_Base {}

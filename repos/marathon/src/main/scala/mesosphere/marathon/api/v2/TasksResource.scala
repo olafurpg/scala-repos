@@ -70,8 +70,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
       val enrichedTasks: IterableView[EnrichedTask, Iterable[_]] = for {
         (appId, task) <- tasks
         app <- appIdsToApps(appId) if isAuthorized(ViewApp, app)
-              if statusSet.isEmpty ||
-              task.mesosStatus.exists(s => statusSet(s.getState))
+        if statusSet.isEmpty ||
+        task.mesosStatus.exists(s => statusSet(s.getState))
       } yield {
         EnrichedTask(
             appId,
@@ -133,8 +133,8 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         val killed = result(Future.sequence(toKill.map {
           case (appId, tasks) => taskKiller.kill(appId, _ => tasks)
         })).flatten
-        ok(jsonObjString("tasks" -> killed.map(
-                    task => EnrichedTask(task.taskId.appId, task, Seq.empty))))
+        ok(jsonObjString("tasks" -> killed.map(task =>
+                      EnrichedTask(task.taskId.appId, task, Seq.empty))))
       }
 
       val tasksByAppId = tasksToAppId.flatMap {

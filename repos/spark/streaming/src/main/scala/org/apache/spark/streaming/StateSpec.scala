@@ -153,7 +153,7 @@ object StateSpec {
     */
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (Time, KeyType, Option[ValueType],
-      State[StateType]) => Option[MappedType]
+                        State[StateType]) => Option[MappedType]
   ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     new StateSpecImpl(mappingFunction)
@@ -172,13 +172,12 @@ object StateSpec {
     */
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (KeyType, Option[ValueType],
-      State[StateType]) => MappedType
+                        State[StateType]) => MappedType
   ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     val wrappedFunction = (time: Time, key: KeyType, value: Option[ValueType],
-    state: State[StateType]) =>
-      {
-        Some(mappingFunction(key, value, state))
+                           state: State[StateType]) => {
+      Some(mappingFunction(key, value, state))
     }
     new StateSpecImpl(wrappedFunction)
   }
@@ -203,14 +202,13 @@ object StateSpec {
                                   Optional[MappedType]])
     : StateSpec[KeyType, ValueType, StateType, MappedType] = {
     val wrappedFunc = (time: Time, k: KeyType, v: Option[ValueType],
-    s: State[StateType]) =>
-      {
-        val t = mappingFunction.call(time, k, JavaUtils.optionToOptional(v), s)
-        if (t.isPresent) {
-          Some(t.get)
-        } else {
-          None
-        }
+                       s: State[StateType]) => {
+      val t = mappingFunction.call(time, k, JavaUtils.optionToOptional(v), s)
+      if (t.isPresent) {
+        Some(t.get)
+      } else {
+        None
+      }
     }
     StateSpec.function(wrappedFunc)
   }
@@ -231,9 +229,8 @@ object StateSpec {
           KeyType, Optional[ValueType], State[StateType], MappedType])
     : StateSpec[KeyType, ValueType, StateType, MappedType] = {
     val wrappedFunc = (k: KeyType, v: Option[ValueType],
-    s: State[StateType]) =>
-      {
-        mappingFunction.call(k, JavaUtils.optionToOptional(v), s)
+                       s: State[StateType]) => {
+      mappingFunction.call(k, JavaUtils.optionToOptional(v), s)
     }
     StateSpec.function(wrappedFunc)
   }

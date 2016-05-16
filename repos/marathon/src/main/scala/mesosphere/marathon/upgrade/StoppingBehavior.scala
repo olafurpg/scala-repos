@@ -76,8 +76,8 @@ trait StoppingBehavior extends Actor with ActorLogging {
     }
 
   def scheduleSynchronization(): Unit =
-    periodicalCheck = context.system.scheduler
-      .scheduleOnce(5.seconds, self, SynchronizeTasks)
+    periodicalCheck =
+      context.system.scheduler.scheduleOnce(5.seconds, self, SynchronizeTasks)
 }
 
 object StoppingBehavior {

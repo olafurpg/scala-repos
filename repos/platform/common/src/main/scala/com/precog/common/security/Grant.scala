@@ -93,8 +93,8 @@ object Grant extends Logging {
     override def validated(obj: JValue) = {
       (obj.validated[GrantId]("gid") |@| obj
             .validated[Option[APIKey]]("cid")
-            .map(_.getOrElse("(undefined)")) |@| obj.validated[
-              Option[GrantId]]("issuer") |@| obj.validated[Permission](
+            .map(_.getOrElse("(undefined)")) |@| obj.validated[Option[
+                  GrantId]]("issuer") |@| obj.validated[Permission](
               "permission")(Permission.extractorV0) |@| obj
             .validated[Option[DateTime]]("permission.expirationDate")).apply {
         (gid, cid, issuer, permission, expiration) =>

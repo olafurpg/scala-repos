@@ -14,7 +14,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class PersistenceQuerySpec
-    extends WordSpecLike with Matchers with BeforeAndAfterAll {
+    extends WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val eventAdaptersConfig = s"""
       |akka.persistence.query.journal.dummy {

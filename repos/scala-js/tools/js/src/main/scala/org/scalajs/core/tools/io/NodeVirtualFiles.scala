@@ -25,7 +25,8 @@ class NodeVirtualFile(override val path: String) extends VirtualFile {
 }
 
 class NodeVirtualTextFile(p: String)
-    extends NodeVirtualFile(p) with VirtualTextFile {
+    extends NodeVirtualFile(p)
+    with VirtualTextFile {
   import NodeFS.fs
 
   override def content: String = {
@@ -35,7 +36,8 @@ class NodeVirtualTextFile(p: String)
 }
 
 class NodeVirtualBinaryFile(p: String)
-    extends NodeVirtualFile(p) with VirtualBinaryFile {
+    extends NodeVirtualFile(p)
+    with VirtualBinaryFile {
   import NodeFS.fs
 
   private def buf: ArrayBuffer =
@@ -46,14 +48,16 @@ class NodeVirtualBinaryFile(p: String)
 }
 
 class NodeVirtualJSFile(p: String)
-    extends NodeVirtualTextFile(p) with VirtualJSFile {
+    extends NodeVirtualTextFile(p)
+    with VirtualJSFile {
 
   /** Always returns None. We can't read them on JS anyway */
   override def sourceMap: Option[String] = None
 }
 
 class NodeVirtualScalaJSIRFile(p: String)
-    extends NodeVirtualBinaryFile(p) with VirtualSerializedScalaJSIRFile
+    extends NodeVirtualBinaryFile(p)
+    with VirtualSerializedScalaJSIRFile
 
 private[io] object NodeFS {
   val fs = js.Dynamic.global.require("fs")

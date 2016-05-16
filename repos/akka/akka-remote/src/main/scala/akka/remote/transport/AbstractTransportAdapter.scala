@@ -50,7 +50,8 @@ class TransportAdapters(system: ExtendedActorSystem) extends Extension {
 }
 
 object TransportAdaptersExtension
-    extends ExtensionId[TransportAdapters] with ExtensionIdProvider {
+    extends ExtensionId[TransportAdapters]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): TransportAdapters = super.get(system)
   override def lookup = TransportAdaptersExtension
   override def createExtension(
@@ -82,7 +83,8 @@ trait SchemeAugmenter {
 abstract class AbstractTransportAdapter(
     protected val wrappedTransport: Transport)(
     implicit val ec: ExecutionContext)
-    extends Transport with SchemeAugmenter {
+    extends Transport
+    with SchemeAugmenter {
 
   protected def maximumOverhead: Int
 
@@ -111,9 +113,9 @@ abstract class AbstractTransportAdapter(
       // Enforce ordering between the signalling of "listen ready" to upstream
       // and initialization happening in interceptListen
       _ ← listenerPromise
-        .tryCompleteWith(
-            interceptListen(listenAddress, upstreamListenerPromise.future))
-        .future
+           .tryCompleteWith(
+               interceptListen(listenAddress, upstreamListenerPromise.future))
+           .future
     } yield (augmentScheme(listenAddress), upstreamListenerPromise)
   }
 
@@ -147,7 +149,8 @@ abstract class AbstractTransportAdapterHandle(
     val originalRemoteAddress: Address,
     val wrappedHandle: AssociationHandle,
     val addedSchemeIdentifier: String)
-    extends AssociationHandle with SchemeAugmenter {
+    extends AssociationHandle
+    with SchemeAugmenter {
 
   def this(wrappedHandle: AssociationHandle, addedSchemeIdentifier: String) =
     this(wrappedHandle.localAddress,
@@ -173,7 +176,8 @@ object ActorTransportAdapter {
       extends TransportOperation
   final case class DisassociateUnderlying(
       info: DisassociateInfo = AssociationHandle.Unknown)
-      extends TransportOperation with DeadLetterSuppression
+      extends TransportOperation
+      with DeadLetterSuppression
 
   implicit val AskTimeout = Timeout(5.seconds)
 }
@@ -215,13 +219,14 @@ abstract class ActorTransportAdapter(
   override def shutdown(): Future[Boolean] =
     for {
       stopResult ← gracefulStop(
-          manager, RARP(system).provider.remoteSettings.FlushWait)
+                      manager, RARP(system).provider.remoteSettings.FlushWait)
       wrappedStopResult ← wrappedTransport.shutdown()
     } yield stopResult && wrappedStopResult
 }
 
 abstract class ActorTransportAdapterManager
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ActorTransportAdapter.{ListenUnderlying, ListenerRegistered}
 
   private var delayedEvents = immutable.Queue.empty[Any]

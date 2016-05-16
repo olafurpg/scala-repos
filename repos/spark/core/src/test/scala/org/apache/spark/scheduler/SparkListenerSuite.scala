@@ -29,7 +29,9 @@ import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkListenerSuite
-    extends SparkFunSuite with LocalSparkContext with Matchers
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Matchers
     with ResetSystemProperties {
 
   /** Length of time to wait while draining listener events. */
@@ -368,7 +370,7 @@ class SparkListenerSuite
     listener.synchronized {
       var remainingWait = finishTime - System.currentTimeMillis
       while (listener.endedTasks.size < listener.startedTasks.size &&
-      remainingWait > 0) {
+             remainingWait > 0) {
         listener.wait(finishTime - System.currentTimeMillis)
         remainingWait = finishTime - System.currentTimeMillis
       }

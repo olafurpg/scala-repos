@@ -16,8 +16,7 @@ object Formatter {
       keys: Seq[String],
       value: String
   ): Map[String, Object] =
-    old +
-    (keys match {
+    old + (keys match {
           case Nil => (Eponymous -> value)
           case head +: tail => {
               head ->

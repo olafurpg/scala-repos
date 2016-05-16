@@ -53,7 +53,8 @@ object TextFlow {
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/text/TextFlow.html]]
   */
 class TextFlow(override val delegate: jfxst.TextFlow = new jfxst.TextFlow)
-    extends Pane(delegate) with SFXDelegate[jfxst.TextFlow] {
+    extends Pane(delegate)
+    with SFXDelegate[jfxst.TextFlow] {
 
   /**
     * Defines horizontal text alignment.

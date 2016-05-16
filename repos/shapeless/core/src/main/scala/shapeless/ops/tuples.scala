@@ -1363,7 +1363,8 @@ object tuple {
     * @author Owein Reese
     */
   trait Patcher[N <: Nat, M <: Nat, T, InT]
-      extends DepFn2[T, InT] with Serializable
+      extends DepFn2[T, InT]
+      with Serializable
 
   object Patcher {
     def apply[N <: Nat, M <: Nat, T, InT](
@@ -1422,15 +1423,16 @@ object tuple {
     * @author Andreas Koestler
     */
   trait PaddedGrouper[T, N <: Nat, Step <: Nat, Pad]
-      extends DepFn2[T, Pad] with Serializable
+      extends DepFn2[T, Pad]
+      with Serializable
 
   object PaddedGrouper {
     def apply[T, N <: Nat, Step <: Nat, Pad](
         implicit grouper: PaddedGrouper[T, N, Step, Pad])
       : Aux[T, N, Step, Pad, grouper.Out] = grouper
 
-    type Aux[T, N <: Nat, Step <: Nat, Pad, Out0] = PaddedGrouper[
-        T, N, Step, Pad] { type Out = Out0 }
+    type Aux[T, N <: Nat, Step <: Nat, Pad, Out0] =
+      PaddedGrouper[T, N, Step, Pad] { type Out = Out0 }
 
     implicit def tuplePaddedGrouper[Pad,
                                     PadL <: HList,

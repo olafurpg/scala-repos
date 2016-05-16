@@ -150,8 +150,9 @@ import scala.language.implicitConversions"""
       unaryOps map
       (x => "%s\n  def unary_%s : %s".format(x.doc, x.op, this opType I))
     def mkStringOps = List("def +(x: String): String")
-    def mkShiftOps = (for (op <- shiftOps; arg <- List(I, L)) yield
-      "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I))
+    def mkShiftOps =
+      (for (op <- shiftOps; arg <- List(I, L)) yield
+        "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I))
 
     def clumps: List[List[String]] = {
       val xs1 =

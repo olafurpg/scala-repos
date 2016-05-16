@@ -17,7 +17,8 @@ import scala.util.Try
 class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
                                  stream: EventStream,
                                  maxOutStanding: Int)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[http] var outstanding = List.empty[MarathonEvent]
 

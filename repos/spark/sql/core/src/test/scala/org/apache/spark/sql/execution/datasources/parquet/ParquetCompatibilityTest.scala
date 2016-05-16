@@ -33,7 +33,8 @@ import org.apache.spark.sql.QueryTest
   * Helper class for testing Parquet compatibility.
   */
 private[sql] abstract class ParquetCompatibilityTest
-    extends QueryTest with ParquetTest {
+    extends QueryTest
+    with ParquetTest {
   protected def readParquetSchema(path: String): MessageType = {
     readParquetSchema(path, { path =>
       !path.getName.startsWith("_")

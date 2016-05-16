@@ -81,7 +81,7 @@ object Env {
         modLog = lila.mod.Env.current.logApi,
         shutup = lila.hub.Env.current.actor.shutup,
         hub = lila.hub.Env.current,
-        detectLanguage = DetectLanguage(
-              lila.common.PlayApp loadConfig "detectlanguage"),
+        detectLanguage =
+          DetectLanguage(lila.common.PlayApp loadConfig "detectlanguage"),
         system = lila.common.PlayApp.system)
 }

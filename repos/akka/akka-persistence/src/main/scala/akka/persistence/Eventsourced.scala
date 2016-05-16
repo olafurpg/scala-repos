@@ -43,7 +43,9 @@ private[persistence] object Eventsourced {
   * [[UntypedPersistentActor]].
   */
 private[persistence] trait Eventsourced
-    extends Snapshotter with PersistenceStash with PersistenceIdentity
+    extends Snapshotter
+    with PersistenceStash
+    with PersistenceIdentity
     with PersistenceRecovery {
   import JournalProtocol._
   import SnapshotProtocol.LoadSnapshotResult

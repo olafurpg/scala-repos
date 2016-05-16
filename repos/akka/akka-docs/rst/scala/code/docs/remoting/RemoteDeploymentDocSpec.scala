@@ -23,7 +23,8 @@ class RemoteDeploymentDocSpec
     akka.remote.netty.tcp {
       port = 0
     }
-""") with ImplicitSender {
+""")
+    with ImplicitSender {
 
   import RemoteDeploymentDocSpec._
 

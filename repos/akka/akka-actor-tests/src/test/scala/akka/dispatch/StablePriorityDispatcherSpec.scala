@@ -40,7 +40,8 @@ object StablePriorityDispatcherSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class StablePriorityDispatcherSpec
-    extends AkkaSpec(StablePriorityDispatcherSpec.config) with DefaultTimeout {
+    extends AkkaSpec(StablePriorityDispatcherSpec.config)
+    with DefaultTimeout {
 
   "A StablePriorityDispatcher" must {
     "Order its messages according to the specified comparator while preserving FIFO for equal priority messages, " +

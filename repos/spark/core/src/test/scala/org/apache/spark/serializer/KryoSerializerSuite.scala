@@ -77,7 +77,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   test("basic types") {
     val ser = new KryoSerializer(conf).newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
     }
     check(1)
@@ -107,7 +107,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   test("pairs") {
     val ser = new KryoSerializer(conf).newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
     }
     check((1, 1))
@@ -131,7 +131,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   test("Scala data structures") {
     val ser = new KryoSerializer(conf).newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
     }
     check(List[Int]())
@@ -161,7 +161,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
       new KryoSerializer(
           conf.clone.set("spark.kryo.registrationRequired", "true"))
         .newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
     }
     check((1, 3))
@@ -192,7 +192,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   test("ranges") {
     val ser = new KryoSerializer(conf).newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
       // Check that very long ranges don't get written one element at a time
       assert(ser.serialize(t).limit < 100)
@@ -228,7 +228,7 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 
   test("custom registrator") {
     val ser = new KryoSerializer(conf).newInstance()
-    def check[T : ClassTag](t: T) {
+    def check[T: ClassTag](t: T) {
       assert(ser.deserialize[T](ser.serialize(t)) === t)
     }
 
@@ -303,10 +303,9 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
     val result = sc
       .parallelize(control, 2)
       .map(new ClassWithoutNoArgConstructor(_))
-      .fold(null)((t1, t2) =>
-            {
-          val t1x = if (t1 == null) 0 else t1.x
-          new ClassWithoutNoArgConstructor(t1x + t2.x)
+      .fold(null)((t1, t2) => {
+        val t1x = if (t1 == null) 0 else t1.x
+        new ClassWithoutNoArgConstructor(t1x + t2.x)
       })
       .x
     assert(control.sum === result)
@@ -469,7 +468,8 @@ class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
 }
 
 class KryoSerializerAutoResetDisabledSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
   conf.set("spark.serializer", classOf[KryoSerializer].getName)
   conf.set(
       "spark.kryo.registrator", classOf[RegistratorWithoutAutoReset].getName)

@@ -200,7 +200,8 @@ private[data] trait CoproductFoldable[F[_], G[_]]
 }
 
 private[data] trait CoproductTraverse[F[_], G[_]]
-    extends CoproductFoldable[F, G] with Traverse[Coproduct[F, G, ?]] {
+    extends CoproductFoldable[F, G]
+    with Traverse[Coproduct[F, G, ?]] {
   implicit def F: Traverse[F]
 
   implicit def G: Traverse[G]
@@ -233,7 +234,8 @@ private[data] trait CoproductCoflatMap[F[_], G[_]]
 }
 
 private[data] trait CoproductComonad[F[_], G[_]]
-    extends Comonad[Coproduct[F, G, ?]] with CoproductCoflatMap[F, G] {
+    extends Comonad[Coproduct[F, G, ?]]
+    with CoproductCoflatMap[F, G] {
   implicit def F: Comonad[F]
 
   implicit def G: Comonad[G]

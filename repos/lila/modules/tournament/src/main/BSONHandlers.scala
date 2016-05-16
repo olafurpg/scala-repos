@@ -47,9 +47,8 @@ object BSONHandlers {
           id = r str "_id",
           name = r str "name",
           status = r.get[Status]("status"),
-          system = r
-              .intO("system")
-              .fold[System](System.default)(System.orDefault),
+          system =
+            r.intO("system").fold[System](System.default)(System.orDefault),
           clock = r.get[TournamentClock]("clock"),
           minutes = r int "minutes",
           variant = variant,

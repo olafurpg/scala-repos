@@ -24,9 +24,10 @@ case class AnaDrop(role: chess.Role,
              fen = fen,
              check = game.situation.check,
              dests = Some(movable ?? game.situation.destinations),
-             opening = Variant.openingSensibleVariants(variant) ?? {
-               FullOpeningDB findByFen fen
-             },
+             opening =
+               Variant.openingSensibleVariants(variant) ?? {
+                 FullOpeningDB findByFen fen
+               },
              drops = movable.fold(game.situation.drops, Some(Nil)),
              crazyData = game.situation.board.crazyData)
     }

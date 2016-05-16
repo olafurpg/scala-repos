@@ -129,7 +129,7 @@ private[changeSignature] trait ScalaChangeSignatureUsageHandler {
         var paramsBuf = Seq[String]()
         for {
           (arg, param) <- inv.matchedParameters.sortBy(_._2.index)
-                             if ScUnderScoreSectionUtil.isUnderscore(arg)
+          if ScUnderScoreSectionUtil.isUnderscore(arg)
         } {
           val paramName =
             if (!param.name.isEmpty) param.name
@@ -458,7 +458,8 @@ private[changeSignature] trait ScalaChangeSignatureUsageHandler {
             UsageUtil.substitutor(usage).subst(sInfo.scType).canonicalText
           val `=> ` =
             if (sInfo.isByName)
-              ScalaPsiUtil.functionArrow(method.getProject) + " " else ""
+              ScalaPsiUtil.functionArrow(method.getProject) + " "
+            else ""
           val `*` = if (sInfo.isRepeatedParameter) "*" else ""
           `=> ` + text + `*`
         case jInfo: JavaParameterInfo =>
@@ -466,7 +467,7 @@ private[changeSignature] trait ScalaChangeSignatureUsageHandler {
           val scType = UsageUtil
             .substitutor(usage)
             .subst(ScType.create(javaType, method.getProject))
-            (scType, javaType) match {
+          (scType, javaType) match {
             case (JavaArrayType(tpe), _: PsiEllipsisType) =>
               tpe.canonicalText + "*"
             case _ => scType.canonicalText

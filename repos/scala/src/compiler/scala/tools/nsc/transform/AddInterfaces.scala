@@ -69,8 +69,7 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
     }
     val mixinConstructorCalls: List[Tree] = {
       for (mc <- clazz.mixinClasses.reverse if mc.isTrait &&
-                mc.primaryConstructor != NoSymbol) yield
-        mixinConstructorCall(mc)
+           mc.primaryConstructor != NoSymbol) yield mixinConstructorCall(mc)
     }
     tree match {
 

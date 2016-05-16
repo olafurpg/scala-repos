@@ -232,9 +232,9 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
   }
 
   @inline
-  private def store8Bytes(index: Int,
-                          bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte,
-                          Byte)): Unit = {
+  private def store8Bytes(
+      index: Int,
+      bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte)): Unit = {
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2

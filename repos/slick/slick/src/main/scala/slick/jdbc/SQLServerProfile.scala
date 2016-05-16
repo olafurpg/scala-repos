@@ -144,7 +144,8 @@ trait SQLServerProfile extends JdbcProfile {
             case None =>
               if (sym
                     .flatMap(_.findColumnOption[ColumnOption.PrimaryKey.type])
-                    .isDefined) "VARCHAR(254)" else "VARCHAR(MAX)"
+                    .isDefined) "VARCHAR(254)"
+              else "VARCHAR(MAX)"
           }
       }
     case java.sql.Types.BOOLEAN => "BIT"

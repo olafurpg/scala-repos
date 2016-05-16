@@ -40,7 +40,8 @@ private[spark] trait SchedulableBuilder {
 }
 
 private[spark] class FIFOSchedulableBuilder(val rootPool: Pool)
-    extends SchedulableBuilder with Logging {
+    extends SchedulableBuilder
+    with Logging {
 
   override def buildPools() {
     // nothing
@@ -54,7 +55,8 @@ private[spark] class FIFOSchedulableBuilder(val rootPool: Pool)
 
 private[spark] class FairSchedulableBuilder(
     val rootPool: Pool, conf: SparkConf)
-    extends SchedulableBuilder with Logging {
+    extends SchedulableBuilder
+    with Logging {
 
   val schedulerAllocFile = conf.getOption("spark.scheduler.allocation.file")
   val DEFAULT_SCHEDULER_FILE = "fairscheduler.xml"
@@ -150,8 +152,8 @@ private[spark] class FairSchedulableBuilder(
     var poolName = DEFAULT_POOL_NAME
     var parentPool = rootPool.getSchedulableByName(poolName)
     if (properties != null) {
-      poolName = properties.getProperty(
-          FAIR_SCHEDULER_PROPERTIES, DEFAULT_POOL_NAME)
+      poolName =
+        properties.getProperty(FAIR_SCHEDULER_PROPERTIES, DEFAULT_POOL_NAME)
       parentPool = rootPool.getSchedulableByName(poolName)
       if (parentPool == null) {
         // we will create a new pool that user has configured in app

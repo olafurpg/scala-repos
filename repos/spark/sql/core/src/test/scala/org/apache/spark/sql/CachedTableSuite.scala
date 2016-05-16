@@ -33,7 +33,9 @@ import org.apache.spark.storage.{RDDBlockId, StorageLevel}
 private case class BigData(s: String)
 
 class CachedTableSuite
-    extends QueryTest with SQLTestUtils with SharedSQLContext {
+    extends QueryTest
+    with SQLTestUtils
+    with SharedSQLContext {
   import testImplicits._
 
   def rddIdOf(tableName: String): Int = {
@@ -48,8 +50,8 @@ class CachedTableSuite
 
   def isMaterialized(rddId: Int): Boolean = {
     val maybeBlock = sparkContext.env.blockManager.get(RDDBlockId(rddId, 0))
-    maybeBlock.foreach(
-        _ => sparkContext.env.blockManager.releaseLock(RDDBlockId(rddId, 0)))
+    maybeBlock.foreach(_ =>
+          sparkContext.env.blockManager.releaseLock(RDDBlockId(rddId, 0)))
     maybeBlock.nonEmpty
   }
 
@@ -391,7 +393,8 @@ class CachedTableSuite
     * Verifies that the plan for `df` contains `expected` number of Exchange operators.
     */
   private def verifyNumExchanges(df: DataFrame, expected: Int): Unit = {
-    assert(df.queryExecution.executedPlan.collect {
+    assert(
+        df.queryExecution.executedPlan.collect {
       case e: ShuffleExchange => e
     }.size == expected)
   }

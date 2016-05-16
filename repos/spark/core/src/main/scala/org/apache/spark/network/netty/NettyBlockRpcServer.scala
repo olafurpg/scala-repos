@@ -39,7 +39,8 @@ import org.apache.spark.storage.{BlockId, StorageLevel}
   */
 class NettyBlockRpcServer(
     appId: String, serializer: Serializer, blockManager: BlockDataManager)
-    extends RpcHandler with Logging {
+    extends RpcHandler
+    with Logging {
 
   private val streamManager = new OneForOneStreamManager()
 

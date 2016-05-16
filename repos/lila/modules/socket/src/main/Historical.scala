@@ -10,7 +10,7 @@ trait Historical[M <: SocketMember, Metadata] { self: SocketActor[M] =>
 
   protected def shouldSkipMessageFor(message: Message, member: M): Boolean
 
-  def notifyVersion[A : Writes](t: String, data: A, metadata: Metadata) {
+  def notifyVersion[A: Writes](t: String, data: A, metadata: Metadata) {
     val vmsg = history.+=(makeMessage(t, data), metadata)
     val send = sendMessage(vmsg) _
     members.values foreach send

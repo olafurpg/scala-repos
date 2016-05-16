@@ -68,7 +68,9 @@ class VersionedKeyValSource[K, V](val path: String,
                                   val maxFailures: Int,
                                   val versionsToKeep: Int)(
     implicit @transient codec: Injection[(K, V), (Array[Byte], Array[Byte])])
-    extends Source with Mappable[(K, V)] with TypedSink[(K, V)] {
+    extends Source
+    with Mappable[(K, V)]
+    with TypedSink[(K, V)] {
 
   import Dsl._
 
@@ -240,15 +242,16 @@ class VersionedKeyValSource[K, V](val path: String,
 
 object RichPipeEx extends java.io.Serializable {
   implicit def pipeToRichPipeEx(pipe: Pipe): RichPipeEx = new RichPipeEx(pipe)
-  implicit def typedPipeToRichPipeEx[K : Ordering, V : Monoid](
+  implicit def typedPipeToRichPipeEx[K: Ordering, V: Monoid](
       pipe: TypedPipe[(K, V)]) =
     new TypedRichPipeEx(pipe)
-  implicit def keyedListLikeToRichPipeEx[K : Ordering, V : Monoid, T[
-          K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T]) =
+  implicit def keyedListLikeToRichPipeEx[
+      K: Ordering, V: Monoid, T[K, +V] <: KeyedListLike[K, V, T]](
+      kll: KeyedListLike[K, V, T]) =
     typedPipeToRichPipeEx(kll.toTypedPipe)
 }
 
-class TypedRichPipeEx[K : Ordering, V : Monoid](pipe: TypedPipe[(K, V)])
+class TypedRichPipeEx[K: Ordering, V: Monoid](pipe: TypedPipe[(K, V)])
     extends java.io.Serializable {
   import Dsl._
   import TDsl._

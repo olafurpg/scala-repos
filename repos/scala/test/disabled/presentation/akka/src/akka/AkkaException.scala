@@ -16,7 +16,8 @@ import java.net.{InetAddress, UnknownHostException}
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 class AkkaException(message: String = "", cause: Throwable = null)
-    extends RuntimeException(message, cause) with Serializable {
+    extends RuntimeException(message, cause)
+    with Serializable {
   val uuid = "%s_%s".format(AkkaException.hostname, newUuid)
 
   override lazy val toString = "%s: %s\n[%s]\n%s".format(

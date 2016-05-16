@@ -374,7 +374,7 @@ object Codec {
     }
 
     override def skip(buf: ByteBuffer) {
-      while ( (buf.get() & ~0x7F) != 0) {
+      while ((buf.get() & ~0x7F) != 0) {
         // Spin.
       }
     }
@@ -551,7 +551,8 @@ object Codec {
     }
 
     def read(src: ByteBuffer): IndexedSeq[A] =
-      ((0 until readPackedInt(src)) map (_ => elemCodec.read(src))).toIndexedSeq
+      ((0 until readPackedInt(src)) map (_ =>
+                elemCodec.read(src))).toIndexedSeq
 
     override def skip(buf: ByteBuffer) {
       (0 until readPackedInt(buf)) foreach { _ =>
@@ -563,11 +564,11 @@ object Codec {
   implicit def IndexedSeqCodec[A](implicit elemCodec: Codec[A]) =
     new IndexedSeqCodec(elemCodec)
 
-  implicit def arrayCodec[
-      @spec(Boolean, Long, Double) A : Codec : Manifest]: Codec[Array[A]] =
+  implicit def arrayCodec[@spec(Boolean, Long, Double) A: Codec: Manifest]
+    : Codec[Array[A]] =
     ArrayCodec(Codec[A])
 
-  case class ArrayCodec[@spec(Boolean, Long, Double) A : Manifest](
+  case class ArrayCodec[@spec(Boolean, Long, Double) A: Manifest](
       elemCodec: Codec[A])
       extends Codec[Array[A]] {
     type S = Either[Array[A], (elemCodec.S, Array[A], Int)]
@@ -623,8 +624,8 @@ object Codec {
     def writeMore(more: S, sink: ByteBuffer): Option[S] = more match {
       case Left(as) => writeInit(as, sink)
       case Right((s, as, row)) =>
-        elemCodec.writeMore(s, sink) map (s => Right((s, as, row))) orElse writeArray(
-            as, row, sink)
+        elemCodec.writeMore(s, sink) map (s =>
+              Right((s, as, row))) orElse writeArray(as, row, sink)
     }
 
     def read(src: ByteBuffer): Array[A] = {
@@ -727,7 +728,8 @@ object Codec {
 
     override def skip(buf: ByteBuffer) {
       var b = buf.get()
-      while ( (b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
+      while ((b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 &&
+             (b & 192) != 0) {
         b = buf.get()
       }
     }
@@ -849,7 +851,8 @@ object Codec {
 
     override def skip(buf: ByteBuffer) {
       var b = buf.get()
-      while ( (b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 && (b & 192) != 0) {
+      while ((b & 3) != 0 && (b & 12) != 0 && (b & 48) != 0 &&
+             (b & 192) != 0) {
         b = buf.get()
       }
     }

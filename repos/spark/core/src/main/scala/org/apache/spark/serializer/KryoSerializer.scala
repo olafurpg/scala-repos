@@ -49,7 +49,8 @@ import org.apache.spark.util.collection.CompactBuffer
   * Spark application.
   */
 class KryoSerializer(conf: SparkConf)
-    extends org.apache.spark.serializer.Serializer with Logging
+    extends org.apache.spark.serializer.Serializer
+    with Logging
     with Serializable {
 
   private val bufferSizeKb =
@@ -162,8 +163,8 @@ class KryoSerializer(conf: SparkConf)
         classOf[Array[Tuple8[Any, Any, Any, Any, Any, Any, Any, Any]]])
     kryo.register(
         classOf[Array[Tuple9[Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
-    kryo.register(classOf[Array[Tuple10[
-                    Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
+    kryo.register(classOf[
+            Array[Tuple10[Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
     kryo.register(classOf[Array[Tuple11[
                     Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any]]])
     kryo.register(
@@ -396,7 +397,7 @@ private[spark] class KryoSerializationStream(
   private[this] var output: KryoOutput = new KryoOutput(outStream)
   private[this] var kryo: Kryo = serInstance.borrowKryo()
 
-  override def writeObject[T : ClassTag](t: T): SerializationStream = {
+  override def writeObject[T: ClassTag](t: T): SerializationStream = {
     kryo.writeClassAndObject(output, t)
     this
   }
@@ -428,7 +429,7 @@ private[spark] class KryoDeserializationStream(
   private[this] var input: KryoInput = new KryoInput(inStream)
   private[this] var kryo: Kryo = serInstance.borrowKryo()
 
-  override def readObject[T : ClassTag](): T = {
+  override def readObject[T: ClassTag](): T = {
     try {
       kryo.readClassAndObject(input).asInstanceOf[T]
     } catch {
@@ -496,7 +497,7 @@ private[spark] class KryoSerializerInstance(ks: KryoSerializer)
   private lazy val output = ks.newKryoOutput()
   private lazy val input = new KryoInput()
 
-  override def serialize[T : ClassTag](t: T): ByteBuffer = {
+  override def serialize[T: ClassTag](t: T): ByteBuffer = {
     output.clear()
     val kryo = borrowKryo()
     try {
@@ -512,7 +513,7 @@ private[spark] class KryoSerializerInstance(ks: KryoSerializer)
     ByteBuffer.wrap(output.toBytes)
   }
 
-  override def deserialize[T : ClassTag](bytes: ByteBuffer): T = {
+  override def deserialize[T: ClassTag](bytes: ByteBuffer): T = {
     val kryo = borrowKryo()
     try {
       input.setBuffer(bytes.array(),
@@ -524,7 +525,7 @@ private[spark] class KryoSerializerInstance(ks: KryoSerializer)
     }
   }
 
-  override def deserialize[T : ClassTag](
+  override def deserialize[T: ClassTag](
       bytes: ByteBuffer, loader: ClassLoader): T = {
     val kryo = borrowKryo()
     val oldClassLoader = kryo.getClassLoader
@@ -611,7 +612,8 @@ private[serializer] object KryoSerializer {
   * an InputStream or ObjectInput but you want to use Kryo.
   */
 private[spark] class KryoInputObjectInputBridge(kryo: Kryo, input: KryoInput)
-    extends FilterInputStream(input) with ObjectInput {
+    extends FilterInputStream(input)
+    with ObjectInput {
   override def readLong(): Long = input.readLong()
   override def readChar(): Char = input.readChar()
   override def readFloat(): Float = input.readFloat()
@@ -643,7 +645,8 @@ private[spark] class KryoInputObjectInputBridge(kryo: Kryo, input: KryoInput)
   */
 private[spark] class KryoOutputObjectOutputBridge(
     kryo: Kryo, output: KryoOutput)
-    extends FilterOutputStream(output) with ObjectOutput {
+    extends FilterOutputStream(output)
+    with ObjectOutput {
   override def writeFloat(v: Float): Unit = output.writeFloat(v)
   // There is no "readChars" counterpart, except maybe "readLine", which is not supported
   override def writeChars(s: String): Unit =

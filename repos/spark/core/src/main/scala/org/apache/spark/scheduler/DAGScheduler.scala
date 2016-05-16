@@ -289,8 +289,8 @@ private[spark] class DAGScheduler(
       case None =>
         // We are going to register ancestor shuffle dependencies
         getAncestorShuffleDependencies(shuffleDep.rdd).foreach { dep =>
-          shuffleToMapStage(dep.shuffleId) = newOrUsedShuffleStage(
-              dep, firstJobId)
+          shuffleToMapStage(dep.shuffleId) =
+            newOrUsedShuffleStage(dep, firstJobId)
         }
         // Then register current shuffleDep
         val stage = newOrUsedShuffleStage(shuffleDep, firstJobId)
@@ -1569,10 +1569,10 @@ private[spark] class DAGScheduler(
   }
 
   /** Fails a job and all stages that are only used by that job, and cleans up relevant state. */
-  private def failJobAndIndependentStages(
-      job: ActiveJob,
-      failureReason: String,
-      exception: Option[Throwable] = None): Unit = {
+  private def failJobAndIndependentStages(job: ActiveJob,
+                                          failureReason: String,
+                                          exception: Option[Throwable] =
+                                            None): Unit = {
     val error = new SparkException(failureReason, exception.getOrElse(null))
     var ableToCancelStages = true
 

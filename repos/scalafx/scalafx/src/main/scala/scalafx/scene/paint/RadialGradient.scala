@@ -91,7 +91,8 @@ object RadialGradient {
 }
 
 class RadialGradient(override val delegate: jfxsp.RadialGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.RadialGradient] {
+    extends Paint(delegate)
+    with SFXDelegate[jfxsp.RadialGradient] {
 
   def this(focusAngle: Double,
            focusDistance: Double,

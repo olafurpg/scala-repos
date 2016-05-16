@@ -55,17 +55,16 @@ object GraphicsContext {
 class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     extends SFXDelegate[jfxsc.GraphicsContext] {
 
-  private def executeWithPoints(action: (Array[Double], Array[Double],
-                                Int) => Unit,
-                                points: Seq[(Double, Double)]) {
+  private def executeWithPoints(
+      action: (Array[Double], Array[Double], Int) => Unit,
+      points: Seq[(Double, Double)]) {
     val xPoints = new ArrayBuffer[Double](points.size)
     val yPoints = new ArrayBuffer[Double](points.size)
 
     points.foreach(
-        p =>
-          {
-        xPoints += p._1
-        yPoints += p._2
+        p => {
+      xPoints += p._1
+      yPoints += p._2
     })
 
     action(xPoints.toArray, yPoints.toArray, points.size)

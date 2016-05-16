@@ -7,8 +7,12 @@ import gitbucket.core.util.Implicits._
 import gitbucket.core.service.IssuesService._
 
 class DashboardController
-    extends DashboardControllerBase with IssuesService with PullRequestService
-    with RepositoryService with AccountService with UsersAuthenticator
+    extends DashboardControllerBase
+    with IssuesService
+    with PullRequestService
+    with RepositoryService
+    with AccountService
+    with UsersAuthenticator
 
 trait DashboardControllerBase extends ControllerBase {
   self: IssuesService with PullRequestService with RepositoryService with AccountService with UsersAuthenticator =>

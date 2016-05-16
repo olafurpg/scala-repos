@@ -13,7 +13,8 @@ case class FriendConfig(variant: chess.variant.Variant,
                         mode: Mode,
                         color: Color,
                         fen: Option[String] = None)
-    extends HumanConfig with Positional {
+    extends HumanConfig
+    with Positional {
 
   val strictFen = false
 

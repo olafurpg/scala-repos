@@ -62,7 +62,9 @@ import blueeyes.core.service.test.BlueEyesServiceSpecification
 import blueeyes.json._
 
 trait TestEventService
-    extends BlueEyesServiceSpecification with EventService with AkkaDefaults {
+    extends BlueEyesServiceSpecification
+    with EventService
+    with AkkaDefaults {
   import EventService._
   import Permission._
 
@@ -192,8 +194,8 @@ trait TestEventService
     stored.clear()
     for {
       response <- svcWithQueries.post[A](path.toString)(data)
-      content <- response.content map (a => bi(a) map (Some(_))) getOrElse Future(
-          None)
+      content <- response.content map (a =>
+                      bi(a) map (Some(_))) getOrElse Future(None)
     } yield {
       (
           response.copy(content = content),

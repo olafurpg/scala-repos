@@ -19,7 +19,8 @@ object MarathonBuild extends Build {
   lazy val pluginInterface: Project = Project(
       id = "plugin-interface",
       base = file("plugin-interface"),
-      settings = baseSettings ++ asmSettings ++ formatSettings ++ scalaStyleSettings ++ publishSettings ++ Seq(
+      settings =
+        baseSettings ++ asmSettings ++ formatSettings ++ scalaStyleSettings ++ publishSettings ++ Seq(
             libraryDependencies ++= Dependencies.pluginInterface
         )
   )
@@ -27,7 +28,8 @@ object MarathonBuild extends Build {
   lazy val root: Project = Project(
       id = "marathon",
       base = file("."),
-      settings = baseSettings ++ buildInfoSettings ++ asmSettings ++ customReleaseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ graphSettings ++ testSettings ++ integrationTestSettings ++ teamCitySetEnvSettings ++ Seq(
+      settings =
+        baseSettings ++ buildInfoSettings ++ asmSettings ++ customReleaseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ graphSettings ++ testSettings ++ integrationTestSettings ++ teamCitySetEnvSettings ++ Seq(
             unmanagedResourceDirectories in Compile +=
               file("docs/docs/rest-api"),
             libraryDependencies ++= Dependencies.root,
@@ -46,7 +48,8 @@ object MarathonBuild extends Build {
   lazy val mesosSimulation: Project = Project(
       id = "mesos-simulation",
       base = file("mesos-simulation"),
-      settings = baseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ testSettings ++ integrationTestSettings
+      settings =
+        baseSettings ++ formatSettings ++ scalaStyleSettings ++ revolverSettings ++ testSettings ++ integrationTestSettings
   ).dependsOn(root % "compile->compile; test->test").configs(IntegrationTest)
 
   /**
@@ -176,7 +179,7 @@ object MarathonBuild extends Build {
           .setPreference(SpaceInsideParentheses, false)
           .setPreference(SpacesWithinPatternBinders, true)
           .setPreference(FormatXml, true)
-      )
+    )
 
   /**
     * This is the standard release process without

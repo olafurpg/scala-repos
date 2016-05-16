@@ -52,7 +52,8 @@ private[spark] class CoarseMesosSchedulerBackend(
     master: String,
     securityManager: SecurityManager)
     extends CoarseGrainedSchedulerBackend(scheduler, sc.env.rpcEnv)
-    with MScheduler with MesosSchedulerUtils {
+    with MScheduler
+    with MesosSchedulerUtils {
 
   val MAX_SLAVE_FAILURES = 2 // Blacklist a slave after this many failures
 
@@ -153,7 +154,7 @@ private[spark] class CoarseMesosSchedulerBackend(
         sc.conf
           .getOption("spark.mesos.driver.webui.url")
           .orElse(sc.ui.map(_.appUIAddress))
-      )
+    )
     startScheduler(driver)
   }
 
@@ -368,8 +369,8 @@ private[spark] class CoarseMesosSchedulerBackend(
     val tasks = new HashMap[OfferID, List[MesosTaskInfo]].withDefaultValue(Nil)
 
     // offerID -> resources
-    val remainingResources = mutable.Map(offers.map(
-            offer => (offer.getId.getValue, offer.getResourcesList)): _*)
+    val remainingResources = mutable.Map(offers.map(offer =>
+              (offer.getId.getValue, offer.getResourcesList)): _*)
 
     var launchTasks = true
 
@@ -529,7 +530,7 @@ private[spark] class CoarseMesosSchedulerBackend(
 
     // slaveIdsWithExecutors has no memory barrier, so this is eventually consistent
     while (numExecutors() > 0 &&
-    System.nanoTime() - startTime < shutdownTimeoutMS * 1000L * 1000L) {
+           System.nanoTime() - startTime < shutdownTimeoutMS * 1000L * 1000L) {
       Thread.sleep(100)
     }
 

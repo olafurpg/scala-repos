@@ -33,8 +33,15 @@ import scala.tools.nsc.classpath.FlatClassPath
 import scala.tools.nsc.settings.ClassPathRepresentationType
 
 class Global(var currentSettings: Settings, var reporter: Reporter)
-    extends SymbolTable with CompilationUnits with Plugins with PhaseAssembly
-    with Trees with Printers with DocComments with Positions with Reporting
+    extends SymbolTable
+    with CompilationUnits
+    with Plugins
+    with PhaseAssembly
+    with Trees
+    with Printers
+    with DocComments
+    with Positions
+    with Reporting
     with Parsing {
   self =>
 
@@ -183,7 +190,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
         if (lastPrintedSource == source)
           println(": tree is unchanged since " + lastPrintedPhase)
         else {
-          lastPrintedPhase = phase.prev // since we're running inside "exitingPhase"
+          lastPrintedPhase =
+            phase.prev // since we're running inside "exitingPhase"
           lastPrintedSource = source
           println("")
           println(source)
@@ -286,8 +294,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
   def logError(msg: String, t: Throwable): Unit = ()
 
   override def shouldLogAtThisPhase =
-    settings.log.isSetByUser &&
-    ((settings.log containsPhase globalPhase) ||
+    settings.log.isSetByUser && ((settings.log containsPhase globalPhase) ||
         (settings.log containsPhase phase))
   // Over 200 closure objects are eliminated by inlining this.
   @inline final def log(msg: => AnyRef) {
@@ -781,10 +788,11 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     }
 
     // phase id in run, or suitable icon
-    def idOf(p: SubComponent) = (if (settings.skip contains p.phaseName)
-                                   "oo" // (currentRun skipPhase p.phaseName)
-                                 else if (!p.enabled) "xx"
-                                 else p.ownPhase.id.toString)
+    def idOf(p: SubComponent) =
+      (if (settings.skip contains p.phaseName)
+         "oo" // (currentRun skipPhase p.phaseName)
+       else if (!p.enabled) "xx"
+       else p.ownPhase.id.toString)
     def mkText(p: SubComponent) = {
       val (name, text) =
         if (elliptically) (dotfmt(p.phaseName), dotfmt(describe(p)))
@@ -1010,11 +1018,12 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     if (currentUnit.exists) currentUnit.source else lastSeenSourceFile
   def currentFreshNameCreator = currentUnit.fresh
 
-  def isGlobalInitialized = (definitions.isDefinitionsInitialized &&
-      rootMirror.isMirrorInitialized)
-  override def isPastTyper = ((curRun ne null) &&
-      isGlobalInitialized // defense against init order issues
-      && (globalPhase.id > currentRun.typerPhase.id))
+  def isGlobalInitialized =
+    (definitions.isDefinitionsInitialized && rootMirror.isMirrorInitialized)
+  override def isPastTyper =
+    ((curRun ne null) &&
+        isGlobalInitialized // defense against init order issues
+        && (globalPhase.id > currentRun.typerPhase.id))
 
   // TODO - trim these to the absolute minimum.
   @inline final def exitingErasure[T](op: => T): T =
@@ -1061,10 +1070,11 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
     enteringPhase(currentRun.uncurryPhase)(op)
 
   // Owners which aren't package classes.
-  private def ownerChainString(sym: Symbol): String = (if (sym == null) ""
-                                                       else
-                                                         sym.ownerChain takeWhile
-                                                         (!_.isPackageClass) mkString " -> ")
+  private def ownerChainString(sym: Symbol): String =
+    (if (sym == null) ""
+     else
+       sym.ownerChain takeWhile
+       (!_.isPackageClass) mkString " -> ")
 
   private def formatExplain(pairs: (String, Any)*): String =
     (pairs.toList collect {
@@ -1082,7 +1092,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       val site = lastSeenContext.enclClassOrMethod.owner
       val pos_s =
         if (tree.pos.isDefined)
-          s"line ${tree.pos.line} of ${tree.pos.source.file}" else "<unknown>"
+          s"line ${tree.pos.line} of ${tree.pos.source.file}"
+        else "<unknown>"
       val context_s = try {
         // Taking 3 before, 3 after the fingered line.
         val start = 0 max (tree.pos.line - 3)
@@ -1112,8 +1123,8 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
           "tree position" -> pos_s,
           "tree tpe" -> tpe,
           "symbol" -> Option(sym).fold("null")(_.debugLocationString),
-          "symbol definition" -> Option(sym)
-            .fold("null")(s => s.defString + s" (a ${s.shortSymbolClass})"),
+          "symbol definition" -> Option(sym).fold("null")(s =>
+                s.defString + s" (a ${s.shortSymbolClass})"),
           "symbol package" -> sym.enclosingPackage.fullName,
           "symbol owners" -> ownerChainString(sym),
           "call site" ->
@@ -1672,8 +1683,7 @@ class Global(var currentSettings: Settings, var reporter: Reporter)
       // The name as given was not found, so we'll sift through every symbol in
       // the run looking for plausible matches.
       case NoSymbol =>
-        phased(
-            currentRun.symSource.keys map
+        phased(currentRun.symSource.keys map
             (sym => findNamedMember(fullName, sym)) filterNot (_ == NoSymbol) toList)
       // The name as given matched, so show only that.
       case sym => List(sym)

@@ -37,7 +37,7 @@ private[mllib] class RandomRDDPartition[T](
 }
 
 // These two classes are necessary since Range objects in Scala cannot have size > Int.MaxValue
-private[mllib] class RandomRDD[T : ClassTag](
+private[mllib] class RandomRDD[T: ClassTag](
     sc: SparkContext,
     size: Long,
     numPartitions: Int,
@@ -110,7 +110,7 @@ private[mllib] object RandomRDD {
 
   // The RNG has to be reset every time the iterator is requested to guarantee same data
   // every time the content of the RDD is examined.
-  def getPointIterator[T : ClassTag](
+  def getPointIterator[T: ClassTag](
       partition: RandomRDDPartition[T]): Iterator[T] = {
     val generator = partition.generator.copy()
     generator.setSeed(partition.seed)

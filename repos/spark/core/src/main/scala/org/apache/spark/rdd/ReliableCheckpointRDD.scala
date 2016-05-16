@@ -32,7 +32,7 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 /**
   * An RDD that reads from checkpoint files previously written to reliable storage.
   */
-private[spark] class ReliableCheckpointRDD[T : ClassTag](
+private[spark] class ReliableCheckpointRDD[T: ClassTag](
     sc: SparkContext,
     val checkpointPath: String,
     _partitioner: Option[Partitioner] = None
@@ -123,7 +123,7 @@ private[spark] object ReliableCheckpointRDD extends Logging {
   /**
     * Write RDD to checkpoint files and return a ReliableCheckpointRDD representing the RDD.
     */
-  def writeRDDToCheckpointDirectory[T : ClassTag](
+  def writeRDDToCheckpointDirectory[T: ClassTag](
       originalRDD: RDD[T],
       checkpointDir: String,
       blockSize: Int = -1): ReliableCheckpointRDD[T] = {
@@ -164,7 +164,7 @@ private[spark] object ReliableCheckpointRDD extends Logging {
   /**
     * Write a RDD partition's data to a checkpoint file.
     */
-  def writePartitionToCheckpointFile[T : ClassTag](
+  def writePartitionToCheckpointFile[T: ClassTag](
       path: String,
       broadcastedConf: Broadcast[SerializableConfiguration],
       blockSize: Int = -1)(ctx: TaskContext, iterator: Iterator[T]) {

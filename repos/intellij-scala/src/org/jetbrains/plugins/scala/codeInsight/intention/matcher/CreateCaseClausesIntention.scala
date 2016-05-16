@@ -96,8 +96,7 @@ final class CreateCaseClausesIntention extends PsiElementBaseIntentionAction {
       newMatchStmt: ScMatchStmt, bindTargets: Int => PsiNamedElement) {
     for {
       (caseClause, i) <- newMatchStmt.caseClauses.zipWithIndex
-                            if !caseClause.pattern.exists(
-                            _.isInstanceOf[ScWildcardPattern])
+      if !caseClause.pattern.exists(_.isInstanceOf[ScWildcardPattern])
     } {
       val bindTo = bindTargets(i)
       bindReference(caseClause, bindTo)

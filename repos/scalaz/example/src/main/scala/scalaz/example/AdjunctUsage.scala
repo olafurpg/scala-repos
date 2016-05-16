@@ -88,11 +88,11 @@ object AdjunctUsage extends App {
   // computations: look for repeats and sum the ints, could be
   // composed together, so that they happen on a single pass through a
   // Traversable,
-  type ROIRIWW[A] = Reader[
-      Option[Int], // read the previous value for computing repeats
-      Reader[Int, // read the accumulated sum
-             Writer[Int, // write the new sum
-                    Writer[Option[Int], A]]]] // write the next value for computing repeats
+  type ROIRIWW[A] =
+    Reader[Option[Int], // read the previous value for computing repeats
+           Reader[Int, // read the accumulated sum
+                  Writer[Int, // write the new sum
+                         Writer[Option[Int], A]]]] // write the next value for computing repeats
 
   // now we can combine our two stateful computations
   val checkForRepeatsAdjAndSum2: Int ⇒ ROIRIWW[Boolean] = { next ⇒

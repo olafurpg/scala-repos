@@ -15,7 +15,7 @@ class PoolingReadRepairClient(
     readRepairProbability: Float,
     readRepairCount: Int = 1,
     futurePool: FuturePool = new ExecutorServiceFuturePool(
-          Executors.newCachedThreadPool()))
+        Executors.newCachedThreadPool()))
     extends Client {
 
   val rand = new Random()

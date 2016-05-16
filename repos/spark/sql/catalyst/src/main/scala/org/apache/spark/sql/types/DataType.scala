@@ -254,10 +254,9 @@ object DataType {
         fromFields.length == toFields.length &&
         fromFields.zip(toFields).forall {
           case (fromField, toField) =>
-            fromField.name == toField.name &&
-            (toField.nullable || !fromField.nullable) &&
-            equalsIgnoreCompatibleNullability(fromField.dataType,
-                                              toField.dataType)
+            fromField.name == toField.name && (toField.nullable ||
+                !fromField.nullable) && equalsIgnoreCompatibleNullability(
+                fromField.dataType, toField.dataType)
         }
 
       case (fromDataType, toDataType) => fromDataType == toDataType

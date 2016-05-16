@@ -49,8 +49,7 @@ object ScopeSuggester {
       for (elementOwner <- owners) {
         val pparent =
           PsiTreeUtil.getParentOfType(parent, classOf[ScTemplateDefinition])
-        if (pparent != null &&
-            (!elementOwner.isAncestorOf(pparent) ||
+        if (pparent != null && (!elementOwner.isAncestorOf(pparent) ||
                 !elementOwner.isInstanceOf[ScTemplateDefinition])) {
           result = false
         }
@@ -277,8 +276,8 @@ object ScopeSuggester {
           intersectionResult = intersectionResult.intersect(inBuffer)
         }
 
-        resultBuffer.foreach(
-            (element: ArrayBuffer[ScalaFile]) => intersect(element))
+        resultBuffer.foreach((element: ArrayBuffer[ScalaFile]) =>
+              intersect(element))
         intersectionResult.toList.reverse.toArray
       }
     }
@@ -388,8 +387,8 @@ case class SimpleScopeItem(name: String,
     extends ScopeItem(name, availableNames) {
 
   var occurrencesFromInheretors: Array[ScTypeElement] = Array[ScTypeElement]()
-  val usualOccurrencesRanges = usualOccurrences.map(
-      (x: ScTypeElement) => (x.getTextRange, x.getContainingFile))
+  val usualOccurrencesRanges = usualOccurrences.map((x: ScTypeElement) =>
+        (x.getTextRange, x.getContainingFile))
   val fileEncloserRange =
     (fileEncloser.getTextRange, fileEncloser.getContainingFile)
 

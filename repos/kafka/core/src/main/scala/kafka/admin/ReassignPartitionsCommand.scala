@@ -319,8 +319,8 @@ class ReassignPartitionsCommand(
     extends Logging {
   def reassignPartitions(): Boolean = {
     try {
-      val validPartitions = partitions.filter(
-          p => validatePartition(zkUtils, p._1.topic, p._1.partition))
+      val validPartitions = partitions.filter(p =>
+            validatePartition(zkUtils, p._1.topic, p._1.partition))
       if (validPartitions.isEmpty) {
         false
       } else {

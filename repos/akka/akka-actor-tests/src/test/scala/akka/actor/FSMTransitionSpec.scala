@@ -15,7 +15,8 @@ object FSMTransitionSpec {
   }
 
   class SendAnyTransitionFSM(target: ActorRef)
-      extends Actor with FSM[Int, Int] {
+      extends Actor
+      with FSM[Int, Int] {
     startWith(0, 0)
     when(0) {
       case Event("stay", _) ⇒ stay()

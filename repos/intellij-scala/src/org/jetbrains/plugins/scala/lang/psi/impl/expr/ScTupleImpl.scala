@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   * @author ilyas, Alexander Podkhalyuzin
   */
 class ScTupleImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTuple {
+    extends ScalaPsiElementImpl(node)
+    with ScTuple {
   override def toString: String = "Tuple"
 
   protected[expr] override def innerType(

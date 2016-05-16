@@ -26,7 +26,7 @@ import scalaz._
 import scalaz.syntax.monad._
 
 object TerminateJson {
-  final class ArrayStack[@specialized(Int) A : Manifest](
+  final class ArrayStack[@specialized(Int) A: Manifest](
       initCapacity: Int = 128) {
     private[bifrost] var stack = new Array[A](initCapacity)
     private[bifrost] var next: Int = 0
@@ -154,8 +154,7 @@ object TerminateJson {
         Some({
           val sb = new StringBuilder()
           while (stack.nonEmpty) {
-            sb ++=
-            (stack.pop() match {
+            sb ++= (stack.pop() match {
                   case ExpectValue => "null"
                   case ExpectField => "\"\":null"
                   case SkipChar => "\""

@@ -63,7 +63,7 @@ private[streaming] class DummyInputDStream(ssc: StreamingContext)
   * replayable, reliable message queue like Kafka. It requires a sequence as input, and
   * returns the i_th element at the i_th batch under manual clock.
   */
-class TestInputStream[T : ClassTag](
+class TestInputStream[T: ClassTag](
     _ssc: StreamingContext, input: Seq[Seq[T]], numPartitions: Int)
     extends InputDStream[T](_ssc) {
 
@@ -97,18 +97,15 @@ class TestInputStream[T : ClassTag](
   *
   * The buffer contains a sequence of RDD's, each containing a sequence of items.
   */
-class TestOutputStream[T : ClassTag](
+class TestOutputStream[T: ClassTag](
     parent: DStream[T],
-    val output: ConcurrentLinkedQueue[Seq[T]] = new ConcurrentLinkedQueue[Seq[
-              T]]()
+    val output: ConcurrentLinkedQueue[Seq[T]] =
+      new ConcurrentLinkedQueue[Seq[T]]()
 )
-    extends ForEachDStream[T](parent,
-                              (rdd: RDD[T], t: Time) =>
-                                {
-                                  val collected = rdd.collect()
-                                  output.add(collected)
-                              },
-                              false) {
+    extends ForEachDStream[T](parent, (rdd: RDD[T], t: Time) => {
+      val collected = rdd.collect()
+      output.add(collected)
+    }, false) {
 
   // This is to clear the output buffer every it is read from a checkpoint
   @throws(classOf[IOException])
@@ -126,18 +123,14 @@ class TestOutputStream[T : ClassTag](
   * The queue contains a sequence of RDD's, each containing a sequence of partitions, each
   * containing a sequence of items.
   */
-class TestOutputStreamWithPartitions[T : ClassTag](
+class TestOutputStreamWithPartitions[T: ClassTag](
     parent: DStream[T],
-    val output: ConcurrentLinkedQueue[Seq[Seq[T]]] = new ConcurrentLinkedQueue[
-          Seq[Seq[T]]]())
-    extends ForEachDStream[T](parent,
-                              (rdd: RDD[T], t: Time) =>
-                                {
-                                  val collected =
-                                    rdd.glom().collect().map(_.toSeq)
-                                  output.add(collected)
-                              },
-                              false) {
+    val output: ConcurrentLinkedQueue[Seq[Seq[T]]] =
+      new ConcurrentLinkedQueue[Seq[Seq[T]]]())
+    extends ForEachDStream[T](parent, (rdd: RDD[T], t: Time) => {
+      val collected = rdd.glom().collect().map(_.toSeq)
+      output.add(collected)
+    }, false) {
 
   // This is to clear the output buffer every it is read from a checkpoint
   @throws(classOf[IOException])
@@ -330,7 +323,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Set up required DStreams to test the DStream operation using the two sequences
     * of input collections.
     */
-  def setupStreams[U : ClassTag, V : ClassTag](
+  def setupStreams[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       numPartitions: Int = numInputPartitions
@@ -354,7 +347,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Set up required DStreams to test the binary operation using the sequence
     * of input collections.
     */
-  def setupStreams[U : ClassTag, V : ClassTag, W : ClassTag](
+  def setupStreams[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W]
@@ -382,7 +375,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     *
     * Returns a sequence of items for each RDD.
     */
-  def runStreams[V : ClassTag](
+  def runStreams[V: ClassTag](
       ssc: StreamingContext,
       numBatches: Int,
       numExpectedOutput: Int
@@ -400,7 +393,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Returns a sequence of RDD's. Each RDD is represented as several sequences of items, each
     * representing one partition.
     */
-  def runStreamsWithPartitions[V : ClassTag](
+  def runStreamsWithPartitions[V: ClassTag](
       ssc: StreamingContext,
       numBatches: Int,
       numExpectedOutput: Int
@@ -440,7 +433,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
       // Wait until expected number of output items have been generated
       val startTime = System.currentTimeMillis()
       while (output.size < numExpectedOutput &&
-      System.currentTimeMillis() - startTime < maxWaitTimeMillis) {
+             System.currentTimeMillis() - startTime < maxWaitTimeMillis) {
         logInfo("output.size = " + output.size + ", numExpectedOutput = " +
             numExpectedOutput)
         ssc.awaitTerminationOrTimeout(50)
@@ -465,7 +458,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * is same as the expected output values, by comparing the output
     * collections either as lists (order matters) or sets (order does not matter)
     */
-  def verifyOutput[V : ClassTag](
+  def verifyOutput[V: ClassTag](
       output: Seq[Seq[V]],
       expectedOutput: Seq[Seq[V]],
       useSet: Boolean
@@ -506,7 +499,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Test unary DStream operation with a list of inputs, with number of
     * batches to run same as the number of expected output values
     */
-  def testOperation[U : ClassTag, V : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       expectedOutput: Seq[Seq[V]],
@@ -524,7 +517,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * @param useSet     Compare the output values with the expected output values
     *                   as sets (order matters) or as lists (order does not matter)
     */
-  def testOperation[U : ClassTag, V : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag](
       input: Seq[Seq[U]],
       operation: DStream[U] => DStream[V],
       expectedOutput: Seq[Seq[V]],
@@ -542,7 +535,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * Test binary DStream operation with two lists of inputs, with number of
     * batches to run same as the number of expected output values
     */
-  def testOperation[U : ClassTag, V : ClassTag, W : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W],
@@ -563,7 +556,7 @@ trait TestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging {
     * @param useSet     Compare the output values with the expected output values
     *                   as sets (order matters) or as lists (order does not matter)
     */
-  def testOperation[U : ClassTag, V : ClassTag, W : ClassTag](
+  def testOperation[U: ClassTag, V: ClassTag, W: ClassTag](
       input1: Seq[Seq[U]],
       input2: Seq[Seq[V]],
       operation: (DStream[U], DStream[V]) => DStream[W],

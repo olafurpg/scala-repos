@@ -279,7 +279,8 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   * &lt;th&gt;&lt;sort:name/&gt;&lt;/th&gt;&lt;th&gt;&lt;sort:email/&gt;&lt;/th&gt; etc.
   */
 trait SortedPaginatorSnippet[T, C]
-    extends SortedPaginator[T, C] with PaginatorSnippet[T] {
+    extends SortedPaginator[T, C]
+    with PaginatorSnippet[T] {
 
   /**
     * The prefix to bind the sorting column headers

@@ -161,15 +161,14 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
   protected def kindMatches(element: PsiElement): Boolean =
     ResolveUtils.kindMatches(element, kinds)
 
-  def processType(
-      t: ScType,
-      place: PsiElement,
-      state: ResolveState = ResolveState.initial(),
-      updateWithProjectionSubst: Boolean = true,
-      //todo ugly recursion breakers, maybe we need general for type? What about performance?
-      visitedAliases: HashSet[ScTypeAlias] = HashSet.empty,
-      visitedTypeParameter: HashSet[ScTypeParameterType] = HashSet.empty)
-    : Boolean = {
+  def processType(t: ScType,
+                  place: PsiElement,
+                  state: ResolveState = ResolveState.initial(),
+                  updateWithProjectionSubst: Boolean = true,
+                  //todo ugly recursion breakers, maybe we need general for type? What about performance?
+                  visitedAliases: HashSet[ScTypeAlias] = HashSet.empty,
+                  visitedTypeParameter: HashSet[ScTypeParameterType] =
+                    HashSet.empty): Boolean = {
     ProgressManager.checkCanceled()
 
     t match {
@@ -234,15 +233,15 @@ abstract class BaseProcessor(val kinds: Set[ResolveTargets.Value])
         //not scala from scala
         var break = true
         for (method <- e.getMethods if break &&
-                      method.hasModifierProperty("static")) {
+             method.hasModifierProperty("static")) {
           if (!execute(method, state)) break = false
         }
         for (cl <- e.getInnerClasses if break &&
-                  cl.hasModifierProperty("static")) {
+             cl.hasModifierProperty("static")) {
           if (!execute(cl, state)) break = false
         }
         for (field <- e.getFields if break &&
-                     field.hasModifierProperty("static")) {
+             field.hasModifierProperty("static")) {
           if (!execute(field, state)) break = false
         }
         if (!break) return false

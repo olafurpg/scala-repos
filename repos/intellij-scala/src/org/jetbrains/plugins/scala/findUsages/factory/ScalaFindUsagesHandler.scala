@@ -116,8 +116,7 @@ class ScalaFindUsagesHandler(
               Array(IS_GETTER, SETTER)
             case _ => Array.empty
           }
-          a.map(
-              role =>
+          a.map(role =>
                 t.getTypedDefinitionWrapper(isStatic = false,
                                             isInterface = false,
                                             role = role,
@@ -240,7 +239,7 @@ class ScalaFindUsagesHandler(
       element match {
         case function: ScFunction if !function.isLocal =>
           for (elem <- ScalaOverridingMemberSearcher.search(
-              function, deep = true)) {
+                          function, deep = true)) {
             val processed =
               super.processElementUsages(elem, processor, options)
             if (!processed) return false

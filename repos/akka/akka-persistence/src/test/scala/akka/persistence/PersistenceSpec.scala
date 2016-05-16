@@ -21,7 +21,9 @@ import akka.actor.Props
 import akka.testkit.AkkaSpec
 
 abstract class PersistenceSpec(config: Config)
-    extends AkkaSpec(config) with BeforeAndAfterEach with Cleanup
+    extends AkkaSpec(config)
+    with BeforeAndAfterEach
+    with Cleanup
     with PersistenceMatchers {
   this: AkkaSpec ⇒
   private var _name: String = _
@@ -42,7 +44,7 @@ abstract class PersistenceSpec(config: Config)
   /**
     * Creates a persistent actor with current name as constructor argument.
     */
-  def namedPersistentActor[T <: NamedPersistentActor : ClassTag] =
+  def namedPersistentActor[T <: NamedPersistentActor: ClassTag] =
     system.actorOf(Props(implicitly[ClassTag[T]].runtimeClass, name))
 
   override protected def beforeEach() {
@@ -76,8 +78,8 @@ trait Cleanup {
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+          new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     storageLocations.foreach(FileUtils.deleteDirectory)
@@ -110,7 +112,8 @@ trait PersistenceMatchers {
     override def apply(_left: immutable.Seq[Any]) = {
       val left = _left.map(_.toString)
       val mapped =
-        left.groupBy(l ⇒ prefixes.indexWhere(p ⇒ l.startsWith(p))) - (-1) // ignore other messages
+        left.groupBy(l ⇒ prefixes.indexWhere(p ⇒ l.startsWith(p))) -
+        (-1) // ignore other messages
       val results = for {
         (pos, seq) ← mapped
         nrs = seq.map(_.replaceFirst(prefixes(pos), "").toInt)

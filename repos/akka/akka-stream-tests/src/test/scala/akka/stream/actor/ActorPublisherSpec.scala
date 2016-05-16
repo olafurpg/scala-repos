@@ -129,7 +129,8 @@ object ActorPublisherSpec {
 }
 
 class ActorPublisherSpec
-    extends AkkaSpec(ActorPublisherSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorPublisherSpec.config)
+    with ImplicitSender {
 
   import akka.stream.actor.ActorPublisherSpec._
 
@@ -327,10 +328,9 @@ class ActorPublisherSpec
 
         val (snd, rcv) = source.collect {
           case n if n % 2 == 0 ⇒ "elem-" + n
-        }.toMat(sink)(Keep.both)
-          .run()
+        }.toMat(sink)(Keep.both).run()
 
-          (1 to 3) foreach { snd ! _ }
+        (1 to 3) foreach { snd ! _ }
         probe.expectMsg("elem-2")
 
         (4 to 500) foreach { n ⇒
@@ -380,7 +380,7 @@ class ActorPublisherSpec
         })
         .run()
 
-        (0 to 10).foreach {
+      (0 to 10).foreach {
         senderRef1 ! _
         senderRef2 ! _
       }

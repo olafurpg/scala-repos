@@ -31,7 +31,10 @@ import org.apache.spark.sql.DataFrame
 
 /** Params for Multilayer Perceptron. */
 private[ml] trait MultilayerPerceptronParams
-    extends PredictorParams with HasSeed with HasMaxIter with HasTol {
+    extends PredictorParams
+    with HasSeed
+    with HasMaxIter
+    with HasTol {
 
   /**
     * Layer sizes including input size and output size.

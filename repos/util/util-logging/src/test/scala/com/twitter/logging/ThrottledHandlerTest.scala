@@ -25,7 +25,9 @@ import com.twitter.util.{TempFolder, Time}
 
 @RunWith(classOf[JUnitRunner])
 class ThrottledHandlerTest
-    extends WordSpec with BeforeAndAfter with TempFolder {
+    extends WordSpec
+    with BeforeAndAfter
+    with TempFolder {
   private var handler: StringHandler = null
 
   "ThrottledHandler" should {

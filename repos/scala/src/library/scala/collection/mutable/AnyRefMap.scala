@@ -31,7 +31,9 @@ import generic.CanBuildFrom
 final class AnyRefMap[K <: AnyRef, V] private[collection](
     defaultEntry: K => V, initialBufferSize: Int, initBlank: Boolean)
     extends AbstractMap[K, V]
-    with Map[K, V] with MapLike[K, V, AnyRefMap[K, V]] with Serializable {
+    with Map[K, V]
+    with MapLike[K, V, AnyRefMap[K, V]]
+    with Serializable {
   import AnyRefMap._
   def this() = this(AnyRefMap.exceptionDefault, 16, true)
 
@@ -60,10 +62,11 @@ final class AnyRefMap[K <: AnyRef, V] private[collection](
   if (initBlank) defaultInitialize(initialBufferSize)
 
   private[this] def defaultInitialize(n: Int) {
-    mask = if (n < 0) 0x7
-    else
-      (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
-              1) & 0x3FFFFFFF) | 0x7
+    mask =
+      if (n < 0) 0x7
+      else
+        (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
+                1) & 0x3FFFFFFF) | 0x7
     _hashes = new Array[Int](mask + 1)
     _keys = new Array[AnyRef](mask + 1)
     _values = new Array[AnyRef](mask + 1)
@@ -328,8 +331,8 @@ final class AnyRefMap[K <: AnyRef, V] private[collection](
     var e = _size
     while (e > 0) {
       while (i < _hashes.length && {
-        val h = _hashes(i); h + h == 0 && i < _hashes.length
-      }) i += 1
+               val h = _hashes(i); h + h == 0 && i < _hashes.length
+             }) i += 1
       if (i < _hashes.length) {
         f((_keys(i).asInstanceOf[K], _values(i).asInstanceOf[V]))
         i += 1
@@ -431,8 +434,8 @@ object AnyRefMap {
   private val exceptionDefault = (k: Any) =>
     throw new NoSuchElementException(if (k == null) "(null)" else k.toString)
 
-  implicit def canBuildFrom[K <: AnyRef, V, J <: AnyRef, U]: CanBuildFrom[
-      AnyRefMap[K, V], (J, U), AnyRefMap[J, U]] =
+  implicit def canBuildFrom[K <: AnyRef, V, J <: AnyRef, U]
+    : CanBuildFrom[AnyRefMap[K, V], (J, U), AnyRefMap[J, U]] =
     new CanBuildFrom[AnyRefMap[K, V], (J, U), AnyRefMap[J, U]] {
       def apply(from: AnyRefMap[K, V]): AnyRefMapBuilder[J, U] = apply()
       def apply(): AnyRefMapBuilder[J, U] = new AnyRefMapBuilder[J, U]

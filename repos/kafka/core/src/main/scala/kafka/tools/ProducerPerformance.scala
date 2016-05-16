@@ -289,8 +289,8 @@ object ProducerPerformance extends Logging {
       // thread 1 IDs : 100 ~ 199
       // thread 2 IDs : 200 ~ 299
       // . . .
-      leftPaddedSeqId = String.format(
-          "%0" + seqIdNumDigit + "d", long2Long(msgId))
+      leftPaddedSeqId =
+        String.format("%0" + seqIdNumDigit + "d", long2Long(msgId))
 
       val msgHeader =
         topicLabel + SEP + topic + SEP + threadIdLabel + SEP + threadId + SEP +
@@ -324,14 +324,13 @@ object ProducerPerformance extends Logging {
 
       while (i < messagesPerThread) {
         try {
-          config.topics.foreach(topic =>
-                {
-              message = generateProducerData(topic, i)
-              producer.send(topic, BigInteger.valueOf(i).toByteArray, message)
-              bytesSent += message.size
-              nSends += 1
-              if (config.messageSendGapMs > 0)
-                Thread.sleep(config.messageSendGapMs)
+          config.topics.foreach(topic => {
+            message = generateProducerData(topic, i)
+            producer.send(topic, BigInteger.valueOf(i).toByteArray, message)
+            bytesSent += message.size
+            nSends += 1
+            if (config.messageSendGapMs > 0)
+              Thread.sleep(config.messageSendGapMs)
           })
         } catch {
           case e: Throwable =>

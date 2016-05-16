@@ -18,7 +18,8 @@ import scala.util.control.NonFatal
   */
 private[tracker] class TaskCreationHandlerAndUpdaterDelegate(
     clock: Clock, conf: TaskTrackerConfig, taskTrackerRef: ActorRef)
-    extends TaskCreationHandler with TaskUpdater {
+    extends TaskCreationHandler
+    with TaskUpdater {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -41,8 +42,8 @@ private[tracker] class TaskCreationHandlerAndUpdaterDelegate(
 
     import akka.pattern.ask
     val deadline = clock.now + timeout.duration
-    val op: ForwardTaskOp = TaskTrackerActor.ForwardTaskOp(
-        deadline, taskId, action)
+    val op: ForwardTaskOp =
+      TaskTrackerActor.ForwardTaskOp(deadline, taskId, action)
     (taskTrackerRef ? op).mapTo[Unit].recover {
       case NonFatal(e) =>
         throw new RuntimeException(

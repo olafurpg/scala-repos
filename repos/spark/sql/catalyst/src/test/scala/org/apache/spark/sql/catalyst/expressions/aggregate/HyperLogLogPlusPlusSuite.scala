@@ -28,8 +28,10 @@ import org.apache.spark.sql.types.{DataType, IntegerType}
 class HyperLogLogPlusPlusSuite extends SparkFunSuite {
 
   /** Create a HLL++ instance and an input and output buffer. */
-  def createEstimator(rsd: Double, dt: DataType = IntegerType)
-    : (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
+  def createEstimator(
+      rsd: Double,
+      dt: DataType =
+        IntegerType): (HyperLogLogPlusPlus, MutableRow, MutableRow) = {
     val input = new SpecificMutableRow(Seq(dt))
     val hll = new HyperLogLogPlusPlus(new BoundReference(0, dt, true), rsd)
     val buffer = createBuffer(hll)
@@ -94,17 +96,15 @@ class HyperLogLogPlusPlusSuite extends SparkFunSuite {
   test("random cardinality estimation") {
     val srng = new Random(323981238L)
     val seen = mutable.HashSet.empty[Int]
-    val update = (i: Int) =>
-      {
-        val value = srng.nextInt()
-        seen += value
-        value
+    val update = (i: Int) => {
+      val value = srng.nextInt()
+      seen += value
+      value
     }
-    val eval = (n: Int) =>
-      {
-        val cardinality = seen.size
-        seen.clear()
-        cardinality
+    val eval = (n: Int) => {
+      val cardinality = seen.size
+      seen.clear()
+      cardinality
     }
     testCardinalityEstimates(
         Seq(0.05, 0.01), Seq(100, 10000, 500000), update, eval)

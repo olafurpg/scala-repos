@@ -171,8 +171,8 @@ object KafkaTools extends Command {
           "<start:stop>",
           "show message range, e.g.: 5:10 :100 10:", { s: String =>
             val range = MessageRange.parse(s)
-            config.range = range.getOrElse(
-                sys.error("Invalid range specification: " + s))
+            config.range =
+              range.getOrElse(sys.error("Invalid range specification: " + s))
           })
       intOpt(
           "i",
@@ -334,8 +334,9 @@ object KafkaTools extends Command {
           }
       }
 
-      trackedAccounts = trackedAccounts ++
-      (byAccount.keySet -- trackedAccounts)
+      trackedAccounts =
+        trackedAccounts ++
+        (byAccount.keySet -- trackedAccounts)
       slices += (timestamp -> byAccount)
     }
 
@@ -477,8 +478,7 @@ object KafkaTools extends Command {
       trackState(finalState)
 
       if (config.reportFormat == "csv") {
-        println(
-            "index,total," + trackedAccounts.sorted.map { acct =>
+        println("index,total," + trackedAccounts.sorted.map { acct =>
           "\"%s\"".format(accountLookup.getOrElse(acct, acct))
         }.mkString(","))
         slices.foreach {
@@ -772,10 +772,9 @@ object ZookeeperTools extends Command {
       ListBuffer[(String, String)]()
     } else {
       children.asScala map { child =>
-        val bytes = client
-          .readData(path + "/" + child)
-          .asInstanceOf[Array[Byte]]
-          (child, new String(bytes))
+        val bytes =
+          client.readData(path + "/" + child).asInstanceOf[Array[Byte]]
+        (child, new String(bytes))
       }
     }
   }
@@ -1052,14 +1051,14 @@ object ImportTools extends Command with Logging {
         rootKey <- apiKeyManager.rootAPIKey
         rootGrantId <- apiKeyManager.rootGrantId
         _ <- apiKeyManager.populateAPIKey(
-            None, None, rootKey, key, Set(rootGrantId)) onComplete {
-          case Left(error) =>
-            logger.error(
-                "Could not add grant " + rootGrantId + " to apiKey " + key,
-                error)
-          case Right(success) =>
-            logger.info("Updated API key record: " + success)
-        }
+                None, None, rootKey, key, Set(rootGrantId)) onComplete {
+              case Left(error) =>
+                logger.error(
+                    "Could not add grant " + rootGrantId + " to apiKey " + key,
+                    error)
+              case Right(success) =>
+                logger.info("Updated API key record: " + success)
+            }
       } yield key
 
     def logGrants(key: APIKey) =
@@ -1365,11 +1364,11 @@ object APIKeyTools extends Command with AkkaDefaults with Logging {
 }
 
 object CSVToJSONConverter {
-  def convert(
-      file: String,
-      delimeter: Char = ',',
-      timestampConversion: Boolean = false,
-      verbose: Boolean = false): Iterator[JValue] = new Iterator[JValue] {
+  def convert(file: String,
+              delimeter: Char = ',',
+              timestampConversion: Boolean = false,
+              verbose: Boolean =
+                false): Iterator[JValue] = new Iterator[JValue] {
 
     private val reader = new CSVReader(new FileReader(file), delimeter)
     private val header = reader.readNext

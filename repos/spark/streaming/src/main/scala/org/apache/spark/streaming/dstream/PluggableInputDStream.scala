@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.receiver.Receiver
 
-private[streaming] class PluggableInputDStream[T : ClassTag](
+private[streaming] class PluggableInputDStream[T: ClassTag](
     _ssc: StreamingContext, receiver: Receiver[T])
     extends ReceiverInputDStream[T](_ssc) {
 

@@ -42,7 +42,7 @@ object Insight extends LilaController {
                                      prefId = prefId,
                                      ui = env.jsonView.ui(cache.ecos),
                                      question = env.jsonView.question(
-                                           metric, dimension, filters),
+                                         metric, dimension, filters),
                                      stale = s == Stale))
         }
       }

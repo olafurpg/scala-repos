@@ -39,9 +39,12 @@ import scala.collection.parallel.mutable.ParHashMap
 @SerialVersionUID(1L)
 class HashMap[A, B] private[collection](
     contents: HashTable.Contents[A, DefaultEntry[A, B]])
-    extends AbstractMap[A, B] with Map[A, B] with MapLike[A, B, HashMap[A, B]]
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, HashMap[A, B]]
     with HashTable[A, DefaultEntry[A, B]]
-    with CustomParallelizable[(A, B), ParHashMap[A, B]] with Serializable {
+    with CustomParallelizable[(A, B), ParHashMap[A, B]]
+    with Serializable {
   initWithContents(contents)
 
   type Entry = DefaultEntry[A, B]

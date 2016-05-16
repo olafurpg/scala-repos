@@ -89,13 +89,12 @@ final class Semantics private (
         "strictFloats", strictFloats)
   }
 
-  private def copy(
-      asInstanceOfs: CheckedBehavior = this.asInstanceOfs,
-      moduleInit: CheckedBehavior = this.moduleInit,
-      strictFloats: Boolean = this.strictFloats,
-      productionMode: Boolean = this.productionMode,
-      runtimeClassName: RuntimeClassNameFunction = this.runtimeClassName)
-    : Semantics = {
+  private def copy(asInstanceOfs: CheckedBehavior = this.asInstanceOfs,
+                   moduleInit: CheckedBehavior = this.moduleInit,
+                   strictFloats: Boolean = this.strictFloats,
+                   productionMode: Boolean = this.productionMode,
+                   runtimeClassName: RuntimeClassNameFunction =
+                     this.runtimeClassName): Semantics = {
     new Semantics(asInstanceOfs = asInstanceOfs,
                   moduleInit = moduleInit,
                   strictFloats = strictFloats,

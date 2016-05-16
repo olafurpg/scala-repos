@@ -27,7 +27,8 @@ import org.apache.spark.util.Utils
 
 private[spark] class PartitionwiseSampledRDDPartition(
     val prev: Partition, val seed: Long)
-    extends Partition with Serializable {
+    extends Partition
+    with Serializable {
   override val index: Int = prev.index
 }
 
@@ -44,7 +45,7 @@ private[spark] class PartitionwiseSampledRDDPartition(
   * @tparam T input RDD item type
   * @tparam U sampled RDD item type
   */
-private[spark] class PartitionwiseSampledRDD[T : ClassTag, U : ClassTag](
+private[spark] class PartitionwiseSampledRDD[T: ClassTag, U: ClassTag](
     prev: RDD[T],
     sampler: RandomSampler[T, U],
     preservesPartitioning: Boolean,
@@ -56,8 +57,8 @@ private[spark] class PartitionwiseSampledRDD[T : ClassTag, U : ClassTag](
 
   override def getPartitions: Array[Partition] = {
     val random = new Random(seed)
-    firstParent[T].partitions
-      .map(x => new PartitionwiseSampledRDDPartition(x, random.nextLong()))
+    firstParent[T].partitions.map(x =>
+          new PartitionwiseSampledRDDPartition(x, random.nextLong()))
   }
 
   override def getPreferredLocations(split: Partition): Seq[String] =

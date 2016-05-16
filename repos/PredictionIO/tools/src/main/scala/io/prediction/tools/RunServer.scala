@@ -119,7 +119,8 @@ object RunServer extends Logging {
          Seq()
        }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
       (if (ca.common.batch != "")
-         Seq("--batch", ca.common.batch) else Seq()) ++
+         Seq("--batch", ca.common.batch)
+       else Seq()) ++
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))
         .getOrElse(Seq()) ++ ca.deploy.logPrefix

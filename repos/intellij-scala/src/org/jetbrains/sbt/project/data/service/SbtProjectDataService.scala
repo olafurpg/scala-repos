@@ -84,16 +84,16 @@ object SbtProjectDataService {
       }
 
     private def setSbtVersion(project: Project, data: SbtProjectData): Unit =
-      Option(
-          SbtSystemSettings
+      Option(SbtSystemSettings
             .getInstance(project)
-            .getLinkedProjectSettings(data.projectPath))
-        .foreach(s => s.sbtVersion = data.sbtVersion)
+            .getLinkedProjectSettings(data.projectPath)).foreach(s =>
+            s.sbtVersion = data.sbtVersion)
 
     private def updateIncrementalityType(project: Project): Unit = {
       if (getModules.exists(it =>
                 ModuleUtil.getModuleType(it) == SharedSourcesModuleType.instance))
-        ScalaCompilerConfiguration.instanceIn(project).incrementalityType = IncrementalityType.SBT
+        ScalaCompilerConfiguration.instanceIn(project).incrementalityType =
+          IncrementalityType.SBT
     }
 
     private def updateJavaCompilerOptionsIn(

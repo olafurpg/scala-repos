@@ -30,8 +30,10 @@ class LookupRemoteActorMultiJvmNode1 extends LookupRemoteActorSpec
 class LookupRemoteActorMultiJvmNode2 extends LookupRemoteActorSpec
 
 class LookupRemoteActorSpec
-    extends MultiNodeSpec(LookupRemoteActorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(LookupRemoteActorMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import LookupRemoteActorMultiJvmSpec._
 
   def initialParticipants = 2
@@ -49,10 +51,8 @@ class LookupRemoteActorSpec
           expectMsgType[ActorIdentity].ref.get
         }
         hello.isInstanceOf[RemoteActorRef] should ===(true)
-        val masterAddress = testConductor
-          .getAddressFor(master)
-          .await
-          (hello ? "identify").await.asInstanceOf[ActorRef].path.address should ===(
+        val masterAddress = testConductor.getAddressFor(master).await
+        (hello ? "identify").await.asInstanceOf[ActorRef].path.address should ===(
             masterAddress)
       }
       enterBarrier("done")

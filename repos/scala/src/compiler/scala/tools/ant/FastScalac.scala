@@ -208,8 +208,7 @@ class FastScalac extends Scalac {
     val res = execWithArgFiles(java, paths)
 
     if (failonerror && res != 0)
-      buildError(
-          "Compilation failed because of an internal compiler error;" +
+      buildError("Compilation failed because of an internal compiler error;" +
           " see the error output for details.")
   }
 }

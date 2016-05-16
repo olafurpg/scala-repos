@@ -38,7 +38,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
                          condition: Option[Expression],
                          left: SparkPlan,
                          right: SparkPlan)
-    extends BinaryNode with CodegenSupport {
+    extends BinaryNode
+    with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -876,12 +877,12 @@ private class SortMergeFullOuterJoinScanner(
     rightIndex = 0
 
     while (leftRowKey != null &&
-    keyOrdering.compare(leftRowKey, matchingKey) == 0) {
+           keyOrdering.compare(leftRowKey, matchingKey) == 0) {
       leftMatches += leftRow.copy()
       advancedLeft()
     }
     while (rightRowKey != null &&
-    keyOrdering.compare(rightRowKey, matchingKey) == 0) {
+           keyOrdering.compare(rightRowKey, matchingKey) == 0) {
       rightMatches += rightRow.copy()
       advancedRight()
     }

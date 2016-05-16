@@ -69,7 +69,8 @@ object ChoiceDialog {
   */
 class ChoiceDialog[T](
     override val delegate: jfxsc.ChoiceDialog[T] = new jfxsc.ChoiceDialog[T]())
-    extends Dialog[T](delegate) with SFXDelegate[jfxsc.ChoiceDialog[T]] {
+    extends Dialog[T](delegate)
+    with SFXDelegate[jfxsc.ChoiceDialog[T]] {
 
   /**
     * Creates a new ChoiceDialog instance with the first argument specifying the

@@ -79,7 +79,8 @@ abstract class AutoImportTestBase
           UsefulTestCase.doPostponedFormatting(getProjectAdapter)
         }
       }, getProjectAdapter, "Test")
-      res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
+      res =
+        scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
       assert(refPointer.getElement.resolve != null,
              "reference is unresolved after import action")
     } catch {

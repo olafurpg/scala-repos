@@ -26,7 +26,9 @@ import org.apache.spark.internal.Logging
   * Base abstract class for all unit tests in Spark for handling common functionality.
   */
 private[spark] abstract class SparkFunSuite
-    extends FunSuite with BeforeAndAfterAll with Logging {
+    extends FunSuite
+    with BeforeAndAfterAll
+    with Logging {
 // scalastyle:on
 
   protected override def afterAll(): Unit = {

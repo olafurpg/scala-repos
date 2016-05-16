@@ -55,8 +55,8 @@ object sum extends UFunc with sumLowPrio with VectorizedReduceUFunc {
   }
 
   @expand
-  implicit def helper[
-      @expand.args(Int, Float, Long, Double) T]: VectorizeHelper[T] =
+  implicit def helper[@expand.args(Int, Float, Long, Double) T]
+    : VectorizeHelper[T] =
     new VectorizeHelper[T] {
       override def zerosLike(len: Int): DenseVector[T] =
         DenseVector.zeros[T](len)
@@ -74,7 +74,7 @@ trait VectorizedReduceUFunc extends UFunc {
     def combine(x: T, y: T): T
   }
 
-  implicit def vectorizeRows[T : ClassTag](
+  implicit def vectorizeRows[T: ClassTag](
       implicit helper: VectorizeHelper[T],
       baseOp: UFunc.InPlaceImpl2[Op, DenseVector[T], DenseVector[T]])
     : Impl[BroadcastedRows[DenseMatrix[T], DenseVector[T]], DenseVector[T]] = {
@@ -94,7 +94,7 @@ trait VectorizedReduceUFunc extends UFunc {
 
   @expand
   implicit def vectorizeCols[
-      @expand.args(Double, Float, Int, Long) T : ClassTag : Zero](
+      @expand.args(Double, Float, Int, Long) T: ClassTag: Zero](
       implicit helper: VectorizeHelper[T])
     : Impl[BroadcastedColumns[DenseMatrix[T], DenseVector[T]],
            Transpose[DenseVector[T]]] = {

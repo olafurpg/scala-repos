@@ -10,7 +10,8 @@ import concurrent.duration.Duration
 import concurrent.Await
 
 object ParsingSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Parsing" should {

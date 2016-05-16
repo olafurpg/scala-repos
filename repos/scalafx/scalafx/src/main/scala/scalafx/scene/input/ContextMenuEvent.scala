@@ -38,7 +38,8 @@ object ContextMenuEvent {
 }
 
 class ContextMenuEvent(override val delegate: jfxsi.ContextMenuEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.ContextMenuEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.ContextMenuEvent] {
 
   def sceneX: Double = delegate.getSceneX
 

@@ -9,7 +9,7 @@ import org.scalacheck.Prop.forAll
 trait MonadStateTests[F[_], S] extends MonadTests[F] {
   def laws: MonadStateLaws[F, S]
 
-  def monadState[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def monadState[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

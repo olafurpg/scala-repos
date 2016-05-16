@@ -42,7 +42,8 @@ class JepsenInspiredInsertSpecMultiJvmNode5 extends JepsenInspiredInsertSpec
 class JepsenInspiredInsertSpecMultiJvmNode6 extends JepsenInspiredInsertSpec
 
 class JepsenInspiredInsertSpec
-    extends MultiNodeSpec(JepsenInspiredInsertSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(JepsenInspiredInsertSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import JepsenInspiredInsertSpec._
   import Replicator._

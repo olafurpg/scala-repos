@@ -73,14 +73,15 @@ class UnsafeRowSuite extends SparkFunSuite {
       .create(Array[DataType](StringType, StringType, IntegerType))
       .apply(row)
     assert(arrayBackedUnsafeRow.getBaseObject.isInstanceOf[Array[Byte]])
-    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[Byte],
-    String) = {
+    val (bytesFromArrayBackedRow, field0StringFromArrayBackedRow): (Array[
+                                                                        Byte],
+                                                                    String) = {
       val baos = new ByteArrayOutputStream()
       arrayBackedUnsafeRow.writeToStream(baos, null)
       (baos.toByteArray, arrayBackedUnsafeRow.getString(0))
     }
     val (bytesFromOffheapRow, field0StringFromOffheapRow): (Array[Byte],
-    String) = {
+                                                            String) = {
       val offheapRowPage =
         MemoryAllocator.UNSAFE.allocate(arrayBackedUnsafeRow.getSizeInBytes)
       try {

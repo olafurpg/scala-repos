@@ -28,9 +28,10 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.streaming.Time
 import org.apache.spark.util.Utils
 
-private[streaming] class DStreamCheckpointData[T : ClassTag](
+private[streaming] class DStreamCheckpointData[T: ClassTag](
     dstream: DStream[T])
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
   protected val data = new HashMap[Time, AnyRef]()
 
   // Mapping of the batch time to the checkpointed RDD file of that time
@@ -66,8 +67,8 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
       // This will be used to delete old checkpoint files
       timeToCheckpointFile ++= currentCheckpointFiles
       // Remember the time of the oldest checkpoint RDD in current state
-      timeToOldestCheckpointFileTime(time) = currentCheckpointFiles.keys.min(
-          Time.ordering)
+      timeToOldestCheckpointFileTime(time) =
+        currentCheckpointFiles.keys.min(Time.ordering)
     }
   }
 
@@ -123,7 +124,7 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
           logInfo("Restoring checkpointed RDD for time " + time +
               " from file '" + file + "'")
           dstream.generatedRDDs +=
-          ((time, dstream.context.sparkContext.checkpointFile[T](file)))
+            ((time, dstream.context.sparkContext.checkpointFile[T](file)))
         }
     }
   }

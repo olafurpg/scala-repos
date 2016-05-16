@@ -702,7 +702,8 @@ private[spark] class Client(val args: ClientArguments,
         args, yarnConf, sparkConf, env, true, sparkConf.get(DRIVER_CLASS_PATH))
     env("SPARK_YARN_MODE") = "true"
     env("SPARK_YARN_STAGING_DIR") = stagingDir
-    env("SPARK_USER") = UserGroupInformation.getCurrentUser().getShortUserName()
+    env("SPARK_USER") =
+      UserGroupInformation.getCurrentUser().getShortUserName()
     if (loginFromKeytab) {
       val remoteFs = FileSystem.get(hadoopConf)
       val stagingDirPath = new Path(remoteFs.getHomeDirectory, stagingDir)
@@ -878,7 +879,8 @@ private[spark] class Client(val args: ClientArguments,
       val libraryPaths = Seq(sparkConf.get(DRIVER_LIBRARY_PATH),
                              sys.props.get("spark.driver.libraryPath")).flatten
       if (libraryPaths.nonEmpty) {
-        prefixEnv = Some(getClusterPath(
+        prefixEnv = Some(
+            getClusterPath(
                 sparkConf, Utils.libraryPathEnvPrefix(libraryPaths)))
       }
       if (sparkConf.get(AM_JAVA_OPTIONS).isDefined) {
@@ -910,8 +912,7 @@ private[spark] class Client(val args: ClientArguments,
     }
 
     // For log4j configuration to reference
-    javaOpts +=
-    ("-Dspark.yarn.app.container.log.dir=" +
+    javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
         ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
@@ -1007,8 +1008,8 @@ private[spark] class Client(val args: ClientArguments,
   }
 
   def setupCredentials(): Unit = {
-    loginFromKeytab = args.principal != null ||
-    sparkConf.contains(PRINCIPAL.key)
+    loginFromKeytab =
+      args.principal != null || sparkConf.contains(PRINCIPAL.key)
     if (loginFromKeytab) {
       principal = Option(args.principal).orElse(sparkConf.get(PRINCIPAL)).get
       keytab = Option(args.keytab).orElse(sparkConf.get(KEYTAB)).orNull
@@ -1039,10 +1040,11 @@ private[spark] class Client(val args: ClientArguments,
     * @param logApplicationReport Whether to log details of the application report every iteration.
     * @return A pair of the yarn application state and the final application state.
     */
-  def monitorApplication(appId: ApplicationId,
-                         returnOnRunning: Boolean = false,
-                         logApplicationReport: Boolean = true)
-    : (YarnApplicationState, FinalApplicationStatus) = {
+  def monitorApplication(
+      appId: ApplicationId,
+      returnOnRunning: Boolean = false,
+      logApplicationReport: Boolean =
+        true): (YarnApplicationState, FinalApplicationStatus) = {
     val interval = sparkConf.get(REPORT_INTERVAL)
     var lastState: YarnApplicationState = null
     while (true) {
@@ -1323,13 +1325,13 @@ object Client extends Logging {
     *
     * @param args Client arguments (when starting the AM) or null (when starting executors).
     */
-  private[yarn] def populateClasspath(
-      args: ClientArguments,
-      conf: Configuration,
-      sparkConf: SparkConf,
-      env: HashMap[String, String],
-      isAM: Boolean,
-      extraClassPath: Option[String] = None): Unit = {
+  private[yarn] def populateClasspath(args: ClientArguments,
+                                      conf: Configuration,
+                                      sparkConf: SparkConf,
+                                      env: HashMap[String, String],
+                                      isAM: Boolean,
+                                      extraClassPath: Option[String] =
+                                        None): Unit = {
     extraClassPath.foreach { cp =>
       addClasspathEntry(getClusterPath(sparkConf, cp), env)
     }

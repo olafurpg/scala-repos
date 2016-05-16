@@ -83,7 +83,8 @@ package messages {
   import play.api.i18n._
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) with I18nComponents {
+      extends BuiltInComponentsFromContext(context)
+      with I18nComponents {
     lazy val router = Router.empty
 
     lazy val myComponent = new MyComponent(messagesApi)

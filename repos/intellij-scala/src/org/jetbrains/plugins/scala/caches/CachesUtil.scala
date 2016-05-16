@@ -331,10 +331,7 @@ object CachesUtil {
   }
 
   case class ProbablyRecursionException[Dom <: PsiElement, Data, T](
-      elem: Dom,
-      data: Data,
-      key: Key[T],
-      set: Set[ScFunction])
+      elem: Dom, data: Data, key: Key[T], set: Set[ScFunction])
       extends ControlThrowable
 
   private[this] val funsRetTpToCheck =
@@ -402,11 +399,10 @@ object CachesUtil {
     val project = fun.getProject
 
     doQueueWithLock(
-        queue =>
-          {
-            if (!queue.exists(_._1 == fun)) {
-              queue.enqueue((fun, project)); needToCheckFuns = true
-            }
+        queue => {
+          if (!queue.exists(_._1 == fun)) {
+            queue.enqueue((fun, project)); needToCheckFuns = true
+          }
         }
     )
   }

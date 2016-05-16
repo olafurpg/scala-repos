@@ -47,7 +47,8 @@ object ReadOnlyFloatWrapper {
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyFloatWrapper.html javafx.beans.property.ReadOnlyFloatWrapper]] */
 class ReadOnlyFloatWrapper(
-    override val delegate: jfxbp.ReadOnlyFloatWrapper = new jfxbp.ReadOnlyFloatWrapper(
+    override val delegate: jfxbp.ReadOnlyFloatWrapper =
+      new jfxbp.ReadOnlyFloatWrapper(
           ))
     extends FloatProperty(delegate)
     with SFXDelegate[jfxbp.ReadOnlyFloatWrapper] {

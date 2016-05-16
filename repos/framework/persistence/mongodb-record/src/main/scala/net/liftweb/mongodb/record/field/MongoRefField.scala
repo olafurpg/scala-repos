@@ -112,7 +112,8 @@ class UUIDRefField[
     rec: OwnerType,
     val refMeta: MongoMetaRecord[RefType]
 )
-    extends UUIDField[OwnerType](rec) with MongoRefField[RefType, UUID] {}
+    extends UUIDField[OwnerType](rec)
+    with MongoRefField[RefType, UUID] {}
 
 class StringRefField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
@@ -128,11 +129,13 @@ class IntRefField[
     rec: OwnerType,
     val refMeta: MongoMetaRecord[RefType]
 )
-    extends IntField[OwnerType](rec) with MongoRefField[RefType, Int] {}
+    extends IntField[OwnerType](rec)
+    with MongoRefField[RefType, Int] {}
 
 class LongRefField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](
     rec: OwnerType,
     val refMeta: MongoMetaRecord[RefType]
 )
-    extends LongField[OwnerType](rec) with MongoRefField[RefType, Long] {}
+    extends LongField[OwnerType](rec)
+    with MongoRefField[RefType, Long] {}

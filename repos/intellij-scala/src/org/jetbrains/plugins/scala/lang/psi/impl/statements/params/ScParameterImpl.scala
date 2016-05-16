@@ -28,7 +28,8 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScParameterImpl protected (
     stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameter {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScParameter {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScParameterStub) = {
@@ -173,16 +174,16 @@ class ScParameterImpl protected (
           if (index != length) {
             var n = node.getTreeNext
             while (n != null &&
-            n.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+                   n.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
+                   !n.getPsi.isInstanceOf[ScParameter]) {
               toRemove += n
               n = n.getTreeNext
             }
           } else {
             var n = node.getTreePrev
             while (n != null &&
-            n.getElementType != ScalaTokenTypes.tLPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+                   n.getElementType != ScalaTokenTypes.tLPARENTHESIS &&
+                   !n.getPsi.isInstanceOf[ScParameter]) {
               toRemove += n
               n = n.getTreePrev
             }

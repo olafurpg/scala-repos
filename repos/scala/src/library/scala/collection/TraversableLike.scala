@@ -67,8 +67,11 @@ import scala.language.higherKinds
   *  @define coll traversable collection
   */
 trait TraversableLike[+A, +Repr]
-    extends Any with HasNewBuilder[A, Repr] with FilterMonadic[A, Repr]
-    with TraversableOnce[A] with GenTraversableLike[A, Repr]
+    extends Any
+    with HasNewBuilder[A, Repr]
+    with FilterMonadic[A, Repr]
+    with TraversableOnce[A]
+    with GenTraversableLike[A, Repr]
     with Parallelizable[A, ParIterable[A]] {
   self =>
 

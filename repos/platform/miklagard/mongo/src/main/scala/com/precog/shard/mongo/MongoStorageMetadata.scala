@@ -40,9 +40,10 @@ class MongoStorageMetadataSource(
     new MongoStorageMetadata(mongo)
 }
 
-class MongoStorageMetadata(
-    mongo: Mongo)(implicit asyncContext: ExecutionContext)
-    extends StorageMetadata[Future] with Logging {
+class MongoStorageMetadata(mongo: Mongo)(
+    implicit asyncContext: ExecutionContext)
+    extends StorageMetadata[Future]
+    with Logging {
   implicit val M = new FutureMonad(asyncContext)
 
   // FIXME: Actually implement these for Mongo

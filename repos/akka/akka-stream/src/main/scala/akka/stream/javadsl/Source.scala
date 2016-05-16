@@ -148,8 +148,7 @@ object Source {
     */
   def range(
       start: Int, end: Int, step: Int): javadsl.Source[Integer, NotUsed] =
-    fromIterator[Integer](
-        new function.Creator[util.Iterator[Integer]]() {
+    fromIterator[Integer](new function.Creator[util.Iterator[Integer]]() {
       def create(): util.Iterator[Integer] =
         new Inclusive(start, end, step) {
           override def toString: String =
@@ -299,8 +298,8 @@ object Source {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Source(
-        scaladsl.Source.combine(first.asScala, second.asScala, seq: _*)(
-            num ⇒ strategy.apply(num)))
+        scaladsl.Source.combine(first.asScala, second.asScala, seq: _*)(num ⇒
+              strategy.apply(num)))
   }
 
   /**
@@ -715,8 +714,7 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       that: Graph[SourceShape[U], Mat2],
       comp: util.Comparator[U],
       matF: function.Function2[Mat, Mat2, Mat3]): javadsl.Source[U, Mat3] =
-    new Source(
-        delegate.mergeSortedMat(that)(combinerToScala(matF))(
+    new Source(delegate.mergeSortedMat(that)(combinerToScala(matF))(
             Ordering.comparatorToOrdering(comp)))
 
   /**

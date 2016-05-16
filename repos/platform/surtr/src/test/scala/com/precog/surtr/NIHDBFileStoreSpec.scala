@@ -48,7 +48,9 @@ import scalaz._
 import scalaz.syntax.comonad._
 
 class NIHDBFileStoreSpec
-    extends NIHDBTestActors with Specification with Logging {
+    extends NIHDBTestActors
+    with Specification
+    with Logging {
   class YggConfig extends NIHDBTestActorsConfig {
     val tmpDir = IOUtils.createTmpDir("filestorespec").unsafePerformIO
     val config =
@@ -75,17 +77,17 @@ class NIHDBFileStoreSpec
       (projectionsActor ? IngestData(
               Seq(
                   (0L,
-                   StoreFileMessage(testAPIKey,
-                                    testPath,
-                                    Authorities(testAccount),
-                                    None,
-                                    EventId.fromLong(42L),
-                                    FileContent(loremIpsum.getBytes("UTF-8"),
-                                                MimeType("text", "plain"),
-                                                RawUTF8Encoding),
-                                    Clock.System.instant,
-                                    StreamRef.Create(
-                                        UUID.randomUUID,
+                   StoreFileMessage(
+                       testAPIKey,
+                       testPath,
+                       Authorities(testAccount),
+                       None,
+                       EventId.fromLong(42L),
+                       FileContent(loremIpsum.getBytes("UTF-8"),
+                                   MimeType("text", "plain"),
+                                   RawUTF8Encoding),
+                       Clock.System.instant,
+                       StreamRef.Create(UUID.randomUUID,
                                         true)))))).copoint must beLike {
         case UpdateSuccess(_) => ok
       }

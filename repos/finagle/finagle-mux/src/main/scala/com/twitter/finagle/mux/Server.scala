@@ -28,7 +28,8 @@ import scala.collection.JavaConverters._
   * request, as per [[com.twitter.finagle.mux]].
   */
 case class ClientDiscardedRequestException(why: String)
-    extends Exception(why) with HasLogLevel {
+    extends Exception(why)
+    with HasLogLevel {
   def logLevel: com.twitter.logging.Level = com.twitter.logging.Level.DEBUG
 }
 
@@ -198,7 +199,8 @@ private[twitter] class ServerDispatcher(
     tracer: Tracer,
     statsReceiver: StatsReceiver
 )
-    extends Closable with Lessee {
+    extends Closable
+    with Lessee {
   import ServerDispatcher.State
 
   private[this] implicit val injectTimer = DefaultTimer.twitter
@@ -394,7 +396,7 @@ private[finagle] object Processor
   import Message._
 
   private[this] val ContextsToBufs: ((ChannelBuffer, ChannelBuffer)) => ((Buf,
-  Buf)) = {
+                                                                          Buf)) = {
     case (k, v) =>
       (ChannelBufferBuf.Owned(k.duplicate),
        ChannelBufferBuf.Owned(v.duplicate))

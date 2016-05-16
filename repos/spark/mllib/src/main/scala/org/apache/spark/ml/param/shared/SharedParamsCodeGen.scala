@@ -122,7 +122,7 @@ private[shared] object SharedParamsCodeGen {
   }
 
   /** Description of a param. */
-  private case class ParamDesc[T : ClassTag](
+  private case class ParamDesc[T: ClassTag](
       name: String,
       doc: String,
       defaultValueStr: Option[String] = None,

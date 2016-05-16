@@ -230,8 +230,8 @@ private[akka] trait StashSupport {
     */
   private[akka] def unstashAll(filterPredicate: Any ⇒ Boolean): Unit = {
     try {
-      val i = theStash.reverseIterator.filter(
-          envelope ⇒ filterPredicate(envelope.message))
+      val i = theStash.reverseIterator.filter(envelope ⇒
+            filterPredicate(envelope.message))
       while (i.hasNext) enqueueFirst(i.next())
     } finally {
       theStash = Vector.empty[Envelope]
@@ -267,4 +267,5 @@ private[akka] trait StashSupport {
   * Is thrown when the size of the Stash exceeds the capacity of the Stash
   */
 class StashOverflowException(message: String, cause: Throwable = null)
-    extends AkkaException(message, cause) with NoStackTrace
+    extends AkkaException(message, cause)
+    with NoStackTrace

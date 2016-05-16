@@ -50,7 +50,8 @@ trait IntTypedField extends NumericTypedField[Int] {
 }
 
 class IntField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Int, OwnerType] with MandatoryTypedField[Int]
+    extends Field[Int, OwnerType]
+    with MandatoryTypedField[Int]
     with IntTypedField {
 
   def owner = rec
@@ -62,7 +63,8 @@ class IntField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalIntField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Int, OwnerType] with OptionalTypedField[Int]
+    extends Field[Int, OwnerType]
+    with OptionalTypedField[Int]
     with IntTypedField {
 
   def owner = rec

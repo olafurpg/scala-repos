@@ -120,9 +120,9 @@ object MaybeTest extends SpecLite {
   }
 
   object instances {
-    def equal[A : Equal] = Equal[Maybe[A]]
-    def order[A : Order] = Order[Maybe[A]]
-    def semigroup[A : Semigroup] = Monoid[Maybe[A]]
+    def equal[A: Equal] = Equal[Maybe[A]]
+    def order[A: Order] = Order[Maybe[A]]
+    def semigroup[A: Semigroup] = Monoid[Maybe[A]]
     def bindRec = BindRec[Maybe]
     def monad = Monad[Maybe]
 
@@ -130,6 +130,6 @@ object MaybeTest extends SpecLite {
     def monoidLast[A] = Monoid[Maybe[A] @@ Last]
 
     // checking absence of ambiguity
-    def equal[A : Order] = Equal[Maybe[A]]
+    def equal[A: Order] = Equal[Maybe[A]]
   }
 }

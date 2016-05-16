@@ -305,7 +305,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   }
 
   trait JDBCColumnarTableCompanion
-      extends BlockStoreColumnarTableCompanion with Logging {
+      extends BlockStoreColumnarTableCompanion
+      with Logging {
 
     /** Maps a given database name to a JDBC connection URL */
     def databaseMap: Map[String, String]

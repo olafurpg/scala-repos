@@ -197,22 +197,20 @@ trait SValueInstances {
 
   implicit def order: Order[SValue] = new Order[SValue] {
     private val objectOrder = (o1: Map[String, SValue]) =>
-      (o2: Map[String, SValue]) =>
-        {
-          (o1.size ?|? o2.size) |+|
-          (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1))
-            .foldLeft[Ordering](EQ) {
-            case (ord, ((k1, v1), (k2, v2))) =>
-              ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
-          }
+      (o2: Map[String, SValue]) => {
+        (o1.size ?|? o2.size) |+|
+        (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1))
+          .foldLeft[Ordering](EQ) {
+          case (ord, ((k1, v1), (k2, v2))) =>
+            ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
+        }
     }
 
     private val arrayOrder = (o1: Vector[SValue]) =>
-      (o2: Vector[SValue]) =>
-        {
-          (o1.length ?|? o2.length) |+| (o1 zip o2).foldLeft[Ordering](EQ) {
-            case (ord, (v1, v2)) => ord |+| (v1 ?|? v2)
-          }
+      (o2: Vector[SValue]) => {
+        (o1.length ?|? o2.length) |+| (o1 zip o2).foldLeft[Ordering](EQ) {
+          case (ord, (v1, v2)) => ord |+| (v1 ?|? v2)
+        }
     }
 
     private val stringOrder = (Order[String].order _).curried

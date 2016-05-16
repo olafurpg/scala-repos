@@ -132,7 +132,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     }
 
     val producer2 = TestUtils.createProducer[String, String](
-        brokerList = "localhost:80," +
+        brokerList =
+          "localhost:80," +
           TestUtils.getBrokerListStrFromServers(Seq(server1)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName)
@@ -146,8 +147,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     }
 
     val producer3 = TestUtils.createProducer[String, String](
-        brokerList = TestUtils.getBrokerListStrFromServers(
-              Seq(server1, server2)),
+        brokerList =
+          TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName)
 
@@ -174,8 +175,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
                           servers = servers)
 
     val producer1 = TestUtils.createProducer[String, String](
-        brokerList = TestUtils.getBrokerListStrFromServers(
-              Seq(server1, server2)),
+        brokerList =
+          TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
@@ -238,8 +239,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
     try {
       val producer2 = TestUtils.createProducer[String, String](
-          brokerList = TestUtils.getBrokerListStrFromServers(
-                Seq(server1, server2)),
+          brokerList =
+            TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
           encoder = classOf[StringEncoder].getName,
           keyEncoder = classOf[StringEncoder].getName,
           partitioner = classOf[StaticPartitioner].getName,
@@ -265,13 +266,13 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     TestUtils.createTopic(
         zkUtils,
         topic,
-        partitionReplicaAssignment = Map(
-              0 -> Seq(0), 1 -> Seq(0), 2 -> Seq(0), 3 -> Seq(0)),
+        partitionReplicaAssignment =
+          Map(0 -> Seq(0), 1 -> Seq(0), 2 -> Seq(0), 3 -> Seq(0)),
         servers = servers)
 
     val producer = TestUtils.createProducer[String, String](
-        brokerList = TestUtils.getBrokerListStrFromServers(
-              Seq(server1, server2)),
+        brokerList =
+          TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
@@ -335,8 +336,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     props.put(
         "client.id", "ProducerTest-testAsyncSendCanCorrectlyFailWithTimeout")
     val producer = TestUtils.createProducer[String, String](
-        brokerList = TestUtils.getBrokerListStrFromServers(
-              Seq(server1, server2)),
+        brokerList =
+          TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName,
@@ -388,8 +389,8 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
   @Test
   def testSendNullMessage() {
     val producer = TestUtils.createProducer[String, String](
-        brokerList = TestUtils.getBrokerListStrFromServers(
-              Seq(server1, server2)),
+        brokerList =
+          TestUtils.getBrokerListStrFromServers(Seq(server1, server2)),
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName)

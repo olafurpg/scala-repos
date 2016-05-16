@@ -127,15 +127,15 @@ class Engine[TD, EI, PD, Q, P, A](
 
   /** Returns a new Engine instance, mimicking case class's copy method behavior.
     */
-  def copy(dataSourceClassMap: Map[
-               String,
-               Class[_ <: BaseDataSource[TD, EI, Q, A]]] = dataSourceClassMap,
-           preparatorClassMap: Map[String, Class[_ <: BasePreparator[TD, PD]]] = preparatorClassMap,
-           algorithmClassMap: Map[
-               String,
-               Class[_ <: BaseAlgorithm[PD, _, Q, P]]] = algorithmClassMap,
-           servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]] = servingClassMap)
-    : Engine[TD, EI, PD, Q, P, A] = {
+  def copy(
+      dataSourceClassMap: Map[String, Class[_ <: BaseDataSource[TD, EI, Q, A]]] =
+        dataSourceClassMap,
+      preparatorClassMap: Map[String, Class[_ <: BasePreparator[TD, PD]]] =
+        preparatorClassMap,
+      algorithmClassMap: Map[String, Class[_ <: BaseAlgorithm[PD, _, Q, P]]] =
+        algorithmClassMap,
+      servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]] =
+        servingClassMap): Engine[TD, EI, PD, Q, P, A] = {
     new Engine(dataSourceClassMap,
                preparatorClassMap,
                algorithmClassMap,
@@ -784,10 +784,8 @@ object Engine {
               }
           }
 
-          val unionAlgoPredicts: RDD[(QX, Seq[P])] = sc
-            .union(algoPredicts)
-            .groupByKey()
-            .mapValues { ps =>
+          val unionAlgoPredicts: RDD[(QX, Seq[P])] =
+            sc.union(algoPredicts).groupByKey().mapValues { ps =>
               {
                 assert(ps.size == algoCount,
                        "Must have same length as algoCount")
@@ -796,7 +794,7 @@ object Engine {
               }
             }
 
-            (ex, unionAlgoPredicts)
+          (ex, unionAlgoPredicts)
         }
     }.toMap
 

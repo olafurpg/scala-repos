@@ -14,7 +14,8 @@ case class NativeConnector(connectString: String,
                            sessionTimeout: Duration,
                            timer: Timer,
                            authenticate: Option[AuthInfo] = None)
-    extends Connector with Serialized {
+    extends Connector
+    with Serialized {
   override val name = "native-zk-connector"
 
   protected[this] def mkConnection = {

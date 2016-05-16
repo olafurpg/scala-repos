@@ -14,18 +14,20 @@ object PomRepoTest extends Build {
           (makePom, result, streams) map checkPomRepositories
         }, makePomConfiguration <<= (makePomConfiguration, baseDirectory) {
           (conf, base) =>
-            conf.copy(filterRepositories = pomIncludeRepository(
-                      base, conf.filterRepositories))
+            conf.copy(filterRepositories =
+                  pomIncludeRepository(base, conf.filterRepositories))
         }, ivyPaths <<=
           baseDirectory(dir => new IvyPaths(dir, Some(dir / "ivy-home"))))
 
   val local =
-    "local-maven-repo" at "file://" + (Path.userHome / ".m2" / "repository").absolutePath
+    "local-maven-repo" at "file://" +
+    (Path.userHome / ".m2" / "repository").absolutePath
 
   def pomIncludeRepository(base: File, prev: MavenRepository => Boolean) =
     (r: MavenRepository) =>
       if (base / "repo.none" exists) false
-      else if (base / "repo.all" exists) true else prev(r)
+      else if (base / "repo.all" exists) true
+      else prev(r)
 
   def addSlash(s: String): String =
     s match {

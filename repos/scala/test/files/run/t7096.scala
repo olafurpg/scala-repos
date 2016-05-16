@@ -77,14 +77,13 @@ class Sub extends Base {
     exitingTyper {
       terms
         .filter(_.name.toString == "foo")
-        .foreach(sym =>
-              {
-            val xParam = sym.tpe.paramss.flatten.head
-            val annot = sym.tpe.finalResultType.annotations.head
-            val xRefs = annot.args.head.filter(t => t.symbol == xParam)
-            println(
-                s"testing symbol ${sym.ownerChain}, param $xParam, xRefs $xRefs")
-            assert(xRefs.length == 1, xRefs)
+        .foreach(sym => {
+          val xParam = sym.tpe.paramss.flatten.head
+          val annot = sym.tpe.finalResultType.annotations.head
+          val xRefs = annot.args.head.filter(t => t.symbol == xParam)
+          println(
+              s"testing symbol ${sym.ownerChain}, param $xParam, xRefs $xRefs")
+          assert(xRefs.length == 1, xRefs)
         })
     }
   }

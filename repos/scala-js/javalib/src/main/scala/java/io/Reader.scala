@@ -3,7 +3,8 @@ package java.io
 import java.nio.CharBuffer
 
 abstract class Reader private[this](_lock: Option[Object])
-    extends Readable with Closeable {
+    extends Readable
+    with Closeable {
 
   protected val lock = _lock.getOrElse(this)
 

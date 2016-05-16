@@ -52,7 +52,9 @@ import TableModule._
 import PrecogJValueOrder._
 
 trait BlockSortSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+    extends BlockStoreTestSupport[M]
+    with Specification
+    with ScalaCheck {
   self =>
   def testSortDense(sample: SampleData,
                     sortOrder: DesiredSortOrder,
@@ -94,8 +96,8 @@ trait BlockSortSpec[M[+ _]]
 
     val resultM = for {
       sorted <- module
-        .fromSample(sample)
-        .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
+                 .fromSample(sample)
+                 .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
       json <- sorted.toJson
     } yield (json, sorted)
 

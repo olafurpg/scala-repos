@@ -41,7 +41,8 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
     implicit space: MutableVectorField[T, Double])
     extends FirstOrderMinimizer[T, DiffFunction[T]](
         fvalMemory = fvalMemory, maxIter = maxIter, tolerance = tolerance)
-    with Projecting[T] with SerializableLogging {
+    with Projecting[T]
+    with SerializableLogging {
   import space._
   case class History(alphaBB: Double, fvals: IndexedSeq[Double])
 

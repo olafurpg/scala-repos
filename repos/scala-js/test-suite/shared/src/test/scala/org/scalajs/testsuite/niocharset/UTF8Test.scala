@@ -105,8 +105,8 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
         Seq(1, 1, 2, 1, 2, 3).map(Malformed(_)): _*)
     // and with normal sequences interspersed
     testDecode(bb"c2 41 e0 41 e0 a0 41 f0 41 f0 90 41 f0 90 80 41")(
-        Seq(1, 1, 2, 1, 2, 3).flatMap(
-            l => Seq[OutPart[CharBuffer]](Malformed(l), cb"A")): _*)
+        Seq(1, 1, 2, 1, 2, 3).flatMap(l =>
+              Seq[OutPart[CharBuffer]](Malformed(l), cb"A")): _*)
 
     // Impossible bytes
     testDecode(bb"fe")(Malformed(1))

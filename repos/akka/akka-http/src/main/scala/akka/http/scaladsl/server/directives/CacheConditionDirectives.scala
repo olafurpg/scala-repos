@@ -111,7 +111,8 @@ trait CacheConditionDirectives {
           header[`If-None-Match`] match {
             case Some(`If-None-Match`(inm)) if eTag.isDefined ⇒
               if (!matchesRange(eTag.get, inm, weakComparison = true)) step5()
-              else if (isGetOrHead) complete304() else complete412()
+              else if (isGetOrHead) complete304()
+              else complete412()
             case None ⇒ step4()
           }
         def step4(): Route =

@@ -36,7 +36,8 @@ import org.apache.spark.network.shuffle.BlockFetchingListener
 import org.apache.spark.shuffle.FetchFailedException
 
 class ShuffleBlockFetcherIteratorSuite
-    extends SparkFunSuite with PrivateMethodTester {
+    extends SparkFunSuite
+    with PrivateMethodTester {
   // Some of the tests are quite tricky because we are testing the cleanup behavior
   // in the presence of faults.
 
@@ -104,7 +105,7 @@ class ShuffleBlockFetcherIteratorSuite
          remoteBlocks.keys
            .map(blockId => (blockId, 1.asInstanceOf[Long]))
            .toSeq)
-      )
+    )
 
     val iterator = new ShuffleBlockFetcherIterator(TaskContext.empty(),
                                                    transfer,

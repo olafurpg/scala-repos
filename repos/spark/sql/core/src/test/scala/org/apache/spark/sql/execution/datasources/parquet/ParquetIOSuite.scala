@@ -74,7 +74,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
   /**
     * Writes `data` to a Parquet file, reads it back and check file contents.
     */
-  protected def checkParquetFile[T <: Product : ClassTag : TypeTag](
+  protected def checkParquetFile[T <: Product: ClassTag: TypeTag](
       data: Seq[T]): Unit = {
     withParquetDataFrame(data)(r => checkAnswer(r, data.map(Row.fromTuple)))
   }
@@ -124,10 +124,9 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       val path = new Path(location.getCanonicalPath)
       val conf = sparkContext.hadoopConfiguration
       writeMetadata(parquetSchema, path, conf)
-      readParquetFile(path.toString)(df =>
-            {
-          val sparkTypes = df.schema.map(_.dataType)
-          assert(sparkTypes === expectedSparkTypes)
+      readParquetFile(path.toString)(df => {
+        val sparkTypes = df.schema.map(_.dataType)
+        assert(sparkTypes === expectedSparkTypes)
       })
     }
   }
@@ -301,7 +300,7 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     def compressionCodecFor(path: String, codecName: String): String = {
       val codecs = for {
         footer <- readAllFootersWithoutSummaryFiles(
-            new Path(path), hadoopConfiguration)
+                     new Path(path), hadoopConfiguration)
         block <- footer.getParquetMetadata.getBlocks.asScala
         column <- block.getColumns.asScala
       } yield column.getCodec.name()
@@ -503,8 +502,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+            hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -533,8 +532,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+            hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -558,8 +557,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       } finally {
         // Hadoop 1 doesn't have `Configuration.unset`
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+              hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }
@@ -606,8 +605,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+            hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -647,8 +646,8 @@ class ParquetIOSuite extends QueryTest with ParquetTest with SharedSQLContext {
       } finally {
         // Manually clear the hadoop configuration for other tests.
         hadoopConfiguration.clear()
-        clonedConf.asScala.foreach(
-            entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+        clonedConf.asScala.foreach(entry =>
+              hadoopConfiguration.set(entry.getKey, entry.getValue))
       }
     }
   }

@@ -89,11 +89,9 @@ object Configuration {
         enabled.toSet diff engine.getSupportedCipherSuites.toSet
       val gotAllEnabled =
         enabled.toSet diff engine.getEnabledCipherSuites.toSet
-      gotAllSupported.isEmpty ||
-      (throw new IllegalArgumentException(
+      gotAllSupported.isEmpty || (throw new IllegalArgumentException(
               "Cipher Suite not supported: " + gotAllSupported))
-      gotAllEnabled.isEmpty ||
-      (throw new IllegalArgumentException(
+      gotAllEnabled.isEmpty || (throw new IllegalArgumentException(
               "Cipher Suite not enabled: " + gotAllEnabled))
       engine.getSupportedProtocols.contains(settings.SSLProtocol.get) ||
       (throw new IllegalArgumentException(
@@ -175,7 +173,8 @@ class Ticket1978NonExistingRNGSecureSpec
         CipherConfig(false, AkkaSpec.testConf, "NonExistingRNG", 12345, 12346))
 
 abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
-    extends AkkaSpec(cipherConfig.config) with ImplicitSender {
+    extends AkkaSpec(cipherConfig.config)
+    with ImplicitSender {
 
   implicit val timeout: Timeout = Timeout(10.seconds)
 

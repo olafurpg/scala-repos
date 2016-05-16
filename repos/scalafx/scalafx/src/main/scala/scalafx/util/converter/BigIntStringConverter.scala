@@ -36,8 +36,8 @@ object BigIntStringConverter {
     if (c != null) c.delegate else null
 }
 
-class BigIntStringConverter(
-    delegate: jfxuc.BigIntegerStringConverter = new jfxuc.BigIntegerStringConverter)
+class BigIntStringConverter(delegate: jfxuc.BigIntegerStringConverter =
+      new jfxuc.BigIntegerStringConverter)
     extends StringConverterDelegate[
         java.math.BigInteger, BigInt, jfxuc.BigIntegerStringConverter](
         delegate) {

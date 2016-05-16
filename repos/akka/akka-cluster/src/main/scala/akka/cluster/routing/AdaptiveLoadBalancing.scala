@@ -46,16 +46,19 @@ import akka.routing._
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
 final case class AdaptiveLoadBalancingRoutingLogic(
     system: ActorSystem, metricsSelector: MetricsSelector = MixMetricsSelector)
-    extends RoutingLogic with NoSerializationVerificationNeeded {
+    extends RoutingLogic
+    with NoSerializationVerificationNeeded {
 
   private val cluster = Cluster(system)
 
   // The current weighted routees, if any. Weights are produced by the metricsSelector
   // via the metricsListener Actor. It's only updated by the actor, but accessed from
   // the threads of the sender()s.
-  private val weightedRouteesRef = new AtomicReference[(immutable.IndexedSeq[
-          Routee], Set[NodeMetrics], Option[WeightedRoutees])](
-      (Vector.empty, Set.empty, None))
+  private val weightedRouteesRef =
+    new AtomicReference[(immutable.IndexedSeq[Routee],
+                         Set[NodeMetrics],
+                         Option[WeightedRoutees])](
+        (Vector.empty, Set.empty, None))
 
   @tailrec final def metricsChanged(event: ClusterMetricsChanged): Unit = {
     val oldValue = weightedRouteesRef.get
@@ -142,14 +145,15 @@ final case class AdaptiveLoadBalancingRoutingLogic(
 final case class AdaptiveLoadBalancingPool(
     metricsSelector: MetricsSelector = MixMetricsSelector,
     override val nrOfInstances: Int = 0,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
     extends Pool {
 
   def this(config: Config, dynamicAccess: DynamicAccess) =
-    this(nrOfInstances = ClusterRouterSettingsBase.getMaxTotalNrOfInstances(
-               config),
+    this(nrOfInstances =
+           ClusterRouterSettingsBase.getMaxTotalNrOfInstances(config),
          metricsSelector = MetricsSelector.fromConfig(config, dynamicAccess),
          usePoolDispatcher = config.hasPath("pool-dispatcher"))
 

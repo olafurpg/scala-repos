@@ -153,12 +153,10 @@ class ScalaChangeSignatureUsageProcessor
       for {
         jc @ (_u: JavaCallUsageInfo) <- usages
         call @ (_c: PsiMethodCallExpression) <- jc.getElement.toOption
-          .map(_.getParent)
+                                                 .map(_.getParent)
         exprs = call.getArgumentList.getExpressions
         (defaultArg @ (_d: PsiMethodCallExpression), idx) <- exprs.zipWithIndex
-                                                                if defaultArg.getText
-                                                              .contains(
-                                                                "$default$")
+        if defaultArg.getText.contains("$default$")
       } {
         val exprsToAdd = exprs.take(numberOfParamsToAdd(idx))
         val text =
@@ -304,10 +302,10 @@ class ScalaChangeSignatureUsageProcessor
       oldIdx = paramInfo.getOldIndex if oldIdx >= 0
       oldName = changeInfo.getOldParameterNames()(oldIdx)
       parameters = method.getParameterList.getParameters
-          if parameters.length > oldIdx
+      if parameters.length > oldIdx
       param = parameters(oldIdx)
       newName = paramInfo.getName
-          if oldName == param.name /*skip overriders with other param name*/ &&
+      if oldName == param.name /*skip overriders with other param name*/ &&
       newName != param.name
     } {
       addParameterUsages(param, oldIdx, newName, results)
@@ -319,17 +317,16 @@ class ScalaChangeSignatureUsageProcessor
                                  newName: String,
                                  results: ArrayBuffer[UsageInfo]) {
     val scope: SearchScope = param.getUseScope
-    val process = (ref: PsiReference) =>
-      {
-        ref.getElement match {
-          case refElem: ScReferenceElement =>
-            results += ParameterUsageInfo(oldIndex, newName, refElem)
-          case refElem: PsiReferenceExpression =>
-            results += new ChangeSignatureParameterUsageInfo(
-                refElem, param.name, newName)
-          case _ =>
-        }
-        true
+    val process = (ref: PsiReference) => {
+      ref.getElement match {
+        case refElem: ScReferenceElement =>
+          results += ParameterUsageInfo(oldIndex, newName, refElem)
+        case refElem: PsiReferenceExpression =>
+          results +=
+            new ChangeSignatureParameterUsageInfo(refElem, param.name, newName)
+        case _ =>
+      }
+      true
     }
     ReferencesSearch.search(param, scope, false).forEach(process)
   }

@@ -13,18 +13,20 @@ import scala.concurrent.Future
 import scala.util.Random
 
 object NettyBadClientHandlingSpec
-    extends BadClientHandlingSpec with NettyIntegrationSpecification
+    extends BadClientHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpBadClientHandlingSpec
-    extends BadClientHandlingSpec with AkkaHttpIntegrationSpecification
+    extends BadClientHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait BadClientHandlingSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   "Play" should {
 
-    def withServer[T](
-        errorHandler: HttpErrorHandler = DefaultHttpErrorHandler)(
-        block: Port => T) = {
+    def withServer[T](errorHandler: HttpErrorHandler =
+                        DefaultHttpErrorHandler)(block: Port => T) = {
       val port = testServerPort
 
       val app = new BuiltInComponentsFromContext(

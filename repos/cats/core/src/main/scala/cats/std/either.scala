@@ -11,8 +11,8 @@ trait EitherInstances extends EitherInstances1 {
         case Right(b) => G.map(g(b))(Right(_))
       }
 
-    def bifoldLeft[A, B, C](
-        fab: Either[A, B], c: C)(f: (C, A) => C, g: (C, B) => C): C =
+    def bifoldLeft[A, B, C](fab: Either[A, B], c: C)(
+        f: (C, A) => C, g: (C, B) => C): C =
       fab match {
         case Left(a) => f(c, a)
         case Right(b) => g(c, b)
@@ -26,8 +26,8 @@ trait EitherInstances extends EitherInstances1 {
       }
   }
 
-  implicit def eitherInstances[A]: Monad[Either[A, ?]] with Traverse[Either[
-          A, ?]] =
+  implicit def eitherInstances[A]
+    : Monad[Either[A, ?]] with Traverse[Either[A, ?]] =
     new Monad[Either[A, ?]] with Traverse[Either[A, ?]] {
       def pure[B](b: B): Either[A, B] = Right(b)
 

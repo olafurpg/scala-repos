@@ -38,7 +38,7 @@ import org.apache.spark.streaming.util.WriteAheadLogUtils
   * @param _ssc Streaming context that will execute this input stream
   * @tparam T Class type of the object of this stream
   */
-abstract class ReceiverInputDStream[T : ClassTag](_ssc: StreamingContext)
+abstract class ReceiverInputDStream[T: ClassTag](_ssc: StreamingContext)
     extends InputDStream[T](_ssc) {
 
   /**

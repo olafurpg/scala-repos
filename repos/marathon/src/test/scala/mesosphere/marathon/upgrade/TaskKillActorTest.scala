@@ -19,8 +19,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class TaskKillActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers
-    with BeforeAndAfterAll with BeforeAndAfter with MockitoSugar {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfter
+    with MockitoSugar {
 
   var taskTracker: TaskTracker = _
   var driver: SchedulerDriver = _

@@ -30,7 +30,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util._
 
 class TaskContextSuite
-    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with LocalSparkContext {
 
   test("provide metrics sources") {
     val filePath = getClass.getClassLoader
@@ -41,14 +43,12 @@ class TaskContextSuite
     sc = new SparkContext("local", "test", conf)
     val rdd = sc.makeRDD(1 to 1)
     val result = sc
-      .runJob(rdd,
-              (tc: TaskContext, it: Iterator[Int]) =>
-                {
-                  tc.getMetricsSources("jvm").count {
-                    case source: JvmSource => true
-                    case _ => false
-                  }
-              })
+      .runJob(rdd, (tc: TaskContext, it: Iterator[Int]) => {
+        tc.getMetricsSources("jvm").count {
+          case source: JvmSource => true
+          case _ => false
+        }
+      })
       .sum
     assert(result > 0)
   }
@@ -59,8 +59,8 @@ class TaskContextSuite
     val rdd = new RDD[String](sc, List()) {
       override def getPartitions = Array[Partition](StubPartition(0))
       override def compute(split: Partition, context: TaskContext) = {
-        context.addTaskCompletionListener(
-            context => TaskContextSuite.completed = true)
+        context.addTaskCompletionListener(context =>
+              TaskContextSuite.completed = true)
         sys.error("failed")
       }
     }
@@ -82,8 +82,8 @@ class TaskContextSuite
     val rdd = new RDD[String](sc, List()) {
       override def getPartitions = Array[Partition](StubPartition(0))
       override def compute(split: Partition, context: TaskContext) = {
-        context.addTaskFailureListener(
-            (context, error) => TaskContextSuite.lastError = error)
+        context.addTaskFailureListener((context, error) =>
+              TaskContextSuite.lastError = error)
         sys.error("damn error")
       }
     }
@@ -116,11 +116,11 @@ class TaskContextSuite
   test("all TaskFailureListeners should be called even if some fail") {
     val context = TaskContext.empty()
     val listener = mock(classOf[TaskFailureListener])
-    context.addTaskFailureListener(
-        (_, _) => throw new Exception("exception in listener1"))
+    context.addTaskFailureListener((_, _) =>
+          throw new Exception("exception in listener1"))
     context.addTaskFailureListener(listener)
-    context.addTaskFailureListener(
-        (_, _) => throw new Exception("exception in listener3"))
+    context.addTaskFailureListener((_, _) =>
+          throw new Exception("exception in listener3"))
 
     val e = intercept[TaskCompletionListenerException] {
       context.markTaskFailed(new Exception("exception in task"))
@@ -137,7 +137,8 @@ class TaskContextSuite
 
   test(
       "TaskContext.attemptNumber should return attempt number, not task id (SPARK-4014)") {
-    sc = new SparkContext("local[1,2]", "test") // use maxRetries = 2 because we test failed tasks
+    sc =
+      new SparkContext("local[1,2]", "test") // use maxRetries = 2 because we test failed tasks
     // Check that attemptIds are 0 for all tasks' initial attempts
     val attemptIds = sc
       .parallelize(Seq(1, 2), 2)

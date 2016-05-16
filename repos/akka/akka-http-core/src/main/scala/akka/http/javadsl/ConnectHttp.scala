@@ -111,10 +111,10 @@ final class ConnectHttpImpl(val host: String, val port: Int)
   def connectionContext: Optional[HttpsConnectionContext] = Optional.empty()
 }
 
-final class ConnectHttpsImpl(
-    val host: String,
-    val port: Int,
-    val context: Optional[HttpsConnectionContext] = Optional.empty())
+final class ConnectHttpsImpl(val host: String,
+                             val port: Int,
+                             val context: Optional[HttpsConnectionContext] =
+                               Optional.empty())
     extends ConnectWithHttps {
 
   override def isHttps: Boolean = true

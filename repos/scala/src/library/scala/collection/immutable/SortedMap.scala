@@ -26,7 +26,8 @@ import mutable.Builder
   *  @define coll immutable sorted map
   */
 trait SortedMap[A, +B]
-    extends Map[A, B] with scala.collection.SortedMap[A, B]
+    extends Map[A, B]
+    with scala.collection.SortedMap[A, B]
     with MapLike[A, B, SortedMap[A, B]]
     with SortedMapLike[A, B, SortedMap[A, B]] {
   self =>
@@ -40,7 +41,8 @@ trait SortedMap[A, +B]
   override def keySet: immutable.SortedSet[A] = new DefaultKeySortedSet
 
   protected class DefaultKeySortedSet
-      extends super.DefaultKeySortedSet with immutable.SortedSet[A] {
+      extends super.DefaultKeySortedSet
+      with immutable.SortedSet[A] {
     override def +(elem: A): SortedSet[A] =
       if (this(elem)) this
       else SortedSet[A]() ++ this + elem
@@ -130,7 +132,8 @@ object SortedMap extends ImmutableSortedMapFactory[SortedMap] {
     TreeMap.empty[A, B]
 
   private[collection] trait Default[A, +B]
-      extends SortedMap[A, B] with scala.collection.SortedMap.Default[A, B] {
+      extends SortedMap[A, B]
+      with scala.collection.SortedMap.Default[A, B] {
     self =>
     override def +[B1 >: B](kv: (A, B1)): SortedMap[A, B1] = {
       val b = SortedMap.newBuilder[A, B1]

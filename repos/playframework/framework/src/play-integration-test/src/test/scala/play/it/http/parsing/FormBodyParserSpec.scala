@@ -54,7 +54,7 @@ class FormBodyParserSpec extends PlaySpecification {
             BodyParsers.parse.form(
                 userForm,
                 onErrors = (form: Form[User]) =>
-                    Results.BadRequest(form.errorsAsJson))) must beLeft.which {
+                  Results.BadRequest(form.errorsAsJson))) must beLeft.which {
         result =>
           result.header.status must equalTo(BAD_REQUEST)
           val json = contentAsJson(Future.successful(result))

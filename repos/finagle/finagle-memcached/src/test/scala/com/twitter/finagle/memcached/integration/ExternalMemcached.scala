@@ -139,8 +139,7 @@ private[memcached] object ExternalMemcached { self =>
   // Make sure the process is always killed eventually
   Runtime
     .getRuntime()
-    .addShutdownHook(
-        new Thread {
+    .addShutdownHook(new Thread {
       override def run() {
         processes foreach { p =>
           p.destroy()

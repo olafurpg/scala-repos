@@ -344,10 +344,10 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
       // Generate a case block for each (methods, argCounts) tuple
       val cases = for {
         (methods, argcs) <- caseDefinitions if methods.nonEmpty &&
-                           argcs.nonEmpty
+        argcs.nonEmpty
 
-                           // exclude default case we're generating anyways for varargs
-                           if methods != varArgMeths.toSet
+        // exclude default case we're generating anyways for varargs
+        if methods != varArgMeths.toSet
 
         // body of case to disambiguates methods with current count
         caseBody = genExportSameArgc(
@@ -774,7 +774,8 @@ trait GenJSExports extends SubComponent { self: GenJSCode =>
     implicit object Ordering extends PartialOrdering[RTTypeTest] {
       override def tryCompare(lhs: RTTypeTest, rhs: RTTypeTest): Option[Int] = {
         if (lteq(lhs, rhs)) if (lteq(rhs, lhs)) Some(0) else Some(-1)
-        else if (lteq(rhs, lhs)) Some(1) else None
+        else if (lteq(rhs, lhs)) Some(1)
+        else None
       }
 
       override def lteq(lhs: RTTypeTest, rhs: RTTypeTest): Boolean = {

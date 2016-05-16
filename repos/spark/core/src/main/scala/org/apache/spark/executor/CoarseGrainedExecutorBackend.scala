@@ -41,7 +41,9 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
                                                   cores: Int,
                                                   userClassPath: Seq[URL],
                                                   env: SparkEnv)
-    extends ThreadSafeRpcEndpoint with ExecutorBackend with Logging {
+    extends ThreadSafeRpcEndpoint
+    with ExecutorBackend
+    with Logging {
 
   private[this] val stopping = new AtomicBoolean(false)
   var executor: Executor = null

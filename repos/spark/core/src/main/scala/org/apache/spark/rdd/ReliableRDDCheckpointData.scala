@@ -28,9 +28,10 @@ import org.apache.spark.internal.Logging
   * An implementation of checkpointing that writes the RDD data to reliable storage.
   * This allows drivers to be restarted on failure with previously computed state.
   */
-private[spark] class ReliableRDDCheckpointData[T : ClassTag](
+private[spark] class ReliableRDDCheckpointData[T: ClassTag](
     @transient private val rdd: RDD[T])
-    extends RDDCheckpointData[T](rdd) with Logging {
+    extends RDDCheckpointData[T](rdd)
+    with Logging {
 
   // The directory to which the associated RDD has been checkpointed to
   // This is assumed to be a non-local path that points to some reliable storage

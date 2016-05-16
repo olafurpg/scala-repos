@@ -347,8 +347,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
             generatedType = genLoadModule(tree)
           } else {
             mnode.visitVarInsn(asm.Opcodes.ALOAD, 0)
-            generatedType = if (tree.symbol == ArrayClass) ObjectRef
-            else classBTypeFromSymbol(claszSymbol)
+            generatedType =
+              if (tree.symbol == ArrayClass) ObjectRef
+              else classBTypeFromSymbol(claszSymbol)
           }
 
         case Select(Ident(nme.EMPTY_PACKAGE_NAME), module) =>
@@ -713,7 +714,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
                           mname,
                           methodType.descriptor,
                           app.pos)
-          generatedType = boxResultType(fun.symbol) // was typeToBType(fun.symbol.tpe.resultType)
+          generatedType =
+            boxResultType(fun.symbol) // was typeToBType(fun.symbol.tpe.resultType)
 
         case Apply(fun @ _, List(expr))
             if currentRun.runDefinitions.isUnbox(fun.symbol) =>
@@ -773,8 +775,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
 
                 case _ =>
               }
-              if ((targetTypeKind != null) && (sym == definitions.Array_clone) &&
-                  invokeStyle.isVirtual) {
+              if ((targetTypeKind != null) &&
+                  (sym == definitions.Array_clone) && invokeStyle.isVirtual) {
                 // An invokevirtual points to a CONSTANT_Methodref_info which in turn points to a
                 // CONSTANT_Class_info of the receiver type.
                 // The JVMS is not explicit about this, but that receiver type may be an array type
@@ -1136,9 +1138,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       // info calls so that types are up to date; erasure may add lateINTERFACE to traits
       hostSymbol.info; methodOwner.info
 
-      def needsInterfaceCall(sym: Symbol) = (sym.isTraitOrInterface ||
-          sym.isJavaDefined &&
-          sym.isNonBottomSubClass(definitions.ClassfileAnnotationClass))
+      def needsInterfaceCall(sym: Symbol) =
+        (sym.isTraitOrInterface || sym.isJavaDefined &&
+            sym.isNonBottomSubClass(definitions.ClassfileAnnotationClass))
 
       val isTraitCallToObjectMethod =
         hostSymbol != methodOwner && methodOwner.isTraitOrInterface &&
@@ -1149,8 +1151,9 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       // the type of the method owner
       val useMethodOwner =
         ((!style.isVirtual || hostSymbol.isBottomClass ||
-                methodOwner == definitions.ObjectClass) && !(style.isSuper &&
-                hostSymbol != null)) || isTraitCallToObjectMethod
+                methodOwner == definitions.ObjectClass) &&
+            !(style.isSuper && hostSymbol != null)) ||
+        isTraitCallToObjectMethod
       val receiver = if (useMethodOwner) methodOwner else hostSymbol
       val jowner = internalName(receiver)
 
@@ -1493,8 +1496,8 @@ abstract class BCodeBodyBuilder extends BCodeSkelBuilder {
       // Requires https://github.com/scala/scala-java8-compat on the runtime classpath
       val invokedType = asm.Type.getMethodDescriptor(
           asmType(functionalInterface),
-          (receiver ::: capturedParams).map(
-              sym => typeToBType(sym.info).toASMType): _*)
+          (receiver ::: capturedParams).map(sym =>
+                typeToBType(sym.info).toASMType): _*)
 
       val constrainedType = new MethodBType(
           lambdaParams.map(p => typeToBType(p.tpe)),

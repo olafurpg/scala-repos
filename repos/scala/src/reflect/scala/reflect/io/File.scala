@@ -44,7 +44,8 @@ object File {
   *  ''Note:  This is library is considered experimental and should not be used unless you know what you are doing.''
   */
 class File(jfile: JFile)(implicit constructorCodec: Codec)
-    extends Path(jfile) with Streamable.Chars {
+    extends Path(jfile)
+    with Streamable.Chars {
   override val creationCodec = constructorCodec
 
   override def addExtension(ext: String): File = super.addExtension(ext).toFile

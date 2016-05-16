@@ -18,8 +18,12 @@ import org.scalatest.{Matchers, GivenWhenThen, BeforeAndAfterAll}
 import scala.concurrent.Future
 
 class MarathonSchedulerTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Mockito with Matchers with GivenWhenThen {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
+    with Mockito
+    with Matchers
+    with GivenWhenThen {
 
   var probe: TestProbe = _
   var repo: AppRepository = _

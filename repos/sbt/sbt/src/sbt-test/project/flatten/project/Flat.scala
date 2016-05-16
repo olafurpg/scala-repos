@@ -7,7 +7,8 @@ object Flat extends Build {
   lazy val root = Project(
       "root",
       file("."),
-      settings = Defaults.defaultSettings ++ forConfig(Compile, "src") ++ forConfig(
+      settings =
+        Defaults.defaultSettings ++ forConfig(Compile, "src") ++ forConfig(
             Test, "test-src") ++ baseSettings)
 
   def baseSettings = Seq(
@@ -23,7 +24,7 @@ object Flat extends Build {
   def unpackageSettings(name: String) = Seq(
       unmanagedSourceDirectories := (baseDirectory.value / name) :: Nil,
       excludeFilter in unmanagedResources :=
-      (includeFilter in unmanagedSources).value,
+        (includeFilter in unmanagedSources).value,
       unmanagedResourceDirectories := unmanagedSourceDirectories.value,
       unpackage :=
         IO.unzip(artifactPath in packageSrc value, baseDirectory.value / name)

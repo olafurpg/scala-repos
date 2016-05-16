@@ -205,10 +205,11 @@ private[testutil] trait AbstractComparator extends Assertions {
   private def groupMethods(cls: Class[_], useStatic: Boolean) = {
     val staticIndicator: Boolean => Boolean =
       if (useStatic) (b => b) else (b => !b)
-    val isAcceptable: Method => Boolean = (m =>
-      isPublicMethod(m) &&
-      staticIndicator(Modifier.isStatic(m.getModifiers)) &&
-      !isSpecialMethodName(m.getName))
+    val isAcceptable: Method => Boolean =
+      (m =>
+         isPublicMethod(m) &&
+         staticIndicator(Modifier.isStatic(m.getModifiers)) &&
+         !isSpecialMethodName(m.getName))
 
     cls.getDeclaredMethods.filter(isAcceptable).sortWith(nameComparator).toList
   }
@@ -222,10 +223,10 @@ private[testutil] trait AbstractComparator extends Assertions {
     *                               [[scala.Nil]].
     */
   @tailrec
-  private def compare(
-      javaMethods: List[Method],
-      scalaMethods: List[Method],
-      javaMethodsNotMirrored: List[Method] = Nil): List[Method] = {
+  private def compare(javaMethods: List[Method],
+                      scalaMethods: List[Method],
+                      javaMethodsNotMirrored: List[Method] =
+                        Nil): List[Method] = {
     javaMethods match {
       case Nil => javaMethodsNotMirrored
       case javaMethod :: otherMethods => {

@@ -24,8 +24,7 @@ import ParserOutput._
   */
 private[http] abstract class HttpMessageParser[
     Output >: MessageOutput <: ParserOutput](
-    val settings: ParserSettings,
-    val headerParser: HttpHeaderParser) { self ⇒
+    val settings: ParserSettings, val headerParser: HttpHeaderParser) { self ⇒
   import HttpMessageParser._
   import settings._
 
@@ -92,7 +91,8 @@ private[http] abstract class HttpMessageParser[
       val head = result.head
       result.remove(0) // faster than `ListBuffer::drop`
       head
-    } else if (terminated) StreamEnd else NeedMoreData
+    } else if (terminated) StreamEnd
+    else NeedMoreData
 
   final def onUpstreamFinish(): Boolean = {
     completionHandling() match {
@@ -420,8 +420,8 @@ private[http] abstract class HttpMessageParser[
       } else parseTrailer(extension, cursor)
 
     @tailrec
-    def parseChunkExtensions(chunkSize: Int, cursor: Int)(
-        startIx: Int = cursor): StateResult =
+    def parseChunkExtensions(
+        chunkSize: Int, cursor: Int)(startIx: Int = cursor): StateResult =
       if (cursor - startIx <= maxChunkExtLength) {
         def extension = asciiString(input, startIx, cursor)
         byteChar(input, cursor) match {

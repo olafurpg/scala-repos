@@ -61,13 +61,13 @@ object ScalaRefactoringUtil {
     var end = editor.getSelectionModel.getSelectionEnd
     if (start == end) return
     while (file.findElementAt(start).isInstanceOf[PsiWhiteSpace] ||
-    (file.findElementAt(start).isInstanceOf[PsiComment] && trimComments) ||
-    file.getText.charAt(start) == '\n' ||
-    file.getText.charAt(start) == ' ') start = start + 1
+           (file.findElementAt(start).isInstanceOf[PsiComment] &&
+               trimComments) || file.getText.charAt(start) == '\n' ||
+           file.getText.charAt(start) == ' ') start = start + 1
     while (file.findElementAt(end - 1).isInstanceOf[PsiWhiteSpace] ||
-    (file.findElementAt(end - 1).isInstanceOf[PsiComment] && trimComments) ||
-    file.getText.charAt(end - 1) == '\n' ||
-    file.getText.charAt(end - 1) == ' ') end = end - 1
+           (file.findElementAt(end - 1).isInstanceOf[PsiComment] &&
+               trimComments) || file.getText.charAt(end - 1) == '\n' ||
+           file.getText.charAt(end - 1) == ' ') end = end - 1
     editor.getSelectionModel.setSelection(start, end)
   }
 
@@ -564,7 +564,7 @@ object ScalaRefactoringUtil {
                                    title: String,
                                    elementName: T => String,
                                    toHighlight: T => PsiElement = (t: T) =>
-                                       t.asInstanceOf[PsiElement]) {
+                                     t.asInstanceOf[PsiElement]) {
     class Selection {
       val selectionModel = editor.getSelectionModel
       val (start, end) =
@@ -814,7 +814,7 @@ object ScalaRefactoringUtil {
                               dataContext: DataContext,
                               refactoringName: String,
                               exprFilter: (ScExpression) => Boolean = e =>
-                                  true)(invokesNext: => Unit) {
+                                true)(invokesNext: => Unit) {
 
     if (!editor.getSelectionModel.hasSelection) {
       val offset = editor.getCaretModel.getOffset
@@ -841,9 +841,8 @@ object ScalaRefactoringUtil {
             expressions,
             (elem: ScExpression) => chooseExpression(elem),
             ScalaBundle.message("choose.expression.for", refactoringName),
-            (expr: ScExpression) =>
-              {
-                getShortText(expr)
+            (expr: ScExpression) => {
+              getShortText(expr)
             })
         return
       }
@@ -904,9 +903,8 @@ object ScalaRefactoringUtil {
             typeElement,
             (elem: ScTypeElement) => chooseTypeElement(elem),
             ScalaBundle.message("choose.type.element.for", refactoringName),
-            (value: ScTypeElement) =>
-              {
-                getShortText(value)
+            (value: ScTypeElement) => {
+              getShortText(value)
             })
         return
       }
@@ -1027,8 +1025,8 @@ object ScalaRefactoringUtil {
 
     val guard: ScGuard = PsiTreeUtil.getParentOfType(expr, classOf[ScGuard])
     if (guard != null && guard.getParent.isInstanceOf[ScCaseClause])
-      errorMessage = ScalaBundle.message(
-          "refactoring.is.not.supported.in.guard")
+      errorMessage =
+        ScalaBundle.message("refactoring.is.not.supported.in.guard")
 
     expr match {
       case block: ScBlock if !block.hasRBrace && block.statements.size != 1 =>
@@ -1087,8 +1085,9 @@ object ScalaRefactoringUtil {
             ScalaTokenTypes.IDENTIFIER_TOKEN_SET.contains(prevElemType) ||
             ScalaTokenTypes.KEYWORDS.contains(prevElemType)
           }
-        shift = pars.getTextRange.getStartOffset -
-        inner.getTextRange.getStartOffset + (if (afterWord) 1 else 0)
+        shift =
+          pars.getTextRange.getStartOffset -
+          inner.getTextRange.getStartOffset + (if (afterWord) 1 else 0)
         document.replaceString(textRange.getStartOffset,
                                textRange.getEndOffset,
                                (if (afterWord) " " else "") + newString)
@@ -1137,8 +1136,9 @@ object ScalaRefactoringUtil {
           val endOffset =
             if (isEnd) literalRange.getEndOffset else newRange.getEndOffset
           document.replaceString(startOffset, endOffset, text)
-          shift = if (isStart) startOffset - newRange.getStartOffset
-          else firstPart.length
+          shift =
+            if (isStart) startOffset - newRange.getStartOffset
+            else firstPart.length
         }
       case _ =>
     }
@@ -1160,8 +1160,8 @@ object ScalaRefactoringUtil {
                         file: PsiFile): Array[TextRange] = {
     val revercedRangeMarkers =
       occurences.reverseMap(replaceOccurence(_, newString, file))
-    revercedRangeMarkers.reverseMap(
-        rm => new TextRange(rm.getStartOffset, rm.getEndOffset))
+    revercedRangeMarkers.reverseMap(rm =>
+          new TextRange(rm.getStartOffset, rm.getEndOffset))
   }
 
   def statementsAndMembersInClass(
@@ -1355,8 +1355,8 @@ object ScalaRefactoringUtil {
       val refs = ReferencesSearch.search(elem, scope).findAll()
       import scala.collection.JavaConverters.collectionAsScalaIterableConverter
       for {
-        ref <- refs.asScala if !elements.exists(
-                  PsiTreeUtil.isAncestor(_, ref.getElement, false))
+        ref <- refs.asScala
+        if !elements.exists(PsiTreeUtil.isAncestor(_, ref.getElement, false))
       } {
         return true
       }

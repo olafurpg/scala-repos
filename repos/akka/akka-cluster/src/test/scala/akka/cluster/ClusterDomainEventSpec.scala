@@ -149,9 +149,10 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
                           seenBy = Set(aUp.address, bUp.address))))
       diffMemberEvents(g2, g1) should ===(Seq.empty)
       diffUnreachable(g2, g1, selfDummyAddress) should ===(Seq.empty)
-      diffSeen(g2, g1, selfDummyAddress) should ===(Seq(SeenChanged(
-                  convergence = true,
-                  seenBy = Set(aUp.address, bUp.address, eJoining.address))))
+      diffSeen(g2, g1, selfDummyAddress) should ===(
+          Seq(SeenChanged(convergence = true,
+                          seenBy =
+                            Set(aUp.address, bUp.address, eJoining.address))))
     }
 
     "be produced for leader changes" in {

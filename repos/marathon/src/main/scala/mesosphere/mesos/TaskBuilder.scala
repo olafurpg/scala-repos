@@ -25,8 +25,8 @@ class TaskBuilder(app: AppDefinition,
 
   def build(offer: Offer,
             resourceMatchOpt: Option[ResourceMatcher.ResourceMatch],
-            volumeMatchOpt: Option[PersistentVolumeMatcher.VolumeMatch] = None)
-    : Option[(TaskInfo, Seq[Int])] = {
+            volumeMatchOpt: Option[PersistentVolumeMatcher.VolumeMatch] =
+              None): Option[(TaskInfo, Seq[Int])] = {
 
     def logInsufficientResources(): Unit = {
       val appHostPorts =

@@ -43,4 +43,5 @@ class ProgressBarTableCellSpec[S]
     extends SimpleSFXDelegateSpec[
         jfxscc.ProgressBarTableCell[S], ProgressBarTableCell[S]](
         classOf[jfxscc.ProgressBarTableCell[S]],
-        classOf[ProgressBarTableCell[S]]) with RunOnApplicationThread
+        classOf[ProgressBarTableCell[S]])
+    with RunOnApplicationThread

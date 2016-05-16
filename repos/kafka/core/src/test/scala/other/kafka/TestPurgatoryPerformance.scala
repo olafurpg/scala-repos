@@ -124,8 +124,8 @@ object TestPurgatoryPerformance {
     val latch = new CountDownLatch(numRequests)
     val start = System.currentTimeMillis
     val rand = new Random()
-    val keys = (0 until numKeys).map(
-        i => "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
+    val keys = (0 until numKeys).map(i =>
+          "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
     @volatile var requestArrivalTime = start
     @volatile var end = 0L
     val generator = new Runnable {
@@ -171,8 +171,8 @@ object TestPurgatoryPerformance {
       numRequests.toDouble * 1000d / (requestArrivalTime - start).toDouble
     val actualRate = numRequests.toDouble * 1000d / (end - start).toDouble
 
-    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(
-        x => (x - initialCpuTimeNano.get) / 1000000L)
+    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(x =>
+          (x - initialCpuTimeNano.get) / 1000000L)
     val gcCounts = gcMXBeans.map(_.getCollectionCount)
     val gcTimes = gcMXBeans.map(_.getCollectionTime)
 

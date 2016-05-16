@@ -82,8 +82,8 @@ object Protocols {
     }
   }
 
-  def factory(statsReceiver: StatsReceiver = DefaultStatsReceiver)
-    : TProtocolFactory = {
+  def factory(statsReceiver: StatsReceiver =
+        DefaultStatsReceiver): TProtocolFactory = {
     binaryFactory(statsReceiver = statsReceiver)
   }
 

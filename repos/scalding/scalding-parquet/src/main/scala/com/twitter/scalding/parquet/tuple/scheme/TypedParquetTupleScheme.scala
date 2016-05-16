@@ -42,7 +42,8 @@ class ParquetTupleMaterializer[T](val converter: ParquetTupleConverter[T])
   * @tparam T user defined value type
   */
 abstract class ParquetReadSupport[T](val rootSchema: String)
-    extends ReadSupport[T] with Serializable {
+    extends ReadSupport[T]
+    with Serializable {
   val tupleConverter: ParquetTupleConverter[T]
 
   lazy val rootType: MessageType =
@@ -101,7 +102,8 @@ class ReadSupportInstanceProxy[T] extends ReadSupport[T] {
   * @tparam T user defined value type
   */
 abstract class ParquetWriteSupport[T](val rootSchema: String)
-    extends WriteSupport[T] with Serializable {
+    extends WriteSupport[T]
+    with Serializable {
 
   var recordConsumer: RecordConsumer = null
 

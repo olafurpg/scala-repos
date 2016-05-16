@@ -163,9 +163,9 @@ private[spark] class BlockManagerMaster(var driverEndpoint: RpcEndpointRef,
     * updated block statuses. This is useful when the master is not informed of the given block
     * by all block managers.
     */
-  def getBlockStatus(
-      blockId: BlockId,
-      askSlaves: Boolean = true): Map[BlockManagerId, BlockStatus] = {
+  def getBlockStatus(blockId: BlockId,
+                     askSlaves: Boolean =
+                       true): Map[BlockManagerId, BlockStatus] = {
     val msg = GetBlockStatus(blockId, askSlaves)
     /*
      * To avoid potential deadlocks, the use of Futures is necessary, because the master endpoint

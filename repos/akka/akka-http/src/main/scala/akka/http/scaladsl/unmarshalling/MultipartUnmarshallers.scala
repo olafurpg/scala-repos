@@ -28,19 +28,20 @@ trait MultipartUnmarshallers {
 
   implicit def defaultMultipartGeneralUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
-      parserSettings: ParserSettings = null)
-    : FromEntityUnmarshaller[Multipart.General] =
+      parserSettings: ParserSettings =
+        null): FromEntityUnmarshaller[Multipart.General] =
     multipartGeneralUnmarshaller(`UTF-8`)
 
-  def multipartGeneralUnmarshaller(
-      defaultCharset: HttpCharset)(implicit log: LoggingAdapter = NoLogging,
-                                   parserSettings: ParserSettings = null)
-    : FromEntityUnmarshaller[Multipart.General] =
+  def multipartGeneralUnmarshaller(defaultCharset: HttpCharset)(
+      implicit log: LoggingAdapter = NoLogging,
+      parserSettings: ParserSettings =
+        null): FromEntityUnmarshaller[Multipart.General] =
     multipartUnmarshaller[Multipart.General,
                           Multipart.General.BodyPart,
                           Multipart.General.BodyPart.Strict](
         mediaRange = `multipart/*`,
-        defaultContentType = MediaTypes.`text/plain` withCharset defaultCharset,
+        defaultContentType =
+          MediaTypes.`text/plain` withCharset defaultCharset,
         createBodyPart = Multipart.General.BodyPart(_, _),
         createStreamed = Multipart.General(_, _),
         createStrictBodyPart = Multipart.General.BodyPart.Strict,
@@ -48,49 +49,47 @@ trait MultipartUnmarshallers {
 
   implicit def multipartFormDataUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
-      parserSettings: ParserSettings = null)
-    : FromEntityUnmarshaller[Multipart.FormData] =
+      parserSettings: ParserSettings =
+        null): FromEntityUnmarshaller[Multipart.FormData] =
     multipartUnmarshaller[Multipart.FormData,
                           Multipart.FormData.BodyPart,
                           Multipart.FormData.BodyPart.Strict](
         mediaRange = `multipart/form-data`,
         defaultContentType = ContentTypes.`text/plain(UTF-8)`,
         createBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart(entity, headers).toFormDataBodyPart.get,
+          Multipart.General.BodyPart(entity, headers).toFormDataBodyPart.get,
         createStreamed = (_, parts) ⇒ Multipart.FormData(parts),
         createStrictBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart
-              .Strict(entity, headers)
-              .toFormDataBodyPart
-              .get,
+          Multipart.General.BodyPart
+            .Strict(entity, headers)
+            .toFormDataBodyPart
+            .get,
         createStrict = (_, parts) ⇒ Multipart.FormData.Strict(parts))
 
   implicit def defaultMultipartByteRangesUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
-      parserSettings: ParserSettings = null)
-    : FromEntityUnmarshaller[Multipart.ByteRanges] =
+      parserSettings: ParserSettings =
+        null): FromEntityUnmarshaller[Multipart.ByteRanges] =
     multipartByteRangesUnmarshaller(`UTF-8`)
 
-  def multipartByteRangesUnmarshaller(
-      defaultCharset: HttpCharset)(implicit log: LoggingAdapter = NoLogging,
-                                   parserSettings: ParserSettings = null)
-    : FromEntityUnmarshaller[Multipart.ByteRanges] =
+  def multipartByteRangesUnmarshaller(defaultCharset: HttpCharset)(
+      implicit log: LoggingAdapter = NoLogging,
+      parserSettings: ParserSettings =
+        null): FromEntityUnmarshaller[Multipart.ByteRanges] =
     multipartUnmarshaller[Multipart.ByteRanges,
                           Multipart.ByteRanges.BodyPart,
                           Multipart.ByteRanges.BodyPart.Strict](
         mediaRange = `multipart/byteranges`,
-        defaultContentType = MediaTypes.`text/plain` withCharset defaultCharset,
+        defaultContentType =
+          MediaTypes.`text/plain` withCharset defaultCharset,
         createBodyPart = (entity, headers) ⇒
-            Multipart.General
-              .BodyPart(entity, headers)
-              .toByteRangesBodyPart
-              .get,
+          Multipart.General.BodyPart(entity, headers).toByteRangesBodyPart.get,
         createStreamed = (_, parts) ⇒ Multipart.ByteRanges(parts),
         createStrictBodyPart = (entity, headers) ⇒
-            Multipart.General.BodyPart
-              .Strict(entity, headers)
-              .toByteRangesBodyPart
-              .get,
+          Multipart.General.BodyPart
+            .Strict(entity, headers)
+            .toByteRangesBodyPart
+            .get,
         createStrict = (_, parts) ⇒ Multipart.ByteRanges.Strict(parts))
 
   def multipartUnmarshaller[T <: Multipart,

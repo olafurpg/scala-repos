@@ -97,7 +97,7 @@ sealed abstract class Heap[A] {
   def toList: List[A] = toStream.toList
 
   /**Map a function over the heap, returning a new heap ordered appropriately. O(n)*/
-  def map[B : Order](f: A => B) =
+  def map[B: Order](f: A => B) =
     fold(Empty[B], (_, _, t) => t.foldMap(x => singleton(f(x.value))))
 
   def forall(f: A => Boolean) = toStream.forall(f)
@@ -124,16 +124,14 @@ sealed abstract class Heap[A] {
 
   /**Partition the heap of the elements that are less than, equal to, and greater than a given value. O(n)*/
   def split(a: A): (Heap[A], Heap[A], Heap[A]) = {
-    fold((Empty[A], Empty[A], Empty[A]),
-         (s, leq, t) =>
-           {
-             def f(x: A) =
-               if (leq(x, a))
-                 if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
-                 else (singletonWith(leq, x), Empty[A], Empty[A])
-               else (Empty[A], Empty[A], singletonWith(leq, x))
-             t foldMap (x => f(x.value))
-         })
+    fold((Empty[A], Empty[A], Empty[A]), (s, leq, t) => {
+      def f(x: A) =
+        if (leq(x, a))
+          if (leq(a, x)) (Empty[A], singletonWith(leq, x), Empty[A])
+          else (singletonWith(leq, x), Empty[A], Empty[A])
+        else (Empty[A], Empty[A], singletonWith(leq, x))
+      t foldMap (x => f(x.value))
+    })
   }
 
   /**Return a heap consisting of the least n elements of this heap. O(n log n) */
@@ -170,22 +168,20 @@ sealed abstract class Heap[A] {
 
   /**Remove duplicate entries from the heap. O(n log n)*/
   def nub: Heap[A] =
-    fold(Empty[A],
-         (_, leq, t) =>
-           {
-             val x = t.rootLabel.value
-             val xs = deleteMin
-             val zs = xs.dropWhile(leq(_, x))
-             zs.nub.insertWith(leq, x)
-         })
+    fold(Empty[A], (_, leq, t) => {
+      val x = t.rootLabel.value
+      val xs = deleteMin
+      val zs = xs.dropWhile(leq(_, x))
+      zs.nub.insertWith(leq, x)
+    })
 
   /**Construct heaps from each element in this heap and union them together into a new heap. O(n)*/
-  def flatMap[B : Order](f: A => Heap[B]): Heap[B] =
+  def flatMap[B: Order](f: A => Heap[B]): Heap[B] =
     fold(Empty[B], (_, _, t) => t foldMap (x => f(x.value)))
 
   /**Traverse the elements of the heap in sorted order and produce a new heap with applicative effects.
     * O(n log n)*/
-  def traverse[F[_]: Applicative, B : Order](f: A => F[B]): F[Heap[B]] = {
+  def traverse[F[_]: Applicative, B: Order](f: A => F[B]): F[Heap[B]] = {
     val F = Applicative[F]
     import std.stream._
     F.map(F.traverse(toStream)(f))(fromCodata[Stream, B])
@@ -202,30 +198,26 @@ sealed abstract class Heap[A] {
   }
 
   private[scalaz] def insertWith(f: (A, A) => Boolean, x: A) =
-    fold(singletonWith(f, x),
-         (s, _, t) =>
-           {
-             val y = t.rootLabel.value
-             if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
-             else
-               Heap(s + 1,
-                    f,
-                    Node(Ranked(0, y),
-                         skewInsert(f,
-                                    Node(Ranked(0, x), Stream()),
-                                    t.subForest)))
-         })
+    fold(singletonWith(f, x), (s, _, t) => {
+      val y = t.rootLabel.value
+      if (f(x, y)) Heap(s + 1, f, Node(Ranked(0, x), Stream(t)))
+      else
+        Heap(s + 1,
+             f,
+             Node(Ranked(0, y),
+                  skewInsert(f,
+                             Node(Ranked(0, x), Stream()),
+                             t.subForest)))
+    })
 
   private def splitWithList(f: List[A] => (List[A], List[A])) = {
     import std.list._
 
-    fold((Empty[A], Empty[A]),
-         (_, leq, _) =>
-           {
-             val g = (x: List[A]) => fromDataWith(leq, x)
-             val x = f(toList)
-             (g(x._1), g(x._2))
-         })
+    fold((Empty[A], Empty[A]), (_, leq, _) => {
+      val g = (x: List[A]) => fromDataWith(leq, x)
+      val x = f(toList)
+      (g(x._1), g(x._2))
+    })
   }
 
   override def toString = "<heap>"
@@ -242,7 +234,7 @@ object Heap extends HeapInstances {
     def apply[A]: Heap[A] = new Heap[A] {
       def fold[B](empty: => B,
                   nonempty: (Int, (A, A) => Boolean,
-                  Tree[Ranked[A]]) => B): B = empty
+                             Tree[Ranked[A]]) => B): B = empty
     }
 
     def unapply[A](h: Heap[A]): Boolean = h.fold(true, (_, _, _) => false)
@@ -250,10 +242,10 @@ object Heap extends HeapInstances {
 
   import Heap.impl._
 
-  def fromData[F[_]: Foldable, A : Order](as: F[A]): Heap[A] =
+  def fromData[F[_]: Foldable, A: Order](as: F[A]): Heap[A] =
     Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
 
-  def fromCodata[F[_]: Foldable, A : Order](as: F[A]): Heap[A] =
+  def fromCodata[F[_]: Foldable, A: Order](as: F[A]): Heap[A] =
     Foldable[F].foldr(as, Empty[A])(x => y => y insert x)
 
   def fromDataWith[F[_]: Foldable, A](
@@ -261,18 +253,18 @@ object Heap extends HeapInstances {
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
 
   /**Heap sort */
-  def sort[F[_]: Foldable, A : Order](xs: F[A]): List[A] = fromData(xs).toList
+  def sort[F[_]: Foldable, A: Order](xs: F[A]): List[A] = fromData(xs).toList
 
   /**Heap sort */
   def sortWith[F[_]: Foldable, A](f: (A, A) => Boolean, xs: F[A]): List[A] =
     fromDataWith(f, xs).toList
 
   /**A heap with one element. */
-  def singleton[A : Order](a: A): Heap[A] =
+  def singleton[A: Order](a: A): Heap[A] =
     singletonWith[A](Order[A].lessThanOrEqual, a)
 
   /**Create a heap consisting of multiple copies of the same value. O(log n) */
-  def replicate[A : Order](a: A, i: Int): Heap[A] = {
+  def replicate[A: Order](a: A, i: Int): Heap[A] = {
     def f(x: Heap[A], y: Int): Heap[A] =
       if (y % 2 == 0) f(x union x, y / 2)
       else if (y == 1) x
@@ -398,8 +390,8 @@ object Heap extends HeapInstances {
           }
       }
 
-    def splitForest[A]: (Int, Forest[A], Forest[A], Forest[A]) => (Forest[A],
-    Forest[A], Forest[A]) = {
+    def splitForest[A]: (Int, Forest[A], Forest[A],
+                         Forest[A]) => (Forest[A], Forest[A], Forest[A]) = {
       case (0, zs, ts, f) => (zs, ts, f)
       case (1, zs, ts, Stream(t)) => (zs, t #:: ts, Stream())
       case (1, zs, ts, t1 #:: t2 #:: f) =>
@@ -457,6 +449,6 @@ sealed abstract class HeapInstances {
 
   import std.stream._
 
-  implicit def heapEqual[A : Equal]: Equal[Heap[A]] =
+  implicit def heapEqual[A: Equal]: Equal[Heap[A]] =
     Equal.equalBy((_: Heap[A]).toStream)
 }

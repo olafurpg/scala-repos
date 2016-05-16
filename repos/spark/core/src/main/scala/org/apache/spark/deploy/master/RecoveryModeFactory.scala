@@ -52,7 +52,8 @@ abstract class StandaloneRecoveryModeFactory(
   */
 private[master] class FileSystemRecoveryModeFactory(
     conf: SparkConf, serializer: Serializer)
-    extends StandaloneRecoveryModeFactory(conf, serializer) with Logging {
+    extends StandaloneRecoveryModeFactory(conf, serializer)
+    with Logging {
 
   val RECOVERY_DIR = conf.get("spark.deploy.recoveryDirectory", "")
 

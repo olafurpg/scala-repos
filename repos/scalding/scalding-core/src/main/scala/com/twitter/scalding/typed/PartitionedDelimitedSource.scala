@@ -48,21 +48,22 @@ import cascading.tuple.{Fields, Tuple, TupleEntry}
   * val in: TypedPipe[((String, String), (String, Int))] = PartitionedDelimited[(String, String), (String, Int)](args("in"), "col1=%s/col2=%s")
   * }}}
   */
-case class PartitionedDelimitedSource[P, T](
-    path: String,
-    template: String,
-    separator: String,
-    fields: Fields,
-    skipHeader: Boolean = false,
-    writeHeader: Boolean = false,
-    quote: String = "\"",
-    strict: Boolean = true,
-    safe: Boolean = true)(implicit mt: Manifest[T],
-                          val valueSetter: TupleSetter[T],
-                          val valueConverter: TupleConverter[T],
-                          val partitionSetter: TupleSetter[P],
-                          val partitionConverter: TupleConverter[P])
-    extends PartitionSchemed[P, T] with Serializable {
+case class PartitionedDelimitedSource[P, T](path: String,
+                                            template: String,
+                                            separator: String,
+                                            fields: Fields,
+                                            skipHeader: Boolean = false,
+                                            writeHeader: Boolean = false,
+                                            quote: String = "\"",
+                                            strict: Boolean = true,
+                                            safe: Boolean = true)(
+    implicit mt: Manifest[T],
+    val valueSetter: TupleSetter[T],
+    val valueConverter: TupleConverter[T],
+    val partitionSetter: TupleSetter[P],
+    val partitionConverter: TupleConverter[P])
+    extends PartitionSchemed[P, T]
+    with Serializable {
   assert(
       fields.size == valueSetter.arity,
       "The number of fields needs to be the same as the arity of the value setter")
@@ -112,8 +113,8 @@ case class PartitionedDelimitedSource[P, T](
 trait PartitionedDelimited extends Serializable {
   def separator: String
 
-  def apply[P : Manifest : TupleConverter : TupleSetter,
-            T : Manifest : TupleConverter : TupleSetter](
+  def apply[P: Manifest: TupleConverter: TupleSetter,
+            T: Manifest: TupleConverter: TupleSetter](
       path: String, template: String): PartitionedDelimitedSource[P, T] =
     PartitionedDelimitedSource(
         path,
@@ -121,8 +122,8 @@ trait PartitionedDelimited extends Serializable {
         separator,
         PartitionUtil.toFields(0, implicitly[TupleSetter[T]].arity))
 
-  def apply[P : Manifest : TupleConverter : TupleSetter,
-            T : Manifest : TupleConverter : TupleSetter](
+  def apply[P: Manifest: TupleConverter: TupleSetter,
+            T: Manifest: TupleConverter: TupleSetter](
       path: String,
       template: String,
       fields: Fields): PartitionedDelimitedSource[P, T] =

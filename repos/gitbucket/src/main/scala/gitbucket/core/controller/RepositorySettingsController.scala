@@ -17,9 +17,14 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
 
 class RepositorySettingsController
-    extends RepositorySettingsControllerBase with RepositoryService
-    with AccountService with WebHookService with ProtectedBranchService
-    with CommitStatusService with OwnerAuthenticator with UsersAuthenticator
+    extends RepositorySettingsControllerBase
+    with RepositoryService
+    with AccountService
+    with WebHookService
+    with ProtectedBranchService
+    with CommitStatusService
+    with OwnerAuthenticator
+    with UsersAuthenticator
 
 trait RepositorySettingsControllerBase extends ControllerBase {
   self: RepositoryService with AccountService with WebHookService with ProtectedBranchService with CommitStatusService with OwnerAuthenticator with UsersAuthenticator =>
@@ -29,11 +34,12 @@ trait RepositorySettingsControllerBase extends ControllerBase {
       repositoryName: String, description: Option[String], isPrivate: Boolean)
 
   val optionsForm = mapping(
-      "repositoryName" -> trim(label("Repository Name",
-                                     text(required,
-                                          maxlength(40),
-                                          identifier,
-                                          renameRepositoryName))),
+      "repositoryName" -> trim(
+          label("Repository Name",
+                text(required,
+                     maxlength(40),
+                     identifier,
+                     renameRepositoryName))),
       "description" -> trim(label("Description", optional(text()))),
       "isPrivate" -> trim(label("Repository Type", boolean()))
   )(OptionsForm.apply)
@@ -285,21 +291,24 @@ trait RepositorySettingsControllerBase extends ControllerBase {
         val pushedCommit = commits.drop(1)
 
         WebHookPushPayload(
-            git = git,
-            sender = ownerAccount,
+            git =
+              git,
+            sender =
+              ownerAccount,
             refName = "refs/heads/" + repository.repository.defaultBranch,
-            repositoryInfo = repository,
-            commits = pushedCommit,
-            repositoryOwner = ownerAccount,
-            oldId = commits.lastOption
-                .map(_.id)
-                .map(ObjectId.fromString)
-                .getOrElse(ObjectId.zeroId()),
+            repositoryInfo =
+              repository,
+            commits =
+              pushedCommit,
+            repositoryOwner =
+              ownerAccount,
+            oldId =
+              commits.lastOption.map(_.id).map(ObjectId.fromString).getOrElse(ObjectId.zeroId()),
             newId = commits.headOption
-                .map(_.id)
-                .map(ObjectId.fromString)
-                .getOrElse(ObjectId.zeroId())
-          )
+              .map(_.id)
+              .map(ObjectId.fromString)
+              .getOrElse(ObjectId.zeroId())
+        )
       }
 
       val (webHook, json, reqFuture, resFuture) =
@@ -316,7 +325,8 @@ trait RepositorySettingsControllerBase extends ControllerBase {
       }
 
       contentType = formats("json")
-      org.json4s.jackson.Serialization.write(
+      org.json4s.jackson.Serialization
+        .write(
           Map(
               "url" -> url,
               "request" -> Await.result(
@@ -328,17 +338,19 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                         ))
                     .recover(toErrorMap),
                   20 seconds),
-              "responce" -> Await
-                .result(
-                  resFuture
-                    .map(res =>
-                          Map(
-                              "status" -> res.getStatusLine(),
-                              "body" -> EntityUtils.toString(res.getEntity()),
-                              "headers" -> _headers(res.getAllHeaders())
-                        ))
-                    .recover(toErrorMap),
-                  20 seconds)
+              "responce" -> Await.result(resFuture
+                                           .map(res =>
+                                                 Map(
+                                                     "status" -> res
+                                                       .getStatusLine(),
+                                                     "body" -> EntityUtils
+                                                       .toString(
+                                                         res.getEntity()),
+                                                     "headers" -> _headers(
+                                                         res.getAllHeaders())
+                                               ))
+                                           .recover(toErrorMap),
+                                         20 seconds)
           ))
     }
   })
@@ -465,8 +477,7 @@ trait RepositorySettingsControllerBase extends ControllerBase {
         case None => Some("User does not exist.")
         case Some(x) if (x.isGroupAccount) => Some("User does not exist.")
         case Some(x)
-            if
-            (x.userName == params("owner") ||
+            if (x.userName == params("owner") ||
                 getCollaborators(params("owner"), params("repository"))
                   .contains(x.userName)) =>
           Some("User can access this repository already.")

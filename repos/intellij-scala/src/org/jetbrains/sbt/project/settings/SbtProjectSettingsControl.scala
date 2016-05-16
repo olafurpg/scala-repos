@@ -89,8 +89,8 @@ class SbtProjectSettingsControl(
   protected def resetExtraSettings(isDefaultModuleCreation: Boolean) {
     val settings = getInitialSettings
 
-    val jdk = settings.jdkName.flatMap(
-        name => Option(ProjectJdkTable.getInstance.findJdk(name)))
+    val jdk = settings.jdkName.flatMap(name =>
+          Option(ProjectJdkTable.getInstance.findJdk(name)))
     jdkComboBox.setSelectedJdk(jdk.orNull)
 
     resolveClassifiersCheckBox.setSelected(settings.resolveClassifiers)

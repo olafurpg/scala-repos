@@ -5,7 +5,9 @@ package org.ensime.sexp.formats
 import org.ensime.sexp._
 
 class ProductFormatsSpec
-    extends FormatSpec with BasicFormats with StandardFormats
+    extends FormatSpec
+    with BasicFormats
+    with StandardFormats
     with ProductFormats {
 
   case class Foo(i: Int, s: String)
@@ -92,8 +94,11 @@ class ProductFormatsSpec
 }
 
 class CustomisedProductFormatsSpec
-    extends FormatSpec with BasicFormats with StandardFormats
-    with ProductFormats with CamelCaseToDashes {
+    extends FormatSpec
+    with BasicFormats
+    with StandardFormats
+    with ProductFormats
+    with CamelCaseToDashes {
 
   trait SkippingEnabled extends ProductFormats {
     override val skipNilValues = true

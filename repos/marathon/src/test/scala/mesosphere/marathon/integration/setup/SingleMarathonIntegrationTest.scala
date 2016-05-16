@@ -34,7 +34,8 @@ object SingleMarathonIntegrationTest {
   * After the test is finished, everything will be clean up.
   */
 trait SingleMarathonIntegrationTest
-    extends ExternalMarathonIntegrationTest with BeforeAndAfterAllConfigMap
+    extends ExternalMarathonIntegrationTest
+    with BeforeAndAfterAllConfigMap
     with MarathonCallbackTestSupport {
   self: Suite =>
 
@@ -146,10 +147,10 @@ trait SingleMarathonIntegrationTest
     zooKeeper.close()
   }
 
-  def waitForTasks(
-      appId: PathId,
-      num: Int,
-      maxWait: FiniteDuration = 30.seconds): List[ITEnrichedTask] = {
+  def waitForTasks(appId: PathId,
+                   num: Int,
+                   maxWait: FiniteDuration =
+                     30.seconds): List[ITEnrichedTask] = {
     def checkTasks: Option[List[ITEnrichedTask]] = {
       val tasks = Try(marathon.tasks(appId))
         .map(_.value)
@@ -211,41 +212,41 @@ trait SingleMarathonIntegrationTest
         id = appId,
         cmd = cmd,
         container = Some(
-              new Container(
-                  docker = Some(
-                        new mesosphere.marathon.state.Container.Docker(
-                            image = s"""marathon-buildbase:${sys.env.getOrElse(
+            new Container(
+                docker = Some(new mesosphere.marathon.state.Container.Docker(
+                        image = s"""marathon-buildbase:${sys.env.getOrElse(
                         "BUILD_ID", "test")}""",
-                            network = Some(
-                                  Protos.ContainerInfo.DockerInfo.Network.HOST)
-                        )),
-                  volumes = collection.immutable.Seq(
-                        new DockerVolume(hostPath = env.getOrElse(
-                                               "IVY2_DIR", "/root/.ivy2"),
-                                         containerPath = "/root/.ivy2",
-                                         mode = Protos.Volume.Mode.RO),
-                        new DockerVolume(
-                            hostPath = env.getOrElse("SBT_DIR", "/root/.sbt"),
-                            containerPath = "/root/.sbt",
-                            mode = Protos.Volume.Mode.RO),
-                        new DockerVolume(
-                            hostPath = env.getOrElse("SBT_DIR", "/root/.sbt"),
-                            containerPath = "/root/.sbt",
-                            mode = Protos.Volume.Mode.RO),
-                        new DockerVolume(hostPath = s"""$targetDirs/main""",
-                                         containerPath = "/marathon/target",
-                                         mode = Protos.Volume.Mode.RO),
-                        new DockerVolume(
-                            hostPath = s"""$targetDirs/project""",
-                            containerPath = "/marathon/project/target",
-                            mode = Protos.Volume.Mode.RO)
-                    )
-              )
-          ),
+                        network =
+                          Some(Protos.ContainerInfo.DockerInfo.Network.HOST)
+                    )),
+                volumes = collection.immutable.Seq(
+                    new DockerVolume(hostPath = env.getOrElse("IVY2_DIR",
+                                                              "/root/.ivy2"),
+                                     containerPath = "/root/.ivy2",
+                                     mode = Protos.Volume.Mode.RO),
+                    new DockerVolume(hostPath =
+                                       env.getOrElse("SBT_DIR", "/root/.sbt"),
+                                     containerPath = "/root/.sbt",
+                                     mode = Protos.Volume.Mode.RO),
+                    new DockerVolume(hostPath =
+                                       env.getOrElse("SBT_DIR", "/root/.sbt"),
+                                     containerPath = "/root/.sbt",
+                                     mode = Protos.Volume.Mode.RO),
+                    new DockerVolume(hostPath = s"""$targetDirs/main""",
+                                     containerPath = "/marathon/target",
+                                     mode = Protos.Volume.Mode.RO),
+                    new DockerVolume(hostPath = s"""$targetDirs/project""",
+                                     containerPath =
+                                       "/marathon/project/target",
+                                     mode = Protos.Volume.Mode.RO)
+                )
+            )
+        ),
         instances = instances,
         cpus = 0.5,
         mem = 128.0,
-        healthChecks = if (withHealth) appProxyHealthChecks
+        healthChecks =
+          if (withHealth) appProxyHealthChecks
           else Set.empty[HealthCheck],
         dependencies = dependencies
     )
@@ -265,7 +266,8 @@ trait SingleMarathonIntegrationTest
         instances = instances,
         cpus = 0.5,
         mem = 128.0,
-        healthChecks = if (withHealth) appProxyHealthChecks
+        healthChecks =
+          if (withHealth) appProxyHealthChecks
           else Set.empty[HealthCheck],
         dependencies = dependencies
     )

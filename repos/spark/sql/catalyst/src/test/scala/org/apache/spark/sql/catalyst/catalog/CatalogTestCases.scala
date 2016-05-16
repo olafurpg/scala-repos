@@ -380,12 +380,13 @@ abstract class CatalogTestCases extends SparkFunSuite with BeforeAndAfterEach {
       // alter but keep spec the same
       val oldPart1 = catalog.getPartition("db2", "tbl2", part1.spec)
       val oldPart2 = catalog.getPartition("db2", "tbl2", part2.spec)
-      catalog.alterPartitions("db2",
-                              "tbl2",
-                              Seq(oldPart1.copy(storage = storageFormat.copy(
-                                            locationUri = Some(newLocation))),
-                                  oldPart2.copy(storage = storageFormat.copy(
-                                            locationUri = Some(newLocation)))))
+      catalog.alterPartitions(
+          "db2",
+          "tbl2",
+          Seq(oldPart1.copy(storage =
+                    storageFormat.copy(locationUri = Some(newLocation))),
+              oldPart2.copy(storage =
+                    storageFormat.copy(locationUri = Some(newLocation)))))
       val newPart1 = catalog.getPartition("db2", "tbl2", part1.spec)
       val newPart2 = catalog.getPartition("db2", "tbl2", part2.spec)
       assert(newPart1.storage.locationUri == Some(newLocation))
@@ -592,10 +593,10 @@ abstract class CatalogTestUtils {
         name = TableIdentifier(name, database),
         tableType = CatalogTableType.EXTERNAL_TABLE,
         storage = storageFormat,
-        schema = Seq(
-              CatalogColumn("col1", "int"), CatalogColumn("col2", "string")),
-        partitionColumns = Seq(
-              CatalogColumn("a", "int"), CatalogColumn("b", "string")))
+        schema =
+          Seq(CatalogColumn("col1", "int"), CatalogColumn("col2", "string")),
+        partitionColumns =
+          Seq(CatalogColumn("a", "int"), CatalogColumn("b", "string")))
   }
 
   def newFunc(name: String, database: Option[String] = None): CatalogFunction = {

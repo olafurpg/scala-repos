@@ -33,7 +33,7 @@ import scala.language.implicitConversions
 object Exception {
   type Catcher[+T] = PartialFunction[Throwable, T]
 
-  def mkCatcher[Ex <: Throwable : ClassTag, T](
+  def mkCatcher[Ex <: Throwable: ClassTag, T](
       isDef: Ex => Boolean, f: Ex => T) = new Catcher[T] {
     private def downcast(x: Throwable): Option[Ex] =
       if (classTag[Ex].runtimeClass.isAssignableFrom(x.getClass))
@@ -47,7 +47,7 @@ object Exception {
   def mkThrowableCatcher[T](isDef: Throwable => Boolean, f: Throwable => T) =
     mkCatcher(isDef, f)
 
-  implicit def throwableSubtypeToCatcher[Ex <: Throwable : ClassTag, T](
+  implicit def throwableSubtypeToCatcher[Ex <: Throwable: ClassTag, T](
       pf: PartialFunction[Ex, T]) =
     mkCatcher(pf.isDefinedAt _, pf.apply _)
 

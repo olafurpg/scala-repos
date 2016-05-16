@@ -103,7 +103,8 @@ abstract class IntroduceFieldTestBase()
     } catch {
       case e: Exception =>
         assert(assertion = false,
-               message = e.getMessage + "\n" +
+               message =
+                 e.getMessage + "\n" +
                  e.getStackTrace.map(_.toString).mkString("  \n"))
     }
 

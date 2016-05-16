@@ -50,8 +50,10 @@ private[prediction] class FakeRunner(f: (SparkContext => Unit))
   @transient private lazy val logger = Logger[this.type]
   def evaluateBase(sc: SparkContext,
                    evaluation: Evaluation,
-                   engineEvalDataSet: Seq[(EngineParams, Seq[(EmptyParams, RDD[
-                               (EmptyParams, EmptyParams, EmptyParams)])])],
+                   engineEvalDataSet: Seq[
+                       (EngineParams,
+                        Seq[(EmptyParams,
+                             RDD[(EmptyParams, EmptyParams, EmptyParams)])])],
                    params: WorkflowParams): FakeEvalResult = {
     f(sc)
     FakeEvalResult()

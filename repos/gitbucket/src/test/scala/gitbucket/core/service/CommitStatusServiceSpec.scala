@@ -6,8 +6,11 @@ import profile.simple._
 import org.scalatest.FunSuite
 
 class CommitStatusServiceSpec
-    extends FunSuite with ServiceSpecBase with CommitStatusService
-    with RepositoryService with AccountService {
+    extends FunSuite
+    with ServiceSpecBase
+    with CommitStatusService
+    with RepositoryService
+    with AccountService {
   val now = new java.util.Date()
   val fixture1 = CommitStatus(
       userName = "root",

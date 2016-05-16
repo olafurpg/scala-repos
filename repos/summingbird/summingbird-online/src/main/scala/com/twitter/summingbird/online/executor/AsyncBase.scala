@@ -26,7 +26,8 @@ import org.slf4j.{LoggerFactory, Logger}
 abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
                                          maxWaitingTime: MaxFutureWaitTime,
                                          maxEmitPerExec: MaxEmitPerExecute)
-    extends Serializable with OperationContainer[I, O, S, D, RC] {
+    extends Serializable
+    with OperationContainer[I, O, S, D, RC] {
 
   @transient protected lazy val logger: Logger =
     LoggerFactory.getLogger(getClass)
@@ -47,14 +48,12 @@ abstract class AsyncBase[I, O, S, D, RC](maxWaitingFutures: MaxWaitingFutures,
     Queue.linkedNonBlocking[(Seq[S], Try[TraversableOnce[O]])]
 
   override def executeTick =
-    finishExecute(
-        tick.onFailure { thr =>
+    finishExecute(tick.onFailure { thr =>
       responses.put(((Seq(), Failure(thr))))
     })
 
   override def execute(state: S, data: I) =
-    finishExecute(
-        apply(state, data).onFailure { thr =>
+    finishExecute(apply(state, data).onFailure { thr =>
       responses.put(((List(state), Failure(thr))))
     })
 

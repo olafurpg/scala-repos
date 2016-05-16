@@ -110,12 +110,13 @@ object EventEncoding extends EncodingFlags with Logging {
       msgType <- readHeader(buffer)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
       event <- msgType match {
-        case `jsonIngestFlag` => jv.validated[Ingest]
-        case `jsonArchiveFlag` => jv.validated[Archive]
-        case `jsonIngestMessageFlag` => jv.validated[Ingest]("ingest")
-        case `jsonArchiveMessageFlag` => jv.validated[Archive]("archive")
-        case `storeFileFlag` => jv.validated[StoreFile]
-      }
+                case `jsonIngestFlag` => jv.validated[Ingest]
+                case `jsonArchiveFlag` => jv.validated[Archive]
+                case `jsonIngestMessageFlag` => jv.validated[Ingest]("ingest")
+                case `jsonArchiveMessageFlag` =>
+                  jv.validated[Archive]("archive")
+                case `storeFileFlag` => jv.validated[StoreFile]
+              }
     } yield event
   }
 }
@@ -160,12 +161,14 @@ object EventMessageEncoding extends EncodingFlags with Logging {
       //_ = println(java.nio.charset.Charset.forName("UTF-8").decode(buffer).toString)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
       message <- msgType match {
-        case `jsonIngestMessageFlag` =>
-          jv.validated[EventMessageExtraction](IngestMessage.Extractor)
-        case `jsonArchiveMessageFlag` =>
-          jv.validated[ArchiveMessage].map(\/.right(_))
-        case `storeFileFlag` => jv.validated[StoreFileMessage].map(\/.right(_))
-      }
+                  case `jsonIngestMessageFlag` =>
+                    jv.validated[EventMessageExtraction](
+                        IngestMessage.Extractor)
+                  case `jsonArchiveMessageFlag` =>
+                    jv.validated[ArchiveMessage].map(\/.right(_))
+                  case `storeFileFlag` =>
+                    jv.validated[StoreFileMessage].map(\/.right(_))
+                }
     } yield message
   }
 }

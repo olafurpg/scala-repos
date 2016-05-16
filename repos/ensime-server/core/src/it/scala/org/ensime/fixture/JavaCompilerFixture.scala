@@ -17,7 +17,7 @@ import scala.collection.immutable.Queue
 trait JavaCompilerFixture {
   def withJavaCompiler(
       testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
-      SearchService) => Any
+                 SearchService) => Any
   ): Any
 
   def runForPositionInCompiledSource(
@@ -67,12 +67,14 @@ class JavaStoreReporter extends ReportHandler {
 }
 
 trait IsolatedJavaCompilerFixture
-    extends JavaCompilerFixture with IsolatedEnsimeVFSFixture
-    with IsolatedTestKitFixture with IsolatedSearchServiceFixture {
+    extends JavaCompilerFixture
+    with IsolatedEnsimeVFSFixture
+    with IsolatedTestKitFixture
+    with IsolatedSearchServiceFixture {
 
   override def withJavaCompiler(
       testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
-      SearchService) => Any
+                 SearchService) => Any
   ): Any = {
     withVFS { implicit vfs =>
       withTestKit { testkit =>

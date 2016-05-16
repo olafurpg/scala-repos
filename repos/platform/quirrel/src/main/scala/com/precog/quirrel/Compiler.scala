@@ -31,7 +31,9 @@ import scala.collection.mutable
   * you mix in the other requisite traits.
   */
 trait Compiler
-    extends Phases with parser.Parser with typer.TreeShaker
+    extends Phases
+    with parser.Parser
+    with typer.TreeShaker
     with parser.QuirrelCache {
   def quirrelCacheSize: Int = 1000
   private val cache = new ParseCache(quirrelCacheSize)

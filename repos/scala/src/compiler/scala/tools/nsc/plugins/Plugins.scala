@@ -94,25 +94,29 @@ trait Plugins { global: Global =>
         roughPluginsList, Set(), (phasesSet map (_.phaseName)).toSet)
 
     // Verify required plugins are present.
-    for (req <- settings.require.value; if !(plugs exists (_.name == req))) globalError(
+    for (req <- settings.require.value;
+         if !(plugs exists (_.name == req))) globalError(
         "Missing required plugin: " + req)
 
     // Verify no non-existent plugin given with -P
     for {
       opt <- settings.pluginOptions.value if !(plugs exists
-                (opt startsWith _.name + ":"))
+          (opt startsWith _.name + ":"))
     } globalError("bad option: -P:" + opt)
 
     // Plugins may opt out, unless we just want to show info
     plugs filter
-    (p => p.init(p.options, globalError) || (settings.debug && settings.isInfo))
+    (p =>
+          p.init(p.options, globalError) ||
+          (settings.debug && settings.isInfo))
   }
 
   lazy val plugins: List[Plugin] = loadPlugins()
 
   /** A description of all the plugins that are loaded */
   def pluginDescriptions: String =
-    roughPluginsList map (x => "%s - %s".format(x.name, x.description)) mkString "\n"
+    roughPluginsList map (x =>
+          "%s - %s".format(x.name, x.description)) mkString "\n"
 
   /**
     * Extract all phases supplied by plugins and add them to the phasesSet.

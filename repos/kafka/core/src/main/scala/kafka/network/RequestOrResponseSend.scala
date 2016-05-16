@@ -40,7 +40,8 @@ object RequestOrResponseSend {
 }
 
 class RequestOrResponseSend(val dest: String, val buffer: ByteBuffer)
-    extends NetworkSend(dest, buffer) with Logging {
+    extends NetworkSend(dest, buffer)
+    with Logging {
 
   def this(dest: String, request: RequestOrResponse) {
     this(dest, RequestOrResponseSend.serialize(request))

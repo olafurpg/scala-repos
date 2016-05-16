@@ -105,8 +105,8 @@ class GroupManager @Singleton @Inject()(
              fn: Group => Group,
              version: Timestamp = Timestamp.now(),
              force: Boolean = false,
-             toKill: Map[PathId, Iterable[Task]] = Map.empty)
-    : Future[DeploymentPlan] =
+             toKill: Map[PathId, Iterable[Task]] =
+               Map.empty): Future[DeploymentPlan] =
     upgrade(gid, _.update(gid, fn, version), version, force, toKill)
 
   /**
@@ -120,12 +120,12 @@ class GroupManager @Singleton @Inject()(
     * @param force if the change has to be forced.
     * @return the deployment plan which will be executed.
     */
-  def updateApp(
-      appId: PathId,
-      fn: Option[AppDefinition] => AppDefinition,
-      version: Timestamp = Timestamp.now(),
-      force: Boolean = false,
-      toKill: Iterable[Task] = Iterable.empty): Future[DeploymentPlan] =
+  def updateApp(appId: PathId,
+                fn: Option[AppDefinition] => AppDefinition,
+                version: Timestamp = Timestamp.now(),
+                force: Boolean = false,
+                toKill: Iterable[Task] =
+                  Iterable.empty): Future[DeploymentPlan] =
     upgrade(appId.parent,
             _.updateApp(appId, fn, version),
             version,
@@ -136,8 +136,8 @@ class GroupManager @Singleton @Inject()(
                       change: Group => Group,
                       version: Timestamp = Timestamp.now(),
                       force: Boolean = false,
-                      toKill: Map[PathId, Iterable[Task]] = Map.empty)
-    : Future[DeploymentPlan] = serializeUpdates {
+                      toKill: Map[PathId, Iterable[Task]] =
+                        Map.empty): Future[DeploymentPlan] = serializeUpdates {
 
     log.info(s"Upgrade group id:$gid version:$version with force:$force")
 
@@ -160,8 +160,8 @@ class GroupManager @Singleton @Inject()(
 
     val deployment = for {
       from <- rootGroup()
-      (toUnversioned, resolve) <- resolveStoreUrls(
-          assignDynamicServicePorts(from, change(from)))
+      (toUnversioned, resolve) <- resolveStoreUrls(assignDynamicServicePorts(
+                                         from, change(from)))
       to = GroupVersioningUtil.updateVersionInfoForChangedApps(
           version, from, toUnversioned)
       _ = validateOrThrow(to)(Group.validGroupWithConfig(config.maxApps.get))
@@ -291,7 +291,7 @@ class GroupManager @Singleton @Inject()(
 
       app.copy(
           portDefinitions = mergeServicePortsAndPortDefinitions(
-                app.portDefinitions, servicePorts),
+              app.portDefinitions, servicePorts),
           container = newContainer.orElse(app.container)
       )
     }
@@ -302,7 +302,7 @@ class GroupManager @Singleton @Inject()(
         // Always set the ports to service ports, even if we do not have dynamic ports in our port mappings
         app.copy(
             portDefinitions = mergeServicePortsAndPortDefinitions(
-                  app.portDefinitions, app.servicePorts)
+                app.portDefinitions, app.servicePorts)
         )
     }
 

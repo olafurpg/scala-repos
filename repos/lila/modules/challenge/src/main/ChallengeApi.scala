@@ -66,24 +66,26 @@ final class ChallengeApi(repo: ChallengeRepo,
         challengerOption <- pov.player.userId ?? UserRepo.byId
         destUserOption <- pov.opponent.userId ?? UserRepo.byId
         success <- (destUserOption |@| challengerOption).tupled ?? {
-          case (destUser, challenger) =>
-            create(
-                Challenge.make(
-                    variant = pov.game.variant,
-                    initialFen = initialFen,
-                    timeControl = (pov.game.clock, pov.game.daysPerTurn) match {
-                  case (Some(clock), _) =>
-                    TimeControl.Clock(clock.limit, clock.increment)
-                  case (_, Some(days)) => TimeControl.Correspondence(days)
-                  case _ => TimeControl.Unlimited
-                },
-                    mode = pov.game.mode,
-                    color = (!pov.color).name,
-                    challenger = Right(challenger),
-                    destUser = Some(destUser),
-                    rematchOf = pov.game.id.some
-                )) inject true
-        }
+                    case (destUser, challenger) =>
+                      create(
+                          Challenge.make(
+                              variant = pov.game.variant,
+                              initialFen = initialFen,
+                              timeControl =
+                                (pov.game.clock, pov.game.daysPerTurn) match {
+                              case (Some(clock), _) =>
+                                TimeControl.Clock(clock.limit, clock.increment)
+                              case (_, Some(days)) =>
+                                TimeControl.Correspondence(days)
+                              case _ => TimeControl.Unlimited
+                            },
+                              mode = pov.game.mode,
+                              color = (!pov.color).name,
+                              challenger = Right(challenger),
+                              destUser = Some(destUser),
+                              rematchOf = pov.game.id.some
+                          )) inject true
+                  }
       } yield success
     }
 

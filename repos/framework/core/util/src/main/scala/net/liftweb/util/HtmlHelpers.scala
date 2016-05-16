@@ -237,9 +237,9 @@ trait HtmlHelpers extends CssBindImplicits {
   // found as well as the duplicate id stripping function, and the
   // caller can decide whether to ensure uniqueness at only one level or
   // whether to recurse through children.
-  private def ensureUniqueIdHelper(in: Seq[NodeSeq],
-                                   processElement: (Elem,
-                                   (Node) => Node) => Elem): Seq[NodeSeq] = {
+  private def ensureUniqueIdHelper(
+      in: Seq[NodeSeq],
+      processElement: (Elem, (Node) => Node) => Elem): Seq[NodeSeq] = {
     var ids: Set[String] = Set()
 
     def stripDuplicateId(node: Node): Node = node match {
@@ -249,8 +249,8 @@ trait HtmlHelpers extends CssBindImplicits {
           case Some(id) => {
               if (ids.contains(id.text)) {
                 processElement(
-                    element.copy(attributes = removeAttribute(
-                              "id", element.attributes)),
+                    element.copy(attributes =
+                          removeAttribute("id", element.attributes)),
                     stripDuplicateId _
                 )
               } else {

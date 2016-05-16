@@ -55,7 +55,8 @@ private[hive] case object NativePlaceholder extends LogicalPlan {
 
 private[hive] case class CreateTableAsSelect(
     tableDesc: CatalogTable, child: LogicalPlan, allowExisting: Boolean)
-    extends UnaryNode with Command {
+    extends UnaryNode
+    with Command {
 
   override def output: Seq[Attribute] = Seq.empty[Attribute]
   override lazy val resolved: Boolean =
@@ -70,14 +71,16 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
                                             allowExisting: Boolean,
                                             replace: Boolean,
                                             sql: String)
-    extends UnaryNode with Command {
+    extends UnaryNode
+    with Command {
   override def output: Seq[Attribute] = Seq.empty[Attribute]
   override lazy val resolved: Boolean = false
 }
 
 /** Provides a mapping from HiveQL statements to catalyst logical plans and expression trees. */
 private[hive] class HiveQl(conf: ParserConf)
-    extends SparkQl(conf) with Logging {
+    extends SparkQl(conf)
+    with Logging {
   import ParseUtils._
   import ParserUtils._
 
@@ -180,12 +183,12 @@ private[hive] class HiveQl(conf: ParserConf)
         tableType = CatalogTableType.VIRTUAL_VIEW,
         schema = schema,
         storage = CatalogStorageFormat(
-              locationUri = None,
-              inputFormat = None,
-              outputFormat = None,
-              serde = None,
-              serdeProperties = Map.empty[String, String]
-          ),
+            locationUri = None,
+            inputFormat = None,
+            outputFormat = None,
+            serde = None,
+            serdeProperties = Map.empty[String, String]
+        ),
         properties = properties,
         viewOriginalText = Some(originalText),
         viewText = Some(originalText))
@@ -358,18 +361,19 @@ private[hive] class HiveQl(conf: ParserConf)
         // TODO add bucket support
         var tableDesc: CatalogTable = CatalogTable(
             name = tableIdentifier,
-            tableType = if (externalTable.isDefined) {
-              CatalogTableType.EXTERNAL_TABLE
-            } else {
-              CatalogTableType.MANAGED_TABLE
-            },
+            tableType =
+              if (externalTable.isDefined) {
+                CatalogTableType.EXTERNAL_TABLE
+              } else {
+                CatalogTableType.MANAGED_TABLE
+              },
             storage = CatalogStorageFormat(
-                  locationUri = None,
-                  inputFormat = None,
-                  outputFormat = None,
-                  serde = None,
-                  serdeProperties = Map.empty[String, String]
-              ),
+                locationUri = None,
+                inputFormat = None,
+                outputFormat = None,
+                serde = None,
+                serdeProperties = Map.empty[String, String]
+            ),
             schema = Seq.empty[CatalogColumn])
 
         // default storage type abbreviation (e.g. RCFile, ORC, PARQUET etc.)
@@ -379,17 +383,17 @@ private[hive] class HiveQl(conf: ParserConf)
         val hiveSerDe =
           HiveSerDe.sourceToSerDe(defaultStorageType, hiveConf).getOrElse {
             HiveSerDe(
-                inputFormat = Option(
-                      "org.apache.hadoop.mapred.TextInputFormat"),
+                inputFormat =
+                  Option("org.apache.hadoop.mapred.TextInputFormat"),
                 outputFormat = Option(
-                      "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"))
+                    "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"))
           }
 
         tableDesc = tableDesc.withNewStorage(
-            inputFormat = hiveSerDe.inputFormat
-                .orElse(tableDesc.storage.inputFormat),
-            outputFormat = hiveSerDe.outputFormat.orElse(
-                  tableDesc.storage.outputFormat),
+            inputFormat =
+              hiveSerDe.inputFormat.orElse(tableDesc.storage.inputFormat),
+            outputFormat =
+              hiveSerDe.outputFormat.orElse(tableDesc.storage.outputFormat),
             serde = hiveSerDe.serde.orElse(tableDesc.storage.serde))
 
         children.collect {
@@ -439,13 +443,13 @@ private[hive] class HiveQl(conf: ParserConf)
               // TODO support the nullFormat
               case _ => assert(false)
             }
-            tableDesc = tableDesc.withNewStorage(
-                serdeProperties = tableDesc.storage.serdeProperties ++ serdeParams.asScala)
+            tableDesc = tableDesc.withNewStorage(serdeProperties =
+                  tableDesc.storage.serdeProperties ++ serdeParams.asScala)
           case Token("TOK_TABLELOCATION", child :: Nil) =>
             val location = EximUtil.relativeToAbsolutePath(
                 hiveConf, unescapeSQLString(child.text))
-            tableDesc = tableDesc.withNewStorage(
-                locationUri = Option(location))
+            tableDesc =
+              tableDesc.withNewStorage(locationUri = Option(location))
           case Token("TOK_TABLESERIALIZER", child :: Nil) =>
             tableDesc = tableDesc.withNewStorage(
                 serde = Option(unescapeSQLString(child.children.head.text)))
@@ -463,70 +467,70 @@ private[hive] class HiveQl(conf: ParserConf)
                       .map(_.text)
                       .map(unescapeSQLString)
                       .orNull
-                      (unescapeSQLString(prop), value)
+                    (unescapeSQLString(prop), value)
                 }
                 .toMap
-              tableDesc = tableDesc.withNewStorage(
-                  serdeProperties = tableDesc.storage.serdeProperties ++ serdeParams)
+              tableDesc = tableDesc.withNewStorage(serdeProperties =
+                    tableDesc.storage.serdeProperties ++ serdeParams)
             }
           case Token("TOK_FILEFORMAT_GENERIC", child :: Nil) =>
             child.text.toLowerCase(Locale.ENGLISH) match {
               case "orc" =>
                 tableDesc = tableDesc.withNewStorage(
                     inputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"),
+                        "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"))
+                        "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"))
                 if (tableDesc.storage.serde.isEmpty) {
-                  tableDesc = tableDesc.withNewStorage(serde = Option(
-                            "org.apache.hadoop.hive.ql.io.orc.OrcSerde"))
+                  tableDesc = tableDesc.withNewStorage(serde =
+                        Option("org.apache.hadoop.hive.ql.io.orc.OrcSerde"))
                 }
 
               case "parquet" =>
                 tableDesc = tableDesc.withNewStorage(
                     inputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
+                        "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"))
+                        "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"))
                 if (tableDesc.storage.serde.isEmpty) {
                   tableDesc = tableDesc.withNewStorage(serde = Option(
-                            "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"))
+                          "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"))
                 }
 
               case "rcfile" =>
                 tableDesc = tableDesc.withNewStorage(
-                    inputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.RCFileInputFormat"),
+                    inputFormat =
+                      Option("org.apache.hadoop.hive.ql.io.RCFileInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.RCFileOutputFormat"))
+                        "org.apache.hadoop.hive.ql.io.RCFileOutputFormat"))
                 if (tableDesc.storage.serde.isEmpty) {
                   tableDesc = tableDesc.withNewStorage(serde = Option(
-                            "org.apache.hadoop.hive.serde2.columnar.LazyBinaryColumnarSerDe"))
+                          "org.apache.hadoop.hive.serde2.columnar.LazyBinaryColumnarSerDe"))
                 }
 
               case "textfile" =>
                 tableDesc = tableDesc.withNewStorage(
-                    inputFormat = Option(
-                          "org.apache.hadoop.mapred.TextInputFormat"),
+                    inputFormat =
+                      Option("org.apache.hadoop.mapred.TextInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"))
+                        "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"))
 
               case "sequencefile" =>
                 tableDesc = tableDesc.withNewStorage(
                     inputFormat = Option(
-                          "org.apache.hadoop.mapred.SequenceFileInputFormat"),
+                        "org.apache.hadoop.mapred.SequenceFileInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.mapred.SequenceFileOutputFormat"))
+                        "org.apache.hadoop.mapred.SequenceFileOutputFormat"))
 
               case "avro" =>
                 tableDesc = tableDesc.withNewStorage(
                     inputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat"),
+                        "org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat"),
                     outputFormat = Option(
-                          "org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat"))
+                        "org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat"))
                 if (tableDesc.storage.serde.isEmpty) {
-                  tableDesc = tableDesc.withNewStorage(serde = Option(
-                            "org.apache.hadoop.hive.serde2.avro.AvroSerDe"))
+                  tableDesc = tableDesc.withNewStorage(serde =
+                        Option("org.apache.hadoop.hive.serde2.avro.AvroSerDe"))
                 }
 
               case _ =>
@@ -542,9 +546,8 @@ private[hive] class HiveQl(conf: ParserConf)
 
             otherProps match {
               case Token("TOK_TABLEPROPERTIES", list :: Nil) :: Nil =>
-                tableDesc = tableDesc.withNewStorage(
-                    serdeProperties = tableDesc.storage.serdeProperties ++ getProperties(
-                          list))
+                tableDesc = tableDesc.withNewStorage(serdeProperties =
+                      tableDesc.storage.serdeProperties ++ getProperties(list))
               case _ =>
             }
 
@@ -553,10 +556,10 @@ private[hive] class HiveQl(conf: ParserConf)
                 properties = tableDesc.properties ++ getProperties(list))
           case list @ Token("TOK_TABLEFILEFORMAT", _) =>
             tableDesc = tableDesc.withNewStorage(
-                inputFormat = Option(
-                      unescapeSQLString(list.children.head.text)),
-                outputFormat = Option(
-                      unescapeSQLString(list.children(1).text)))
+                inputFormat =
+                  Option(unescapeSQLString(list.children.head.text)),
+                outputFormat =
+                  Option(unescapeSQLString(list.children(1).text)))
           case Token("TOK_STORAGEHANDLER", _) =>
             throw new AnalysisException(
                 "CREATE TABLE AS SELECT cannot be used for a non-native table")
@@ -617,9 +620,9 @@ private[hive] class HiveQl(conf: ParserConf)
       }
 
       type SerDeInfo = (Seq[(String, String)], // Input row format information
-      Option[String], // Optional input SerDe class
-      Seq[(String, String)], // Input SerDe properties
-      Boolean // Whether to use default record reader/writer
+                        Option[String], // Optional input SerDe class
+                        Seq[(String, String)], // Input SerDe properties
+                        Boolean // Whether to use default record reader/writer
       )
 
       def matchSerDe(clause: Seq[ASTNode]): SerDeInfo = clause match {

@@ -55,15 +55,12 @@ case class MakeDecimal(child: Expression, precision: Int, scale: Int)
     Decimal(input.asInstanceOf[Long], precision, scale)
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        s"""
+    nullSafeCodeGen(ctx, ev, eval => {
+      s"""
         ${ev.value} = (new Decimal()).setOrNull($eval, $precision, $scale);
         ${ev.isNull} = ${ev.value} == null;
       """
-                    })
+    })
   }
 }
 
@@ -100,12 +97,9 @@ case class CheckOverflow(child: Expression, dataType: DecimalType)
   }
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        val tmp = ctx.freshName("tmp")
-                        s"""
+    nullSafeCodeGen(ctx, ev, eval => {
+      val tmp = ctx.freshName("tmp")
+      s"""
          | Decimal $tmp = $eval.clone();
          | if ($tmp.changePrecision(${dataType.precision}, ${dataType.scale})) {
          |   ${ev.value} = $tmp;
@@ -113,7 +107,7 @@ case class CheckOverflow(child: Expression, dataType: DecimalType)
          |   ${ev.isNull} = true;
          | }
        """.stripMargin
-                    })
+    })
   }
 
   override def toString: String = s"CheckOverflow($child, $dataType)"

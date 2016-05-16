@@ -13,7 +13,8 @@ import akka.remote.transport.TestTransport.{DisassociateAttempt, WriteAttempt, L
 abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
     extends AkkaSpec(
         """akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
-    with DefaultTimeout with ImplicitSender {
+    with DefaultTimeout
+    with ImplicitSender {
 
   def transportName: String
   def schemeIdentifier: String

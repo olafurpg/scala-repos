@@ -31,7 +31,8 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
                                       nodeType: IElementType,
                                       node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScReferencePattern with ContributedReferenceHost {
+    with ScReferencePattern
+    with ContributedReferenceHost {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

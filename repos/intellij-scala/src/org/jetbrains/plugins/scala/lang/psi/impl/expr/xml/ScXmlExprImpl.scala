@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   * @author Alexander Podkhalyuzin
   */
 class ScXmlExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScXmlExpr {
   override def toString: String = "XmlExpression"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {

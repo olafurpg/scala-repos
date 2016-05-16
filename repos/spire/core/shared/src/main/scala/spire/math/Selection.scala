@@ -4,7 +4,7 @@ package math
 import spire.algebra.Order
 
 trait Select extends Any {
-  def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit
+  def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit
 }
 
 /**
@@ -13,7 +13,7 @@ trait Select extends Any {
   */
 trait SelectLike extends Any with Select {
 
-  def approxMedian[@sp A : Order](
+  def approxMedian[@sp A: Order](
       data: Array[A], left: Int, right: Int, stride: Int): A
 
   /**
@@ -24,7 +24,7 @@ trait SelectLike extends Any with Select {
     * This is an in-place algorithm and is not stable and it WILL mess up the
     * order of equal elements.
     */
-  final def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit = {
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit = {
     select(data, 0, data.length, 1, k)
   }
 
@@ -45,7 +45,7 @@ trait SelectLike extends Any with Select {
   }
 
   @tailrec
-  protected final def select[@sp A : Order](
+  protected final def select[@sp A: Order](
       data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
     val length = (right - left + stride - 1) / stride
     if (length < 10) {
@@ -401,7 +401,7 @@ object LinearSelect extends SelectLike with HighBranchingMedianOf5 {
   // one side. This makes this quite a bit slower in the general case (though
   // not terribly so), but doesn't suffer from bad worst-case behaviour.
 
-  final def approxMedian[@sp A : Order](
+  final def approxMedian[@sp A: Order](
       data: Array[A], left: Int, right: Int, stride: Int): A = {
     var offset = left
     var last = left + 4 * stride
@@ -426,7 +426,7 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
   // pivot, quickly is essential. So, we have 3 cases, getting slightly smarter
   // about our pivot as the array grows.
 
-  final def approxMedian[@sp A : Order](
+  final def approxMedian[@sp A: Order](
       data: Array[A], left: Int, right: Int, stride: Int): A = {
     val length = (right - left + stride - 1) / stride
 
@@ -450,14 +450,13 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@sp A : Order : ClassTag](data: Array[A], k: Int): Unit =
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
     quickSelect(data, k)
 
-  final def linearSelect[@sp A : Order : ClassTag](
+  final def linearSelect[@sp A: Order: ClassTag](
       data: Array[A], k: Int): Unit =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@sp A : Order : ClassTag](
-      data: Array[A], k: Int): Unit =
+  final def quickSelect[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
     QuickSelect.select(data, k)
 }

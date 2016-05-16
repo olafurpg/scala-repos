@@ -104,7 +104,8 @@ object CheckBoxTreeCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean]])",
+      message =
+        "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean]])",
       since = "1.0")
   def forTreeView[T](getSelectedProperty: jfxu.Callback[
           jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]]) =
@@ -132,7 +133,8 @@ object CheckBoxTreeCell {
     * Added to satisfy Spec tests.
     */
   @deprecated(
-      message = "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean], StringConverter[TreeItem[T]])",
+      message =
+        "Use forTreeView[T](TreeItem[T] => ObservableValue[Boolean, java.lang.Boolean], StringConverter[TreeItem[T]])",
       since = "1.0")
   def forTreeView[T](getSelectedProperty: jfxu.Callback[
                          jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]],
@@ -152,8 +154,8 @@ object CheckBoxTreeCell {
   *         selected or not.
   */
 class CheckBoxTreeCell[T](
-    override val delegate: jfxscc.CheckBoxTreeCell[T] = new jfxscc.CheckBoxTreeCell[
-          T])
+    override val delegate: jfxscc.CheckBoxTreeCell[T] =
+      new jfxscc.CheckBoxTreeCell[T])
     extends TreeCell[T](delegate)
     with ConvertableCell[jfxscc.CheckBoxTreeCell[T], T, jfxsc.TreeItem[T]]
     with StateSelectableCell[jfxscc.CheckBoxTreeCell[T], T, jfxsc.TreeItem[T]]

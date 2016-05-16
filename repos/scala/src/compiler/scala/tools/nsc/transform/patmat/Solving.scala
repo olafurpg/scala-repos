@@ -418,11 +418,10 @@ trait Solving extends Logic {
           Solution(projectToModel(model, symForVar), unassigned map symForVar)
       }
 
-      def findAllModels(
-          clauses: Array[Clause],
-          models: List[TseitinSolution],
-          recursionDepthAllowed: Int = AnalysisBudget.maxDPLLdepth)
-        : List[TseitinSolution] =
+      def findAllModels(clauses: Array[Clause],
+                        models: List[TseitinSolution],
+                        recursionDepthAllowed: Int =
+                          AnalysisBudget.maxDPLLdepth): List[TseitinSolution] =
         if (recursionDepthAllowed == 0) {
           uncheckedWarning(pos, AnalysisBudget.recursionDepthReached)
           models
@@ -497,8 +496,7 @@ trait Solving extends Logic {
               // partition symbols according to whether they appear in positive and/or negative literals
               val pos = new mutable.HashSet[Int]()
               val neg = new mutable.HashSet[Int]()
-              mforeach(clauses)(
-                  lit =>
+              mforeach(clauses)(lit =>
                     if (lit.positive) pos += lit.variable
                     else neg += lit.variable)
 

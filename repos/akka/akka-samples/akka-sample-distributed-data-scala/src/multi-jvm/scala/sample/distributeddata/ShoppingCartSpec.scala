@@ -28,7 +28,8 @@ class ShoppingCartSpecMultiJvmNode2 extends ShoppingCartSpec
 class ShoppingCartSpecMultiJvmNode3 extends ShoppingCartSpec
 
 class ShoppingCartSpec
-    extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ShoppingCartSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ShoppingCartSpec._
   import ShoppingCart._

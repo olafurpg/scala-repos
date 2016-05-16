@@ -46,7 +46,7 @@ sealed trait Segment {
 
 sealed trait ValueSegment[@spec(Boolean, Long, Double) A] extends Segment {
   def ctype: CValueType[A]
-  def map[@spec(Boolean, Long, Double) B : CValueType : Manifest](
+  def map[@spec(Boolean, Long, Double) B: CValueType: Manifest](
       f: A => B): ValueSegment[B]
 
   def normalize: ValueSegment[A] = this match {
@@ -90,7 +90,7 @@ case class ArraySegment[@spec(Boolean, Long, Double) A](blockid: Long,
     ArraySegment(blockid, cpath, ctype, defined.copy, arr)
   }
 
-  def map[@spec(Boolean, Long, Double) B : CValueType : Manifest](
+  def map[@spec(Boolean, Long, Double) B: CValueType: Manifest](
       f: A => B): ValueSegment[B] = {
     val values0 = new Array[B](values.length)
     defined.foreach { row =>
@@ -115,7 +115,7 @@ case class BooleanSegment(
   def extend(amount: Int) =
     BooleanSegment(blockid, cpath, defined.copy, values.copy, length + amount)
 
-  def map[@spec(Boolean, Long, Double) B : CValueType : Manifest](
+  def map[@spec(Boolean, Long, Double) B: CValueType: Manifest](
       f: Boolean => B): ValueSegment[B] = {
     val values0 = new Array[B](values.length)
     defined.foreach { row =>

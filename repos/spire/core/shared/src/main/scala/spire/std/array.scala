@@ -8,7 +8,7 @@ object ArraySupport {
   import spire.syntax.order._
   import spire.syntax.ring._
 
-  def eqv[@sp A : Eq](x: Array[A], y: Array[A]): Boolean = {
+  def eqv[@sp A: Eq](x: Array[A], y: Array[A]): Boolean = {
     var i = 0
     if (x.length != y.length) return false
     while (i < x.length && i < y.length && x(i) === y(i)) i += 1
@@ -24,7 +24,7 @@ object ArraySupport {
     i >= x.length && i >= y.length
   }
 
-  def compare[@sp A : Order](x: Array[A], y: Array[A]): Int = {
+  def compare[@sp A: Order](x: Array[A], y: Array[A]): Int = {
     var i = 0
     while (i < x.length && i < y.length) {
       val cmp = x(i) compare y(i)
@@ -53,14 +53,14 @@ object ArraySupport {
     0
   }
 
-  def concat[@sp A : ClassTag](x: Array[A], y: Array[A]): Array[A] = {
+  def concat[@sp A: ClassTag](x: Array[A], y: Array[A]): Array[A] = {
     val z = new Array[A](x.length + y.length)
     System.arraycopy(x, 0, z, 0, x.length)
     System.arraycopy(y, 0, z, x.length, y.length)
     z
   }
 
-  def negate[@sp(Int, Long, Float, Double) A : ClassTag : Ring](
+  def negate[@sp(Int, Long, Float, Double) A: ClassTag: Ring](
       x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
@@ -71,7 +71,7 @@ object ArraySupport {
     y
   }
 
-  def plus[@sp(Int, Long, Float, Double) A : ClassTag : AdditiveMonoid](
+  def plus[@sp(Int, Long, Float, Double) A: ClassTag: AdditiveMonoid](
       x: Array[A], y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
@@ -81,7 +81,7 @@ object ArraySupport {
     z
   }
 
-  def minus[@sp(Int, Long, Float, Double) A : ClassTag : AdditiveGroup](
+  def minus[@sp(Int, Long, Float, Double) A: ClassTag: AdditiveGroup](
       x: Array[A], y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
@@ -92,7 +92,7 @@ object ArraySupport {
   }
 
   def timesl[
-      @sp(Int, Long, Float, Double) A : ClassTag : MultiplicativeSemigroup](
+      @sp(Int, Long, Float, Double) A: ClassTag: MultiplicativeSemigroup](
       r: A, x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
@@ -122,8 +122,8 @@ trait ArrayInstances0 {
   type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
 
   implicit def ArrayModule[
-      @sp(Int, Long, Float, Double) A : NI0 : ClassTag : Ring]: Module[
-      Array[A], A] =
+      @sp(Int, Long, Float, Double) A: NI0: ClassTag: Ring]
+    : Module[Array[A], A] =
     new ArrayModule[A]
 }
 
@@ -131,40 +131,41 @@ trait ArrayInstances1 extends ArrayInstances0 {
   type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
 
   implicit def ArrayVectorSpace[
-      @sp(Int, Long, Float, Double) A : NI1 : ClassTag : Field]: VectorSpace[
-      Array[A], A] =
+      @sp(Int, Long, Float, Double) A: NI1: ClassTag: Field]
+    : VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
 
-  implicit def ArrayEq[@sp A : Eq]: Eq[Array[A]] =
+  implicit def ArrayEq[@sp A: Eq]: Eq[Array[A]] =
     new ArrayEq[A]
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[
-      @sp(Float, Double) A : Field : ClassTag]: InnerProductSpace[Array[A], A] =
+  implicit def ArrayInnerProductSpace[@sp(Float, Double) A: Field: ClassTag]
+    : InnerProductSpace[Array[A], A] =
     new ArrayInnerProductSpace[A]
 
-  implicit def ArrayOrder[@sp A : Order]: Order[Array[A]] =
+  implicit def ArrayOrder[@sp A: Order]: Order[Array[A]] =
     new ArrayOrder[A]
 }
 
 trait ArrayInstances3 extends ArrayInstances2 {
   implicit def ArrayNormedVectorSpace[
-      @sp(Float, Double) A : Field : NRoot : ClassTag]: NormedVectorSpace[
-      Array[A], A] =
+      @sp(Float, Double) A: Field: NRoot: ClassTag]
+    : NormedVectorSpace[Array[A], A] =
     ArrayInnerProductSpace[A].normed
 }
 
 trait ArrayInstances extends ArrayInstances3 {
-  implicit def ArrayMonoid[@sp A : ClassTag]: Monoid[Array[A]] =
+  implicit def ArrayMonoid[@sp A: ClassTag]: Monoid[Array[A]] =
     new ArrayMonoid[A]
 }
 
 @SerialVersionUID(0L)
 private final class ArrayModule[
-    @sp(Int, Long, Float, Double) A : ClassTag : Ring](
+    @sp(Int, Long, Float, Double) A: ClassTag: Ring](
     implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
-    extends Module[Array[A], A] with Serializable {
+    extends Module[Array[A], A]
+    with Serializable {
   def scalar: Ring[A] = Ring[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
@@ -176,9 +177,10 @@ private final class ArrayModule[
 
 @SerialVersionUID(0L)
 private final class ArrayVectorSpace[
-    @sp(Int, Float, Long, Double) A : ClassTag : Field](
+    @sp(Int, Float, Long, Double) A: ClassTag: Field](
     implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
-    extends VectorSpace[Array[A], A] with Serializable {
+    extends VectorSpace[Array[A], A]
+    with Serializable {
   def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
@@ -189,15 +191,17 @@ private final class ArrayVectorSpace[
 }
 
 @SerialVersionUID(0L)
-private final class ArrayEq[@sp(Int, Float, Long, Double) A : Eq]
-    extends Eq[Array[A]] with Serializable {
+private final class ArrayEq[@sp(Int, Float, Long, Double) A: Eq]
+    extends Eq[Array[A]]
+    with Serializable {
   def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
 }
 
 @SerialVersionUID(0L)
 private final class ArrayInnerProductSpace[
-    @sp(Int, Float, Long, Double) A : ClassTag : Field]
-    extends InnerProductSpace[Array[A], A] with Serializable {
+    @sp(Int, Float, Long, Double) A: ClassTag: Field]
+    extends InnerProductSpace[Array[A], A]
+    with Serializable {
   def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
@@ -209,23 +213,26 @@ private final class ArrayInnerProductSpace[
 }
 
 @SerialVersionUID(0L)
-private final class ArrayOrder[@sp(Int, Float, Long, Double) A : Order]
-    extends Order[Array[A]] with Serializable {
+private final class ArrayOrder[@sp(Int, Float, Long, Double) A: Order]
+    extends Order[Array[A]]
+    with Serializable {
   override def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
   def compare(x: Array[A], y: Array[A]): Int = ArraySupport.compare(x, y)
 }
 
 @SerialVersionUID(0L)
-private final class ArrayMonoid[@sp(Int, Float, Long, Double) A : ClassTag]
-    extends Monoid[Array[A]] with Serializable {
+private final class ArrayMonoid[@sp(Int, Float, Long, Double) A: ClassTag]
+    extends Monoid[Array[A]]
+    with Serializable {
   def id: Array[A] = new Array[A](0)
   def op(x: Array[A], y: Array[A]): Array[A] = ArraySupport.concat(x, y)
 }
 
 @SerialVersionUID(0L)
-class ArrayCoordinateSpace[@sp(Int, Long, Float, Double) A : ClassTag](
+class ArrayCoordinateSpace[@sp(Int, Long, Float, Double) A: ClassTag](
     final val dimensions: Int)(implicit val scalar: Field[A])
-    extends CoordinateSpace[Array[A], A] with Serializable {
+    extends CoordinateSpace[Array[A], A]
+    with Serializable {
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -238,15 +245,16 @@ class ArrayCoordinateSpace[@sp(Int, Long, Float, Double) A : ClassTag](
 }
 
 @SerialVersionUID(0L)
-class ArrayVectorEq[@sp(Int, Long, Float, Double) A : Eq : AdditiveMonoid]
-    extends Eq[Array[A]] with Serializable {
+class ArrayVectorEq[@sp(Int, Long, Float, Double) A: Eq: AdditiveMonoid]
+    extends Eq[Array[A]]
+    with Serializable {
   def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.vectorEqv(x, y)
 }
 
 @SerialVersionUID(0L)
-class ArrayVectorOrder[
-    @sp(Int, Long, Float, Double) A : Order : AdditiveMonoid]
-    extends Order[Array[A]] with Serializable {
+class ArrayVectorOrder[@sp(Int, Long, Float, Double) A: Order: AdditiveMonoid]
+    extends Order[Array[A]]
+    with Serializable {
   override def eqv(x: Array[A], y: Array[A]): Boolean =
     ArraySupport.vectorEqv(x, y)
 

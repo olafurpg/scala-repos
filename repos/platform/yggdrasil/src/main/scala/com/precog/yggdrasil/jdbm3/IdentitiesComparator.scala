@@ -35,7 +35,8 @@ object IdentitiesComparator {
 }
 
 class IdentitiesComparator private[jdbm3](val ascending: Boolean)
-    extends Comparator[Identities] with Serializable {
+    extends Comparator[Identities]
+    with Serializable {
   def compare(a: Identities, b: Identities) = {
     val len = if (a.length < b.length) a.length else b.length
 

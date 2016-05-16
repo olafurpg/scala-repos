@@ -7,9 +7,11 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * Date: 19.10.11
   */
 class ScalaExpressionsEvaluator
-    extends ScalaExpressionsEvaluatorBase with ScalaVersion_2_11
+    extends ScalaExpressionsEvaluatorBase
+    with ScalaVersion_2_11
 class ScalaExpressionsEvaluator_212
-    extends ScalaExpressionsEvaluatorBase with ScalaVersion_2_12
+    extends ScalaExpressionsEvaluatorBase
+    with ScalaVersion_2_12
 
 abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
   addFileWithBreakpoints("PrefixUnary.scala",

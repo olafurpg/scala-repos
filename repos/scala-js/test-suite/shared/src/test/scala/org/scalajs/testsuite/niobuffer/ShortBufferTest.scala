@@ -20,7 +20,8 @@ abstract class ShortBufferTest extends BaseBufferTest {
   }
 
   class WrappedShortBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedBufferFactory {
     def baseWrap(array: Array[Short]): ShortBuffer =
       ShortBuffer.wrap(array)
 
@@ -30,7 +31,8 @@ abstract class ShortBufferTest extends BaseBufferTest {
 
   class ByteBufferShortViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory
+      with BufferFactory.ByteBufferViewFactory {
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): ShortBuffer =

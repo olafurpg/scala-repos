@@ -44,7 +44,8 @@ class BubbleChartSpec
     extends SimpleSFXDelegateSpec[
         jfxsc.BubbleChart[Number, Number], BubbleChart[Number, Number]](
         classOf[jfxsc.BubbleChart[Number, Number]],
-        classOf[BubbleChart[Number, Number]]) with RunOnApplicationThread {
+        classOf[BubbleChart[Number, Number]])
+    with RunOnApplicationThread {
 
   override def getScalaClassInstance =
     new BubbleChart[Number, Number](getJavaClassInstance)

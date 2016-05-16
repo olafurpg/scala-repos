@@ -93,8 +93,11 @@ abstract class Specs2PackageTest extends Specs2TestCase {
                     checkPackageConfigAndSettings(
                         _, generatedName = "ScalaTests in 'src'"),
                     root =>
-                      checkResultTreeHasExactNamedPath(
-                          root, "[root]", "Test1", "One should", "run") &&
+                      checkResultTreeHasExactNamedPath(root,
+                                                       "[root]",
+                                                       "Test1",
+                                                       "One should",
+                                                       "run") &&
                       checkResultTreeHasExactNamedPath(root,
                                                        "[root]",
                                                        "Test1",

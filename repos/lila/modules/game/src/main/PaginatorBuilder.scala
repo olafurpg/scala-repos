@@ -18,8 +18,7 @@ private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int) {
 
   def apply(selector: JsObject, sort: Sort, nb: Option[Int] = None)(
       page: Int): Fu[Paginator[Game]] =
-    apply(
-        nb.fold(noCacheAdapter(selector, sort)) { cached =>
+    apply(nb.fold(noCacheAdapter(selector, sort)) { cached =>
       cacheAdapter(selector, sort, fuccess(cached))
     })(page)
 

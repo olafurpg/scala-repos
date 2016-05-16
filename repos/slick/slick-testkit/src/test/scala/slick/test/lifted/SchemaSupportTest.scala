@@ -36,15 +36,13 @@ class SchemaSupportTest {
 
     val s5 = ts.schema.createStatements
     s5.foreach(println)
-    s5.foreach(
-        s =>
+    s5.foreach(s =>
           assertTrue("DDL (create) uses schema name",
                      s contains """ "myschema"."mytable""""))
 
     val s6 = ts.schema.dropStatements
     s6.foreach(println)
-    s6.foreach(
-        s =>
+    s6.foreach(s =>
           assertTrue("DDL (drop) uses schema name",
                      s contains """ "myschema"."mytable""""))
   }

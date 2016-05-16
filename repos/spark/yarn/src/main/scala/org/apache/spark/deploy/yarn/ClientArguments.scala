@@ -100,7 +100,8 @@ private[spark] class ClientArguments(args: Array[String], sparkConf: SparkConf) 
     * This is intended to be called only after the provided arguments have been parsed.
     */
   private def validateArgs(): Unit = {
-    if (numExecutors < 0 || (!isDynamicAllocationEnabled && numExecutors == 0)) {
+    if (numExecutors < 0 ||
+        (!isDynamicAllocationEnabled && numExecutors == 0)) {
       throw new IllegalArgumentException(s"""
            |Number of executors was $numExecutors, but must be at least 1
            |(or 0 if dynamic executor allocation is enabled).

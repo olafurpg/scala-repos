@@ -146,7 +146,7 @@ object RequestChannel extends Logging {
         val isFromFollower =
           requestObj.asInstanceOf[FetchRequest].isFromFollower
         metricsList ::=
-        (if (isFromFollower)
+          (if (isFromFollower)
            RequestMetrics.metricsMap(RequestMetrics.followFetchMetricName)
          else
            RequestMetrics.metricsMap(RequestMetrics.consumerFetchMetricName))
@@ -220,8 +220,8 @@ class RequestChannel(val numProcessors: Int, val queueSize: Int)
     new ArrayBlockingQueue[RequestChannel.Request](queueSize)
   private val responseQueues =
     new Array[BlockingQueue[RequestChannel.Response]](numProcessors)
-  for (i <- 0 until numProcessors) responseQueues(i) = new LinkedBlockingQueue[
-      RequestChannel.Response]()
+  for (i <- 0 until numProcessors) responseQueues(i) =
+    new LinkedBlockingQueue[RequestChannel.Response]()
 
   newGauge(
       "RequestQueueSize",

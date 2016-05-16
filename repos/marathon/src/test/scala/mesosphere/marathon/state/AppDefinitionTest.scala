@@ -53,8 +53,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = None,
         args = Some(Seq("a", "b", "c")),
         container = Some(
-              Container(docker = Some(Container.Docker("group/image")))
-          ),
+            Container(docker = Some(Container.Docker("group/image")))
+        ),
         cpus = 4.0,
         mem = 256.0,
         instances = 5,
@@ -122,14 +122,14 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("sleep 30"),
         portDefinitions = Nil,
         ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    )
-              )
-          )
+            IpAddress(
+                groups = Seq("a", "b", "c"),
+                labels = Map(
+                    "foo" -> "bar",
+                    "baz" -> "buzz"
+                )
+            )
+        )
     )
 
     val proto = app.toProto
@@ -146,19 +146,19 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         cmd = Some("sleep 30"),
         portDefinitions = Nil,
         ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo(
-                        ports = Vector(DiscoveryInfo.Port(name = "http",
-                                                          number = 80,
-                                                          protocol = "tcp"))
-                    )
-              )
-          )
+            IpAddress(
+                groups = Seq("a", "b", "c"),
+                labels = Map(
+                    "foo" -> "bar",
+                    "baz" -> "buzz"
+                ),
+                discoveryInfo = DiscoveryInfo(
+                    ports = Vector(DiscoveryInfo.Port(name = "http",
+                                                      number = 80,
+                                                      protocol = "tcp"))
+                )
+            )
+        )
     )
 
     val proto = app.toProto
@@ -218,10 +218,10 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
         portDefinitions = PortDefinitions(8080, 8081),
         executor = "//cmd",
         labels = Map(
-              "one" -> "aaa",
-              "two" -> "bbb",
-              "three" -> "ccc"
-          ),
+            "one" -> "aaa",
+            "two" -> "bbb",
+            "three" -> "ccc"
+        ),
         versionInfo = fullVersion
     )
     val result1 = AppDefinition().mergeFromProto(app1.toProto)

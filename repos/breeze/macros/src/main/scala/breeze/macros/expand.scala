@@ -179,9 +179,9 @@ object expand {
   }
 
   /** for a valdef with a [[breeze.macros.expand.sequence]] annotation, converts the sequence of associations to a Map */
-  private def solveSequence(context: Context)(
-      v: context.mirror.universe.ValDef,
-      typeMappings: Map[context.Name, List[context.Type]])
+  private def solveSequence(
+      context: Context)(v: context.mirror.universe.ValDef,
+                        typeMappings: Map[context.Name, List[context.Type]])
     : (context.Name, Map[context.Type, context.Tree]) = {
     import context.mirror.universe._
     val x = v.mods.annotations.collectFirst {

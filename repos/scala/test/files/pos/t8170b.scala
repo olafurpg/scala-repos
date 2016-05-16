@@ -6,8 +6,8 @@ object ScalaZeee {
   }
   trait GenericCons[M[_], H, +T <: GenericList[M]] extends GenericList[M] {
     val tail: T
-    override type Folded[N[X] >: M[X], U, F <: HFold[N, U]] = F#Apply[
-        H, tail.Folded[N, U, F]]
+    override type Folded[N[X] >: M[X], U, F <: HFold[N, U]] =
+      F#Apply[H, tail.Folded[N, U, F]]
   }
   val KNil: GenericList[Nothing] = ???
   sealed trait GenericList[+M[_]] {

@@ -40,11 +40,11 @@ object RemoteWatcherSpec {
   }
 
   class TestRemoteWatcher(heartbeatExpectedResponseAfter: FiniteDuration)
-      extends RemoteWatcher(
-          createFailureDetector,
-          heartbeatInterval = TurnOff,
-          unreachableReaperInterval = TurnOff,
-          heartbeatExpectedResponseAfter = heartbeatExpectedResponseAfter) {
+      extends RemoteWatcher(createFailureDetector,
+                            heartbeatInterval = TurnOff,
+                            unreachableReaperInterval = TurnOff,
+                            heartbeatExpectedResponseAfter =
+                              heartbeatExpectedResponseAfter) {
 
     def this() = this(heartbeatExpectedResponseAfter = TurnOff)
 
@@ -72,7 +72,8 @@ class RemoteWatcherSpec
          hostname = localhost
          port = 0
        }
-     }""") with ImplicitSender {
+     }""")
+    with ImplicitSender {
 
   import RemoteWatcherSpec._
   import RemoteWatcher._

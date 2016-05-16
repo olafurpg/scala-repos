@@ -13,7 +13,9 @@ import Implicits._
   * Provides BASIC Authentication for [[GitRepositoryServlet]].
   */
 class BasicAuthenticationFilter
-    extends Filter with RepositoryService with AccountService
+    extends Filter
+    with RepositoryService
+    with AccountService
     with SystemSettingsService {
 
   private val logger =

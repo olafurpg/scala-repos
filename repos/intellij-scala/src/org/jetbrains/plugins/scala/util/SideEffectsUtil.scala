@@ -41,8 +41,7 @@ object SideEffectsUtil {
     case ref: ScReferenceExpression =>
       if (hasImplicitConversion(ref)) false
       else {
-        ref.qualifier.forall(hasNoSideEffects) &&
-        (ref.resolve() match {
+        ref.qualifier.forall(hasNoSideEffects) && (ref.resolve() match {
               case Both(b: ScBindingPattern,
                         ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
                   if pd.hasModifierProperty("lazy") =>
@@ -130,8 +129,8 @@ object SideEffectsUtil {
       Seq("Option._", "Some._", "Tuple._", "Symbol._").map("scala." + _)
 
     val fromScalaUtil =
-      Seq("Either", "Failure", "Left", "Right", "Success", "Try").map(
-          name => s"scala.util.$name._")
+      Seq("Either", "Failure", "Left", "Right", "Success", "Try").map(name =>
+            s"scala.util.$name._")
 
     val fromScalaMath = Seq("scala.math.BigInt._", "scala.math.BigDecimal._")
 

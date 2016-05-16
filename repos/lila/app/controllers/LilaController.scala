@@ -17,7 +17,10 @@ import lila.security.{Permission, Granter, FingerprintedUser}
 import lila.user.{UserContext, User => UserModel}
 
 private[controllers] trait LilaController
-    extends Controller with ContentTypes with RequestGetter with ResponseWriter
+    extends Controller
+    with ContentTypes
+    with RequestGetter
+    with ResponseWriter
     with LilaSocket {
 
   import Results._
@@ -36,8 +39,8 @@ private[controllers] trait LilaController
 
   protected implicit def LilaHtmlToResult(content: Html): Result = Ok(content)
 
-  protected implicit def LilaFunitToResult(
-      funit: Funit)(implicit ctx: Context): Fu[Result] =
+  protected implicit def LilaFunitToResult(funit: Funit)(
+      implicit ctx: Context): Fu[Result] =
     negotiate(html = fuccess(Ok("ok")),
               api = _ => fuccess(Ok(Json.obj("ok" -> true)) as JSON))
 
@@ -48,19 +51,19 @@ private[controllers] trait LilaController
       EXPIRES -> "0"
   )
 
-  protected def Socket[A : FrameFormatter](
+  protected def Socket[A: FrameFormatter](
       f: Context => Fu[(Iteratee[A, _], Enumerator[A])]) =
     WebSocket.tryAccept[A] { req =>
       reqToCtx(req) flatMap f map scala.util.Right.apply
     }
 
-  protected def SocketEither[A : FrameFormatter](
+  protected def SocketEither[A: FrameFormatter](
       f: Context => Fu[Either[Result, (Iteratee[A, _], Enumerator[A])]]) =
     WebSocket.tryAccept[A] { req =>
       reqToCtx(req) flatMap f
     }
 
-  protected def SocketOption[A : FrameFormatter](
+  protected def SocketOption[A: FrameFormatter](
       f: Context => Fu[Option[(Iteratee[A, _], Enumerator[A])]]) =
     WebSocket.tryAccept[A] { req =>
       reqToCtx(req) flatMap f map {
@@ -69,7 +72,7 @@ private[controllers] trait LilaController
       }
     }
 
-  protected def SocketOptionLimited[A : FrameFormatter](
+  protected def SocketOptionLimited[A: FrameFormatter](
       consumer: TokenBucket.Consumer, name: String)(
       f: Context => Fu[Option[(Iteratee[A, _], Enumerator[A])]]) =
     rateLimitedSocket[A](consumer, name) { ctx =>
@@ -82,8 +85,8 @@ private[controllers] trait LilaController
   protected def Open(f: Context => Fu[Result]): Action[Unit] =
     Open(BodyParsers.parse.empty)(f)
 
-  protected def Open[A](p: BodyParser[A])(
-      f: Context => Fu[Result]): Action[A] =
+  protected def Open[A](
+      p: BodyParser[A])(f: Context => Fu[Result]): Action[A] =
     Action.async(p) { req =>
       reqToCtx(req) flatMap { ctx =>
         Env.i18n.requestHandler.forUser(req, ctx.me).fold(f(ctx))(fuccess)
@@ -135,8 +138,8 @@ private[controllers] trait LilaController
       f: Context => UserModel => Fu[Result]): Action[AnyContent] =
     Secure(BodyParsers.parse.anyContent)(perm)(f)
 
-  protected def Secure[A](p: BodyParser[A])(perm: Permission)(
-      f: Context => UserModel => Fu[Result]): Action[A] =
+  protected def Secure[A](p: BodyParser[A])(
+      perm: Permission)(f: Context => UserModel => Fu[Result]): Action[A] =
     Auth(p) { implicit ctx => me =>
       isGranted(perm).fold(f(ctx)(me), fuccess(authorizationFailed(ctx.req)))
     }
@@ -181,7 +184,7 @@ private[controllers] trait LilaController
         negotiate(
             html = Lobby.renderHome(Results.Forbidden),
             api = _ =>
-                fuccess {
+              fuccess {
                 Forbidden(jsonError(
                         s"Banned from playing for ${ban.remainingMinutes} minutes. Reason: Too many aborts or unplayed games"
                     )) as JSON
@@ -197,7 +200,7 @@ private[controllers] trait LilaController
         negotiate(
             html = Lobby.renderHome(Results.Forbidden),
             api = _ =>
-                fuccess {
+              fuccess {
                 Forbidden(jsonError(
                         s"You are already playing ${current.opponent}"
                     )) as JSON
@@ -210,16 +213,16 @@ private[controllers] trait LilaController
       implicit ctx: Context): Fu[Result] =
     NoPlayban(NoCurrentGame(a))
 
-  protected def JsonOk[A : Writes](fua: Fu[A]) = fua map { a =>
+  protected def JsonOk[A: Writes](fua: Fu[A]) = fua map { a =>
     Ok(Json toJson a) as JSON
   }
 
-  protected def JsonOptionOk[A : Writes](fua: Fu[Option[A]])(
+  protected def JsonOptionOk[A: Writes](fua: Fu[Option[A]])(
       implicit ctx: Context) = fua flatMap {
     _.fold(notFound(ctx))(a => fuccess(Ok(Json toJson a) as JSON))
   }
 
-  protected def JsonOptionFuOk[A, B : Writes](fua: Fu[Option[A]])(
+  protected def JsonOptionFuOk[A, B: Writes](fua: Fu[Option[A]])(
       op: A => Fu[B])(implicit ctx: Context) =
     fua flatMap {
       _.fold(notFound(ctx))(a =>
@@ -238,7 +241,7 @@ private[controllers] trait LilaController
     form.bindFromRequest.fold(
         form => fuccess(BadRequest(form.errors mkString "\n")), op)
 
-  protected def FormFuResult[A, B : Writeable : ContentTypeOf](form: Form[A])(
+  protected def FormFuResult[A, B: Writeable: ContentTypeOf](form: Form[A])(
       err: Form[A] => Fu[B])(op: A => Fu[Result])(implicit req: Request[_]) =
     form.bindFromRequest.fold(
         form => err(form) map { BadRequest(_) },
@@ -247,14 +250,14 @@ private[controllers] trait LilaController
 
   protected def FuRedirect(fua: Fu[Call]) = fua map { Redirect(_) }
 
-  protected def OptionOk[A, B : Writeable : ContentTypeOf](fua: Fu[Option[A]])(
-      op: A => B)(implicit ctx: Context): Fu[Result] =
+  protected def OptionOk[A, B: Writeable: ContentTypeOf](
+      fua: Fu[Option[A]])(op: A => B)(implicit ctx: Context): Fu[Result] =
     OptionFuOk(fua) { a =>
       fuccess(op(a))
     }
 
-  protected def OptionFuOk[A, B : Writeable : ContentTypeOf](
-      fua: Fu[Option[A]])(op: A => Fu[B])(implicit ctx: Context) =
+  protected def OptionFuOk[A, B: Writeable: ContentTypeOf](fua: Fu[Option[A]])(
+      op: A => Fu[B])(implicit ctx: Context) =
     fua flatMap { _.fold(notFound(ctx))(a => op(a) map { Ok(_) }) }
 
   protected def OptionFuRedirect[A](fua: Fu[Option[A]])(
@@ -275,8 +278,8 @@ private[controllers] trait LilaController
       })
     }
 
-  protected def OptionResult[A](
-      fua: Fu[Option[A]])(op: A => Result)(implicit ctx: Context) =
+  protected def OptionResult[A](fua: Fu[Option[A]])(op: A => Result)(
+      implicit ctx: Context) =
     OptionFuResult(fua) { a =>
       fuccess(op(a))
     }
@@ -286,7 +289,8 @@ private[controllers] trait LilaController
     fua flatMap { _.fold(notFound(ctx))(a => op(a)) }
 
   def notFound(implicit ctx: Context): Fu[Result] = negotiate(
-      html = if (HTTPRequest isSynchronousHttp ctx.req) Main notFound ctx.req
+      html =
+        if (HTTPRequest isSynchronousHttp ctx.req) Main notFound ctx.req
         else fuccess(Results.NotFound("Resource not found")),
       api = _ => notFoundJson("Resource not found")
   )
@@ -295,7 +299,7 @@ private[controllers] trait LilaController
     NotFound(jsonError(msg))
   }
 
-  def jsonError[A : Writes](err: A): JsObject = Json.obj("error" -> err)
+  def jsonError[A: Writes](err: A): JsObject = Json.obj("error" -> err)
 
   protected def notFoundReq(req: RequestHeader): Fu[Result] =
     reqToCtx(req) flatMap (x => notFound(x))

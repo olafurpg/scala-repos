@@ -24,7 +24,7 @@ import org.apache.spark.SparkException
 import org.apache.spark.rdd.{RDD, UnionRDD}
 import org.apache.spark.streaming.{Duration, Time}
 
-private[streaming] class UnionDStream[T : ClassTag](parents: Array[DStream[T]])
+private[streaming] class UnionDStream[T: ClassTag](parents: Array[DStream[T]])
     extends DStream[T](parents.head.ssc) {
 
   require(parents.length > 0, "List of DStreams to union is empty")

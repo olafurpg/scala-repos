@@ -335,33 +335,31 @@ class StandardImageExtractor(
     var cnt: Int = 0
     val goodImages: ArrayList[Element] = new ArrayList[Element]
 
-    images.foreach(
-        image =>
-          {
-        try {
-          if (cnt > 30) {
-            trace(logPrefix +
-                "Abort! they have over 30 images near the top node: " +
-                this.doc.baseUri)
-            return Some(goodImages)
-          }
-          val bytes: Int = getBytesForImage(image.attr("src"))
-
-          val MAX_BYTES_SIZE: Int = 15728640
-          if ((bytes == 0 || bytes > minBytesForImages) &&
-              bytes < MAX_BYTES_SIZE) {
-            trace(logPrefix +
-                "findImagesThatPassByteSizeTest: Found potential image - size: " +
-                bytes + " src: " + image.attr("src"))
-            goodImages.add(image)
-          } else {
-            trace(logPrefix + " Removing image: " + image.attr("src"))
-            image.remove()
-          }
-        } catch {
-          case e: Exception => warn(e, e.toString)
+    images.foreach(image => {
+      try {
+        if (cnt > 30) {
+          trace(logPrefix +
+              "Abort! they have over 30 images near the top node: " +
+              this.doc.baseUri)
+          return Some(goodImages)
         }
-        cnt += 1
+        val bytes: Int = getBytesForImage(image.attr("src"))
+
+        val MAX_BYTES_SIZE: Int = 15728640
+        if ((bytes == 0 || bytes > minBytesForImages) &&
+            bytes < MAX_BYTES_SIZE) {
+          trace(logPrefix +
+              "findImagesThatPassByteSizeTest: Found potential image - size: " +
+              bytes + " src: " + image.attr("src"))
+          goodImages.add(image)
+        } else {
+          trace(logPrefix + " Removing image: " + image.attr("src"))
+          image.remove()
+        }
+      } catch {
+        case e: Exception => warn(e, e.toString)
+      }
+      cnt += 1
     })
 
     trace(logPrefix + " Now leaving findImagesThatPassByteSizeTest")

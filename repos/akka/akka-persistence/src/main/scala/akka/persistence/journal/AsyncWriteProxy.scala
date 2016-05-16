@@ -20,7 +20,9 @@ import scala.concurrent.duration.Duration
   * A journal that delegates actual storage to a target actor. For testing only.
   */
 private[persistence] trait AsyncWriteProxy
-    extends AsyncWriteJournal with Stash with ActorLogging {
+    extends AsyncWriteJournal
+    with Stash
+    with ActorLogging {
   import AsyncWriteProxy._
   import AsyncWriteTarget._
   import context.dispatcher

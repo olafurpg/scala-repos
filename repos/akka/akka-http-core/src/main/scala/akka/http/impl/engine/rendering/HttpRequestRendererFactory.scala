@@ -84,7 +84,8 @@ private[http] class HttpRequestRendererFactory(
                   // if the user applied some custom transfer-encoding we need to keep the header
                   render(
                       if (entity.isChunked && !entity.isKnownEmpty)
-                        te.withChunked else te)
+                        te.withChunked
+                      else te)
                   renderHeaders(tail,
                                 hostHeaderSeen,
                                 userAgentSeen,
@@ -142,7 +143,8 @@ private[http] class HttpRequestRendererFactory(
     def renderContentLength(contentLength: Long) =
       if (method.isEntityAccepted &&
           (contentLength > 0 || method.requestEntityAcceptance == Expected))
-        r ~~ `Content-Length` ~~ contentLength ~~ CrLf else r
+        r ~~ `Content-Length` ~~ contentLength ~~ CrLf
+      else r
 
     def renderStreamed(body: Source[ByteString, Any]): RequestRenderingOutput = {
       val headerPart = Source.single(r.get)
@@ -153,7 +155,7 @@ private[http] class HttpRequestRendererFactory(
             .fromFuture(future)
             .drop(1)
             .asInstanceOf[Source[ByteString, Any]]
-            (headerPart ++ barrier ++ body).recoverWith {
+          (headerPart ++ barrier ++ body).recoverWith {
             case HttpResponseParser.OneHundredContinueError ⇒ Source.empty
           }
       }

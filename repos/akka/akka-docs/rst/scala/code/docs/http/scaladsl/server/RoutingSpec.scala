@@ -10,5 +10,8 @@ import docs.CompileOnlySpec
 import org.scalatest.{Matchers, WordSpec}
 
 abstract class RoutingSpec
-    extends WordSpec with Matchers with Directives with ScalatestRouteTest
+    extends WordSpec
+    with Matchers
+    with Directives
+    with ScalatestRouteTest
     with CompileOnlySpec

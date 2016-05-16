@@ -23,7 +23,7 @@ import org.ensime.sexp.util.ThreadLocalSupport
   * `OptionAltFormat`.
   */
 trait StandardFormats extends ThreadLocalSupport {
-  implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => SexpList(x.toSexp)
@@ -39,8 +39,8 @@ trait StandardFormats extends ThreadLocalSupport {
   import scala.util.Success
   import scala.util.Failure
   import SexpFormatUtils._
-  implicit def eitherFormat[L : SexpFormat, R : SexpFormat]: SexpFormat[Either[
-          L, R]] =
+  implicit def eitherFormat[L: SexpFormat, R: SexpFormat]
+    : SexpFormat[Either[L, R]] =
     new SexpFormat[Either[L, R]] {
       def write(either: Either[L, R]) = either match {
         case Left(b) => b.toSexp
@@ -119,7 +119,7 @@ trait StandardFormats extends ThreadLocalSupport {
 trait OptionAltFormat {
   this: StandardFormats =>
 
-  override implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  override implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => x.toSexp

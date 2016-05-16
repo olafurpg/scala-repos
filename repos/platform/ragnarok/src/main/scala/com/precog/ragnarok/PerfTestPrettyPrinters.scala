@@ -140,8 +140,7 @@ trait PrettyPrinters {
 
   def prettyPerfTestResult(
       result: Tree[(PerfTest, Option[Statistics])]): String =
-    prettyPerfTest(result)(
-        _ map { s =>
+    prettyPerfTest(result)(_ map { s =>
       "%.1f ms  (s = %.1f ms)" format (s.mean, s.stdDev)
     } getOrElse "")
 }
@@ -155,7 +154,8 @@ object PerfTestPrettyPrinters extends PrettyPrinters with JsonConverters {
 }
 
 final class PerfTestDeltaPrettyPrinter(result: Tree[(PerfTest, PerfDelta)])
-    extends PrettyPrinters with JsonConverters {
+    extends PrettyPrinters
+    with JsonConverters {
 
   def toJson: JValue = perfTestDeltaToJson(result)
   def toPrettyString: String = prettyPerfTestDelta(result)
@@ -163,7 +163,8 @@ final class PerfTestDeltaPrettyPrinter(result: Tree[(PerfTest, PerfDelta)])
 
 final class PerfTestStatsPrettyPrinter(
     result: Tree[(PerfTest, Option[Statistics])])
-    extends PrettyPrinters with JsonConverters {
+    extends PrettyPrinters
+    with JsonConverters {
 
   def toJson: JValue = perfTestResultToJson(result)
   def toPrettyString: String = prettyPerfTestResult(result)

@@ -45,10 +45,10 @@ object TypedPipe extends Serializable {
     * Create a TypedPipe from a cascading Pipe, some Fields and the type T
     * Avoid this if you can. Prefer from(TypedSource).
     */
-  def from[T](pipe: Pipe, fields: Fields)(
-      implicit flowDef: FlowDef,
-      mode: Mode,
-      conv: TupleConverter[T]): TypedPipe[T] = {
+  def from[T](
+      pipe: Pipe, fields: Fields)(implicit flowDef: FlowDef,
+                                  mode: Mode,
+                                  conv: TupleConverter[T]): TypedPipe[T] = {
     val localFlow = flowDef.onlyUpstreamFrom(pipe)
     new TypedPipeInst[T](pipe, fields, localFlow, mode, Converter(conv))
   }
@@ -93,8 +93,8 @@ object TypedPipe extends Serializable {
     *
     * This method is the Vitaly-was-right method.
     */
-  implicit def toHashJoinable[K, V](
-      pipe: TypedPipe[(K, V)])(implicit ord: Ordering[K]): HashJoinable[K, V] =
+  implicit def toHashJoinable[K, V](pipe: TypedPipe[(K, V)])(
+      implicit ord: Ordering[K]): HashJoinable[K, V] =
     new HashJoinable[K, V] {
       def mapped = pipe
       def keyOrdering = ord
@@ -214,8 +214,8 @@ trait TypedPipe[+T] extends Serializable {
     * Put the items in this into the keys, and unit as the value in a Group
     * in some sense, this is the dual of groupAll
     */
-  @annotation.implicitNotFound(
-      msg = "For asKeys method to work, the type in TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+        "For asKeys method to work, the type in TypedPipe must have an Ordering.")
   def asKeys[U >: T](implicit ord: Ordering[U]): Grouped[U, Unit] =
     map((_, ())).group
 
@@ -265,16 +265,16 @@ trait TypedPipe[+T] extends Serializable {
     * }
     * The latter creates 1 map/reduce phase rather than 2
     */
-  @annotation.implicitNotFound(
-      msg = "For distinct method to work, the type in TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+        "For distinct method to work, the type in TypedPipe must have an Ordering.")
   def distinct(implicit ord: Ordering[_ >: T]): TypedPipe[T] =
     asKeys(ord.asInstanceOf[Ordering[T]]).sum.keys
 
   /**
     * Returns the set of distinct elements identified by a given lambda extractor in the TypedPipe
     */
-  @annotation.implicitNotFound(
-      msg = "For distinctBy method to work, the type to distinct on in the TypedPipe must have an Ordering.")
+  @annotation.implicitNotFound(msg =
+        "For distinctBy method to work, the type to distinct on in the TypedPipe must have an Ordering.")
   def distinctBy[U](fn: T => U, numReducers: Option[Int] = None)(
       implicit ord: Ordering[_ >: U]): TypedPipe[T] = {
     // cast because Ordering is not contravariant, but should be (and this cast is safe)
@@ -738,8 +738,8 @@ trait TypedPipe[+T] extends Serializable {
     * The iterable on the right is over all elements with a matching key K, and it may be empty
     * if there are no values for this key K.
     */
-  def hashCogroup[K, V, W, R](
-      smaller: HashJoinable[K, W])(joiner: (K, V, Iterable[W]) => Iterator[R])(
+  def hashCogroup[K, V, W, R](smaller: HashJoinable[K, W])(
+      joiner: (K, V, Iterable[W]) => Iterator[R])(
       implicit ev: TypedPipe[T] <:< TypedPipe[(K, V)]): TypedPipe[(K, R)] =
     smaller.hashCogroupOn(ev(this))(joiner)
 

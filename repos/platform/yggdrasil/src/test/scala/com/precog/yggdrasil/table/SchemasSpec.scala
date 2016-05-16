@@ -33,7 +33,8 @@ import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
 trait SchemasSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification
+    extends ColumnarTableModuleTestSupport[M]
+    with Specification
     with ScalaCheck {
   import SampleData._
   import trans._

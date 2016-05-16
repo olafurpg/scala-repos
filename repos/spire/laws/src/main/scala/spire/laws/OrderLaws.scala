@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object OrderLaws {
-  def apply[A : Eq : Arbitrary] = new OrderLaws[A] {
+  def apply[A: Eq: Arbitrary] = new OrderLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }

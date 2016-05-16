@@ -165,8 +165,8 @@ class SocketServerTest extends JUnitSuite {
     processRequest(server.requestChannel)
 
     // make sure the sockets are open
-    server.acceptors.values
-      .map(acceptor => assertFalse(acceptor.serverChannel.socket.isClosed))
+    server.acceptors.values.map(acceptor =>
+          assertFalse(acceptor.serverChannel.socket.isClosed))
     // then shutdown the server
     server.shutdown()
 
@@ -225,7 +225,7 @@ class SocketServerTest extends JUnitSuite {
     try {
       overrideServer.startup()
       // make the maximum allowable number of connections and then leak them
-      val conns = ( (0 until overrideNum).map(i => connect(overrideServer)))
+      val conns = ((0 until overrideNum).map(i => connect(overrideServer)))
       // now try one more (should fail)
       val conn = connect(overrideServer)
       conn.setSoTimeout(3000)

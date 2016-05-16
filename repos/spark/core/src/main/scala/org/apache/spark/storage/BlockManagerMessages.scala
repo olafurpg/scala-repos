@@ -63,7 +63,8 @@ private[spark] object BlockManagerMessages {
                              var storageLevel: StorageLevel,
                              var memSize: Long,
                              var diskSize: Long)
-      extends ToBlockManagerMaster with Externalizable {
+      extends ToBlockManagerMaster
+      with Externalizable {
 
     def this() = this(null, null, null, 0, 0) // For deserialization only
 

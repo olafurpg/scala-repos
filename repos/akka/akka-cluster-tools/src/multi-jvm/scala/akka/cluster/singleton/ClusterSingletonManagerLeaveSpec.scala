@@ -65,7 +65,8 @@ class ClusterSingletonManagerLeaveMultiJvmNode3
 
 class ClusterSingletonManagerLeaveSpec
     extends MultiNodeSpec(ClusterSingletonManagerLeaveSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterSingletonManagerLeaveSpec._
 
   override def initialParticipants = roles.size
@@ -88,10 +89,11 @@ class ClusterSingletonManagerLeaveSpec
   }
 
   lazy val echoProxy: ActorRef = {
-    system.actorOf(ClusterSingletonProxy.props(
-                       singletonManagerPath = "/user/echo",
-                       settings = ClusterSingletonProxySettings(system)),
-                   name = "echoProxy")
+    system.actorOf(
+        ClusterSingletonProxy.props(singletonManagerPath = "/user/echo",
+                                    settings =
+                                      ClusterSingletonProxySettings(system)),
+        name = "echoProxy")
   }
 
   "Leaving ClusterSingletonManager" must {
@@ -108,8 +110,8 @@ class ClusterSingletonManagerLeaveSpec
       join(second, first)
       join(third, first)
       within(10.seconds) {
-        awaitAssert(cluster.state.members
-              .count(m ⇒ m.status == MemberStatus.Up) should be(3))
+        awaitAssert(cluster.state.members.count(m ⇒
+                  m.status == MemberStatus.Up) should be(3))
       }
       enterBarrier("all-up")
 

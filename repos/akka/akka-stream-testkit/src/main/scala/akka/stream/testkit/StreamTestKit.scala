@@ -24,7 +24,8 @@ object TestPublisher {
   import StreamTestKit._
 
   trait PublisherEvent
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class Subscribe(subscription: Subscription) extends PublisherEvent
   final case class CancelSubscription(subscription: Subscription)
       extends PublisherEvent
@@ -149,8 +150,8 @@ object TestPublisher {
   /**
     * Single subscription and demand tracking for [[TestPublisher.ManualProbe]].
     */
-  class Probe[T] private[TestPublisher](initialPendingRequests: Long)(
-      implicit system: ActorSystem)
+  class Probe[T] private[TestPublisher](
+      initialPendingRequests: Long)(implicit system: ActorSystem)
       extends ManualProbe[T] {
 
     type Self = Probe[T]
@@ -200,7 +201,8 @@ object TestPublisher {
 object TestSubscriber {
 
   trait SubscriberEvent
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class OnSubscribe(subscription: Subscription)
       extends SubscriberEvent
   final case class OnNext[I](element: I) extends SubscriberEvent

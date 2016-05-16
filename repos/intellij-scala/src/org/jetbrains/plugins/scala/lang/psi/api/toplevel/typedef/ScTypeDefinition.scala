@@ -21,9 +21,15 @@ import scala.collection.Seq
   * @author AlexanderPodkhalyuzin
   */
 trait ScTypeDefinition
-    extends ScTemplateDefinition with ScMember with NavigationItem
-    with PsiClass with ScTypeParametersOwner with Iconable
-    with ScDocCommentOwner with ScAnnotationsHolder with ScCommentOwner {
+    extends ScTemplateDefinition
+    with ScMember
+    with NavigationItem
+    with PsiClass
+    with ScTypeParametersOwner
+    with Iconable
+    with ScDocCommentOwner
+    with ScAnnotationsHolder
+    with ScCommentOwner {
   private var synthNavElement: Option[PsiElement] = None
   var syntheticContainingClass: Option[ScTypeDefinition] = None
   def setSynthetic(navElement: PsiElement) {
@@ -104,13 +110,12 @@ trait ScTypeDefinition
               val typeElementText =
                 clazz.constructor.get.effectiveParameterClauses.map { clause =>
                   clause.effectiveParameters
-                    .map(parameter =>
-                          {
-                        val parameterText = parameter.typeElement.fold(
-                            "_root_.scala.Nothing")(_.getText)
-                        if (parameter.isRepeatedParameter)
-                          s"_root_.scala.Seq[$parameterText]"
-                        else parameterText
+                    .map(parameter => {
+                      val parameterText = parameter.typeElement.fold(
+                          "_root_.scala.Nothing")(_.getText)
+                      if (parameter.isRepeatedParameter)
+                        s"_root_.scala.Seq[$parameterText]"
+                      else parameterText
                     })
                     .mkString("(", ", ", ")")
                 }.mkString("(", " => ", s" => $name)")

@@ -33,7 +33,9 @@ object SwaggerCommandSupportSpec {
   }
 
   class CommandSupportServlet()(protected implicit val swagger: Swagger)
-      extends ScalatraServlet with ParamsOnlyCommandSupport with SwaggerSupport
+      extends ScalatraServlet
+      with ParamsOnlyCommandSupport
+      with SwaggerSupport
       with SwaggerCommandSupport {
 
     val allOperation =

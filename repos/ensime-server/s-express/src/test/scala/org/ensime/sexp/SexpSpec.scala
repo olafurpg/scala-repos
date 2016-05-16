@@ -105,8 +105,7 @@ class SexpSpec extends EnsimeSpec {
   "SexpCons" should "unroll as fully basic" in {
     val a = SexpList(foosym)
     val b = SexpList(barsym)
-    SexpCons(a, b) should ===(
-        SexpCons(
+    SexpCons(a, b) should ===(SexpCons(
             SexpCons(foosym, SexpNil),
             SexpCons(barsym, SexpNil)
         ))

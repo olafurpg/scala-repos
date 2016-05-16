@@ -41,9 +41,10 @@ object InterpolatedStringFormatter extends StringFormatter {
         if (it.isLiteral && !it.isFormattingRequired) text
         else {
           val presentation =
-            if ((it.isComplexBlock ||
-                    (!it.isLiteral && it.isAlphanumericIdentifier)) &&
-                noBraces(parts, it)) "$" + text else "${" + text + "}"
+            if ((it.isComplexBlock || (!it.isLiteral &&
+                        it.isAlphanumericIdentifier)) && noBraces(parts, it))
+              "$" + text
+            else "${" + text + "}"
           if (it.isFormattingRequired) presentation + it.format
           else presentation
         }

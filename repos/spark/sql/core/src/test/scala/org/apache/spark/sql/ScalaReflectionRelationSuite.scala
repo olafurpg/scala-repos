@@ -68,7 +68,8 @@ case class ComplexReflectData(arrayField: Seq[Int],
                               dataField: Data)
 
 class ScalaReflectionRelationSuite
-    extends SparkFunSuite with SharedSQLContext {
+    extends SparkFunSuite
+    with SharedSQLContext {
   import testImplicits._
 
   test("query case class RDD") {

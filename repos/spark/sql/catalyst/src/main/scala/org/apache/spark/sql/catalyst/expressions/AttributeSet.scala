@@ -59,7 +59,8 @@ object AttributeSet {
   * when the transformation was a no-op).
   */
 class AttributeSet private (val baseSet: Set[AttributeEquals])
-    extends Traversable[Attribute] with Serializable {
+    extends Traversable[Attribute]
+    with Serializable {
 
   /** Returns true if the members of this AttributeSet and other are the same. */
   override def equals(other: Any): Boolean = other match {

@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
   * Date: 06.03.2008
   */
 class ScEnumeratorsImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScEnumerators {
+    extends ScalaPsiElementImpl(node)
+    with ScEnumerators {
 
   override def toString: String = "Enumerators"
 
@@ -28,7 +29,7 @@ class ScEnumeratorsImpl(node: ASTNode)
 
   def namings: Seq[ScPatterned] =
     for (c <- getChildren if c.isInstanceOf[ScGenerator] ||
-             c.isInstanceOf[ScEnumerator]) yield c.asInstanceOf[ScPatterned]
+         c.isInstanceOf[ScEnumerator]) yield c.asInstanceOf[ScPatterned]
 
   type Patterned = {
     def pattern: ScPattern
@@ -42,8 +43,7 @@ class ScEnumeratorsImpl(node: ASTNode)
     val children =
       if (reverseChildren.contains(lastParent))
         reverseChildren.drop(
-            reverseChildren.indexOf(lastParent) +
-            (lastParent match {
+            reverseChildren.indexOf(lastParent) + (lastParent match {
               case g: ScGenerator => 1
               case _ => 0
             }))

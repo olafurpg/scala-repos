@@ -42,7 +42,8 @@ object Chart {
 }
 
 abstract class Chart(override val delegate: jfxsc.Chart)
-    extends Region(delegate) with SFXDelegate[jfxsc.Chart] {
+    extends Region(delegate)
+    with SFXDelegate[jfxsc.Chart] {
   def animated: BooleanProperty = delegate.animatedProperty
   def animated_=(v: Boolean) {
     animated() = v

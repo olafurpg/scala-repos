@@ -12,8 +12,12 @@ import org.eclipse.jgit.api.Git
 import org.scalatra.i18n.Messages
 
 class WikiController
-    extends WikiControllerBase with WikiService with RepositoryService
-    with AccountService with ActivityService with CollaboratorsAuthenticator
+    extends WikiControllerBase
+    with WikiService
+    with RepositoryService
+    with AccountService
+    with ActivityService
+    with CollaboratorsAuthenticator
     with ReferrerAuthenticator
 
 trait WikiControllerBase extends ControllerBase {
@@ -73,8 +77,7 @@ trait WikiControllerBase extends ControllerBase {
         s"/${repository.owner}/${repository.name}/wiki/${StringUtil.urlEncode(pageName)}/_edit")
   })
 
-  get("/:owner/:repository/wiki/:page/_history")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/wiki/:page/_history")(referrersOnly { repository =>
     val pageName = StringUtil.urlDecode(params("page"))
 
     using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
@@ -108,8 +111,7 @@ trait WikiControllerBase extends ControllerBase {
     }
   })
 
-  get("/:owner/:repository/wiki/_compare/:commitId")(
-      referrersOnly { repository =>
+  get("/:owner/:repository/wiki/_compare/:commitId")(referrersOnly { repository =>
     val Array(from, to) = params("commitId").split("\\.\\.\\.")
 
     using(Git.open(getWikiRepositoryDir(repository.owner, repository.name))) {
@@ -185,13 +187,14 @@ trait WikiControllerBase extends ControllerBase {
               loginAccount,
               form.message.getOrElse(""),
               Some(form.id)
-          ).map { commitId =>
-            updateLastActivityDate(repository.owner, repository.name)
-            recordEditWikiPageActivity(repository.owner,
-                                       repository.name,
-                                       loginAccount.userName,
-                                       form.pageName,
-                                       commitId)
+          ).map {
+            commitId =>
+              updateLastActivityDate(repository.owner, repository.name)
+              recordEditWikiPageActivity(repository.owner,
+                                         repository.name,
+                                         loginAccount.userName,
+                                         form.pageName,
+                                         commitId)
           }
           if (notReservedPageName(form.pageName)) {
             redirect(

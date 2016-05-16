@@ -9,7 +9,9 @@ import org.scalatest._
 import prop._
 
 class NumberPropertiesTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   property("Number.apply(Long)") {
     forAll { (n: Long) =>
       Number(n) shouldBe n

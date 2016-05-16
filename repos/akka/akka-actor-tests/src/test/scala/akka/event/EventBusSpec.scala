@@ -24,7 +24,8 @@ object EventBusSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 abstract class EventBusSpec(
     busName: String, conf: Config = ConfigFactory.empty())
-    extends AkkaSpec(conf) with BeforeAndAfterEach {
+    extends AkkaSpec(conf)
+    with BeforeAndAfterEach {
   type BusType <: EventBus
 
   def createNewEventBus(): BusType
@@ -162,7 +163,8 @@ abstract class EventBusSpec(
 
 object ActorEventBusSpec {
   class MyActorEventBus(protected val system: ActorSystem)
-      extends ActorEventBus with ManagedActorClassification
+      extends ActorEventBus
+      with ManagedActorClassification
       with ActorClassifier {
 
     type Event = Notification

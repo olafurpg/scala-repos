@@ -47,7 +47,8 @@ object TreeView {
   }
 
   class EditEvent[T](override val delegate: jfxsc.TreeView.EditEvent[T])
-      extends Event(delegate) with SFXDelegate[jfxsc.TreeView.EditEvent[T]] {
+      extends Event(delegate)
+      with SFXDelegate[jfxsc.TreeView.EditEvent[T]] {
 
     /**
       * Creates a new EditEvent instance to represent an edit event.
@@ -130,7 +131,8 @@ object TreeView {
 
 class TreeView[T](
     override val delegate: jfxsc.TreeView[T] = new jfxsc.TreeView[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.TreeView[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TreeView[T]] {
 
   /**
     * Creates a TreeView with the provided root node.

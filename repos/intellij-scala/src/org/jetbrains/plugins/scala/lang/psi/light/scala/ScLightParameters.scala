@@ -12,7 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * @since 03/04/14.
   */
 class ScLightParameters(pTypes: List[List[ScType]], p: ScFunction)
-    extends LightElement(p.getManager, p.getLanguage) with ScParameters {
+    extends LightElement(p.getManager, p.getLanguage)
+    with ScParameters {
   override def clauses: Seq[ScParameterClause] =
     pTypes.zip(p.effectiveParameterClauses).map {
       case (types: List[ScType], clause: ScParameterClause) =>

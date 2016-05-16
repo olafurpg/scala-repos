@@ -227,8 +227,8 @@ class ScalaImportOptimizer extends ImportOptimizer {
     val newRange: TextRange =
       if (text.isEmpty) {
         var start = range.getStartOffset
-        while (start > 0 &&
-        documentText(start - 1).isWhitespace) start = start - 1
+        while (start > 0 && documentText(start - 1).isWhitespace) start =
+          start - 1
         val end = range.getEndOffset
         new TextRange(start, end)
       } else range
@@ -504,7 +504,7 @@ object ScalaImportOptimizer {
       var i = infos.size
       infos.insert(i, newInfo)
       while (i > 0 && greater(infos(i - 1), infos(i), settings) &&
-      swapWithNext(infos, i - 1)) {
+             swapWithNext(infos, i - 1)) {
         i -= 1
       }
     }
@@ -560,8 +560,8 @@ object ScalaImportOptimizer {
         otherInfos.flatMap(_.namesFromWildcard).toSet
       val simpleNamesToRemain =
         simpleInfos.flatMap(_.singleNames).toSet & namesFromOtherWildcards & usedImportedNames
-      val simpleInfosToRemain = simpleInfos.filter(
-          si => simpleNamesToRemain.contains(si.singleNames.head))
+      val simpleInfosToRemain = simpleInfos.filter(si =>
+            simpleNamesToRemain.contains(si.singleNames.head))
       val renames = withArrows.flatMap(_.renames)
       val hiddenNames = withArrows.flatMap(_.hiddenNames)
       val newHiddenNames =
@@ -821,7 +821,7 @@ object ScalaImportOptimizer {
 
   def createInfo(imp: ScImportStmt,
                  isImportUsed: ImportUsed => Boolean = _ =>
-                     true): Seq[ImportInfo] =
+                   true): Seq[ImportInfo] =
     imp.importExprs.flatMap(ImportInfo(_, isImportUsed))
 
   private def allElementsIn(

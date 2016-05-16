@@ -56,7 +56,8 @@ object HTMLEditor {
   */
 class HTMLEditor(
     override val delegate: jfxsw.HTMLEditor = new jfxsw.HTMLEditor)
-    extends Control(delegate) with SFXDelegate[jfxsw.HTMLEditor] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsw.HTMLEditor] {
 
   /**
     * Returns the HTML content of the editor.

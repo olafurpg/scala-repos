@@ -13,7 +13,7 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpChunk, HttpResponse}
 /**
   * Stream chunks into StreamResponses.
   */
-private[twitter] class StreamClientDispatcher[Req : RequestType](
+private[twitter] class StreamClientDispatcher[Req: RequestType](
     trans: Transport[Any, Any], statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Req, StreamResponse, Any, Any](
         trans, statsReceiver) {

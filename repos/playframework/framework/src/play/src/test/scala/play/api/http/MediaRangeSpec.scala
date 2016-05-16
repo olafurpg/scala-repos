@@ -77,8 +77,7 @@ object MediaRangeSpec extends Specification {
         new MediaRange("*", "*", Nil, None, Nil)
     }
     "maintain the original order of media ranges in the accept header" in {
-      MediaRange.parse("foo1/bar1, foo3/bar3, foo2/bar2") must contain(
-          exactly(
+      MediaRange.parse("foo1/bar1, foo3/bar3, foo2/bar2") must contain(exactly(
               new MediaRange("foo1", "bar1", Nil, None, Nil),
               new MediaRange("foo3", "bar3", Nil, None, Nil),
               new MediaRange("foo2", "bar2", Nil, None, Nil)
@@ -93,8 +92,7 @@ object MediaRangeSpec extends Specification {
           ).inOrder)
     }
     "order by specificity" in {
-      MediaRange.parse("*/*, foo/*, foo/bar") must contain(
-          exactly(
+      MediaRange.parse("*/*, foo/*, foo/bar") must contain(exactly(
               new MediaRange("foo", "bar", Nil, None, Nil),
               new MediaRange("foo", "*", Nil, None, Nil),
               new MediaRange("*", "*", Nil, None, Nil)
@@ -127,11 +125,12 @@ object MediaRangeSpec extends Specification {
     }
     "be able to be convert back to a string" in {
       new MediaType("foo", "bar", Nil).toString must_== "foo/bar"
-      new MediaType("foo",
-                    "bar",
-                    Seq("p1" -> Some("v1"),
-                        "p2" -> Some(""" v\"v"""),
-                        "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
+      new MediaType(
+          "foo",
+          "bar",
+          Seq("p1" -> Some("v1"),
+              "p2" -> Some(""" v\"v"""),
+              "p3" -> None)).toString must_== """foo/bar; p1=v1; p2=" v\\\"v"; p3"""
       new MediaRange("foo", "bar", Nil, None, Nil).toString must_== "foo/bar"
       new MediaRange("foo", "bar", Nil, Some(0.25f), Nil).toString must_== "foo/bar; q=0.25"
       new MediaRange(
@@ -150,11 +149,11 @@ object MediaRangeSpec extends Specification {
       for {
         c <- "\u0000\u007F (){}\\\"".toSeq
         format <- Seq(
-            "fo%so/bar, text/plain;charset=utf-8",
-            "foo/ba%sr, text/plain;charset=utf-8",
-            "text/plain;pa%sram;charset=utf-8",
-            "text/plain;param=va%slue;charset=utf-8"
-        )
+                     "fo%so/bar, text/plain;charset=utf-8",
+                     "foo/ba%sr, text/plain;charset=utf-8",
+                     "text/plain;pa%sram;charset=utf-8",
+                     "text/plain;param=va%slue;charset=utf-8"
+                 )
       } yield {
         // Use URL encoder so we can see which ctl character it's using
         def description =

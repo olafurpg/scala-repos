@@ -120,7 +120,8 @@ object Constants {
   // canvas
   //
   val CANVAS_WIDTH =
-    (NUMBER_OF_STONES + 1) * STONE_TOTAL_WIDTH + (NUMBER_OF_STONES - 1) * STONE_GAP
+    (NUMBER_OF_STONES + 1) * STONE_TOTAL_WIDTH +
+    (NUMBER_OF_STONES - 1) * STONE_GAP
   //
 }
 
@@ -210,20 +211,19 @@ class Model(var optionalFrogMap: Map[Int, Option[Frog]]) {
     } yield i
 
   private def update(next: Int => Int) =
-    (frog: Frog) =>
-      {
-        optionalFrogMap = for {
-          entry @ (i, _) <- optionalFrogMap
-          j <- positionSingleton(frog)
-        } yield {
-          if (i == j) {
-            i -> None
-          } else if (i == next(j)) {
-            i -> Some(frog)
-          } else {
-            entry
-          }
+    (frog: Frog) => {
+      optionalFrogMap = for {
+        entry @ (i, _) <- optionalFrogMap
+        j <- positionSingleton(frog)
+      } yield {
+        if (i == j) {
+          i -> None
+        } else if (i == next(j)) {
+          i -> Some(frog)
+        } else {
+          entry
         }
+      }
     }
 
   val position = (frog: Frog) => positionSingleton(frog).head
@@ -322,28 +322,27 @@ object theViewValues {
 //
 class View(position: FrogShape => Int, val frogShapes: List[FrogShape]) {
   private def update(length: Int, next: (Double, Double) => Double) =
-    (frogShape: FrogShape) =>
-      {
-        val frogShapeCenterX =
-          FIRST_FROG_CENTER_X + STONE_STEP * position(frogShape)
-        val frogShapeCenterY = FROG_CENTER_Y
+    (frogShape: FrogShape) => {
+      val frogShapeCenterX =
+        FIRST_FROG_CENTER_X + STONE_STEP * position(frogShape)
+      val frogShapeCenterY = FROG_CENTER_Y
 
-        Timeline(
-            Seq(
-                at(length * TIME s) {
-              frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
-            },
-                at(length * TIME s) {
-              frogShape.centerX -> next(frogShapeCenterX,
-                                        length * STONE_STEP / 2)
-            },
-                at(2 * length * TIME s) {
-              frogShape.centerY -> frogShapeCenterY
-            },
-                at(2 * length * TIME s) {
-              frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
-            }
-            )).play()
+      Timeline(
+          Seq(
+              at(length * TIME s) {
+            frogShape.centerY -> (frogShapeCenterY - length * STONE_STEP / 2)
+          },
+              at(length * TIME s) {
+            frogShape.centerX -> next(frogShapeCenterX,
+                                      length * STONE_STEP / 2)
+          },
+              at(2 * length * TIME s) {
+            frogShape.centerY -> frogShapeCenterY
+          },
+              at(2 * length * TIME s) {
+            frogShape.centerX -> next(frogShapeCenterX, length * STONE_STEP)
+          }
+          )).play()
     }
 
   val jumpOneRight = update(1, _ + _)
@@ -411,7 +410,8 @@ object JumpingFrogsPuzzle extends JFXApp {
   stage = new PrimaryStage {
     title = TITLE
     scene = new Scene {
-      content = theViewValues.canvasShape :: theViewValues.stoneShapes ::: theView.frogShapes
+      content =
+        theViewValues.canvasShape :: theViewValues.stoneShapes ::: theView.frogShapes
     }
   }
 }

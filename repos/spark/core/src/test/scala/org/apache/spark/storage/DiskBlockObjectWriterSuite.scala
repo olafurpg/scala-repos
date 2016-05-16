@@ -26,7 +26,8 @@ import org.apache.spark.serializer.JavaSerializer
 import org.apache.spark.util.Utils
 
 class DiskBlockObjectWriterSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   var tempDir: File = _
 

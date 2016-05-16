@@ -41,7 +41,8 @@ abstract class SbtImportNotificationProvider(
   override def createNotificationPanel(
       file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel =
     if (!isIgnored(file) && isSbtFile(file) &&
-        shouldShowPanel(file, fileEditor)) createPanel(file) else null
+        shouldShowPanel(file, fileEditor)) createPanel(file)
+    else null
 
   protected def refreshProject(): Unit = {
     FileDocumentManager.getInstance.saveAllDocuments()
@@ -109,10 +110,10 @@ abstract class SbtImportNotificationProvider(
       file: VirtualFile): Option[SbtProjectSettings] =
     for {
       externalProjectPath <- Option(file.getCanonicalPath)
-        .flatMap(getExternalProject)
+                              .flatMap(getExternalProject)
       sbtSettings <- Option(SbtSystemSettings.getInstance(project))
-      projectSettings <- Option(
-          sbtSettings.getLinkedProjectSettings(externalProjectPath))
+      projectSettings <- Option(sbtSettings.getLinkedProjectSettings(
+                                externalProjectPath))
     } yield {
       projectSettings
     }

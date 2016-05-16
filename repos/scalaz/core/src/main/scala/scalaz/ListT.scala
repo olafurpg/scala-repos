@@ -72,16 +72,16 @@ final case class ListT[M[_], A](run: M[List[A]]) {
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]): ListT[M, A] = new ListT(M.map(run)(_.tail))
 
-  def foldLeft[B](z: => B)(f: (=> B, => A) => B)(
-      implicit M: Functor[M]): M[B] =
+  def foldLeft[B](z: => B)(
+      f: (=> B, => A) => B)(implicit M: Functor[M]): M[B] =
     M.map(run)(_.foldLeft(z) { (left, right) =>
       f(left, right)
     })
 
   def toList: M[List[A]] = run
 
-  def foldRight[B](z: => B)(f: (=> A, => B) => B)(
-      implicit M: Functor[M]): M[B] =
+  def foldRight[B](z: => B)(
+      f: (=> A, => B) => B)(implicit M: Functor[M]): M[B] =
     M.map(run)(_.foldRight(z) { (right, left) =>
       f(right, left)
     })
@@ -161,14 +161,16 @@ private trait ListTSemigroup[F[_], A] extends Semigroup[ListT[F, A]] {
 }
 
 private trait ListTMonoid[F[_], A]
-    extends Monoid[ListT[F, A]] with ListTSemigroup[F, A] {
+    extends Monoid[ListT[F, A]]
+    with ListTSemigroup[F, A] {
   implicit def F: Monad[F]
 
   def zero: ListT[F, A] = ListT.empty[F, A]
 }
 
 private trait ListTMonadPlus[F[_]]
-    extends MonadPlus[ListT[F, ?]] with ListTFunctor[F] {
+    extends MonadPlus[ListT[F, ?]]
+    with ListTFunctor[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: ListT[F, A])(f: A => ListT[F, B]): ListT[F, B] =
@@ -190,8 +192,8 @@ private trait ListTHoist extends Hoist[ListT] {
   def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] =
     fromList(G.map(a)(entry => entry :: Nil))
 
-  def hoist[M[_], N[_]](
-      f: M ~> N)(implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
+  def hoist[M[_], N[_]](f: M ~> N)(
+      implicit M: Monad[M]): ListT[M, ?] ~> ListT[N, ?] =
     new (ListT[M, ?] ~> ListT[N, ?]) {
       def apply[A](a: ListT[M, A]): ListT[N, A] = fromList(f(a.run))
     }

@@ -69,8 +69,8 @@ object InstructionStackEffect {
       t(cons, prod)
     } else {
       val cons =
-        Type.getArgumentTypes(methodDesc).length +
-        (if (consumesReceiver) 1 else 0)
+        Type.getArgumentTypes(methodDesc).length + (if (consumesReceiver) 1
+                                                    else 0)
       val prod = if (Type.getReturnType(methodDesc) == Type.VOID_TYPE) 0 else 1
       t(cons, prod)
     }

@@ -185,8 +185,8 @@ trait MatchTranslation { self: PatternMatching =>
       // accessors) TODO: get to the bottom of this -- I assume it happens when type checking
       // infers a weird type for an unapply call. By going back to the parameterType for the
       // extractor call we get a saner type, so let's just do that for now.
-      def ensureConformsTo(paramType: Type): Boolean = ((tpe =:= paramType) ||
-          (tpe <:< paramType) && setInfo(paramType))
+      def ensureConformsTo(paramType: Type): Boolean =
+        ((tpe =:= paramType) || (tpe <:< paramType) && setInfo(paramType))
 
       private def concreteType = tpe.bounds.hi
       private def unbound = unbind(tree)
@@ -294,8 +294,8 @@ trait MatchTranslation { self: PatternMatching =>
             }
 
           for (cases <- emitTypeSwitch(bindersAndCases, pt).toList
-                           if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
-          cse <- cases) yield
+               if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
+               cse <- cases) yield
             fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
         }
 
@@ -495,10 +495,11 @@ trait MatchTranslation { self: PatternMatching =>
       // the trees that select the subpatterns on the extractor's result,
       // referenced by `binder`
       protected def subPatRefsSeq(binder: Symbol): List[Tree] = {
-        def lastTrees: List[Tree] = (if (!aligner.isStar) Nil
-                                     else if (expectedLength == 0)
-                                       seqTree(binder) :: Nil
-                                     else genDrop(binder, expectedLength))
+        def lastTrees: List[Tree] =
+          (if (!aligner.isStar) Nil
+           else if (expectedLength == 0)
+             seqTree(binder) :: Nil
+           else genDrop(binder, expectedLength))
         // this error-condition has already been checked by checkStarPatOK:
         //   if(isSeq) assert(firstIndexingBinder + nbIndexingIndices + (if(lastIsStar) 1 else 0) == totalArity, "(resultInMonad, ts, subPatTypes, subPats)= "+(resultInMonad, ts, subPatTypes, subPats))
 
@@ -589,8 +590,7 @@ trait MatchTranslation { self: PatternMatching =>
              subPatBinders.zipWithIndex.flatMap {
                case (binder, idx) =>
                  val param = paramAccessorAt(idx)
-                 if (param.isMutable ||
-                     (definitions.isRepeated(param) &&
+                 if (param.isMutable || (definitions.isRepeated(param) &&
                          !aligner.isStar)) binder :: Nil
                  else Nil
              }

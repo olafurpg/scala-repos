@@ -43,7 +43,8 @@ final class RandomForestClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends ProbabilisticClassifier[
         Vector, RandomForestClassifier, RandomForestClassificationModel]
-    with RandomForestParams with TreeClassifierParams {
+    with RandomForestParams
+    with TreeClassifierParams {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("rfc"))
@@ -162,7 +163,8 @@ final class RandomForestClassificationModel private[ml](
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
     extends ProbabilisticClassificationModel[
-        Vector, RandomForestClassificationModel] with TreeEnsembleModel
+        Vector, RandomForestClassificationModel]
+    with TreeEnsembleModel
     with Serializable {
 
   require(numTrees > 0,

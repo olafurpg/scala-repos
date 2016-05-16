@@ -825,7 +825,8 @@ object Trees {
   }
 
   case class StringLiteral(value: String)(implicit val pos: Position)
-      extends Literal with PropertyName {
+      extends Literal
+      with PropertyName {
     val tpe = StringType
     override def name: String = value
   }

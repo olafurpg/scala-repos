@@ -57,7 +57,9 @@ object Service {
   * Class.
   */
 abstract class Service[T](override val delegate: jfxc.Service[T])
-    extends Worker[T] with jfxe.EventTarget with EventHandlerDelegate
+    extends Worker[T]
+    with jfxe.EventTarget
+    with EventHandlerDelegate
     with SFXDelegate[jfxc.Service[T]] {
 
   def eventHandlerDelegate = delegate.asInstanceOf[EventHandled]

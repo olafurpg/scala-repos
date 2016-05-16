@@ -64,7 +64,9 @@ import scala.tools.refactoring.analysis.GlobalIndexes
 import org.ensime.util.file._
 
 trait RichCompilerControl
-    extends CompilerControl with RefactoringControl with CompletionControl
+    extends CompilerControl
+    with RefactoringControl
+    with CompletionControl
     with DocFinding {
   self: RichPresentationCompiler =>
 
@@ -129,19 +131,19 @@ trait RichCompilerControl
     val x = new Response[List[Member]]()
     askScopeCompletion(p, x)
     (for (members <- x.get.left.toOption;
-    infos <- askOption {
-      val roots = filterMembersByPrefix(
-          members,
-          firstName,
-          matchEntire = true,
-          caseSens = true
-      ).map { _.sym }
-      val restOfPath = nameSegs.drop(1).mkString(".")
-      val syms = roots.flatMap { symbolByName(restOfPath, _) }
-      syms.find(_.tpe != NoType).map { sym =>
-        TypeInfo(sym.tpe)
-      }
-    }) yield infos).flatten
+          infos <- askOption {
+                    val roots = filterMembersByPrefix(
+                        members,
+                        firstName,
+                        matchEntire = true,
+                        caseSens = true
+                    ).map { _.sym }
+                    val restOfPath = nameSegs.drop(1).mkString(".")
+                    val syms = roots.flatMap { symbolByName(restOfPath, _) }
+                    syms.find(_.tpe != NoType).map { sym =>
+                      TypeInfo(sym.tpe)
+                    }
+                  }) yield infos).flatten
   }
 
   def askPackageByPath(path: String): Option[PackageInfo] =
@@ -272,9 +274,14 @@ class RichPresentationCompiler(
 )(
     implicit val vfs: EnsimeVFS
 )
-    extends Global(settings, richReporter) with ModelBuilders
-    with RichCompilerControl with RefactoringImpl with Completion with Helpers
-    with PresentationCompilerBackCompat with PositionBackCompat
+    extends Global(settings, richReporter)
+    with ModelBuilders
+    with RichCompilerControl
+    with RefactoringImpl
+    with Completion
+    with Helpers
+    with PresentationCompilerBackCompat
+    with PositionBackCompat
     with StructureViewBuilder {
 
   val logger = LoggerFactory.getLogger(this.getClass)
@@ -390,15 +397,14 @@ class RichPresentationCompiler(
 
   protected def inspectTypeAt(p: Position): Option[TypeInspectInfo] = {
     typeAt(p)
-      .map(tpe =>
-            {
-          val members = getMembersForTypeAt(tpe, p)
-          val parents = tpe.parents
-          val preparedMembers = prepareSortedInterfaceInfo(members, parents)
-          new TypeInspectInfo(
-              TypeInfo(tpe, PosNeededAvail),
-              preparedMembers
-          )
+      .map(tpe => {
+        val members = getMembersForTypeAt(tpe, p)
+        val parents = tpe.parents
+        val preparedMembers = prepareSortedInterfaceInfo(members, parents)
+        new TypeInspectInfo(
+            TypeInfo(tpe, PosNeededAvail),
+            preparedMembers
+        )
       })
       .orElse {
         logger.error("ERROR: Failed to get any type information :(  ")
@@ -450,8 +456,7 @@ class RichPresentationCompiler(
         val module = rawName.endsWith("$")
         val nm = if (module) rawName.dropRight(1) else rawName
         val candidates = owner.info.members.filter { s =>
-          s.nameString == nm &&
-          ((module && s.isModule) ||
+          s.nameString == nm && ((module && s.isModule) ||
               (!module && (!s.isModule || s.hasPackageFlag)))
         }
         val exact = signatureString.flatMap { s =>
@@ -470,9 +475,8 @@ class RichPresentationCompiler(
     val prefixUpper = prefix.toUpperCase
     val sym = m.sym
     val ns = sym.nameString
-    (((matchEntire && ns == prefix) ||
-            (!matchEntire && caseSens && ns.startsWith(prefix)) ||
-            (!matchEntire && !caseSens &&
+    (((matchEntire && ns == prefix) || (!matchEntire && caseSens &&
+                ns.startsWith(prefix)) || (!matchEntire && !caseSens &&
                 ns.toUpperCase.startsWith(prefixUpper))) &&
         !sym.nameString.contains("$"))
   }

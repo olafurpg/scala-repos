@@ -39,18 +39,16 @@ object OffsetRequest {
     val clientId = readShortString(buffer)
     val replicaId = buffer.getInt
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            val time = buffer.getLong
-            val maxNumOffsets = buffer.getInt
-            (TopicAndPartition(topic, partitionId),
-             PartitionOffsetRequestInfo(time, maxNumOffsets))
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        val time = buffer.getLong
+        val maxNumOffsets = buffer.getInt
+        (TopicAndPartition(topic, partitionId),
+         PartitionOffsetRequestInfo(time, maxNumOffsets))
+      })
     })
     OffsetRequest(Map(pairs: _*),
                   versionId = versionId,
@@ -106,15 +104,14 @@ case class OffsetRequest(
     4 + /* correlationId */
     shortStringLength(clientId) + 4 + /* replicaId */
     4 + /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
-        val (topic, partitionInfos) = currTopic
-        foldedTopics + shortStringLength(topic) + 4 + /* partition count */
-        partitionInfos.size *
-        (4 + /* partition */
-            8 + /* time */
-            4 /* maxNumOffsets */
-            )
+    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) => {
+      val (topic, partitionInfos) = currTopic
+      foldedTopics + shortStringLength(topic) + 4 + /* partition count */
+      partitionInfos.size *
+      (4 + /* partition */
+          8 + /* time */
+          4 /* maxNumOffsets */
+          )
     })
 
   def isFromOrdinaryClient = replicaId == Request.OrdinaryConsumerId

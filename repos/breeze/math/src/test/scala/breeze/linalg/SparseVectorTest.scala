@@ -381,8 +381,9 @@ class SparseVectorOps_DoubleTest
   val space = SparseVector.space[Double]
 
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (SparseVector[Double], SparseVector[Double], SparseVector[Double])] = {
+  implicit def genTriple: Arbitrary[(SparseVector[Double],
+                                     SparseVector[Double],
+                                     SparseVector[Double])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Double].map { _ % 1E100 }
@@ -414,8 +415,9 @@ class SparseVectorOps_FloatTest
 
   override val TOL: Double = 1E-2
   val N = 30
-  implicit def genTriple: Arbitrary[
-      (SparseVector[Float], SparseVector[Float], SparseVector[Float])] = {
+  implicit def genTriple: Arbitrary[(SparseVector[Float],
+                                     SparseVector[Float],
+                                     SparseVector[Float])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Float].map { _ % 100 }
@@ -449,8 +451,9 @@ class SparseVectorOps_IntTest
   val space = SparseVector.space[Int]
 
   val N = 100
-  implicit def genTriple: Arbitrary[
-      (SparseVector[Int], SparseVector[Int], SparseVector[Int])] = {
+  implicit def genTriple: Arbitrary[(SparseVector[Int],
+                                     SparseVector[Int],
+                                     SparseVector[Int])] = {
     Arbitrary {
       for {
         x <- Arbitrary.arbitrary[Int].map { _ % 100 }

@@ -28,7 +28,8 @@ object TestOptions {
 
     new DefaultCompositeOption(
         if (extractInTargetFolder)
-          kdc.unpackDirectory(new File("target/paxexam/unpack/")) else kdc,
+          kdc.unpackDirectory(new File("target/paxexam/unpack/"))
+        else kdc,
         editConfigurationFilePut(
             "etc/config.properties", "karaf.framework", "equinox"))
   }
@@ -42,14 +43,14 @@ object TestOptions {
         junitBundles)
   }
 
-  def debugOptions(
-      level: LogLevelOption.LogLevel = LogLevelOption.LogLevel.INFO,
-      debugPort: Option[Int] = None): PaxOption = {
+  def debugOptions(level: LogLevelOption.LogLevel =
+                     LogLevelOption.LogLevel.INFO,
+                   debugPort: Option[Int] = None): PaxOption = {
     val options: List[PaxOption] =
       List(logLevel(level),
            configureConsole().startLocalConsole(),
-           configureConsole().startRemoteShell()) ++ debugPort.toList.map(
-          p => debugConfiguration(String.valueOf(p), true))
+           configureConsole().startRemoteShell()) ++ debugPort.toList.map(p =>
+            debugConfiguration(String.valueOf(p), true))
     new DefaultCompositeOption(options: _*)
   }
 

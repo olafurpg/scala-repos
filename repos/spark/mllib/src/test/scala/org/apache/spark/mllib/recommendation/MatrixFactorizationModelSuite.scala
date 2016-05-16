@@ -24,7 +24,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util.Utils
 
 class MatrixFactorizationModelSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   val rank = 2
   var userFeatures: RDD[(Int, Array[Double])] = _
@@ -32,8 +33,8 @@ class MatrixFactorizationModelSuite
 
   override def beforeAll(): Unit = {
     super.beforeAll()
-    userFeatures = sc.parallelize(
-        Seq((0, Array(1.0, 2.0)), (1, Array(3.0, 4.0))))
+    userFeatures =
+      sc.parallelize(Seq((0, Array(1.0, 2.0)), (1, Array(3.0, 4.0))))
     prodFeatures = sc.parallelize(Seq((2, Array(5.0, 6.0))))
   }
 

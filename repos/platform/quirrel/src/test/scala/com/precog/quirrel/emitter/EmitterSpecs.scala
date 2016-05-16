@@ -36,8 +36,13 @@ import scalaz.Scalaz._
 // import scalaz.syntax.arrow._
 
 object EmitterSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with Emitter with RawErrors with StaticLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with Emitter
+    with RawErrors
+    with StaticLibrarySpec {
 
   import instructions._
   import library._

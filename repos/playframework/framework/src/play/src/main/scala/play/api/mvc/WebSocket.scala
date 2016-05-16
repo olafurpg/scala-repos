@@ -191,8 +191,8 @@ object WebSocket {
       * If the input messages fail to be parsed, the WebSocket will be closed with an 1003 close code and the parse error
       * serialised to JSON.
       */
-    def jsonMessageFlowTransformer[
-        In : Reads, Out : Writes]: MessageFlowTransformer[In, Out] = {
+    def jsonMessageFlowTransformer[In: Reads, Out: Writes]
+      : MessageFlowTransformer[In, Out] = {
       jsonMessageFlowTransformer.map(
           json =>
             Json
@@ -220,7 +220,7 @@ object WebSocket {
     @deprecated(
         "Use MessageFlowTransformer.jsonMessageFlowTransformer instead",
         "2.5.0")
-    def jsonFrame[A : Format]: MessageFlowTransformer[A, A] =
+    def jsonFrame[A: Format]: MessageFlowTransformer[A, A] =
       MessageFlowTransformer.jsonMessageFlowTransformer[A, A]
   }
 
@@ -262,11 +262,9 @@ object WebSocket {
         // is sent.
         val enumeratorCompletion = Promise[Enumerator[A]]()
         val nonCompletingEnumerator =
-          onEOF(enumerator,
-                () =>
-                  {
-                    enumeratorCompletion.success(Enumerator.empty)
-                }) >>> Enumerator.flatten(enumeratorCompletion.future)
+          onEOF(enumerator, () => {
+            enumeratorCompletion.success(Enumerator.empty)
+          }) >>> Enumerator.flatten(enumeratorCompletion.future)
         val publisher = Streams.enumeratorToPublisher(nonCompletingEnumerator)
         val (subscriber, _) = Streams.iterateeToSubscriber(iteratee)
         Flow.fromSinkAndSource(Sink.fromSubscriber(subscriber),
@@ -358,8 +356,7 @@ object WebSocket {
 
     implicit val system = app.actorSystem
 
-    acceptOrResult(
-        f.andThen(_.map(_.right.map { props =>
+    acceptOrResult(f.andThen(_.map(_.right.map { props =>
       ActorFlow.actorRef(props)
     })))
   }

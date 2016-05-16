@@ -43,7 +43,8 @@ object InputEvent {
 }
 
 class InputEvent(override val delegate: jfxsi.InputEvent)
-    extends Event(delegate) with SFXDelegate[jfxsi.InputEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsi.InputEvent] {
 
   def this(eventType: jfxe.EventType[jfxsi.InputEvent]) =
     this(new jfxsi.InputEvent(eventType))

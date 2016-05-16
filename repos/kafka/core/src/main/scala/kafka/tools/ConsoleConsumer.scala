@@ -354,8 +354,9 @@ object ConsoleConsumer extends Logging {
         CommandLineUtils.printUsageAndDie(
             parser, "Exactly one of whitelist/blacklist/topic is required.")
       topicArg = options.valueOf(topicOrFilterOpt.head)
-      filterSpec = if (options.has(blacklistOpt)) new Blacklist(topicArg)
-      else new Whitelist(topicArg)
+      filterSpec =
+        if (options.has(blacklistOpt)) new Blacklist(topicArg)
+        else new Whitelist(topicArg)
     }
     val consumerProps =
       if (options.has(consumerConfigOpt))
@@ -438,11 +439,8 @@ class DefaultMessageFormatter extends MessageFormatter {
 
   override def init(props: Properties) {
     if (props.containsKey("print.timestamp"))
-      printTimestamp = props
-        .getProperty("print.timestamp")
-        .trim
-        .toLowerCase
-        .equals("true")
+      printTimestamp =
+        props.getProperty("print.timestamp").trim.toLowerCase.equals("true")
     if (props.containsKey("print.key"))
       printKey = props.getProperty("print.key").trim.toLowerCase.equals("true")
     if (props.containsKey("key.separator"))
@@ -505,7 +503,8 @@ class LoggingMessageFormatter extends MessageFormatter {
     if (logger.isInfoEnabled)
       logger.info({
         if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
-          s"$timestampType:$timestamp, " else ""
+          s"$timestampType:$timestamp, "
+        else ""
       } + s"key:${if (key == null) "null" else new String(key)}, " +
       s"value:${if (value == null) "null" else new String(value)}")
   }

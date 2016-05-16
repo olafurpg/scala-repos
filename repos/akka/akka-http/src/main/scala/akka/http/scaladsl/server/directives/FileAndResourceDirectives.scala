@@ -68,8 +68,7 @@ trait FileAndResourceDirectives {
     }
 
   private def conditionalFor(length: Long, lastModified: Long): Directive0 =
-    extractSettings.flatMap(
-        settings ⇒
+    extractSettings.flatMap(settings ⇒
           if (settings.fileGetConditional) {
         val tag = java.lang.Long
           .toHexString(lastModified ^ java.lang.Long.reverse(length))

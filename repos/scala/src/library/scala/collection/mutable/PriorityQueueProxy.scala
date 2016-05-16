@@ -22,7 +22,8 @@ package mutable
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
 abstract class PriorityQueueProxy[A](implicit ord: Ordering[A])
-    extends PriorityQueue[A] with Proxy {
+    extends PriorityQueue[A]
+    with Proxy {
   def self: PriorityQueue[A]
 
   /** Creates a new iterator over all elements contained in this

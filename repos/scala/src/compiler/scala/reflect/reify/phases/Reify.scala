@@ -5,8 +5,13 @@ import scala.runtime.ScalaRunTime.isAnyVal
 import scala.reflect.reify.codegen._
 
 trait Reify
-    extends GenSymbols with GenTypes with GenNames with GenTrees
-    with GenAnnotationInfos with GenPositions with GenUtils {
+    extends GenSymbols
+    with GenTypes
+    with GenNames
+    with GenTrees
+    with GenAnnotationInfos
+    with GenPositions
+    with GenUtils {
 
   self: Reifier =>
 

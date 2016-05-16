@@ -50,8 +50,8 @@ private[netty4] object PipelineInit {
   */
 private[finagle] case class Netty4Listener[In, Out](
     params: Stack.Params,
-    transportFactory: SocketChannel => Transport[In, Out] = new ChannelTransport[
-          In, Out](_)
+    transportFactory: SocketChannel => Transport[In, Out] =
+      new ChannelTransport[In, Out](_)
 )
     extends Listener[In, Out] {
 

@@ -56,8 +56,7 @@ trait DistributedBackend extends RelationalBackend with Logging {
         def reportFailure(t: Throwable): Unit =
           executionContext.reportFailure(t)
         def execute(runnable: Runnable): Unit =
-          executionContext.execute(
-              new Runnable {
+          executionContext.execute(new Runnable {
             def run(): Unit = blocking(runnable.run)
           })
       }

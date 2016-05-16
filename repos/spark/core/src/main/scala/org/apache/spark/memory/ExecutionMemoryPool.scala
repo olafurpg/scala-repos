@@ -43,7 +43,8 @@ private[memory] class ExecutionMemoryPool(
     lock: Object,
     poolName: String
 )
-    extends MemoryPool(lock) with Logging {
+    extends MemoryPool(lock)
+    with Logging {
 
   /**
     * Map from taskAttemptId -> memory consumption in bytes
@@ -89,7 +90,7 @@ private[memory] class ExecutionMemoryPool(
       taskAttemptId: Long,
       maybeGrowPool: Long => Unit = (additionalSpaceNeeded: Long) => Unit,
       computeMaxPoolSize: () => Long = () =>
-          poolSize): Long = lock.synchronized {
+        poolSize): Long = lock.synchronized {
     assert(numBytes > 0, s"invalid number of bytes requested: $numBytes")
 
     // TODO: clean up this clunky method signature

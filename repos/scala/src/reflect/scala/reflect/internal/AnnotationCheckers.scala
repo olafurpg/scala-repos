@@ -101,10 +101,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     if (annotationCheckers.isEmpty ||
         (tp1.annotations.isEmpty && tp2.annotations.isEmpty)) true
     else
-      annotationCheckers.forall(
-          checker =>
-            {
-          !checker.isActive() || checker.annotationsConform(tp1, tp2)
+      annotationCheckers.forall(checker => {
+        !checker.isActive() || checker.annotationsConform(tp1, tp2)
       })
 
   /** @see AnnotationChecker.annotationsLub */
@@ -144,9 +142,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     if (annotationCheckers.isEmpty) false
     else
       annotationCheckers.exists(
-          checker =>
-            {
-          checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
+          checker => {
+        checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
       })
 
   def adaptAnnotations(tree: Tree, mode: Mode, pt: Type): Tree =

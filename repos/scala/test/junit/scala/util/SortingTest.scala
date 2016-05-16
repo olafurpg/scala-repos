@@ -95,14 +95,15 @@ class SortingTest {
       size <- sizes
       v <- variety
       i <- 0 until math.min(
-          100,
-          math
-            .max(math.min(
-                     math.floor(math.pow(v, size) / 2),
-                     math.ceil(workLimit /
-                         (math.log(math.max(2, size)) / math.log(2) * size))),
-                 1)
-            .toInt)
+              100,
+              math
+                .max(
+                    math.min(
+                        math.floor(math.pow(v, size) / 2),
+                        math.ceil(workLimit /
+                            (math.log(math.max(2, size)) / math.log(2) * size))),
+                    1)
+                .toInt)
     } runOneTest(size, v)
 
     for (size <- sizes) {

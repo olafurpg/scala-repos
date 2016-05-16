@@ -55,28 +55,32 @@ sealed abstract class CharPredicate extends (Char ⇒ Boolean) {
   def matchesAny(string: String): Boolean = {
     @tailrec def rec(ix: Int): Boolean =
       if (ix == string.length) false
-      else if (this(string charAt ix)) true else rec(ix + 1)
+      else if (this(string charAt ix)) true
+      else rec(ix + 1)
     rec(0)
   }
 
   def matchesAll(string: String): Boolean = {
     @tailrec def rec(ix: Int): Boolean =
       if (ix == string.length) true
-      else if (!this(string charAt ix)) false else rec(ix + 1)
+      else if (!this(string charAt ix)) false
+      else rec(ix + 1)
     rec(0)
   }
 
   def indexOfFirstMatch(string: String): Int = {
     @tailrec def rec(ix: Int): Int =
       if (ix == string.length) -1
-      else if (this(string charAt ix)) ix else rec(ix + 1)
+      else if (this(string charAt ix)) ix
+      else rec(ix + 1)
     rec(0)
   }
 
   def indexOfFirstMismatch(string: String): Int = {
     @tailrec def rec(ix: Int): Int =
       if (ix == string.length) -1
-      else if (this(string charAt ix)) rec(ix + 1) else ix
+      else if (this(string charAt ix)) rec(ix + 1)
+      else ix
     rec(0)
   }
 
@@ -156,7 +160,8 @@ object CharPredicate {
       extends CharPredicate {
     def apply(c: Char): Boolean = {
       val mask = if (c < 64) lowMask else highMask
-      ((1L << c) & ((c - 128) >> 31) & mask) != 0L // branchless for `(c < 128) && (mask & (1L << c) != 0)`
+      ((1L << c) & ((c -
+                  128) >> 31) & mask) != 0L // branchless for `(c < 128) && (mask & (1L << c) != 0)`
     }
 
     def ++(that: CharPredicate): CharPredicate = that match {

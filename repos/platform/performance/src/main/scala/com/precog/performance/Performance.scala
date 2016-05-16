@@ -34,15 +34,15 @@ class Performance(
 
   def benchmark[T](test: => T,
                    warmupParams: BenchmarkParameters = warmupDefaults,
-                   benchmarkParams: BenchmarkParameters = benchmarkDefaults)
-    : BenchmarkResults[T] = {
+                   benchmarkParams: BenchmarkParameters =
+                     benchmarkDefaults): BenchmarkResults[T] = {
     benchmarkOnly(test, warmupParams)
     benchmarkOnly(test, benchmarkParams)
   }
 
-  def benchmarkOnly[T](
-      test: => T, parameters: BenchmarkParameters = benchmarkDefaults)
-    : BenchmarkResults[T] = {
+  def benchmarkOnly[T](test: => T,
+                       parameters: BenchmarkParameters =
+                         benchmarkDefaults): BenchmarkResults[T] = {
 
     @tailrec
     def benchmark[A](

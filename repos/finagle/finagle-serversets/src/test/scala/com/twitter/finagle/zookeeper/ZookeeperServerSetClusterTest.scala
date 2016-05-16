@@ -29,7 +29,7 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
       endpointName: Option[String]
   )(
       f: (ZookeeperServerSetCluster, (InetSocketAddress,
-      EndpointMap) => Unit) => Unit
+                                      EndpointMap) => Unit) => Unit
   ) {
     val serverSet = mock[ServerSet]
     val monitorCaptor =

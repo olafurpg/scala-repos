@@ -41,8 +41,7 @@ object AssertUtil {
     *  Any other exception is propagated.
     */
   def assertThrows[T <: Throwable](
-      body: => Any,
-      checkMessage: String => Boolean = s => true)(
+      body: => Any, checkMessage: String => Boolean = s => true)(
       implicit manifest: Manifest[T]): Unit = {
     try {
       body
@@ -83,8 +82,8 @@ object AssertUtil {
           seen.put(o, ())
           for {
             f <- o.getClass.allFields if !Modifier.isStatic(f.getModifiers)
-                if !f.getType.isPrimitive
-                if !classOf[Reference[_]].isAssignableFrom(f.getType)
+            if !f.getType.isPrimitive
+            if !classOf[Reference[_]].isAssignableFrom(f.getType)
           } loop(f follow o)
         }
       loop(root)

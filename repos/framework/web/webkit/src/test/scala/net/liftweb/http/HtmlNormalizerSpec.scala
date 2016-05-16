@@ -231,7 +231,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "link").map(_ \@ "href") must_==
+      (result \\ "link").map(_ \@ "href") must_==
         "/context-path/testlink" :: "/context-path/testlink2" :: "/context-path/testlink3" :: Nil
     }
 
@@ -261,7 +261,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "script").map(_ \@ "src") must_==
+      (result \\ "script").map(_ \@ "src") must_==
         "/context-path/testscript" :: "/context-path/testscript2" :: Nil
     }
 
@@ -291,7 +291,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "a").map(_ \@ "href") must_==
+      (result \\ "a").map(_ \@ "href") must_==
         "/context-path/testa1" :: "/context-path/testa2" :: "testa3" :: "testa4" :: "/context-path/testa5" :: "/context-path/testa6" :: Nil
     }
 
@@ -321,7 +321,7 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
         )
         .nodes
 
-        (result \\ "form").map(_ \@ "action") must_==
+      (result \\ "form").map(_ \@ "action") must_==
         "/context-path/testform1" :: "/context-path/testform2" :: "testform3" :: "testform4" :: "/context-path/testform5" :: "/context-path/testform6" :: Nil
     }
 

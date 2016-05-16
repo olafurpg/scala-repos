@@ -59,7 +59,8 @@ class InteractiveReader(completer: () => Completion)
 
 // implements a jline interface
 private class JLineConsoleReader
-    extends jconsole.ConsoleReader with interpreter.VariColumnTabulator {
+    extends jconsole.ConsoleReader
+    with interpreter.VariColumnTabulator {
   val isAcross = interpreter.`package`.isAcross
   val marginSize = 3
 

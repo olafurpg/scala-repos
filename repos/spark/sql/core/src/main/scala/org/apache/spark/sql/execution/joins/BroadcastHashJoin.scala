@@ -42,7 +42,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
                              condition: Option[Expression],
                              left: SparkPlan,
                              right: SparkPlan)
-    extends BinaryNode with HashJoin with CodegenSupport {
+    extends BinaryNode
+    with HashJoin
+    with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -162,10 +164,8 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     if (canJoinKeyFitWithinLong) {
       // generate the join key as Long
       val expr = rewriteKeyExpr(streamedKeys).head
-      val ev = BindReferences
-        .bindReference(expr, streamedPlan.output)
-        .gen(ctx)
-        (ev, ev.isNull)
+      val ev = BindReferences.bindReference(expr, streamedPlan.output).gen(ctx)
+      (ev, ev.isNull)
     } else {
       // generate the join key as UnsafeRow
       val keyExpr =

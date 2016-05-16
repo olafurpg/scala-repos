@@ -122,17 +122,18 @@ trait IntroduceExpressions {
                   .getInstance()
                   .INTRODUCE_VARIABLE_EXPLICIT_TYPE)
             val selectedType = if (needExplicitType) types(0) else null
-            val introduceRunnable: Computable[SmartPsiElementPointer[
-                    PsiElement]] = introduceVariable(startOffset,
-                                                     endOffset,
-                                                     file,
-                                                     editor,
-                                                     expr,
-                                                     occurrences,
-                                                     suggestedNames(0),
-                                                     selectedType,
-                                                     replaceAll,
-                                                     asVar)
+            val introduceRunnable: Computable[
+                SmartPsiElementPointer[PsiElement]] = introduceVariable(
+                startOffset,
+                endOffset,
+                file,
+                editor,
+                expr,
+                occurrences,
+                suggestedNames(0),
+                selectedType,
+                replaceAll,
+                asVar)
             CommandProcessor.getInstance.executeCommand(project, new Runnable {
               def run() {
                 val newDeclaration: PsiElement =
@@ -235,7 +236,7 @@ trait IntroduceExpressions {
         forSt <- result
         enums <- forSt.enumerators
         generator = enums.generators.head
-            if firstOccurenceOffset > generator.getTextRange.getEndOffset
+        if firstOccurenceOffset > generator.getTextRange.getEndOffset
       } yield forSt
     }
     def addPrivateIfNotLocal(declaration: PsiElement) {
@@ -298,7 +299,7 @@ trait IntroduceExpressions {
         offsets.forall(document.getLineNumber(_) == lineNumber)
       }
       while (parent != null && !parent.isInstanceOf[PsiFile] &&
-      atSameLine(parent)) {
+             atSameLine(parent)) {
         parent = parent.getParent
       }
       val insideExpression = parent match {
@@ -325,8 +326,8 @@ trait IntroduceExpressions {
       } else occurrences_
     val occCount = occurrences.length
 
-    val mainOcc = occurrences.indexWhere(
-        range => range.contains(mainRange) || mainRange.contains(range))
+    val mainOcc = occurrences.indexWhere(range =>
+          range.contains(mainRange) || mainRange.contains(range))
     val fastDefinition = occCount == 1 && isOneLiner
 
     //changes document directly
@@ -372,15 +373,14 @@ trait IntroduceExpressions {
         var needSemicolon = true
         var sibling = elem.getPrevSibling
         if (inParentheses) {
-          while (sibling != null &&
-          sibling.getText.trim == "") sibling = sibling.getPrevSibling
+          while (sibling != null && sibling.getText.trim == "") sibling =
+            sibling.getPrevSibling
           if (sibling != null && sibling.getText.endsWith(";"))
             needSemicolon = false
           val semicolon = parent.addBefore(
               ScalaPsiElementFactory.createSemicolon(parent.getManager), elem)
-          result = parent
-            .addBefore(created, semicolon)
-            .asInstanceOf[ScEnumerator]
+          result =
+            parent.addBefore(created, semicolon).asInstanceOf[ScEnumerator]
           if (needSemicolon) {
             parent.addBefore(
                 ScalaPsiElementFactory.createSemicolon(parent.getManager),
@@ -529,8 +529,8 @@ trait IntroduceExpressions {
       validator: ScalaVariableValidator): ScalaIntroduceVariableDialog = {
     // Add occurrences highlighting
     if (occurrences.length > 1)
-      occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
-          project, occurrences, editor)
+      occurrenceHighlighters =
+        ScalaRefactoringUtil.highlightOccurrences(project, occurrences, editor)
 
     val possibleNames = NameSuggester.suggestNames(expr, validator)
     val dialog = new ScalaIntroduceVariableDialog(

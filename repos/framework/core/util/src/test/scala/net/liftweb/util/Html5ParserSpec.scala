@@ -29,7 +29,9 @@ import Helpers._
   * Systems under specification for Html5 Parser.
   */
 object Html5ParserSpec
-    extends Specification with PendingUntilFixed with Html5Parser
+    extends Specification
+    with PendingUntilFixed
+    with Html5Parser
     with Html5Writer {
   "Html5Parser Specification".title
 
@@ -45,15 +47,12 @@ object Html5ParserSpec
 
   "Html5 Parser" should {
     val pages = for {
-      page1 <- tryo(readWholeStream(
-              getClass.getResourceAsStream("Html5ParserSpec.page1.html")))
-        .filter(_ ne null)
-      page2 <- tryo(readWholeStream(
-              getClass.getResourceAsStream("Html5ParserSpec.page2.html")))
-        .filter(_ ne null)
-      page3 <- tryo(readWholeStream(
-              getClass.getResourceAsStream("Html5ParserSpec.page3.html")))
-        .filter(_ ne null)
+      page1 <- tryo(readWholeStream(getClass.getResourceAsStream(
+                          "Html5ParserSpec.page1.html"))).filter(_ ne null)
+      page2 <- tryo(readWholeStream(getClass.getResourceAsStream(
+                          "Html5ParserSpec.page2.html"))).filter(_ ne null)
+      page3 <- tryo(readWholeStream(getClass.getResourceAsStream(
+                          "Html5ParserSpec.page3.html"))).filter(_ ne null)
     } yield (page1, page2, page3)
 
     pages match {

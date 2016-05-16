@@ -77,7 +77,7 @@ object SdkUtils {
       sdk <- allAndroidSdks
       platformVersion <- Option(AndroidPlatform.getInstance(sdk))
                           .map(_.getApiLevel.toString) if isGEQAsInt(
-                            platformVersion, version)
+          platformVersion, version)
     } yield sdk
     matchingSdks.headOption
   }

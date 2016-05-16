@@ -52,7 +52,8 @@ abstract class SubqueryExpression extends LeafExpression {
   */
 case class ScalarSubquery(
     query: LogicalPlan, exprId: ExprId = NamedExpression.newExprId)
-    extends SubqueryExpression with Unevaluable {
+    extends SubqueryExpression
+    with Unevaluable {
 
   override def plan: LogicalPlan = SubqueryAlias(toString, query)
 

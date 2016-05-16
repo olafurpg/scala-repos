@@ -19,7 +19,7 @@ case class TreePrinter(name: String = "",
 
   def print(n: Dumpable,
             out: PrintWriter = new PrintWriter(
-                  new OutputStreamWriter(System.out))) {
+                new OutputStreamWriter(System.out))) {
     def dump(baseValue: Dumpable,
              prefix1: String,
              prefix2: String,
@@ -51,9 +51,8 @@ case class TreePrinter(name: String = "",
           out.println(p + l)
         }
       } else {
-        out.println(di.mainInfo +
-            (if (di.attrInfo.isEmpty) ""
-             else " " + cBlue + di.attrInfo + cNormal))
+        out.println(di.mainInfo + (if (di.attrInfo.isEmpty) ""
+                                   else " " + cBlue + di.attrInfo + cNormal))
       }
       val children = di.children.toIndexedSeq
       children.zipWithIndex.foreach {
@@ -136,10 +135,8 @@ object Ellipsis {
         parent.copy(
             children = parent.children.zipWithIndex.map {
           case ((name, ch), idx) =>
-            val chposs = poss
-              .filter(_.head == idx)
-              .map(_.tail)
-              (name, apply(ch, chposs: _*))
+            val chposs = poss.filter(_.head == idx).map(_.tail)
+            (name, apply(ch, chposs: _*))
         })
     }
   }

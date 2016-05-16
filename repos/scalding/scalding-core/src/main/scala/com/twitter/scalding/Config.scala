@@ -223,7 +223,8 @@ trait Config extends Serializable {
       .+(Config.ScaldingVersion -> scaldingVersion))
       .+(
           // This is setting a property for cascading/driven
-          (AppProps.APP_FRAMEWORKS -> ("scalding:" + scaldingVersion.toString)))
+          (AppProps.APP_FRAMEWORKS -> ("scalding:" +
+                  scaldingVersion.toString)))
 
   def getUniqueIds: Set[UniqueID] =
     get(UniqueID.UNIQUE_JOB_ID).map { str =>
@@ -352,7 +353,7 @@ trait Config extends Serializable {
 
   def addFlowStepStrategy(
       flowStrategyProvider: (Mode,
-      Config) => FlowStepStrategy[JobConf]): Config = {
+                             Config) => FlowStepStrategy[JobConf]): Config = {
     val serializedListener = flowStepStrategiesSerializer(flowStrategyProvider)
     update(Config.FlowStepStrategies) {
       case None => (Some(serializedListener), ())
@@ -363,8 +364,8 @@ trait Config extends Serializable {
   def clearFlowStepStrategies: Config =
     this.-(Config.FlowStepStrategies)
 
-  def getFlowStepStrategies: List[Try[(Mode, Config) => FlowStepStrategy[
-              JobConf]]] =
+  def getFlowStepStrategies: List[Try[(Mode,
+                                       Config) => FlowStepStrategy[JobConf]]] =
     get(Config.FlowStepStrategies).toIterable
       .flatMap(s => StringUtility.fastSplit(s, ","))
       .map(flowStepStrategiesSerializer.invert(_))
@@ -545,8 +546,7 @@ object Config {
    */
   def fromHadoop(conf: Configuration): Config =
     // use `conf.get` to force JobConf to evaluate expressions
-    Config(
-        conf.asScala.map { e =>
+    Config(conf.asScala.map { e =>
       e.getKey -> conf.get(e.getKey)
     }.toMap)
 
@@ -586,8 +586,8 @@ object Config {
     md5Hex(bytes)
   }
 
-  private[this] def buildInj[
-      T : ExternalizerInjection : ExternalizerCodec]: Injection[T, String] =
+  private[this] def buildInj[T: ExternalizerInjection: ExternalizerCodec]
+    : Injection[T, String] =
     Injection.connect[T, Externalizer[T], Array[Byte], Base64String, String]
 
   @transient private[scalding] lazy val flowStepListenerSerializer =

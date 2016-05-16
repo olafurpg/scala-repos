@@ -36,7 +36,8 @@ class TlsEndpointVerificationSpec
     "not accept certificates signed by unknown CA" in {
       val pipe = pipeline(
           Http().defaultClientHttpsContext,
-          hostname = "akka.example.org") // default context doesn't include custom CA
+          hostname =
+            "akka.example.org") // default context doesn't include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
                 timeout) { e ⇒
@@ -46,7 +47,8 @@ class TlsEndpointVerificationSpec
     "accept certificates signed by known CA" in {
       val pipe = pipeline(
           ExampleHttpContexts.exampleClientContext,
-          hostname = "akka.example.org") // example context does include custom CA
+          hostname =
+            "akka.example.org") // example context does include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
                 timeout) { response ⇒
@@ -56,9 +58,10 @@ class TlsEndpointVerificationSpec
       }
     }
     "not accept certificates for foreign hosts" in {
-      val pipe = pipeline(
-          ExampleHttpContexts.exampleClientContext,
-          hostname = "hijack.de") // example context does include custom CA
+      val pipe =
+        pipeline(ExampleHttpContexts.exampleClientContext,
+                 hostname =
+                   "hijack.de") // example context does include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://hijack.de/")).failed, timeout) {
         e ⇒

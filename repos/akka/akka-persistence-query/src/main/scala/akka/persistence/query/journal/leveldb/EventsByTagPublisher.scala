@@ -56,7 +56,8 @@ private[akka] abstract class AbstractEventsByTagPublisher(
     val fromOffset: Long,
     val maxBufSize: Int,
     val writeJournalPluginId: String)
-    extends ActorPublisher[EventEnvelope] with DeliveryBuffer[EventEnvelope]
+    extends ActorPublisher[EventEnvelope]
+    with DeliveryBuffer[EventEnvelope]
     with ActorLogging {
   import EventsByTagPublisher._
 

@@ -20,7 +20,7 @@ import org.scalacheck.Arbitrary._
 
 class LawTests extends FunSuite with Discipline {
 
-  def fuzzyEq[@sp(Float, Double) A : Ring : Signed : Order](eps: A): Eq[A] =
+  def fuzzyEq[@sp(Float, Double) A: Ring: Signed: Order](eps: A): Eq[A] =
     new Eq[A] {
       def eqv(x: A, y: A): Boolean = {
         val delta = Order[A].max(x.abs, y.abs) * eps
@@ -88,19 +88,19 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 
-  implicit def eqFreeMonoid[A : Monoid : Eq]: Eq[FreeMonoid[A]] =
+  implicit def eqFreeMonoid[A: Monoid: Eq]: Eq[FreeMonoid[A]] =
     new Eq[FreeMonoid[A]] {
       def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
     }
 
-  implicit def eqFreeGroup[A : Group : Eq]: Eq[FreeGroup[A]] =
+  implicit def eqFreeGroup[A: Group: Eq]: Eq[FreeGroup[A]] =
     new Eq[FreeGroup[A]] {
       def eqv(x: FreeGroup[A], y: FreeGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
     }
 
-  implicit def eqFreeAbGroup[A : AbGroup : Eq]: Eq[FreeAbGroup[A]] =
+  implicit def eqFreeAbGroup[A: AbGroup: Eq]: Eq[FreeAbGroup[A]] =
     new Eq[FreeAbGroup[A]] {
       def eqv(x: FreeAbGroup[A], y: FreeAbGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
@@ -118,7 +118,8 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Heyting[Trilean]", LogicLaws[Int].heyting)
 
   object intMinMaxLattice
-      extends MinMaxLattice[Int] with BoundedLattice[Int]
+      extends MinMaxLattice[Int]
+      with BoundedLattice[Int]
       with spire.std.IntOrder {
     def zero = Int.MinValue
     def one = Int.MaxValue

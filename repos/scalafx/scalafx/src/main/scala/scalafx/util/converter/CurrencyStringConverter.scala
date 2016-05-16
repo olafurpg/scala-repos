@@ -39,7 +39,8 @@ object CurrencyStringConverter {
 }
 
 class CurrencyStringConverter(
-    override val delegate: jfxuc.CurrencyStringConverter = new jfxuc.CurrencyStringConverter)
+    override val delegate: jfxuc.CurrencyStringConverter =
+      new jfxuc.CurrencyStringConverter)
     extends NumberStringConverterDelegate[jfxuc.CurrencyStringConverter](
         delegate) {
 

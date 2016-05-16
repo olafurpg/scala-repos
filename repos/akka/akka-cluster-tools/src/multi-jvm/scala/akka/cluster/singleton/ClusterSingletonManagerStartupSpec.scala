@@ -61,7 +61,8 @@ class ClusterSingletonManagerStartupMultiJvmNode3
 
 class ClusterSingletonManagerStartupSpec
     extends MultiNodeSpec(ClusterSingletonManagerStartupSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterSingletonManagerStartupSpec._
 
   override def initialParticipants = roles.size
@@ -82,10 +83,11 @@ class ClusterSingletonManagerStartupSpec
   }
 
   lazy val echoProxy: ActorRef = {
-    system.actorOf(ClusterSingletonProxy.props(
-                       singletonManagerPath = "/user/echo",
-                       settings = ClusterSingletonProxySettings(system)),
-                   name = "echoProxy")
+    system.actorOf(
+        ClusterSingletonProxy.props(singletonManagerPath = "/user/echo",
+                                    settings =
+                                      ClusterSingletonProxySettings(system)),
+        name = "echoProxy")
   }
 
   "Startup of Cluster Singleton" must {

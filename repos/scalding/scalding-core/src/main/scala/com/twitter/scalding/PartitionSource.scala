@@ -29,7 +29,8 @@ import cascading.tuple.Fields
   * This is a base class for partition-based output sources
   */
 abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
-    extends SchemedSource with HfsTapProvider {
+    extends SchemedSource
+    with HfsTapProvider {
 
   // The root path of the partitioned output.
   def basePath: String
@@ -139,7 +140,8 @@ case class PartitionedTsv(override val basePath: String,
                           override val writeHeader: Boolean,
                           val tsvFields: Fields,
                           override val sinkMode: SinkMode)
-    extends PartitionSource with DelimitedScheme {
+    extends PartitionSource
+    with DelimitedScheme {
 
   override val fields = tsvFields
 }
@@ -180,7 +182,8 @@ case class PartitionedSequenceFile(override val basePath: String,
                                    override val partition: Partition,
                                    val sequenceFields: Fields,
                                    override val sinkMode: SinkMode)
-    extends PartitionSource with SequenceFileScheme {
+    extends PartitionSource
+    with SequenceFileScheme {
 
   override val fields = sequenceFields
 }

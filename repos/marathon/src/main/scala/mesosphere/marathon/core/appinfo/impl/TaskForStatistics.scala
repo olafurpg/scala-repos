@@ -35,7 +35,8 @@ private[appinfo] object TaskForStatistics {
             running = maybeTaskState.contains(TaskState.TASK_RUNNING),
             // Tasks that are staged do not have the taskState set at all, currently.
             // To make this a bit more robust, we also allow it to be set explicitly.
-            staging = maybeTaskState.isEmpty ||
+            staging =
+              maybeTaskState.isEmpty ||
               maybeTaskState.contains(TaskState.TASK_STAGING),
             healthy = healths.nonEmpty && healths.forall(_.alive),
             unhealthy = healths.exists(!_.alive),

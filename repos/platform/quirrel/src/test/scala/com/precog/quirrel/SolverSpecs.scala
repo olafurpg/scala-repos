@@ -25,7 +25,10 @@ import com.codecommit.gll.ast.Node
 import org.specs2.mutable.Specification
 
 object SolverSpecs
-    extends Specification with parser.Parser with StubPhases with Solver
+    extends Specification
+    with parser.Parser
+    with StubPhases
+    with Solver
     with RandomLibrarySpec {
 
   import ast._

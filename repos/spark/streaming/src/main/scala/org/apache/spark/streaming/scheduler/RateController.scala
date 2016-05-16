@@ -33,7 +33,8 @@ import org.apache.spark.util.{ThreadUtils, Utils}
   */
 private[streaming] abstract class RateController(
     val streamUID: Int, rateEstimator: RateEstimator)
-    extends StreamingListener with Serializable {
+    extends StreamingListener
+    with Serializable {
 
   init()
 

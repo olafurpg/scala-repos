@@ -4,7 +4,7 @@ import scala.reflect.runtime.{universe => ru}
 object StaticReflect {
   def method[A](name: String): ru.Type = macro methodImpl[A]
 
-  def methodImpl[A : c.WeakTypeTag](c: Context)(
+  def methodImpl[A: c.WeakTypeTag](c: Context)(
       name: c.Expr[String]): c.Expr[ru.Type] = {
     import c.universe._
     import internal._

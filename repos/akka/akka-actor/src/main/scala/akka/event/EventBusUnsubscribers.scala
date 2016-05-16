@@ -104,7 +104,8 @@ private[akka] object EventStreamUnsubscriber {
   */
 private[akka] class ActorClassificationUnsubscriber(
     bus: ManagedActorClassification, debug: Boolean)
-    extends Actor with Stash {
+    extends Actor
+    with Stash {
 
   import ActorClassificationUnsubscriber._
 

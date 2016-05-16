@@ -44,12 +44,14 @@ class ScalaExpressionSurroundDescriptor extends SurroundDescriptor {
     surrounders(WHILE_SURROUNDER) = new ScalaWithWhileSurrounder
     surrounders(DO_WHILE_SURROUNDER) = new ScalaWithDoWhileSurrounder
     surrounders(MATCH_SURROUNDER) = new ScalaWithMatchSurrounder
-    surrounders(TRY_CATCH_FINALLY_SURROUNDER) = new ScalaWithTryCatchFinallySurrounder
+    surrounders(TRY_CATCH_FINALLY_SURROUNDER) =
+      new ScalaWithTryCatchFinallySurrounder
     surrounders(TRY_CATCH_SURROUNDER) = new ScalaWithTryCatchSurrounder
     surrounders(TRY_FINALLY_SURROUNDER) = new ScalaWithTryFinallySurrounder
     surrounders(PARENTHESIS_SURROUNDER) = new ScalaWithParenthesisSurrounder
     surrounders(IF_COND_SURROUNDER) = new ScalaWithIfConditionSurrounder
-    surrounders(IF_ELSE_COND_SURROUNDER) = new ScalaWithIfElseConditionSurrounder
+    surrounders(IF_ELSE_COND_SURROUNDER) =
+      new ScalaWithIfElseConditionSurrounder
     surrounders(UNARY_NOT_SURROUNDER) = new ScalaWithUnaryNotSurrounder
     surrounders(TYPE_SURROUNDER) = new ScalaTypeSurrounder
     surrounders
@@ -102,20 +104,21 @@ class ScalaExpressionSurroundDescriptor extends SurroundDescriptor {
         file: PsiFile, startOffset: Int, endOffset: Int): Array[PsiElement] = {
       var element = file.findElementAt(startOffset)
       while (element != null && !element.isInstanceOf[ScExpression] &&
-      !element.isInstanceOf[ScValue] && !element.isInstanceOf[ScFunction] &&
-      !element.isInstanceOf[ScTypeAlias] &&
-      !element.isInstanceOf[ScVariable] &&
-      !element.isInstanceOf[PsiWhiteSpace] &&
-      element.getNode.getElementType != ScalaTokenTypes.tSEMICOLON &&
-      !ScalaTokenTypes.COMMENTS_TOKEN_SET
-        .contains(element.getNode.getElementType) ||
-      (element.getParent.getTextRange.getStartOffset == startOffset &&
-          (element.getParent.isInstanceOf[ScExpression] ||
-              element.getParent.isInstanceOf[ScValue] ||
-              element.getParent.isInstanceOf[ScVariable] ||
-              element.getParent.isInstanceOf[ScFunction] ||
-              element.getParent.isInstanceOf[ScTypeAlias]) &&
-          element.getParent.getTextRange.getEndOffset <= endOffset)) {
+             !element.isInstanceOf[ScValue] &&
+             !element.isInstanceOf[ScFunction] &&
+             !element.isInstanceOf[ScTypeAlias] &&
+             !element.isInstanceOf[ScVariable] &&
+             !element.isInstanceOf[PsiWhiteSpace] &&
+             element.getNode.getElementType != ScalaTokenTypes.tSEMICOLON &&
+             !ScalaTokenTypes.COMMENTS_TOKEN_SET.contains(
+                 element.getNode.getElementType) ||
+             (element.getParent.getTextRange.getStartOffset == startOffset &&
+                 (element.getParent.isInstanceOf[ScExpression] ||
+                     element.getParent.isInstanceOf[ScValue] ||
+                     element.getParent.isInstanceOf[ScVariable] ||
+                     element.getParent.isInstanceOf[ScFunction] ||
+                     element.getParent.isInstanceOf[ScTypeAlias]) &&
+                 element.getParent.getTextRange.getEndOffset <= endOffset)) {
         element = element.getParent
         if (element == null || element.getTextRange == null ||
             element.getTextRange.getStartOffset != startOffset) return null

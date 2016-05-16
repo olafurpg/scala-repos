@@ -11,7 +11,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object LatticePartialOrderLaws {
-  def apply[A : Eq : Arbitrary] = new LatticePartialOrderLaws[A] {
+  def apply[A: Eq: Arbitrary] = new LatticePartialOrderLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -45,8 +45,8 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def latticePartialOrder(implicit A: Lattice[A], P: PartialOrder[A]) =
     new LatticePartialOrderProperties(
         name = "latticePartialOrder",
-        parents = Seq(
-              joinSemilatticePartialOrder, meetSemilatticePartialOrder),
+        parents =
+          Seq(joinSemilatticePartialOrder, meetSemilatticePartialOrder),
         bases = Seq.empty
     )
 

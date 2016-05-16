@@ -102,7 +102,7 @@ class CopyOnWriteArrayListFactory extends ListFactory {
   override def implementationName: String =
     "java.util.concurrent.CopyOnWriteArrayList"
 
-  override def empty[E : ClassTag]: ju.concurrent.CopyOnWriteArrayList[E] =
+  override def empty[E: ClassTag]: ju.concurrent.CopyOnWriteArrayList[E] =
     new ju.concurrent.CopyOnWriteArrayList[E]
 
   def newFrom[E <: AnyRef](

@@ -3,7 +3,8 @@ package java.lang
 import scala.scalajs.js
 
 class Throwable(s: String, private var e: Throwable)
-    extends Object with java.io.Serializable {
+    extends Object
+    with java.io.Serializable {
   def this() = this(null, null)
   def this(s: String) = this(s, null)
   def this(e: Throwable) = this(null, e)
@@ -69,7 +70,7 @@ class Throwable(s: String, private var e: Throwable)
 
     // Causes
     var wCause: Throwable = this
-    while ( (wCause ne wCause.getCause) && (wCause.getCause ne null)) {
+    while ((wCause ne wCause.getCause) && (wCause.getCause ne null)) {
       val parentTrace = wCause.getStackTrace
       wCause = wCause.getCause
       val thisTrace = wCause.getStackTrace
@@ -85,8 +86,8 @@ class Throwable(s: String, private var e: Throwable)
          */
         var sameFrameCount: Int = 0
         while (sameFrameCount < thisLength && sameFrameCount < parentLength &&
-        thisTrace(thisLength - sameFrameCount - 1) == parentTrace(
-            parentLength - sameFrameCount - 1)) {
+               thisTrace(thisLength - sameFrameCount - 1) == parentTrace(
+                   parentLength - sameFrameCount - 1)) {
           sameFrameCount += 1
         }
 

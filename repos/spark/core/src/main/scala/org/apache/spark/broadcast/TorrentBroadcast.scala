@@ -53,8 +53,10 @@ import org.apache.spark.util.io.{ByteArrayChunkOutputStream, ChunkedByteBuffer}
   * @param obj object to broadcast
   * @param id A unique identifier for the broadcast variable.
   */
-private[spark] class TorrentBroadcast[T : ClassTag](obj: T, id: Long)
-    extends Broadcast[T](id) with Logging with Serializable {
+private[spark] class TorrentBroadcast[T: ClassTag](obj: T, id: Long)
+    extends Broadcast[T](id)
+    with Logging
+    with Serializable {
 
   /**
     * Value of the broadcast object on executors. This is reconstructed by [[readBroadcastBlock]],
@@ -71,13 +73,15 @@ private[spark] class TorrentBroadcast[T : ClassTag](obj: T, id: Long)
   @transient private var blockSize: Int = _
 
   private def setConf(conf: SparkConf) {
-    compressionCodec = if (conf.getBoolean("spark.broadcast.compress", true)) {
-      Some(CompressionCodec.createCodec(conf))
-    } else {
-      None
-    }
+    compressionCodec =
+      if (conf.getBoolean("spark.broadcast.compress", true)) {
+        Some(CompressionCodec.createCodec(conf))
+      } else {
+        None
+      }
     // Note: use getSizeAsKb (not bytes) to maintain compatibility if no units are provided
-    blockSize = conf.getSizeAsKb("spark.broadcast.blockSize", "4m").toInt * 1024
+    blockSize =
+      conf.getSizeAsKb("spark.broadcast.blockSize", "4m").toInt * 1024
   }
   setConf(SparkEnv.get.conf)
 
@@ -220,8 +224,8 @@ private[spark] class TorrentBroadcast[T : ClassTag](obj: T, id: Long)
     val blockManager = SparkEnv.get.blockManager
     Option(TaskContext.get()) match {
       case Some(taskContext) =>
-        taskContext.addTaskCompletionListener(
-            _ => blockManager.releaseLock(blockId))
+        taskContext.addTaskCompletionListener(_ =>
+              blockManager.releaseLock(blockId))
       case None =>
         // This should only happen on the driver, where broadcast variables may be accessed
         // outside of running tasks (e.g. when computing rdd.partitions()). In order to allow
@@ -235,7 +239,7 @@ private[spark] class TorrentBroadcast[T : ClassTag](obj: T, id: Long)
 
 private object TorrentBroadcast extends Logging {
 
-  def blockifyObject[T : ClassTag](
+  def blockifyObject[T: ClassTag](
       obj: T,
       blockSize: Int,
       serializer: Serializer,
@@ -249,7 +253,7 @@ private object TorrentBroadcast extends Logging {
     bos.toArrays.map(ByteBuffer.wrap)
   }
 
-  def unBlockifyObject[T : ClassTag](
+  def unBlockifyObject[T: ClassTag](
       blocks: Array[ByteBuffer],
       serializer: Serializer,
       compressionCodec: Option[CompressionCodec]): T = {

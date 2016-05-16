@@ -17,12 +17,15 @@ import scala.util.Try
 import play.api.http.{HttpEntity, HttpChunk, Status}
 
 object NettyScalaResultsHandlingSpec
-    extends ScalaResultsHandlingSpec with NettyIntegrationSpecification
+    extends ScalaResultsHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpScalaResultsHandlingSpec
-    extends ScalaResultsHandlingSpec with AkkaHttpIntegrationSpecification
+    extends ScalaResultsHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait ScalaResultsHandlingSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -81,7 +84,7 @@ trait ScalaResultsHandlingSpec
         Results.Ok
           .chunked(Source(List("a", "b")) via EventSource.flow)
           .as("text/event-stream")
-      ) { response =>
+    ) { response =>
       response.header(CONTENT_TYPE) must beSome.like {
         case value =>
           value.toLowerCase(java.util.Locale.ENGLISH) must_== "text/event-stream"
@@ -293,7 +296,7 @@ trait ScalaResultsHandlingSpec
                 Cookies.decodeSetCookieHeader(headerValue).to[Set]
             }.to[Set]
             decodedCookieHeaders must_==
-            (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
+              (Set(Set(aCookie), Set(bCookie), Set(cCookie)))
         }
       }
     }

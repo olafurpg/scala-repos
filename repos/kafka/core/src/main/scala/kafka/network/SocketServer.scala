@@ -50,7 +50,8 @@ import scala.util.control.{NonFatal, ControlThrowable}
   */
 class SocketServer(
     val config: KafkaConfig, val metrics: Metrics, val time: Time)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   private val endpoints = config.listeners
   private val numProcessorThreads = config.numNetworkThreads
@@ -82,8 +83,8 @@ class SocketServer(
   def startup() {
     this.synchronized {
 
-      connectionQuotas = new ConnectionQuotas(
-          maxConnectionsPerIp, maxConnectionsPerIpOverrides)
+      connectionQuotas =
+        new ConnectionQuotas(maxConnectionsPerIp, maxConnectionsPerIpOverrides)
 
       val sendBufferSize = config.socketSendBufferBytes
       val recvBufferSize = config.socketReceiveBufferBytes
@@ -174,7 +175,8 @@ class SocketServer(
   */
 private[kafka] abstract class AbstractServerThread(
     connectionQuotas: ConnectionQuotas)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
 
   private val startupLatch = new CountDownLatch(1)
   private val shutdownLatch = new CountDownLatch(1)
@@ -249,7 +251,8 @@ private[kafka] class Acceptor(val endPoint: EndPoint,
                               brokerId: Int,
                               processors: Array[Processor],
                               connectionQuotas: ConnectionQuotas)
-    extends AbstractServerThread(connectionQuotas) with KafkaMetricsGroup {
+    extends AbstractServerThread(connectionQuotas)
+    with KafkaMetricsGroup {
 
   private val nioSelector = NSelector.open()
   val serverChannel = openServerSocket(endPoint.host, endPoint.port)
@@ -389,7 +392,8 @@ private[kafka] class Processor(val id: Int,
                                protocol: SecurityProtocol,
                                channelConfigs: java.util.Map[String, _],
                                metrics: Metrics)
-    extends AbstractServerThread(connectionQuotas) with KafkaMetricsGroup {
+    extends AbstractServerThread(connectionQuotas)
+    with KafkaMetricsGroup {
 
   private object ConnectionId {
     def fromString(s: String): Option[ConnectionId] = s.split("-") match {
@@ -581,8 +585,8 @@ private[kafka] class Processor(val id: Int,
         case NonFatal(e) =>
           // need to close the channel here to avoid socket leak.
           close(channel)
-          error("Processor " + id +
-                " closed connection from " + channel.getRemoteAddress,
+          error("Processor " + id + " closed connection from " +
+                channel.getRemoteAddress,
                 e)
       }
     }

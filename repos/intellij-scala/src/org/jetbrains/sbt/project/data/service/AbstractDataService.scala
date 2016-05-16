@@ -103,8 +103,8 @@ trait Importer[E] {
       .orderEntries()
       .librariesOnly()
       .forEachLibrary(collector)
-    collector.getResults.toSet
-      .filter(l => Option(l.getName).exists(_.contains(ScalaLibraryName)))
+    collector.getResults.toSet.filter(l =>
+          Option(l.getName).exists(_.contains(ScalaLibraryName)))
   }
 
   def executeProjectChangeAction(action: => Unit): Unit =

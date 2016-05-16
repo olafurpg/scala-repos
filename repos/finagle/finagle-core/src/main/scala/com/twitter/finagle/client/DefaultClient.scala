@@ -66,10 +66,11 @@ case class DefaultClient[Req, Rep](
     maxLifetime: Duration = Duration.Top,
     requestTimeout: Duration = Duration.Top,
     failFast: Boolean = true,
-    failureAccrual: Transformer[Req, Rep] = new DefaultClient.UninitializedFailureAccrual
+    failureAccrual: Transformer[Req, Rep] =
+      new DefaultClient.UninitializedFailureAccrual
       with Transformer[Req, Rep] {
-      def apply(f: ServiceFactory[Req, Rep]) = f
-    },
+        def apply(f: ServiceFactory[Req, Rep]) = f
+      },
     serviceTimeout: Duration = Duration.Top,
     timer: Timer = DefaultTimer.twitter,
     statsReceiver: StatsReceiver = ClientStatsReceiver,
@@ -78,8 +79,8 @@ case class DefaultClient[Req, Rep](
     monitor: Monitor = DefaultMonitor,
     reporter: ReporterFactory = LoadedReporterFactory,
     loadBalancer: LoadBalancerFactory = DefaultBalancerFactory,
-    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
-        .clientModule[Req, Rep]
+    newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] =
+      TraceInitializerFilter.clientModule[Req, Rep]
 )
     extends Client[Req, Rep] { outer =>
 
@@ -162,12 +163,10 @@ case class DefaultClient[Req, Rep](
   // These are kept around to not break the API. They probably should
   // have been private[finagle] to begin with.
   val newStack: Name => ServiceFactory[Req, Rep] = newClient(_, name)
-  val newStack0: Var[Addr] => ServiceFactory[Req, Rep] = va =>
-    {
-      clientStack.make(params + LoadBalancerFactory.Dest(va))
+  val newStack0: Var[Addr] => ServiceFactory[Req, Rep] = va => {
+    clientStack.make(params + LoadBalancerFactory.Dest(va))
   }
-  val bindStack: Address => ServiceFactory[Req, Rep] = addr =>
-    {
-      endpointStack.make(params + Transporter.EndpointAddr(addr))
+  val bindStack: Address => ServiceFactory[Req, Rep] = addr => {
+    endpointStack.make(params + Transporter.EndpointAddr(addr))
   }
 }

@@ -18,9 +18,9 @@ object iFourierShift extends UFunc {
 
   @expand
   @expand.valify
-  implicit def implIFourierShift[
-      @expand.args(Int, Long, Float, Double, Complex) T]: Impl[
-      DenseVector[T], DenseVector[T]] = {
+  implicit def implIFourierShift[@expand.args(
+          Int, Long, Float, Double, Complex) T]
+    : Impl[DenseVector[T], DenseVector[T]] = {
     new Impl[DenseVector[T], DenseVector[T]] {
       def apply(dft: DenseVector[T]): DenseVector[T] = {
         if (isEven(dft.length))

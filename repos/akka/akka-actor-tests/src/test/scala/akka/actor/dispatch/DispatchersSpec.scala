@@ -70,7 +70,8 @@ object DispatchersSpec {
   }
 
   class OneShotMailboxType(settings: ActorSystem.Settings, config: Config)
-      extends MailboxType with ProducesMessageQueue[DoublingMailbox] {
+      extends MailboxType
+      with ProducesMessageQueue[DoublingMailbox] {
     val created = new AtomicBoolean(false)
     override def create(owner: Option[ActorRef], system: Option[ActorSystem]) =
       if (created.compareAndSet(false, true)) {
@@ -91,7 +92,8 @@ object DispatchersSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class DispatchersSpec
-    extends AkkaSpec(DispatchersSpec.config) with ImplicitSender {
+    extends AkkaSpec(DispatchersSpec.config)
+    with ImplicitSender {
   import DispatchersSpec._
   val df = system.dispatchers
   import df._
@@ -106,8 +108,7 @@ class DispatchersSpec
 
   def instance(dispatcher: MessageDispatcher): (MessageDispatcher) ⇒ Boolean =
     _ == dispatcher
-  def ofType[
-      T <: MessageDispatcher : ClassTag]: (MessageDispatcher) ⇒ Boolean =
+  def ofType[T <: MessageDispatcher: ClassTag]: (MessageDispatcher) ⇒ Boolean =
     _.getClass == implicitly[ClassTag[T]].runtimeClass
 
   def typesAndValidators: Map[String, (MessageDispatcher) ⇒ Boolean] =
@@ -121,8 +122,7 @@ class DispatchersSpec
 
   lazy val allDispatchers: Map[String, MessageDispatcher] = {
     validTypes
-      .map(
-          t ⇒
+      .map(t ⇒
             (t,
              from(ConfigFactory
                    .parseMap(Map(tipe -> t, id -> t).asJava)
@@ -173,8 +173,8 @@ class DispatchersSpec
 
     "get the correct types of dispatchers" in {
       //All created/obtained dispatchers are of the expeced type/instance
-      assert(typesAndValidators.forall(
-              tuple ⇒ tuple._2(allDispatchers(tuple._1))))
+      assert(typesAndValidators.forall(tuple ⇒
+                tuple._2(allDispatchers(tuple._1))))
     }
 
     "provide lookup of dispatchers by id" in {

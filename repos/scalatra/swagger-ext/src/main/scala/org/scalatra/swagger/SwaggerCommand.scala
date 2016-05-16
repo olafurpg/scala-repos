@@ -80,10 +80,10 @@ object SwaggerCommandSupport {
 
   class CommandOperationBuilder[B <: SwaggerOperationBuilder[_]](
       registerModel: Model => Unit, underlying: B) {
-    def parametersFromCommand[C <: Command : Manifest]: B =
+    def parametersFromCommand[C <: Command: Manifest]: B =
       parametersFromCommand(manifest[C].erasure.newInstance().asInstanceOf[C])
 
-    def parametersFromCommand[C <: Command : Manifest](cmd: => C): B = {
+    def parametersFromCommand[C <: Command: Manifest](cmd: => C): B = {
       SwaggerCommandSupport.parametersFromCommand(cmd) match {
         case (parameters, None) =>
           underlying.parameters(parameters: _*)
@@ -101,13 +101,13 @@ trait SwaggerCommandSupport {
   @deprecated(
       "Use the `apiOperation.parameters` and `operation` methods to build swagger descriptions of endpoints",
       "2.2")
-  protected def parameters[T <: CommandType : Manifest] =
+  protected def parameters[T <: CommandType: Manifest] =
     swaggerMeta(Symbols.Parameters, parametersFromCommand[T])
 
   @deprecated(
       "Use the `apiOperation.parameters` and `operation` methods to build swagger descriptions of endpoints",
       "2.2")
-  protected def parameters[T <: CommandType : Manifest](cmd: => T) =
+  protected def parameters[T <: CommandType: Manifest](cmd: => T) =
     swaggerMeta(Symbols.Parameters, parametersFromCommand(cmd))
 
   protected implicit def operationBuilder2commandOpBuilder[

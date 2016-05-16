@@ -20,7 +20,8 @@ import _root_.scala.collection.mutable.ListBuffer
   * Date: 13.03.2008
   */
 class ScExistentialTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScExistentialTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScExistentialTypeElement {
   override def toString: String = "ExistentialType: " + getText
 
   protected def innerType(ctx: TypingContext) = {

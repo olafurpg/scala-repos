@@ -49,7 +49,7 @@ class ApplyUnapplyForBindingSearcher
         val IsApply = new Apply(binding)
         val IsUnapply = new Unapply(binding)
         for (ref <- references
-                       if ref.getRangeInElement.contains(offsetInElement)) {
+             if ref.getRangeInElement.contains(offsetInElement)) {
           inReadAction {
             ref match {
               case IsApply(reference) if checkApply =>

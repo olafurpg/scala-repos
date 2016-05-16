@@ -112,7 +112,8 @@ object DockerSerializer {
         },
         privileged = proto.getPrivileged,
         parameters = proto.getParametersList.asScala.map(Parameter(_)).to[Seq],
-        forcePullImage = if (proto.hasForcePullImage) proto.getForcePullImage
+        forcePullImage =
+          if (proto.hasForcePullImage) proto.getForcePullImage
           else false
     )
 

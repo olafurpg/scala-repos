@@ -74,7 +74,8 @@ object NumberAxis {
 
 class NumberAxis(
     override val delegate: jfxsc.NumberAxis = new jfxsc.NumberAxis)
-    extends ValueAxis[Number](delegate) with SFXDelegate[jfxsc.NumberAxis] {
+    extends ValueAxis[Number](delegate)
+    with SFXDelegate[jfxsc.NumberAxis] {
 
   def this(lowerBound: Double, upperBound: Double, tickUnit: Double) {
     this(new jfxsc.NumberAxis(lowerBound, upperBound, tickUnit))

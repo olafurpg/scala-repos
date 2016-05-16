@@ -28,7 +28,9 @@ import scala.annotation.tailrec
 // specialization is just too buggy to get it working (tried).
 
 sealed trait IntList
-    extends LinearSeq[Int] with LinearSeqOptimized[Int, IntList] { self =>
+    extends LinearSeq[Int]
+    with LinearSeqOptimized[Int, IntList] {
+  self =>
   def head: Int
   def tail: IntList
 

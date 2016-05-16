@@ -30,7 +30,8 @@ import org.apache.spark.storage.memory.MemoryStore
   * @param lock a [[MemoryManager]] instance to synchronize on
   */
 private[memory] class StorageMemoryPool(lock: Object)
-    extends MemoryPool(lock) with Logging {
+    extends MemoryPool(lock)
+    with Logging {
 
   @GuardedBy("lock")
   private[this] var _memoryUsed: Long = 0L

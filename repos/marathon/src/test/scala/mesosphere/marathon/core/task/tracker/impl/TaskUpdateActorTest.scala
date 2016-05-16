@@ -17,8 +17,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
 class TaskUpdateActorTest
-    extends MarathonActorSupport with FunSuiteLike with Mockito
-    with GivenWhenThen with Matchers {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
 
   test("process failures are escalated") {
     val f = new Fixture

@@ -47,7 +47,8 @@ case class StaticInvoke(staticObject: Class[_],
                         functionName: String,
                         arguments: Seq[Expression] = Nil,
                         propagateNull: Boolean = true)
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
 
   val objectName = staticObject.getName.stripSuffix("$")
 
@@ -111,7 +112,8 @@ case class Invoke(targetObject: Expression,
                   functionName: String,
                   dataType: DataType,
                   arguments: Seq[Expression] = Nil)
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
 
   override def nullable: Boolean = true
   override def children: Seq[Expression] = arguments.+:(targetObject)
@@ -214,7 +216,8 @@ case class NewInstance(cls: Class[_],
                        propagateNull: Boolean,
                        dataType: DataType,
                        outerPointer: Option[Literal])
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
   private val className = cls.getName
 
   override def nullable: Boolean = propagateNull
@@ -277,7 +280,9 @@ case class NewInstance(cls: Class[_],
   * @param child An expression that returns an `Option`
   */
 case class UnwrapOption(dataType: DataType, child: Expression)
-    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with NonSQLExpression
+    with ExpectsInputTypes {
 
   override def nullable: Boolean = true
 
@@ -308,7 +313,9 @@ case class UnwrapOption(dataType: DataType, child: Expression)
   * @param optType The type of this option.
   */
 case class WrapOption(child: Expression, optType: DataType)
-    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with NonSQLExpression
+    with ExpectsInputTypes {
 
   override def dataType: DataType = ObjectType(classOf[Option[_]])
 
@@ -339,7 +346,9 @@ case class WrapOption(child: Expression, optType: DataType)
   * manually, but will instead be passed into the provided lambda function.
   */
 case class LambdaVariable(value: String, isNull: String, dataType: DataType)
-    extends LeafExpression with Unevaluable with NonSQLExpression {
+    extends LeafExpression
+    with Unevaluable
+    with NonSQLExpression {
 
   override def nullable: Boolean = true
 
@@ -378,7 +387,8 @@ object MapObjects {
 case class MapObjects private (loopVar: LambdaVariable,
                                lambdaFunction: Expression,
                                inputData: Expression)
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
 
   @tailrec
   private def itemAccessorMethod(dataType: DataType): String => String =
@@ -531,7 +541,8 @@ case class MapObjects private (loopVar: LambdaVariable,
   * @param children A list of expression to use as content of the external row.
   */
 case class CreateExternalRow(children: Seq[Expression], schema: StructType)
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
 
   override def dataType: DataType = ObjectType(classOf[Row])
 
@@ -568,7 +579,8 @@ case class CreateExternalRow(children: Seq[Expression], schema: StructType)
   * @param kryo if true, use Kryo. Otherwise, use Java.
   */
 case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression
+    with NonSQLExpression {
 
   override def eval(input: InternalRow): Any =
     throw new UnsupportedOperationException(
@@ -614,7 +626,8 @@ case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
   */
 case class DecodeUsingSerializer[T](
     child: Expression, tag: ClassTag[T], kryo: Boolean)
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression
+    with NonSQLExpression {
 
   override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     // Code to initialize the serializer.
@@ -655,7 +668,8 @@ case class DecodeUsingSerializer[T](
   */
 case class InitializeJavaBean(
     beanInstance: Expression, setters: Map[String, Expression])
-    extends Expression with NonSQLExpression {
+    extends Expression
+    with NonSQLExpression {
 
   override def nullable: Boolean = beanInstance.nullable
   override def children: Seq[Expression] = beanInstance +: setters.values.toSeq
@@ -698,7 +712,8 @@ case class InitializeJavaBean(
   * non-null `s`, `s.i` can't be null.
   */
 case class AssertNotNull(child: Expression, walkedTypePath: Seq[String])
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression
+    with NonSQLExpression {
 
   override def dataType: DataType = child.dataType
 

@@ -193,7 +193,9 @@ trait OpenImplicitMacros {
 
 @macrocompat.bundle
 class LazyMacros(val c: whitebox.Context)
-    extends CaseClassMacros with OpenImplicitMacros with LowPriorityTypes {
+    extends CaseClassMacros
+    with OpenImplicitMacros
+    with LowPriorityTypes {
   import c.universe._
   import c.internal._
   import decorators._
@@ -201,14 +203,14 @@ class LazyMacros(val c: whitebox.Context)
   def mkLazyImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
         (tree,
-        actualType) => q"_root_.shapeless.Lazy.apply[$actualType]($tree)",
+         actualType) => q"_root_.shapeless.Lazy.apply[$actualType]($tree)",
         q"null.asInstanceOf[_root_.shapeless.Lazy[_root_.scala.Nothing]]"
     )
 
   def mkStrictImpl[I](implicit iTag: WeakTypeTag[I]): Tree =
     mkImpl[I](
         (tree,
-        actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
+         actualType) => q"_root_.shapeless.Strict.apply[$actualType]($tree)",
         q"null.asInstanceOf[_root_.shapeless.Strict[_root_.scala.Nothing]]"
     )
 
@@ -372,8 +374,9 @@ class LazyMacros(val c: whitebox.Context)
         val open0 = open match {
           case Nil => Nil
           case h :: t =>
-            h.copy(dependsOn = if (h.instTpe =:= tpe ||
-                                   h.dependsOn.exists(_ =:= tpe)) h.dependsOn
+            h.copy(dependsOn =
+                  if (h.instTpe =:= tpe || h.dependsOn.exists(_ =:= tpe))
+                    h.dependsOn
                   else tpe :: h.dependsOn) :: t
         }
         copy(open = open0)

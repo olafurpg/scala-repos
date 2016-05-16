@@ -274,7 +274,7 @@ object Execution {
   /**
     * This is the standard semigroup on an Applicative (zip, then inside the Execution do plus)
     */
-  implicit def semigroup[T : Semigroup]: Semigroup[Execution[T]] =
+  implicit def semigroup[T: Semigroup]: Semigroup[Execution[T]] =
     Semigroup.from[Execution[T]] { (a, b) =>
       a.zip(b).map { case (ta, tb) => Semigroup.plus(ta, tb) }
     }
@@ -285,7 +285,7 @@ object Execution {
     * Monoid.sum(ex1, ex2, ex3, ex4): Execution[Unit]
     * where each are exi are Execution[Unit]
     */
-  implicit def monoid[T : Monoid]: Monoid[Execution[T]] =
+  implicit def monoid[T: Monoid]: Monoid[Execution[T]] =
     Monoid.from(Execution.from(Monoid.zero[T])) { (a, b) =>
       a.zip(b).map { case (ta, tb) => Monoid.plus(ta, tb) }
     }
@@ -696,10 +696,10 @@ object Execution {
       : Future[ExecutionCounters] = {
       for {
         flowDef <- toFuture(
-            Try {
-          val fd =
-            new FlowDef; (head :: tail).foreach(_.write(conf, fd, mode)); fd
-        })
+                      Try {
+                    val fd = new FlowDef;
+                    (head :: tail).foreach(_.write(conf, fd, mode)); fd
+                  })
         _ = FlowStateMap.validateSources(flowDef, mode)
         jobStats <- cache.runFlowDef(conf, mode, flowDef)
         _ = FlowStateMap.clear(flowDef)
@@ -723,8 +723,9 @@ object Execution {
     def runStats(conf: Config, mode: Mode, cache: EvalCache)(
         implicit cec: ConcurrentExecutionContext) =
       cache.getOrElseInsert(conf, this, {
-        val cacheLookup: List[(ToWrite, Either[
-                Promise[ExecutionCounters], Future[ExecutionCounters]])] =
+        val cacheLookup: List[
+            (ToWrite,
+             Either[Promise[ExecutionCounters], Future[ExecutionCounters]])] =
           (head :: tail).map { tw =>
             (tw, cache.getOrLock(conf, tw))
           }
@@ -837,7 +838,7 @@ object Execution {
   private[scalding] def write[T, U](pipe: TypedPipe[T],
                                     sink: TypedSink[T],
                                     generatorFn: (Config,
-                                    Mode) => U): Execution[U] =
+                                                  Mode) => U): Execution[U] =
     WriteExecution(SimpleWrite(pipe, sink), Nil, generatorFn)
 
   /**
@@ -1111,8 +1112,7 @@ object ExecutionCounters {
       override def isNonZero(that: ExecutionCounters) = that.keys.nonEmpty
       def zero = ExecutionCounters.empty
       def plus(left: ExecutionCounters, right: ExecutionCounters) = {
-        fromMap(
-            (left.keys ++ right.keys).map { k =>
+        fromMap((left.keys ++ right.keys).map { k =>
           (k, left(k) + right(k))
         }.toMap)
       }

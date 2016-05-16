@@ -107,8 +107,8 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     result.nroot(p)
   }
 
-  def qnormWith[@sp(Double) R](p: Int)(f: A => R)(
-      implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R = {
+  def qnormWith[@sp(Double) R](p: Int)(
+      f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R = {
     var result: R = ev.one
     cfor(0)(_ < arr.length, _ + 1) { i =>
       result += f(arr(i)).abs.pow(p)
@@ -236,8 +236,8 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
     as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)
 
-  def qnormWith[R](p: Int)(f: A => R)(
-      implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
+  def qnormWith[R](p: Int)(
+      f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
     as.aggregate(ev.one)((t, a) => t + f(a).abs.pow(p), _ + _).nroot(p)
 
   /** Computes the minimal elements of a partially ordered set.
@@ -324,10 +324,10 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     fromArray(arr)
   }
 
-  def qsortedBy[@sp B](f: A => B)(
-      implicit ev: Order[B],
-      ct: ClassTag[A],
-      cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qsortedBy[@sp B](
+      f: A => B)(implicit ev: Order[B],
+                 ct: ClassTag[A],
+                 cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr = as.toArray
     Sorting.sort(arr)

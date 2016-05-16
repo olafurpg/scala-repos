@@ -261,7 +261,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
                              _system: ActorSystem,
                              _roles: immutable.Seq[RoleName],
                              deployments: RoleName ⇒ Seq[String])
-    extends TestKit(_system) with MultiNodeSpecCallbacks {
+    extends TestKit(_system)
+    with MultiNodeSpecCallbacks {
 
   import MultiNodeSpec._
 
@@ -389,8 +390,8 @@ abstract class MultiNodeSpec(val myself: RoleName,
   def node(role: RoleName): ActorPath =
     RootActorPath(testConductor.getAddressFor(role).await)
 
-  def muteDeadLetters(messageClasses: Class[_]*)(
-      sys: ActorSystem = system): Unit =
+  def muteDeadLetters(
+      messageClasses: Class[_]*)(sys: ActorSystem = system): Unit =
     if (!sys.log.isDebugEnabled) {
       def mute(clazz: Class[_]): Unit =
         sys.eventStream.publish(

@@ -48,8 +48,8 @@ class GzipFilter @Inject()(
 
   def this(bufferSize: Int = 8192,
            chunkedThreshold: Int = 102400,
-           shouldGzip: (RequestHeader, Result) => Boolean = (_, _) => true)(
-      implicit mat: Materializer) =
+           shouldGzip: (RequestHeader, Result) => Boolean = (_, _) =>
+             true)(implicit mat: Materializer) =
     this(GzipFilterConfig(bufferSize, chunkedThreshold, shouldGzip))
 
   def apply(next: EssentialAction) = new EssentialAction {
@@ -211,10 +211,10 @@ class GzipFilter @Inject()(
   * @param shouldGzip Whether the given request/result should be gzipped.  This can be used, for example, to implement
   *                   black/white lists for gzipping by content type.
   */
-case class GzipFilterConfig(bufferSize: Int = 8192,
-                            chunkedThreshold: Int = 102400,
-                            shouldGzip: (RequestHeader,
-                            Result) => Boolean = (_, _) => true) {
+case class GzipFilterConfig(
+    bufferSize: Int = 8192,
+    chunkedThreshold: Int = 102400,
+    shouldGzip: (RequestHeader, Result) => Boolean = (_, _) => true) {
 
   // alternate constructor and builder methods for Java
   def this() = this(shouldGzip = (_, _) => true)
@@ -223,12 +223,12 @@ case class GzipFilterConfig(bufferSize: Int = 8192,
       shouldGzip: (RequestHeader, Result) => Boolean): GzipFilterConfig =
     copy(shouldGzip = shouldGzip)
 
-  def withShouldGzip(shouldGzip: BiFunction[
+  def withShouldGzip(
+      shouldGzip: BiFunction[
           play.mvc.Http.RequestHeader, play.mvc.Result, Boolean])
     : GzipFilterConfig =
-    withShouldGzip(
-        (req,
-        res) => shouldGzip.asScala(new j.RequestHeaderImpl(req), res.asJava))
+    withShouldGzip((req, res) =>
+          shouldGzip.asScala(new j.RequestHeaderImpl(req), res.asJava))
 
   def withChunkedThreshold(threshold: Int): GzipFilterConfig =
     copy(chunkedThreshold = threshold)
@@ -243,11 +243,9 @@ object GzipFilterConfig {
 
     GzipFilterConfig(
         bufferSize = config.get[ConfigMemorySize]("bufferSize").toBytes.toInt,
-        chunkedThreshold = config
-            .get[ConfigMemorySize]("chunkedThreshold")
-            .toBytes
-            .toInt
-      )
+        chunkedThreshold =
+          config.get[ConfigMemorySize]("chunkedThreshold").toBytes.toInt
+    )
   }
 }
 

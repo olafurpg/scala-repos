@@ -54,7 +54,7 @@ object Reflect {
       javaDelegate: ClassTag[JavaDelegate],
       default: ClassTag[Default]): Seq[Binding[_]] = {
 
-    def bind[T : SubClassOf]: BindingKey[T] =
+    def bind[T: SubClassOf]: BindingKey[T] =
       BindingKey(implicitly[SubClassOf[T]].runtimeClass)
 
     configuredClass[ScalaTrait, JavaInterface, Default](
@@ -153,7 +153,7 @@ object Reflect {
     }
   }
 
-  def createInstance[T : ClassTag](fqcn: String, classLoader: ClassLoader): T = {
+  def createInstance[T: ClassTag](fqcn: String, classLoader: ClassLoader): T = {
     try {
       createInstance(getClass(fqcn, classLoader))
     } catch {
@@ -166,7 +166,7 @@ object Reflect {
     }
   }
 
-  def getClass[T : ClassTag](
+  def getClass[T: ClassTag](
       fqcn: String, classLoader: ClassLoader): Class[_ <: T] = {
     val c = Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
     val t = implicitly[ClassTag[T]].runtimeClass
@@ -174,7 +174,7 @@ object Reflect {
     else throw new ClassCastException(t + " is not assignable from " + c)
   }
 
-  def createInstance[T : ClassTag](clazz: Class[_]): T = {
+  def createInstance[T: ClassTag](clazz: Class[_]): T = {
     val o = clazz.newInstance
     val t = implicitly[ClassTag[T]].runtimeClass
     if (t.isInstance(o)) o.asInstanceOf[T]
@@ -199,7 +199,7 @@ object Reflect {
   }
 
   object SubClassOf {
-    implicit def provide[T : ClassTag]: SubClassOf[T] =
+    implicit def provide[T: ClassTag]: SubClassOf[T] =
       new SubClassOf[T](
           implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
   }

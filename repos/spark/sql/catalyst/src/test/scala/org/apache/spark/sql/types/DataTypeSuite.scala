@@ -335,10 +335,10 @@ class DataTypeSuite extends SparkFunSuite {
       expected = false)
   checkEqualsIgnoreCompatibleNullability(
       from = StructType(
-            StructField("a", StringType, nullable = false) :: StructField(
-                "b", StringType, nullable = true) :: Nil),
+          StructField("a", StringType, nullable = false) :: StructField(
+              "b", StringType, nullable = true) :: Nil),
       to = StructType(
-            StructField("a", StringType, nullable = false) :: StructField(
-                "b", StringType, nullable = false) :: Nil),
+          StructField("a", StringType, nullable = false) :: StructField(
+              "b", StringType, nullable = false) :: Nil),
       expected = false)
 }

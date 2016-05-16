@@ -57,7 +57,8 @@ object Logger {
   * Mapped Diagnostic Context (MDC) with attribute name "sourceThread".
   */
 class Slf4jLogger
-    extends Actor with SLF4JLogging
+    extends Actor
+    with SLF4JLogging
     with RequiresMessageQueue[LoggerMessageQueueSemantics] {
 
   val mdcThreadAttributeName = "sourceThread"

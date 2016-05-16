@@ -100,7 +100,8 @@ trait PathPart
   * @param encode Whether this part should be encoded or not.
   */
 case class DynamicPart(name: String, constraint: String, encode: Boolean)
-    extends PathPart with Positional {
+    extends PathPart
+    with Positional {
   override def toString =
     """DynamicPart("""" + name + "\", \"\"\"" + constraint + "\"\"\"," +
     encode + ")" //"

@@ -40,8 +40,10 @@ import scala.collection.parallel.Task
   */
 @SerialVersionUID(1L)
 class ParHashSet[T] private[immutable](private[this] val trie: HashSet[T])
-    extends ParSet[T] with GenericParTemplate[T, ParHashSet]
-    with ParSetLike[T, ParHashSet[T], HashSet[T]] with Serializable {
+    extends ParSet[T]
+    with GenericParTemplate[T, ParHashSet]
+    with ParSetLike[T, ParHashSet[T], HashSet[T]]
+    with Serializable {
   self =>
 
   def this() = this(HashSet.empty[T])
@@ -200,7 +202,8 @@ private[immutable] abstract class HashSetCombiner[T]
         while (i < chunksz) {
           val v = chunkarr(i).asInstanceOf[T]
           val hc = trie.computeHash(v)
-          trie = trie.updated0(v, hc, rootbits) // internal API, private[collection]
+          trie =
+            trie.updated0(v, hc, rootbits) // internal API, private[collection]
           i += 1
         }
         i = 0

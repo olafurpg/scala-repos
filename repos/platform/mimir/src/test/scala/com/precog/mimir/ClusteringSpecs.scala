@@ -34,8 +34,10 @@ import blueeyes.json._
 import scalaz._
 
 trait ClusteringLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with ClusteringTestSupport with LongIdMemoryDatasetConsumer[M] {
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with ClusteringTestSupport
+    with LongIdMemoryDatasetConsumer[M] {
   self =>
 
   import dag._
@@ -547,18 +549,16 @@ trait ClusteringLibSpecs[M[+ _]]
                                           "clusterCenter" -> SObject(
                                               Map("bar" -> SDecimal(9.0),
                                                   "foo" -> SDecimal(4.4))))))),
-          SObject(Map("model2" -> SObject(Map("clusterId" -> SString("cluster1"),
-                                              "clusterCenter" -> SObject(
-                                                  Map("baz" -> SDecimal(
-                                                          4.0))))))),
           SObject(
-              Map(
-                  "model1" -> SObject(
-                      Map("clusterId" -> SString("cluster2"),
-                          "clusterCenter" -> SArray(
-                              Vector(SDecimal(6.0),
-                                     SDecimal(3.0),
-                                     SDecimal(2.0))))))),
+              Map("model2" -> SObject(Map("clusterId" -> SString("cluster1"),
+                                          "clusterCenter" -> SObject(
+                                              Map("baz" -> SDecimal(4.0))))))),
+          SObject(
+              Map("model1" -> SObject(Map("clusterId" -> SString("cluster2"),
+                                          "clusterCenter" -> SArray(Vector(
+                                                  SDecimal(6.0),
+                                                  SDecimal(3.0),
+                                                  SDecimal(2.0))))))),
           SObject(Map("model1" -> SObject(
                       Map("clusterId" -> SString("cluster3"),
                           "clusterCenter" -> SArray(Vector(SDecimal(0.0),
@@ -574,4 +574,5 @@ trait ClusteringLibSpecs[M[+ _]]
 }
 
 object ClusteringLibSpecs
-    extends ClusteringLibSpecs[test.YId] with test.YIdInstances
+    extends ClusteringLibSpecs[test.YId]
+    with test.YIdInstances

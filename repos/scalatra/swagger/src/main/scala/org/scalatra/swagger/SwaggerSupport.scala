@@ -199,13 +199,15 @@ object SwaggerSupportSyntax {
     def fromForm: this.type = paramType(ParamType.Form)
 
     def allowableValues[V](values: V*): this.type = {
-      _allowableValues = if (values.isEmpty) AllowableValues.empty
-      else AllowableValues(values: _*)
+      _allowableValues =
+        if (values.isEmpty) AllowableValues.empty
+        else AllowableValues(values: _*)
       this
     }
     def allowableValues[V](values: List[V]): this.type = {
-      _allowableValues = if (values.isEmpty) AllowableValues.empty
-      else AllowableValues(values)
+      _allowableValues =
+        if (values.isEmpty) AllowableValues.empty
+        else AllowableValues(values)
       this
     }
 
@@ -256,7 +258,7 @@ object SwaggerSupportSyntax {
                 isRequired)
   }
 
-  class ParameterBuilder[T : Manifest](initialDataType: DataType)
+  class ParameterBuilder[T: Manifest](initialDataType: DataType)
       extends SwaggerParameterBuilder {
     dataType(initialDataType)
     private[this] var _defaultValue: Option[String] = None
@@ -470,7 +472,7 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     * non-primitive classes and adds those to the swagger defintion
     * @tparam T the class of the model to register
     */
-  protected def registerModel[T : Manifest : NotNothing]() {
+  protected def registerModel[T: Manifest: NotNothing]() {
     Swagger.collectModels[T](_models.values.toSet) map registerModel
   }
 
@@ -528,12 +530,12 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
     swaggerMeta(Symbols.Errors, value.toList)
 
   import org.scalatra.swagger.SwaggerSupportSyntax._
-  protected def apiOperation[T : Manifest : NotNothing](
+  protected def apiOperation[T: Manifest: NotNothing](
       nickname: String): SwaggerOperationBuilder[_ <: SwaggerOperation]
   implicit def parameterBuilder2parameter(
       pmb: SwaggerParameterBuilder): Parameter = pmb.result
 
-  private[this] def swaggerParam[T : Manifest](
+  private[this] def swaggerParam[T: Manifest](
       name: String,
       liftCollection: Boolean = false,
       allowsCollection: Boolean = true,
@@ -572,31 +574,31 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
       .name(name)
   }
 
-  protected def bodyParam[T : Manifest : NotNothing]: ParameterBuilder[T] =
+  protected def bodyParam[T: Manifest: NotNothing]: ParameterBuilder[T] =
     bodyParam[T]("body")
   protected def bodyParam(model: Model): ModelParameterBuilder =
     bodyParam("body", model)
-  protected def bodyParam[T : Manifest : NotNothing](
+  protected def bodyParam[T: Manifest: NotNothing](
       name: String): ParameterBuilder[T] = swaggerParam[T](name).fromBody
   protected def bodyParam(name: String, model: Model): ModelParameterBuilder =
     swaggerParam(name, model).fromBody
-  protected def queryParam[T : Manifest : NotNothing](
+  protected def queryParam[T: Manifest: NotNothing](
       name: String): ParameterBuilder[T] =
     swaggerParam[T](name, liftCollection = true)
   protected def queryParam(name: String, model: Model): ModelParameterBuilder =
     swaggerParam(name, model)
-  protected def formParam[T : Manifest : NotNothing](
+  protected def formParam[T: Manifest: NotNothing](
       name: String): ParameterBuilder[T] =
     swaggerParam[T](name, liftCollection = true).fromForm
   protected def formParam(name: String, model: Model): ModelParameterBuilder =
     swaggerParam(name, model).fromForm
-  protected def headerParam[T : Manifest : NotNothing](
+  protected def headerParam[T: Manifest: NotNothing](
       name: String): ParameterBuilder[T] =
     swaggerParam[T](name, allowsCollection = false).fromHeader
   protected def headerParam(
       name: String, model: Model): ModelParameterBuilder =
     swaggerParam(name, model).fromHeader
-  protected def pathParam[T : Manifest : NotNothing](
+  protected def pathParam[T: Manifest: NotNothing](
       name: String): ParameterBuilder[T] =
     swaggerParam[T](name, allowsCollection = false, allowsOption = false).fromPath
   protected def pathParam(name: String, model: Model): ModelParameterBuilder =
@@ -638,13 +640,15 @@ trait SwaggerSupportSyntax extends Initializable with CorsSupport {
   * Provides the necessary support for adding documentation to your routes.
   */
 trait SwaggerSupport
-    extends ScalatraBase with SwaggerSupportBase with SwaggerSupportSyntax {
+    extends ScalatraBase
+    with SwaggerSupportBase
+    with SwaggerSupportSyntax {
 
   import org.scalatra.swagger.SwaggerSupportSyntax._
 
   protected implicit def operationBuilder2operation[T](
       bldr: SwaggerOperationBuilder[Operation]): Operation = bldr.result
-  protected def apiOperation[T : Manifest : NotNothing](
+  protected def apiOperation[T: Manifest: NotNothing](
       nickname: String): OperationBuilder = {
     registerModel[T]()
     (new OperationBuilder(DataType[T]) nickname nickname)
@@ -699,11 +703,14 @@ trait SwaggerSupport
           method = method,
           responseClass = responseClass,
           summary = summary,
-          position = 0,
+          position =
+            0,
           notes = notes,
           nickname = nick,
-          parameters = theParams,
-          responseMessages = (errors ::: swaggerDefaultMessages ::: swaggerDefaultErrors).distinct,
+          parameters =
+            theParams,
+          responseMessages =
+            (errors ::: swaggerDefaultMessages ::: swaggerDefaultErrors).distinct,
           produces = produces,
           consumes = consumes)
     }

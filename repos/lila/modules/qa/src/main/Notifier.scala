@@ -23,7 +23,8 @@ private[qa] final class Notifier(
           from = sender,
           to = q.userId,
           subject = s"""${u.username} replied to your question""",
-          message = s"""Your question "${q.title}" got a new answer from ${u.username}!
+          message =
+            s"""Your question "${q.title}" got a new answer from ${u.username}!
 
 Check it out on ${questionUrl(q)}#answer-${a.id}""")
   }

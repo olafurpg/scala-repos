@@ -32,7 +32,8 @@ import org.specs2.mutable._
 import org.scalacheck.Gen
 
 trait SampleSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification
+    extends ColumnarTableModuleTestSupport[M]
+    with Specification
     with ScalaCheck {
   import SampleData._
   import trans._

@@ -8,7 +8,7 @@ object $operator extends $operator
 trait $operator {
   import play.modules.reactivemongo.json._
 
-  def $set[A : Writes](pairs: (String, A)*) =
+  def $set[A: Writes](pairs: (String, A)*) =
     Json.obj("$set" -> Json.obj(wrap(pairs): _*))
   def $set(pairs: (String, Json.JsValueWrapper)*) =
     Json.obj("$set" -> Json.obj(pairs: _*))
@@ -18,16 +18,16 @@ trait $operator {
   def $setBson(pairs: BSONDocument) = BSONDocument("$set" -> pairs)
   def $unset(fields: String*) =
     Json.obj("$unset" -> Json.obj(wrap(fields map (_ -> true)): _*))
-  def $inc[A : Writes](pairs: (String, A)*) =
+  def $inc[A: Writes](pairs: (String, A)*) =
     Json.obj("$inc" -> Json.obj(wrap(pairs): _*))
   def $incBson(pairs: (String, Int)*) =
     BSONDocument(
         "$inc" -> BSONDocument(pairs map {
       case (k, v) => k -> BSONInteger(v)
     }))
-  def $push[A : Writes](field: String, value: A) =
+  def $push[A: Writes](field: String, value: A) =
     Json.obj("$push" -> Json.obj(field -> value))
-  def $pushSlice[A : Writes](field: String, value: A, max: Int) =
+  def $pushSlice[A: Writes](field: String, value: A, max: Int) =
     Json.obj(
         "$push" -> Json.obj(
             field -> Json.obj(
@@ -35,21 +35,21 @@ trait $operator {
                 "$slice" -> max
             )
         ))
-  def $pull[A : Writes](field: String, value: A) =
+  def $pull[A: Writes](field: String, value: A) =
     Json.obj("$pull" -> Json.obj(field -> value))
 
-  def $gt[A : Writes](value: A) = Json.obj("$gt" -> value)
-  def $gte[A : Writes](value: A) = Json.obj("$gte" -> value)
-  def $lt[A : Writes](value: A) = Json.obj("$lt" -> value)
-  def $lte[A : Writes](value: A) = Json.obj("$lte" -> value)
-  def $ne[A : Writes](value: A) = Json.obj("$ne" -> value)
+  def $gt[A: Writes](value: A) = Json.obj("$gt" -> value)
+  def $gte[A: Writes](value: A) = Json.obj("$gte" -> value)
+  def $lt[A: Writes](value: A) = Json.obj("$lt" -> value)
+  def $lte[A: Writes](value: A) = Json.obj("$lte" -> value)
+  def $ne[A: Writes](value: A) = Json.obj("$ne" -> value)
 
-  def $in[A : Writes](values: Iterable[A]) = Json.obj("$in" -> values)
-  def $nin[A : Writes](values: Iterable[A]) = Json.obj("$nin" -> values)
-  def $all[A : Writes](values: Iterable[A]) = Json.obj("$all" -> values)
+  def $in[A: Writes](values: Iterable[A]) = Json.obj("$in" -> values)
+  def $nin[A: Writes](values: Iterable[A]) = Json.obj("$nin" -> values)
+  def $all[A: Writes](values: Iterable[A]) = Json.obj("$all" -> values)
   def $exists(bool: Boolean) = Json.obj("$exists" -> bool)
 
-  def $or[A : Writes](conditions: Iterable[A]): JsObject =
+  def $or[A: Writes](conditions: Iterable[A]): JsObject =
     Json.obj("$or" -> conditions)
 
   def $regex(value: String, flags: String = "") =
@@ -58,7 +58,7 @@ trait $operator {
   import org.joda.time.DateTime
   def $date(value: DateTime) = BSONFormats toJSON BSONDateTime(value.getMillis)
 
-  private def wrap[K, V : Writes](
+  private def wrap[K, V: Writes](
       pairs: Seq[(K, V)]): Seq[(K, Json.JsValueWrapper)] = pairs map {
     case (k, v) => k -> Json.toJsFieldJsValueWrapper(v)
   }

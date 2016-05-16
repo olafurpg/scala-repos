@@ -44,7 +44,8 @@ object Redis extends Client[Command, Reply] {
       stack: Stack[ServiceFactory[Command, Reply]] = Client.newStack,
       params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Reply, Client]
-      with WithDefaultLoadBalancer[Client] with RedisRichClient {
+      with WithDefaultLoadBalancer[Client]
+      with RedisRichClient {
 
     protected def copy1(
         stack: Stack[ServiceFactory[Command, Reply]] = this.stack,

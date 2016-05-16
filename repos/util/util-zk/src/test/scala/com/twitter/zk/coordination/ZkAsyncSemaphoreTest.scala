@@ -20,7 +20,9 @@ import com.twitter.zk.{NativeConnector, RetryPolicy, ZkClient}
 
 @RunWith(classOf[JUnitRunner])
 class ZkAsyncSemaphoreTest
-    extends WordSpec with MockitoSugar with AsyncAssertions {
+    extends WordSpec
+    with MockitoSugar
+    with AsyncAssertions {
 
   "ZkAsyncSemaphore" should {
 

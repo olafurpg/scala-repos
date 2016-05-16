@@ -55,7 +55,8 @@ class HTTPServletSession(session: HttpSession) extends HTTPSession {
   * Represents the "bridge" between HttpSession and LiftSession
   */
 case class SessionToServletBridge(uniqueId: String)
-    extends HttpSessionBindingListener with HttpSessionActivationListener {
+    extends HttpSessionBindingListener
+    with HttpSessionActivationListener {
   def sessionDidActivate(se: HttpSessionEvent) = {
     SessionMaster
       .getSession(uniqueId, Empty)

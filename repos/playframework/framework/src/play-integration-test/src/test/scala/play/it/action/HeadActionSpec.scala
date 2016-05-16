@@ -23,12 +23,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.asynchttpclient.netty.NettyResponse
 
 object NettyHeadActionSpec
-    extends HeadActionSpec with NettyIntegrationSpecification
+    extends HeadActionSpec
+    with NettyIntegrationSpecification
 object AkkaHttpHeadActionSpec
-    extends HeadActionSpec with AkkaHttpIntegrationSpecification
+    extends HeadActionSpec
+    with AkkaHttpIntegrationSpecification
 
 trait HeadActionSpec
-    extends Specification with FutureAwaits with DefaultAwaitTimeout
+    extends Specification
+    with FutureAwaits
+    with DefaultAwaitTimeout
     with ServerIntegrationSpecification {
 
   private def route(verb: String, path: String)(

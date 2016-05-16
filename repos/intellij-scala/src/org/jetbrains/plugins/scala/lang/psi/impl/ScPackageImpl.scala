@@ -117,7 +117,8 @@ class ScPackageImpl private (val pack: PsiPackage)
     val count = ScalaPsiManager.instance(getProject).getModificationCount
     if (tuple == null || tuple._2.longValue != count) {
       val clazz = manager.getPackageObjectByName(getQualifiedName, scope)
-      tuple = (clazz, java.lang.Long.valueOf(count)) // TODO is it safe to cache this ignoring `scope`?
+      tuple =
+        (clazz, java.lang.Long.valueOf(count)) // TODO is it safe to cache this ignoring `scope`?
       pack.putUserData(CachesUtil.PACKAGE_OBJECT_KEY, tuple)
     }
     Option(tuple._1)

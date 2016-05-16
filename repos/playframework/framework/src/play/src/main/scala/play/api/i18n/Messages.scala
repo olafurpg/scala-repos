@@ -320,7 +320,8 @@ object Messages {
         rep(
             ("""\""" ^^ (_ => "")) ~>
             (// Ignore the leading \
-                ("\r" ?) ~> "\n" ^^ (_ => "") | // Ignore escaped end of lines \
+                ("\r" ?) ~> "\n" ^^ (_ =>
+                      "") | // Ignore escaped end of lines \
                 "n" ^^ (_ => "\n") | // Translate literal \n to real newline
                 """\""" | // Handle escaped \\
                 "^.".r ^^ ("""\""" + _)) | "^.".r // Or any character
@@ -338,7 +339,7 @@ object Messages {
     val sentence = (comment | positioned(message)) <~ newLine
 
     val parser =
-      phrase(( (sentence | blankLine).*) <~ end) ^^ {
+      phrase(((sentence | blankLine).*) <~ end) ^^ {
         case messages =>
           messages.collect {
             case m @ Messages.Message(_, _, _, _) => m
@@ -563,8 +564,9 @@ class DefaultMessagesApi @Inject()(
   def translate(key: String, args: Seq[Any])(
       implicit lang: Lang): Option[String] = {
     val codesToTry = Seq(lang.code, lang.language, "default", "default.play")
-    val pattern: Option[String] = codesToTry.foldLeft[Option[String]](None)(
-        (res, lang) => res.orElse(messages.get(lang).flatMap(_.get(key))))
+    val pattern: Option[String] =
+      codesToTry.foldLeft[Option[String]](None)((res, lang) =>
+            res.orElse(messages.get(lang).flatMap(_.get(key))))
     pattern.map(pattern =>
           new MessageFormat(pattern, lang.toLocale)
             .format(args.map(_.asInstanceOf[java.lang.Object]).toArray))

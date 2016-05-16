@@ -144,7 +144,7 @@ object MarkovChain {
     def promoteTuple[A, B, C, D](
         k1: (A, B) => Rand[C], k2: (C, B) => Rand[D]) = { (t: (A, B)) =>
       for (c <- k1(t._1, t._2);
-      d <- k2(c, t._2)) yield (c, d);
+           d <- k2(c, t._2)) yield (c, d);
     }
 
     /**
@@ -155,8 +155,8 @@ object MarkovChain {
                                              k3: (U1, U2, T3) => Rand[U3]) = {
       (t: (T1, T2, T3)) =>
         for (c <- k1(t._1, t._2, t._3);
-        d <- k2(c, t._2, t._3);
-        e <- k3(c, d, t._3)) yield (c, d, e);
+             d <- k2(c, t._2, t._3);
+             e <- k3(c, d, t._3)) yield (c, d, e);
     }
 
     /**
@@ -168,9 +168,9 @@ object MarkovChain {
         k3: (U1, U2, T3, T4) => Rand[U3],
         k4: (U1, U2, U3, T4) => Rand[U4]) = { (t: (T1, T2, T3, T4)) =>
       for (c <- k1(t._1, t._2, t._3, t._4);
-      d <- k2(c, t._2, t._3, t._4);
-      e <- k3(c, d, t._3, t._4);
-      f <- k4(c, d, e, t._4)) yield (c, d, e, f);
+           d <- k2(c, t._2, t._3, t._4);
+           e <- k3(c, d, t._3, t._4);
+           f <- k4(c, d, e, t._4)) yield (c, d, e, f);
     }
 
     /**
@@ -202,13 +202,13 @@ object MarkovChain {
       * @param proposal the <b>symmetric</b> proposal distribution generator
       *
       */
-    def metropolis[T](proposal: T => Rand[T])(logMeasure: T => Double)(
-        implicit rand: RandBasis = Rand) = { t: T =>
+    def metropolis[T](proposal: T => Rand[T])(
+        logMeasure: T => Double)(implicit rand: RandBasis = Rand) = { t: T =>
       for (next <- proposal(t);
-      newLL = logMeasure(next);
-      oldLL = logMeasure(t);
-      a = min(1, exp(newLL - oldLL));
-      u <- rand.uniform) yield if (u < a) next else t;
+           newLL = logMeasure(next);
+           oldLL = logMeasure(t);
+           a = min(1, exp(newLL - oldLL));
+           u <- rand.uniform) yield if (u < a) next else t;
     }
 
     /**
@@ -220,12 +220,12 @@ object MarkovChain {
         logMeasure: T => Double)(implicit rand: RandBasis = Rand) = { t: T =>
       val prop = proposal(t);
       for (next <- prop;
-      newLL = logMeasure(next);
-      newP = prop.logApply(next);
-      oldLL = logMeasure(t);
-      oldP = prop.logApply(t);
-      a = min(1, exp(newLL + newP - oldLL - oldP));
-      u <- rand.uniform) yield if (u < a) next else t;
+           newLL = logMeasure(next);
+           newP = prop.logApply(next);
+           oldLL = logMeasure(t);
+           oldP = prop.logApply(t);
+           a = min(1, exp(newLL + newP - oldLL - oldP));
+           u <- rand.uniform) yield if (u < a) next else t;
     }
 
     /**
@@ -254,7 +254,7 @@ object MarkovChain {
               var k = (M - 1) - j;
 
               while (prop < logMeasure(left) && j > 0 &&
-              valid(left - WINDOW)) {
+                     valid(left - WINDOW)) {
                 left = left - WINDOW;
                 j -= 1;
               }
@@ -262,7 +262,7 @@ object MarkovChain {
               if (!valid(right)) right = last;
               else
                 while (prop < logMeasure(right) && k > 0 &&
-                valid(right + WINDOW)) {
+                       valid(right + WINDOW)) {
                   right = right + WINDOW;
                   k -= 1;
                 }

@@ -37,7 +37,10 @@ import org.apache.spark.util.Utils
   * Suite of Kinesis streaming receiver tests focusing mostly on the KinesisRecordProcessor
   */
 class KinesisReceiverSuite
-    extends TestSuiteBase with Matchers with BeforeAndAfter with MockitoSugar {
+    extends TestSuiteBase
+    with Matchers
+    with BeforeAndAfter
+    with MockitoSugar {
 
   val app = "TestKinesisReceiver"
   val stream = "mySparkStream"

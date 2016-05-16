@@ -144,7 +144,7 @@ object PluginDiscovery {
     new DetectedModules(namesAndValues)
   }
 
-  private[this] def loadModules[T : reflect.ClassTag](
+  private[this] def loadModules[T: reflect.ClassTag](
       data: PluginData,
       names: Seq[String],
       loader: ClassLoader): Seq[(String, T)] =

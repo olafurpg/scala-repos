@@ -118,9 +118,10 @@ object M2 {
     def hasNext = true;
     def next = {
       val p = current.next;
-      current = current filter { x =>
-        !((x % p) == 0)
-      };
+      current =
+        current filter { x =>
+          !((x % p) == 0)
+        };
       p
     }
   }

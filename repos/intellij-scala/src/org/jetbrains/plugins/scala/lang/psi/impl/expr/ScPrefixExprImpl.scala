@@ -16,7 +16,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScPrefixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPrefixExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScPrefixExpr {
   override def toString: String = "PrefixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty

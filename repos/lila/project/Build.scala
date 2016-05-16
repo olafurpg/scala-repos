@@ -63,7 +63,8 @@ object ApplicationBuild extends Build {
           (sources ** "*").get
         },
             // trump sbt-web into not looking at public/
-            resourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
+            resourceDirectory in Assets :=
+              (sourceDirectory in Compile).value / "assets"
         ))
 
   lazy val modules = Seq(chess,

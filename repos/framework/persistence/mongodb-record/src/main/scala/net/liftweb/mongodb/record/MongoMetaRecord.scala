@@ -38,7 +38,8 @@ import com.mongodb.util.JSON
 import org.bson.types.ObjectId
 
 trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
-    extends BsonMetaRecord[BaseRecord] with MongoMeta[BaseRecord] {
+    extends BsonMetaRecord[BaseRecord]
+    with MongoMeta[BaseRecord] {
 
   self: BaseRecord =>
 
@@ -388,7 +389,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
                   builder.add(pair._1, pair._2)
                 }
                 .get
-            )
+          )
         }
 
         if (fieldsToUnset.length > 0) {
@@ -399,7 +400,7 @@ trait MongoMetaRecord[BaseRecord <: MongoRecord[BaseRecord]]
                   builder.add(fieldName, 1)
                 }
                 .get
-            )
+          )
         }
 
         update(inst, dbo.get)

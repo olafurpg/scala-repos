@@ -41,7 +41,8 @@ class ClusterDeathWatchMultiJvmNode5 extends ClusterDeathWatchSpec
 
 abstract class ClusterDeathWatchSpec
     extends MultiNodeSpec(ClusterDeathWatchMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import ClusterDeathWatchMultiJvmSpec._
 

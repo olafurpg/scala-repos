@@ -30,7 +30,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class TrainValidationSplitSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
   test("train validation with logistic regression") {
     val dataset = sqlContext.createDataFrame(
         sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
@@ -120,7 +121,8 @@ object TrainValidationSplitSuite {
   abstract class MyModel extends Model[MyModel]
 
   class MyEstimator(override val uid: String)
-      extends Estimator[MyModel] with HasInputCol {
+      extends Estimator[MyModel]
+      with HasInputCol {
 
     override def fit(dataset: DataFrame): MyModel = {
       throw new UnsupportedOperationException

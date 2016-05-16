@@ -187,7 +187,8 @@ class ScalaJSSBTRunner(
         javaCmd,
         javacCmd,
         scalacArgs
-    ) with ScalaJSSuiteRunner {
+    )
+    with ScalaJSSuiteRunner {
 
   // The test root for partest is read out through the system properties,
   // not passed as an argument

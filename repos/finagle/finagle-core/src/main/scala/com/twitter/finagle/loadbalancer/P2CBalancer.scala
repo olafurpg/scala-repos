@@ -34,8 +34,10 @@ private class P2CBalancer[Req, Rep](
     protected val rng: Rng,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-    extends Balancer[Req, Rep] with LeastLoaded[Req, Rep]
-    with P2C[Req, Rep] with Updating[Req, Rep] {
+    extends Balancer[Req, Rep]
+    with LeastLoaded[Req, Rep]
+    with P2C[Req, Rep]
+    with Updating[Req, Rep] {
 
   protected[this] val maxEffortExhausted =
     statsReceiver.counter("max_effort_exhausted")
@@ -75,8 +77,10 @@ private class P2CBalancerPeakEwma[Req, Rep](
     protected val rng: Rng,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-    extends Balancer[Req, Rep] with PeakEwma[Req, Rep]
-    with P2C[Req, Rep] with Updating[Req, Rep] {
+    extends Balancer[Req, Rep]
+    with PeakEwma[Req, Rep]
+    with P2C[Req, Rep]
+    with Updating[Req, Rep] {
 
   protected[this] val maxEffortExhausted =
     statsReceiver.counter("max_effort_exhausted")
@@ -146,7 +150,8 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
 
   protected case class Node(
       factory: ServiceFactory[Req, Rep], metric: Metric, token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+      extends ServiceFactoryProxy[Req, Rep](factory)
+      with NodeT[Req, Rep] {
     type This = Node
 
     def load: Double = metric.get()

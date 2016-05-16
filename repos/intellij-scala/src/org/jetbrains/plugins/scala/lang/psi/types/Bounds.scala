@@ -240,8 +240,8 @@ object Bounds {
 
   private def lub(seq: Seq[ScType], checkWeak: Boolean)(
       implicit stopAddingUpperBound: Boolean): ScType = {
-    seq.reduce(
-        (l: ScType, r: ScType) => lub(l, r, lubDepth(Seq(l, r)), checkWeak))
+    seq.reduce((l: ScType, r: ScType) =>
+          lub(l, r, lubDepth(Seq(l, r)), checkWeak))
   }
 
   private def lub(t1: ScType, t2: ScType, depth: Int, checkWeak: Boolean)(
@@ -298,8 +298,7 @@ object Bounds {
               case None => JavaArrayType(v)
             }
           case (JavaArrayType(arg), ScParameterizedType(des, args))
-              if args.length == 1 &&
-              (ScType.extractClass(des) match {
+              if args.length == 1 && (ScType.extractClass(des) match {
                     case Some(q) => q.qualifiedName == "scala.Array"
                     case _ => false
                   }) =>
@@ -311,8 +310,7 @@ object Bounds {
               case None => ScParameterizedType(des, Seq(v))
             }
           case (ScParameterizedType(des, args), JavaArrayType(arg))
-              if args.length == 1 &&
-              (ScType.extractClass(des) match {
+              if args.length == 1 && (ScType.extractClass(des) match {
                     case Some(q) => q.qualifiedName == "scala.Array"
                     case _ => false
                   }) =>
@@ -460,8 +458,7 @@ object Bounds {
         for (i <- 0 until baseClass.getTypeParameters.length) {
           val substed1 = tp1.typeArgs.apply(i)
           val substed2 = tp2.typeArgs.apply(i)
-          resTypeArgs +=
-          (baseClass.getTypeParameters.apply(i) match {
+          resTypeArgs += (baseClass.getTypeParameters.apply(i) match {
                 case scp: ScTypeParam if scp.isCovariant =>
                   if (depth > 0) lub(substed1, substed2, depth - 1, checkWeak)
                   else types.Any
@@ -495,10 +492,11 @@ object Bounds {
       alias match {
         case aliasDef: ScTypeAliasDefinition
             if s.aliasesMap.get(aliasDef.name) == None =>
-          run = run bindA
-          (aliasDef.name, { () =>
-                aliasDef.aliasedType(TypingContext.empty).getOrAny
-              })
+          run =
+            run bindA
+            (aliasDef.name, { () =>
+                  aliasDef.aliasedType(TypingContext.empty).getOrAny
+                })
         case _ =>
       }
     }

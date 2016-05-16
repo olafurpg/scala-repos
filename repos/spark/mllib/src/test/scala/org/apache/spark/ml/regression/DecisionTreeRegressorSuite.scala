@@ -28,7 +28,8 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row}
 
 class DecisionTreeRegressorSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import DecisionTreeRegressorSuite.compareAPIs
@@ -37,8 +38,8 @@ class DecisionTreeRegressorSuite
 
   override def beforeAll() {
     super.beforeAll()
-    categoricalDataPointsRDD = sc.parallelize(
-        OldDecisionTreeSuite.generateCategoricalDataPoints())
+    categoricalDataPointsRDD =
+      sc.parallelize(OldDecisionTreeSuite.generateCategoricalDataPoints())
   }
 
   /////////////////////////////////////////////////////////////////////////////

@@ -45,46 +45,39 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
   test("d(e(m)) == m") {
     val ms = mutable.Buffer[Message]()
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           version <- goodVersions
           ctx <- goodContexts
         } yield Tinit(tag, version, ctx))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           version <- goodVersions
           ctx <- goodContexts
         } yield Rinit(tag, version, ctx))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           traceId <- goodTraceIds
           body <- goodBufs
         } yield Treq(tag, traceId, body))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           body <- goodBufs
         } yield RreqOk(tag, body))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
         } yield Tdrain(tag))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           reason <- goodStrings
         } yield Tdiscarded(tag, reason))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           ctx <- goodContexts
           dest <- goodDests
@@ -92,33 +85,28 @@ class MessageTest extends FunSuite with AssertionsForJUnit {
           body <- goodBufs
         } yield Tdispatch(tag, ctx, dest, dtab, body))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           ctx <- goodContexts
           body <- goodBufs
         } yield RdispatchOk(tag, ctx, body))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           ctx <- goodContexts
           err <- goodStrings
         } yield RdispatchError(tag, ctx, err))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           tag <- goodTags
           ctx <- goodContexts
         } yield RdispatchNack(tag, ctx))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           lease <- goodDurationLeases
         } yield Tlease(lease))
 
-    ms ++=
-    (for {
+    ms ++= (for {
           lease <- goodTimeLeases
         } yield Tlease(lease))
 

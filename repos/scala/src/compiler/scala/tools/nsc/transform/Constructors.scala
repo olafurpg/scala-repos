@@ -37,9 +37,9 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
       val stats = cd.impl.body
       val clazz = cd.symbol
 
-      def checkableForInit(sym: Symbol) = ((sym ne null) &&
-          (sym.isVal || sym.isVar) &&
-          !(sym hasFlag LAZY | DEFERRED | SYNTHETIC))
+      def checkableForInit(sym: Symbol) =
+        ((sym ne null) && (sym.isVal || sym.isVar) &&
+            !(sym hasFlag LAZY | DEFERRED | SYNTHETIC))
       val uninitializedVals = mutable.Set[Symbol](
           stats collect {
             case vd: ValDef if checkableForInit(vd.symbol) =>
@@ -181,7 +181,9 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         isEffectivelyFinal && sym.isOuterAccessor && !sym.isOverridingSymbol
       val omittables =
         mutable.Set.empty[Symbol] ++
-        (decls filter (sym => omittableParamAcc(sym) || omittableOuterAcc(sym))) // the closure only captures isEffectivelyFinal
+        (decls filter (sym =>
+                  omittableParamAcc(sym) ||
+                  omittableOuterAcc(sym))) // the closure only captures isEffectivelyFinal
 
       // no point traversing further once omittables is empty, all candidates ruled out already.
       object detectUsages extends Traverser {
@@ -487,7 +489,9 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
 
   private class TemplateTransformer(
       val unit: CompilationUnit, val impl: Template)
-      extends StaticsTransformer with DelayedInitHelper with OmittablesHelper
+      extends StaticsTransformer
+      with DelayedInitHelper
+      with OmittablesHelper
       with GuardianOfCtorStmts {
 
     val clazz = impl.symbol.owner // the transformed class
@@ -545,8 +549,9 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         sym.isParamAccessor && sym.owner == clazz
 
       // Terminology: a stationary location is never written after being read.
-      private def isStationaryParamRef(sym: Symbol) = (isParamRef(sym) &&
-          !(sym.isGetter && sym.accessed.isVariable) && !sym.isSetter)
+      private def isStationaryParamRef(sym: Symbol) =
+        (isParamRef(sym) && !(sym.isGetter && sym.accessed.isVariable) &&
+            !sym.isSetter)
 
       private def possiblySpecialized(s: Symbol) =
         specializeTypes.specializedTypeVars(s).nonEmpty
@@ -790,14 +795,12 @@ abstract class Constructors extends Statics with Transform with ast.TreeDSL {
         else (Nil, remainingConstrStats)
 
       // Assemble final constructor
-      val primaryConstructor = deriveDefDef(primaryConstr)(
-          _ =>
-            {
-          treeCopy.Block(
-              primaryConstrBody,
-              paramInits ::: constructorPrefix ::: uptoSuperStats ::: guardSpecializedInitializer(
-                  remainingConstrStatsDelayedInit),
-              primaryConstrBody.expr)
+      val primaryConstructor = deriveDefDef(primaryConstr)(_ => {
+        treeCopy.Block(
+            primaryConstrBody,
+            paramInits ::: constructorPrefix ::: uptoSuperStats ::: guardSpecializedInitializer(
+                remainingConstrStatsDelayedInit),
+            primaryConstrBody.expr)
       })
 
       val constructors = primaryConstructor :: auxConstructors

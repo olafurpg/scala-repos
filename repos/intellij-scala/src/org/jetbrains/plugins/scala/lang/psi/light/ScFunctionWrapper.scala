@@ -66,8 +66,8 @@ with LightScalaMethod {
       case Some(i) if returnType == null =>
         val param = constr.parameters(i - 1)
         val scalaType = param.getType(TypingContext.empty).getOrAny
-        returnType = ScType.toPsi(
-            scalaType, constr.getProject, constr.getResolveScope)
+        returnType =
+          ScType.toPsi(scalaType, constr.getProject, constr.getResolveScope)
       case _ =>
     }
     returnType
@@ -227,45 +227,43 @@ object ScFunctionWrapper {
 
     function match {
       case function: ScFunction if function.typeParameters.nonEmpty =>
-        builder.append(
-            function.typeParameters
-              .map(tp =>
-                    {
-              var res = tp.name
-              tp.upperTypeElement match {
-                case Some(tParam) =>
-                  val classes = new ArrayBuffer[String]()
-                  tp.upperBound.map(subst.subst) match {
-                    case Success(tp: ScCompoundType, _) =>
-                      tp.components.foreach {
-                        case tp: ScType =>
-                          ScType.extractClass(tp, Some(function.getProject)) match {
-                            case Some(clazz) =>
-                              classes += clazz.getQualifiedName
-                            case _ =>
-                          }
-                      }
-                    case Success(_: StdType, _) =>
-                      JavaPsiFacade
-                        .getInstance(function.getProject)
-                        .getElementFactory
-                        .createTypeByFQClassName("java.lang.Object",
-                                                 function.getResolveScope)
-                    case Success(tpt: ScTypeParameterType, _) =>
-                      classes += tpt.canonicalText
-                    case Success(scType, _) =>
-                      ScType.extractClass(scType, Some(function.getProject)) match {
-                        case Some(clazz) => classes += clazz.getQualifiedName
-                        case _ =>
-                      }
-                    case _ =>
-                  }
-                  if (classes.nonEmpty) {
-                    res += classes.mkString(" extends ", " & ", "")
-                  }
-                case _ =>
-              }
-              res
+        builder.append(function.typeParameters
+              .map(tp => {
+            var res = tp.name
+            tp.upperTypeElement match {
+              case Some(tParam) =>
+                val classes = new ArrayBuffer[String]()
+                tp.upperBound.map(subst.subst) match {
+                  case Success(tp: ScCompoundType, _) =>
+                    tp.components.foreach {
+                      case tp: ScType =>
+                        ScType.extractClass(tp, Some(function.getProject)) match {
+                          case Some(clazz) =>
+                            classes += clazz.getQualifiedName
+                          case _ =>
+                        }
+                    }
+                  case Success(_: StdType, _) =>
+                    JavaPsiFacade
+                      .getInstance(function.getProject)
+                      .getElementFactory
+                      .createTypeByFQClassName("java.lang.Object",
+                                               function.getResolveScope)
+                  case Success(tpt: ScTypeParameterType, _) =>
+                    classes += tpt.canonicalText
+                  case Success(scType, _) =>
+                    ScType.extractClass(scType, Some(function.getProject)) match {
+                      case Some(clazz) => classes += clazz.getQualifiedName
+                      case _ =>
+                    }
+                  case _ =>
+                }
+                if (classes.nonEmpty) {
+                  res += classes.mkString(" extends ", " & ", "")
+                }
+              case _ =>
+            }
+            res
           })
               .mkString("<", ", ", ">"))
       case _ =>

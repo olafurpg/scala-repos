@@ -76,17 +76,20 @@ object ResourceError {
     def messages = nels(message)
   }
   case class IOError(exception: Throwable)
-      extends ResourceError with FatalError {
+      extends ResourceError
+      with FatalError {
     def messages =
       nels(Option(exception.getMessage).getOrElse(exception.getClass.getName))
   }
 
   case class IllegalWriteRequestError(message: String)
-      extends ResourceError with UserError {
+      extends ResourceError
+      with UserError {
     def messages = nels(message)
   }
   case class PermissionsError(message: String)
-      extends ResourceError with UserError {
+      extends ResourceError
+      with UserError {
     def messages = nels(message)
   }
 
@@ -96,7 +99,10 @@ object ResourceError {
 
   case class ResourceErrors private[ResourceError](
       errors: NonEmptyList[ResourceError])
-      extends ResourceError with FatalError with UserError { self =>
+      extends ResourceError
+      with FatalError
+      with UserError {
+    self =>
     override def fold[A](
         fatalError: FatalError => A, userError: UserError => A) = {
       val hasFatal = errors.list.exists(_.fold(_ => true, _ => false))

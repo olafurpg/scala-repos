@@ -34,8 +34,7 @@ object InputTask {
 
     import std.FullInstance._
     def toTask(in: String): Initialize[Task[T]] = flatten(
-        (Def.stateKey zipWith i)(
-            (sTask, it) =>
+        (Def.stateKey zipWith i)((sTask, it) =>
               sTask map
               (s =>
                     Parser.parse(in, it.parser(s)) match {

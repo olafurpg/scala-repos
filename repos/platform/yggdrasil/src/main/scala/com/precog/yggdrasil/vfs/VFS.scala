@@ -65,10 +65,10 @@ object Version {
 }
 
 object VFSModule {
-  def bufferOutput[M[+ _]: Monad](
-      stream0: StreamT[M, CharBuffer],
-      charset: Charset = Charset.forName("UTF-8"),
-      bufferSize: Int = 64 * 1024): StreamT[M, Array[Byte]] = {
+  def bufferOutput[M[+ _]: Monad](stream0: StreamT[M, CharBuffer],
+                                  charset: Charset = Charset.forName("UTF-8"),
+                                  bufferSize: Int =
+                                    64 * 1024): StreamT[M, Array[Byte]] = {
     val encoder = charset.newEncoder()
 
     def loop(stream: StreamT[M, CharBuffer],
@@ -167,7 +167,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
                       OctetStream -> (XJsonStream, OctetStream))).toMap
       for {
         selectedMT <- OptionT(
-            M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
+                         M.point(requestedMimeTypes.find(
+                                 acceptableMimeTypes.contains)))
         (conversionMT, returnMT) = acceptableMimeTypes(selectedMT)
         stream <- asByteStream(conversionMT)
       } yield (returnMT, stream)
@@ -190,7 +191,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
                                     OctetStream -> OctetStream)
       for {
         selectedMT <- OptionT(
-            M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
+                         M.point(requestedMimeTypes.find(
+                                 acceptableMimeTypes.contains)))
         stream <- asByteStream(selectedMT)
       } yield (selectedMT, stream)
     }

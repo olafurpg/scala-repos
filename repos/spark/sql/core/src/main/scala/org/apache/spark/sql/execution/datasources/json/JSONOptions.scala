@@ -29,7 +29,8 @@ import org.apache.spark.sql.execution.datasources.{CompressionCodecs, ParseModes
   */
 private[sql] class JSONOptions(
     @transient private val parameters: Map[String, String])
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   val samplingRatio =
     parameters.get("samplingRatio").map(_.toDouble).getOrElse(1.0)

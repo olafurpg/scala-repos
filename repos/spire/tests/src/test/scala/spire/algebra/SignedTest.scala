@@ -13,7 +13,7 @@ import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
 class SignedTest extends FunSuite {
-  def runWith[@sp(Int, Long, Float, Double) A : Signed : ClassTag](
+  def runWith[@sp(Int, Long, Float, Double) A: Signed: ClassTag](
       neg: A, pos: A, zero: A): Unit = {
     val m = implicitly[ClassTag[A]]
 

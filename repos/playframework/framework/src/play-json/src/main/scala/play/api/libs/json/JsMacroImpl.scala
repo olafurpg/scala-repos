@@ -12,14 +12,14 @@ import language.experimental.macros
   */
 object JsMacroImpl {
 
-  def formatImpl[A : c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
+  def formatImpl[A: c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
     macroImpl[A, OFormat, Format](
         c, "format", "inmap", reads = true, writes = true)
 
-  def readsImpl[A : c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
+  def readsImpl[A: c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
     macroImpl[A, Reads, Reads](c, "read", "map", reads = true, writes = false)
 
-  def writesImpl[A : c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
+  def writesImpl[A: c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
     macroImpl[A, OWrites, Writes](
         c, "write", "contramap", reads = false, writes = true)
 
@@ -166,7 +166,8 @@ object JsMacroImpl {
           // Option[_] needs special treatment because we need to use XXXOpt
           val tp =
             if (implType.typeConstructor <:< typeOf[Option[_]].typeConstructor)
-              args.head else implType
+              args.head
+            else implType
           (isRec, tp)
         case TypeRef(_, t, _) =>
           (false, implType)
@@ -223,8 +224,8 @@ object JsMacroImpl {
           } else {
             // If this is a list/set/seq/map, then we need to wrap the reads into that.
             def readsWritesHelper(methodName: String): List[Tree] =
-              conditionalList(Reads, Writes).map(
-                  s => q"$s.${TermName(methodName)}(this.lazyStuff)")
+              conditionalList(Reads, Writes).map(s =>
+                    q"$s.${TermName(methodName)}(this.lazyStuff)")
 
             val arg =
               if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
@@ -247,8 +248,8 @@ object JsMacroImpl {
     val applyFunction = {
       if (hasVarArgs) {
 
-        val applyParams = params.foldLeft(List[Tree]())(
-            (l, e) => l :+ Ident(TermName(e.name.encodedName.toString)))
+        val applyParams = params.foldLeft(List[Tree]())((l, e) =>
+              l :+ Ident(TermName(e.name.encodedName.toString)))
         val vals = params.foldLeft(List[Tree]())((l, e) =>
               // Let type inference infer the type by using the empty type, TypeTree()
               l :+ q"val ${TermName(e.name.encodedName.toString)}: ${TypeTree()}")

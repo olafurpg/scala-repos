@@ -116,8 +116,9 @@ object Msgs extends DispatchSnippet {
 
     // Compute the formatted set of messages for a given input
     def computeMessageDiv(
-        args: (List[(NodeSeq, Box[String])], NoticeType.Value,
-        SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
+        args: (List[(NodeSeq, Box[String])],
+               NoticeType.Value,
+               SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
       case (messages, noticeType, ajaxStorage) =>
         // get current settings
         val title = ajaxStorage.get.map(_.title) openOr Text("")

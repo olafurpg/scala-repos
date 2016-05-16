@@ -8,7 +8,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BucketedHistogramTest
-    extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
+    with Matchers {
   test("constructor limits cannot be empty") {
     intercept[IllegalArgumentException] {
       new BucketedHistogram(new Array[Int](0))
@@ -189,7 +191,7 @@ private object BucketedHistogramTest {
   def generator =
     for {
       samples <- Gen.nonEmptyContainerOf[List, Int](
-          Gen.chooseNum(0, Int.MaxValue))
+                    Gen.chooseNum(0, Int.MaxValue))
       percentile <- Gen.choose(0.5, 0.9999)
     } yield (samples, percentile)
 }

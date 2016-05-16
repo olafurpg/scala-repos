@@ -151,8 +151,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       r map f
   }
 
-  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] with BindRec[
-      NullArgument[X, ?]] =
+  implicit def nullArgumentMonad[X]
+    : Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =
     new Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] {
       override def ap[A, B](a: => NullArgument[X, A])(
           f: => NullArgument[X, A => B]) =
@@ -176,8 +176,8 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
         }
     }
 
-  implicit def nullArgumentContravariant[
-      X]: Contravariant[NullArgument[?, X]] =
+  implicit def nullArgumentContravariant[X]
+    : Contravariant[NullArgument[?, X]] =
     new Contravariant[NullArgument[?, X]] {
       override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
         a contramap f
@@ -193,7 +193,8 @@ private trait NullArgumentSemigroup[A, B]
 }
 
 private trait NullArgumentMonoid[A, B]
-    extends Monoid[NullArgument[A, B]] with NullArgumentSemigroup[A, B] {
+    extends Monoid[NullArgument[A, B]]
+    with NullArgumentSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

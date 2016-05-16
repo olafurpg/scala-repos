@@ -33,7 +33,8 @@ import org.apache.spark.util.Utils
 
 private[streaming] class Checkpoint(
     ssc: StreamingContext, val checkpointTime: Time)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   val master = ssc.sc.master
   val framework = ssc.sc.appName
   val jars = ssc.sc.jars
@@ -261,10 +262,9 @@ private[streaming] class CheckpointWriter(
           if (allCheckpointFiles.size > 10) {
             allCheckpointFiles
               .take(allCheckpointFiles.size - 10)
-              .foreach(file =>
-                    {
-                  logInfo("Deleting " + file)
-                  fs.delete(file, true)
+              .foreach(file => {
+                logInfo("Deleting " + file)
+                fs.delete(file, true)
               })
           }
 
@@ -370,21 +370,19 @@ private[streaming] object CheckpointReader extends Logging {
     // Try to read the checkpoint files in the order
     logInfo("Checkpoint files found: " + checkpointFiles.mkString(","))
     var readError: Exception = null
-    checkpointFiles.foreach(
-        file =>
-          {
-        logInfo("Attempting to load checkpoint from file " + file)
-        try {
-          val fis = fs.open(file)
-          val cp = Checkpoint.deserialize(fis, conf)
-          logInfo("Checkpoint successfully loaded from file " + file)
-          logInfo("Checkpoint was generated at time " + cp.checkpointTime)
-          return Some(cp)
-        } catch {
-          case e: Exception =>
-            readError = e
-            logWarning("Error reading checkpoint from file " + file, e)
-        }
+    checkpointFiles.foreach(file => {
+      logInfo("Attempting to load checkpoint from file " + file)
+      try {
+        val fis = fs.open(file)
+        val cp = Checkpoint.deserialize(fis, conf)
+        logInfo("Checkpoint successfully loaded from file " + file)
+        logInfo("Checkpoint was generated at time " + cp.checkpointTime)
+        return Some(cp)
+      } catch {
+        case e: Exception =>
+          readError = e
+          logWarning("Error reading checkpoint from file " + file, e)
+      }
     })
 
     // If none of checkpoint files could be read, then throw exception

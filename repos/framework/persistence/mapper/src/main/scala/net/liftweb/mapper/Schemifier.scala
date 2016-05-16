@@ -156,8 +156,7 @@ object Schemifier extends Loggable {
                                            actualTableNames))) +
         (if (structureOnly) EmptyCollector
          else
-           (tables.foldLeft(EmptyCollector)(
-                   (b, t) =>
+           (tables.foldLeft(EmptyCollector)((b, t) =>
                      b + tableCheck(t,
                                     "ensureIndexes",
                                     ensureIndexes(performWrite,
@@ -165,8 +164,7 @@ object Schemifier extends Loggable {
                                                   t,
                                                   connection,
                                                   actualTableNames))) +
-               tables.foldLeft(EmptyCollector)(
-                   (b, t) =>
+               tables.foldLeft(EmptyCollector)((b, t) =>
                      b + tableCheck(t,
                                     "ensureConstraints",
                                     ensureConstraints(performWrite,
@@ -334,10 +332,11 @@ object Schemifier extends Loggable {
       val totalColCnt = field.dbColumnCount
       val md = connection.getMetaData
 
-      using(md.getColumns(null,
-                          getDefaultSchemaName(connection),
-                          actualTableNames(table._dbTableNameLC),
-                          null))(rs =>
+      using(
+          md.getColumns(null,
+                        getDefaultSchemaName(connection),
+                        actualTableNames(table._dbTableNameLC),
+                        null))(rs =>
             while (hasColumn < totalColCnt && rs.next) {
           val tableName = rs.getString(3).toLowerCase
           val columnName = rs.getString(4).toLowerCase
@@ -502,8 +501,8 @@ object Schemifier extends Loggable {
               val pkName = rs.getString(4)
               val fkName = rs.getString(8)
               foundIt =
-              (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
-                  field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
+                (field._dbColumnNameLC.toLowerCase == fkName.toLowerCase &&
+                    field.dbKeyToColumn._dbColumnNameLC.toLowerCase == pkName.toLowerCase)
           })
 
           if (!foundIt) {

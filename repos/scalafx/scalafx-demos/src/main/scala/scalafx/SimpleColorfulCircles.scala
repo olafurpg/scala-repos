@@ -64,25 +64,26 @@ object SimpleColorfulCircles extends JFXApp {
           strokeType = Outside
           effect = new BoxBlur(10, 10, 3)
         }
-      content = circles :+ new Rectangle {
-        width <== _scene.width
-        height <== _scene.height
-        fill = new LinearGradient(0,
-                                  1,
-                                  1,
-                                  0,
-                                  true,
-                                  NoCycle,
-                                  Stops(0xf8bd55,
-                                        0xc0fe56,
-                                        0x5dfbc1,
-                                        0x64c2f8,
-                                        0xbe4af7,
-                                        0xed5fc2,
-                                        0xef504c,
-                                        0xf2660f))
-        blendMode = Overlay
-      }
+      content =
+        circles :+ new Rectangle {
+          width <== _scene.width
+          height <== _scene.height
+          fill = new LinearGradient(0,
+                                    1,
+                                    1,
+                                    0,
+                                    true,
+                                    NoCycle,
+                                    Stops(0xf8bd55,
+                                          0xc0fe56,
+                                          0x5dfbc1,
+                                          0x64c2f8,
+                                          0xbe4af7,
+                                          0xed5fc2,
+                                          0xef504c,
+                                          0xf2660f))
+          blendMode = Overlay
+        }
     }
   }
   new Timeline {

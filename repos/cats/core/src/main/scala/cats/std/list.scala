@@ -69,9 +69,9 @@ trait ListInstances extends ListInstances1 {
   }
 
   implicit def listAlgebra[A]: Monoid[List[A]] = new ListMonoid[A]
-  implicit def listOrder[A : Order]: Order[List[A]] = new ListOrder[A]
+  implicit def listOrder[A: Order]: Order[List[A]] = new ListOrder[A]
 
-  implicit def listShow[A : Show]: Show[List[A]] =
+  implicit def listShow[A: Show]: Show[List[A]] =
     new Show[List[A]] {
       def show(fa: List[A]): String =
         fa.map(_.show).mkString("List(", ", ", ")")
@@ -79,7 +79,7 @@ trait ListInstances extends ListInstances1 {
 }
 
 private[std] sealed trait ListInstances1 extends ListInstances2 {
-  implicit def partialOrderList[A : PartialOrder]: PartialOrder[List[A]] =
+  implicit def partialOrderList[A: PartialOrder]: PartialOrder[List[A]] =
     new PartialOrder[List[A]] {
       def partialCompare(x: List[A], y: List[A]): Double = {
         def loop(xs: List[A], ys: List[A]): Double =
@@ -101,7 +101,7 @@ private[std] sealed trait ListInstances1 extends ListInstances2 {
 }
 
 private[std] sealed trait ListInstances2 {
-  implicit def eqList[A : Eq]: Eq[List[A]] =
+  implicit def eqList[A: Eq]: Eq[List[A]] =
     new Eq[List[A]] {
       def eqv(x: List[A], y: List[A]): Boolean = {
         def loop(xs: List[A], ys: List[A]): Boolean =

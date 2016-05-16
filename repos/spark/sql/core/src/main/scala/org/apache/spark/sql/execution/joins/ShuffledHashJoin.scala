@@ -36,7 +36,8 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
                             condition: Option[Expression],
                             left: SparkPlan,
                             right: SparkPlan)
-    extends BinaryNode with HashJoin {
+    extends BinaryNode
+    with HashJoin {
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -77,31 +78,27 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
           case LeftOuter =>
             val keyGenerator = streamSideKeyGenerator
             val resultProj = createResultProjection
-            streamIter.flatMap(
-                currentRow =>
-                  {
-                val rowKey = keyGenerator(currentRow)
-                joinedRow.withLeft(currentRow)
-                leftOuterIterator(rowKey,
-                                  joinedRow,
-                                  hashed.get(rowKey),
-                                  resultProj,
-                                  numOutputRows)
+            streamIter.flatMap(currentRow => {
+              val rowKey = keyGenerator(currentRow)
+              joinedRow.withLeft(currentRow)
+              leftOuterIterator(rowKey,
+                                joinedRow,
+                                hashed.get(rowKey),
+                                resultProj,
+                                numOutputRows)
             })
 
           case RightOuter =>
             val keyGenerator = streamSideKeyGenerator
             val resultProj = createResultProjection
-            streamIter.flatMap(
-                currentRow =>
-                  {
-                val rowKey = keyGenerator(currentRow)
-                joinedRow.withRight(currentRow)
-                rightOuterIterator(rowKey,
-                                   hashed.get(rowKey),
-                                   joinedRow,
-                                   resultProj,
-                                   numOutputRows)
+            streamIter.flatMap(currentRow => {
+              val rowKey = keyGenerator(currentRow)
+              joinedRow.withRight(currentRow)
+              rightOuterIterator(rowKey,
+                                 hashed.get(rowKey),
+                                 joinedRow,
+                                 resultProj,
+                                 numOutputRows)
             })
 
           case x =>

@@ -24,7 +24,9 @@ import yggdrasil._
 import bytecode.{BinaryOperationType, JNumberT, JBooleanT, JTextT, Library, Instructions}
 
 trait OpFinderModule[M[+ _]]
-    extends Instructions with TableModule[M] with TableLibModule[M] {
+    extends Instructions
+    with TableModule[M]
+    with TableLibModule[M] {
   import instructions._
 
   trait OpFinder {
@@ -34,7 +36,9 @@ trait OpFinderModule[M[+ _]]
 }
 
 trait StdLibOpFinderModule[M[+ _]]
-    extends Instructions with StdLibModule[M] with OpFinderModule[M] {
+    extends Instructions
+    with StdLibModule[M]
+    with OpFinderModule[M] {
   import instructions._
   import library._
 

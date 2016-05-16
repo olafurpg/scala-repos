@@ -12,12 +12,10 @@ trait JavaBigIntegerPicklers extends PrimitivePicklers {
     def pickle(picklee: BigInteger, builder: PBuilder): Unit = {
       builder.beginEntry(picklee, tag)
 
-      builder.putField("value",
-                       b =>
-                         {
-                           b.hintElidedType(FastTypeTag[String])
-                           stringPickler.pickle(picklee.toString, b)
-                       })
+      builder.putField("value", b => {
+        b.hintElidedType(FastTypeTag[String])
+        stringPickler.pickle(picklee.toString, b)
+      })
 
       builder.endEntry()
     }

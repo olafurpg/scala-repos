@@ -416,8 +416,7 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
   private def vectorClockFromProto(
       version: cm.VectorClock, hashMapping: immutable.Seq[String]) = {
     import scala.collection.breakOut
-    VectorClock(
-        version.getVersionsList.asScala.map(v ⇒
+    VectorClock(version.getVersionsList.asScala.map(v ⇒
               (VectorClock.Node.fromHash(hashMapping(v.getHashIndex)),
                v.getTimestamp))(breakOut))
   }
@@ -447,8 +446,8 @@ class ClusterMessageSerializer(val system: ExtendedActorSystem)
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
     val addressMapping = allAddresses.zipWithIndex.toMap
     val allMetricNames: Vector[String] = allNodeMetrics
-      .foldLeft(Set.empty[String])(
-          (s, n) ⇒ s ++ n.metrics.iterator.map(_.name))
+      .foldLeft(Set.empty[String])((s, n) ⇒
+            s ++ n.metrics.iterator.map(_.name))
       .toVector
     val metricNamesMapping = allMetricNames.zipWithIndex.toMap
     def mapAddress(address: Address) =

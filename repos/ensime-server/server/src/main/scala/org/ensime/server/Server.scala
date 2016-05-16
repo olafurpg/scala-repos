@@ -31,7 +31,8 @@ class ServerActor(
     protocol: Protocol,
     interface: String = "127.0.0.1"
 )
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   override val supervisorStrategy = OneForOneStrategy() {
     case ex: Exception =>

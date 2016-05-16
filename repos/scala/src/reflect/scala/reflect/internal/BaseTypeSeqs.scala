@@ -173,8 +173,9 @@ trait BaseTypeSeqs {
       var i = 0
       for (p <- parents) {
         val parentBts = p.dealias.baseTypeSeq // dealias need for SI-8046.
-        pbtss(i) = if (parentBts eq undetBaseTypeSeq) AnyClass.info.baseTypeSeq
-        else parentBts
+        pbtss(i) =
+          if (parentBts eq undetBaseTypeSeq) AnyClass.info.baseTypeSeq
+          else parentBts
         index(i) = 0
         i += 1
       }

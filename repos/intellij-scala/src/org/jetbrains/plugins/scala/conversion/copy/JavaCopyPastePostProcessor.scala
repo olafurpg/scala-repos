@@ -76,9 +76,9 @@ class JavaCopyPastePostProcessor
           var elem: PsiElement = findElem(startOffset)
           if (elem != null) {
             while (elem.getParent != null &&
-            !elem.getParent.isInstanceOf[PsiFile] &&
-            elem.getParent.getTextRange.getEndOffset <= endOffset &&
-            elem.getParent.getTextRange.getStartOffset >= startOffset) {
+                   !elem.getParent.isInstanceOf[PsiFile] &&
+                   elem.getParent.getTextRange.getEndOffset <= endOffset &&
+                   elem.getParent.getTextRange.getStartOffset >= startOffset) {
               elem = elem.getParent
             }
             if (startOffset < elem.getTextRange.getStartOffset) {
@@ -88,7 +88,7 @@ class JavaCopyPastePostProcessor
             }
             buffer += ElementPart(elem)
             while (elem.getNextSibling != null &&
-            elem.getNextSibling.getTextRange.getEndOffset <= endOffset) {
+                   elem.getNextSibling.getTextRange.getEndOffset <= endOffset) {
               elem = elem.getNextSibling
               buffer += ElementPart(elem)
             }
@@ -157,10 +157,10 @@ class JavaCopyPastePostProcessor
       new ConvertedCode(text, updatedAssociations.toArray)
     } catch {
       case e: Exception =>
-        val selections = (startOffsets, endOffsets).zipped
-          .map((a, b) => file.getText.substring(a, b))
-        val attachments = selections.zipWithIndex.map(
-            p => new Attachment("Selection-%d.java".format(p._2 + 1), p._1))
+        val selections = (startOffsets, endOffsets).zipped.map((a, b) =>
+              file.getText.substring(a, b))
+        val attachments = selections.zipWithIndex.map(p =>
+              new Attachment("Selection-%d.java".format(p._2 + 1), p._1))
         Log.error(
             LogMessageEx.createEvent(e.getMessage,
                                      ExceptionUtil.getThrowableText(e),
@@ -221,9 +221,9 @@ class JavaCopyPastePostProcessor
 
         markedAssociations.map {
           case (association, marker) =>
-            val movedAssociation = association.copy(range = new TextRange(
-                      marker.getStartOffset - bounds.getStartOffset,
-                      marker.getEndOffset - bounds.getStartOffset))
+            val movedAssociation = association.copy(range =
+                  new TextRange(marker.getStartOffset - bounds.getStartOffset,
+                                marker.getEndOffset - bounds.getStartOffset))
             marker.dispose()
             movedAssociation
         }
@@ -257,7 +257,8 @@ class JavaCopyPastePostProcessor
       block
     } finally {
       settings.KEEP_BLANK_LINES_IN_CODE = keep_blank_lines_in_code
-      settings.KEEP_BLANK_LINES_IN_DECLARATIONS = keep_blank_lines_in_declarations
+      settings.KEEP_BLANK_LINES_IN_DECLARATIONS =
+        keep_blank_lines_in_declarations
       settings.KEEP_BLANK_LINES_BEFORE_RBRACE = keep_blank_lines_before_rbrace
     }
   }

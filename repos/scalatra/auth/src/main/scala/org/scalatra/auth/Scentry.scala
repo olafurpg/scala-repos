@@ -12,8 +12,8 @@ import scala.collection.mutable
 
 object Scentry {
 
-  type StrategyFactory[UserType <: AnyRef] = ScalatraBase ⇒ ScentryStrategy[
-      UserType]
+  type StrategyFactory[UserType <: AnyRef] =
+    ScalatraBase ⇒ ScentryStrategy[UserType]
 
   private val _globalStrategies =
     new mutable.HashMap[String, StrategyFactory[_ <: AnyRef]]()
@@ -140,9 +140,9 @@ class Scentry[UserType <: AnyRef](
       response: HttpServletResponse): Option[UserType] =
     authenticate((Seq(name) ++ names.toSeq).map(_.name): _*)
 
-  def authenticate(
-      names: String*)(implicit request: HttpServletRequest,
-                      response: HttpServletResponse): Option[UserType] = {
+  def authenticate(names: String*)(
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse): Option[UserType] = {
     val r =
       runAuthentication(names: _*) map {
         case (stratName, usr) ⇒
@@ -159,19 +159,17 @@ class Scentry[UserType <: AnyRef](
     val subset =
       if (names.isEmpty) strategies.values
       else
-        strategies
-          .filterKeys(names.contains)
-          .values
-      (subset filter (_.isValid) map { strat =>
-            logger.debug("Authenticating with: %s" format strat.name)
-            runCallbacks(_.isValid) { _.beforeAuthenticate }
-            strat.authenticate() match {
-              case Some(usr) ⇒ Some(strat.name -> usr)
-              case _ ⇒
-                strat.unauthenticated()
-                None
-            }
-          }).find(_.isDefined) getOrElse None
+        strategies.filterKeys(names.contains).values
+    (subset filter (_.isValid) map { strat =>
+          logger.debug("Authenticating with: %s" format strat.name)
+          runCallbacks(_.isValid) { _.beforeAuthenticate }
+          strat.authenticate() match {
+            case Some(usr) ⇒ Some(strat.name -> usr)
+            case _ ⇒
+              strat.unauthenticated()
+              None
+          }
+        }).find(_.isDefined) getOrElse None
   }
 
   private[this] var defaultUnauthenticated: Option[() ⇒ Unit] = None

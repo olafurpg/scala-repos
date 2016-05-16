@@ -23,10 +23,11 @@ object CokleisliTest extends SpecLite {
   }
 
   implicit val cokleisliArb2: Arbitrary[Cokleisli[Option, Int, Int => Int]] = {
-    def arb(f: (Option[Int],
-        Int) => (Int => Int)): Gen[Cokleisli[Option, Int, Int => Int]] =
-      implicitly[Arbitrary[Int]].arbitrary
-        .map(a => Cokleisli[Option, Int, Int => Int](f(_, a)))
+    def arb(
+        f: (Option[Int],
+            Int) => (Int => Int)): Gen[Cokleisli[Option, Int, Int => Int]] =
+      implicitly[Arbitrary[Int]].arbitrary.map(a =>
+            Cokleisli[Option, Int, Int => Int](f(_, a)))
 
     Arbitrary(
         Gen.oneOf(

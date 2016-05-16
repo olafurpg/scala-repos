@@ -52,7 +52,7 @@ case class SampleData(
       .mkString("[\n  ", ",\n  ", "]\n") + "\nschema: " + schema
   }
 
-  def sortBy[B : Ordering](f: JValue => B) = copy(data = data.sortBy(f))
+  def sortBy[B: Ordering](f: JValue => B) = copy(data = data.sortBy(f))
 }
 
 object SampleData extends CValueGenerators {

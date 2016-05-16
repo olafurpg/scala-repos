@@ -118,7 +118,8 @@ trait SmallestMailboxSelector {
       else selectionCount
 
     while (take > 0) {
-      set = delegates.sortWith(_.mailboxSize < _.mailboxSize).take(take) ++ set //Question, doesn't this risk selecting the same actor multiple times?
+      set =
+        delegates.sortWith(_.mailboxSize < _.mailboxSize).take(take) ++ set //Question, doesn't this risk selecting the same actor multiple times?
       take -= set.size
     }
 
@@ -260,7 +261,8 @@ trait BasicBackoff {
 
   def backoff(pressure: Int, capacity: Int): Int =
     if (capacity > 0 && pressure / capacity < backoffThreshold)
-      math.ceil(-1.0 * backoffRate * capacity) toInt else 0
+      math.ceil(-1.0 * backoffRate * capacity) toInt
+    else 0
 }
 
 /**

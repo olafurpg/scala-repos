@@ -148,10 +148,9 @@ case class JxMatch(exp: JsExp, cases: JxCase*) extends Node with JxBase {
 
   def appendToParent(parentName: String): JsCmd = {
     val vn = "v" + Helpers.nextFuncName
-    JsCrVar(vn, exp) & JsRaw(
-        "if (false) {\n} " + cases.map { c =>
-      " else if (" + vn + " == " + c.toMatch.toJsCmd + ") {" +
-      addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
+    JsCrVar(vn, exp) & JsRaw("if (false) {\n} " + cases.map { c =>
+      " else if (" + vn + " == " + c.toMatch.toJsCmd +
+      ") {" + addToDocFrag(parentName, c.toDo.toList).toJsCmd + "\n}"
     }.mkString("") + " else {throw new Exception('Unmatched: '+" + vn + ");}")
   }
 }
@@ -169,7 +168,8 @@ case class JxIf(toTest: JsExp, ifTrue: NodeSeq) extends Node with JxBase {
 }
 
 case class JxIfElse(toTest: JsExp, ifTrue: NodeSeq, ifFalse: NodeSeq)
-    extends Node with JxBase {
+    extends Node
+    with JxBase {
   def child = Nil
 
   def appendToParent(parentName: String): JsCmd = {

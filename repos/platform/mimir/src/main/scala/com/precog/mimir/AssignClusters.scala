@@ -42,7 +42,8 @@ import scalaz.syntax.traverse._
 import spire.implicits._
 
 trait AssignClusterModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with ModelLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with ModelLibModule[M] {
   import trans._
 
   trait AssignClusterSupport extends ColumnarTableLib with ModelSupport {

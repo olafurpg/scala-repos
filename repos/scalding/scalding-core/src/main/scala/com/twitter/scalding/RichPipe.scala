@@ -107,7 +107,8 @@ object RichPipe extends java.io.Serializable {
   * only to add methods to Pipe.
   */
 class RichPipe(val pipe: Pipe)
-    extends java.io.Serializable with JoinAlgorithms {
+    extends java.io.Serializable
+    with JoinAlgorithms {
   // We need this for the implicits
   import Dsl._
   import RichPipe.assignName
@@ -126,11 +127,11 @@ class RichPipe(val pipe: Pipe)
     /**
       * For pure side effect.
       */
-    def foreach[A](
-        f: Fields)(fn: (C, A) => Unit)(implicit conv: TupleConverter[A],
-                                       set: TupleSetter[Unit],
-                                       flowDef: FlowDef,
-                                       mode: Mode) = {
+    def foreach[A](f: Fields)(fn: (C, A) => Unit)(
+        implicit conv: TupleConverter[A],
+        set: TupleSetter[Unit],
+        flowDef: FlowDef,
+        mode: Mode) = {
       conv.assertArityMatches(f)
       val newPipe = new Each(
           pipe,
@@ -520,9 +521,9 @@ class RichPipe(val pipe: Pipe)
     *
     * Common enough to be useful.
     */
-  def flatten[T](fs: (Fields, Fields))(
-      implicit conv: TupleConverter[TraversableOnce[T]],
-      setter: TupleSetter[T]): Pipe =
+  def flatten[T](
+      fs: (Fields, Fields))(implicit conv: TupleConverter[TraversableOnce[T]],
+                            setter: TupleSetter[T]): Pipe =
     flatMap[TraversableOnce[T], T](fs)({ it: TraversableOnce[T] =>
       it
     })(conv, setter)
@@ -766,8 +767,8 @@ class RichPipe(val pipe: Pipe)
     */
   def upstreamPipes: Set[Pipe] =
     Iterator
-      .iterate(Seq(pipe))(
-          pipes => for (p <- pipes; prev <- p.getPrevious) yield prev)
+      .iterate(Seq(pipe))(pipes =>
+            for (p <- pipes; prev <- p.getPrevious) yield prev)
       .takeWhile(_.length > 0)
       .flatten
       .toSet

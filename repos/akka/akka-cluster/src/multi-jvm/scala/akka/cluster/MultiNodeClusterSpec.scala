@@ -82,7 +82,9 @@ object MultiNodeClusterSpec {
 }
 
 trait MultiNodeClusterSpec
-    extends Suite with STMultiNodeSpec with WatchedByCoroner {
+    extends Suite
+    with STMultiNodeSpec
+    with WatchedByCoroner {
   self: MultiNodeSpec ⇒
 
   override def initialParticipants = roles.size

@@ -40,7 +40,8 @@ object Window {
 }
 
 class Window protected (override val delegate: jfxs.Window)
-    extends EventHandlerDelegate with SFXDelegate[jfxs.Window]
+    extends EventHandlerDelegate
+    with SFXDelegate[jfxs.Window]
     with jfxe.EventTarget {
 
   /**

@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.SpecialCharactersTes
   * @since 22.01.2015
   */
 class Scalatest2_11_2_1_7_SpecialCharactersTest
-    extends Scalatest2_11_2_1_7_Base with SpecialCharactersTest {}
+    extends Scalatest2_11_2_1_7_Base
+    with SpecialCharactersTest {}

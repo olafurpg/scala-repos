@@ -35,7 +35,9 @@ import org.apache.spark.util.collection.OpenHashMap
   * Params for [[CountVectorizer]] and [[CountVectorizerModel]].
   */
 private[feature] trait CountVectorizerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * Max size of the vocabulary.
@@ -117,7 +119,8 @@ private[feature] trait CountVectorizerParams
   */
 @Experimental
 class CountVectorizer(override val uid: String)
-    extends Estimator[CountVectorizerModel] with CountVectorizerParams
+    extends Estimator[CountVectorizerModel]
+    with CountVectorizerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("cntVec"))
@@ -206,7 +209,8 @@ object CountVectorizer extends DefaultParamsReadable[CountVectorizer] {
 @Experimental
 class CountVectorizerModel(
     override val uid: String, val vocabulary: Array[String])
-    extends Model[CountVectorizerModel] with CountVectorizerParams
+    extends Model[CountVectorizerModel]
+    with CountVectorizerParams
     with MLWritable {
 
   import CountVectorizerModel._

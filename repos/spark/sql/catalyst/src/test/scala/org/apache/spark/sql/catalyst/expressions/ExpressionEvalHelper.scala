@@ -89,10 +89,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
     }
   }
 
-  protected def checkEvaluationWithoutCodegen(
-      expression: Expression,
-      expected: Any,
-      inputRow: InternalRow = EmptyRow): Unit = {
+  protected def checkEvaluationWithoutCodegen(expression: Expression,
+                                              expected: Any,
+                                              inputRow: InternalRow =
+                                                EmptyRow): Unit = {
 
     val actual = try evaluate(expression, inputRow) catch {
       case e: Exception => fail(s"Exception evaluating $expression", e)
@@ -123,10 +123,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
     }
   }
 
-  protected def checkEvalutionWithUnsafeProjection(
-      expression: Expression,
-      expected: Any,
-      inputRow: InternalRow = EmptyRow): Unit = {
+  protected def checkEvalutionWithUnsafeProjection(expression: Expression,
+                                                   expected: Any,
+                                                   inputRow: InternalRow =
+                                                     EmptyRow): Unit = {
 
     val plan = generateProject(
         GenerateUnsafeProjection.generate(
@@ -155,10 +155,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
     }
   }
 
-  protected def checkEvaluationWithOptimization(
-      expression: Expression,
-      expected: Any,
-      inputRow: InternalRow = EmptyRow): Unit = {
+  protected def checkEvaluationWithOptimization(expression: Expression,
+                                                expected: Any,
+                                                inputRow: InternalRow =
+                                                  EmptyRow): Unit = {
     val plan = Project(
         Alias(expression, s"Optimized($expression)")() :: Nil, OneRowRelation)
     val optimizedPlan = DefaultOptimizer.execute(plan)
@@ -166,10 +166,10 @@ trait ExpressionEvalHelper extends GeneratorDrivenPropertyChecks {
         optimizedPlan.expressions.head, expected, inputRow)
   }
 
-  protected def checkDoubleEvaluation(
-      expression: => Expression,
-      expected: Spread[Double],
-      inputRow: InternalRow = EmptyRow): Unit = {
+  protected def checkDoubleEvaluation(expression: => Expression,
+                                      expected: Spread[Double],
+                                      inputRow: InternalRow =
+                                        EmptyRow): Unit = {
     checkEvaluationWithoutCodegen(expression, expected)
     checkEvaluationWithGeneratedMutableProjection(expression, expected)
     checkEvaluationWithOptimization(expression, expected)

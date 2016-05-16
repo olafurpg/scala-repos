@@ -8,7 +8,8 @@ import org.jetbrains.plugins.scala.debugger.{ScalaVersion_2_11, ScalaVersion_2_1
 class GetAllClassesTest extends GetAllClassesTestBase with ScalaVersion_2_11
 
 class GetAllClassesTest_212
-    extends GetAllClassesTestBase with ScalaVersion_2_12 {
+    extends GetAllClassesTestBase
+    with ScalaVersion_2_12 {
 
   override def testForStmt(): Unit = {
     checkGetAllClasses("ForStmt$")

@@ -51,7 +51,9 @@ import org.slf4j.LoggerFactory
 import scalaz._
 
 class MongoAPIKeyManagerSpec
-    extends Specification with RealMongoSpecSupport with FutureMatchers {
+    extends Specification
+    with RealMongoSpecSupport
+    with FutureMatchers {
 
   override def mongoStartupPause = Some(0l)
   val timeout = Duration(10, "seconds")
@@ -109,9 +111,9 @@ class MongoAPIKeyManagerSpec
     "list children API keys" in new TestAPIKeyManager {
       val (result, expected) = Await.result(for {
         k1 <- apiKeyManager.createAPIKey(
-            Some("blah1"), None, child2.apiKey, Set.empty)
+                 Some("blah1"), None, child2.apiKey, Set.empty)
         k2 <- apiKeyManager.createAPIKey(
-            Some("blah2"), None, child2.apiKey, Set.empty)
+                 Some("blah2"), None, child2.apiKey, Set.empty)
         kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
       } yield (kids, List(k1, k2)), timeout)
 
@@ -120,8 +122,10 @@ class MongoAPIKeyManagerSpec
 
     "move API key to deleted pool on deletion" in new TestAPIKeyManager {
 
-      type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
-      Option[APIKeyRecord], Option[APIKeyRecord])
+      type Results = (Option[APIKeyRecord],
+                      Option[APIKeyRecord],
+                      Option[APIKeyRecord],
+                      Option[APIKeyRecord])
 
       val fut: Future[Results] = for {
         before <- apiKeyManager.findAPIKey(child2.apiKey)
@@ -142,8 +146,11 @@ class MongoAPIKeyManagerSpec
     }
 
     "no failure on deleting API key that is already deleted" in new TestAPIKeyManager {
-      type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
-      Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord])
+      type Results = (Option[APIKeyRecord],
+                      Option[APIKeyRecord],
+                      Option[APIKeyRecord],
+                      Option[APIKeyRecord],
+                      Option[APIKeyRecord])
 
       val fut: Future[Results] = for {
         before <- apiKeyManager.findAPIKey(child2.apiKey)

@@ -54,7 +54,8 @@ import org.apache.spark.util.Utils
   */
 private[util] class BatchedWriteAheadLog(
     val wrappedLog: WriteAheadLog, conf: SparkConf)
-    extends WriteAheadLog with Logging {
+    extends WriteAheadLog
+    with Logging {
 
   import BatchedWriteAheadLog._
 

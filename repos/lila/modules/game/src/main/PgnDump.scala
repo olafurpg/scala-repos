@@ -111,9 +111,10 @@ final class PgnDump(
     (moves grouped 2).zipWithIndex.toList map {
       case (moves, index) =>
         chessPgn.Turn(number = index + from,
-                      white = moves.headOption filter (".." !=) map {
-                        chessPgn.Move(_)
-                      },
+                      white =
+                        moves.headOption filter (".." !=) map {
+                          chessPgn.Move(_)
+                        },
                       black = moves lift 1 map { chessPgn.Move(_) })
     } filterNot (_.isEmpty)
 }
@@ -121,7 +122,7 @@ final class PgnDump(
 object PgnDump {
 
   def result(game: Game) =
-    game.finished.fold(game.winnerColor.fold("1/2-1/2")(
-                           color => color.white.fold("1-0", "0-1")),
+    game.finished.fold(game.winnerColor.fold("1/2-1/2")(color =>
+                             color.white.fold("1-0", "0-1")),
                        "*")
 }

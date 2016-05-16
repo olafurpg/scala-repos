@@ -102,8 +102,9 @@ case class Dag[P <: Platform[P]](
     nodeToName: Map[Node[P], String] = Map[Node[P], String](),
     nameToNode: Map[String, Node[P]] = Map[String, Node[P]](),
     dependenciesOfM: Map[Node[P], List[Node[P]]] = Map[Node[P], List[Node[P]]](
-          ),
-    dependantsOfM: Map[Node[P], List[Node[P]]] = Map[Node[P], List[Node[P]]]()) {
+        ),
+    dependantsOfM: Map[Node[P], List[Node[P]]] =
+      Map[Node[P], List[Node[P]]]()) {
 
   lazy val producerDependants = Dependants(tail)
 
@@ -225,7 +226,8 @@ object Dag {
           if (seen.contains(name)) tryGetName(name, seen, Some(2)) else name
         case Some(indx) =>
           if (seen.contains(name + "." + indx))
-            tryGetName(name, seen, Some(indx + 1)) else name + "." + indx
+            tryGetName(name, seen, Some(indx + 1))
+          else name + "." + indx
       }
     }
 

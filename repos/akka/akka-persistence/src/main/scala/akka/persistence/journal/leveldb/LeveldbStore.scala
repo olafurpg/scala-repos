@@ -21,7 +21,9 @@ import akka.persistence.journal.Tagged
   * INTERNAL API.
   */
 private[persistence] trait LeveldbStore
-    extends Actor with WriteJournalBase with LeveldbIdMapping
+    extends Actor
+    with WriteJournalBase
+    with LeveldbIdMapping
     with LeveldbRecovery {
   val configPath: String
 

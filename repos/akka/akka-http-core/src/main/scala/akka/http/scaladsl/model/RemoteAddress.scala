@@ -10,7 +10,8 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed abstract class RemoteAddress
-    extends jm.RemoteAddress with ValueRenderable {
+    extends jm.RemoteAddress
+    with ValueRenderable {
   def toOption: Option[InetAddress]
   def toIP: Option[RemoteAddress.IP]
   def isUnknown: Boolean

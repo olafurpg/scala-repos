@@ -351,9 +351,9 @@ class Flags extends ModifierFlags {
     (paramFlags & DefaultGetterFlags) | SYNTHETIC | METHOD | DEFAULTPARAM
 
   def getterFlags(fieldFlags: Long): Long =
-    ACCESSOR +
-    (if ((fieldFlags & MUTABLE) != 0) fieldFlags & ~MUTABLE & ~PRESUPER
-     else fieldFlags & ~PRESUPER | STABLE)
+    ACCESSOR + (if ((fieldFlags & MUTABLE) != 0)
+                  fieldFlags & ~MUTABLE & ~PRESUPER
+                else fieldFlags & ~PRESUPER | STABLE)
 
   def setterFlags(fieldFlags: Long): Long =
     getterFlags(fieldFlags) & ~STABLE & ~CASEACCESSOR

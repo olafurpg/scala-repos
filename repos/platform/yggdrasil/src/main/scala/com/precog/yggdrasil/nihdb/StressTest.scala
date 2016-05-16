@@ -189,8 +189,7 @@ class StressTest {
           println("iteration %d" format i)
           eventid = ctxt.runNihAsync(i, f, 8 * 1024 * 1024, eventid)
           val t = System.currentTimeMillis()
-          println(
-              "total rows: %dM, total time: %.3fs" format
+          println("total rows: %dM, total time: %.3fs" format
               (i, (t - t0) / 1000.0))
         }
       } finally {

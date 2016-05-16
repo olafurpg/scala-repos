@@ -48,8 +48,7 @@ object LispCaseClasses extends Lisp {
   case class CONS(car: Data, cdr: Data) extends Data {
     override def toString() = "(" + elemsToString() + ")";
     override def elemsToString() =
-      car.toString() +
-      (cdr match {
+      car.toString() + (cdr match {
             case NIL() => ""
             case _ => " " + cdr.elemsToString();
           })

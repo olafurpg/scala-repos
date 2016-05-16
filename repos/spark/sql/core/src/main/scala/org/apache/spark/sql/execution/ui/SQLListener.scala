@@ -50,7 +50,8 @@ private[sql] class SQLHistoryListenerFactory
 }
 
 private[sql] class SQLListener(conf: SparkConf)
-    extends SparkListener with Logging {
+    extends SparkListener
+    with Logging {
 
   private val retainedExecutions =
     conf.getInt("spark.sql.ui.retainedExecutions", 1000)
@@ -91,7 +92,7 @@ private[sql] class SQLListener(conf: SparkConf)
       val toRemove = math.max(retainedExecutions / 10, 1)
       executions.take(toRemove).foreach { execution =>
         for (executionUIData <- _executionIdToData.remove(
-            execution.executionId)) {
+                                   execution.executionId)) {
           for (jobId <- executionUIData.jobs.keys) {
             _jobIdToExecutionId.remove(jobId)
           }
@@ -120,8 +121,8 @@ private[sql] class SQLListener(conf: SparkConf)
         executionUIData.jobs(jobId) = JobExecutionStatus.RUNNING
         executionUIData.stages ++= stageIds
         stageIds.foreach(stageId =>
-              _stageIdToStageMetrics(stageId) = new SQLStageMetrics(
-                  stageAttemptId = 0))
+              _stageIdToStageMetrics(stageId) =
+                new SQLStageMetrics(stageAttemptId = 0))
         _jobIdToExecutionId(jobId) = executionId
       }
     }
@@ -130,7 +131,7 @@ private[sql] class SQLListener(conf: SparkConf)
   override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized {
     val jobId = jobEnd.jobId
     for (executionId <- _jobIdToExecutionId.get(jobId);
-    executionUIData <- _executionIdToData.get(executionId)) {
+         executionUIData <- _executionIdToData.get(executionId)) {
       jobEnd.jobResult match {
         case JobSucceeded =>
           executionUIData.jobs(jobId) = JobExecutionStatus.SUCCEEDED
@@ -305,9 +306,11 @@ private[sql] class SQLListener(conf: SparkConf)
         case Some(executionUIData) =>
           val accumulatorUpdates = {
             for (stageId <- executionUIData.stages;
-            stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable;
-            taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
-            accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
+                 stageMetrics <- _stageIdToStageMetrics
+                                  .get(stageId)
+                                  .toIterable;
+                 taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
+                 accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
               assert(
                   accumulatorUpdate.update.isDefined,
                   s"accumulator update from " +
@@ -396,7 +399,8 @@ private[ui] class SQLExecutionUIData(
     val accumulatorMetrics: Map[Long, SQLPlanMetric],
     val submissionTime: Long,
     var completionTime: Option[Long] = None,
-    val jobs: mutable.HashMap[Long, JobExecutionStatus] = mutable.HashMap.empty,
+    val jobs: mutable.HashMap[Long, JobExecutionStatus] =
+      mutable.HashMap.empty,
     val stages: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer()) {
 
   /**
@@ -436,10 +440,11 @@ private[ui] case class SQLPlanMetric(
 /**
   * Store all accumulatorUpdates for all tasks in a Spark stage.
   */
-private[ui] class SQLStageMetrics(val stageAttemptId: Long,
-                                  val taskIdToMetricUpdates: mutable.HashMap[
-                                      Long,
-                                      SQLTaskMetrics] = mutable.HashMap.empty)
+private[ui] class SQLStageMetrics(
+    val stageAttemptId: Long,
+    val taskIdToMetricUpdates: mutable.HashMap[Long,
+                                               SQLTaskMetrics] =
+      mutable.HashMap.empty)
 
 /**
   * Store all accumulatorUpdates for a Spark task.

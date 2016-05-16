@@ -33,7 +33,8 @@ import org.apache.spark.sql.execution.datasources.parquet.test.avro._
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetAvroCompatibilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   private def withWriter[T <: IndexedRecord](path: String, schema: Schema)(
       f: AvroParquetWriter[T] => Unit): Unit = {
     logInfo(

@@ -29,9 +29,8 @@ class TopKTest extends FunSuite with Checkers {
       (k < 0) || (k > 30) || {
         val topk = TopK(k, values.iterator);
         topk.size == math.min(k, values.distinct.size) &&
-        (topk.iterator zip topk.iterator.drop(1))
-          .forall(tup => (tup._1 >= tup._2)) &&
-        (topk.isEmpty || {
+        (topk.iterator zip topk.iterator.drop(1)).forall(tup =>
+              (tup._1 >= tup._2)) && (topk.isEmpty || {
               val set = topk.toSet;
               val last = topk.min;
               values.forall(n => n < last || set.contains(n))
@@ -45,9 +44,8 @@ class TopKTest extends FunSuite with Checkers {
       (k < 0) || (k > 30) || {
         val topk = TopK(k, values.iterator);
         topk.size == math.min(k, values.distinct.size) &&
-        (topk.iterator zip topk.iterator.drop(1))
-          .forall(tup => (tup._1 >= tup._2)) &&
-        (topk.isEmpty || {
+        (topk.iterator zip topk.iterator.drop(1)).forall(tup =>
+              (tup._1 >= tup._2)) && (topk.isEmpty || {
               val set = topk.toSet;
               val last = topk.min;
               values.forall(n => n < last || set.contains(n))

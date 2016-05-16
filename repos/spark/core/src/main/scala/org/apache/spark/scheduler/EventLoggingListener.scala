@@ -51,7 +51,8 @@ private[spark] class EventLoggingListener(appId: String,
                                           logBaseDir: URI,
                                           sparkConf: SparkConf,
                                           hadoopConf: Configuration)
-    extends SparkListener with Logging {
+    extends SparkListener
+    with Logging {
 
   import EventLoggingListener._
 

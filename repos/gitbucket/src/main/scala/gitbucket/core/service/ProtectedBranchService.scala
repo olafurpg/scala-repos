@@ -72,7 +72,8 @@ trait ProtectedBranchService {
 object ProtectedBranchService {
 
   class ProtectedBranchReceiveHook
-      extends ReceiveHook with ProtectedBranchService {
+      extends ReceiveHook
+      with ProtectedBranchService {
     override def preReceive(owner: String,
                             repository: String,
                             receivePack: ReceivePack,
@@ -104,7 +105,8 @@ object ProtectedBranchService {
                                    * Enforce required status checks for repository administrators.
                                    */
                                  includeAdministrators: Boolean)
-      extends AccountService with CommitStatusService {
+      extends AccountService
+      with CommitStatusService {
 
     def isAdministrator(pusher: String)(implicit session: Session): Boolean =
       pusher == owner || getGroupMembers(owner)

@@ -20,7 +20,7 @@ object DslUtils {
     def get[T](attribute: Attribute[T])(implicit m: Manifest[T]): Option[T] =
       attributes.get((attribute, m.toString)).map(_.asInstanceOf[T])
 
-    def getOrFail[T : Manifest](attribute: Attribute[T]): T =
+    def getOrFail[T: Manifest](attribute: Attribute[T]): T =
       get(attribute).getOrElse(
           throw new Error(s"Value for '${attribute.key}' is not found"))
 
@@ -33,7 +33,7 @@ object DslUtils {
     * Assignment to specific attribute
     * Implicit conversion to this class is used to create a fancy DSL
     */
-  class AttributeDef[T : Manifest](
+  class AttributeDef[T: Manifest](
       attribute: Attribute[T], attributes: AttributeMap) {
     def :=(newValue: => T): Unit =
       attributes.put(attribute, newValue)

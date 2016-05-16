@@ -64,7 +64,8 @@ trait ScTypePresentation {
         case c: PsiClass =>
           val qname = c.qualifiedName
           if (qname != null && qname != c.name /* exlude default package*/ )
-            "_root_." + qname else c.name
+            "_root_." + qname
+          else c.name
         case p: PsiPackage => "_root_." + p.getQualifiedName
         case _ =>
           ScalaPsiUtil.nameContext(e) match {
@@ -100,10 +101,12 @@ trait ScTypePresentation {
         wildcard: ScExistentialArgument, argText: String): String = {
       val lowerBoundText =
         if (wildcard.lowerBound != types.Nothing)
-          " >: " + innerTypeText(wildcard.lowerBound) else ""
+          " >: " + innerTypeText(wildcard.lowerBound)
+        else ""
       val upperBoundText =
         if (wildcard.upperBound != types.Any)
-          " <: " + innerTypeText(wildcard.upperBound) else ""
+          " <: " + innerTypeText(wildcard.upperBound)
+        else ""
       s"$argText$lowerBoundText$upperBoundText"
     }
 
@@ -365,15 +368,14 @@ trait ScTypePresentation {
           existentialTypeText(ex, checkWildcard, needDotType)
         case ScTypePolymorphicType(internalType, typeParameters) =>
           typeParameters
-            .map(tp =>
-                  {
-                val lowerBound =
-                  if (tp.lowerType().equiv(types.Nothing)) ""
-                  else " >: " + tp.lowerType().toString
-                val upperBound =
-                  if (tp.upperType().equiv(types.Any)) ""
-                  else " <: " + tp.upperType().toString
-                tp.name + lowerBound + upperBound
+            .map(tp => {
+              val lowerBound =
+                if (tp.lowerType().equiv(types.Nothing)) ""
+                else " >: " + tp.lowerType().toString
+              val upperBound =
+                if (tp.upperType().equiv(types.Any)) ""
+                else " <: " + tp.upperType().toString
+              tp.name + lowerBound + upperBound
             })
             .mkString("[", ", ", "] ") + internalType.toString
         case mt @ ScMethodType(retType, params, isImplicit) =>

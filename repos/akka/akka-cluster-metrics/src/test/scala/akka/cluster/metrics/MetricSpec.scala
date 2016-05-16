@@ -14,7 +14,9 @@ import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricNumericConverterSpec
-    extends WordSpec with Matchers with MetricNumericConverter {
+    extends WordSpec
+    with Matchers
+    with MetricNumericConverter {
 
   "MetricNumericConverter" must {
 
@@ -161,7 +163,8 @@ class NodeMetricsSpec extends WordSpec with Matchers {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsGossipSpec
-    extends AkkaSpec(MetricsConfig.defaultEnabled) with ImplicitSender
+    extends AkkaSpec(MetricsConfig.defaultEnabled)
+    with ImplicitSender
     with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
@@ -318,7 +321,7 @@ class MetricValuesSpec
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
       nodes map { n ⇒
         n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
-                    n.metrics.collect {
+                  n.metrics.collect {
             case streaming if latest sameAs streaming ⇒ streaming :+ latest
         }))
       }

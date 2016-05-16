@@ -86,11 +86,11 @@ sealed trait ExpressionDag[N[_]] { self =>
   protected def roots: Set[Id[_]]
   protected def nextId: Int
 
-  private def copy(
-      id2Exp: HMap[Id, E] = self.idToExp,
-      node2Literal: GenFunction[N, Lit] = self.nodeToLiteral,
-      gcroots: Set[Id[_]] = self.roots,
-      id: Int = self.nextId): ExpressionDag[N] = new ExpressionDag[N] {
+  private def copy(id2Exp: HMap[Id, E] = self.idToExp,
+                   node2Literal: GenFunction[N, Lit] = self.nodeToLiteral,
+                   gcroots: Set[Id[_]] = self.roots,
+                   id: Int =
+                     self.nextId): ExpressionDag[N] = new ExpressionDag[N] {
     def idToExp = id2Exp
     def roots = gcroots
     def nodeToLiteral = node2Literal

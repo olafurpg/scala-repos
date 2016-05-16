@@ -46,13 +46,12 @@ trait MonadTransformer { self: PsiElement =>
     */
   def collectFailures[T](
       seq: Seq[TypeResult[T]], default: T): (Seq[T] => T) => Success[T] =
-    (succ: (Seq[T]) => T) =>
-      {
-        val defaults = seq.map {
-          case Success(t, _) => t
-          case Failure(_, _) => default
-        }
-        (for (f @ Failure(_, _) <- seq) yield
-          f).foldLeft(Success(succ(defaults), Some(self)))(_.apply(_))
+    (succ: (Seq[T]) => T) => {
+      val defaults = seq.map {
+        case Success(t, _) => t
+        case Failure(_, _) => default
+      }
+      (for (f @ Failure(_, _) <- seq) yield
+        f).foldLeft(Success(succ(defaults), Some(self)))(_.apply(_))
     }
 }

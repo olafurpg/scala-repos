@@ -88,12 +88,12 @@ private[logging] object Formatter {
   *
   *     "ERR [20080315-18:39:05.033] jobs: "
   */
-class Formatter(
-    val timezone: Option[String] = None,
-    val truncateAt: Int = 0,
-    val truncateStackTracesAt: Int = Formatter.DefaultStackTraceSizeLimit,
-    val useFullPackageNames: Boolean = false,
-    val prefix: String = Formatter.DefaultPrefix)
+class Formatter(val timezone: Option[String] = None,
+                val truncateAt: Int = 0,
+                val truncateStackTracesAt: Int =
+                  Formatter.DefaultStackTraceSizeLimit,
+                val useFullPackageNames: Boolean = false,
+                val prefix: String = Formatter.DefaultPrefix)
     extends javalog.Formatter {
 
   private val matcher = Formatter.DateFormatRegex.matcher(prefix)

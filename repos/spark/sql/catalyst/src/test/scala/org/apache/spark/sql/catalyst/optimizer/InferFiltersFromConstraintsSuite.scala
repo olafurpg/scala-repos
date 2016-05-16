@@ -51,11 +51,11 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
   test("single inner join: filter out values on either side on equi-join keys") {
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
-    val originalQuery =
-      x.join(y,
-              condition = Some(("x.a".attr === "y.a".attr) &&
-                    ("x.a".attr === 1) && ("y.c".attr > 5)))
-        .analyze
+    val originalQuery = x
+      .join(y,
+            condition = Some(("x.a".attr === "y.a".attr) &&
+                ("x.a".attr === 1) && ("y.c".attr > 5)))
+      .analyze
     val left = x.where(IsNotNull('a) && "x.a".attr === 1)
     val right = y.where(
         IsNotNull('a) && IsNotNull('c) && "y.c".attr > 5 && "y.a".attr === 1)
@@ -68,11 +68,11 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
   test("single inner join: filter out nulls on either side on non equal keys") {
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
-    val originalQuery =
-      x.join(y,
-              condition = Some(("x.a".attr =!= "y.a".attr) &&
-                    ("x.b".attr === 1) && ("y.c".attr > 5)))
-        .analyze
+    val originalQuery = x
+      .join(y,
+            condition = Some(("x.a".attr =!= "y.a".attr) &&
+                ("x.b".attr === 1) && ("y.c".attr > 5)))
+      .analyze
     val left = x.where(IsNotNull('a) && IsNotNull('b) && "x.b".attr === 1)
     val right = y.where(IsNotNull('a) && IsNotNull('c) && "y.c".attr > 5)
     val correctAnswer =
@@ -88,15 +88,15 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
     val originalQuery = x
       .where('b > 5)
       .join(y.where('a === 10),
-            condition = Some(
-                  "x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
+            condition =
+              Some("x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
       .analyze
     val left = x.where(IsNotNull('a) && 'a === 10 && IsNotNull('b) && 'b > 5)
     val right = y.where(IsNotNull('a) && IsNotNull('b) && 'a === 10 && 'b > 5)
     val correctAnswer = left
       .join(right,
-            condition = Some(
-                  "x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
+            condition =
+              Some("x.a".attr === "y.a".attr && "x.b".attr === "y.b".attr))
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)

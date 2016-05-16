@@ -154,20 +154,20 @@ final class PostApi(env: Env,
       post ← optionT(PostRepo(true).byCategAndId(categSlug, postId))
       view ← optionT(view(post))
       _ ← optionT(for {
-        first ← PostRepo.isFirstPost(view.topic.id, view.post.id)
-        _ ← first.fold(
-            env.topicApi.delete(view.categ, view.topic),
-            $remove[Post](view.post) >> (env.topicApi denormalize view.topic) >>
-            (env.categApi denormalize view.categ) >> env.recent.invalidate >>-
-            (indexer ! RemovePost(post)))
-        _ ← MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
-            mod,
-            post.userId,
-            post.author,
-            post.ip,
-            text = "%s / %s / %s".format(
-                  view.categ.name, view.topic.name, post.text))
-      } yield true.some)
+           first ← PostRepo.isFirstPost(view.topic.id, view.post.id)
+           _ ← first.fold(
+                  env.topicApi.delete(view.categ, view.topic),
+                  $remove[Post](view.post) >> (env.topicApi denormalize view.topic) >>
+                  (env.categApi denormalize view.categ) >> env.recent.invalidate >>-
+                  (indexer ! RemovePost(post)))
+           _ ← MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
+                  mod,
+                  post.userId,
+                  post.author,
+                  post.ip,
+                  text = "%s / %s / %s".format(
+                      view.categ.name, view.topic.name, post.text))
+         } yield true.some)
     } yield ()).run.void
 
   def nbByUser(userId: String) = $count[Post](Json.obj("userId" -> userId))

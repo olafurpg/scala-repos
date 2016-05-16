@@ -25,7 +25,8 @@ trait WSTestRequestBuilding { self: RouteTest ⇒
         clientSideHandler.join(handlerFlow).run()
         HttpResponse(
             StatusCodes.SwitchingProtocols,
-            headers = Upgrade(UpgradeProtocol("websocket") :: Nil) :: subprotocol
+            headers =
+              Upgrade(UpgradeProtocol("websocket") :: Nil) :: subprotocol
                 .map(p ⇒ `Sec-WebSocket-Protocol`(p :: Nil))
                 .toList)
       }

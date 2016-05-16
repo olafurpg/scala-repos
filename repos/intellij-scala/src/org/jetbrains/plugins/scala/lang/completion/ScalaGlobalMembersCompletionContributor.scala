@@ -131,7 +131,7 @@ class ScalaGlobalMembersCompletionContributor
         if (qualName == null) return false
         for {
           element <- elemsSet if element.name == name
-                    if element.getContainingFile == file
+          if element.getContainingFile == file
           cClass = ScalaPsiUtil.nameContext(element) match {
             case member: PsiMember => member.containingClass
             case _ => null
@@ -249,7 +249,7 @@ class ScalaGlobalMembersCompletionContributor
         if (qualName == null) return false
         for {
           element <- elemsSet if element.name == name
-                    if element.getContainingFile == file
+          if element.getContainingFile == file
           cClass = ScalaPsiUtil.nameContext(element) match {
             case member: PsiMember => member.containingClass
             case _ => null
@@ -302,7 +302,7 @@ class ScalaGlobalMembersCompletionContributor
             val currentAndInheritors = Iterator(cClass) ++ inheritors.iterator
             for {
               containingClass <- currentAndInheritors if isStatic(
-                                    method, containingClass)
+                  method, containingClass)
             } {
               assert(containingClass != null)
               if (classes.add(containingClass) &&
@@ -313,8 +313,8 @@ class ScalaGlobalMembersCompletionContributor
                 val overloads = containingClass match {
                   case o: ScObject => o.functionsByName(methodName)
                   case _ =>
-                    containingClass.getAllMethods.toSeq
-                      .filter(m => m.name == methodName)
+                    containingClass.getAllMethods.toSeq.filter(m =>
+                          m.name == methodName)
                 }
                 if (overloads.size == 1) {
                   result.addElement(createLookupElement(
@@ -388,8 +388,8 @@ class ScalaGlobalMembersCompletionContributor
               Iterator(field.containingClass) ++ inheritors.iterator
             for {
               containingClass <- currentAndInheritors
-                                    if namedElement != null &&
-                                isStatic(namedElement, containingClass)
+              if namedElement != null &&
+              isStatic(namedElement, containingClass)
             } {
               assert(containingClass != null)
               if (isAccessible(field, containingClass)) {
@@ -406,11 +406,11 @@ class ScalaGlobalMembersCompletionContributor
     }
   }
 
-  private def createLookupElement(
-      member: PsiNamedElement,
-      clazz: PsiClass,
-      shouldImport: Boolean,
-      overloaded: Boolean = false): LookupElement = {
+  private def createLookupElement(member: PsiNamedElement,
+                                  clazz: PsiClass,
+                                  shouldImport: Boolean,
+                                  overloaded: Boolean =
+                                    false): LookupElement = {
     LookupElementManager
       .getLookupElement(new ScalaResolveResult(member),
                         isClassName = true,

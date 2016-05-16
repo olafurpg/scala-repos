@@ -63,7 +63,8 @@ class XmlRenameHandler extends RenameHandler {
 
     val element =
       if (elements(0) == null ||
-          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return else
+          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return
+      else
         elements(0).getParent.asInstanceOf[ScXmlPairedTag]
     if (element.getMatchedTag == null || element.getTagNameElement == null ||
         element.getMatchedTag.getTagNameElement == null) return

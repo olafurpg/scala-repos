@@ -770,9 +770,18 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
   test("SPARK-7324 dropDuplicates") {
     val testData = sparkContext
-      .parallelize((2, 1, 2) :: (1, 1, 1) :: (1, 2, 1) :: (2, 1, 2) :: (
-              2, 2, 2) :: (2, 2, 1) :: (2, 1, 1) :: (1, 1, 2) :: (1, 2, 2) :: (
-              1, 2, 1) :: Nil)
+      .parallelize(
+          (2, 1, 2) :: (1, 1, 1) :: (1, 2, 1) :: (2, 1, 2) :: (2, 2, 2) :: (2,
+                                                                            2,
+                                                                            1) :: (2,
+                                                                                   1,
+                                                                                   1) :: (1,
+                                                                                          1,
+                                                                                          2) :: (1,
+                                                                                                 2,
+                                                                                                 2) :: (1,
+                                                                                                        2,
+                                                                                                        1) :: Nil)
       .toDF("key", "value1", "value2")
 
     checkAnswer(testData.dropDuplicates(),
@@ -868,16 +877,16 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
 
   test("SPARK-8797: sort by float column containing NaN should not crash") {
     val inputData =
-      Seq.fill(10)(Tuple1(Float.NaN)) ++ (1 to 1000).map(
-          x => Tuple1(x.toFloat))
+      Seq.fill(10)(Tuple1(Float.NaN)) ++ (1 to 1000).map(x =>
+            Tuple1(x.toFloat))
     val df = Random.shuffle(inputData).toDF("a")
     df.orderBy("a").collect()
   }
 
   test("SPARK-8797: sort by double column containing NaN should not crash") {
     val inputData =
-      Seq.fill(10)(Tuple1(Double.NaN)) ++ (1 to 1000).map(
-          x => Tuple1(x.toDouble))
+      Seq.fill(10)(Tuple1(Double.NaN)) ++ (1 to 1000).map(x =>
+            Tuple1(x.toDouble))
     val df = Random.shuffle(inputData).toDF("a")
     df.orderBy("a").collect()
   }
@@ -1113,16 +1122,13 @@ class DataFrameSuite extends QueryTest with SharedSQLContext {
     )
     checkAnswer(
         union.select(rand(7)),
-        union.rdd
-          .collectPartitions()
-          .zipWithIndex
-          .flatMap {
-            case (data, index) =>
-              val rng =
-                new org.apache.spark.util.random.XORShiftRandom(7 + index)
-              data.map(_ => rng.nextDouble()).map(i => Row(i))
-          }
-      )
+        union.rdd.collectPartitions().zipWithIndex.flatMap {
+          case (data, index) =>
+            val rng =
+              new org.apache.spark.util.random.XORShiftRandom(7 + index)
+            data.map(_ => rng.nextDouble()).map(i => Row(i))
+        }
+    )
 
     val intersect = df1.intersect(df2)
     checkAnswer(

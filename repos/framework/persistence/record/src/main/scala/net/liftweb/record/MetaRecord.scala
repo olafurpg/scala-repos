@@ -144,8 +144,9 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
     val methods = rootClass.getMethods
 
-    lifecycleCallbacks = (for (v <- methods if v.getName != "meta" &&
-                                   isLifecycle(v)) yield (v.getName, v)).toList
+    lifecycleCallbacks =
+      (for (v <- methods if v.getName != "meta" && isLifecycle(v)) yield
+        (v.getName, v)).toList
 
     introspect(this, methods) {
       case (v, mf) => tArray += FieldHolder(mf.name, v, mf)
@@ -296,8 +297,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     setFieldsFromJValue(inst, JsonParser.parse(json))
 
   def foreachCallback(inst: BaseRecord, f: LifecycleCallbacks => Any) {
-    lifecycleCallbacks.foreach(
-        m => f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
+    lifecycleCallbacks.foreach(m =>
+          f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
   }
 
   /**
@@ -364,8 +365,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
             e =>
               e match {
             case elem: Elem =>
-              elem.copy(child = toForm(
-                        inst, elem.child.flatMap(n => toForm(inst, n))))
+              elem.copy(child =
+                    toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
             case x => x
         })

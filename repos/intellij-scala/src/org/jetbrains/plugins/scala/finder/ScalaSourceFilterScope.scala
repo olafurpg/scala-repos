@@ -30,8 +30,7 @@ class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
   }
 
   def contains(file: VirtualFile): Boolean = {
-    (null == myDelegate || myDelegate.contains(file)) &&
-    ((FileTypeManager
+    (null == myDelegate || myDelegate.contains(file)) && ((FileTypeManager
               .getInstance()
               .isFileOfType(file, ScalaFileType.SCALA_FILE_TYPE) ||
             ScalaLanguageDerivative.hasDerivativeForFileType(file.getFileType)) &&

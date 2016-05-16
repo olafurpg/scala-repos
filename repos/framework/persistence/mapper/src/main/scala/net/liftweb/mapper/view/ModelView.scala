@@ -49,9 +49,8 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
   /**
     * Action when save is successful. Defaults to using the ModelView's redirectOnSave
     */
-  var onSave = (view: MV[T]) =>
-    {
-      view.redirectOnSave.foreach(redirectTo)
+  var onSave = (view: MV[T]) => {
+    view.redirectOnSave.foreach(redirectTo)
   }
 
   /**

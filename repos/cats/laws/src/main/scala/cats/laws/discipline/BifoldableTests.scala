@@ -9,7 +9,7 @@ import org.typelevel.discipline.Laws
 trait BifoldableTests[F[_, _]] extends Laws {
   def laws: BifoldableLaws[F]
 
-  def bifoldable[A : Arbitrary, B : Arbitrary, C : Arbitrary : Monoid : Eq](
+  def bifoldable[A: Arbitrary, B: Arbitrary, C: Arbitrary: Monoid: Eq](
       implicit ArbFAB: Arbitrary[F[A, B]]): RuleSet =
     new DefaultRuleSet(
         name = "bifoldable",

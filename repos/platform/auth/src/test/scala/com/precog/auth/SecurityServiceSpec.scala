@@ -57,7 +57,8 @@ import com.precog.common.accounts._
 import DefaultBijections._
 
 trait TestAPIKeyService
-    extends BlueEyesServiceSpecification with SecurityService
+    extends BlueEyesServiceSpecification
+    with SecurityService
     with AkkaDefaults {
   self =>
 
@@ -86,7 +87,9 @@ trait TestAPIKeyService
 }
 
 class SecurityServiceSpec
-    extends TestAPIKeyService with FutureMatchers with Tags {
+    extends TestAPIKeyService
+    with FutureMatchers
+    with Tags {
   import Permission._
 
   val authService: HttpClient[JValue] = client
@@ -371,10 +374,11 @@ class SecurityServiceSpec
           Some("non-root-2"), None, Set(mkNewGrantRequest(user1Grant)))
       val result = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKey(
-            user1.apiKey, request)
+                                                               user1.apiKey,
+                                                               request)
         apiKey = jid.deserialize[v1.APIKeyDetails].apiKey
         HttpResponse(HttpStatus(OK, _), _, Some(jtd), _) <- getAPIKeyDetails(
-            apiKey)
+                                                               apiKey)
       } yield jtd.deserialize[v1.APIKeyDetails]
 
       result must awaited(to) {
@@ -564,23 +568,30 @@ class SecurityServiceSpec
     "delete a grant" in {
       (for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- addGrantChild(
-            user1.apiKey,
-            user1Grant.grantId,
-            v1.NewGrantRequest(None,
-                               None,
-                               Set.empty[GrantId],
-                               Set(ReadPermission(Path("/user1/secret"),
-                                                  WrittenByAccount("user1"))),
-                               None))
+                                                               user1.apiKey,
+                                                               user1Grant.grantId,
+                                                               v1.NewGrantRequest(
+                                                                   None,
+                                                                   None,
+                                                                   Set.empty[
+                                                                       GrantId],
+                                                                   Set(ReadPermission(
+                                                                           Path("/user1/secret"),
+                                                                           WrittenByAccount(
+                                                                               "user1"))),
+                                                                   None))
         details = jid.deserialize[v1.GrantDetails]
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
-            user1.apiKey, user1Grant.grantId)
+                                                               user1.apiKey,
+                                                               user1Grant.grantId)
         beforeDelete = jgs.deserialize[Set[v1.GrantDetails]]
-            if beforeDelete.exists(_.grantId == details.grantId)
+        if beforeDelete.exists(_.grantId == details.grantId)
         HttpResponse(HttpStatus(NoContent, _), _, None, _) <- deleteGrant(
-            user1.apiKey, details.grantId)
+                                                                 user1.apiKey,
+                                                                 details.grantId)
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
-            user1.apiKey, user1Grant.grantId)
+                                                               user1.apiKey,
+                                                               user1Grant.grantId)
         afterDelete = jgs.deserialize[Set[v1.GrantDetails]]
       } yield
         !afterDelete.exists(_.grantId == details.grantId)) must awaited(to) {
@@ -603,18 +614,22 @@ class SecurityServiceSpec
     "retrieve permissions for a path we don't own" in {
       val permsM = for {
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKeyGrant(
-            user1.apiKey,
-            v1.NewGrantRequest(None,
-                               None,
-                               Set.empty,
-                               Set(ReadPermission(Path("/user1/public"),
-                                                  WrittenByAccount("user1"))),
-                               None))
+                                                               user1.apiKey,
+                                                               v1.NewGrantRequest(
+                                                                   None,
+                                                                   None,
+                                                                   Set.empty,
+                                                                   Set(ReadPermission(
+                                                                           Path("/user1/public"),
+                                                                           WrittenByAccount(
+                                                                               "user1"))),
+                                                                   None))
         _ <- addAPIKeyGrant(user1.apiKey,
                             user4.apiKey,
                             jid.deserialize[v1.GrantDetails].grantId)
         HttpResponse(HttpStatus(OK, _), _, Some(jperms), _) <- getPermissions(
-            user4.apiKey, Path("/user1/public"))
+                                                                  user4.apiKey,
+                                                                  Path("/user1/public"))
       } yield jperms.deserialize[Set[Permission]]
 
       permsM must awaited(to) {

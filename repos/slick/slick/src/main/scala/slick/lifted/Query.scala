@@ -63,7 +63,7 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
   /** Select all elements of this query which satisfy a predicate. This method
     * is used when desugaring for-comprehensions over queries. There is no
     * reason to call it directly because it is the same as `filter`. */
-  def withFilter[T : CanBeQueryCondition](f: E => T) =
+  def withFilter[T: CanBeQueryCondition](f: E => T) =
     filterHelper(f, identity)
 
   /** Join two queries with a cross join or inner join.
@@ -87,9 +87,9 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     * The right side of the join is lifted to an `Option`. If at least one element on the right
     * matches, all matching elements are returned as `Some`, otherwise a single `None` row is
     * returned. */
-  def joinLeft[E2, U2, D[_], O2](q2: Query[E2, _, D])(
-      implicit ol: OptionLift[E2, O2],
-      sh: Shape[FlatShapeLevel, O2, U2, _]) = {
+  def joinLeft[E2, U2, D[_], O2](
+      q2: Query[E2, _, D])(implicit ol: OptionLift[E2, O2],
+                           sh: Shape[FlatShapeLevel, O2, U2, _]) = {
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
     val aliased2 =
@@ -323,8 +323,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
 object Query {
 
   /** Lift a scalar value to a Query. */
-  def apply[E, U, R](
-      value: E)(implicit unpack: Shape[_ <: FlatShapeLevel, E, U, R])
+  def apply[E, U, R](value: E)(
+      implicit unpack: Shape[_ <: FlatShapeLevel, E, U, R])
     : Query[R, U, Seq] = {
     val shaped = ShapedValue(value, unpack).packedValue
     new WrappingQuery[R, U, Seq](Pure(shaped.toNode), shaped)
@@ -350,12 +350,12 @@ object CanBeQueryCondition {
   // Using implicits with explicit type annotation here (instead of previously implicit objects)
   // because otherwise they would not be found in this file above this line. 
   // See https://github.com/slick/slick/pull/217
-  implicit val BooleanColumnCanBeQueryCondition: CanBeQueryCondition[Rep[
-          Boolean]] = new CanBeQueryCondition[Rep[Boolean]] {
+  implicit val BooleanColumnCanBeQueryCondition: CanBeQueryCondition[
+      Rep[Boolean]] = new CanBeQueryCondition[Rep[Boolean]] {
     def apply(value: Rep[Boolean]) = value
   }
-  implicit val BooleanOptionColumnCanBeQueryCondition: CanBeQueryCondition[Rep[
-          Option[Boolean]]] = new CanBeQueryCondition[Rep[Option[Boolean]]] {
+  implicit val BooleanOptionColumnCanBeQueryCondition: CanBeQueryCondition[
+      Rep[Option[Boolean]]] = new CanBeQueryCondition[Rep[Option[Boolean]]] {
     def apply(value: Rep[Option[Boolean]]) = value
   }
   implicit val BooleanCanBeQueryCondition: CanBeQueryCondition[Boolean] =

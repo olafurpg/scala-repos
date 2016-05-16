@@ -284,8 +284,8 @@ object Dependencies {
     Seq(
         guava,
         "org.asynchttpclient" % "async-http-client" % "2.0.0-RC12"
-    ) ++ Seq("signpost-core", "signpost-commonshttp4")
-      .map("oauth.signpost" % _ % "1.2.1.2") ++ logback.map(_ % Test) ++
+    ) ++ Seq("signpost-core", "signpost-commonshttp4").map(
+        "oauth.signpost" % _ % "1.2.1.2") ++ logback.map(_ % Test) ++
     (specsBuild :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
 
   val playDocsSbtPluginDependencies = Seq(

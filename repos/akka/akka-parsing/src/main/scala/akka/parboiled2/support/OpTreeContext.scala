@@ -228,7 +228,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case Literal(Constant(s: String))
             if s.length <= autoExpandMaxStringLength ⇒
           if (s.isEmpty) q"true"
-          else if (wrapped) unrollWrapped(s) else unrollUnwrapped(s)
+          else if (wrapped) unrollWrapped(s)
+          else unrollUnwrapped(s)
         case _ ⇒
           if (wrapped) q"__matchStringWrapped($stringTree)"
           else q"__matchString($stringTree)"
@@ -294,7 +295,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case Literal(Constant(s: String))
             if s.length <= autoExpandMaxStringLength ⇒
           if (s.isEmpty) q"true"
-          else if (wrapped) unrollWrapped(s) else unrollUnwrapped(s)
+          else if (wrapped) unrollWrapped(s)
+          else unrollUnwrapped(s)
         case _ ⇒
           if (wrapped) q"__matchIgnoreCaseStringWrapped($stringTree)"
           else q"__matchIgnoreCaseString($stringTree)"
@@ -816,7 +818,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   lazy val rule1Collector = new Collector(
-      valBuilder = q"val builder = new scala.collection.immutable.VectorBuilder[Any]",
+      valBuilder =
+        q"val builder = new scala.collection.immutable.VectorBuilder[Any]",
       popToBuilder = q"builder += valueStack.pop()",
       pushBuilderResult = q"valueStack.push(builder.result()); true",
       pushSomePop = q"valueStack.push(Some(valueStack.pop()))",

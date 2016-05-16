@@ -573,7 +573,7 @@ object MapFactory {
 trait MapFactory {
   def implementationName: String
 
-  def empty[K : ClassTag, V : ClassTag]: ju.Map[K, V]
+  def empty[K: ClassTag, V: ClassTag]: ju.Map[K, V]
 
   def allowsNullKeys: Boolean
 

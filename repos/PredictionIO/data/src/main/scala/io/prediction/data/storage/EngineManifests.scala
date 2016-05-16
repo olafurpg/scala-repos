@@ -89,7 +89,7 @@ class EngineManifestSerializer
                   enginemanifest.copy(description = Some(description))
                 case JField("files", JArray(s)) =>
                   enginemanifest.copy(files = s.map(t =>
-                              t match {
+                            t match {
                       case JString(file) => file
                       case _ => ""
                   }))

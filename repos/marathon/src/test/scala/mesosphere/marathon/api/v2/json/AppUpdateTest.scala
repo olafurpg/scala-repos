@@ -31,8 +31,8 @@ class AppUpdateTest extends MarathonSpec {
       assert(
           ValidationHelper
             .getAllRuleConstrains(violations)
-            .exists(
-                v => v.path.getOrElse(false) == path && v.message == template))
+            .exists(v =>
+                  v.path.getOrElse(false) == path && v.message == template))
     }
 
     def shouldNotViolate(
@@ -41,8 +41,8 @@ class AppUpdateTest extends MarathonSpec {
       assert(
           !ValidationHelper
             .getAllRuleConstrains(violations)
-            .exists(
-                v => v.path.getOrElse(false) == path && v.message == template))
+            .exists(v =>
+                  v.path.getOrElse(false) == path && v.message == template))
     }
 
     val update = AppUpdate()
@@ -54,17 +54,17 @@ class AppUpdateTest extends MarathonSpec {
     )
 
     shouldViolate(
-        update.copy(portDefinitions = Some(
-                  Seq(PortDefinition(port = 9000, name = Some("foo")),
-                      PortDefinition(port = 9001, name = Some("foo"))))),
+        update.copy(portDefinitions =
+              Some(Seq(PortDefinition(port = 9000, name = Some("foo")),
+                       PortDefinition(port = 9001, name = Some("foo"))))),
         "/portDefinitions",
         "Port names must be unique."
     )
 
     shouldNotViolate(
-        update.copy(portDefinitions = Some(
-                  Seq(PortDefinition(port = 9000, name = Some("foo")),
-                      PortDefinition(port = 9001, name = Some("bar"))))),
+        update.copy(portDefinitions =
+              Some(Seq(PortDefinition(port = 9000, name = Some("foo")),
+                       PortDefinition(port = 9001, name = Some("bar"))))),
         "/portDefinitions",
         "Port names must be unique."
     )
@@ -104,41 +104,41 @@ class AppUpdateTest extends MarathonSpec {
         disk = Some(1024.0),
         executor = Some("/opt/executors/bin/some.executor"),
         constraints = Some(Set()),
-        fetch = Some(
-              Seq(FetchUri(uri = "http://dl.corp.org/prodX-1.2.3.tgz"))),
+        fetch =
+          Some(Seq(FetchUri(uri = "http://dl.corp.org/prodX-1.2.3.tgz"))),
         backoff = Some(2.seconds),
         backoffFactor = Some(1.2),
         maxLaunchDelay = Some(1.minutes),
         container = Some(
-              Container(
-                  `type` = mesos.ContainerInfo.Type.DOCKER,
-                  volumes = Nil,
-                  docker = Some(Docker(image = "docker:///group/image"))
-              )
-          ),
+            Container(
+                `type` = mesos.ContainerInfo.Type.DOCKER,
+                volumes = Nil,
+                docker = Some(Docker(image = "docker:///group/image"))
+            )
+        ),
         healthChecks = Some(Set[HealthCheck]()),
         dependencies = Some(Set[PathId]()),
         upgradeStrategy = Some(UpgradeStrategy.empty),
         labels = Some(
-              Map(
-                  "one" -> "aaa",
-                  "two" -> "bbb",
-                  "three" -> "ccc"
-              )
-          ),
+            Map(
+                "one" -> "aaa",
+                "two" -> "bbb",
+                "three" -> "ccc"
+            )
+        ),
         ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo(
-                        ports = Seq(Port(name = "http",
-                                         number = 80,
-                                         protocol = "tcp"))
-                    )
-              ))
+            IpAddress(
+                groups = Seq("a", "b", "c"),
+                labels = Map(
+                    "foo" -> "bar",
+                    "baz" -> "buzz"
+                ),
+                discoveryInfo = DiscoveryInfo(
+                    ports = Seq(Port(name = "http",
+                                     number = 80,
+                                     protocol = "tcp"))
+                )
+            ))
     )
     JsonTestHelper.assertSerializationRoundtripWorks(update1)
   }

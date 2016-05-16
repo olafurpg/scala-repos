@@ -41,8 +41,8 @@ object WikiService {
   case class WikiPageHistoryInfo(
       name: String, committer: String, message: String, date: Date)
 
-  def wikiHttpUrl(
-      repositoryInfo: RepositoryInfo)(implicit context: Context): String =
+  def wikiHttpUrl(repositoryInfo: RepositoryInfo)(
+      implicit context: Context): String =
     RepositoryService.httpUrl(
         repositoryInfo.owner, repositoryInfo.name + ".wiki")
 

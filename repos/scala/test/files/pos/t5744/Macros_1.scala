@@ -2,8 +2,8 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
 object Macros {
-  def foo[U : Numeric](x: U) = macro foo_impl[U]
-  def bar[U : Numeric : Equiv, Y <% String](x: U)(implicit s: String) = macro bar_impl[
+  def foo[U: Numeric](x: U) = macro foo_impl[U]
+  def bar[U: Numeric: Equiv, Y <% String](x: U)(implicit s: String) = macro bar_impl[
       U, Y]
 
   def foo_impl[U](c: Context)(x: c.Expr[U])(numeric: c.Expr[Numeric[U]]) = {

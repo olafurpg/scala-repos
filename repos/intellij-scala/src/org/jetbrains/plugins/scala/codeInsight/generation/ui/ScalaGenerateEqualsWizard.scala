@@ -66,7 +66,8 @@ private class ScalaGenerateEqualsWizardBuilder(
 
   private val fieldsToHashCode =
     if (needHashCode && needEquals)
-      createFieldToMemberInfoMap(checkedByDefault = true) else null
+      createFieldToMemberInfoMap(checkedByDefault = true)
+    else null
   private val hashCodeMemberInfos =
     if (needHashCode && needEquals) Collections.emptyList[ScalaMemberInfo]
     else if (needHashCode) classFields

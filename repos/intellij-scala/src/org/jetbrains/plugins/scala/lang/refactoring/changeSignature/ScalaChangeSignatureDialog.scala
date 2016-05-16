@@ -264,7 +264,7 @@ class ScalaChangeSignatureDialog(
     if (!getTableComponent.isEditing) {
       for {
         item <- parameterItems if item.parameter.oldIndex < 0 &&
-               StringUtil.isEmpty(item.defaultValueCodeFragment.getText)
+        StringUtil.isEmpty(item.defaultValueCodeFragment.getText)
       } {
         val stuff =
           if (isAddDefaultArgs) "Default arguments" else "Method calls"

@@ -275,10 +275,9 @@ object SetOperationPushDown extends Rule[LogicalPlan] with PredicateHelper {
       assert(children.nonEmpty)
       if (projectList.forall(_.deterministic)) {
         val newFirstChild = Project(projectList, children.head)
-        val newOtherChildren = children.tail.map(child =>
-              {
-            val rewrites = buildRewrites(children.head, child)
-            Project(projectList.map(pushToRight(_, rewrites)), child)
+        val newOtherChildren = children.tail.map(child => {
+          val rewrites = buildRewrites(children.head, child)
+          Project(projectList.map(pushToRight(_, rewrites)), child)
         })
         Union(newFirstChild +: newOtherChildren)
       } else {
@@ -333,11 +332,11 @@ object ColumnPruning extends Rule[LogicalPlan] {
     case p @ Project(_, p2: Project)
         if (p2.outputSet -- p.references).nonEmpty =>
       p.copy(child = p2.copy(
-                projectList = p2.projectList.filter(p.references.contains)))
+              projectList = p2.projectList.filter(p.references.contains)))
     case p @ Project(_, a: Aggregate)
         if (a.outputSet -- p.references).nonEmpty =>
-      p.copy(child = a.copy(aggregateExpressions = a.aggregateExpressions
-                    .filter(p.references.contains)))
+      p.copy(child = a.copy(aggregateExpressions =
+                a.aggregateExpressions.filter(p.references.contains)))
     case a @ Project(_, e @ Expand(_, _, grandChild))
         if (e.outputSet -- a.references).nonEmpty =>
       val newOutput = e.output.filter(a.references.contains(_))
@@ -402,8 +401,8 @@ object ColumnPruning extends Rule[LogicalPlan] {
     // Prune unnecessary window expressions
     case p @ Project(_, w: Window)
         if (w.windowOutputSet -- p.references).nonEmpty =>
-      p.copy(child = w.copy(windowExpressions = w.windowExpressions.filter(
-                      p.references.contains)))
+      p.copy(child = w.copy(windowExpressions =
+                w.windowExpressions.filter(p.references.contains)))
 
     // Eliminate no-op Window
     case w: Window if w.windowExpressions.isEmpty => w.child
@@ -663,7 +662,8 @@ object NullPropagation extends Rule[LogicalPlan] {
   * LeftSemi joins.
   */
 object InferFiltersFromConstraints
-    extends Rule[LogicalPlan] with PredicateHelper {
+    extends Rule[LogicalPlan]
+    with PredicateHelper {
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case filter @ Filter(condition, child) =>
       val newFilters =
@@ -690,12 +690,14 @@ object InferFiltersFromConstraints
           val newFilters =
             additionalConstraints -- splitConjunctivePredicates(condition)
           if (newFilters.nonEmpty)
-            Option(And(newFilters.reduce(And), condition)) else None
+            Option(And(newFilters.reduce(And), condition))
+          else None
         case None =>
           additionalConstraints.reduceOption(And)
       }
       if (newConditionOpt.isDefined)
-        Join(left, right, joinType, newConditionOpt) else join
+        Join(left, right, joinType, newConditionOpt)
+      else join
   }
 }
 
@@ -949,7 +951,8 @@ object PruneFilters extends Rule[LogicalPlan] with PredicateHelper {
   * This heuristic is valid assuming the expression evaluation cost is minimal.
   */
 object PushPredicateThroughProject
-    extends Rule[LogicalPlan] with PredicateHelper {
+    extends Rule[LogicalPlan]
+    with PredicateHelper {
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     // SPARK-13473: We can't push the predicate down when the underlying projection output non-
     // deterministic field(s).  Non-deterministic expressions are essentially stateful. This
@@ -998,7 +1001,8 @@ object PushPredicateThroughProject
   * attributes generated in [[Generate]] will remain above, and the rest should be pushed beneath.
   */
 object PushPredicateThroughGenerate
-    extends Rule[LogicalPlan] with PredicateHelper {
+    extends Rule[LogicalPlan]
+    with PredicateHelper {
 
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case filter @ Filter(condition, g: Generate) =>
@@ -1029,7 +1033,8 @@ object PushPredicateThroughGenerate
   * non-aggregate attributes (typically literals or grouping expressions).
   */
 object PushPredicateThroughAggregate
-    extends Rule[LogicalPlan] with PredicateHelper {
+    extends Rule[LogicalPlan]
+    with PredicateHelper {
 
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case filter @ Filter(condition, aggregate: Aggregate) =>
@@ -1155,13 +1160,13 @@ object OuterJoinElimination extends Rule[LogicalPlan] with PredicateHelper {
     val leftHasNonNullPredicate =
       leftConditions.exists(canFilterOutNull) || filter.constraints
         .filter(_.isInstanceOf[IsNotNull])
-        .exists(
-            expr => join.left.outputSet.intersect(expr.references).nonEmpty)
+        .exists(expr =>
+              join.left.outputSet.intersect(expr.references).nonEmpty)
     val rightHasNonNullPredicate =
       rightConditions.exists(canFilterOutNull) || filter.constraints
         .filter(_.isInstanceOf[IsNotNull])
-        .exists(
-            expr => join.right.outputSet.intersect(expr.references).nonEmpty)
+        .exists(expr =>
+              join.right.outputSet.intersect(expr.references).nonEmpty)
 
     join.joinType match {
       case RightOuter if leftHasNonNullPredicate => Inner
@@ -1194,7 +1199,8 @@ object OuterJoinElimination extends Rule[LogicalPlan] with PredicateHelper {
   * Check https://cwiki.apache.org/confluence/display/Hive/OuterJoinBehavior for more details
   */
 object PushPredicateThroughJoin
-    extends Rule[LogicalPlan] with PredicateHelper {
+    extends Rule[LogicalPlan]
+    with PredicateHelper {
 
   /**
     * Splits join condition expressions into three categories based on the attributes required

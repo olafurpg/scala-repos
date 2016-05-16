@@ -66,7 +66,9 @@ trait MixableMappedField extends BaseField {
   * (e.g., MappedPassword) in the database
   */
 trait BaseMappedField
-    extends SelectableField with Bindable with MixableMappedField
+    extends SelectableField
+    with Bindable
+    with MixableMappedField
     with Serializable {
 
   def dbDisplay_? = true
@@ -265,8 +267,10 @@ trait MappedNullableField[
   */
 trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     extends TypedField[FieldType]
-    with BaseOwnedMappedField[OwnerType] with FieldIdentifier
-    with PSettableValueHolder[FieldType] with scala.Equals {
+    with BaseOwnedMappedField[OwnerType]
+    with FieldIdentifier
+    with PSettableValueHolder[FieldType]
+    with scala.Equals {
 
   /**
     * Will be set to the type of the field
@@ -700,8 +704,7 @@ trait MappedField[FieldType <: Any, OwnerType <: Mapper[OwnerType]]
     (other match {
       case e: scala.Equals => e canEqual this
       case _ => true
-    }) &&
-    (other match {
+    }) && (other match {
           case mapped: MappedField[_, _] => this.i_is_! == mapped.i_is_!
           case ov: AnyRef
               if (ov ne null) && dbFieldClass.isAssignableFrom(ov.getClass) =>

@@ -30,7 +30,8 @@ class NodeJSEnv private (
     addEnv: Map[String, String],
     val sourceMap: Boolean
 )
-    extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
+    extends ExternalJSEnv(addArgs, addEnv)
+    with ComJSEnv {
 
   def this(nodejsPath: String = "node",
            addArgs: Seq[String] = Seq.empty,
@@ -81,15 +82,18 @@ class NodeJSEnv private (
 
   protected class NodeRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends ExtRunner(libs, code) with AbstractNodeRunner
+      extends ExtRunner(libs, code)
+      with AbstractNodeRunner
 
   protected class AsyncNodeRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncExtRunner(libs, code) with AbstractNodeRunner
+      extends AsyncExtRunner(libs, code)
+      with AbstractNodeRunner
 
   protected class ComNodeRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncNodeRunner(libs, code) with ComJSRunner {
+      extends AsyncNodeRunner(libs, code)
+      with ComJSRunner {
 
     private[this] val serverSocket = new ServerSocket(
         0, 0, InetAddress.getByName(null)) // Loopback address
@@ -264,7 +268,8 @@ class NodeJSEnv private (
             } catch (e) {}
             """
             )
-        ) else Seq()
+        )
+      else Seq()
     }
 
     /** File(s) to hack console.log to prevent if from changing `%%` to `%`.
@@ -360,8 +365,8 @@ class NodeJSEnv private (
     override protected def getVMEnv(): Map[String, String] = {
       val baseNodePath = sys.env.get("NODE_PATH").filter(_.nonEmpty)
       val nodePath =
-        libCache.cacheDir.getAbsolutePath +
-        baseNodePath.fold("")(p => File.pathSeparator + p)
+        libCache.cacheDir.getAbsolutePath + baseNodePath.fold("")(p =>
+              File.pathSeparator + p)
 
       sys.env ++ Seq(
           "NODE_MODULE_CONTEXTS" -> "0",

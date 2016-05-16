@@ -28,8 +28,7 @@ abstract class XMapTest[
 
   "satisfy equals laws when not natural" ! equal.laws[Map[NotNatural, String]]
 
-  implicit def mapArb[
-      A : Arbitrary : BKC, B : Arbitrary]: Arbitrary[Map[A, B]] =
+  implicit def mapArb[A: Arbitrary: BKC, B: Arbitrary]: Arbitrary[Map[A, B]] =
     Arbitrary(arbitrary[SMap[A, B]] map (m => fromSeq(m.toSeq: _*)))
 
   class NotNatural(val id: Int)
@@ -100,7 +99,7 @@ abstract class XMapTest[
     // lazy
     var evaluated = false
     getOrAdd[Id.Id, Int, Long](mWithOld, k)({ evaluated = true; vNew }) must_===
-    (mWithOld, vOld)
+      (mWithOld, vOld)
     evaluated must_=== false
   }
 }

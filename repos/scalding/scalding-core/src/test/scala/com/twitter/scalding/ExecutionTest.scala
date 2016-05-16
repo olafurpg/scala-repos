@@ -53,12 +53,9 @@ object ExecutionTestJobs {
 
   def mergeFanout(in: List[Int]): Execution[Iterable[(Int, Int)]] = {
     // Force a reduce, so no fancy optimizations kick in
-    val source = TypedPipe
-      .from(in)
-      .groupBy(_ % 3)
-      .head
+    val source = TypedPipe.from(in).groupBy(_ % 3).head
 
-      (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
+    (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
   }
 }
 
@@ -423,8 +420,7 @@ class ExecutionTest extends WordSpec with Matchers {
     "Ability to do isolated caches so we don't exhaust memory" in {
 
       def memoryWastingExecutionGenerator(id: Int): Execution[Array[Long]] =
-        Execution.withNewCache(
-            Execution
+        Execution.withNewCache(Execution
               .from(id)
               .flatMap { idx =>
             Execution.from(Array.fill(4000000)(idx.toLong))

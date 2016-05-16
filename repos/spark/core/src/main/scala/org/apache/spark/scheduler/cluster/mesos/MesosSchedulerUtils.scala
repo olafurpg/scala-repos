@@ -212,8 +212,8 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
     }
 
     // Filter any resource that has depleted.
-    val filteredResources = remainingResources.filter(
-        r => r.getType != Value.Type.SCALAR || r.getScalar.getValue > 0.0)
+    val filteredResources = remainingResources.filter(r =>
+          r.getType != Value.Type.SCALAR || r.getScalar.getValue > 0.0)
 
     (filteredResources.toList, requestedResources.toList)
   }
@@ -243,15 +243,14 @@ private[mesos] trait MesosSchedulerUtils extends Logging {
   protected def toAttributeMap(
       offerAttributes: JList[Attribute]): Map[String, GeneratedMessage] = {
     offerAttributes.asScala
-      .map(attr =>
-            {
-          val attrValue = attr.getType match {
-            case Value.Type.SCALAR => attr.getScalar
-            case Value.Type.RANGES => attr.getRanges
-            case Value.Type.SET => attr.getSet
-            case Value.Type.TEXT => attr.getText
-          }
-          (attr.getName, attrValue)
+      .map(attr => {
+        val attrValue = attr.getType match {
+          case Value.Type.SCALAR => attr.getScalar
+          case Value.Type.RANGES => attr.getRanges
+          case Value.Type.SET => attr.getSet
+          case Value.Type.TEXT => attr.getText
+        }
+        (attr.getName, attrValue)
       })
       .toMap
   }

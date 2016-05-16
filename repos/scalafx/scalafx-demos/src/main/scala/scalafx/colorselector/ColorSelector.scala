@@ -59,8 +59,8 @@ object ColorSelector extends JFXApp {
   val synchronizedValue = new DoubleProperty()
 
   val synchronizedControls = new ObservableBuffer[SliderControl]
-  synchronizedControls.onChange(
-      (buffer, changes) => synchronizeValues(buffer, changes))
+  synchronizedControls.onChange((buffer, changes) =>
+        synchronizeValues(buffer, changes))
 
   // METHODS - BEGIN
 
@@ -124,8 +124,8 @@ object ColorSelector extends JFXApp {
     if (d > Max / 2) Color.Black else Color.White
 
   private def verifyWebColor() {
-    cmbWebColor
-      .value() = WebColor.colors.find(_.sameColor(currentColor())).orNull
+    cmbWebColor.value() =
+      WebColor.colors.find(_.sameColor(currentColor())).orNull
   }
 
   private def webColorSelected() {
@@ -143,11 +143,11 @@ object ColorSelector extends JFXApp {
     effect = new Reflection {
       fraction = 0.45
     }
-    onMouseClicked = (event: MouseEvent) =>
-      {
-        if ((event.getClickCount == 2) && (event.button == MouseButton.Primary)) {
-          randomizeColors()
-        }
+    onMouseClicked = (event: MouseEvent) => {
+      if ((event.getClickCount == 2) &&
+          (event.button == MouseButton.Primary)) {
+        randomizeColors()
+      }
     }
   }
 
@@ -221,8 +221,8 @@ object ColorSelector extends JFXApp {
 
   val cmbColorFormat = new ComboBox[Formatter](Formatter.formatters) {
     promptText = "Color Format"
-    converter = StringConverter.toStringConverter(
-        (f: Formatter) => f.description)
+    converter =
+      StringConverter.toStringConverter((f: Formatter) => f.description)
     value = RgbFormatter
     onAction = (event: ActionEvent) => formatColor()
   }

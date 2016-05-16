@@ -29,16 +29,14 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
 
   // norm
   test("norm positive homogeneity") {
-    check(
-        Prop.forAll { (trip: (V, V, V), s: S) =>
+    check(Prop.forAll { (trip: (V, V, V), s: S) =>
       val (a, b, c) = trip
       (norm(a * s) - norm(s) * norm(a)) <= TOL * norm(a * s)
     })
   }
 
   test("norm triangle inequality") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       ((1.0 - TOL) * norm(a + b) <= norm(b) + norm(a))
     })
@@ -74,8 +72,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
 
   // zip map values
   test("zip map of + is the same as +") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, _) = trip
       zipMapValues.map(a, b, { scalars.+(_: S, _: S) }) == (a + b)
     })
@@ -95,8 +92,7 @@ trait TensorSpaceTestBase[V, I, S] extends MutableModuleTestBase[V, S] {
   }
 
   test("Vector element-wise mult distributes over vector addition") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       close((a + b) :* c, (b :* c) + (a :* c), TOL)
     })
@@ -136,8 +132,7 @@ trait DoubleValuedTensorSpaceTestBase[V, I]
   }
 
   test("normalize") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val aNorm = normalize(trip._1)
       (norm(aNorm) - 1.0) <= TOL || norm(aNorm) == 0.0
     })

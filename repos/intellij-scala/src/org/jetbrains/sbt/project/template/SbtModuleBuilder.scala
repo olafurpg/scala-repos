@@ -182,7 +182,7 @@ class SbtModuleBuilder
               new ImportSpecBuilder(model.getProject, SbtProjectSystem.Id)
                 .forceWhenUptodate()
                 .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-            )
+          )
       })
     }
   }

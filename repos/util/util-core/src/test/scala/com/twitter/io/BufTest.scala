@@ -11,8 +11,11 @@ import org.scalatest.prop.{GeneratorDrivenPropertyChecks, Checkers}
 
 @RunWith(classOf[JUnitRunner])
 class BufTest
-    extends FunSuite with MockitoSugar with GeneratorDrivenPropertyChecks
-    with Checkers with AssertionsForJUnit {
+    extends FunSuite
+    with MockitoSugar
+    with GeneratorDrivenPropertyChecks
+    with Checkers
+    with AssertionsForJUnit {
 
   val AllCharsets = Seq(
       Charsets.Iso8859_1,
@@ -405,8 +408,8 @@ class BufTest
       .concat(Buf.U32LE(Int.MinValue))
       .concat(Buf.U64LE(Long.MinValue))
 
-    val Buf.U32BE(be32,
-                  Buf.U64BE(be64, Buf.U32LE(le32, Buf.U64LE(le64, rem)))) = buf
+    val Buf.U32BE(be32, Buf.U64BE(be64, Buf.U32LE(le32, Buf.U64LE(le64, rem)))) =
+      buf
 
     assert(be32 == Int.MaxValue)
     assert(be64 == Long.MaxValue)

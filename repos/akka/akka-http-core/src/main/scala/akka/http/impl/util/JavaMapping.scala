@@ -55,7 +55,8 @@ private[http] object S2JMapping {
 
 /** INTERNAL API */
 private[http] trait JavaMapping[_J, _S]
-    extends J2SMapping[_J] with S2JMapping[_S] {
+    extends J2SMapping[_J]
+    with S2JMapping[_S] {
   type J = _J
   type S = _S
 }
@@ -83,13 +84,13 @@ private[http] object JavaMapping {
         implicit mapping: J2SMapping[J]): immutable.Seq[mapping.S] =
       j.map(mapping.toScala(_)).toList
 
-    implicit def AddAsScala[J](
-        javaObject: J)(implicit mapping: J2SMapping[J]): AsScala[mapping.S] =
+    implicit def AddAsScala[J](javaObject: J)(
+        implicit mapping: J2SMapping[J]): AsScala[mapping.S] =
       new AsScala[mapping.S] {
         def asScala = convertToScala(javaObject)
       }
-    implicit def AddAsJava[S](
-        scalaObject: S)(implicit mapping: S2JMapping[S]): AsJava[mapping.J] =
+    implicit def AddAsJava[S](scalaObject: S)(
+        implicit mapping: S2JMapping[S]): AsJava[mapping.J] =
       new AsJava[mapping.J] {
         def asJava = mapping.toJava(scalaObject)
       }

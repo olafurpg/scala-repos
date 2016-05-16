@@ -44,19 +44,18 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
     val javaMethods = classOf[jfxa.Platform].getMethods
     val scalaMethods = Platform.getClass.getMethods
     for (jm <- javaMethods if Modifier.isPublic(jm.getModifiers) &&
-              Modifier.isStatic(jm.getModifiers)) {
+         Modifier.isStatic(jm.getModifiers)) {
       val found = scalaMethods.exists(
-          sm =>
-            {
-              def firstToUpper(s: String) = s.head.toUpper + s.tail
+          sm => {
+            def firstToUpper(s: String) = s.head.toUpper + s.tail
 
-              val javaName = jm.getName
-              val scalaName = sm.getName
-              scalaName == javaName ||
-              "is" + firstToUpper(scalaName) == javaName ||
-              "get" + firstToUpper(scalaName) == javaName ||
-              "set" + firstToUpper(scalaName) == javaName ||
-              scalaName + "Property" == javaName
+            val javaName = jm.getName
+            val scalaName = sm.getName
+            scalaName == javaName ||
+            "is" + firstToUpper(scalaName) == javaName ||
+            "get" + firstToUpper(scalaName) == javaName ||
+            "set" + firstToUpper(scalaName) == javaName ||
+            scalaName + "Property" == javaName
           }
       )
 
@@ -105,10 +104,9 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
       method: String, parameterType: Class[_]): Boolean = {
     val methods = Platform.getClass.getMethods.filter(m => m.getName == method)
     methods.exists(
-        m =>
-          {
-        val parameterTypes = m.getParameterTypes
-        parameterTypes.length == 1 && parameterTypes(0) == parameterType
+        m => {
+      val parameterTypes = m.getParameterTypes
+      parameterTypes.length == 1 && parameterTypes(0) == parameterType
     })
   }
 }

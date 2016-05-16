@@ -55,9 +55,9 @@ abstract class UnreachableNodeJoinsAgainSpec
 
   muteMarkingAsUnreachable()
 
-  def allBut(
-      role: RoleName,
-      roles: immutable.Seq[RoleName] = roles): immutable.Seq[RoleName] = {
+  def allBut(role: RoleName,
+             roles: immutable.Seq[RoleName] =
+               roles): immutable.Seq[RoleName] = {
     roles.filterNot(_ == role)
   }
 

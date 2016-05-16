@@ -49,8 +49,8 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after normalization.")
 
-    assert((data1, data1RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(brzNorm(data1(0).toBreeze, 1) ~== 1.0 absTol 1E-5)
     assert(brzNorm(data1(2).toBreeze, 1) ~== 1.0 absTol 1E-5)
@@ -81,8 +81,8 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after normalization.")
 
-    assert((data2, data2RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(brzNorm(data2(0).toBreeze, 2) ~== 1.0 absTol 1E-5)
     assert(brzNorm(data2(2).toBreeze, 2) ~== 1.0 absTol 1E-5)
@@ -113,8 +113,8 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after normalization.")
 
-    assert((dataInf, dataInfRDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((dataInf, dataInfRDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(dataInf(0).toArray.map(math.abs).max ~== 1.0 absTol 1E-5)
     assert(dataInf(2).toArray.map(math.abs).max ~== 1.0 absTol 1E-5)

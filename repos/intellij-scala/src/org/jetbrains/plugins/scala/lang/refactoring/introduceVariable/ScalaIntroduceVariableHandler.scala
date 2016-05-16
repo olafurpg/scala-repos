@@ -22,8 +22,10 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.{DialogConflictsReporte
   * Date: 23.06.2008
   */
 class ScalaIntroduceVariableHandler
-    extends RefactoringActionHandler with DialogConflictsReporter
-    with IntroduceExpressions with IntroduceTypeAlias {
+    extends RefactoringActionHandler
+    with DialogConflictsReporter
+    with IntroduceExpressions
+    with IntroduceTypeAlias {
   var occurrenceHighlighters = Seq.empty[RangeHighlighter]
 
   def invoke(project: Project,

@@ -237,6 +237,9 @@ trait DatabaseImplicits {
 }
 
 trait Implicits
-    extends ConversionImplicits with InterfaceImplicits with ViewImplicits
-    with WidgetImplicits with DatabaseImplicits
+    extends ConversionImplicits
+    with InterfaceImplicits
+    with ViewImplicits
+    with WidgetImplicits
+    with DatabaseImplicits
 object Implicits extends Implicits

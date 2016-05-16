@@ -14,7 +14,8 @@ import org.apache.thrift.protocol.TProtocolFactory
 class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
     extends StackBasedClient[ThriftClientRequest, Array[Byte]]
     with Stack.Parameterized[ThriftMuxClientLike]
-    with Stack.Transformable[ThriftMuxClientLike] with ThriftRichClient {
+    with Stack.Transformable[ThriftMuxClientLike]
+    with ThriftRichClient {
 
   /**
     * Used for Java access.
@@ -54,7 +55,7 @@ class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
     * Create a new ThriftMuxClientLike with `p` added to the
     * parameters used to configure the `muxer`.
     */
-  override def configured[P : Stack.Param](p: P): ThriftMuxClientLike =
+  override def configured[P: Stack.Param](p: P): ThriftMuxClientLike =
     super.configured(p)
   override def configured[P](psp: (P, Stack.Param[P])): ThriftMuxClientLike =
     super.configured(psp)

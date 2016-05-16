@@ -186,9 +186,9 @@ trait TransSpecModule extends FNModule {
     object TransSpec {
       import CPath._
 
-      def concatChildren[A <: SourceType](
-          tree: CPathTree[Int],
-          leaf: TransSpec[A] = Leaf(Source)): TransSpec[A] = {
+      def concatChildren[A <: SourceType](tree: CPathTree[Int],
+                                          leaf: TransSpec[A] =
+                                            Leaf(Source)): TransSpec[A] = {
         def createSpecs(trees: Seq[CPathTree[Int]]): Seq[TransSpec[A]] =
           trees.map { child =>
             child match {

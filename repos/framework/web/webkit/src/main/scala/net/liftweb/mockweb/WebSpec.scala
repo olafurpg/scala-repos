@@ -44,7 +44,8 @@ import mocks.MockHttpServletRequest
   * is to just point this at your Boostrap.boot method.
   */
 abstract class WebSpec(boot: () => Any = () => {})
-    extends Specification with XmlMatchers {
+    extends Specification
+    with XmlMatchers {
 
   /**
     * This is our private spec instance of Liftrules. Everything we run will

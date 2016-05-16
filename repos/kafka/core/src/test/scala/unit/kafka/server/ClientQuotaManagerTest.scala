@@ -72,8 +72,8 @@ class ClientQuotaManagerTest {
                    new Quota(3000, true),
                    clientMetrics.quota("p1"))
 
-      throttleTimeMs = clientMetrics.recordAndMaybeThrottle(
-          "p1", 0, this.callback)
+      throttleTimeMs =
+        clientMetrics.recordAndMaybeThrottle("p1", 0, this.callback)
       assertEquals(s"throttleTimeMs should be 0. was $throttleTimeMs",
                    0,
                    throttleTimeMs)
@@ -84,8 +84,8 @@ class ClientQuotaManagerTest {
                    new Quota(500, true),
                    clientMetrics.quota("p1"))
 
-      throttleTimeMs = clientMetrics.recordAndMaybeThrottle(
-          "p1", 0, this.callback)
+      throttleTimeMs =
+        clientMetrics.recordAndMaybeThrottle("p1", 0, this.callback)
       assertTrue(s"throttleTimeMs should be > 0. was $throttleTimeMs",
                  throttleTimeMs > 0)
     } finally {

@@ -41,4 +41,6 @@ trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
   * complex numbers.
   */
 trait FieldAlgebra[V, @sp(Float, Double) F]
-    extends Any with RingAlgebra[V, F] with VectorSpace[V, F]
+    extends Any
+    with RingAlgebra[V, F]
+    with VectorSpace[V, F]

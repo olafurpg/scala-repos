@@ -33,7 +33,8 @@ import org.apache.spark.sql.hive.thriftserver.server.SparkSQLOperationManager
 
 private[hive] class SparkSQLSessionManager(
     hiveServer: HiveServer2, hiveContext: HiveContext)
-    extends SessionManager(hiveServer) with ReflectedCompositeService {
+    extends SessionManager(hiveServer)
+    with ReflectedCompositeService {
 
   private lazy val sparkSqlOperationManager = new SparkSQLOperationManager()
 

@@ -46,7 +46,8 @@ import scalaz._
 import scala.collection.mutable
 
 trait PrecogLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with TransSpecModule
+    extends ColumnarTableLibModule[M]
+    with TransSpecModule
     with HttpClientModule[M] {
   val PrecogNamespace = Vector("precog")
 
@@ -74,8 +75,8 @@ trait PrecogLibModule[M[+ _]]
       class EnrichmentMapper(ctx: MorphContext) extends CMapperM[M] {
         import Extractor.Error
 
-        private type Result[+A] = Validation[
-            NonEmptyList[HttpClientError \/ Error], A]
+        private type Result[+A] =
+          Validation[NonEmptyList[HttpClientError \/ Error], A]
         private val httpError: HttpClientError => HttpClientError \/ Error =
           -\/(_)
         private val jsonError: Error => HttpClientError \/ Error = \/-(_)
@@ -187,17 +188,17 @@ trait PrecogLibModule[M[+ _]]
                   val client = HttpClient(url)
                   val request = Request(
                       HttpMethod.POST,
-                      body = Some(
-                            Request.Body("application/json", requestBody)))
+                      body =
+                        Some(Request.Body("application/json", requestBody)))
 
                   client.execute(request).run map { responseE =>
                     val validation = for {
                       response <- httpError <-: responseE.validation
                       body <- httpError <-: response.ok.validation
-                      json <- jsonError <-:(Error.thrown(_)) <-: JParser
-                        .parseFromString(body)
+                      json <- jsonError <-: (Error.thrown(_)) <-: JParser
+                               .parseFromString(body)
                       data <- jsonError <-: (json \ "data")
-                        .validated[List[JValue]]
+                               .validated[List[JValue]]
                       result <- jsonError <-: populate(data)
                     } yield result
                     validation leftMap (NonEmptyList(_))

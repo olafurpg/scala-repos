@@ -39,7 +39,8 @@ trait Unmarshaller[-A, B] {
 }
 
 object Unmarshaller
-    extends GenericUnmarshallers with PredefinedFromEntityUnmarshallers
+    extends GenericUnmarshallers
+    with PredefinedFromEntityUnmarshallers
     with PredefinedFromStringUnmarshallers {
 
   // format: OFF
@@ -89,12 +90,12 @@ object Unmarshaller
   implicit class EnhancedUnmarshaller[A, B](val um: Unmarshaller[A, B])
       extends AnyVal {
     def mapWithInput[C](f: (A, B) ⇒ C): Unmarshaller[A, C] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒ implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
+      Unmarshaller.withMaterializer(implicit ec ⇒
+            implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
 
     def flatMapWithInput[C](f: (A, B) ⇒ Future[C]): Unmarshaller[A, C] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒ implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
+      Unmarshaller.withMaterializer(implicit ec ⇒
+            implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
   }
 
   implicit class EnhancedFromEntityUnmarshaller[A](

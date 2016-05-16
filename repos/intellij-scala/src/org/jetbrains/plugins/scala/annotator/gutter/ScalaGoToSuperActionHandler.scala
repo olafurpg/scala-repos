@@ -93,8 +93,8 @@ private object ScalaGoToSuperActionHandler {
             "scala.Any",
             "scala.AnyRef",
             "scala.AnyVal")
-      val supers = template.supers.filterNot(
-          (x: PsiClass) => ignored.contains(x.qualifiedName))
+      val supers = template.supers.filterNot((x: PsiClass) =>
+            ignored.contains(x.qualifiedName))
       mutable.HashSet[PsiClass](supers: _*).toArray
     }
 
@@ -103,8 +103,9 @@ private object ScalaGoToSuperActionHandler {
         d: ScDeclaredElementsHolder): Array[PsiElement] = {
       var el = file.findElementAt(offset)
       val elOrig = el
-      while (el != null && !(el.isInstanceOf[ScTypedDefinition] &&
-          el != elOrig)) el = el.getParent
+      while (el != null &&
+             !(el.isInstanceOf[ScTypedDefinition] && el != elOrig)) el =
+        el.getParent
       val elements = d.declaredElements
       if (elements.isEmpty) return empty
       val supers = mutable.HashSet[NavigatablePsiElement](

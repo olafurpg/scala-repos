@@ -23,7 +23,7 @@ import scala.reflect.ClassTag
   * An append-only, non-threadsafe, array-backed vector that is optimized for primitive types.
   */
 private[spark] class PrimitiveVector[
-    @specialized(Long, Int, Double) V : ClassTag](initialSize: Int = 64) {
+    @specialized(Long, Int, Double) V: ClassTag](initialSize: Int = 64) {
   private var _numElements = 0
   private var _array: Array[V] = _
 

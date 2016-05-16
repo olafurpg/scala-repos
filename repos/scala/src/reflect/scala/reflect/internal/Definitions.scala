@@ -177,7 +177,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
   }
 
   abstract class DefinitionsClass
-      extends DefinitionsApi with ValueClassDefinitions {
+      extends DefinitionsApi
+      with ValueClassDefinitions {
     private var isInitialized = false
     def isDefinitionsInitialized = isInitialized
 
@@ -245,15 +246,15 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       *  - members of Any or Object, because every instance will inherit a
       *    definition which supersedes the imported one
       */
-    def isUnimportable(sym: Symbol) = ((sym eq NoSymbol) ||
-        sym.isConstructor || sym.isPrivateLocal)
+    def isUnimportable(sym: Symbol) =
+      ((sym eq NoSymbol) || sym.isConstructor || sym.isPrivateLocal)
     def isUnimportableUnlessRenamed(sym: Symbol) =
       isUnimportable(sym) || isUniversalMember(sym)
     def isImportable(sym: Symbol) = !isUnimportable(sym)
 
     /** Is this type equivalent to Any, AnyVal, or AnyRef? */
-    def isTrivialTopType(tp: Type) = (tp =:= AnyTpe || tp =:= AnyValTpe ||
-        tp =:= AnyRefTpe)
+    def isTrivialTopType(tp: Type) =
+      (tp =:= AnyTpe || tp =:= AnyValTpe || tp =:= AnyRefTpe)
 
     def isUnitType(tp: Type) =
       tp.typeSymbol == UnitClass && tp.annotations.isEmpty
@@ -329,8 +330,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       override def isSubClass(that: Symbol) = true
     }
     final object NullClass extends BottomClassSymbol(tpnme.Null, AnyRefClass) {
-      override def isSubClass(that: Symbol) = ((that eq AnyClass) ||
-          (that ne NothingClass) && (that isSubClass ObjectClass))
+      override def isSubClass(that: Symbol) =
+        ((that eq AnyClass) || (that ne NothingClass) &&
+            (that isSubClass ObjectClass))
     }
 
     // exceptions and other throwables
@@ -377,8 +379,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def Predef_wrapArray(tp: Type) =
       getMemberMethod(PredefModule, wrapArrayMethodName(tp))
     def Predef_??? = getMemberMethod(PredefModule, nme.???)
-    def isPredefMemberNamed(sym: Symbol, name: Name) = ((sym.name == name) &&
-        (sym.owner == PredefModule.moduleClass))
+    def isPredefMemberNamed(sym: Symbol, name: Name) =
+      ((sym.name == name) && (sym.owner == PredefModule.moduleClass))
 
     /** Specialization.
       */
@@ -419,12 +421,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     lazy val ByNameParamClass =
       specialPolyClass(tpnme.BYNAME_PARAM_CLASS_NAME, COVARIANT)(_ => AnyTpe)
-    lazy val JavaRepeatedParamClass =
-      specialPolyClass(tpnme.JAVA_REPEATED_PARAM_CLASS_NAME, COVARIANT)(
-          tparam => arrayType(tparam.tpe))
+    lazy val JavaRepeatedParamClass = specialPolyClass(
+        tpnme.JAVA_REPEATED_PARAM_CLASS_NAME, COVARIANT)(tparam =>
+          arrayType(tparam.tpe))
     lazy val RepeatedParamClass =
-      specialPolyClass(tpnme.REPEATED_PARAM_CLASS_NAME, COVARIANT)(
-          tparam => seqType(tparam.tpe))
+      specialPolyClass(tpnme.REPEATED_PARAM_CLASS_NAME, COVARIANT)(tparam =>
+            seqType(tparam.tpe))
 
     def isByNameParamType(tp: Type) = tp.typeSymbol == ByNameParamClass
     def isScalaRepeatedParamType(tp: Type) =
@@ -637,16 +639,19 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     // quasiquotes, if e.g. crosstyping with -Xsource on
     lazy val QuasiquoteClass =
       if (ApiUniverseClass != NoSymbol)
-        getMemberIfDefined(ApiUniverseClass, tpnme.Quasiquote) else NoSymbol
+        getMemberIfDefined(ApiUniverseClass, tpnme.Quasiquote)
+      else NoSymbol
     lazy val QuasiquoteClass_api =
       if (QuasiquoteClass != NoSymbol) getMember(QuasiquoteClass, tpnme.api)
       else NoSymbol
     lazy val QuasiquoteClass_api_apply =
       if (QuasiquoteClass_api != NoSymbol)
-        getMember(QuasiquoteClass_api, nme.apply) else NoSymbol
+        getMember(QuasiquoteClass_api, nme.apply)
+      else NoSymbol
     lazy val QuasiquoteClass_api_unapply =
       if (QuasiquoteClass_api != NoSymbol)
-        getMember(QuasiquoteClass_api, nme.unapply) else NoSymbol
+        getMember(QuasiquoteClass_api, nme.unapply)
+      else NoSymbol
 
     lazy val ScalaSignatureAnnotation =
       requiredClass[scala.reflect.ScalaSignature]
@@ -669,8 +674,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     // The given symbol is a method with the right name and signature to be a runnable java program.
     def isJavaMainMethod(sym: Symbol) =
-      (sym.name == nme.main) &&
-      (sym.info match {
+      (sym.name == nme.main) && (sym.info match {
             case MethodType(p :: Nil, restpe) =>
               isArrayOfSymbol(p.tpe, StringClass) &&
               restpe.typeSymbol == UnitClass
@@ -989,9 +993,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       val tpSym = tp.typeSymbol
       val ctor = tpSym.primaryConstructor
       val ctorOk =
-        !ctor.exists ||
-        (!ctor.isOverloaded && ctor.isPublic && ctor.info.params.isEmpty &&
-            ctor.info.paramSectionCount <= 1)
+        !ctor.exists || (!ctor.isOverloaded && ctor.isPublic &&
+            ctor.info.params.isEmpty && ctor.info.paramSectionCount <= 1)
 
       if (tpSym.exists && ctorOk) {
         // find the single abstract member, if there is one
@@ -1061,8 +1064,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     }
 
     // Can't only check for _1 thanks to pos/t796.
-    def hasSelectors(tp: Type) = ((tp.members containsName nme._1) &&
-        (tp.members containsName nme._2))
+    def hasSelectors(tp: Type) =
+      ((tp.members containsName nme._1) && (tp.members containsName nme._2))
 
     /** Returns the method symbols for members _1, _2, ..., _N
       *  which exist in the given type.
@@ -1397,8 +1400,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val languageFeatureModule = getRequiredModule("scala.languageFeature")
 
     def isMetaAnnotation(sym: Symbol): Boolean =
-      metaAnnotations(sym) ||
-      (// Trying to allow for deprecated locations
+      metaAnnotations(sym) || (// Trying to allow for deprecated locations
           sym.isAliasType && isMetaAnnotation(sym.info.typeSymbol))
     lazy val metaAnnotations: Set[Symbol] =
       getPackage(TermName("scala.annotation.meta")).info.members filter
@@ -1485,7 +1487,8 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
               owner,
               name,
               "member object",
-              addendum = s". A symbol ${other} of kind ${other.accurateKindString} already exists.")
+              addendum =
+                s". A symbol ${other} of kind ${other.accurateKindString} already exists.")
       }
     }
     def getTypeMember(owner: Symbol, name: Name): TypeSymbol = {
@@ -1562,13 +1565,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       */
     def newT1NullaryMethod(owner: Symbol, name: TermName, flags: Long)(
         createFn: Symbol => Type): MethodSymbol = {
-      newPolyMethod(1, owner, name, flags)(
-          tparams => (None, createFn(tparams.head)))
+      newPolyMethod(1, owner, name, flags)(tparams =>
+            (None, createFn(tparams.head)))
     }
     def newT1NoParamsMethod(owner: Symbol, name: TermName, flags: Long)(
         createFn: Symbol => Type): MethodSymbol = {
-      newPolyMethod(1, owner, name, flags)(
-          tparams => (Some(Nil), createFn(tparams.head)))
+      newPolyMethod(1, owner, name, flags)(tparams =>
+            (Some(Nil), createFn(tparams.head)))
     }
 
     /** Is symbol a phantom class for which no runtime representation exists? */
@@ -1809,10 +1812,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
       lazy val materializeClassTag = getMemberMethod(
           ReflectPackage, nme.materializeClassTag)
-      lazy val materializeWeakTypeTag = ReflectApiPackage.map(
-          sym => getMemberMethod(sym, nme.materializeWeakTypeTag))
-      lazy val materializeTypeTag = ReflectApiPackage.map(
-          sym => getMemberMethod(sym, nme.materializeTypeTag))
+      lazy val materializeWeakTypeTag = ReflectApiPackage.map(sym =>
+            getMemberMethod(sym, nme.materializeWeakTypeTag))
+      lazy val materializeTypeTag = ReflectApiPackage.map(sym =>
+            getMemberMethod(sym, nme.materializeTypeTag))
 
       lazy val experimentalModule = getMemberModule(
           languageFeatureModule, nme.experimental)

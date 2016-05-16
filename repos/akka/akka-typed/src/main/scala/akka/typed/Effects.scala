@@ -71,8 +71,8 @@ class EffectfulActorContext[T](
   def run(msg: T): Unit =
     current = Behavior.canonicalize(this, current.message(this, msg), current)
   def signal(signal: Signal): Unit =
-    current = Behavior.canonicalize(
-        this, current.management(this, signal), current)
+    current =
+      Behavior.canonicalize(this, current.management(this, signal), current)
 
   override def spawnAnonymous[U](props: Props[U]): ActorRef[U] = {
     val ref = super.spawnAnonymous(props)

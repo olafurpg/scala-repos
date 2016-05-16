@@ -78,12 +78,11 @@ class GraphOpsSuite extends SparkFunSuite with LocalSparkContext {
       val graph: Graph[Int, Int] = Graph(vertices, edges).cache()
       val filteredGraph = graph
         .filter(
-            graph =>
-              {
-                val degrees: VertexRDD[Int] = graph.outDegrees
-                graph.outerJoinVertices(degrees) { (vid, data, deg) =>
-                  deg.getOrElse(0)
-                }
+            graph => {
+              val degrees: VertexRDD[Int] = graph.outDegrees
+              graph.outerJoinVertices(degrees) { (vid, data, deg) =>
+                deg.getOrElse(0)
+              }
             },
             vpred = (vid: VertexId, deg: Int) => deg > 0
         )

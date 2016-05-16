@@ -76,12 +76,12 @@ class DistributedQueryingTest {
                       ts.flatMap(t => us.map(u => (t, u)))
                         .result
                         .map(d =>
-                              assertEquals(
-                                  tData
-                                    .flatMap(t => uData.map(u => (t, u)))
-                                    .toSet,
-                                  d.toSet))
-                    )),
+                              assertEquals(tData
+                                             .flatMap(t =>
+                                                   uData.map(u => (t, u)))
+                                             .toSet,
+                                           d.toSet))
+                  )),
               Duration.Inf)
         }
       } finally dc2.db.close

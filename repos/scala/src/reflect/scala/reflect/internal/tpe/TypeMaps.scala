@@ -209,8 +209,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     protected def mapOverArgs(
         args: List[Type], tparams: List[Symbol]): List[Type] =
       (if (trackVariance)
-         map2Conserve(args, tparams)((arg,
-             tparam) => withVariance(variance * tparam.variance)(this(arg)))
+         map2Conserve(args, tparams)((arg, tparam) =>
+               withVariance(variance * tparam.variance)(this(arg)))
        else args mapConserve this)
 
     /** Applies this map to the symbol's info, setting variance = Invariant
@@ -466,7 +466,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
   /** A map to compute the asSeenFrom method.
     */
   class AsSeenFromMap(seenFromPrefix0: Type, seenFromClass: Symbol)
-      extends TypeMap with KeepOnlyTypeConstraints {
+      extends TypeMap
+      with KeepOnlyTypeConstraints {
     private val seenFromPrefix: Type =
       if (seenFromPrefix0.typeSymbolDirect.hasPackageFlag &&
           !seenFromClass.hasPackageFlag)
@@ -510,8 +511,9 @@ private[internal] trait TypeMaps { self: SymbolTable =>
     // isBaseClassOfEnclosingClassOrInfoIsNotYetComplete would be a more accurate
     // but less succinct name.
     private def isBaseClassOfEnclosingClass(base: Symbol) = {
-      def loop(encl: Symbol): Boolean = (isPossiblePrefix(encl) &&
-          ((encl isSubClass base) || loop(encl.owner.enclClass)))
+      def loop(encl: Symbol): Boolean =
+        (isPossiblePrefix(encl) &&
+            ((encl isSubClass base) || loop(encl.owner.enclClass)))
       // The hasCompleteInfo guard is necessary to avoid cycles during the typing
       // of certain classes, notably ones defined inside package objects.
       !base.hasCompleteInfo || loop(seenFromClass)
@@ -676,7 +678,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val saved = wroteAnnotation
         wroteAnnotation = false
         try annotationArgRewriter transform tree finally if (wroteAnnotation)
-          giveup() else wroteAnnotation = saved
+          giveup()
+        else wroteAnnotation = saved
       }
     }
 
@@ -724,11 +727,11 @@ private[internal] trait TypeMaps { self: SymbolTable =>
 
     protected def renameBoundSyms(tp: Type): Type = tp match {
       case MethodType(ps, restp) =>
-        createFromClonedSymbols(ps, restp)(
-            (ps1, tp1) => copyMethodType(tp, ps1, renameBoundSyms(tp1)))
+        createFromClonedSymbols(ps, restp)((ps1, tp1) =>
+              copyMethodType(tp, ps1, renameBoundSyms(tp1)))
       case PolyType(bs, restp) =>
-        createFromClonedSymbols(bs, restp)(
-            (ps1, tp1) => PolyType(ps1, renameBoundSyms(tp1)))
+        createFromClonedSymbols(bs, restp)((ps1, tp1) =>
+              PolyType(ps1, renameBoundSyms(tp1)))
       case ExistentialType(bs, restp) =>
         createFromClonedSymbols(bs, restp)(newExistentialType)
       case _ =>
@@ -748,7 +751,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
         val boundSyms = tp0.boundSyms
         val tp1 =
           if (boundSyms.nonEmpty && (boundSyms exists from.contains))
-            renameBoundSyms(tp0) else tp0
+            renameBoundSyms(tp0)
+          else tp0
         val tp = mapOver(tp1)
         def substFor(sym: Symbol) = subst(tp, sym, from, to)
 
@@ -800,29 +804,28 @@ private[internal] trait TypeMaps { self: SymbolTable =>
        else subst(sym, from.tail, to.tail))
     private def substFor(sym: Symbol) = subst(sym, from, to)
 
-    override def apply(tp: Type): Type = (if (from.isEmpty) tp
-                                          else
-                                            tp match {
-                                              case TypeRef(pre, sym, args)
-                                                  if pre ne NoPrefix =>
-                                                val newSym = substFor(sym)
-                                                // mapOver takes care of subst'ing in args
-                                                mapOver(if (sym eq newSym) tp
-                                                    else
-                                                      copyTypeRef(tp,
-                                                                  pre,
-                                                                  newSym,
-                                                                  args))
-                                              // assert(newSym.typeParams.length == sym.typeParams.length, "typars mismatch in SubstSymMap: "+(sym, sym.typeParams, newSym, newSym.typeParams))
-                                              case SingleType(pre, sym)
-                                                  if pre ne NoPrefix =>
-                                                val newSym = substFor(sym)
-                                                mapOver(if (sym eq newSym) tp
-                                                    else
-                                                      singleType(pre, newSym))
-                                              case _ =>
-                                                super.apply(tp)
-                                            })
+    override def apply(tp: Type): Type =
+      (if (from.isEmpty) tp
+       else
+         tp match {
+           case TypeRef(pre, sym, args) if pre ne NoPrefix =>
+             val newSym = substFor(sym)
+             // mapOver takes care of subst'ing in args
+             mapOver(if (sym eq newSym) tp
+                 else
+                   copyTypeRef(tp,
+                               pre,
+                               newSym,
+                               args))
+           // assert(newSym.typeParams.length == sym.typeParams.length, "typars mismatch in SubstSymMap: "+(sym, sym.typeParams, newSym, newSym.typeParams))
+           case SingleType(pre, sym) if pre ne NoPrefix =>
+             val newSym = substFor(sym)
+             mapOver(if (sym eq newSym) tp
+                 else
+                   singleType(pre, newSym))
+           case _ =>
+             super.apply(tp)
+         })
 
     object mapTreeSymbols extends TypeMapTransformer {
       val strictCopy = newStrictTreeCopier
@@ -848,8 +851,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
             transformIfMapped(id)(toSym => strictCopy.Ident(id, toSym.name))
 
           case sel @ Select(qual, name) =>
-            transformIfMapped(sel)(
-                toSym => strictCopy.Select(sel, qual, toSym.name))
+            transformIfMapped(sel)(toSym =>
+                  strictCopy.Select(sel, qual, toSym.name))
 
           case tree => tree
         }
@@ -924,7 +927,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
   /** Note: This map is needed even for non-dependent method types, despite what the name might imply.
     */
   class InstantiateDependentMap(params: List[Symbol], actuals0: List[Type])
-      extends TypeMap with KeepOnlyTypeConstraints {
+      extends TypeMap
+      with KeepOnlyTypeConstraints {
     private val actuals = actuals0.toIndexedSeq
     private val existentials = new Array[Symbol](actuals.size)
     def existentialsNeeded: List[Symbol] =
@@ -953,10 +957,10 @@ private[internal] trait TypeMaps { self: SymbolTable =>
       if (existentials(pid) eq null) {
         val param = params(pid)
         existentials(pid) =
-        (param.owner.newExistential(
-                param.name.toTypeName append nme.SINGLETON_SUFFIX,
-                param.pos,
-                param.flags) setInfo singletonBounds(actuals(pid)))
+          (param.owner.newExistential(
+                  param.name.toTypeName append nme.SINGLETON_SUFFIX,
+                  param.pos,
+                  param.flags) setInfo singletonBounds(actuals(pid)))
       }
       existentials(pid)
     }
@@ -1209,7 +1213,8 @@ private[internal] trait TypeMaps { self: SymbolTable =>
           val args1 = args mapConserve (this)
           try {
             val sym1 = adaptToNewRun(pre1, sym)
-            if ((pre1 eq pre) && (sym1 eq sym) && (args1 eq args) /* && sym.isExternal*/ ) {
+            if ((pre1 eq pre) && (sym1 eq sym) &&
+                (args1 eq args) /* && sym.isExternal*/ ) {
               tp
             } else if (sym1 == NoSymbol) {
               devWarning(

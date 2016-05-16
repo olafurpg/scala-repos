@@ -14,7 +14,7 @@ class C extends A[Int] {
 }
 
 abstract class B[T,
-                 @specialized(scala.Int) U : Manifest,
+                 @specialized(scala.Int) U: Manifest,
                  @specialized(scala.Int) V <% Ordered[V]] {
   val u: U
   val v: V

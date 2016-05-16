@@ -179,7 +179,7 @@ class YahooDataSource(val params: YahooDataSource.Params)
   // array. For a datetime t, if dailyMap contains the data, it calls valueFunc
   // to extract the value; otherwise, it calls fillNaFunc with the optional last
   // extracted value and get the default value.
-  def activeFilter[A : Manifest](
+  def activeFilter[A: Manifest](
       dailyMap: GenMap[DateTime, YahooDataSource.Daily],
       valueFunc: YahooDataSource.Daily => A,
       fillNAFunc: Option[A] => A): Array[A] = {
@@ -373,40 +373,41 @@ object PredefinedDSP {
       appId = 2,
       entityType = "yahoo",
       untilTime = None,
-      windowParams = DataSourceParams(
-            baseDate = new DateTime(2000, 1, 1, 0, 0),
-            fromIdx = 250,
-            untilIdx = 3500,
-            trainingWindowSize = 200,
-            maxTestingWindowSize = 30,
-            marketTicker = "SPY",
-            tickerList = Run.sp500List))
+      windowParams =
+        DataSourceParams(baseDate = new DateTime(2000, 1, 1, 0, 0),
+                         fromIdx = 250,
+                         untilIdx = 3500,
+                         trainingWindowSize = 200,
+                         maxTestingWindowSize = 30,
+                         marketTicker = "SPY",
+                         tickerList = Run.sp500List))
 
   val SmallSP500 = YahooDataSource.Params(
       appId = 4,
       entityType = "yahoo",
       untilTime = None,
-      windowParams = DataSourceParams(
-            baseDate = new DateTime(2000, 1, 1, 0, 0),
-            fromIdx = 250,
-            untilIdx = 3500,
-            trainingWindowSize = 200,
-            maxTestingWindowSize = 30,
-            marketTicker = "SPY",
-            tickerList = Run.sp500List.take(25)))
+      windowParams =
+        DataSourceParams(baseDate = new DateTime(2000, 1, 1, 0, 0),
+                         fromIdx = 250,
+                         untilIdx = 3500,
+                         trainingWindowSize = 200,
+                         maxTestingWindowSize = 30,
+                         marketTicker = "SPY",
+                         tickerList = Run.sp500List.take(25)))
 
   val Test = YahooDataSource.Params(
       appId = 4,
       entityType = "yahoo",
       untilTime = Some(new DateTime(2014, 5, 1, 0, 0)),
-      windowParams = DataSourceParams(
-            baseDate = new DateTime(2014, 1, 1, 0, 0),
-            fromIdx = 20,
-            untilIdx = 50,
-            trainingWindowSize = 15,
-            maxTestingWindowSize = 10,
-            marketTicker = "SPY",
-            tickerList = Seq("AAPL", "MSFT", "IBM", "FB", "AMZN", "IRONMAN")))
+      windowParams =
+        DataSourceParams(baseDate = new DateTime(2014, 1, 1, 0, 0),
+                         fromIdx = 20,
+                         untilIdx = 50,
+                         trainingWindowSize = 15,
+                         maxTestingWindowSize = 10,
+                         marketTicker = "SPY",
+                         tickerList = Seq(
+                             "AAPL", "MSFT", "IBM", "FB", "AMZN", "IRONMAN")))
 }
 
 object YahooDataSourceRun {
@@ -433,22 +434,21 @@ object YahooDataSourceRun {
 
     Workflow.run(dataSourceClassOpt = Some(classOf[YahooDataSource]),
                  dataSourceParams = dsp,
-                 preparatorClassOpt = Some(
-                       IdentityPreparator(classOf[YahooDataSource])),
-                 algorithmClassMapOpt = Some(
-                       Map(
-                           //"" -> classOf[MomentumStrategy]
-                           "" -> classOf[RegressionStrategy]
-                       )),
+                 preparatorClassOpt =
+                   Some(IdentityPreparator(classOf[YahooDataSource])),
+                 algorithmClassMapOpt = Some(Map(
+                         //"" -> classOf[MomentumStrategy]
+                         "" -> classOf[RegressionStrategy]
+                     )),
                  //algorithmParamsList = Seq(("", momentumParams)),
                  algorithmParamsList = Seq(
-                       ("",
-                        RegressionStrategyParams(
-                            Seq[(String, BaseIndicator)](
-                                ("RSI1", new RSIIndicator(rsiPeriod = 1)),
-                                ("RSI5", new RSIIndicator(rsiPeriod = 5)),
-                                ("RSI22", new RSIIndicator(rsiPeriod = 22))),
-                            200))),
+                     ("",
+                      RegressionStrategyParams(
+                          Seq[(String, BaseIndicator)](
+                              ("RSI1", new RSIIndicator(rsiPeriod = 1)),
+                              ("RSI5", new RSIIndicator(rsiPeriod = 5)),
+                              ("RSI22", new RSIIndicator(rsiPeriod = 22))),
+                          200))),
                  servingClassOpt = Some(LFirstServing(classOf[EmptyStrategy])),
                  evaluatorClassOpt = Some(classOf[BacktestingEvaluator]),
                  evaluatorParams = metricsParams,

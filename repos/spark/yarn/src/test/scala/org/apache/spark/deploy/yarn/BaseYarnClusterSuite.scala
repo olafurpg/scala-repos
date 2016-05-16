@@ -40,7 +40,10 @@ import org.apache.spark.launcher._
 import org.apache.spark.util.Utils
 
 abstract class BaseYarnClusterSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Matchers with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Matchers
+    with Logging {
 
   // log4j configuration for the YARN containers, so that their output is collected
   // by YARN instead of trying to overwrite unit-tests.log.

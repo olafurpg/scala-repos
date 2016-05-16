@@ -34,14 +34,13 @@ private case class LassoCalculator(data: DenseMatrix[Double],
       iter += 1
       improvedResult = false
       cfor(0)(i => i < data.cols, i => i + 1)(
-          i =>
-            {
-          val eoc = estimateOneColumn(i)
-          val oldCoefficient = resultVec(i)
-          resultVec(i) = shrink(eoc.coefficients(0))
-          if (oldCoefficient != resultVec(i)) {
-            improvedResult = true
-          }
+          i => {
+        val eoc = estimateOneColumn(i)
+        val oldCoefficient = resultVec(i)
+        resultVec(i) = shrink(eoc.coefficients(0))
+        if (oldCoefficient != resultVec(i)) {
+          improvedResult = true
+        }
       })
     }
 
@@ -67,32 +66,28 @@ private case class LassoCalculator(data: DenseMatrix[Double],
      */
     require(column < data.cols)
     require(column >= 0)
-    cfor(0)(i => i < outputs.size, i => i + 1)(i =>
-          {
-        singleColumnMatrix(i, 0) = data(i, column)
+    cfor(0)(i => i < outputs.size, i => i + 1)(i => {
+      singleColumnMatrix(i, 0) = data(i, column)
 
-        var o = outputs(i)
-        cfor(0)(j => j < data.cols, j => j + 1)(j =>
-              {
-            if (j != column) {
-              o -= data(i, j) * resultVec(j)
-            }
-        })
-        outputCopy(i) = o
+      var o = outputs(i)
+      cfor(0)(j => j < data.cols, j => j + 1)(j => {
+        if (j != column) {
+          o -= data(i, j) * resultVec(j)
+        }
+      })
+      outputCopy(i) = o
     })
   }
 
   private def computeRsquared = {
     var r2 = 0.0
     cfor(0)(i => i < outputs.size, i => i + 1)(
-        i =>
-          {
-        var o = outputs(i)
-        cfor(0)(j => j < data.cols, j => j + 1)(j =>
-              {
-            o -= data(i, j) * resultVec(j)
-        })
-        r2 += o * o
+        i => {
+      var o = outputs(i)
+      cfor(0)(j => j < data.cols, j => j + 1)(j => {
+        o -= data(i, j) * resultVec(j)
+      })
+      r2 += o * o
     })
     r2
   }

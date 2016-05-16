@@ -26,8 +26,7 @@ object AuthRole {
   }
 
   def apply(roleNames: String*): List[Role] =
-    roleNames.toList.map(
-        n =>
+    roleNames.toList.map(n =>
           new Role {
         def name = n
     })

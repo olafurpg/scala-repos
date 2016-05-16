@@ -27,21 +27,25 @@ import scala.language.implicitConversions
   *  @tparam Coll the type of the underlying collection containing the elements.
   *  @tparam This the type of the view itself
   */
-trait IterableViewLike[
-    +A,
-    +Coll,
-    +This <: IterableView[A, Coll] with IterableViewLike[A, Coll, This]]
-    extends Iterable[A] with IterableLike[A, This]
-    with TraversableView[A, Coll] with TraversableViewLike[A, Coll, This] {
+trait IterableViewLike[+A,
+                       +Coll,
+                       +This <: IterableView[A, Coll] with IterableViewLike[
+                           A, Coll, This]]
+    extends Iterable[A]
+    with IterableLike[A, This]
+    with TraversableView[A, Coll]
+    with TraversableViewLike[A, Coll, This] {
   self =>
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
-      extends Iterable[B] with super [TraversableViewLike].Transformed[B]
+      extends Iterable[B]
+      with super [TraversableViewLike].Transformed[B]
       with Transformed[B]
 
   trait Transformed[+B]
-      extends IterableView[B, Coll] with super.Transformed[B] {
+      extends IterableView[B, Coll]
+      with super.Transformed[B] {
     def iterator: Iterator[B]
     override def foreach[U](f: B => U): Unit = iterator foreach f
     override def toString = viewToString

@@ -39,7 +39,8 @@ object DateTimeStringConverter {
 }
 
 class DateTimeStringConverter(
-    delegate: jfxuc.DateTimeStringConverter = new jfxuc.DateTimeStringConverter)
+    delegate: jfxuc.DateTimeStringConverter =
+      new jfxuc.DateTimeStringConverter)
     extends DateTimeStringConverterDelegate[jfxuc.DateTimeStringConverter](
         delegate) {
 

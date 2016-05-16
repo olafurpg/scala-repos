@@ -34,14 +34,13 @@ trait ScMethodLike extends ScMember with PsiMethod {
         clazz match {
           case c: ScTypeDefinition =>
             c.typeParametersClause.map(
-                (typeParamClause: ScTypeParamClause) =>
-                  {
-                val paramClauseText = typeParamClause.getTextByStub
-                ScalaPsiElementFactory
-                  .createTypeParameterClauseFromTextWithContext(
-                    paramClauseText,
-                    typeParamClause.getContext,
-                    typeParamClause)
+                (typeParamClause: ScTypeParamClause) => {
+              val paramClauseText = typeParamClause.getTextByStub
+              ScalaPsiElementFactory
+                .createTypeParameterClauseFromTextWithContext(
+                  paramClauseText,
+                  typeParamClause.getContext,
+                  typeParamClause)
             })
           case _ => None
         }

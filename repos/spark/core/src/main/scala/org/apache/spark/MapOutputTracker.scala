@@ -42,7 +42,8 @@ private[spark] class MapOutputTrackerMasterEndpoint(
     override val rpcEnv: RpcEnv,
     tracker: MapOutputTrackerMaster,
     conf: SparkConf)
-    extends RpcEndpoint with Logging {
+    extends RpcEndpoint
+    with Logging {
   val maxRpcMessageSize = RpcUtils.maxMessageSizeBytes(conf)
 
   override def receiveAndReply(
@@ -112,7 +113,7 @@ private[spark] abstract class MapOutputTracker(conf: SparkConf)
     * Send a message to the trackerEndpoint and get its result within a default timeout, or
     * throw a SparkException if this fails.
     */
-  protected def askTracker[T : ClassTag](message: Any): T = {
+  protected def askTracker[T: ClassTag](message: Any): T = {
     try {
       trackerEndpoint.askWithRetry[T](message)
     } catch {
@@ -226,8 +227,8 @@ private[spark] abstract class MapOutputTracker(conf: SparkConf)
         try {
           val fetchedBytes =
             askTracker[Array[Byte]](GetMapOutputStatuses(shuffleId))
-          fetchedStatuses = MapOutputTracker.deserializeMapStatuses(
-              fetchedBytes)
+          fetchedStatuses =
+            MapOutputTracker.deserializeMapStatuses(fetchedBytes)
           logInfo("Got the output locations")
           mapStatuses.put(shuffleId, fetchedStatuses)
         } finally {
@@ -433,8 +434,8 @@ private[spark] class MapOutputTrackerMaster(conf: SparkConf)
             if (status != null) {
               val blockSize = status.getSizeForBlock(reducerId)
               if (blockSize > 0) {
-                locs(status.location) = locs.getOrElse(status.location, 0L) +
-                blockSize
+                locs(status.location) =
+                  locs.getOrElse(status.location, 0L) + blockSize
                 totalOutputSize += blockSize
               }
             }
@@ -575,8 +576,8 @@ private[spark] object MapOutputTracker extends Logging {
       } else {
         for (part <- startPartition until endPartition) {
           splitsByAddress.getOrElseUpdate(status.location, ArrayBuffer()) +=
-          ((ShuffleBlockId(shuffleId, mapId, part),
-            status.getSizeForBlock(part)))
+            ((ShuffleBlockId(shuffleId, mapId, part),
+              status.getSizeForBlock(part)))
         }
       }
     }

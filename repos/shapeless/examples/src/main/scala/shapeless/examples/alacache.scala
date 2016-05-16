@@ -128,18 +128,30 @@ trait CachedFacet extends ProductISOFacet {
 }
 
 trait CachedCaseClassDefns
-    extends LogFacet with CachedFacet with ProductFacet
-    with PolymorphicEqualityFacet with CopyFacet with ToStringFacet {
+    extends LogFacet
+    with CachedFacet
+    with ProductFacet
+    with PolymorphicEqualityFacet
+    with CopyFacet
+    with ToStringFacet {
 
   trait CaseClassOps
-      extends LogOps with CachedOps with ProductOps with PolymorphicEqualityOps
-      with CopyOps with ToStringOps
+      extends LogOps
+      with CachedOps
+      with ProductOps
+      with PolymorphicEqualityOps
+      with CopyOps
+      with ToStringOps
 
   trait CaseClassCompanion extends CachedCompanion
 
   trait CaseClass
-      extends LogMethods with CachedMethods with ProductMethods
-      with PolymorphicEqualityMethods with CopyMethods with ToStringMethods {
+      extends LogMethods
+      with CachedMethods
+      with ProductMethods
+      with PolymorphicEqualityMethods
+      with CopyMethods
+      with ToStringMethods {
     self: C =>
   }
 

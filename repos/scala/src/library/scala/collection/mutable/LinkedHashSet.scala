@@ -39,9 +39,12 @@ import generic._
   */
 @SerialVersionUID(1L)
 class LinkedHashSet[A]
-    extends AbstractSet[A] with Set[A]
-    with GenericSetTemplate[A, LinkedHashSet] with SetLike[A, LinkedHashSet[A]]
-    with HashTable[A, LinkedHashSet.Entry[A]] with Serializable {
+    extends AbstractSet[A]
+    with Set[A]
+    with GenericSetTemplate[A, LinkedHashSet]
+    with SetLike[A, LinkedHashSet[A]]
+    with HashTable[A, LinkedHashSet.Entry[A]]
+    with Serializable {
   override def companion: GenericCompanion[LinkedHashSet] = LinkedHashSet
 
   type Entry = LinkedHashSet.Entry[A]
@@ -140,7 +143,8 @@ object LinkedHashSet extends MutableSetFactory[LinkedHashSet] {
     *  @since 2.10
     */
   private[scala] final class Entry[A](val key: A)
-      extends HashEntry[A, Entry[A]] with Serializable {
+      extends HashEntry[A, Entry[A]]
+      with Serializable {
     var earlier: Entry[A] = null
     var later: Entry[A] = null
   }

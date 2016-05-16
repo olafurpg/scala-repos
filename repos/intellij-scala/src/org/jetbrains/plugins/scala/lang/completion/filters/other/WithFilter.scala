@@ -21,8 +21,8 @@ class WithFilter extends ElementFilter {
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
     if (leaf != null) {
       var i = context.getTextRange.getStartOffset - 1
-      while (i >= 0 &&
-      context.getContainingFile.getText.charAt(i) == ' ') i = i - 1
+      while (i >= 0 && context.getContainingFile.getText.charAt(i) == ' ') i =
+        i - 1
       if (i >= 0) {
         var leaf1 = getLeafByOffset(i, context)
         while (leaf1 != null && !leaf1.isInstanceOf[ScTypeDefinition]) {
@@ -39,7 +39,7 @@ class WithFilter extends ElementFilter {
         }
         leaf1 = getLeafByOffset(i, context)
         while (leaf1 != null && !leaf1.isInstanceOf[ScTypeElement] &&
-        !leaf1.isInstanceOf[ScNewTemplateDefinition]) {
+               !leaf1.isInstanceOf[ScNewTemplateDefinition]) {
           leaf1 = leaf1.getParent
         }
         if (leaf1 != null && leaf1.getTextRange.getEndOffset != i + 1 &&

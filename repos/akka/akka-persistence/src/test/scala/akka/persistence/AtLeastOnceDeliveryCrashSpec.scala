@@ -32,7 +32,9 @@ object AtLeastOnceDeliveryCrashSpec {
   }
 
   class CrashingActor(testProbe: ActorRef)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+      extends PersistentActor
+      with AtLeastOnceDelivery
+      with ActorLogging {
     import CrashingActor._
 
     override def persistenceId = self.path.name

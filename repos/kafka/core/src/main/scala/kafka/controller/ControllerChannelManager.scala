@@ -50,8 +50,8 @@ class ControllerChannelManager(controllerContext: ControllerContext,
 
   def startup() = {
     brokerLock synchronized {
-      brokerStateInfo.foreach(
-          brokerState => startRequestSendThread(brokerState._1))
+      brokerStateInfo.foreach(brokerState =>
+            startRequestSendThread(brokerState._1))
     }
   }
 
@@ -367,27 +367,29 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
                                       partition: Int,
                                       deletePartition: Boolean,
                                       callback: (AbstractRequestResponse,
-                                      Int) => Unit = null) {
+                                                 Int) => Unit = null) {
     brokerIds.filter(b => b >= 0).foreach { brokerId =>
       stopReplicaRequestMap.getOrElseUpdate(
           brokerId, Seq.empty[StopReplicaRequestInfo])
       val v = stopReplicaRequestMap(brokerId)
       if (callback != null)
-        stopReplicaRequestMap(brokerId) = v :+ StopReplicaRequestInfo(
-            PartitionAndReplica(topic, partition, brokerId),
-            deletePartition,
-            (r: AbstractRequestResponse) => callback(r, brokerId))
+        stopReplicaRequestMap(brokerId) =
+          v :+ StopReplicaRequestInfo(
+              PartitionAndReplica(topic, partition, brokerId),
+              deletePartition,
+              (r: AbstractRequestResponse) => callback(r, brokerId))
       else
-        stopReplicaRequestMap(brokerId) = v :+ StopReplicaRequestInfo(
-            PartitionAndReplica(topic, partition, brokerId), deletePartition)
+        stopReplicaRequestMap(brokerId) =
+          v :+ StopReplicaRequestInfo(
+              PartitionAndReplica(topic, partition, brokerId), deletePartition)
     }
   }
 
   /** Send UpdateMetadataRequest to the given brokers for the given partitions and partitions that are being deleted */
   def addUpdateMetadataRequestForBrokers(
       brokerIds: Seq[Int],
-      partitions: collection.Set[TopicAndPartition] = Set
-          .empty[TopicAndPartition],
+      partitions: collection.Set[TopicAndPartition] =
+        Set.empty[TopicAndPartition],
       callback: AbstractRequestResponse => Unit = null) {
     def updateMetadataRequestMapFor(
         partition: TopicAndPartition, beingDeleted: Boolean) {
@@ -455,7 +457,8 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
             case (topicPartition, state) =>
               val typeOfRequest =
                 if (broker == state.leaderIsrAndControllerEpoch.leaderAndIsr.leader)
-                  "become-leader" else "become-follower"
+                  "become-leader"
+                else "become-follower"
               stateChangeLogger.trace(
                   ("Controller %d epoch %d sending %s LeaderAndIsr request %s to broker %d " +
                       "for partition [%s,%d]").format(
@@ -585,13 +588,12 @@ class ControllerBrokerRequestBatch(controller: KafkaController)
               "The stop replica request (delete = false) sent to broker %d is %s"
                 .format(broker, stopReplicaWithoutDelete.mkString(",")))
           replicaInfoList.foreach { r =>
-            val stopReplicaRequest =
-              new StopReplicaRequest(controllerId,
-                                     controllerEpoch,
-                                     r.deletePartition,
-                                     Set(new TopicPartition(
-                                             r.replica.topic,
-                                             r.replica.partition)).asJava)
+            val stopReplicaRequest = new StopReplicaRequest(
+                controllerId,
+                controllerEpoch,
+                r.deletePartition,
+                Set(new TopicPartition(r.replica.topic,
+                                       r.replica.partition)).asJava)
             controller.sendRequest(broker,
                                    ApiKeys.STOP_REPLICA,
                                    None,
@@ -628,16 +630,16 @@ case class ControllerBrokerStateInfo(networkClient: NetworkClient,
                                      messageQueue: BlockingQueue[QueueItem],
                                      requestSendThread: RequestSendThread)
 
-case class StopReplicaRequestInfo(
-    replica: PartitionAndReplica,
-    deletePartition: Boolean,
-    callback: AbstractRequestResponse => Unit = null)
+case class StopReplicaRequestInfo(replica: PartitionAndReplica,
+                                  deletePartition: Boolean,
+                                  callback: AbstractRequestResponse => Unit =
+                                    null)
 
 class Callbacks private (
     var leaderAndIsrResponseCallback: AbstractRequestResponse => Unit = null,
     var updateMetadataResponseCallback: AbstractRequestResponse => Unit = null,
-    var stopReplicaResponseCallback: (AbstractRequestResponse,
-    Int) => Unit = null)
+    var stopReplicaResponseCallback: (AbstractRequestResponse, Int) => Unit =
+      null)
 
 object Callbacks {
   class CallbackBuilder {

@@ -12,7 +12,7 @@ final object Test extends java.lang.Object with Application {
       case _ => scala.Predef.println(":(")
     }
   Test.this.foo[Test.Foo, String, Int]({ ((eta$0$1: Test.Foo) =>
-    Test.this.Foo.unapply(eta$0$1))
+                                            Test.this.Foo.unapply(eta$0$1))
   }, Test.this.Foo.apply("this might be fun", 10));
   final object Foo extends java.lang.Object with ((String, Int) => Test.Foo) {
     def unapply(x$0: Test.Foo): Some[(String, Int)] =

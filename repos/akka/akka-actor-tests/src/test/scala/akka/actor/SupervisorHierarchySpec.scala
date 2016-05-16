@@ -72,7 +72,8 @@ object SupervisorHierarchySpec {
                            var failPost: Int,
                            val failConstr: Int,
                            stopKids: Int)
-      extends RuntimeException("Failure") with NoStackTrace {
+      extends RuntimeException("Failure")
+      with NoStackTrace {
     override def toString =
       productPrefix + productIterator.mkString("(", ",", ")")
   }
@@ -450,7 +451,8 @@ object SupervisorHierarchySpec {
    */
 
   class StressTest(testActor: ActorRef, size: Int, breadth: Int)
-      extends Actor with LoggingFSM[State, Int] {
+      extends Actor
+      with LoggingFSM[State, Int] {
     import context.system
 
     val randomSeed = System.nanoTime()
@@ -503,7 +505,8 @@ object SupervisorHierarchySpec {
 
     when(Idle) {
       case Event(Init, _) ⇒
-        hierarchy = context.watch(context.actorOf(
+        hierarchy = context.watch(
+            context.actorOf(
                 Props(new Hierarchy(size, breadth, self, 0, random))
                   .withDispatcher("hierarchy"),
                 "head"))
@@ -800,7 +803,8 @@ object SupervisorHierarchySpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SupervisorHierarchySpec
-    extends AkkaSpec(SupervisorHierarchySpec.config) with DefaultTimeout
+    extends AkkaSpec(SupervisorHierarchySpec.config)
+    with DefaultTimeout
     with ImplicitSender {
   import SupervisorHierarchySpec._
 

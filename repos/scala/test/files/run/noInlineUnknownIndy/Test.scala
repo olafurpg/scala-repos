@@ -30,15 +30,13 @@ object Test extends DirectTest {
         "notAMetaFactoryMethod",
         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;")
     modifyClassFile(new File(testOutput.toFile, "A_1.class"))(
-        (cn: ClassNode) =>
-          {
-        val testMethod =
-          cn.methods.iterator.asScala.find(_.name == "test").head
-        val indy = testMethod.instructions.iterator.asScala
-          .collect({ case i: InvokeDynamicInsnNode => i })
-          .next()
-        indy.bsm = unknownBootstrapMethod
-        cn
+        (cn: ClassNode) => {
+      val testMethod = cn.methods.iterator.asScala.find(_.name == "test").head
+      val indy = testMethod.instructions.iterator.asScala
+        .collect({ case i: InvokeDynamicInsnNode => i })
+        .next()
+      indy.bsm = unknownBootstrapMethod
+      cn
     })
 
     compileCode("class T { def foo = A_1.test }")

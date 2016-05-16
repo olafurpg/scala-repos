@@ -36,7 +36,8 @@ object ActorSelectionSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorSelectionSpec
-    extends AkkaSpec("akka.loglevel=DEBUG") with DefaultTimeout {
+    extends AkkaSpec("akka.loglevel=DEBUG")
+    with DefaultTimeout {
   import ActorSelectionSpec._
 
   val c1 = system.actorOf(p, "c1")
@@ -265,13 +266,13 @@ class ActorSelectionSpec
       }
       def check(looker: ActorRef) {
         val lookname = looker.path.elements.mkString("", "/", "/")
-        for ((l, r) ← Seq(
-            SelectString("a/b/c") -> None,
-            SelectString("akka://all-systems/Nobody") -> None,
-            SelectPath(system / "hallo") -> None,
-            SelectPath(looker.path child "hallo") -> None, // test Java API
-            SelectPath(looker.path descendant Seq("a", "b").asJava) -> None) // test Java API
-        ) checkOne(looker, l, r)
+        for ((l, r) ← Seq(SelectString("a/b/c") -> None,
+                          SelectString("akka://all-systems/Nobody") -> None,
+                          SelectPath(system / "hallo") -> None,
+                          SelectPath(looker.path child "hallo") -> None, // test Java API
+                          SelectPath(
+                              looker.path descendant Seq("a", "b").asJava) -> None) // test Java API
+             ) checkOne(looker, l, r)
       }
       for (looker ← all) check(looker)
     }

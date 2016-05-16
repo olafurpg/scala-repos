@@ -65,7 +65,8 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
                                        val regParam: Double,
                                        val standardizeFeatures: Boolean,
                                        val standardizeLabel: Boolean)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
   import WeightedLeastSquares._
 
   require(regParam >= 0.0, s"regParam cannot be negative: $regParam")

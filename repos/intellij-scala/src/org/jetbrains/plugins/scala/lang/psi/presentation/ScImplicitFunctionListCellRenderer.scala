@@ -63,11 +63,15 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
         }
 
         if (firstPart.contains(item)) {
-          colored.setBackground(if (isSelected)
-                UIUtil.getListSelectionBackground else implicitFirstPart)
+          colored.setBackground(
+              if (isSelected)
+                UIUtil.getListSelectionBackground
+              else implicitFirstPart)
         } else if (secondPart.contains(item)) {
-          colored.setBackground(if (isSelected)
-                UIUtil.getListSelectionBackground else implicitSecondPart)
+          colored.setBackground(
+              if (isSelected)
+                UIUtil.getListSelectionBackground
+              else implicitSecondPart)
         } else {
           throw new RuntimeException(
               "Implicit conversions list contains unknown value: " + item)

@@ -16,7 +16,7 @@ class ProjectImportingTest extends ImportingTestCase with InexactMatch {
       lazy val scalaLibrary =
         new library("SBT: org.scala-lang:scala-library:2.11.6:jar") {
           classes +=
-          (IvyCacheDir / "org.scala-lang" / "scala-library" / "jars" / "scala-library-2.11.6.jar").getAbsolutePath
+            (IvyCacheDir / "org.scala-lang" / "scala-library" / "jars" / "scala-library-2.11.6.jar").getAbsolutePath
         }
 
       libraries += scalaLibrary
@@ -55,7 +55,8 @@ class ProjectImportingTest extends ImportingTestCase with InexactMatch {
       new project("unmanagedDependency") {
         modules += new module("unmanagedDependency") {
           lazy val unmanagedLibrary = new library("SBT: unmanaged-jars") {
-            classes += (testProjectDir / "lib" / "unmanaged.jar").getAbsolutePath
+            classes +=
+              (testProjectDir / "lib" / "unmanaged.jar").getAbsolutePath
           }
           libraries += unmanagedLibrary
           libraryDependencies += unmanagedLibrary

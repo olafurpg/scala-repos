@@ -24,8 +24,11 @@ import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
 class UniformTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with HasCdfTestBase {
 
   import Arbitrary.arbitrary;
 
@@ -35,7 +38,7 @@ class UniformTest
 
   implicit def arbDistr = Arbitrary {
     for (a <- arbitrary[Double].map { _.abs % 10000.0 };
-    b <- arbitrary[Double].map { _.abs % 10000.0 } if a != b) yield
+         b <- arbitrary[Double].map { _.abs % 10000.0 } if a != b) yield
       new Uniform(a min b, a max b)
   }
 

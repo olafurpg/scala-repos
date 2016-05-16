@@ -81,7 +81,7 @@ abstract class SimpleTestCase extends UsefulTestCase {
 
     def parse: ScalaFile = parseText(s)
 
-    def parse[T <: PsiElement : ClassTag]: T =
+    def parse[T <: PsiElement: ClassTag]: T =
       parse(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 
     def parse[T <: PsiElement](aClass: Class[T]): T =

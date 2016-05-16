@@ -37,7 +37,7 @@ object JavaReceiverInputDStream {
     * Convert a scala [[org.apache.spark.streaming.dstream.ReceiverInputDStream]] to a Java-friendly
     * [[org.apache.spark.streaming.api.java.JavaReceiverInputDStream]].
     */
-  implicit def fromReceiverInputDStream[T : ClassTag](
+  implicit def fromReceiverInputDStream[T: ClassTag](
       receiverInputDStream: ReceiverInputDStream[T])
     : JavaReceiverInputDStream[T] = {
     new JavaReceiverInputDStream[T](receiverInputDStream)

@@ -18,7 +18,9 @@ import scala.concurrent.duration._
 import ZKStore._
 
 class ZKStoreTest
-    extends PersistentStoreTest with StartedZookeeper with Matchers {
+    extends PersistentStoreTest
+    with StartedZookeeper
+    with Matchers {
 
   //
   // See PersistentStoreTests for general store tests

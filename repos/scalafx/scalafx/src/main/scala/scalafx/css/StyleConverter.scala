@@ -111,7 +111,8 @@ object StyleConverter {
   * @since 8.0
   */
 class StyleConverter[F, T](
-    override val delegate: jfxcss.StyleConverter[F, T] = new jfxcss.StyleConverter)
+    override val delegate: jfxcss.StyleConverter[F, T] =
+      new jfxcss.StyleConverter)
     extends SFXDelegate[jfxcss.StyleConverter[F, T]] {
 
   /**

@@ -40,8 +40,10 @@ object PerspectiveTransform {
 }
 
 class PerspectiveTransform(
-    override val delegate: jfxse.PerspectiveTransform = new jfxse.PerspectiveTransform)
-    extends Effect(delegate) with InputDelegate[jfxse.PerspectiveTransform]
+    override val delegate: jfxse.PerspectiveTransform =
+      new jfxse.PerspectiveTransform)
+    extends Effect(delegate)
+    with InputDelegate[jfxse.PerspectiveTransform]
     with SFXDelegate[jfxse.PerspectiveTransform] {
 
   /**

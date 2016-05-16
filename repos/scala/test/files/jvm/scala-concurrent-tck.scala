@@ -857,9 +857,15 @@ trait ExecutionContextPrepare extends TestBase {
 }
 
 object Test
-    extends App with FutureCallbacks with FutureCombinators
-    with FutureProjections with Promises with BlockContexts with Exceptions
-    with GlobalExecutionContext with CustomExecutionContext
+    extends App
+    with FutureCallbacks
+    with FutureCombinators
+    with FutureProjections
+    with Promises
+    with BlockContexts
+    with Exceptions
+    with GlobalExecutionContext
+    with CustomExecutionContext
     with ExecutionContextPrepare {
   System.exit(0)
 }

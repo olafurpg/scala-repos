@@ -32,7 +32,8 @@ import org.apache.spark.serializer.Serializer
 
 private[master] class ZooKeeperPersistenceEngine(
     conf: SparkConf, val serializer: Serializer)
-    extends PersistenceEngine with Logging {
+    extends PersistenceEngine
+    with Logging {
 
   private val WORKING_DIR =
     conf.get("spark.deploy.zookeeper.dir", "/spark") + "/master_status"
@@ -48,7 +49,7 @@ private[master] class ZooKeeperPersistenceEngine(
     zk.delete().forPath(WORKING_DIR + "/" + name)
   }
 
-  override def read[T : ClassTag](prefix: String): Seq[T] = {
+  override def read[T: ClassTag](prefix: String): Seq[T] = {
     zk.getChildren
       .forPath(WORKING_DIR)
       .asScala

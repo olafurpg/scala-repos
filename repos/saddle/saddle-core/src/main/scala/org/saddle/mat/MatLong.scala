@@ -33,7 +33,7 @@ class MatLong(r: Int, c: Int, values: Array[Long]) extends Mat[Long] {
 
   def toVec = scalarTag.makeVec(toArray)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: (Long) => B): Mat[B] =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: (Long) => B): Mat[B] =
     MatImpl.map(this)(f)
 
   // Cache the transpose: it's much faster to transpose and slice a continuous
@@ -88,8 +88,7 @@ class MatLong(r: Int, c: Int, values: Array[Long]) extends Mat[Long] {
         var i = 0
         var eq = true
         while (eq && i < length) {
-          eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+          eq &&= (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
         }

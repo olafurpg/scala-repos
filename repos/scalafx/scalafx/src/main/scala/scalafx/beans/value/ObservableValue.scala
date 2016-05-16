@@ -87,7 +87,8 @@ object ObservableValue {
   * @define SUBRET A new [[scalafx.event.subscriptions.Subscription]] to remove $OV.
   */
 trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
-    extends Observable with SFXDelegate[jfxbv.ObservableValue[J]] {
+    extends Observable
+    with SFXDelegate[jfxbv.ObservableValue[J]] {
 
   /**
     * Returns $OV

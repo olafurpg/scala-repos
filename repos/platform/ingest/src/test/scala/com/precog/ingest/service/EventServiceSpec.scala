@@ -65,7 +65,8 @@ import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.util.Clock
 
 class EventServiceSpec
-    extends TestEventService with AkkaConversions
+    extends TestEventService
+    with AkkaConversions
     with com.precog.common.util.ArbitraryJValue {
   implicit def executionContext = defaultFutureDispatch
 
@@ -300,8 +301,10 @@ class EventServiceSpec
       }
 
       result.copoint must beLike {
-        case (HttpResponse(
-              HttpStatus(BadRequest, _), _, Some(JObject(fields)), _),
+        case (HttpResponse(HttpStatus(BadRequest, _),
+                           _,
+                           Some(JObject(fields)),
+                           _),
               _) =>
           fields("errors") must beLike {
             case JArray(errors) =>

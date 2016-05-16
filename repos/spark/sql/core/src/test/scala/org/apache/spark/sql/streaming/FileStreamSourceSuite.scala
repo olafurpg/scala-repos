@@ -60,10 +60,10 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
   }
 
   /** Use `format` and `path` to create FileStreamSource via DataFrameReader */
-  def createFileStreamSource(
-      format: String,
-      path: String,
-      schema: Option[StructType] = None): FileStreamSource = {
+  def createFileStreamSource(format: String,
+                             path: String,
+                             schema: Option[StructType] =
+                               None): FileStreamSource = {
     val reader =
       if (schema.isDefined) {
         sqlContext.read.format(format).schema(schema.get)
@@ -82,14 +82,15 @@ class FileStreamSourceTest extends StreamTest with SharedSQLContext {
 }
 
 class FileStreamSourceSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
-  private def createFileStreamSourceAndGetSchema(
-      format: Option[String],
-      path: Option[String],
-      schema: Option[StructType] = None): StructType = {
+  private def createFileStreamSourceAndGetSchema(format: Option[String],
+                                                 path: Option[String],
+                                                 schema: Option[StructType] =
+                                                   None): StructType = {
     val reader = sqlContext.read
     format.foreach(reader.format)
     schema.foreach(reader.schema)
@@ -401,7 +402,8 @@ class FileStreamSourceSuite
 }
 
 class FileStreamSourceStressTestSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest
+    with SharedSQLContext {
 
   import testImplicits._
 
@@ -411,12 +413,9 @@ class FileStreamSourceStressTestSuite
 
     val textSource = createFileStreamSource("text", src.getCanonicalPath)
     val ds = textSource.toDS[String]().map(_.toInt + 1)
-    runStressTest(
-        ds,
-        data =>
-          {
-            AddTextFileData(textSource, data.mkString("\n"), src, tmp)
-        })
+    runStressTest(ds, data => {
+      AddTextFileData(textSource, data.mkString("\n"), src, tmp)
+    })
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)

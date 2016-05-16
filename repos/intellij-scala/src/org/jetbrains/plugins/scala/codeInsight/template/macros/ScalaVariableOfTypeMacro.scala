@@ -57,18 +57,17 @@ class ScalaVariableOfTypeMacro extends Macro {
         val element = file.findElementAt(offset)
         val variants = MacroUtil
           .getVariablesForScope(element)
-          .filter(r =>
-                {
-              val clazz =
-                PsiTreeUtil.getParentOfType(r.element, classOf[PsiClass])
-              if (clazz == null) true
-              else {
-                clazz.qualifiedName match {
-                  case "scala.Predef" => false
-                  case "scala" => false
-                  case _ => true
-                }
+          .filter(r => {
+            val clazz =
+              PsiTreeUtil.getParentOfType(r.element, classOf[PsiClass])
+            if (clazz == null) true
+            else {
+              clazz.qualifiedName match {
+                case "scala.Predef" => false
+                case "scala" => false
+                case _ => true
               }
+            }
           })
         for (variant <- variants) {
           variant.getElement match {
@@ -100,18 +99,17 @@ class ScalaVariableOfTypeMacro extends Macro {
         val element = file.findElementAt(offset)
         val variants = MacroUtil
           .getVariablesForScope(element)
-          .filter(r =>
-                {
-              val clazz =
-                PsiTreeUtil.getParentOfType(r.element, classOf[PsiClass])
-              if (clazz == null) true
-              else {
-                clazz.qualifiedName match {
-                  case "scala.Predef" => false
-                  case "scala" => false
-                  case _ => true
-                }
+          .filter(r => {
+            val clazz =
+              PsiTreeUtil.getParentOfType(r.element, classOf[PsiClass])
+            if (clazz == null) true
+            else {
+              clazz.qualifiedName match {
+                case "scala.Predef" => false
+                case "scala" => false
+                case _ => true
               }
+            }
           })
         for (variant <- variants) {
           variant.getElement match {

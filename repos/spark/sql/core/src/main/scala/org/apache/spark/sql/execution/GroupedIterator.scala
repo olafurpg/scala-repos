@@ -117,7 +117,7 @@ class GroupedIterator private (input: BufferedIterator[InternalRow],
       // Skip to next group.
       // currentRow may be overwritten by `hasNext`, so we should compare them first.
       while (keyOrdering.compare(currentGroup, currentRow) == 0 &&
-      input.hasNext) {
+             input.hasNext) {
         currentRow = input.next()
       }
 

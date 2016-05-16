@@ -284,8 +284,7 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       // SI-9393: the classfile / java source parsers add Annotation and ClassfileAnnotation to the
       // parents of a java annotations. undo this for the backend (where we need classfile-level information).
       if (classSym.hasJavaAnnotationFlag)
-        parents.filterNot(
-            c =>
+        parents.filterNot(c =>
               c.typeSymbol == ClassfileAnnotationClass ||
               c.typeSymbol == AnnotationClass)
       else parents
@@ -367,14 +366,16 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           // SI-9393: the classfile / java source parser make java annotation symbols look like classes.
           // here we recover the actual classfile flags.
           if (classSym.hasJavaAnnotationFlag)
-            ACC_ANNOTATION | ACC_INTERFACE | ACC_ABSTRACT else 0,
+            ACC_ANNOTATION | ACC_INTERFACE | ACC_ABSTRACT
+          else 0,
           if (classSym.isPublic) ACC_PUBLIC else 0,
           if (classSym.isFinal) ACC_FINAL else 0,
           // see the link above. javac does the same: ACC_SUPER for all classes, but not interfaces.
           if (classSym.isInterface) ACC_INTERFACE else ACC_SUPER,
           // for Java enums, we cannot trust `hasAbstractFlag` (see comment in enumFlags)
           if (!classSym.hasJavaEnumFlag && classSym.hasAbstractFlag)
-            ACC_ABSTRACT else 0,
+            ACC_ABSTRACT
+          else 0,
           if (classSym.isArtifact) ACC_SYNTHETIC else 0,
           if (classSym.hasJavaEnumFlag) enumFlags else 0
       )
@@ -505,18 +506,17 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
       * Here we get rid of the module class B, making sure that the class B is present.
       */
     val nestedClassSymbolsNoJavaModuleClasses = nestedClassSymbols.filter(
-        s =>
-          {
-        if (s.isJavaDefined && s.isModuleClass) {
-          // We could also search in nestedClassSymbols for s.linkedClassOfClass, but sometimes that
-          // returns NoSymbol, so it doesn't work.
-          val nb = nestedClassSymbols.count(
-              mc => mc.name == s.name && mc.owner == s.owner)
-          assert(
-              nb == 2,
-              s"Java member module without member class: $s - $nestedClassSymbols")
-          false
-        } else true
+        s => {
+      if (s.isJavaDefined && s.isModuleClass) {
+        // We could also search in nestedClassSymbols for s.linkedClassOfClass, but sometimes that
+        // returns NoSymbol, so it doesn't work.
+        val nb = nestedClassSymbols.count(mc =>
+              mc.name == s.name && mc.owner == s.owner)
+        assert(
+            nb == 2,
+            s"Java member module without member class: $s - $nestedClassSymbols")
+        false
+      } else true
     })
 
     val nestedClasses =
@@ -640,9 +640,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         case Right(classNode) =>
           inlineInfoFromClassfile(classNode)
         case Left(missingClass) =>
-          EmptyInlineInfo.copy(
-              warning = Some(ClassNotFoundWhenBuildingInlineInfoFromSymbol(
-                        missingClass)))
+          EmptyInlineInfo.copy(warning = Some(
+                  ClassNotFoundWhenBuildingInlineInfoFromSymbol(missingClass)))
       }
     }
   }
@@ -665,10 +664,12 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
           ClassInfo(
               superClass = Some(ObjectRef),
               interfaces = Nil,
-              flags = asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
+              flags =
+                asm.Opcodes.ACC_SUPER | asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_FINAL,
               nestedClasses = nested,
               nestedInfo = None,
-              inlineInfo = EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
+              inlineInfo =
+                EmptyInlineInfo.copy(isEffectivelyFinal = true))) // no method inline infos needed, scala never invokes methods on the mirror class
       c
     })
   }
@@ -785,7 +786,8 @@ class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
         if (privateFlag) ACC_PRIVATE else ACC_PUBLIC,
         if ((sym.isDeferred &&
                 !sym.hasFlag(symtab.Flags.JAVA_DEFAULTMETHOD)) ||
-            sym.hasAbstractFlag) ACC_ABSTRACT else 0,
+            sym.hasAbstractFlag) ACC_ABSTRACT
+        else 0,
         if (sym.isTraitOrInterface) ACC_INTERFACE else 0,
         if (finalFlag && !sym.hasAbstractFlag) ACC_FINAL else 0,
         if (sym.isStaticMember) ACC_STATIC else 0,

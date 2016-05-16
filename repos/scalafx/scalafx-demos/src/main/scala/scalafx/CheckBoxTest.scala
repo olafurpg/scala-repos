@@ -42,9 +42,9 @@ object CheckBoxTest extends JFXApp {
   val check = new CheckBox {
     text = "CheckBox"
   }
-  check.onAction = (event: ActionEvent) =>
-    {
-      lblCheckState.text = if (check.indeterminate.get) "Indeterminate"
+  check.onAction = (event: ActionEvent) => {
+    lblCheckState.text =
+      if (check.indeterminate.get) "Indeterminate"
       else check.selected.get().toString
   }
 
@@ -55,9 +55,8 @@ object CheckBoxTest extends JFXApp {
   val btnAllowIndeterminate = new scalafx.scene.control.Button {
     text = "Allow Indeterminate"
   }
-  btnAllowIndeterminate.onAction = (event: ActionEvent) =>
-    {
-      check.allowIndeterminate = !check.allowIndeterminate.get()
+  btnAllowIndeterminate.onAction = (event: ActionEvent) => {
+    check.allowIndeterminate = !check.allowIndeterminate.get()
   }
 
   val lblAllowIndeterminate = new Label {

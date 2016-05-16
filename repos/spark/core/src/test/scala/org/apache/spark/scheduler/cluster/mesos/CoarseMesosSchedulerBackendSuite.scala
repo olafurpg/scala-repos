@@ -37,7 +37,9 @@ import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.scheduler.TaskSchedulerImpl
 
 class CoarseMesosSchedulerBackendSuite
-    extends SparkFunSuite with LocalSparkContext with MockitoSugar
+    extends SparkFunSuite
+    with LocalSparkContext
+    with MockitoSugar
     with BeforeAndAfter {
 
   private var sparkConf: SparkConf = _

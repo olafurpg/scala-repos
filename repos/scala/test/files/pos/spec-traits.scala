@@ -28,12 +28,11 @@ trait T[X]
 class Bug3301 {
   def t[A]: T[A] = sys.error("stub")
 
-  () =>
-    {
-      type X = Int
+  () => {
+    type X = Int
 
-      def foo[X] = t[X]
-      ()
+    def foo[X] = t[X]
+    ()
   }
 }
 // issue 3299

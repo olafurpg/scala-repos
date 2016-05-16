@@ -52,8 +52,8 @@ private[i18n] final class GitWrite(
                     fuccess(logger.warn("! Branch already exists: " + branch)),
                     git.checkout(branch, true) >> writeMessages(translation) >>- logger
                       .info("Add " + relFileOf(translation)) >>
-                    (git add relFileOf(translation)) >>- logger.info("- " +
-                        commitMsg) >> (git commit commitMsg).void
+                    (git add relFileOf(translation)) >>- logger.info(
+                        "- " + commitMsg) >> (git commit commitMsg).void
                 )
               }).await
         }

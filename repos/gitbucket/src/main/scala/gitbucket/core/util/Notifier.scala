@@ -15,13 +15,15 @@ import SystemSettingsService.Smtp
 import ControlUtil.defining
 
 trait Notifier
-    extends RepositoryService with AccountService with IssuesService {
+    extends RepositoryService
+    with AccountService
+    with IssuesService {
   def toNotify(
       r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
       msg: String => String)(implicit context: Context): Unit
 
-  protected def recipients(issue: Issue)(
-      notify: String => Unit)(implicit session: Session, context: Context) =
+  protected def recipients(issue: Issue)(notify: String => Unit)(
+      implicit session: Session, context: Context) =
     (// individual repository's owner
         issue.userName :: // collaborators
         getCollaborators(issue.userName, issue.repositoryName) ::: // participants
@@ -31,7 +33,8 @@ trait Notifier
             issue.issueId).map(_.commentedUserName)).distinct
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
-          (LDAPUtil.isDummyMailAddress(_)) foreach (x => notify(x.mailAddress)))
+          (LDAPUtil.isDummyMailAddress(_)) foreach (x =>
+                notify(x.mailAddress)))
 }
 
 object Notifier {

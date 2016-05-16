@@ -12,7 +12,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class LimitConcurrentRequestsFilterTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("Multiple requests below boundary get answered correctly") {
     Given("A http filter chain")

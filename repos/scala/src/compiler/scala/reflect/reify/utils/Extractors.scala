@@ -64,8 +64,8 @@ trait Extractors { self: Utils =>
           def extractNames(tree: Tree) =
             tree.collect { case ref: RefTree => ref.name }.toSet
           val usedNames =
-            extractNames(rtree) ++ symtab.syms.flatMap(
-                sym => extractNames(symtab.symDef(sym)))
+            extractNames(rtree) ++ symtab.syms.flatMap(sym =>
+                  extractNames(symtab.symDef(sym)))
           symtab filterAliases { case (_, name) => usedNames(name) }
         }
         var prev = symtab
@@ -116,12 +116,14 @@ trait Extractors { self: Utils =>
                                       List(),
                                       TypeBoundsTree(
                                           Ident(NothingClass),
-                                          CompoundTypeTree(Template(List(Ident(reifierUniverse),
-                                                                         Ident(SingletonClass)),
-                                                                    noSelfType,
-                                                                    List(
-                                                                        )))))),
-                          List(List(
+                                          CompoundTypeTree(Template(
+                                                  List(Ident(reifierUniverse),
+                                                       Ident(SingletonClass)),
+                                                  noSelfType,
+                                                  List(
+                                                      )))))),
+                          List(
+                              List(
                                   ValDef(Modifiers(PARAM),
                                          nme.MIRROR_UNTYPED,
                                          AppliedTypeTree(Ident(MirrorClass),
@@ -182,46 +184,50 @@ trait Extractors { self: Utils =>
         case Block(
             List(
             udef @ ValDef(_, _, _, universe), mdef @ ValDef(_, _, _, mirror)),
-            Apply(Apply(TypeApply(_, List(ttpe @ TypeTree())),
-                        List(_,
-                             Block(List(
-                                   ClassDef(_,
-                                            _,
-                                            _,
-                                            Template(_,
-                                                     _,
-                                                     List(
-                                                     _,
-                                                     DefDef(
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     _,
-                                                     Block(
-                                                     _ :: _ :: symbolTable1,
-                                                     rtree)))))),
-                                   _))),
-                  // todo. doesn't take into account optimizations such as $u.TypeTag.Int or the upcoming closure optimization
+            Apply(
+            Apply(TypeApply(_, List(ttpe @ TypeTree())),
                   List(
-                  Apply(TypeApply(tagFactory @ Select(_, _), _),
-                        List(_,
-                             Block(List(ClassDef(_,
-                                                 _,
-                                                 _,
-                                                 Template(_,
-                                                          _,
-                                                          List(_,
-                                                               DefDef(
-                                                               _,
-                                                               _,
-                                                               _,
-                                                               _,
-                                                               _,
-                                                               Block(
-                                                               _ :: _ :: symbolTable2,
-                                                               rtpe)))))),
-                                   _))))))
+                  _,
+                  Block(List(
+                        ClassDef(
+                        _,
+                        _,
+                        _,
+                        Template(
+                        _,
+                        _,
+                        List(
+                        _,
+                        DefDef(_,
+                               _,
+                               _,
+                               _,
+                               _,
+                               Block(_ :: _ :: symbolTable1,
+                                     rtree)))))),
+                        _))),
+            // todo. doesn't take into account optimizations such as $u.TypeTag.Int or the upcoming closure optimization
+            List(Apply(
+            TypeApply(tagFactory @ Select(_, _), _),
+            List(
+            _,
+            Block(
+            List(
+            ClassDef(_,
+                     _,
+                     _,
+                     Template(
+                     _,
+                     _,
+                     List(_,
+                          DefDef(_,
+                                 _,
+                                 _,
+                                 _,
+                                 _,
+                                 Block(_ :: _ :: symbolTable2,
+                                       rtpe)))))),
+            _))))))
             if udef.name == nme.UNIVERSE_SHORT &&
             mdef.name == nme.MIRROR_SHORT =>
           val tagFlavor = tagFactory match {
@@ -408,8 +414,7 @@ trait Extractors { self: Utils =>
     def unapply(tree: Tree): Option[TermName] = tree match {
       case Apply(Select(Select(uref @ Ident(_), typeRef), apply),
                  List(Select(_, noSymbol), Ident(freeType: TermName), nil))
-          if
-          (uref.name == nme.UNIVERSE_SHORT && typeRef == nme.TypeRef &&
+          if (uref.name == nme.UNIVERSE_SHORT && typeRef == nme.TypeRef &&
               noSymbol == nme.NoSymbol &&
               freeType.startsWith(nme.REIFY_FREE_PREFIX)) =>
         Some(freeType)

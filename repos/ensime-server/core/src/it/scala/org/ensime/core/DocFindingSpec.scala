@@ -6,7 +6,8 @@ import org.ensime.fixture._
 import org.ensime.util.EnsimeSpec
 
 class DocFindingSpec
-    extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
+    extends EnsimeSpec
+    with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
     with ReallyRichPresentationCompilerFixture {
   import ReallyRichPresentationCompilerFixture._

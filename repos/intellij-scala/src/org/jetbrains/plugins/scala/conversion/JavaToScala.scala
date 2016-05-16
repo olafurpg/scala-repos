@@ -51,8 +51,9 @@ object JavaToScala {
       element.hasModifierProperty(PsiModifier.PUBLIC) ||
       element.hasModifierProperty(PsiModifier.PROTECTED)
 
-    val references = findVariableUsage(element, parent).filter(
-        (el: PsiReferenceExpression) => PsiUtil.isAccessedForWriting(el))
+    val references =
+      findVariableUsage(element, parent).filter((el: PsiReferenceExpression) =>
+            PsiUtil.isAccessedForWriting(el))
 
     references.length match {
       case 0 if possibleVal => false
@@ -206,8 +207,8 @@ object JavaToScala {
         PackageStatement(convertPsiToIntermdeiate(
                 p.getPackageReference, externalProperties))
       case f: PsiForeachStatement =>
-        val tp = Option(f.getIteratedValue)
-          .flatMap((e: PsiExpression) => Option(e.getType))
+        val tp = Option(f.getIteratedValue).flatMap((e: PsiExpression) =>
+              Option(e.getType))
         val isJavaCollection =
           if (tp.isEmpty) true else !tp.get.isInstanceOf[PsiArrayType]
 
@@ -412,13 +413,14 @@ object JavaToScala {
           MethodConstruction(
               handleModifierList(m),
               m.getName,
-              m.getTypeParameters
-                .map(convertPsiToIntermdeiate(_, externalProperties)),
+              m.getTypeParameters.map(
+                  convertPsiToIntermdeiate(_, externalProperties)),
               convertPsiToIntermdeiate(m.getParameterList, externalProperties),
               body,
               if (m.getReturnType != PsiType.VOID)
                 convertPsiToIntermdeiate(
-                    m.getReturnTypeElement, externalProperties) else null)
+                    m.getReturnTypeElement, externalProperties)
+              else null)
         }
       case c: PsiClass => createClass(c, externalProperties)
       case p: PsiParenthesizedExpression =>
@@ -531,8 +533,8 @@ object JavaToScala {
             next match {
               case varible: PsiResourceVariable =>
                 resourcesVariables +=
-                ((varible.getName,
-                  convertPsiToIntermdeiate(varible, externalProperties)))
+                  ((varible.getName,
+                    convertPsiToIntermdeiate(varible, externalProperties)))
               case _ =>
             }
           }
@@ -887,8 +889,8 @@ object JavaToScala {
   def handlePrimaryConstructor(constructors: Seq[PsiMethod])(
       implicit associations: ListBuffer[AssociationHelper] = new ListBuffer(),
       refs: Seq[ReferenceData] = Seq.empty,
-      withComments: Boolean = false)
-    : (Option[Seq[PsiMember]], Option[PrimaryConstruction]) = {
+      withComments: Boolean =
+        false): (Option[Seq[PsiMember]], Option[PrimaryConstruction]) = {
 
     val dropFields = new ArrayBuffer[PsiField]()
     def createPrimaryConstructor(constructor: PsiMethod): PrimaryConstruction = {
@@ -1093,8 +1095,7 @@ object JavaToScala {
         case c: PsiClass =>
           serialVersion(c) match {
             case Some(f) =>
-              modifiers.append(
-                  ModifierWithExpression(
+              modifiers.append(ModifierWithExpression(
                       ModifierType.SerialVersionUID,
                       convertPsiToIntermdeiate(f.getInitializer, null)))
             case _ =>

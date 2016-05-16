@@ -72,7 +72,8 @@ object Variance extends Impurity {
   * Note: Instances of this class do not hold the data; they operate on views of the data.
   */
 private[tree] class VarianceAggregator()
-    extends ImpurityAggregator(statsSize = 3) with Serializable {
+    extends ImpurityAggregator(statsSize = 3)
+    with Serializable {
 
   /**
     * Update stats for one (node, feature, bin) with the given label.

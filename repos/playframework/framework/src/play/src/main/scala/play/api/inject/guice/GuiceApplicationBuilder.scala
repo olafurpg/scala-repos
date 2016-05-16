@@ -27,8 +27,8 @@ final case class GuiceApplicationBuilder(
     eagerly: Boolean = false,
     loadConfiguration: Environment => Configuration = Configuration.load,
     global: Option[GlobalSettings.Deprecated] = None,
-    loadModules: (Environment,
-    Configuration) => Seq[GuiceableModule] = GuiceableModule.loadModules)
+    loadModules: (Environment, Configuration) => Seq[GuiceableModule] =
+      GuiceableModule.loadModules)
     extends GuiceBuilder[GuiceApplicationBuilder](
         environment,
         configuration,
@@ -70,9 +70,8 @@ final case class GuiceApplicationBuilder(
     * Set the module loader.
     * Overrides the default or any previously configured values.
     */
-  def load(
-      loader: (Environment,
-      Configuration) => Seq[GuiceableModule]): GuiceApplicationBuilder =
+  def load(loader: (Environment, Configuration) => Seq[GuiceableModule])
+    : GuiceApplicationBuilder =
     copy(loadModules = loader)
 
   /**
@@ -150,9 +149,8 @@ final case class GuiceApplicationBuilder(
       eagerly: Boolean = eagerly,
       loadConfiguration: Environment => Configuration = loadConfiguration,
       global: Option[GlobalSettings] = global,
-      loadModules: (Environment,
-      Configuration) => Seq[GuiceableModule] = loadModules)
-    : GuiceApplicationBuilder =
+      loadModules: (Environment, Configuration) => Seq[GuiceableModule] =
+        loadModules): GuiceApplicationBuilder =
     new GuiceApplicationBuilder(environment,
                                 configuration,
                                 modules,

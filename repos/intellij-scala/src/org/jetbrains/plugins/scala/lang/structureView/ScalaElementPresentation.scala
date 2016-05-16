@@ -53,8 +53,8 @@ object ScalaElementPresentation {
     presentableText.append(
         if (!function.isConstructor) function.name else "this")
 
-    function.typeParametersClause.foreach(
-        clause => presentableText.append(clause.getText))
+    function.typeParametersClause.foreach(clause =>
+          presentableText.append(clause.getText))
 
     if (function.paramClauses != null)
       presentableText.append(StructureViewUtil.getParametersAsString(

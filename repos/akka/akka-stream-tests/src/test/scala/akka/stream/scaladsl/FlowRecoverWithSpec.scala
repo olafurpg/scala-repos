@@ -96,8 +96,8 @@ class FlowRecoverWithSpec extends AkkaSpec {
         if (a == 3) throw new IndexOutOfBoundsException() else a
       }.recoverWith {
         case t: IndexOutOfBoundsException ⇒
-          Source(List(11, 22)).map(
-              m ⇒ if (m == 22) throw new IllegalArgumentException() else m)
+          Source(List(11, 22)).map(m ⇒
+                if (m == 22) throw new IllegalArgumentException() else m)
         case t: IllegalArgumentException ⇒ Source(List(33, 44))
       }.runWith(TestSink.probe[Int])
         .request(2)

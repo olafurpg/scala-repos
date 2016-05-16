@@ -42,7 +42,9 @@ import org.apache.spark.sql.types.StructType
   */
 @Experimental
 final class VectorSlicer(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vectorSlicer"))

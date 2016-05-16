@@ -24,7 +24,7 @@ object M
 
 object Test extends App {
   println("Testing Symbol.isAbstract...")
-  def test[T : TypeTag] = {
+  def test[T: TypeTag] = {
     val sym = typeOf[T].typeSymbol
     println(s"=======$sym=======")
     def printAbstract(sym: Symbol) = println(s"$sym => ${sym.isAbstract}")

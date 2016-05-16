@@ -54,14 +54,14 @@ class CaseClassPickling(
               GetField(field.methodName, field)
             })))
             val unpickle = UnpickleBehavior(Seq(CallConstructor(
-                        fields.map(_.name),
-                        c)) ++ standAloneVars.map { field =>
-              field.setter match {
-                case Some(mth) => SetField(field.methodName, mth)
-                case _ =>
-                  sys.error(
-                      s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
-              }
+                        fields.map(_.name), c)) ++ standAloneVars.map {
+              field =>
+                field.setter match {
+                  case Some(mth) => SetField(field.methodName, mth)
+                  case _ =>
+                    sys.error(
+                        s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
+                }
             })
             if (!allowReflection &&
                 (pickle.requiresReflection || unpickle.requiresReflection)) {
@@ -111,9 +111,9 @@ class CaseClassPickling(
     (for {
       companion <- tpe.companion
       factoryMethod <- tpe.methods
-        .filter(_.methodName == "apply")
-        .sortBy(_.parameterNames.flatten.size)
-        .headOption
+                        .filter(_.methodName == "apply")
+                        .sortBy(_.parameterNames.flatten.size)
+                        .headOption
     } yield {
       val vars = allVars(tpe)
       val names = factoryMethod.parameterNames.flatten.toSet
@@ -171,8 +171,8 @@ class CaseClassPickling(
                 .transform(b) {
                   case x: PickleEntry =>
                     SubclassDispatch.apply(
-                        subClasses = subs.filterNot(
-                              _.className == tpe.className),
+                        subClasses =
+                          subs.filterNot(_.className == tpe.className),
                         tpe,
                         Some(x),
                         allowReflection // TODO - This should be `allow runtime pickler lookup`.

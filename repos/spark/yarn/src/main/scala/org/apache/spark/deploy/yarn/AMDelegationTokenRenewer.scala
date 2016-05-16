@@ -202,8 +202,8 @@ private[yarn] class AMDelegationTokenRenewer(
                          SparkHadoopUtil.SPARK_YARN_CREDS_TEMP_EXTENSION)
         .lastOption
         .foreach { status =>
-          lastCredentialsFileSuffix = hadoopUtil.getSuffixForCredentialsPath(
-              status.getPath)
+          lastCredentialsFileSuffix =
+            hadoopUtil.getSuffixForCredentialsPath(status.getPath)
         }
     }
     val nextSuffix = lastCredentialsFileSuffix + 1

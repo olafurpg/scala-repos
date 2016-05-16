@@ -398,7 +398,8 @@ object DateTimeUtils {
     var currentSegmentValue = 0
     val bytes = s.getBytes
     var j = 0
-    while (j < bytes.length && (i < 3 && !(bytes(j) == ' ' || bytes(j) == 'T'))) {
+    while (j < bytes.length &&
+           (i < 3 && !(bytes(j) == ' ' || bytes(j) == 'T'))) {
       val b = bytes(j)
       if (i < 2 && b == '-') {
         if (i == 0 && j != 4) {
@@ -778,7 +779,8 @@ object DateTimeUtils {
     val timeInDay2 = millis2 - daysToMillis(date2)
     val timesBetween = (timeInDay1 - timeInDay2).toDouble / MILLIS_PER_DAY
     val diff =
-      (months1 - months2).toDouble + (dayInMonth1 - dayInMonth2 + timesBetween) / 31.0
+      (months1 - months2).toDouble +
+      (dayInMonth1 - dayInMonth2 + timesBetween) / 31.0
     // rounding to 8 digits
     math.round(diff * 1e8) / 1e8
   }

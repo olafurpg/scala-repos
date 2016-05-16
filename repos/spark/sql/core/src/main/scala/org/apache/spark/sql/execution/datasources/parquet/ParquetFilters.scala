@@ -30,7 +30,8 @@ import org.apache.spark.sql.types._
 
 private[sql] object ParquetFilters {
   case class SetInFilter[T <: Comparable[T]](valueSet: Set[T])
-      extends UserDefinedPredicate[T] with Serializable {
+      extends UserDefinedPredicate[T]
+      with Serializable {
 
     override def keep(value: T): Boolean = {
       value != null && valueSet.contains(value)

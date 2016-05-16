@@ -1103,7 +1103,8 @@ trait Iterator[+A] extends TraversableOnce[A] { self =>
     *  Typical uses can be achieved via methods `grouped` and `sliding`.
     */
   class GroupedIterator[B >: A](self: Iterator[A], size: Int, step: Int)
-      extends AbstractIterator[Seq[B]] with Iterator[Seq[B]] {
+      extends AbstractIterator[Seq[B]]
+      with Iterator[Seq[B]] {
 
     require(
         size >= 1 && step >= 1,

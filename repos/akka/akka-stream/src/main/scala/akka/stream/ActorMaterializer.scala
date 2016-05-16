@@ -256,8 +256,8 @@ object ActorMaterializerSettings {
         maxInputBufferSize = config.getInt("max-input-buffer-size"),
         dispatcher = config.getString("dispatcher"),
         supervisionDecider = Supervision.stoppingDecider,
-        subscriptionTimeoutSettings = StreamSubscriptionTimeoutSettings(
-              config),
+        subscriptionTimeoutSettings =
+          StreamSubscriptionTimeoutSettings(config),
         debugLogging = config.getBoolean("debug-logging"),
         outputBurstLimit = config.getInt("output-burst-limit"),
         fuzzingMode = config.getBoolean("debug.fuzzing-mode"),
@@ -357,7 +357,8 @@ final class ActorMaterializerSettings private (
       maxInputBufferSize: Int = this.maxInputBufferSize,
       dispatcher: String = this.dispatcher,
       supervisionDecider: Supervision.Decider = this.supervisionDecider,
-      subscriptionTimeoutSettings: StreamSubscriptionTimeoutSettings = this.subscriptionTimeoutSettings,
+      subscriptionTimeoutSettings: StreamSubscriptionTimeoutSettings =
+        this.subscriptionTimeoutSettings,
       debugLogging: Boolean = this.debugLogging,
       outputBurstLimit: Int = this.outputBurstLimit,
       fuzzingMode: Boolean = this.fuzzingMode,

@@ -114,11 +114,11 @@ class WorksheetEditorPrinter(
             insertedToOriginal -= differ
 
             foldingOffsets +=
-            ((start + insertedToOriginal + differ,
-              outputBuffer.length -
-              outputBuffer.reverseIterator.takeWhile(_ == '\n').length,
-              end - start + 1,
-              end))
+              ((start + insertedToOriginal + differ,
+                outputBuffer.length -
+                outputBuffer.reverseIterator.takeWhile(_ == '\n').length,
+                end - start + 1,
+                end))
           }
 
           buffed += linesCount
@@ -368,11 +368,12 @@ object WorksheetEditorPrinter {
 
   def getPatched = patched
 
-  private def synch(originalEditor: Editor,
-                    worksheetViewer: Editor,
-                    diffSplitter: Option[
-                        WorksheetDiffSplitters.SimpleWorksheetSplitter] = None,
-                    foldGroup: Option[WorksheetFoldGroup] = None) {
+  private def synch(
+      originalEditor: Editor,
+      worksheetViewer: Editor,
+      diffSplitter: Option[WorksheetDiffSplitters.SimpleWorksheetSplitter] =
+        None,
+      foldGroup: Option[WorksheetFoldGroup] = None) {
     class MyCaretAdapterBase extends CaretAdapter {
       override def equals(obj: Any): Boolean = obj match {
         case _: MyCaretAdapterBase => true

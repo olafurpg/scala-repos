@@ -140,11 +140,12 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
       */
     def cast(tree: Tree, pt: Type): Tree = {
       if ((tree.tpe ne null) && !(tree.tpe =:= ObjectTpe)) {
-        def word = (if (tree.tpe <:< pt) "upcast"
-                    else if (pt <:< tree.tpe) "downcast"
-                    else if (pt weak_<:< tree.tpe) "coerce"
-                    else if (tree.tpe weak_<:< pt) "widen"
-                    else "cast")
+        def word =
+          (if (tree.tpe <:< pt) "upcast"
+           else if (pt <:< tree.tpe) "downcast"
+           else if (pt weak_<:< tree.tpe) "coerce"
+           else if (tree.tpe weak_<:< pt) "widen"
+           else "cast")
         log(s"erasure ${word}s from ${tree.tpe} to $pt")
       }
       if (pt =:= UnitTpe) {

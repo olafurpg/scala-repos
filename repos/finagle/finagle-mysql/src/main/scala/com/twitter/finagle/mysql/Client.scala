@@ -102,7 +102,8 @@ trait Transactions {
 }
 
 private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
-    extends Client with Transactions {
+    extends Client
+    with Transactions {
   private[this] val service = factory.toService
 
   def query(sql: String): Future[Result] = service(QueryRequest(sql))

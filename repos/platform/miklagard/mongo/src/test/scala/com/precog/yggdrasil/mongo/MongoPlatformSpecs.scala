@@ -159,13 +159,18 @@ object MongoPlatformSpecEngine extends Logging {
 }
 
 trait MongoPlatformSpecs
-    extends ParseEvalStackSpecs[Future] with MongoColumnarTableModule
-    with Logging with StringIdMemoryDatasetConsumer[Future] {
+    extends ParseEvalStackSpecs[Future]
+    with MongoColumnarTableModule
+    with Logging
+    with StringIdMemoryDatasetConsumer[Future] {
   self =>
 
   class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
       with MongoColumnarTableModuleConfig
 
   object yggConfig extends YggConfig {
@@ -251,12 +256,14 @@ trait MongoPlatformSpecs
 }
 
 class MongoBasicValidationSpecs
-    extends BasicValidationSpecs with MongoPlatformSpecs
+    extends BasicValidationSpecs
+    with MongoPlatformSpecs
 
 class MongoHelloQuirrelSpecs extends HelloQuirrelSpecs with MongoPlatformSpecs
 
 class MongoLogisticRegressionSpecs
-    extends LogisticRegressionSpecs with MongoPlatformSpecs
+    extends LogisticRegressionSpecs
+    with MongoPlatformSpecs
 
 class MongoMiscStackSpecs extends MiscStackSpecs with MongoPlatformSpecs
 
@@ -265,7 +272,8 @@ class MongoRankSpecs extends RankSpecs with MongoPlatformSpecs
 class MongoRenderStackSpecs extends RenderStackSpecs with MongoPlatformSpecs
 
 class MongoUndefinedLiteralSpecs
-    extends UndefinedLiteralSpecs with MongoPlatformSpecs
+    extends UndefinedLiteralSpecs
+    with MongoPlatformSpecs
 
 class MongoIdFieldSpecs extends MongoPlatformSpecs {
   override def includeIdField = true

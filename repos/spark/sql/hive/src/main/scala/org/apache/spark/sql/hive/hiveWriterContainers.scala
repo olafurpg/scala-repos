@@ -54,7 +54,9 @@ private[hive] class SparkHiveWriterContainer(
     fileSinkConf: FileSinkDesc,
     inputSchema: Seq[Attribute],
     table: MetastoreRelation)
-    extends Logging with HiveInspectors with Serializable {
+    extends Logging
+    with HiveInspectors
+    with Serializable {
 
   private val now = new Date()
   private val tableDesc: TableDesc = fileSinkConf.getTableInfo
@@ -194,8 +196,9 @@ private[hive] class SparkHiveWriterContainer(
     iterator.foreach { row =>
       var i = 0
       while (i < fieldOIs.length) {
-        outputData(i) = if (row.isNullAt(i)) null
-        else wrappers(i)(row.get(i, dataTypes(i)))
+        outputData(i) =
+          if (row.isNullAt(i)) null
+          else wrappers(i)(row.get(i, dataTypes(i)))
         i += 1
       }
       writer.write(serializer.serialize(outputData, standardOI))
@@ -324,11 +327,12 @@ private[spark] class SparkHiveDynamicPartitionWriterContainer(
 
           var i = 0
           while (i < fieldOIs.length) {
-            outputData(i) = if (sortedIterator.getValue.isNullAt(i)) {
-              null
-            } else {
-              wrappers(i)(sortedIterator.getValue.get(i, dataTypes(i)))
-            }
+            outputData(i) =
+              if (sortedIterator.getValue.isNullAt(i)) {
+                null
+              } else {
+                wrappers(i)(sortedIterator.getValue.get(i, dataTypes(i)))
+              }
             i += 1
           }
           currentWriter.write(serializer.serialize(outputData, standardOI))

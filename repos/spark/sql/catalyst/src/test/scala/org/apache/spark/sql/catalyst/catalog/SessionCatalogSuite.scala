@@ -663,8 +663,8 @@ class SessionCatalogSuite extends SparkFunSuite {
         TableIdentifier("tbl2", Some("db2")),
         Seq(oldPart1.copy(
                 storage = storageFormat.copy(locationUri = Some(newLocation))),
-            oldPart2.copy(storage = storageFormat.copy(
-                      locationUri = Some(newLocation)))))
+            oldPart2.copy(storage =
+                  storageFormat.copy(locationUri = Some(newLocation)))))
     val newPart1 =
       catalog.getPartition(TableIdentifier("tbl2", Some("db2")), part1.spec)
     val newPart2 =

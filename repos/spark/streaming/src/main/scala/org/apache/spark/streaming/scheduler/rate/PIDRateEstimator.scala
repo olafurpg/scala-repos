@@ -52,7 +52,8 @@ private[streaming] class PIDRateEstimator(
     derivative: Double,
     minRate: Double
 )
-    extends RateEstimator with Logging {
+    extends RateEstimator
+    with Logging {
 
   private var firstRun: Boolean = true
   private var latestTime: Long = -1L

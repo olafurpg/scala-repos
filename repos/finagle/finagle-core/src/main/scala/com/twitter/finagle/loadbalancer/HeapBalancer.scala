@@ -22,7 +22,8 @@ class HeapBalancer[Req, Rep](
     emptyException: Throwable,
     rng: Random
 )
-    extends ServiceFactory[Req, Rep] with OnReady {
+    extends ServiceFactory[Req, Rep]
+    with OnReady {
 
   import HeapBalancer._
 

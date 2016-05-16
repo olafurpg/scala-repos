@@ -15,7 +15,9 @@ package algebra
   *
   */
 trait Torsor[V, @sp(Int, Long, Float, Double) R]
-    extends Any with Action[V, R] { self =>
+    extends Any
+    with Action[V, R] {
+  self =>
   def diff(v: V, w: V): R
 
   def fixOrigin(id0: V): AbGroup[V] =
@@ -28,7 +30,9 @@ trait Torsor[V, @sp(Int, Long, Float, Double) R]
 }
 
 trait AdditiveTorsor[V, @sp(Int, Long, Float, Double) R]
-    extends Any with AdditiveAction[V, R] { self =>
+    extends Any
+    with AdditiveAction[V, R] {
+  self =>
   implicit def scalar: AdditiveAbGroup[R]
 
   def pminus(v: V, w: V): R
@@ -43,7 +47,9 @@ trait AdditiveTorsor[V, @sp(Int, Long, Float, Double) R]
 }
 
 trait MultiplicativeTorsor[V, @sp(Int, Long, Float, Double) R]
-    extends Any with MultiplicativeAction[V, R] { self =>
+    extends Any
+    with MultiplicativeAction[V, R] {
+  self =>
   implicit def scalar: MultiplicativeAbGroup[R]
 
   def pdiv(v: V, w: V): R

@@ -42,8 +42,8 @@ class ExchangeCoordinatorSuite extends SparkFunSuite with BeforeAndAfterAll {
   override protected def afterAll(): Unit = {
     // Set these states back.
     originalActiveSQLContext.foreach(ctx => SQLContext.setActive(ctx))
-    originalInstantiatedSQLContext.foreach(
-        ctx => SQLContext.setInstantiatedContext(ctx))
+    originalInstantiatedSQLContext.foreach(ctx =>
+          SQLContext.setInstantiatedContext(ctx))
   }
 
   private def checkEstimation(

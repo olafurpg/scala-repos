@@ -44,7 +44,8 @@ trait ClassfileIndexer {
     }
 
   private class AsmCallback
-      extends ClassVisitor(ASM5) with ReferenceInClassHunter {
+      extends ClassVisitor(ASM5)
+      with ReferenceInClassHunter {
     // updated every time we get more info
     var clazz: RawClassfile = _
 
@@ -111,8 +112,8 @@ trait ClassfileIndexer {
                 case (_, None) =>
                 case (Some(existing), Some(latest)) if existing <= latest =>
                 case _ =>
-                  clazz = clazz.copy(
-                      source = clazz.source.copy(line = firstLine))
+                  clazz =
+                    clazz.copy(source = clazz.source.copy(line = firstLine))
               }
 
             case name =>

@@ -64,8 +64,8 @@ object FormattedStringParser extends StringParser {
 
       // String.format("%d", 1)
       case MethodInvocation(
-          PsiReferenceEx.resolve(
-          (f: PsiMethod) && ContainingClass(owner: PsiClass)),
+          PsiReferenceEx
+            .resolve((f: PsiMethod) && ContainingClass(owner: PsiClass)),
           Seq(literal: ScLiteral, args @ _ *))
           if literal.isString &&
           isStringFormatMethod(owner.qualifiedName, f.getName) =>

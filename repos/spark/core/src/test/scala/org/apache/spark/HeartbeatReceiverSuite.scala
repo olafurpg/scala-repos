@@ -42,7 +42,9 @@ import org.apache.spark.util.ManualClock
   * A test suite for the heartbeating behavior between the driver and the executors.
   */
 class HeartbeatReceiverSuite
-    extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with PrivateMethodTester
     with LocalSparkContext {
 
   private val executorId1 = "executor-1"
@@ -77,8 +79,8 @@ class HeartbeatReceiverSuite
     when(scheduler.sc).thenReturn(sc)
     heartbeatReceiverClock = new ManualClock
     heartbeatReceiver = new HeartbeatReceiver(sc, heartbeatReceiverClock)
-    heartbeatReceiverRef = sc.env.rpcEnv
-      .setupEndpoint("heartbeat", heartbeatReceiver)
+    heartbeatReceiverRef =
+      sc.env.rpcEnv.setupEndpoint("heartbeat", heartbeatReceiver)
     when(scheduler.executorHeartbeatReceived(any(), any(), any()))
       .thenReturn(true)
   }
@@ -237,15 +239,13 @@ class HeartbeatReceiverSuite
   }
 
   private def addExecutorAndVerify(executorId: String): Unit = {
-    assert(
-        heartbeatReceiver.addExecutor(executorId).map { f =>
+    assert(heartbeatReceiver.addExecutor(executorId).map { f =>
       Await.result(f, 10.seconds)
     } === Some(true))
   }
 
   private def removeExecutorAndVerify(executorId: String): Unit = {
-    assert(
-        heartbeatReceiver.removeExecutor(executorId).map { f =>
+    assert(heartbeatReceiver.removeExecutor(executorId).map { f =>
       Await.result(f, 10.seconds)
     } === Some(true))
   }

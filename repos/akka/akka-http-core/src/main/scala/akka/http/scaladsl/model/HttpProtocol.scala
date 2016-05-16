@@ -8,7 +8,8 @@ import akka.http.javadsl.{model ⇒ jm}
 
 /** The protocol of an HTTP message */
 final case class HttpProtocol private[http](override val value: String)
-    extends jm.HttpProtocol with SingletonValueRenderable
+    extends jm.HttpProtocol
+    with SingletonValueRenderable
 
 object HttpProtocols extends ObjectRegistry[String, HttpProtocol] {
   private def register(p: HttpProtocol): HttpProtocol = register(p.value, p)

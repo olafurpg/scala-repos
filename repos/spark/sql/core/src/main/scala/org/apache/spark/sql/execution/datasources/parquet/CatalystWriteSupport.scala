@@ -49,7 +49,8 @@ import org.apache.spark.sql.types._
   * argument.
   */
 private[parquet] class CatalystWriteSupport
-    extends WriteSupport[InternalRow] with Logging {
+    extends WriteSupport[InternalRow]
+    with Logging {
   // A `ValueWriter` is responsible for writing a field of an `InternalRow` to the record consumer.
   // Here we are using `SpecializedGetters` rather than `InternalRow` so that we can directly access
   // data in `ArrayData` without the help of `SpecificMutableRow`.
@@ -188,13 +189,11 @@ private[parquet] class CatalystWriteSupport
         makeDecimalWriter(precision, scale)
 
       case t: StructType =>
-        val fieldWriters = t
-          .map(_.dataType)
-          .map(makeWriter)
-          (row: SpecializedGetters, ordinal: Int) =>
-            consumeGroup {
-              writeFields(row.getStruct(ordinal, t.length), t, fieldWriters)
-            }
+        val fieldWriters = t.map(_.dataType).map(makeWriter)
+        (row: SpecializedGetters, ordinal: Int) =>
+          consumeGroup {
+            writeFields(row.getStruct(ordinal, t.length), t, fieldWriters)
+          }
 
         case t: ArrayType => makeArrayWriter(t)
 
@@ -214,64 +213,59 @@ private[parquet] class CatalystWriteSupport
 
     val numBytes = minBytesForPrecision(precision)
 
-    val int32Writer = (row: SpecializedGetters, ordinal: Int) =>
-      {
-        val unscaledLong =
-          row.getDecimal(ordinal, precision, scale).toUnscaledLong
-        recordConsumer.addInteger(unscaledLong.toInt)
+    val int32Writer = (row: SpecializedGetters, ordinal: Int) => {
+      val unscaledLong =
+        row.getDecimal(ordinal, precision, scale).toUnscaledLong
+      recordConsumer.addInteger(unscaledLong.toInt)
     }
 
-    val int64Writer = (row: SpecializedGetters, ordinal: Int) =>
-      {
-        val unscaledLong =
-          row.getDecimal(ordinal, precision, scale).toUnscaledLong
-        recordConsumer.addLong(unscaledLong)
+    val int64Writer = (row: SpecializedGetters, ordinal: Int) => {
+      val unscaledLong =
+        row.getDecimal(ordinal, precision, scale).toUnscaledLong
+      recordConsumer.addLong(unscaledLong)
     }
 
     val binaryWriterUsingUnscaledLong = (row: SpecializedGetters,
-    ordinal: Int) =>
-      {
-        // When the precision is low enough (<= 18) to squeeze the decimal value into a `Long`, we
-        // can build a fixed-length byte array with length `numBytes` using the unscaled `Long`
-        // value and the `decimalBuffer` for better performance.
-        val unscaled = row.getDecimal(ordinal, precision, scale).toUnscaledLong
-        var i = 0
-        var shift = 8 * (numBytes - 1)
+                                         ordinal: Int) => {
+      // When the precision is low enough (<= 18) to squeeze the decimal value into a `Long`, we
+      // can build a fixed-length byte array with length `numBytes` using the unscaled `Long`
+      // value and the `decimalBuffer` for better performance.
+      val unscaled = row.getDecimal(ordinal, precision, scale).toUnscaledLong
+      var i = 0
+      var shift = 8 * (numBytes - 1)
 
-        while (i < numBytes) {
-          decimalBuffer(i) = (unscaled >> shift).toByte
-          i += 1
-          shift -= 8
-        }
+      while (i < numBytes) {
+        decimalBuffer(i) = (unscaled >> shift).toByte
+        i += 1
+        shift -= 8
+      }
 
-        recordConsumer.addBinary(
-            Binary.fromByteArray(decimalBuffer, 0, numBytes))
+      recordConsumer.addBinary(
+          Binary.fromByteArray(decimalBuffer, 0, numBytes))
     }
 
     val binaryWriterUsingUnscaledBytes = (row: SpecializedGetters,
-    ordinal: Int) =>
-      {
-        val decimal = row.getDecimal(ordinal, precision, scale)
-        val bytes = decimal.toJavaBigDecimal.unscaledValue().toByteArray
-        val fixedLengthBytes =
-          if (bytes.length == numBytes) {
-            // If the length of the underlying byte array of the unscaled `BigInteger` happens to be
-            // `numBytes`, just reuse it, so that we don't bother copying it to `decimalBuffer`.
-            bytes
-          } else {
-            // Otherwise, the length must be less than `numBytes`.  In this case we copy contents of
-            // the underlying bytes with padding sign bytes to `decimalBuffer` to form the result
-            // fixed-length byte array.
-            val signByte = if (bytes.head < 0) -1: Byte else 0: Byte
-            util.Arrays.fill(
-                decimalBuffer, 0, numBytes - bytes.length, signByte)
-            System.arraycopy(
-                bytes, 0, decimalBuffer, numBytes - bytes.length, bytes.length)
-            decimalBuffer
-          }
+                                          ordinal: Int) => {
+      val decimal = row.getDecimal(ordinal, precision, scale)
+      val bytes = decimal.toJavaBigDecimal.unscaledValue().toByteArray
+      val fixedLengthBytes =
+        if (bytes.length == numBytes) {
+          // If the length of the underlying byte array of the unscaled `BigInteger` happens to be
+          // `numBytes`, just reuse it, so that we don't bother copying it to `decimalBuffer`.
+          bytes
+        } else {
+          // Otherwise, the length must be less than `numBytes`.  In this case we copy contents of
+          // the underlying bytes with padding sign bytes to `decimalBuffer` to form the result
+          // fixed-length byte array.
+          val signByte = if (bytes.head < 0) -1: Byte else 0: Byte
+          util.Arrays.fill(decimalBuffer, 0, numBytes - bytes.length, signByte)
+          System.arraycopy(
+              bytes, 0, decimalBuffer, numBytes - bytes.length, bytes.length)
+          decimalBuffer
+        }
 
-        recordConsumer.addBinary(
-            Binary.fromByteArray(fixedLengthBytes, 0, numBytes))
+      recordConsumer.addBinary(
+          Binary.fromByteArray(fixedLengthBytes, 0, numBytes))
     }
 
     writeLegacyParquetFormat match {
@@ -295,46 +289,44 @@ private[parquet] class CatalystWriteSupport
 
     def threeLevelArrayWriter(
         repeatedGroupName: String, elementFieldName: String): ValueWriter =
-      (row: SpecializedGetters, ordinal: Int) =>
-        {
-          val array = row.getArray(ordinal)
-          consumeGroup {
-            // Only creates the repeated field if the array is non-empty.
-            if (array.numElements() > 0) {
-              consumeField(repeatedGroupName, 0) {
-                var i = 0
-                while (i < array.numElements()) {
-                  consumeGroup {
-                    // Only creates the element field if the current array element is not null.
-                    if (!array.isNullAt(i)) {
-                      consumeField(elementFieldName, 0) {
-                        elementWriter.apply(array, i)
-                      }
+      (row: SpecializedGetters, ordinal: Int) => {
+        val array = row.getArray(ordinal)
+        consumeGroup {
+          // Only creates the repeated field if the array is non-empty.
+          if (array.numElements() > 0) {
+            consumeField(repeatedGroupName, 0) {
+              var i = 0
+              while (i < array.numElements()) {
+                consumeGroup {
+                  // Only creates the element field if the current array element is not null.
+                  if (!array.isNullAt(i)) {
+                    consumeField(elementFieldName, 0) {
+                      elementWriter.apply(array, i)
                     }
                   }
-                  i += 1
                 }
+                i += 1
               }
             }
           }
+        }
       }
 
     def twoLevelArrayWriter(repeatedFieldName: String): ValueWriter =
-      (row: SpecializedGetters, ordinal: Int) =>
-        {
-          val array = row.getArray(ordinal)
-          consumeGroup {
-            // Only creates the repeated field if the array is non-empty.
-            if (array.numElements() > 0) {
-              consumeField(repeatedFieldName, 0) {
-                var i = 0
-                while (i < array.numElements()) {
-                  elementWriter.apply(array, i)
-                  i += 1
-                }
+      (row: SpecializedGetters, ordinal: Int) => {
+        val array = row.getArray(ordinal)
+        consumeGroup {
+          // Only creates the repeated field if the array is non-empty.
+          if (array.numElements() > 0) {
+            consumeField(repeatedFieldName, 0) {
+              var i = 0
+              while (i < array.numElements()) {
+                elementWriter.apply(array, i)
+                i += 1
               }
             }
           }
+        }
       }
 
     (writeLegacyParquetFormat, arrayType.containsNull) match {

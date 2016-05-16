@@ -26,28 +26,33 @@ import org.apache.thrift.TBase
 
 abstract class HourlySuffixLzoCodec[T](prefix: String, dateRange: DateRange)(
     implicit @transient suppliedInjection: Injection[T, Array[Byte]])
-    extends HourlySuffixSource(prefix, dateRange) with LzoCodec[T] {
+    extends HourlySuffixSource(prefix, dateRange)
+    with LzoCodec[T] {
   val boxed = Externalizer(suppliedInjection)
   override lazy val injection = boxed.get
 }
 
 case class HourlySuffixLzoTsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with LzoTsv {
+    extends HourlySuffixSource(prefix, dateRange)
+    with LzoTsv {
   override val fields = fs
 }
 
 abstract class HourlySuffixLzoThrift[T <: TBase[_, _]: Manifest](
     prefix: String, dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with LzoThrift[T] {
+    extends HourlySuffixSource(prefix, dateRange)
+    with LzoThrift[T] {
   override def column = manifest[T].runtimeClass
 }
 
-abstract class HourlySuffixLzoProtobuf[T <: Message : Manifest](
+abstract class HourlySuffixLzoProtobuf[T <: Message: Manifest](
     prefix: String, dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with LzoProtobuf[T] {
+    extends HourlySuffixSource(prefix, dateRange)
+    with LzoProtobuf[T] {
   override def column = manifest[T].runtimeClass
 }
 
 abstract class HourlySuffixLzoText(prefix: String, dateRange: DateRange)
-    extends HourlySuffixSource(prefix, dateRange) with LzoText
+    extends HourlySuffixSource(prefix, dateRange)
+    with LzoText

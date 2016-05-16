@@ -63,7 +63,7 @@ class SparkConf(loadDefaults: Boolean) extends Cloneable with Logging {
   private[spark] def loadFromSystemProperties(silent: Boolean): SparkConf = {
     // Load any spark.* system properties
     for ((key, value) <- Utils.getSystemProperties
-                            if key.startsWith("spark.")) {
+         if key.startsWith("spark.")) {
       set(key, value, silent)
     }
     this
@@ -638,8 +638,7 @@ private[spark] object SparkConf extends Logging {
         DeprecatedConfig("spark.rpc", "2.0", "Not used any more.")
     )
 
-    Map(
-        configs.map { cfg =>
+    Map(configs.map { cfg =>
       (cfg.key -> cfg)
     }: _*)
   }
@@ -672,7 +671,7 @@ private[spark] object SparkConf extends Logging {
           AlternateConfig("spark.kryoserializer.buffer.mb",
                           "1.4",
                           translation = s =>
-                              s"${(s.toDouble * 1000).toInt}k")),
+                            s"${(s.toDouble * 1000).toInt}k")),
       "spark.kryoserializer.buffer.max" -> Seq(
           AlternateConfig("spark.kryoserializer.buffer.max.mb", "1.4")),
       "spark.shuffle.file.buffer" -> Seq(
@@ -693,8 +692,8 @@ private[spark] object SparkConf extends Logging {
           AlternateConfig("spark.akka.lookupTimeout", "1.4")),
       "spark.streaming.fileStream.minRememberDuration" -> Seq(
           AlternateConfig("spark.streaming.minRememberDuration", "1.5")),
-      "spark.yarn.max.executor.failures" -> Seq(
-          AlternateConfig("spark.yarn.max.worker.failures", "1.5")),
+      "spark.yarn.max.executor.failures" -> Seq(AlternateConfig(
+              "spark.yarn.max.worker.failures", "1.5")),
       "spark.memory.offHeap.enabled" -> Seq(
           AlternateConfig("spark.unsafe.offHeap", "1.6")),
       "spark.rpc.message.maxSize" -> Seq(

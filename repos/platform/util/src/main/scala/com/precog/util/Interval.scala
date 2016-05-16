@@ -19,7 +19,7 @@
  */
 package com.precog.util
 
-case class Interval[T : Ordering](start: Option[T], end: Option[T]) {
+case class Interval[T: Ordering](start: Option[T], end: Option[T]) {
   import scala.math.Ordered._
   def withStart(start: Option[T]) = Interval(start, end)
   def withEnd(end: Option[T]) = Interval(start, end)

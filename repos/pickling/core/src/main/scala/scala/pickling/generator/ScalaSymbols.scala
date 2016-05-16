@@ -367,7 +367,8 @@ private[pickling] class IrScalaSymbols[
   }
 
   private class ScalaIrConstructor(mthd: MethodSymbol, owner: ScalaIrClass)
-      extends ScalaIrMethod(mthd, owner) with IrConstructor {
+      extends ScalaIrMethod(mthd, owner)
+      with IrConstructor {
 
     override def returnType[U <: Universe with Singleton](
         u: Universe): u.Type = owner.tpe[u.type](u)

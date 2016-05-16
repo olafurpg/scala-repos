@@ -64,12 +64,14 @@ private[columnar] abstract class BasicColumnAccessor[JvmType](
 }
 
 private[columnar] class NullColumnAccessor(buffer: ByteBuffer)
-    extends BasicColumnAccessor[Any](buffer, NULL) with NullableColumnAccessor
+    extends BasicColumnAccessor[Any](buffer, NULL)
+    with NullableColumnAccessor
 
 private[columnar] abstract class NativeColumnAccessor[T <: AtomicType](
     override protected val buffer: ByteBuffer,
     override protected val columnType: NativeColumnType[T])
-    extends BasicColumnAccessor(buffer, columnType) with NullableColumnAccessor
+    extends BasicColumnAccessor(buffer, columnType)
+    with NullableColumnAccessor
     with CompressibleColumnAccessor[T]
 
 private[columnar] class BooleanColumnAccessor(buffer: ByteBuffer)

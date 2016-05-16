@@ -28,7 +28,8 @@ class ReplicatedMetricsSpecMultiJvmNode2 extends ReplicatedMetricsSpec
 class ReplicatedMetricsSpecMultiJvmNode3 extends ReplicatedMetricsSpec
 
 class ReplicatedMetricsSpec
-    extends MultiNodeSpec(ReplicatedMetricsSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatedMetricsSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatedMetricsSpec._
   import ReplicatedMetrics._

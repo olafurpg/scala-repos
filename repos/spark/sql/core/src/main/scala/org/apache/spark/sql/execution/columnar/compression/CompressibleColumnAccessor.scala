@@ -29,8 +29,8 @@ private[columnar] trait CompressibleColumnAccessor[T <: AtomicType]
 
   abstract override protected def initialize(): Unit = {
     super.initialize()
-    decoder = CompressionScheme(underlyingBuffer.getInt())
-      .decoder(buffer, columnType)
+    decoder =
+      CompressionScheme(underlyingBuffer.getInt()).decoder(buffer, columnType)
   }
 
   abstract override def hasNext: Boolean = super.hasNext || decoder.hasNext

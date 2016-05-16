@@ -12,7 +12,9 @@ import java.lang.reflect.InvocationTargetException
   * extensible (in the way we need it), and more Scala-like.
   */
 abstract class SimpleParentRunner[T](testClass: Class[_])
-    extends Runner with Filterable with Sortable {
+    extends Runner
+    with Filterable
+    with Sortable {
 
   private var _children: Seq[T] = null
   protected final def children = {

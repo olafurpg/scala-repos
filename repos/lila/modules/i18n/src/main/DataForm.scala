@@ -39,9 +39,10 @@ final class DataForm(keys: I18nKeys,
           }).flatten
       val translation = Translation(id = id,
                                     code = code,
-                                    text = sorted map {
-                                      case (key, trans) => key + "=" + trans
-                                    } mkString "\n",
+                                    text =
+                                      sorted map {
+                                        case (key, trans) => key + "=" + trans
+                                      } mkString "\n",
                                     comment = metadata.comment,
                                     author = user.some,
                                     createdAt = DateTime.now)

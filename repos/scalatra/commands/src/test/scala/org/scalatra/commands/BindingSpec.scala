@@ -412,7 +412,7 @@ class BindingSpec extends Specification {
     field(Right(Some(Extraction.decompose(s)))).value must_== v.toDate.success
   }
 
-  def newBinding[T : Manifest]: FieldDescriptor[T] =
+  def newBinding[T: Manifest]: FieldDescriptor[T] =
     FieldDescriptor[T](randomFieldName)
 
   def randomFieldName = "field_" + random

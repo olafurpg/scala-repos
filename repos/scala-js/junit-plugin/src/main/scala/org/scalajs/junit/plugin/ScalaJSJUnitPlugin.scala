@@ -101,7 +101,8 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
   }
 
   object ScalaJSJUnitPluginComponent
-      extends plugins.PluginComponent with transform.Transform
+      extends plugins.PluginComponent
+      with transform.Transform
       with Compat210Component {
 
     val global: Global = ScalaJSJUnitPlugin.this.global
@@ -434,7 +435,7 @@ class ScalaJSJUnitPlugin(val global: Global) extends NscPlugin {
       private def hasAnnotation(mtd: MethodSymbol, tpe: TypeSymbol): Boolean =
         mtd.annotations.exists(_.atp.typeSymbol == tpe)
 
-      private def mkNewInstance[T : TypeTag](params: List[Tree]): Apply =
+      private def mkNewInstance[T: TypeTag](params: List[Tree]): Apply =
         mkNewInstance(TypeTree(typeOf[T]), params)
 
       private def mkNewInstance(tpe: TypeTree, params: List[Tree]): Apply =

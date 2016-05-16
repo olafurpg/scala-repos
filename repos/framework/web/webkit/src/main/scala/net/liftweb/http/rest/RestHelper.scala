@@ -185,7 +185,8 @@ trait RestHelper extends LiftRules.DispatchPF {
       */
     def unapply(r: Req): Option[(List[String], Req)] =
       if (r.requestType.delete_? && testResponse_?(r))
-        Some(r.path.partPath -> r) else None
+        Some(r.path.partPath -> r)
+      else None
 
     def testResponse_?(r: Req): Boolean
   }
@@ -337,22 +338,21 @@ trait RestHelper extends LiftRules.DispatchPF {
         selection(r).isDefined && pf.isDefinedAt(r)
 
       def apply(r: Req): () => Box[LiftResponse] =
-        () =>
-          {
-            pf(r).box match {
-              case Full(resp) =>
-                val selType = selection(r).openOrThrowException(
-                    "Full because pass isDefinedAt")
-                if (cvt.isDefinedAt((selType, resp, r)))
-                  Full(cvt((selType, resp, r)))
-                else
-                  emptyToResp(ParamFailure("Unabled to convert the message",
-                                           Empty,
-                                           Empty,
-                                           500))
+        () => {
+          pf(r).box match {
+            case Full(resp) =>
+              val selType = selection(r).openOrThrowException(
+                  "Full because pass isDefinedAt")
+              if (cvt.isDefinedAt((selType, resp, r)))
+                Full(cvt((selType, resp, r)))
+              else
+                emptyToResp(ParamFailure("Unabled to convert the message",
+                                         Empty,
+                                         Empty,
+                                         500))
 
-              case e: EmptyBox => emptyToResp(e)
-            }
+            case e: EmptyBox => emptyToResp(e)
+          }
         }
     })
   }
@@ -373,8 +373,8 @@ trait RestHelper extends LiftRules.DispatchPF {
       implicit cvt: JxCvtPF[T]): Unit =
     serveType(jxSel)(pf)(cvt)
 
-  protected type JxCvtPF[T] = PartialFunction[
-      (JsonXmlSelect, T, Req), LiftResponse]
+  protected type JxCvtPF[T] =
+    PartialFunction[(JsonXmlSelect, T, Req), LiftResponse]
 
   /**
     * Serve a request returning either JSON or XML.
@@ -472,7 +472,8 @@ trait RestHelper extends LiftRules.DispatchPF {
       */
     def unapply(r: Req): Option[(List[String], (T, Req))] =
       if (r.put_? && testResponse_?(r))
-        body(r).toOption.map(b => (r.path.partPath -> (b -> r))) else None
+        body(r).toOption.map(b => (r.path.partPath -> (b -> r)))
+      else None
 
     def testResponse_?(r: Req): Boolean
 
@@ -544,17 +545,15 @@ trait RestHelper extends LiftRules.DispatchPF {
       implicit asyncResolveProvider: CanResolveAsync[AsyncResolvableType, T],
       responseCreator: T => LiftResponse
   ): () => Box[LiftResponse] =
-    () =>
-      {
-        RestContinuation.async(
-            reply =>
-              {
-            asyncResolveProvider.resolveAsync(
-                asyncContainer, { resolved =>
-                  reply(responseCreator(resolved))
-                }
-            )
-        })
+    () => {
+      RestContinuation.async(
+          reply => {
+        asyncResolveProvider.resolveAsync(
+            asyncContainer, { resolved =>
+              reply(responseCreator(resolved))
+            }
+        )
+      })
     }
 
   /**
@@ -571,17 +570,15 @@ trait RestHelper extends LiftRules.DispatchPF {
           AsyncResolvableType, Box[T]],
       responseCreator: T => LiftResponse
   ): () => Box[LiftResponse] =
-    () =>
-      {
-        RestContinuation.async(
-            reply =>
-              {
-            asyncResolveProvider.resolveAsync(
-                asyncBoxContainer, { resolvedBox =>
-                  boxToResp(resolvedBox).apply() openOr NotFoundResponse()
-                }
-            )
-        })
+    () => {
+      RestContinuation.async(
+          reply => {
+        asyncResolveProvider.resolveAsync(
+            asyncBoxContainer, { resolvedBox =>
+              boxToResp(resolvedBox).apply() openOr NotFoundResponse()
+            }
+        )
+      })
     }
 
   /**
@@ -590,8 +587,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * messages from Failure() and return codes and messages
     * from ParamFailure[Int[(msg, _, _, code) 
     */
-  protected implicit def boxToResp[T](in: Box[T])(
-      implicit c: T => LiftResponse): () => Box[LiftResponse] =
+  protected implicit def boxToResp[T](
+      in: Box[T])(implicit c: T => LiftResponse): () => Box[LiftResponse] =
     in match {
       case Full(v) =>
         () =>
@@ -621,8 +618,8 @@ trait RestHelper extends LiftRules.DispatchPF {
     * Turn an Option[T] into the return type expected by
     * DispatchPF.
     */
-  protected implicit def optionToResp[T](
-      in: Option[T])(implicit c: T => LiftResponse): () => Box[LiftResponse] =
+  protected implicit def optionToResp[T](in: Option[T])(
+      implicit c: T => LiftResponse): () => Box[LiftResponse] =
     in match {
       case Some(v) =>
         () =>
@@ -640,23 +637,22 @@ trait RestHelper extends LiftRules.DispatchPF {
     */
   protected implicit def boxFuncToResp[T](in: () => Box[T])(
       implicit c: T => LiftResponse): () => Box[LiftResponse] =
-    () =>
-      {
-        in() match {
-          case ParamFailure(msg, _, _, code: Int) =>
-            Full(
-                InMemoryResponse(
-                    msg.getBytes("UTF-8"),
-                    ("Content-Type" -> "text/plain; charset=utf-8") :: Nil,
-                    Nil,
-                    code))
+    () => {
+      in() match {
+        case ParamFailure(msg, _, _, code: Int) =>
+          Full(
+              InMemoryResponse(
+                  msg.getBytes("UTF-8"),
+                  ("Content-Type" -> "text/plain; charset=utf-8") :: Nil,
+                  Nil,
+                  code))
 
-          case Failure(msg, _, _) =>
-            Full(NotFoundResponse(msg))
+        case Failure(msg, _, _) =>
+          Full(NotFoundResponse(msg))
 
-          case Full(v) => Full(c(v))
-          case _ => Empty
-        }
+        case Full(v) => Full(c(v))
+        case _ => Empty
+      }
     }
 
   /**

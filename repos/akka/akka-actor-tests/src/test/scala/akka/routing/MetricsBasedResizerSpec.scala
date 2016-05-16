@@ -70,7 +70,8 @@ object MetricsBasedResizerSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsBasedResizerSpec
-    extends AkkaSpec(ResizerSpec.config) with DefaultTimeout
+    extends AkkaSpec(ResizerSpec.config)
+    with DefaultTimeout
     with ImplicitSender {
 
   override def atStartup: Unit = {
@@ -89,8 +90,8 @@ class MetricsBasedResizerSpec
     "be false if the last resize is too close within actionInterval enough history" in {
       val resizer =
         DefaultOptimalSizeExploringResizer(actionInterval = 10.seconds)
-      resizer.record = ResizeRecord(
-          checkTime = System.nanoTime() - 8.seconds.toNanos)
+      resizer.record =
+        ResizeRecord(checkTime = System.nanoTime() - 8.seconds.toNanos)
 
       resizer.isTimeForResize(100) should ===(false)
     }
@@ -98,8 +99,8 @@ class MetricsBasedResizerSpec
     "be true if the last resize is before actionInterval ago" in {
       val resizer =
         DefaultOptimalSizeExploringResizer(actionInterval = 10.seconds)
-      resizer.record = ResizeRecord(
-          checkTime = System.nanoTime() - 11.seconds.toNanos)
+      resizer.record =
+        ResizeRecord(checkTime = System.nanoTime() - 11.seconds.toNanos)
 
       resizer.isTimeForResize(100) should ===(true)
     }
@@ -142,8 +143,8 @@ class MetricsBasedResizerSpec
     "stop an underutilizationStreak when fully utilized" in {
       val resizer = DefaultOptimalSizeExploringResizer()
       resizer.record = ResizeRecord(underutilizationStreak = Some(
-                UnderUtilizationStreak(start = LocalDateTime.now.minusHours(1),
-                                       highestUtilization = 1)))
+              UnderUtilizationStreak(start = LocalDateTime.now.minusHours(1),
+                                     highestUtilization = 1)))
 
       val router = TestRouter(routees(2))
       router.sendToAll(await = true)
@@ -158,7 +159,7 @@ class MetricsBasedResizerSpec
       val start: LocalDateTime = LocalDateTime.now.minusHours(1)
       val resizer = DefaultOptimalSizeExploringResizer()
       resizer.record = ResizeRecord(underutilizationStreak = Some(
-                UnderUtilizationStreak(start = start, highestUtilization = 1)))
+              UnderUtilizationStreak(start = start, highestUtilization = 1)))
 
       resizer.reportMessageCount(routees(2), 0)
       resizer.record.underutilizationStreak.get.start shouldBe start
@@ -166,8 +167,8 @@ class MetricsBasedResizerSpec
 
     "leave the underutilizationStreak highestUtilization unchanged if current utilization is lower" in {
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record = ResizeRecord(
-          underutilizationStreak = Some(UnderUtilizationStreak(
+      resizer.record =
+        ResizeRecord(underutilizationStreak = Some(UnderUtilizationStreak(
                     start = LocalDateTime.now, highestUtilization = 2)))
 
       val router = TestRouter(routees(2))
@@ -181,8 +182,8 @@ class MetricsBasedResizerSpec
 
     "update the underutilizationStreak highestUtilization if current utilization is higher" in {
       val resizer = DefaultOptimalSizeExploringResizer()
-      resizer.record = ResizeRecord(
-          underutilizationStreak = Some(UnderUtilizationStreak(
+      resizer.record =
+        ResizeRecord(underutilizationStreak = Some(UnderUtilizationStreak(
                     start = LocalDateTime.now, highestUtilization = 1)))
 
       val router = TestRouter(routees(3))
@@ -300,10 +301,9 @@ class MetricsBasedResizerSpec
       val resizer = DefaultOptimalSizeExploringResizer(
           downsizeAfterUnderutilizedFor = 72.hours, downsizeRatio = 0.5)
 
-      resizer.record = ResizeRecord(
-          underutilizationStreak = Some(UnderUtilizationStreak(
-                    start = LocalDateTime.now.minusHours(73),
-                    highestUtilization = 8)))
+      resizer.record = ResizeRecord(underutilizationStreak = Some(
+              UnderUtilizationStreak(start = LocalDateTime.now.minusHours(73),
+                                     highestUtilization = 8)))
       resizer.resize(routees(20)) should be(4 - 20)
     }
 
@@ -339,8 +339,8 @@ class MetricsBasedResizerSpec
     "optimize towards the fastest pool size" in {
       val resizer =
         DefaultOptimalSizeExploringResizer(explorationProbability = 0)
-      resizer.performanceLog = Map(
-          7 → 5.millis, 10 → 3.millis, 11 → 2.millis, 12 → 4.millis)
+      resizer.performanceLog =
+        Map(7 → 5.millis, 10 → 3.millis, 11 → 2.millis, 12 → 4.millis)
       resizer.resize(routees(10)) should be(1)
       resizer.resize(routees(12)) should be(-1)
       resizer.resize(routees(7)) should be(2)

@@ -11,7 +11,7 @@ object StateMetrics {
                                       prefix: String,
                                       metricsClass: Class[_],
                                       nanoTime: () => Long = () =>
-                                          System.nanoTime) {
+                                        System.nanoTime) {
     def timedFuture[T](f: => Future[T]): Future[T] = {
       requestMeter.mark()
       val t0 = nanoTime()

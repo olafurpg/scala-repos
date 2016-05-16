@@ -30,7 +30,8 @@ trait FastaByteStream {
 // extend the Java BufferedInputStream class
 
 final class FastaInputStream(in: InputStream)
-    extends BufferedInputStream(in) with FastaByteStream {
+    extends BufferedInputStream(in)
+    with FastaByteStream {
 
   val gt = '>'.toByte
   val sc = ';'.toByte
@@ -87,7 +88,8 @@ final class FastaInputStream(in: InputStream)
 // extend the Java BufferedOutputStream class
 
 final class FastaOutputStream(in: OutputStream)
-    extends BufferedOutputStream(in) with FastaByteStream {
+    extends BufferedOutputStream(in)
+    with FastaByteStream {
 
   private val IUB = IUBCodeComplements
 

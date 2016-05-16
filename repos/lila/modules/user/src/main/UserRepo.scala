@@ -417,20 +417,20 @@ object UserRepo {
     implicit def perfsHandler = Perfs.perfsBSONHandler
     import lila.db.BSON.BSONJodaDateTimeHandler
 
-    BSONDocument(F.id -> normalize(username),
-                 F.username -> username,
-                 F.email -> email,
-                 F.mustConfirmEmail ->
-                 (email.isDefined &&
-                     mobileApiVersion.isEmpty).option(DateTime.now),
-                 "password" -> hash(password, salt),
-                 "salt" -> salt,
-                 F.perfs -> Json.obj(),
-                 F.count -> Count.default,
-                 F.enabled -> true,
-                 F.createdAt -> DateTime.now,
-                 F.createdWithApiVersion -> mobileApiVersion,
-                 F.seenAt -> DateTime.now) ++ {
+    BSONDocument(
+        F.id -> normalize(username),
+        F.username -> username,
+        F.email -> email,
+        F.mustConfirmEmail ->
+        (email.isDefined && mobileApiVersion.isEmpty).option(DateTime.now),
+        "password" -> hash(password, salt),
+        "salt" -> salt,
+        F.perfs -> Json.obj(),
+        F.count -> Count.default,
+        F.enabled -> true,
+        F.createdAt -> DateTime.now,
+        F.createdWithApiVersion -> mobileApiVersion,
+        F.seenAt -> DateTime.now) ++ {
       if (blind) BSONDocument("blind" -> true) else BSONDocument()
     }
   }

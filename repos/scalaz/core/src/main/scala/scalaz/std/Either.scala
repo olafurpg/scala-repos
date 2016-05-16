@@ -41,17 +41,21 @@ sealed trait EitherInstances0 {
       implicit A0: Equal[A]): Equal[LeftProjection[A, X] @@ Last] =
     Last.subst(Equal[LeftProjection[A, X]])
 
-  implicit def eitherFirstLeftSemigroup[A : Semigroup, X]: Semigroup[
-      LeftProjection[A, X] @@ First] = new EitherFirstLeftSemigroup[A, X] {}
+  implicit def eitherFirstLeftSemigroup[A: Semigroup, X]
+    : Semigroup[LeftProjection[A, X] @@ First] =
+    new EitherFirstLeftSemigroup[A, X] {}
 
-  implicit def eitherFirstRightSemigroup[X, A : Semigroup]: Semigroup[
-      RightProjection[X, A] @@ First] = new EitherFirstRightSemigroup[X, A] {}
+  implicit def eitherFirstRightSemigroup[X, A: Semigroup]
+    : Semigroup[RightProjection[X, A] @@ First] =
+    new EitherFirstRightSemigroup[X, A] {}
 
-  implicit def eitherLastLeftSemigroup[A : Semigroup, X]: Semigroup[
-      LeftProjection[A, X] @@ Last] = new EitherLastLeftSemigroup[A, X] {}
+  implicit def eitherLastLeftSemigroup[A: Semigroup, X]
+    : Semigroup[LeftProjection[A, X] @@ Last] =
+    new EitherLastLeftSemigroup[A, X] {}
 
-  implicit def eitherLastRightSemigroup[X, A : Semigroup]: Semigroup[
-      RightProjection[X, A] @@ Last] = new EitherLastRightSemigroup[X, A] {}
+  implicit def eitherLastRightSemigroup[X, A: Semigroup]
+    : Semigroup[RightProjection[X, A] @@ Last] =
+    new EitherLastRightSemigroup[X, A] {}
 
   implicit def eitherLeftSemigroup[A, X](
       implicit SemigroupA: Semigroup[A],
@@ -142,13 +146,13 @@ trait EitherInstances extends EitherInstances0 {
     LeftProjectionIso2.unlift1[E]
 
   /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
-  def FirstLeftProjectionEIso2[
-      E]: λ[α => LeftProjection[E, α] @@ First] <~> Either[E, ?] =
+  def FirstLeftProjectionEIso2[E]
+    : λ[α => LeftProjection[E, α] @@ First] <~> Either[E, ?] =
     FirstLeftProjectionIso2.unlift1[E]
 
   /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
-  def LastLeftProjectionEIso2[
-      E]: λ[α => LeftProjection[E, α] @@ Last] <~> Either[E, ?] =
+  def LastLeftProjectionEIso2[E]
+    : λ[α => LeftProjection[E, α] @@ Last] <~> Either[E, ?] =
     LastLeftProjectionIso2.unlift1[E]
 
   /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
@@ -178,13 +182,13 @@ trait EitherInstances extends EitherInstances0 {
     RightProjectionIso2.unlift2[A]
 
   /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
-  def FirstRightProjectionAIso2[
-      A]: λ[α => RightProjection[α, A] @@ First] <~> Either[?, A] =
+  def FirstRightProjectionAIso2[A]
+    : λ[α => RightProjection[α, A] @@ First] <~> Either[?, A] =
     FirstRightProjectionIso2.unlift2[A]
 
   /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
-  def LastRightProjectionAIso2[
-      A]: λ[α => RightProjection[α, A] @@ Last] <~> Either[?, A] =
+  def LastRightProjectionAIso2[A]
+    : λ[α => RightProjection[α, A] @@ Last] <~> Either[?, A] =
     LastRightProjectionIso2.unlift2[A]
 
   /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
@@ -236,13 +240,13 @@ trait EitherInstances extends EitherInstances0 {
       }
     }
 
-  implicit def eitherFirstRightLInstance[L]: Monad[
-      λ[α => RightProjection[L, α] @@ First]] =
+  implicit def eitherFirstRightLInstance[L]
+    : Monad[λ[α => RightProjection[L, α] @@ First]] =
     Tags.First
       .subst1[Monad, RightProjection[L, ?]](Monad[RightProjection[L, ?]])
 
-  implicit def eitherLastRightLInstance[
-      L]: Monad[λ[α => RightProjection[L, α] @@ Last]] =
+  implicit def eitherLastRightLInstance[L]
+    : Monad[λ[α => RightProjection[L, α] @@ Last]] =
     Tags.Last
       .subst1[Monad, RightProjection[L, ?]](Monad[RightProjection[L, ?]])
 
@@ -256,12 +260,12 @@ trait EitherInstances extends EitherInstances0 {
         }
     }
 
-  implicit def eitherFirstLeftRInstance[R]: Monad[
-      λ[α => LeftProjection[α, R] @@ First]] =
+  implicit def eitherFirstLeftRInstance[R]
+    : Monad[λ[α => LeftProjection[α, R] @@ First]] =
     Tags.First.subst1[Monad, LeftProjection[?, R]](Monad[LeftProjection[?, R]])
 
-  implicit def eitherLastLeftRInstance[R]: Monad[
-      λ[α => LeftProjection[α, R] @@ Last]] =
+  implicit def eitherLastLeftRInstance[R]
+    : Monad[λ[α => LeftProjection[α, R] @@ Last]] =
     Tags.Last.subst1[Monad, LeftProjection[?, R]](Monad[LeftProjection[?, R]])
 
   implicit def eitherOrder[A, B](
@@ -484,7 +488,8 @@ private trait EitherLastLeftMonoid[A, X]
 }
 
 private trait EitherLeftMonoid[A, X]
-    extends Monoid[LeftProjection[A, X]] with EitherLeftSemigroup[A, X] {
+    extends Monoid[LeftProjection[A, X]]
+    with EitherLeftSemigroup[A, X] {
   implicit def X: Monoid[X]
 
   def zero: LeftProjection[A, X] = Right(Monoid[X].zero).left
@@ -507,14 +512,16 @@ private trait EitherLastRightMonoid[X, A]
 }
 
 private trait EitherRightMonoid[X, A]
-    extends Monoid[RightProjection[X, A]] with EitherRightSemigroup[X, A] {
+    extends Monoid[RightProjection[X, A]]
+    with EitherRightSemigroup[X, A] {
   implicit def X: Monoid[X]
 
   def zero: RightProjection[X, A] = Left(Monoid[X].zero).right
 }
 
 private trait EitherOrder[A, B]
-    extends Order[Either[A, B]] with EitherEqual[A, B] {
+    extends Order[Either[A, B]]
+    with EitherEqual[A, B] {
   implicit def A: Order[A]
   implicit def B: Order[B]
 
@@ -529,7 +536,8 @@ private trait EitherOrder[A, B]
 }
 
 private trait EitherLeftOrder[A, X]
-    extends Order[LeftProjection[A, X]] with EitherLeftEqual[A, X] {
+    extends Order[LeftProjection[A, X]]
+    with EitherLeftEqual[A, X] {
   implicit def A: Order[A]
 
   import Ordering._
@@ -544,7 +552,8 @@ private trait EitherLeftOrder[A, X]
 }
 
 private trait EitherRightOrder[X, A]
-    extends Order[RightProjection[X, A]] with EitherRightEqual[X, A] {
+    extends Order[RightProjection[X, A]]
+    with EitherRightEqual[X, A] {
   implicit def A: Order[A]
 
   import Ordering._

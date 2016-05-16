@@ -174,11 +174,12 @@ object Netty3Transporter {
         label,
         pipelineFactory,
         newChannel = cf.newChannel(_),
-        newTransport = (ch: Channel) =>
-            Transport.cast[In, Out](newTransport(ch)),
-        tlsConfig = tls map {
-          case engine => Netty3TransporterTLSConfig(engine, tlsHostname)
-        },
+        newTransport =
+          (ch: Channel) => Transport.cast[In, Out](newTransport(ch)),
+        tlsConfig =
+          tls map {
+            case engine => Netty3TransporterTLSConfig(engine, tlsHostname)
+          },
         httpProxy = httpProxy,
         httpProxyCredentials = httpProxyCredentials,
         socksProxy = socksProxy,
@@ -283,17 +284,20 @@ private[netty3] object FireChannelClosedLater extends ChannelFutureListener {
 case class Netty3Transporter[In, Out](
     name: String,
     pipelineFactory: ChannelPipelineFactory,
-    newChannel: ChannelPipeline => Channel = Netty3Transporter.channelFactory.newChannel,
+    newChannel: ChannelPipeline => Channel =
+      Netty3Transporter.channelFactory.newChannel,
     newTransport: Channel => Transport[In, Out] = (ch: Channel) =>
-        Transport.cast[In, Out](new ChannelTransport[Any, Any](ch)),
+      Transport.cast[In, Out](new ChannelTransport[Any, Any](ch)),
     tlsConfig: Option[Netty3TransporterTLSConfig] = None,
     httpProxy: Option[SocketAddress] = None,
     socksProxy: Option[SocketAddress] = SocksProxyFlags.socksProxy,
-    socksUsernameAndPassword: Option[(String, String)] = SocksProxyFlags.socksUsernameAndPassword,
+    socksUsernameAndPassword: Option[(String, String)] =
+      SocksProxyFlags.socksUsernameAndPassword,
     channelReaderTimeout: Duration = Duration.Top,
     channelWriterTimeout: Duration = Duration.Top,
     channelSnooper: Option[ChannelSnooper] = None,
-    channelOptions: Map[String, Object] = Netty3Transporter.defaultChannelOptions,
+    channelOptions: Map[String, Object] =
+      Netty3Transporter.defaultChannelOptions,
     httpProxyCredentials: Option[Transporter.Credentials] = None
 )
     extends ((SocketAddress, StatsReceiver) => Future[Transport[In, Out]]) {

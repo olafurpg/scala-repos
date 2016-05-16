@@ -27,7 +27,9 @@ import org.scalatest.concurrent.Eventually._
 import org.apache.spark.JobExecutionStatus._
 
 class StatusTrackerSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   test("basic status API usage") {
     sc = new SparkContext("local", "test", new SparkConf(false))

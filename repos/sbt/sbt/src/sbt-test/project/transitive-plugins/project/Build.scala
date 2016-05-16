@@ -9,8 +9,8 @@ object Build extends Build {
   lazy val c = project("c")
   def project(s: String) =
     Project(s, file(s)) settings
-    (ivyPaths <<= (baseDirectory in root, target in root)(
-            (dir, t) => new IvyPaths(dir, Some(t / "ivy-cache"))),
+    (ivyPaths <<= (baseDirectory in root, target in root)((dir, t) =>
+              new IvyPaths(dir, Some(t / "ivy-cache"))),
         resolvers <+= appConfiguration { app =>
           // need this to resolve sbt
           val ivyHome =

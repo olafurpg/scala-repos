@@ -13,7 +13,8 @@ object ActorContextSpec {
   sealed trait Event
 
   final case class GotSignal(signal: Signal)
-      extends Event with DeadLetterSuppression
+      extends Event
+      with DeadLetterSuppression
 
   final case class Ping(replyTo: ActorRef[Pong]) extends Command
   sealed trait Pong extends Event
@@ -199,8 +200,8 @@ class ActorContextSpec
 
     def setup(name: String)(
         proc: (ActorContext[Event],
-        StepWise.Steps[Event, ActorRef[Command]]) ⇒ StepWise.Steps[Event, _])
-      : Future[TypedSpec.Status] =
+               StepWise.Steps[Event, ActorRef[Command]]) ⇒ StepWise.Steps[
+            Event, _]): Future[TypedSpec.Status] =
       runTest(s"$suite-$name")(
           StepWise[Event] { (ctx, startWith) ⇒
         val steps = startWith
@@ -250,10 +251,10 @@ class ActorContextSpec
 
     private implicit class MessageStep[T](
         val startWith: StepWise.Steps[Event, T]) {
-      def stimulate(
-          f: T ⇒ Unit,
-          ev: T ⇒ Event,
-          timeout: FiniteDuration = 500.millis): StepWise.Steps[Event, T] =
+      def stimulate(f: T ⇒ Unit,
+                    ev: T ⇒ Event,
+                    timeout: FiniteDuration =
+                      500.millis): StepWise.Steps[Event, T] =
         startWith.keep(f).expectMessageKeep(timeout) { (msg, v) ⇒
           msg should ===(ev(v))
         }

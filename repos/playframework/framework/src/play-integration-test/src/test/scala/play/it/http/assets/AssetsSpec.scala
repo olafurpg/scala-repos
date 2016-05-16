@@ -15,10 +15,12 @@ import play.it._
 
 object NettyAssetsSpec extends AssetsSpec with NettyIntegrationSpecification
 object AkkaHttpAssetsSpec
-    extends AssetsSpec with AkkaHttpIntegrationSpecification
+    extends AssetsSpec
+    with AkkaHttpIntegrationSpecification
 
 trait AssetsSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential

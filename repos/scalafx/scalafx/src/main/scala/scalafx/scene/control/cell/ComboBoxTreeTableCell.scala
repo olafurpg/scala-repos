@@ -113,7 +113,8 @@ object ComboBoxTreeTableCell {
     * $SATISFY
     */
   @deprecated(
-      message = "Use forTreeTableColumn[S, T](StringConverter[S, T], ObservableBuffer[S, T])",
+      message =
+        "Use forTreeTableColumn[S, T](StringConverter[S, T], ObservableBuffer[S, T])",
       since = "8.0")
   def forTreeTableColumn[S, T](
       converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
@@ -182,8 +183,9 @@ object ComboBoxTreeTableCell {
   * @define CONVPARAM A $STCV that can convert an item of type T into a user-readable string so that it may then be shown in the $CMBX popup menu.
   * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user.
   */
-class ComboBoxTreeTableCell[S, T](override val delegate: jfxscc.ComboBoxTreeTableCell[
-        S, T] = new jfxscc.ComboBoxTreeTableCell[S, T])
+class ComboBoxTreeTableCell[S, T](
+    override val delegate: jfxscc.ComboBoxTreeTableCell[S, T] =
+      new jfxscc.ComboBoxTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.ComboBoxTreeTableCell[S, T], T, T]
     with ComboBoxEditableCell[jfxscc.ComboBoxTreeTableCell[S, T], T]

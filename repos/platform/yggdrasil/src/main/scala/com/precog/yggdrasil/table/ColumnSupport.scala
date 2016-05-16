@@ -36,8 +36,8 @@ class BitsetColumn(definedAt: BitSet) {
   override def toString = {
     val limit = definedAt.max
     val repr = (row: Int) => if (definedAt(row)) 'x' else '_'
-    getClass.getName + "(" + (0 until limit).map(repr).mkString("[", ",", "]") +
-    ", " + limit + ")"
+    getClass.getName + "(" +
+    (0 until limit).map(repr).mkString("[", ",", "]") + ", " + limit + ")"
   }
 }
 
@@ -100,7 +100,8 @@ class IntersectLotsColumn[T <: Column](cols: Array[T]) {
 }
 
 class AndLotsColumn(cols: Array[BoolColumn])
-    extends UnionLotsColumn[BoolColumn](cols) with BoolColumn {
+    extends UnionLotsColumn[BoolColumn](cols)
+    with BoolColumn {
   def apply(row: Int): Boolean = {
     var result = true
     var i = 0
@@ -113,7 +114,8 @@ class AndLotsColumn(cols: Array[BoolColumn])
 }
 
 class OrLotsColumn(cols: Array[BoolColumn])
-    extends UnionLotsColumn[BoolColumn](cols) with BoolColumn {
+    extends UnionLotsColumn[BoolColumn](cols)
+    with BoolColumn {
   def apply(row: Int): Boolean = {
     var result = false
     var i = 0
@@ -128,8 +130,7 @@ class OrLotsColumn(cols: Array[BoolColumn])
 class ConcatColumn[T <: Column](at: Int, c1: T, c2: T) {
   this: T =>
   def isDefinedAt(row: Int) =
-    row >= 0 &&
-    ((row < at && c1.isDefinedAt(row)) ||
+    row >= 0 && ((row < at && c1.isDefinedAt(row)) ||
         (row >= at && c2.isDefinedAt(row - at)))
 }
 

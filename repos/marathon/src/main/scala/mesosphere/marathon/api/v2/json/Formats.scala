@@ -50,9 +50,15 @@ object Formats extends Formats {
 }
 
 trait Formats
-    extends AppAndGroupFormats with HealthCheckFormats with FetchUriFormats
-    with ContainerFormats with DeploymentFormats with EventFormats
-    with EventSubscribersFormats with PluginFormats with IpAddressFormats {
+    extends AppAndGroupFormats
+    with HealthCheckFormats
+    with FetchUriFormats
+    with ContainerFormats
+    with DeploymentFormats
+    with EventFormats
+    with EventSubscribersFormats
+    with PluginFormats
+    with IpAddressFormats {
 
   implicit lazy val TaskFailureWrites: Writes[TaskFailure] = Writes {
     failure =>
@@ -633,10 +639,10 @@ trait AppAndGroupFormats {
           .asSeconds ~ (__ \ "container").readNullable[Container] ~
         (__ \ "healthChecks")
           .readNullable[Set[HealthCheck]]
-          .withDefault(AppDefinition.DefaultHealthChecks))((id, cmd, args,
-        maybeString, env, instances, cpus, mem, disk, executor, constraints,
-        storeUrls, requirePorts, backoff, backoffFactor, maxLaunchDelay,
-        container, checks) =>
+          .withDefault(AppDefinition.DefaultHealthChecks))(
+        (id, cmd, args, maybeString, env, instances, cpus, mem, disk,
+         executor, constraints, storeUrls, requirePorts,
+         backoff, backoffFactor, maxLaunchDelay, container, checks) =>
           AppDefinition(id = id,
                         cmd = cmd,
                         args = args,
@@ -675,7 +681,8 @@ trait AppAndGroupFormats {
         }
         def residencyOrDefault: Option[Residency] = {
           residency.orElse(if (app.persistentVolumes.nonEmpty)
-                Some(Residency.defaultResidency) else None)
+                Some(Residency.defaultResidency)
+              else None)
         }
       }
 
@@ -913,8 +920,8 @@ trait AppAndGroupFormats {
     val statsJson =
       Json.obj("counts" -> TaskCountsWritesWithoutPrefix.writes(stats.counts))
     Json.obj(
-        "stats" -> stats.maybeLifeTime.fold(ifEmpty = statsJson)(
-            lifeTime => statsJson ++ Json.obj("lifeTime" -> lifeTime))
+        "stats" -> stats.maybeLifeTime.fold(ifEmpty = statsJson)(lifeTime =>
+              statsJson ++ Json.obj("lifeTime" -> lifeTime))
     )
   }
 
@@ -938,13 +945,13 @@ trait AppAndGroupFormats {
 
     val maybeJson = Seq[Option[JsObject]](
         info.maybeCounts.map(TaskCountsWrites.writes(_).as[JsObject]),
-        info.maybeDeployments.map(
-            deployments => Json.obj("deployments" -> deployments)),
+        info.maybeDeployments.map(deployments =>
+              Json.obj("deployments" -> deployments)),
         info.maybeTasks.map(tasks => Json.obj("tasks" -> tasks)),
-        info.maybeLastTaskFailure.map(
-            lastFailure => Json.obj("lastTaskFailure" -> lastFailure)),
-        info.maybeTaskStats.map(
-            taskStats => Json.obj("taskStats" -> taskStats))
+        info.maybeLastTaskFailure.map(lastFailure =>
+              Json.obj("lastTaskFailure" -> lastFailure)),
+        info.maybeTaskStats.map(taskStats =>
+              Json.obj("taskStats" -> taskStats))
     ).flatten
 
     maybeJson.foldLeft(appJson)((result, obj) => result ++ obj)
@@ -982,10 +989,14 @@ trait AppAndGroupFormats {
         (__ \ "maxLaunchDelaySeconds").readNullable[Long].map(_.map(_.seconds)) ~
         (__ \ "container").readNullable[Container] ~ (__ \ "healthChecks")
           .readNullable[Set[HealthCheck]] ~ (__ \ "dependencies")
-          .readNullable[Set[PathId]])((id, cmd, args, user, env, instances,
-        cpus, mem, disk, executor, constraints, storeUrls, requirePorts,
-        backoffSeconds, backoffFactor, maxLaunchDelaySeconds, container,
-        healthChecks, dependencies) =>
+          .readNullable[Set[PathId]])((id,
+                                       cmd, args, user, env, instances,
+                                       cpus, mem, disk,
+                                       executor, constraints,
+                                       storeUrls, requirePorts, backoffSeconds,
+                                       backoffFactor, maxLaunchDelaySeconds,
+                                       container,
+                                       healthChecks, dependencies) =>
           AppUpdate(
               id = id,
               cmd = cmd,

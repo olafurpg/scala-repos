@@ -302,8 +302,7 @@ class Settings(
       *  the function result should be a humanly-understandable description of the type class
       */
     val knownTypeClasses: Map[String, String => String] =
-      Map() +
-      ("scala.math.Numeric" ->
+      Map() + ("scala.math.Numeric" ->
           ((tparam: String) =>
                 tparam +
               " is a numeric class, such as Int, Long, Float or Double")) +

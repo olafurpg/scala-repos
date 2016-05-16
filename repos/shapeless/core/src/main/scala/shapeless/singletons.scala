@@ -89,9 +89,9 @@ object NatWith {
   implicit def apply[TC[_ <: Nat]](i: Any): NatWith[TC] = macro SingletonTypeMacros
     .convertInstanceImplNat[TC]
 
-  implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](i: Int): NatWith[
-      ({ type λ[t <: Nat] = TC[T, t] })#λ] = macro SingletonTypeMacros
-    .convertInstanceImplNat1[B, T, TC]
+  implicit def apply2[B, T <: B, TC[_ <: B, _ <: Nat]](i: Int): NatWith[({
+        type λ[t <: Nat] = TC[T, t]
+      })#λ] = macro SingletonTypeMacros.convertInstanceImplNat1[B, T, TC]
 }
 
 /**
@@ -235,7 +235,8 @@ trait SingletonTypeUtils extends ReprTypes {
 
 @macrocompat.bundle
 class SingletonTypeMacros(val c: whitebox.Context)
-    extends SingletonTypeUtils with NatMacroDefns {
+    extends SingletonTypeUtils
+    with NatMacroDefns {
   import c.universe._
   import internal.decorators._
 
@@ -312,7 +313,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
             c.enclosingPosition, s"Type argument $tpe is not a singleton type")
     }
 
-  def materializeImpl[T : WeakTypeTag]: Tree = {
+  def materializeImpl[T: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T].dealias
     mkWitness(tpe, extractSingletonValue(tpe))
   }
@@ -384,8 +385,8 @@ class SingletonTypeMacros(val c: whitebox.Context)
     mkWitnessNat(parent, nTpe, n, iInst)
   }
 
-  def convertInstanceImpl1[TC[_]](
-      t: Tree)(implicit tcTag: WeakTypeTag[TC[_]]): Tree =
+  def convertInstanceImpl1[TC[_]](t: Tree)(
+      implicit tcTag: WeakTypeTag[TC[_]]): Tree =
     extractResult(t) { (sTpe, value) =>
       val tc = tcTag.tpe.typeConstructor
       val wwTC = typeOf[WitnessWith[Nothing]].typeConstructor
@@ -417,7 +418,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
       mkOps(tpe, mkWitness(tpe, tree))
     }
 
-  def narrowSymbol[S <: String : WeakTypeTag](t: Tree): Tree = {
+  def narrowSymbol[S <: String: WeakTypeTag](t: Tree): Tree = {
     (weakTypeOf[S], t) match {
       case (ConstantType(Constant(s1: String)), LiteralSymbol(s2))
           if s1 == s2 =>
@@ -436,7 +437,7 @@ class SingletonTypeMacros(val c: whitebox.Context)
     fieldTypeCarrier(tpe)
   }
 
-  def materializeWiden[T : WeakTypeTag, Out : WeakTypeTag]: Tree = {
+  def materializeWiden[T: WeakTypeTag, Out: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T].dealias
 
     val widenTpe = tpe match {

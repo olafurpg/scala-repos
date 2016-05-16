@@ -24,13 +24,13 @@ object Scaladoc extends AutoPlugin {
     settingKey[Boolean]("Validate generated scaladoc diagrams")
 
   override lazy val projectSettings = {
-    inTask(doc)(
-        Seq(
+    inTask(doc)(Seq(
             scalacOptions in Compile <++=
               (version, baseDirectory in ThisBuild) map scaladocOptions,
             autoAPIMappings := CliOptions.scaladocAutoAPI.get
         )) ++ Seq(validateDiagrams in Compile := true) ++ CliOptions.scaladocDiagramsEnabled
-      .ifTrue(doc in Compile := {
+      .ifTrue(
+        doc in Compile := {
       val docs = (doc in Compile).value
       if ((validateDiagrams in Compile).value) scaladocVerifier(docs)
       docs
@@ -108,14 +108,12 @@ object UnidocRoot extends AutoPlugin {
   override def trigger = noTrigger
 
   val akkaSettings = UnidocRoot.CliOptions.genjavadocEnabled
-    .ifTrue(
-        Seq(
+    .ifTrue(Seq(
             javacOptions in (JavaUnidoc, unidoc) ++= Seq("-Xdoclint:none"),
             // genjavadoc needs to generate synthetic methods since the java code uses them
             scalacOptions += "-P:genjavadoc:suppressSynthetic=false",
             // FIXME: see #18056
-            sources in (JavaUnidoc, unidoc) ~=
-            (_.filterNot(_.getPath.contains(
+            sources in (JavaUnidoc, unidoc) ~= (_.filterNot(_.getPath.contains(
                         "Access$minusControl$minusAllow$minusOrigin")))
         ))
     .getOrElse(Nil)
@@ -163,8 +161,7 @@ object Unidoc extends AutoPlugin {
             scalacOptions in Compile += "-P:genjavadoc:fabricateParams=true",
             unidocGenjavadocVersion in Global := "0.9",
             // FIXME: see #18056
-            sources in (Genjavadoc, doc) ~=
-            (_.filterNot(_.getPath.contains(
+            sources in (Genjavadoc, doc) ~= (_.filterNot(_.getPath.contains(
                         "Access$minusControl$minusAllow$minusOrigin")))
         )
     )

@@ -23,7 +23,8 @@ case class ServerError(what: String) extends Exception(what) with NoStacktrace
   * failure to interpret the request.
   */
 case class ServerApplicationError(what: String)
-    extends Exception(what) with NoStacktrace
+    extends Exception(what)
+    with NoStacktrace
 
 /**
   * Implements a dispatcher for a mux client. The dispatcher implements the bookkeeping
@@ -39,10 +40,9 @@ private[twitter] class ClientDispatcher(trans: Transport[Message, Message])
   private[this] val tags = TagSet(Message.Tags.MinTag to Message.Tags.MaxTag)
   private[this] val messages = TagMap[Updatable[Try[Message]]](tags)
 
-  private[this] val processAndRead: Message => Future[Unit] = msg =>
-    {
-      process(msg)
-      readLoop()
+  private[this] val processAndRead: Message => Future[Unit] = msg => {
+    process(msg)
+    readLoop()
   }
 
   /**

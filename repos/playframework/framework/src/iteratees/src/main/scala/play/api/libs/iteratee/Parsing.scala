@@ -48,8 +48,8 @@ object Parsing {
         if (piece.length < needleSize) {
           (previousMatches, piece)
         } else {
-          val fullMatch = Range(needleSize - 1, -1, -1)
-            .forall(scan => needle(scan) == piece(scan + startScan))
+          val fullMatch = Range(needleSize - 1, -1, -1).forall(scan =>
+                needle(scan) == piece(scan + startScan))
           if (fullMatch) {
             val (prefix, suffix) = piece.splitAt(startScan)
             val (matched, left) = suffix.splitAt(needleSize)
@@ -87,36 +87,37 @@ object Parsing {
             def inputOrEmpty(a: Array[Byte]) =
               if (a.isEmpty) Input.Empty else Input.El(a)
 
-            Iteratee.flatten(
-                inner.fold1(
-                    (a, e) =>
-                      Future.successful(Done(Done(a, e), inputOrEmpty(rest))),
-                    k =>
-                      {
-                    val (result, suffix) = scan(Nil, all, 0)
-                    val fed = result
-                      .filter(!_.content.isEmpty)
-                      .foldLeft(Future.successful(Array[Byte]() -> Cont(k))) {
-                        (p, m) =>
-                          p.flatMap(i =>
-                                i._2.fold1((a,
-                                           e) =>
-                                             Future.successful(
-                                                 (i._1 ++ m.content,
-                                                  Done(a, e))),
-                                           k =>
-                                             Future.successful(
-                                                 (i._1, k(Input.El(m)))),
-                                           (err, e) =>
-                                             throw new Exception())(dec))(dec)
-                      }
-                    fed.flatMap {
-                      case (ss, i) =>
-                        i.fold1(
-                            (a, e) =>
-                              Future
-                                .successful(
-                                  Done(Done(a, e),
+            Iteratee.flatten(inner
+                  .fold1((a, e) =>
+                           Future.successful(
+                               Done(Done(a, e), inputOrEmpty(rest))),
+                         k => {
+                       val (result, suffix) = scan(Nil, all, 0)
+                       val fed =
+                         result
+                           .filter(!_.content.isEmpty)
+                           .foldLeft(
+                               Future.successful(Array[Byte]() -> Cont(k))) {
+                             (p, m) =>
+                               p.flatMap(i =>
+                                     i._2.fold1(
+                                         (a, e) =>
+                                           Future.successful(
+                                               (i._1 ++ m.content,
+                                                Done(a, e))),
+                                         k =>
+                                           Future.successful(
+                                               (i._1, k(Input.El(m)))),
+                                         (err, e) =>
+                                           throw new Exception())(dec))(dec)
+                           }
+                       fed.flatMap {
+                         case (ss, i) =>
+                           i.fold1((a,
+                                    e) =>
+                                     Future
+                                       .successful(Done(
+                                             Done(a, e),
                                        inputOrEmpty(ss ++ suffix))),
                             k =>
                               Future.successful(
@@ -125,15 +126,14 @@ object Parsing {
                                       (in: Input[Array[Byte]]) =>
                                         in match {
                                   case Input.EOF =>
-                                    Done(k(Input.El(Unmatched(suffix))),
-                                         Input.EOF) //suffix maybe empty
-                                  case other =>
-                                    step(ss ++ suffix, Cont(k))(other)
-                              })),
-                            (err, e) => throw new Exception())(dec)
-                    }(dec)
-                },
-                    (err, e) => throw new Exception())(dec))
+                                       Done(k(Input.El(Unmatched(suffix))),
+                                            Input.EOF) //suffix maybe empty
+                                     case other =>
+                                       step(ss ++ suffix, Cont(k))(other) })),
+                                   (err, e) => throw new Exception())(dec)
+                       }(dec)
+                     },
+                         (err, e) => throw new Exception())(dec))
         }
       }
     }

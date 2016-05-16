@@ -31,8 +31,8 @@ class ScalaExtractMethodSettings(val methodName: String,
     var elem: PsiElement = elements.apply(0)
     val nextRange = nextSibling.getTextRange
     while (elem != null && !(elem.getTextRange.contains(nextRange) &&
-        !elem.getTextRange.equalsToRange(
-            nextRange.getStartOffset, nextRange.getEndOffset))) {
+               !elem.getTextRange.equalsToRange(nextRange.getStartOffset,
+                                                nextRange.getEndOffset))) {
       elem match {
         case tpo: ScTypeParametersOwner => tp ++= tpo.typeParameters
         case _ =>

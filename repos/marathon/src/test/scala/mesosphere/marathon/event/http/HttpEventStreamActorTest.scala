@@ -16,8 +16,12 @@ import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 import scala.concurrent.duration._
 
 class HttpEventStreamActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with MockitoSugar with ImplicitSender
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with MockitoSugar
+    with ImplicitSender
     with BeforeAndAfter {
 
   test("Register Handler") {

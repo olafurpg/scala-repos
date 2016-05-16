@@ -114,7 +114,7 @@ object TypeAdjuster extends ApplicationAdapter {
           for {
             oldRes <- info.resolve
             newRes <- newResolve
-                         if ScEquivalenceUtil.smartEquivalence(oldRes, newRes)
+            if ScEquivalenceUtil.smartEquivalence(oldRes, newRes)
           } yield {
             info.withNewText(withoutThisType)
           }
@@ -186,9 +186,9 @@ object TypeAdjuster extends ApplicationAdapter {
       case _ => None
     }
 
-  private def shortenReference(
-      info: ReplacementInfo,
-      useTypeAliases: Boolean = true): ReplacementInfo = {
+  private def shortenReference(info: ReplacementInfo,
+                               useTypeAliases: Boolean =
+                                 true): ReplacementInfo = {
     object hasStableReplacement {
       def unapply(rInfo: SimpleInfo): Option[ReplacementInfo] = {
         rInfo.resolve.flatMap { resolved =>
@@ -221,8 +221,8 @@ object TypeAdjuster extends ApplicationAdapter {
 
     info match {
       case cmp: CompoundInfo =>
-        cmp.copy(childInfos = cmp.childInfos.map(
-                  shortenReference(_, useTypeAliases)))
+        cmp.copy(childInfos =
+              cmp.childInfos.map(shortenReference(_, useTypeAliases)))
       case hasStableReplacement(rInfo) => rInfo
       case _ => info
     }
@@ -345,10 +345,8 @@ object TypeAdjuster extends ApplicationAdapter {
           if (needPrefix) {
             val words = qName.split('.')
             val withPrefix = words.takeRight(2).mkString(".")
-            val packageName = words
-              .dropRight(1)
-              .mkString(".")
-              (withPrefix, Some(packageName))
+            val packageName = words.dropRight(1).mkString(".")
+            (withPrefix, Some(packageName))
           } else (clazz.name, Some(qName))
         case _ => (target.name, ScalaNamesUtil.qualifiedName(target))
       }

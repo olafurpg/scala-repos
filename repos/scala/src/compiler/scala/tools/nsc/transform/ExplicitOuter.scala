@@ -17,7 +17,9 @@ import scala.collection.mutable.ListBuffer
   *  @version 1.0
   */
 abstract class ExplicitOuter
-    extends InfoTransform with TypingTransformers with ast.TreeDSL {
+    extends InfoTransform
+    with TypingTransformers
+    with ast.TreeDSL {
   import global._
   import definitions._
   import CODE._
@@ -228,7 +230,8 @@ abstract class ExplicitOuter
     *  The class provides methods for referencing via outer.
     */
   abstract class OuterPathTransformer(unit: CompilationUnit)
-      extends TypingTransformer(unit) with UnderConstructionTransformer {
+      extends TypingTransformer(unit)
+      with UnderConstructionTransformer {
 
     /** The directly enclosing outer parameter, if we are in a constructor */
     protected var outerParam: Symbol = NoSymbol

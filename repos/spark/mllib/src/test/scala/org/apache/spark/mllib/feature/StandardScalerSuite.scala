@@ -108,12 +108,12 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data1, data1RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data2, data2RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data3, data3RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
+    assert((data3, data3RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(summary1.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary1.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
@@ -180,12 +180,12 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data1, data1RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data2, data2RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
-    assert((data3, data3RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data1, data1RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
+    assert((data3, data3RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(summary1.mean ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary1.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
@@ -251,8 +251,8 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data2, data2RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)
@@ -298,8 +298,8 @@ class StandardScalerSuite extends SparkFunSuite with MLlibTestSparkContext {
       case _ => false
     }, "The vector type should be preserved after standardization.")
 
-    assert((data2, data2RDD.collect()).zipped
-          .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
+    assert((data2, data2RDD.collect()).zipped.forall((v1, v2) =>
+              v1 ~== v2 absTol 1E-5))
 
     assert(summary.mean !~== Vectors.dense(0.0, 0.0, 0.0) absTol 1E-5)
     assert(summary.variance ~== Vectors.dense(1.0, 1.0, 1.0) absTol 1E-5)

@@ -24,7 +24,7 @@ class Tokenizer(s: String, delimiters: String) extends Iterator[String] {
       if (isDelimiter(ch)) ch.toString()
       else {
         while (i < s.length() && s.charAt(i) > ' ' &&
-        !isDelimiter(s.charAt(i))) { i = i + 1 }
+               !isDelimiter(s.charAt(i))) { i = i + 1 }
         s.substring(start, i)
       }
     } else "";
@@ -148,8 +148,8 @@ object Programs {
         else Stream.empty
       case q :: query1 =>
         for (clause <- list2stream(clauses);
-        s1 <- tryClause(clause.newInstance, q, s);
-        s2 <- solve1(query1, s1)) yield s2
+             s1 <- tryClause(clause.newInstance, q, s);
+             s2 <- solve1(query1, s1)) yield s2
     }
 
     def solve1(query: List[Term], s: Subst): Stream[Subst] = {

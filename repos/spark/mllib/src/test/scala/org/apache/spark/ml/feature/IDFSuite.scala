@@ -27,7 +27,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class IDFSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   def scaleDataWithIDF(dataSet: Array[Vector], model: Vector): Array[Vector] = {

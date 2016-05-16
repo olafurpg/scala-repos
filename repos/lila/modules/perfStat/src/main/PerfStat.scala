@@ -26,8 +26,8 @@ case class PerfStat(_id: String, // userId/perfId
           highest = RatingAt.agg(highest, pov, 1),
           lowest = thisYear.fold(RatingAt.agg(lowest, pov, -1), lowest),
           bestWins = (~pov.win).fold(bestWins.agg(pov, -1), bestWins),
-          worstLosses = (thisYear &&
-                ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
+          worstLosses =
+            (thisYear && ~pov.loss).fold(worstLosses.agg(pov, 1), worstLosses),
           count = count(pov),
           resultStreak = resultStreak agg pov,
           playStreak = playStreak agg pov
@@ -49,8 +49,8 @@ object PerfStat {
       worstLosses = Results(Nil),
       count = Count.init,
       resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
-      playStreak = PlayStreak(
-            nb = Streaks.init, time = Streaks.init, lastDate = none)
+      playStreak =
+        PlayStreak(nb = Streaks.init, time = Streaks.init, lastDate = none)
   )
 }
 
@@ -93,11 +93,14 @@ case class Streak(v: Int, from: Option[RatingAt], to: Option[RatingAt]) {
   def apply(cont: Boolean, pov: Pov)(v: Int) =
     cont.fold(inc(pov, v), Streak.init)
   private def inc(pov: Pov, by: Int) =
-    copy(v = v + by, from = from orElse pov.player.rating.map {
-      RatingAt(_, pov.game.createdAt, pov.gameId)
-    }, to = pov.player.ratingAfter.map {
-      RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.gameId)
-    })
+    copy(v = v + by,
+         from =
+           from orElse pov.player.rating.map {
+             RatingAt(_, pov.game.createdAt, pov.gameId)
+           },
+         to = pov.player.ratingAfter.map {
+           RatingAt(_, pov.game.updatedAtOrCreatedAt, pov.gameId)
+         })
 }
 object Streak {
   val init = Streak(0, none, none)
@@ -124,14 +127,15 @@ case class Count(all: Int,
          tour = tour + pov.game.isTournament.fold(1, 0),
          berserk = berserk + pov.player.berserk.fold(1, 0),
          opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
-         seconds = seconds +
-           (pov.game.durationSeconds match {
-               case s if s > 3 * 60 * 60 => 0
-               case s => s
-             }),
-         disconnects = disconnects + {
-           ~pov.loss && pov.game.status == chess.Status.Timeout
-         }.fold(1, 0))
+         seconds =
+           seconds + (pov.game.durationSeconds match {
+                 case s if s > 3 * 60 * 60 => 0
+                 case s => s
+               }),
+         disconnects =
+           disconnects + {
+             ~pov.loss && pov.game.status == chess.Status.Timeout
+           }.fold(1, 0))
 }
 object Count {
   val init = Count(all = 0,
@@ -168,7 +172,8 @@ case class Results(results: List[Result]) {
   def agg(pov: Pov, comp: Int) =
     pov.opponent.rating.ifTrue(pov.game.rated).fold(this) { opInt =>
       copy(
-          results = (Result(
+          results =
+            (Result(
                     opInt,
                     UserId(~pov.opponent.userId),
                     pov.game.updatedAtOrCreatedAt,

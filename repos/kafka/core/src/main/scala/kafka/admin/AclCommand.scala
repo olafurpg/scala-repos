@@ -257,9 +257,9 @@ object AclCommand {
     else Set.empty[KafkaPrincipal]
   }
 
-  private def getResource(
-      opts: AclCommandOptions,
-      dieIfNoResourceFound: Boolean = true): Set[Resource] = {
+  private def getResource(opts: AclCommandOptions,
+                          dieIfNoResourceFound: Boolean =
+                            true): Set[Resource] = {
     var resources = Set.empty[Resource]
     if (opts.options.has(opts.topicOpt))
       opts.options

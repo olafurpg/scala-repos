@@ -29,14 +29,17 @@ trait Adaptations { self: Analyzer =>
         case Apply(_, arg :: Nil) => arg
         case _ => EmptyTree
       }
-      def callString = ((if (t.symbol.isConstructor) "new " else "") +
-          (t.symbol.owner.decodedName) +
-          (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
-           else "." + t.symbol.decodedName))
+      def callString =
+        ((if (t.symbol.isConstructor) "new " else "") +
+            (t.symbol.owner.decodedName) +
+            (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
+             else "." + t.symbol.decodedName))
       def sigString =
-        t.symbol.owner.decodedName +
-        (if (t.symbol.isConstructor) t.symbol.signatureString
-         else "." + t.symbol.decodedName + t.symbol.signatureString)
+        t.symbol.owner.decodedName + (if (t.symbol.isConstructor)
+                                        t.symbol.signatureString
+                                      else
+                                        "." + t.symbol.decodedName +
+                                        t.symbol.signatureString)
       def givenString = if (args.isEmpty) "<none>" else args.mkString(", ")
       def adaptedArgs =
         if (args.isEmpty) "(): Unit"

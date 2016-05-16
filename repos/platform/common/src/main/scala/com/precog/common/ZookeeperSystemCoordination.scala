@@ -77,7 +77,8 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
                                   uid: ServiceUID,
                                   yggCheckpointsEnabled: Boolean,
                                   createIfMissingFlag: Option[String])
-    extends SystemCoordination with Logging {
+    extends SystemCoordination
+    with Logging {
   import ZookeeperSystemCoordination._
 
   // Make it difficult to accidentally enable this
@@ -165,10 +166,10 @@ class ZookeeperSystemCoordination(private val zkc: ZkClient,
     }
   }
 
-  private def acquireActivePath(
-      base: String,
-      retries: Int = defaultRetries,
-      delay: Int = defaultDelay): Validation[Error, Unit] = {
+  private def acquireActivePath(base: String,
+                                retries: Int = defaultRetries,
+                                delay: Int =
+                                  defaultDelay): Validation[Error, Unit] = {
     val activePath = base + delimeter + active
     if (retries < 0) {
       Failure(Invalid("Unable to acquire relay agent lock"))

@@ -28,7 +28,8 @@ import kafka.utils.{CoreUtils, VerifiableProperties, Logging}
 private trait KafkaCSVMetricsReporterMBean extends KafkaMetricsReporterMBean
 
 private class KafkaCSVMetricsReporter
-    extends KafkaMetricsReporter with KafkaCSVMetricsReporterMBean
+    extends KafkaMetricsReporter
+    with KafkaCSVMetricsReporterMBean
     with Logging {
 
   private var csvDir: File = null
@@ -43,8 +44,8 @@ private class KafkaCSVMetricsReporter
     synchronized {
       if (!initialized) {
         val metricsConfig = new KafkaMetricsConfig(props)
-        csvDir = new File(
-            props.getString("kafka.csv.metrics.dir", "kafka_metrics"))
+        csvDir =
+          new File(props.getString("kafka.csv.metrics.dir", "kafka_metrics"))
         CoreUtils.rm(csvDir)
         csvDir.mkdirs()
         underlying = new CsvReporter(Metrics.defaultRegistry(), csvDir)

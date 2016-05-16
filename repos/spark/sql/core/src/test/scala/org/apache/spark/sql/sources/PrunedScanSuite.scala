@@ -34,9 +34,10 @@ class PrunedScanSource extends RelationProvider {
   }
 }
 
-case class SimplePrunedScan(from: Int, to: Int)(
-    @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedScan {
+case class SimplePrunedScan(
+    from: Int, to: Int)(@transient val sqlContext: SQLContext)
+    extends BaseRelation
+    with PrunedScan {
 
   override def schema: StructType =
     StructType(StructField("a", IntegerType, nullable = false) :: StructField(

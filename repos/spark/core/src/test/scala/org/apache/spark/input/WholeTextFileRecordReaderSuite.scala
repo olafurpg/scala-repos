@@ -37,7 +37,9 @@ import org.apache.spark.util.Utils
   * directory is created as fake input. Temporal storage would be deleted in the end.
   */
 class WholeTextFileRecordReaderSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Logging {
   private var sc: SparkContext = _
   private var factory: CompressionCodecFactory = _
 

@@ -31,7 +31,9 @@ import org.apache.spark.network.shuffle.ShuffleTestAccessor
 import org.apache.spark.network.shuffle.protocol.ExecutorShuffleInfo
 
 class YarnShuffleServiceSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach {
   private[yarn] var yarnConfig: YarnConfiguration = new YarnConfiguration
 
   override def beforeEach(): Unit = {

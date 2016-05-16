@@ -23,11 +23,11 @@ object Route {
   /**
     * "Seals" a route by wrapping it with exception handling and rejection conversion.
     */
-  def seal(route: Route)(
-      implicit routingSettings: RoutingSettings,
-      parserSettings: ParserSettings = null,
-      rejectionHandler: RejectionHandler = RejectionHandler.default,
-      exceptionHandler: ExceptionHandler = null): Route = {
+  def seal(route: Route)(implicit routingSettings: RoutingSettings,
+                         parserSettings: ParserSettings = null,
+                         rejectionHandler: RejectionHandler =
+                           RejectionHandler.default,
+                         exceptionHandler: ExceptionHandler = null): Route = {
     import directives.ExecutionDirectives._
     handleExceptions(ExceptionHandler.seal(exceptionHandler)) {
       handleRejections(rejectionHandler.seal) {
@@ -48,8 +48,8 @@ object Route {
       routingLog: RoutingLog,
       executionContext: ExecutionContextExecutor = null,
       rejectionHandler: RejectionHandler = RejectionHandler.default,
-      exceptionHandler: ExceptionHandler = null)
-    : Flow[HttpRequest, HttpResponse, NotUsed] =
+      exceptionHandler: ExceptionHandler =
+        null): Flow[HttpRequest, HttpResponse, NotUsed] =
     Flow[HttpRequest].mapAsync(1)(asyncHandler(route))
 
   /**
@@ -62,8 +62,8 @@ object Route {
       routingLog: RoutingLog,
       executionContext: ExecutionContextExecutor = null,
       rejectionHandler: RejectionHandler = RejectionHandler.default,
-      exceptionHandler: ExceptionHandler = null)
-    : HttpRequest ⇒ Future[HttpResponse] = {
+      exceptionHandler: ExceptionHandler =
+        null): HttpRequest ⇒ Future[HttpResponse] = {
     val effectiveEC =
       if (executionContext ne null) executionContext
       else materializer.executionContext

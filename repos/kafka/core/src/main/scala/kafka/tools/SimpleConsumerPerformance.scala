@@ -56,7 +56,8 @@ object SimpleConsumerPerformance {
         Map(
             topicAndPartition -> PartitionOffsetRequestInfo(
                 if (config.fromLatest)
-                  OffsetRequest.LatestTime else OffsetRequest.EarliestTime,
+                  OffsetRequest.LatestTime
+                else OffsetRequest.EarliestTime,
                 1)
         ))
     var offset: Long = consumer

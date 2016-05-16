@@ -26,11 +26,11 @@ class DataSource(val dsp: DataSourceParams)
   override def readTraining(sc: SparkContext): TrainingData = {
     val eventsDb = Storage.getPEvents()
     val labeledPoints: RDD[LabeledPoint] = eventsDb
-      .aggregateProperties(
-          appId = dsp.appId,
-          entityType = "user",
-          // only keep entities with these required properties defined
-          required = Some(List("plan", "attr0", "attr1", "attr2")))(sc)
+      .aggregateProperties(appId = dsp.appId,
+                           entityType = "user",
+                           // only keep entities with these required properties defined
+                           required =
+                             Some(List("plan", "attr0", "attr1", "attr2")))(sc)
       // aggregateProperties() returns RDD pair of
       // entity ID and its aggregated properties
       .map {

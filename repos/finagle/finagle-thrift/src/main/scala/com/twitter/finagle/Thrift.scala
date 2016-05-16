@@ -58,8 +58,10 @@ import org.apache.thrift.protocol.TProtocolFactory
   * @define serverExampleObject Thrift
   */
 object Thrift
-    extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
-    with Server[Array[Byte], Array[Byte]] with ThriftRichServer {
+    extends Client[ThriftClientRequest, Array[Byte]]
+    with ThriftRichClient
+    with Server[Array[Byte], Array[Byte]]
+    with ThriftRichServer {
 
   val protocolFactory: TProtocolFactory = Protocols.binaryFactory()
 
@@ -139,16 +141,19 @@ object Thrift
   }
 
   case class Client(
-      stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] = Client.stack,
-      params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
-            "thrift")
+      stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] =
+        Client.stack,
+      params: Stack.Params =
+        StackClient.defaultParams + ProtocolLibrary("thrift")
   )
       extends StdStackClient[ThriftClientRequest, Array[Byte], Client]
-      with WithSessionPool[Client] with WithDefaultLoadBalancer[Client]
+      with WithSessionPool[Client]
+      with WithDefaultLoadBalancer[Client]
       with ThriftRichClient {
 
     protected def copy1(
-        stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] = this.stack,
+        stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] =
+          this.stack,
         params: Stack.Params = this.params
     ): Client = copy(stack, params)
 
@@ -306,8 +311,8 @@ object Thrift
 
   case class Server(
       stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] = Server.stack,
-      params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
-            "thrift")
+      params: Stack.Params =
+        StackServer.defaultParams + ProtocolLibrary("thrift")
   )
       extends StdStackServer[Array[Byte], Array[Byte], Server]
       with ThriftRichServer {

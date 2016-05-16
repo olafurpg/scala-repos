@@ -28,26 +28,26 @@ class SyntaxTests extends AllInstances with AllSyntax {
   // pretend we have a value of type A
   def mock[A]: A = ???
 
-  def testSemigroup[A : Semigroup]: Unit = {
+  def testSemigroup[A: Semigroup]: Unit = {
     val x = mock[A]
     val y = mock[A]
     val z: A = x |+| y
   }
 
-  def testGroup[A : Group](x: A, y: A): Unit = {
+  def testGroup[A: Group](x: A, y: A): Unit = {
     val x = mock[A]
     val y = mock[A]
     val z: A = x |-| y
   }
 
-  def testEq[A : Eq]: Unit = {
+  def testEq[A: Eq]: Unit = {
     val x = mock[A]
     val y = mock[A]
     val b0: Boolean = x === y
     val b1: Boolean = x =!= y
   }
 
-  def testPartialOrder[A : PartialOrder]: Unit = {
+  def testPartialOrder[A: PartialOrder]: Unit = {
     val x = mock[A]
     val y = mock[A]
     val b0: Boolean = x < y
@@ -60,7 +60,7 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val oz1: Option[A] = x pmax y
   }
 
-  def testOrder[A : Order]: Unit = {
+  def testOrder[A: Order]: Unit = {
     val x = mock[A]
     val y = mock[A]
     val i: Int = x compare y
@@ -81,8 +81,8 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val fb: F[B] = fa.contramap(f)
   }
 
-  def testFoldable[
-      F[_]: Foldable, G[_]: Applicative : MonoidK, A : Monoid, B, Z]: Unit = {
+  def testFoldable[F[_]: Foldable, G[_]: Applicative: MonoidK, A: Monoid, B, Z]
+    : Unit = {
     val fa = mock[F[A]]
     val b = mock[B]
     val f1 = mock[(B, A) => B]
@@ -117,7 +117,7 @@ class SyntaxTests extends AllInstances with AllSyntax {
   }
 
   def testReducible[
-      F[_]: Reducible, G[_]: Apply : SemigroupK, A : Semigroup, B, Z]: Unit = {
+      F[_]: Reducible, G[_]: Apply: SemigroupK, A: Semigroup, B, Z]: Unit = {
     val fa = mock[F[A]]
     val f1 = mock[(A, A) => A]
     val a1: A = fa.reduceLeft(f1)
@@ -182,7 +182,7 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val fz5: F[Z] = (fa |@| fb |@| fc).apWith(ff2)
   }
 
-  def testBifoldable[F[_, _]: Bifoldable, A, B, C, D : Monoid]: Unit = {
+  def testBifoldable[F[_, _]: Bifoldable, A, B, C, D: Monoid]: Unit = {
     val fab = mock[F[A, B]]
 
     val f0 = mock[(C, A) => C]
@@ -198,8 +198,8 @@ class SyntaxTests extends AllInstances with AllSyntax {
     val d0 = fab.bifoldMap(f2, g2)
   }
 
-  def testBitraverse[
-      F[_, _]: Bitraverse, G[_]: Applicative, A, B, C, D]: Unit = {
+  def testBitraverse[F[_, _]: Bitraverse, G[_]: Applicative, A, B, C, D]
+    : Unit = {
     val f = mock[A => G[C]]
     val g = mock[B => G[D]]
 

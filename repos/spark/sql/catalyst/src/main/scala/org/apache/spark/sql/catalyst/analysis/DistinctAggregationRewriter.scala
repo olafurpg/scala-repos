@@ -190,9 +190,9 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
         // Select the result of the first aggregate in the last aggregate.
         val result = AggregateExpression(
-            aggregate.First(evalWithinGroup(regularGroupId,
-                                            operator.toAttribute),
-                            Literal(true)),
+            aggregate.First(
+                evalWithinGroup(regularGroupId, operator.toAttribute),
+                Literal(true)),
             mode = Complete,
             isDistinct = false)
 
@@ -243,8 +243,8 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
       // Construct the second aggregate
       val transformations: Map[Expression, Expression] =
-        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(
-                e => (e._1, e._3))).toMap
+        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(e =>
+                  (e._1, e._3))).toMap
 
       val patchedAggExpressions = a.aggregateExpressions.map { e =>
         e.transformDown {

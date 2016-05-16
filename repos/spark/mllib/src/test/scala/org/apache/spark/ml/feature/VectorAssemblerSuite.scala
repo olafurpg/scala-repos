@@ -27,7 +27,8 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.functions.col
 
 class VectorAssemblerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {

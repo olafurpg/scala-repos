@@ -221,8 +221,10 @@ object ORSet {
 final class ORSet[A] private[akka](
     private[akka] val elementsMap: Map[A, ORSet.Dot],
     private[akka] val vvector: VersionVector)
-    extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning with FastMerge {
+    extends ReplicatedData
+    with ReplicatedDataSerialization
+    with RemovedNodePruning
+    with FastMerge {
 
   type T = ORSet[A]
 
@@ -349,9 +351,9 @@ final class ORSet[A] private[akka](
       copy(vvector = vvector.prune(removedNode, collapseInto))
     else {
       // re-add elements that were pruned, to bump dots to right vvector
-      val newSet = new ORSet(
-          elementsMap = elementsMap ++ pruned,
-          vvector = vvector.prune(removedNode, collapseInto))
+      val newSet = new ORSet(elementsMap = elementsMap ++ pruned,
+                             vvector =
+                               vvector.prune(removedNode, collapseInto))
       pruned.keys.foldLeft(newSet) {
         case (s, elem) ⇒ s.add(collapseInto, elem)
       }
@@ -396,4 +398,5 @@ object ORSetKey {
 
 @SerialVersionUID(1L)
 final case class ORSetKey[A](_id: String)
-    extends Key[ORSet[A]](_id) with ReplicatedDataSerialization
+    extends Key[ORSet[A]](_id)
+    with ReplicatedDataSerialization

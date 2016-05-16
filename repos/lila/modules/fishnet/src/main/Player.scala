@@ -21,11 +21,15 @@ final class Player(moveDb: MoveDB, uciMemo: UciMemo) {
       if (game.turns <= maxPlies)
         GameRepo.initialFen(game) zip uciMemo.get(game) map {
           case (initialFen, moves) =>
-            Work.Move(_id = Work.makeId,
-                      game = Work.Game(id = game.id,
-                                       initialFen = initialFen map FEN.apply,
-                                       variant = game.variant,
-                                       moves = moves mkString " "),
+            Work.Move(_id =
+                        Work.makeId,
+                      game =
+                        Work.Game(id = game.id,
+                                  initialFen =
+                                    initialFen map FEN.apply,
+                                  variant = game.variant,
+                                  moves =
+                                    moves mkString " "),
                       currentFen = FEN(Forsyth >> game.toChess),
                       level = level,
                       tries = 0,

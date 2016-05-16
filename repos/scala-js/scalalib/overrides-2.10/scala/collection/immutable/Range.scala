@@ -42,7 +42,8 @@ import scala.collection.parallel.immutable.ParRange
 @SerialVersionUID(7618862778670199309L)
 @inline
 class Range(val start: Int, val end: Int, val step: Int)
-    extends scala.collection.AbstractSeq[Int] with IndexedSeq[Int]
+    extends scala.collection.AbstractSeq[Int]
+    with IndexedSeq[Int]
     with scala.collection.CustomParallelizable[Int, ParRange]
     with Serializable {
   override def par = new ParRange(this)
@@ -136,8 +137,8 @@ class Range(val start: Int, val end: Int, val step: Int)
     val terminal = terminalElement
     val step = this.step
     while (if (isCommonCase) { i != terminal } else {
-      count < numRangeElements
-    }) {
+             count < numRangeElements
+           }) {
       f(i)
       count += 1
       i += step
@@ -163,13 +164,14 @@ class Range(val start: Int, val end: Int, val step: Int)
     *  @param n  the number of elements to drop.
     *  @return   a new range consisting of all the elements of this range except `n` first elements.
     */
-  final override def drop(n: Int): Range = (if (n <= 0 || isEmpty) this
-                                            else if (n >= numRangeElements)
-                                              newEmptyRange(end)
-                                            else
-                                              copy(locationAfterN(n),
-                                                   end,
-                                                   step))
+  final override def drop(n: Int): Range =
+    (if (n <= 0 || isEmpty) this
+     else if (n >= numRangeElements)
+       newEmptyRange(end)
+     else
+       copy(locationAfterN(n),
+            end,
+            step))
 
   /** Creates a new range containing all the elements of this range except the last one.
     *
@@ -209,8 +211,7 @@ class Range(val start: Int, val end: Int, val step: Int)
   // Tests whether a number is within the endpoints, without testing
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: Int) =
-    !isEmpty &&
-    ((step > 0 && start <= elem && elem <= last) ||
+    !isEmpty && ((step > 0 && start <= elem && elem <= last) ||
         (step < 0 && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.

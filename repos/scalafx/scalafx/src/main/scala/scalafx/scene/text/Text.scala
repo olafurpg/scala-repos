@@ -43,7 +43,8 @@ object Text {
 }
 
 class Text(override val delegate: jfxst.Text = new jfxst.Text)
-    extends Shape(delegate) with PositionDelegate[jfxst.Text]
+    extends Shape(delegate)
+    with PositionDelegate[jfxst.Text]
     with SFXDelegate[jfxst.Text] {
 
   /**

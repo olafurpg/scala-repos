@@ -117,9 +117,9 @@ class DslConsistencySpec extends WordSpec with Matchers {
           val allOps = (for {
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
-               if !ignore(m.getName)
-               if !m.getName.contains("$")
-               if !materializing(m)
+            if !ignore(m.getName)
+            if !m.getName.contains("$")
+            if !materializing(m)
           } yield m.getName).toSet
 
           for (c ← classes; op ← allOps) assertHasMethod(c, op)
@@ -129,9 +129,9 @@ class DslConsistencySpec extends WordSpec with Matchers {
           val materializingOps = (for {
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
-               if !ignore(m.getName)
-               if !m.getName.contains("$")
-               if materializing(m)
+            if !ignore(m.getName)
+            if !m.getName.contains("$")
+            if materializing(m)
           } yield m.getName).toSet
 
           for (c ← classes; op ← materializingOps) assertHasMethod(c, op)

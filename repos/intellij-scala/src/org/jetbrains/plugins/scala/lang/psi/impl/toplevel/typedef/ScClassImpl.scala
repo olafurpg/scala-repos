@@ -38,8 +38,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
                            nodeType: IElementType,
                            node: ASTNode)
-    extends ScTypeDefinitionImpl(stub, nodeType, node) with ScClass
-    with ScTypeParametersOwner with ScTemplateDefinition {
+    extends ScTypeDefinitionImpl(stub, nodeType, node)
+    with ScClass
+    with ScTypeParametersOwner
+    with ScTemplateDefinition {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => visitor.visitClass(this)
@@ -138,10 +140,10 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         case t: ScTypedDefinition if t.isAbstractMember => true
         case _ => false
       }
-      this.processPsiMethodsForNode(
-          node,
-          isStatic = false,
-          isInterface = isInterface)(res += _, names += _)
+      this.processPsiMethodsForNode(node,
+                                    isStatic = false,
+                                    isInterface =
+                                      isInterface)(res += _, names += _)
     }
 
     for (synthetic <- syntheticMethodsNoOverride) {
@@ -241,8 +243,8 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
     val x = constructor.getOrElse(return "")
     val paramString =
       (if (x.parameterList.clauses.length == 1 &&
-           x.parameterList.clauses.head.isImplicit) "()" else "") +
-      x.parameterList.clauses.map { c =>
+           x.parameterList.clauses.head.isImplicit) "()"
+       else "") + x.parameterList.clauses.map { c =>
         val start = if (c.isImplicit) "(implicit " else "("
         c.parameters.map { p =>
           val paramType = p.typeElement match {
@@ -265,21 +267,19 @@ class ScClassImpl private (stub: StubElement[ScTemplateDefinition],
         .map(clause => typeParameters.map(_.name).mkString("[", ",", "]"))
         .getOrElse("")
     val typeParametersText = typeParametersClause
-      .map(tp =>
-            {
-          tp.typeParameters
-            .map(tp =>
-                  {
-                val baseText = tp.typeParameterText
-                if (tp.isContravariant) {
-                  val i = baseText.indexOf('-')
-                  baseText.substring(i + 1)
-                } else if (tp.isCovariant) {
-                  val i = baseText.indexOf('+')
-                  baseText.substring(i + 1)
-                } else baseText
-            })
-            .mkString("[", ", ", "]")
+      .map(tp => {
+        tp.typeParameters
+          .map(tp => {
+            val baseText = tp.typeParameterText
+            if (tp.isContravariant) {
+              val i = baseText.indexOf('-')
+              baseText.substring(i + 1)
+            } else if (tp.isCovariant) {
+              val i = baseText.indexOf('+')
+              baseText.substring(i + 1)
+            } else baseText
+          })
+          .mkString("[", ", ", "]")
       })
       .getOrElse("")
     val parametersText = constr.parameterList.clauses.map {

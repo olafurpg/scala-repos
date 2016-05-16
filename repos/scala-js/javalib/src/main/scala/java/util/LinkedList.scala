@@ -4,7 +4,10 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 class LinkedList[E]()
-    extends AbstractSequentialList[E] with List[E] with Deque[E] with Cloneable
+    extends AbstractSequentialList[E]
+    with List[E]
+    with Deque[E]
+    with Cloneable
     with Serializable {
 
   def this(c: Collection[_ <: E]) = {

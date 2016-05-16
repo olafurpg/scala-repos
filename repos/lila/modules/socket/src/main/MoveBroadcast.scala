@@ -34,9 +34,8 @@ private final class MoveBroadcast extends Actor {
       }
 
     case StartWatching(uid, member, gameIds) =>
-      members +=
-      (uid -> WatchingMember(member,
-                             gameIds ++ members.get(uid).??(_.gameIds)))
+      members += (uid -> WatchingMember(
+              member, gameIds ++ members.get(uid).??(_.gameIds)))
       gameIds foreach { id =>
         games += (id -> (~games.get(id) + uid))
       }

@@ -68,8 +68,7 @@ class TickSourceSpec extends AkkaSpec {
       val c = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           import GraphDSL.Implicits._
           val zip = b.add(Zip[Int, String]())
           Source(1 to 100) ~> zip.in0

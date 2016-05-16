@@ -77,12 +77,14 @@ object MongoJobManagerSettings {
       5000, "jobs", "jog_messages")
 }
 
-final class MongoJobManager(database: Database,
-                            settings: MongoJobManagerSettings,
-                            fs0: FileStorage[Future])(
-    implicit executionContext: ExecutionContext)
+final class MongoJobManager(
+    database: Database,
+    settings: MongoJobManagerSettings,
+    fs0: FileStorage[Future])(implicit executionContext: ExecutionContext)
     extends JobManager[Future]
-    with JobStateManager[Future] with JobResultManager[Future] with Logging {
+    with JobStateManager[Future]
+    with JobResultManager[Future]
+    with Logging {
 
   import JobManager._
   import JobState._

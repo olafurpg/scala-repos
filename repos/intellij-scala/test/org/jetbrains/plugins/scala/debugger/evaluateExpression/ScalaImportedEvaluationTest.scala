@@ -8,10 +8,12 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * 12/9/13
   */
 class ScalaImportedEvaluationTest
-    extends ScalaImportedEvaluationTestBase with ScalaVersion_2_11
+    extends ScalaImportedEvaluationTestBase
+    with ScalaVersion_2_11
 
 class ScalaImportedEvaluationTest_212
-    extends ScalaImportedEvaluationTestBase with ScalaVersion_2_12
+    extends ScalaImportedEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class ScalaImportedEvaluationTestBase extends ScalaDebuggerTestCase {
   addFileWithBreakpoints("ImportFromObject.scala",

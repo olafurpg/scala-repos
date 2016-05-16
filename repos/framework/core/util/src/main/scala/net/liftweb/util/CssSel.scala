@@ -147,9 +147,9 @@ private class SelectorMap(binds: List[CssBind])
 
       case i @ CssBind(AttrSelector(name, value, _)) => {
           val oldMap = attrMap.getOrElse(name, Map())
-          attrMap +=
-          (name ->
-              (oldMap + (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
+          attrMap += (name ->
+              (oldMap +
+                  (value -> sortBinds(i :: oldMap.getOrElse(value, Nil)))))
         }
     }
 
@@ -203,8 +203,7 @@ private class SelectorMap(binds: List[CssBind])
 
     final def applyAttributeRules(bindList: List[CssBind], elem: Elem): Elem = {
       bindList
-        .map(
-            b =>
+        .map(b =>
               (b,
                b.css
                  .openOrThrowException(
@@ -497,7 +496,8 @@ private class SelectorMap(binds: List[CssBind])
                                 ids.contains(id)
                               } getOrElse (false)
                             val newIds =
-                              targetId filter (_ => keepId) map (i => ids - i) getOrElse
+                              targetId filter (_ => keepId) map (i =>
+                                    ids - i) getOrElse
                               (ids)
                             val newElem = new Elem(
                                 e.prefix,
@@ -537,10 +537,10 @@ private class SelectorMap(binds: List[CssBind])
       for {
         binds <- starFunc
         bind <- binds if (bind match {
-                 case CssBind(StarSelector(_, topOnly)) =>
-                   !topOnly || (depth == 0)
-                 case _ => true
-               })
+          case CssBind(StarSelector(_, topOnly)) =>
+            !topOnly || (depth == 0)
+          case _ => true
+        })
       } buff += bind
     }
 
@@ -980,16 +980,16 @@ object CanBind extends CssBindImplicits {
       implicit f: T[N] => Iterable[N]): CanBind[T[N]] =
     new CanBind[T[N]] {
       def apply(info: => T[N])(ns: NodeSeq): Seq[NodeSeq] =
-        f(info).toSeq
-          .flatMap(a => if (a eq null) Nil else List(Text(a.toString)))
+        f(info).toSeq.flatMap(a =>
+              if (a eq null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableDouble[T[Double]](
       implicit f: T[Double] => Iterable[Double]): CanBind[T[Double]] =
     new CanBind[T[Double]] {
       def apply(info: => T[Double])(ns: NodeSeq): Seq[NodeSeq] =
-        f(info).toSeq
-          .flatMap(a => if (a equals null) Nil else List(Text(a.toString)))
+        f(info).toSeq.flatMap(a =>
+              if (a equals null) Nil else List(Text(a.toString)))
     }
 
   implicit def iterableBindableTransform[T[_]](

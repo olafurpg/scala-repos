@@ -26,7 +26,10 @@ import breeze.util.DoubleImplicits
 
 @RunWith(classOf[JUnitRunner])
 class DenseMatrixTest
-    extends FunSuite with Checkers with Matchers with DoubleImplicits {
+    extends FunSuite
+    with Checkers
+    with Matchers
+    with DoubleImplicits {
 
   test("Slicing") {
     val m = DenseMatrix((0, 1, 2), (3, 4, 5))
@@ -386,8 +389,7 @@ class DenseMatrixTest
     val c = DenseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val cs = SparseVector(Complex(6, 0), Complex(2, 0), Complex(3, 0))
     val value: DenseMatrix[Complex] = a * b
-    assert(
-        value === DenseMatrix(
+    assert(value === DenseMatrix(
             (Complex(0, 74), Complex(0, -16), Complex(0, 50)),
             (Complex(0, 170), Complex(0, -46), Complex(0, 134))))
     assert(b * c === DenseVector(

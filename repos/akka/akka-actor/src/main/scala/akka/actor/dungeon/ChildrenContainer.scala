@@ -45,7 +45,8 @@ private[akka] object ChildrenContainer {
   case object UserRequest extends SuspendReason
   // careful with those system messages, all handling to be taking place in ActorCell.scala!
   final case class Recreation(cause: Throwable)
-      extends SuspendReason with WaitingForChildren
+      extends SuspendReason
+      with WaitingForChildren
   final case class Creation() extends SuspendReason with WaitingForChildren
   case object Termination extends SuspendReason
 

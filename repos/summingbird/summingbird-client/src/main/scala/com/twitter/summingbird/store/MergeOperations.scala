@@ -31,7 +31,7 @@ object MergeOperations {
   // checking that the batch layer is not more than batchesToKeep
   // behind. the manner of doing that on a per-key basis will change
   // in storehaus 0.3, so add in that check during the upgrade.
-  def sortedSum[V : Semigroup](
+  def sortedSum[V: Semigroup](
       opts: Seq[Option[(BatchID, V)]]): Option[(BatchID, V)] =
     Semigroup.sumOption(opts.flatten.sortBy(_._1))
 
@@ -46,7 +46,7 @@ object MergeOperations {
       seq.map { case (t, futureU) => futureU.map(t -> _) }
     }
 
-  def mergeResults[K, V : Semigroup](
+  def mergeResults[K, V: Semigroup](
       m1: Map[K, Future[Seq[Option[(BatchID, V)]]]],
       m2: Map[K, Future[Seq[Option[(BatchID, V)]]]])
     : Map[K, Future[Option[(BatchID, V)]]] =
@@ -100,13 +100,15 @@ object MergeOperations {
 
   def generateOnlineKeys[K](ks: Seq[K], nowBatch: BatchID, batchesToKeep: Int)(
       lookup: K => FOpt[BatchID])(
-      implicit collect: FutureCollector[(K, Iterable[BatchID])])
-    : Future[Set[(K, BatchID)]] =
+      implicit collect: FutureCollector[(K, Iterable[BatchID])]): Future[Set[(K,
+                                                                              BatchID)]] =
     for {
       collected <- collect(
-          ks.map { k =>
-            lookup(k).map { k -> expand(_, nowBatch, batchesToKeep) }
-          }
-      )
+                      ks.map { k =>
+                        lookup(k).map {
+                          k -> expand(_, nowBatch, batchesToKeep)
+                        }
+                      }
+                  )
     } yield pivot.invert(collected.toMap).toSet
 }

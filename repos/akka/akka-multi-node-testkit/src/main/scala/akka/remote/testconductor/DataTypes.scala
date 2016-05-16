@@ -35,39 +35,49 @@ private[akka] final case class Hello(name: String, addr: Address)
 
 private[akka] final case class EnterBarrier(
     name: String, timeout: Option[FiniteDuration])
-    extends ServerOp with NetworkOp
+    extends ServerOp
+    with NetworkOp
 private[akka] final case class FailBarrier(name: String)
-    extends ServerOp with NetworkOp
+    extends ServerOp
+    with NetworkOp
 private[akka] final case class BarrierResult(name: String, success: Boolean)
-    extends UnconfirmedClientOp with NetworkOp
+    extends UnconfirmedClientOp
+    with NetworkOp
 
 private[akka] final case class Throttle(
     node: RoleName, target: RoleName, direction: Direction, rateMBit: Float)
     extends CommandOp
 private[akka] final case class ThrottleMsg(
     target: Address, direction: Direction, rateMBit: Float)
-    extends ConfirmedClientOp with NetworkOp
+    extends ConfirmedClientOp
+    with NetworkOp
 
 private[akka] final case class Disconnect(
     node: RoleName, target: RoleName, abort: Boolean)
     extends CommandOp
 private[akka] final case class DisconnectMsg(target: Address, abort: Boolean)
-    extends ConfirmedClientOp with NetworkOp
+    extends ConfirmedClientOp
+    with NetworkOp
 
 private[akka] final case class Terminate(
     node: RoleName, shutdownOrExit: Either[Boolean, Int])
     extends CommandOp
 private[akka] final case class TerminateMsg(
     shutdownOrExit: Either[Boolean, Int])
-    extends ConfirmedClientOp with NetworkOp
+    extends ConfirmedClientOp
+    with NetworkOp
 
 private[akka] final case class GetAddress(node: RoleName)
-    extends ServerOp with NetworkOp
+    extends ServerOp
+    with NetworkOp
 private[akka] final case class AddressReply(node: RoleName, addr: Address)
-    extends UnconfirmedClientOp with NetworkOp
+    extends UnconfirmedClientOp
+    with NetworkOp
 
 private[akka] abstract class Done
-    extends ServerOp with UnconfirmedClientOp with NetworkOp
+    extends ServerOp
+    with UnconfirmedClientOp
+    with NetworkOp
 private[akka] case object Done extends Done {
   def getInstance: Done = this
 }

@@ -74,13 +74,13 @@ private[report] final class ReportApi {
   def autoBotReport(userId: String, referer: Option[String]): Funit = {
     UserRepo byId userId zip UserRepo.lichess flatMap {
       case (Some(user), Some(lichess)) =>
-        create(
-            ReportSetup(user = user,
-                        reason = "cheat",
-                        text = s"""Python bot detected on ${referer | "?"}""",
-                        gameId = "",
-                        move = ""),
-            lichess)
+        create(ReportSetup(user = user,
+                           reason = "cheat",
+                           text =
+                             s"""Python bot detected on ${referer | "?"}""",
+                           gameId = "",
+                           move = ""),
+               lichess)
       case _ => funit
     }
   }
@@ -88,12 +88,12 @@ private[report] final class ReportApi {
   def autoBoostReport(userId: String, accompliceId: String): Funit = {
     UserRepo.byId(userId) zip UserRepo.byId(accompliceId) zip UserRepo.lichess flatMap {
       case ((Some(user), Some(accomplice)), Some(lichess)) =>
-        create(ReportSetup(
-                   user = user,
-                   reason = "boost",
-                   text = s"with their accomplice @${accomplice.username}",
-                   gameId = "",
-                   move = ""),
+        create(ReportSetup(user = user,
+                           reason = "boost",
+                           text =
+                             s"with their accomplice @${accomplice.username}",
+                           gameId = "",
+                           move = ""),
                lichess)
       case _ => funit
     }

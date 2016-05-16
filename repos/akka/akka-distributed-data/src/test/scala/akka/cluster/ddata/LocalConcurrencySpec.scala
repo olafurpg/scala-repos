@@ -37,8 +37,11 @@ object LocalConcurrencySpec {
 }
 
 class LocalConcurrencySpec(_system: ActorSystem)
-    extends TestKit(_system) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with ImplicitSender {
+    extends TestKit(_system)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
   import LocalConcurrencySpec._
 
   def this() {

@@ -142,8 +142,9 @@ trait MemberLookupBase {
           lookupInTemplate(pos, mbrName, container, OnlyType) map
           ((_, container))
         if (syms.isEmpty)
-          syms = lookupInTemplate(pos, mbrName, container, OnlyTerm) map
-          ((_, container))
+          syms =
+            lookupInTemplate(pos, mbrName, container, OnlyTerm) map
+            ((_, container))
         syms
 
       case tplName :: rest =>

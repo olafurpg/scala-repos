@@ -74,15 +74,21 @@ import scalaz.syntax.comonad._
 import java.io.File
 
 trait PlatformConfig
-    extends BaseConfig with IdSourceConfig with EvaluatorConfig
-    with StandaloneShardSystemConfig with ColumnarTableModuleConfig
+    extends BaseConfig
+    with IdSourceConfig
+    with EvaluatorConfig
+    with StandaloneShardSystemConfig
+    with ColumnarTableModuleConfig
     with BlockStoreColumnarTableModuleConfig
 
 trait SBTConsolePlatform
     extends muspelheim.ParseEvalStack[Future]
-    with SecureVFSModule[Future, Slice] with ActorVFSModule
-    with IdSourceScannerModule with VFSColumnarTableModule
-    with StandaloneActorProjectionSystem with XLightWebHttpClientModule[Future]
+    with SecureVFSModule[Future, Slice]
+    with ActorVFSModule
+    with IdSourceScannerModule
+    with VFSColumnarTableModule
+    with StandaloneActorProjectionSystem
+    with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
   self =>
 

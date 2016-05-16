@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScParamClausesStub
   */
 class ScParametersImpl private (
     stub: StubElement[ScParameters], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameters {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScParameters {
 
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScParamClausesStub) = {

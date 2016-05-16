@@ -19,8 +19,12 @@ import scala.tools.nsc._
   *  @author Sébastien Doeraene
   */
 abstract class GenJSCode
-    extends plugins.PluginComponent with TypeKinds with JSEncoding
-    with GenJSExports with GenJSFiles with Compat210Component {
+    extends plugins.PluginComponent
+    with TypeKinds
+    with JSEncoding
+    with GenJSExports
+    with GenJSFiles
+    with Compat210Component {
 
   val jsAddons: JSGlobalAddons {
     val global: GenJSCode.this.global.type
@@ -127,14 +131,15 @@ abstract class GenJSCode
 
     val tryingToGenMethodAsJSFunction = new ScopedVar[Boolean](false)
     class CancelGenMethodAsJSFunction(message: String)
-        extends Throwable(message) with scala.util.control.ControlThrowable
+        extends Throwable(message)
+        with scala.util.control.ControlThrowable
 
     // Rewriting of anonymous function classes ---------------------------------
 
     private val translatedAnonFunctions = mutable.Map
       .empty[Symbol,
              ( /*ctor args:*/ List[js.Tree] => /*instance:*/ js.Tree,
-             MethodInfo)]
+              MethodInfo)]
     private val instantiatedAnonFunctions = mutable.Set.empty[Symbol]
     private val undefinedDefaultParams = mutable.Set.empty[Symbol]
 
@@ -246,7 +251,7 @@ abstract class GenJSCode
                 .addInterfaces(tree.interfaces.map(_.name))
 
               generatedClasses +=
-              ((sym, tree, currentClassInfoBuilder.result()))
+                ((sym, tree, currentClassInfoBuilder.result()))
             }
           }
         }
@@ -482,7 +487,7 @@ abstract class GenJSCode
         parent <- sym.info.parents
         typeSym = parent.typeSymbol
         _ = assert(typeSym != NoSymbol, "parent needs symbol")
-            if (typeSym.isInterface)
+        if (typeSym.isInterface)
       } yield {
         encodeClassFullNameIdent(typeSym)
       }
@@ -497,7 +502,7 @@ abstract class GenJSCode
       // Non-method term members are fields, except for module members.
       (for {
         f <- currentClassSym.info.decls if !f.isMethod && f.isTerm &&
-            !f.isModule
+        !f.isModule
       } yield {
         implicit val pos = f.pos
         val mutable =
@@ -892,7 +897,7 @@ abstract class GenJSCode
                 case Ident(_) =>
                   Seq(methodTailJumpThisSym := NoSymbol,
                       fakeTailJumpParamRepl :=
-                      (thisDef.symbol, initialThis.symbol))
+                        (thisDef.symbol, initialThis.symbol))
               }): _*
           ) {
             val innerBody = js.Block(otherStats.map(genStat) :+
@@ -1233,8 +1238,8 @@ abstract class GenJSCode
             }
 
           withScopedVars(
-              enclosingLabelDefParams := enclosingLabelDefParams.get +
-              (tree.symbol -> labelParamSyms)
+              enclosingLabelDefParams :=
+                enclosingLabelDefParams.get + (tree.symbol -> labelParamSyms)
           ) {
             val bodyType = toIRType(tree.tpe)
             val labelIdent = encodeLabelSym(tree.symbol)
@@ -2109,7 +2114,8 @@ abstract class GenJSCode
       else if (jsPrimitives.isJavaScriptPrimitive(code))
         genJSPrimitive(tree, receiver, args, code)
       else
-        abort("Unknown primitive operation: " + sym.fullName + "(" +
+        abort(
+            "Unknown primitive operation: " + sym.fullName + "(" +
             fun.symbol.simpleName + ") " + " at: " + (tree.pos))
     }
 
@@ -2591,8 +2597,8 @@ abstract class GenJSCode
       def matchingSymIn(clazz: Symbol) = clazz.tpe.member(sym.name).suchThat {
         s =>
           val sParams = s.tpe.params
-          !s.isBridge &&
-          params.size == sParams.size && (params zip sParams).forall {
+          !s.isBridge && params.size == sParams.size &&
+          (params zip sParams).forall {
             case (s1, s2) =>
               s1.tpe =:= s2.tpe
           }
@@ -2666,13 +2672,16 @@ abstract class GenJSCode
 
         for {
           (rtClass, reflBoxClass) <- Seq(
-              (StringClass, StringClass),
-              (BoxedDoubleClass, NumberReflectiveCallClass),
-              (BoxedBooleanClass, BooleanReflectiveCallClass),
-              (BoxedLongClass, LongReflectiveCallClass)
-          )
+                                        (StringClass, StringClass),
+                                        (BoxedDoubleClass,
+                                         NumberReflectiveCallClass),
+                                        (BoxedBooleanClass,
+                                         BooleanReflectiveCallClass),
+                                        (BoxedLongClass,
+                                         LongReflectiveCallClass)
+                                    )
           implMethodSym = matchingSymIn(reflBoxClass)
-              if implMethodSym != NoSymbol && implMethodSym.isPublic
+          if implMethodSym != NoSymbol && implMethodSym.isPublic
         } {
           callStatement = js.If(genIsInstanceOf(callTrg, rtClass.tpe), {
             if (implMethodSym.owner == ObjectClass) {
@@ -3097,8 +3106,7 @@ abstract class GenJSCode
               case List(keyArg) =>
                 js.JSBracketSelect(receiver, keyArg)
               case List(keyArg, valueArg) =>
-                js.Assign(js.JSBracketSelect(receiver, keyArg),
-                          valueArg)
+                js.Assign(js.JSBracketSelect(receiver, keyArg), valueArg)
             }
           } else if (jsInterop.isJSBracketCall(sym)) {
             val (methodName, actualArgs) = extractFirstArg(args)
@@ -3188,7 +3196,7 @@ abstract class GenJSCode
       // Filter members of target module for matching member
       val compMembers = for {
         mem <- RuntimeStringModule.tpe.members
-                  if mem.name == jsnme.newString && ctor.tpe.matches(mem.tpe)
+        if mem.name == jsnme.newString && ctor.tpe.matches(mem.tpe)
       } yield mem
 
       if (compMembers.isEmpty) {
@@ -3332,7 +3340,8 @@ abstract class GenJSCode
 
       for (((arg, wasRepeated), tpe) <- (args zip wereRepeated) zip paramTpes) {
         if (wasRepeated) {
-          reversedArgs = genPrimitiveJSRepeatedParam(arg) reverse_::: reversedArgs
+          reversedArgs =
+            genPrimitiveJSRepeatedParam(arg) reverse_::: reversedArgs
         } else {
           val unboxedArg = genExpr(arg)
           val boxedArg = unboxedArg match {
@@ -3351,10 +3360,11 @@ abstract class GenJSCode
 
       // Find remaining js.UndefinedParam and replace by js.Undefined. This can
       // happen with named arguments or when multiple argument lists are present
-      reversedArgs = reversedArgs map {
-        case js.UndefinedParam() => js.Undefined()
-        case arg => arg
-      }
+      reversedArgs =
+        reversedArgs map {
+          case js.UndefinedParam() => js.Undefined()
+          case arg => arg
+        }
 
       reversedArgs.reverse
     }
@@ -3590,8 +3600,8 @@ abstract class GenJSCode
     /** Code common to tryGenAndRecordAnonFunctionClass and
       *  genAndRecordRawJSFunctionClass.
       */
-    private def tryGenAndRecordAnonFunctionClassGeneric(cd: ClassDef)(
-        fail: (=> String) => Nothing)
+    private def tryGenAndRecordAnonFunctionClassGeneric(
+        cd: ClassDef)(fail: (=> String) => Nothing)
       : (List[js.Tree] => js.Tree, MethodInfo, Int) = {
       implicit val pos = cd.pos
       val sym = cd.symbol

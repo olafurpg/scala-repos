@@ -98,7 +98,8 @@ case class ServiceInfo(requestTokenURL: String,
   * The public AsyncHttpClient implementation of WSSignatureCalculator.
   */
 class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
-    extends WSSignatureCalculator with SignatureCalculator {
+    extends WSSignatureCalculator
+    with SignatureCalculator {
 
   import org.asynchttpclient.oauth.{ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken}
 

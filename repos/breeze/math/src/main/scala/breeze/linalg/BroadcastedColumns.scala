@@ -67,8 +67,8 @@ object BroadcastedColumns {
     }
   }
 
-  implicit def scalarOf[T, ColumnType]: ScalarOf[
-      BroadcastedColumns[T, ColumnType], ColumnType] = ScalarOf.dummy
+  implicit def scalarOf[T, ColumnType]
+    : ScalarOf[BroadcastedColumns[T, ColumnType], ColumnType] = ScalarOf.dummy
 
   implicit def broadcastOp[Op, T, ColumnType, OpResult, Result](
       implicit handhold: CanCollapseAxis.HandHold[T, Axis._0.type, ColumnType],
@@ -134,7 +134,8 @@ object BroadcastedColumns {
   // This is a more memory efficient representation if the sequence is long-lived but rarely accessed.
   @SerialVersionUID(1L)
   class BroadcastedDMColsISeq[T](val underlying: DenseMatrix[T])
-      extends IndexedSeq[DenseVector[T]] with Serializable {
+      extends IndexedSeq[DenseVector[T]]
+      with Serializable {
     override def length: Int = underlying.cols
 
     override def apply(idx: Int): DenseVector[T] = underlying(::, idx)

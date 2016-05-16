@@ -46,7 +46,8 @@ object TaskSerializer {
 
     def taskStatus = Task.Status(
         stagedAt = Timestamp(proto.getStagedAt),
-        startedAt = if (proto.hasStartedAt) Some(Timestamp(proto.getStartedAt))
+        startedAt =
+          if (proto.hasStartedAt) Some(Timestamp(proto.getStartedAt))
           else None,
         mesosStatus = opt(_.hasStatus, _.getStatus)
     )
@@ -134,8 +135,8 @@ object TaskSerializer {
                     networking: Task.Networking): Unit = {
       builder.setVersion(appVersion.toString)
       builder.setStagedAt(status.stagedAt.toDateTime.getMillis)
-      status.startedAt.foreach(
-          startedAt => builder.setStartedAt(startedAt.toDateTime.getMillis))
+      status.startedAt.foreach(startedAt =>
+            builder.setStartedAt(startedAt.toDateTime.getMillis))
       status.mesosStatus.foreach(status => builder.setStatus(status))
       networking match {
         case Task.HostPorts(hostPorts) =>
@@ -213,7 +214,8 @@ private[impl] object ReservationSerializer {
     def fromProto(proto: ProtoState): State = {
       val timeout =
         if (proto.hasTimeout)
-          Some(TimeoutSerializer.fromProto(proto.getTimeout)) else None
+          Some(TimeoutSerializer.fromProto(proto.getTimeout))
+        else None
       proto.getType match {
         case ProtoState.Type.New => State.New(timeout)
         case ProtoState.Type.Launched => State.Launched
@@ -241,8 +243,8 @@ private[impl] object ReservationSerializer {
       }
       val builder =
         Protos.MarathonTask.Reservation.State.newBuilder().setType(stateType)
-      state.timeout.foreach(
-          timeout => builder.setTimeout(TimeoutSerializer.toProto(timeout)))
+      state.timeout.foreach(timeout =>
+            builder.setTimeout(TimeoutSerializer.toProto(timeout)))
       builder.build()
     }
   }

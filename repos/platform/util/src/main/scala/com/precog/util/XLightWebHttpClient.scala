@@ -62,7 +62,7 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
                 new PostRequest(url.toString, contenType, body)
             } getOrElse new PostRequest(url.toString)
         }
-        request.params foreach(req.setParameter(_: String, _: String)).tupled
+        request.params foreach (req.setParameter(_: String, _: String)).tupled
         req
       }
     }
@@ -78,8 +78,8 @@ trait XLightWebHttpClientModule[M[+ _]] extends HttpClientModule[M] {
         httpRequest <- EitherT(M point buildRequest(request))
         response <- execute0(httpRequest)
         body <- EitherT(
-            M point fromTryCatch(Some(httpRequest))(
-                Option(response.getBody) map (_.readString("UTF-8"))))
+                   M point fromTryCatch(Some(httpRequest))(
+                       Option(response.getBody) map (_.readString("UTF-8"))))
       } yield {
         Response(response.getStatus, response.getReason, body)
       }

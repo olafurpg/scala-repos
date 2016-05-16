@@ -156,11 +156,11 @@ sealed abstract case class Uri(scheme: String,
     * Converts this URI to an "effective HTTP request URI" as defined by
     * http://tools.ietf.org/html/rfc7230#section-5.5
     */
-  def toEffectiveHttpRequestUri(
-      hostHeaderHost: Host,
-      hostHeaderPort: Int,
-      securedConnection: Boolean = false,
-      defaultAuthority: Authority = Authority.Empty): Uri =
+  def toEffectiveHttpRequestUri(hostHeaderHost: Host,
+                                hostHeaderPort: Int,
+                                securedConnection: Boolean = false,
+                                defaultAuthority: Authority =
+                                  Authority.Empty): Uri =
     effectiveHttpRequestUri(scheme,
                             authority.host,
                             authority.port,
@@ -349,17 +349,17 @@ object Uri {
     * Converts a set of URI components to an "effective HTTP request URI" as defined by
     * http://tools.ietf.org/html/rfc7230#section-5.5.
     */
-  def effectiveHttpRequestUri(
-      scheme: String,
-      host: Host,
-      port: Int,
-      path: Path,
-      query: Option[String],
-      fragment: Option[String],
-      securedConnection: Boolean,
-      hostHeaderHost: Host,
-      hostHeaderPort: Int,
-      defaultAuthority: Authority = Authority.Empty): Uri = {
+  def effectiveHttpRequestUri(scheme: String,
+                              host: Host,
+                              port: Int,
+                              path: Path,
+                              query: Option[String],
+                              fragment: Option[String],
+                              securedConnection: Boolean,
+                              hostHeaderHost: Host,
+                              hostHeaderPort: Int,
+                              defaultAuthority: Authority =
+                                Authority.Empty): Uri = {
     var _scheme = scheme
     var _host = host
     var _port = port
@@ -831,8 +831,8 @@ object Uri {
 
   @tailrec
   private[http] def decode(string: String, charset: Charset, ix: Int)(
-      sb: JStringBuilder = new JStringBuilder(string.length)
-          .append(string, 0, ix)): String =
+      sb: JStringBuilder =
+        new JStringBuilder(string.length).append(string, 0, ix)): String =
     if (ix < string.length)
       string.charAt(ix) match {
         case '%' ⇒
@@ -849,7 +849,7 @@ object Uri {
 
           var lastPercentSignIndexPlus3 = ix + 3
           while (lastPercentSignIndexPlus3 < string.length && string.charAt(
-              lastPercentSignIndexPlus3) == '%') lastPercentSignIndexPlus3 += 3
+                     lastPercentSignIndexPlus3) == '%') lastPercentSignIndexPlus3 += 3
           val bytesCount = (lastPercentSignIndexPlus3 - ix) / 3
           val bytes = new Array[Byte](bytesCount)
 
@@ -882,8 +882,10 @@ object Uri {
       if (ix >= 0) {
         val c = scheme.charAt(ix)
         if (allowed(c))
-          verify(ix - 1, `scheme-char`, allLower && !UPPER_ALPHA(c)) else ix
-      } else if (allLower) -1 else -2
+          verify(ix - 1, `scheme-char`, allLower && !UPPER_ALPHA(c))
+        else ix
+      } else if (allLower) -1
+      else -2
     verify() match {
       case -2 ⇒ scheme.toLowerCase
       case -1 ⇒ scheme
@@ -926,7 +928,8 @@ object Uri {
         case Slash(Segment("..", tail)) ⇒
           process(
               input = if (tail.isEmpty) Path./ else tail,
-              output = if (output.startsWithSegment)
+              output =
+                if (output.startsWithSegment)
                   if (output.tail.startsWithSlash) output.tail.tail else tail
                 else output)
         case Segment("." | "..", tail) ⇒ process(tail, output)
@@ -1045,11 +1048,11 @@ object UriRendering {
           if (path.isEmpty || path.startsWithSlash) r ~~ '/' ~~ '/' else r
       }
 
-  def renderPath[R <: Rendering](
-      r: R,
-      path: Path,
-      charset: Charset,
-      encodeFirstSegmentColons: Boolean = false): r.type =
+  def renderPath[R <: Rendering](r: R,
+                                 path: Path,
+                                 charset: Charset,
+                                 encodeFirstSegmentColons: Boolean =
+                                   false): r.type =
     path match {
       case Path.Empty ⇒ r
       case Path.Slash(tail) ⇒ renderPath(r ~~ '/', tail, charset)
@@ -1059,11 +1062,11 @@ object UriRendering {
         renderPath(encode(r, head, charset, keep), tail, charset)
     }
 
-  def renderQuery[R <: Rendering](
-      r: R,
-      query: Query,
-      charset: Charset,
-      keep: CharPredicate = `strict-query-char-np`): r.type = {
+  def renderQuery[R <: Rendering](r: R,
+                                  query: Query,
+                                  charset: Charset,
+                                  keep: CharPredicate =
+                                    `strict-query-char-np`): r.type = {
     def enc(s: String): Unit =
       encode(r, s, charset, keep, replaceSpaces = true)
     @tailrec def append(q: Query): r.type =

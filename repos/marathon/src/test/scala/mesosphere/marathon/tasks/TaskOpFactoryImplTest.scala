@@ -14,7 +14,10 @@ import mesosphere.mesos.protos.SlaveID
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskOpFactoryImplTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
 
   test("Copy SlaveID from Offer to Task") {
     val f = new Fixture
@@ -36,14 +39,14 @@ class TaskOpFactoryImplTest
     val expectedTask = Task.LaunchedEphemeral(
         taskId = inferredTaskOp.fold(Task.Id("failure"))(_.taskId),
         agentInfo = Task.AgentInfo(
-              host = "some_host",
-              agentId = Some(offer.getSlaveId.getValue),
-              attributes = List.empty
-          ),
+            host = "some_host",
+            agentId = Some(offer.getSlaveId.getValue),
+            attributes = List.empty
+        ),
         appVersion = app.version,
         status = Task.Status(
-              stagedAt = f.clock.now()
-          ),
+            stagedAt = f.clock.now()
+        ),
         networking = Task.HostPorts(List.empty)
     )
     assert(inferredTaskOp.isDefined, "task op is not empty")

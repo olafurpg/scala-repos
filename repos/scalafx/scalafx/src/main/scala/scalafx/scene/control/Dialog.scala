@@ -80,7 +80,8 @@ object Dialog {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Dialog[R](override val delegate: jfxsc.Dialog[R] = new jfxsc.Dialog[R]())
-    extends EventTarget(delegate) with SFXDelegate[jfxsc.Dialog[R]] {
+    extends EventTarget(delegate)
+    with SFXDelegate[jfxsc.Dialog[R]] {
 
   /**
     * Shows the dialog and waits for the user response (in other words, brings

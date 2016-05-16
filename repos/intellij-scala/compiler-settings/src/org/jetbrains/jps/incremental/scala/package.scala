@@ -40,16 +40,16 @@ package object scala {
   def readProperty(classLoader: ClassLoader,
                    resource: String,
                    name: String): Option[String] = {
-    Option(classLoader.getResourceAsStream(resource))
-      .flatMap(it => using(new BufferedInputStream(it))(readProperty(_, name)))
+    Option(classLoader.getResourceAsStream(resource)).flatMap(it =>
+          using(new BufferedInputStream(it))(readProperty(_, name)))
   }
 
   def readProperty(
       file: File, resource: String, name: String): Option[String] = {
     try {
       val url = new URL("jar:%s!/%s".format(file.toURI.toString, resource))
-      Option(url.openStream).flatMap(
-          it => using(new BufferedInputStream(it))(readProperty(_, name)))
+      Option(url.openStream).flatMap(it =>
+            using(new BufferedInputStream(it))(readProperty(_, name)))
     } catch {
       case _: IOException => None
     }

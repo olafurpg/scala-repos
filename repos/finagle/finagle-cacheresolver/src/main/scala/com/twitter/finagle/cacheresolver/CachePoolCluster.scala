@@ -208,10 +208,10 @@ trait CachePoolCluster extends Cluster[CacheNode] {
   private[this] var cachePoolChanges =
     new Promise[Spool[Cluster.Change[CacheNode]]]
 
-  def snap: (Seq[CacheNode],
-  Future[Spool[Cluster.Change[CacheNode]]]) = cachePool synchronized {
-    (cachePool.toSeq, cachePoolChanges)
-  }
+  def snap: (Seq[CacheNode], Future[Spool[Cluster.Change[CacheNode]]]) =
+    cachePool synchronized {
+      (cachePool.toSeq, cachePoolChanges)
+    }
 
   /**
     * TODO: pick up new rev of Cluster once it's ready
@@ -299,7 +299,8 @@ class ZookeeperCachePoolCluster private[cacheresolver](
     protected val zkClient: ZooKeeperClient,
     backupPool: Option[Set[CacheNode]] = None,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends CachePoolCluster with ZookeeperStateMonitor {
+    extends CachePoolCluster
+    with ZookeeperStateMonitor {
 
   import ZookeeperCachePoolCluster._
 
@@ -410,7 +411,8 @@ class ZookeeperCacheNodeGroup(
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
 )
-    extends Group[CacheNode] with ZookeeperStateMonitor {
+    extends Group[CacheNode]
+    with ZookeeperStateMonitor {
 
   protected[finagle] val set = Var(Set[CacheNode]())
 

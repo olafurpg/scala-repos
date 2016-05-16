@@ -167,7 +167,8 @@ class ScalaMoveClassesOrPackagesHandler
       chbMoveCompanion.addActionListener(
           new ActionListener {
         def actionPerformed(e: ActionEvent) {
-          ScalaApplicationSettings.getInstance().MOVE_COMPANION = chbMoveCompanion.isSelected
+          ScalaApplicationSettings.getInstance().MOVE_COMPANION =
+            chbMoveCompanion.isSelected
         }
       })
       chbMoveCompanion.setMnemonic('t')

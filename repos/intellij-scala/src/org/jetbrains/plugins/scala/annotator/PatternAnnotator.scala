@@ -251,8 +251,7 @@ object PatternAnnotatorUtil {
       }
     }
 
-    matching.weakConforms(matched) ||
-    ((matching, matched) match {
+    matching.weakConforms(matched) || ((matching, matched) match {
           case (arrayType(arg1), arrayType(arg2)) => matchesPattern(arg1, arg2)
           case (_, parameterized: ScParameterizedType) =>
             val newtp = abstraction(parameterized)
@@ -285,8 +284,7 @@ object PatternAnnotatorUtil {
         val subPat = tuple.subpatterns
         val subTypes = subPat.flatMap(patternType)
         if (subTypes.size == subPat.size)
-          Some(
-              ScTupleType(subTypes)(
+          Some(ScTupleType(subTypes)(
                   project, GlobalSearchScope.allScope(project)))
         else None
       case typed: ScTypedPattern =>

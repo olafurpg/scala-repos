@@ -20,7 +20,8 @@ abstract class DoubleBufferTest extends BaseBufferTest {
   }
 
   class WrappedDoubleBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory
+      with BufferFactory.WrappedBufferFactory {
     def baseWrap(array: Array[Double]): DoubleBuffer =
       DoubleBuffer.wrap(array)
 
@@ -31,7 +32,8 @@ abstract class DoubleBufferTest extends BaseBufferTest {
 
   class ByteBufferDoubleViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory
+      with BufferFactory.ByteBufferViewFactory {
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): DoubleBuffer =

@@ -24,7 +24,9 @@ import org.apache.spark.deploy.Command
 import org.apache.spark.util.Utils
 
 class CommandUtilsSuite
-    extends SparkFunSuite with Matchers with PrivateMethodTester {
+    extends SparkFunSuite
+    with Matchers
+    with PrivateMethodTester {
 
   test("set libraryPath correctly") {
     val appId = "12345-worker321-9876"
@@ -64,16 +66,18 @@ class CommandUtilsSuite
 
     // auth is set to false
     conf.set(SecurityManager.SPARK_AUTH_CONF, "false")
-    cmd = CommandUtils invokePrivate buildLocalCommand(
-        command, new SecurityManager(conf), (t: String) => t, Seq(), Map())
+    cmd =
+      CommandUtils invokePrivate buildLocalCommand(
+          command, new SecurityManager(conf), (t: String) => t, Seq(), Map())
     assert(!cmd.javaOpts.exists(
             _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
     assert(!cmd.environment.contains(SecurityManager.ENV_AUTH_SECRET))
 
     // auth is set to true
     conf.set(SecurityManager.SPARK_AUTH_CONF, "true")
-    cmd = CommandUtils invokePrivate buildLocalCommand(
-        command, new SecurityManager(conf), (t: String) => t, Seq(), Map())
+    cmd =
+      CommandUtils invokePrivate buildLocalCommand(
+          command, new SecurityManager(conf), (t: String) => t, Seq(), Map())
     assert(!cmd.javaOpts.exists(
             _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
     assert(cmd.environment(SecurityManager.ENV_AUTH_SECRET) === secret)

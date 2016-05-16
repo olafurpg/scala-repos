@@ -16,7 +16,10 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 
 class QueueResourceTest
-    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
+    extends MarathonSpec
+    with Matchers
+    with Mockito
+    with GivenWhenThen {
 
   test("return well formatted JSON") {
     //given

@@ -33,7 +33,9 @@ private[master] class MasterWebUI(val master: Master,
                   master.securityMgr.getSSLOptions("standalone"),
                   requestedPort,
                   master.conf,
-                  name = "MasterUI") with Logging with UIRoot {
+                  name = "MasterUI")
+    with Logging
+    with UIRoot {
 
   val masterEndpointRef = master.self
   val killEnabled = master.conf.getBoolean("spark.ui.killEnabled", true)
@@ -91,10 +93,8 @@ private[master] class MasterWebUI(val master: Master,
   def getSparkUI(appId: String): Option[SparkUI] = {
     val state = masterPage.getMasterState
     val activeApps = state.activeApps.sortBy(_.startTime).reverse
-    val completedApps = state.completedApps
-      .sortBy(_.endTime)
-      .reverse
-      (activeApps ++ completedApps).find { _.id == appId }.flatMap {
+    val completedApps = state.completedApps.sortBy(_.endTime).reverse
+    (activeApps ++ completedApps).find { _.id == appId }.flatMap {
       master.rebuildSparkUI
     }
   }

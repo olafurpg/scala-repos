@@ -787,7 +787,7 @@ private[spark] object Utils extends Logging {
     * result in a new collection. Unlike scala.util.Random.shuffle, this method
     * uses a local random number generator, avoiding inter-thread contention.
     */
-  def randomize[T : ClassTag](seq: TraversableOnce[T]): Seq[T] = {
+  def randomize[T: ClassTag](seq: TraversableOnce[T]): Seq[T] = {
     randomizeInPlace(seq.toArray)
   }
 
@@ -830,8 +830,8 @@ private[spark] object Utils extends Logging {
 
         for (ni <- reOrderedNetworkIFs) {
           val addresses = ni.getInetAddresses.asScala
-            .filterNot(
-                addr => addr.isLinkLocalAddress || addr.isLoopbackAddress)
+            .filterNot(addr =>
+                  addr.isLinkLocalAddress || addr.isLoopbackAddress)
             .toSeq
           if (addresses.nonEmpty) {
             val addr = addresses
@@ -1376,8 +1376,8 @@ private[spark] object Utils extends Logging {
     * @param skipClass Function that is used to exclude non-user-code classes.
     */
   def getCallSite(
-      skipClass: String => Boolean = sparkInternalExclusionFunction)
-    : CallSite = {
+      skipClass: String => Boolean =
+        sparkInternalExclusionFunction): CallSite = {
     // Keep crawling up the stack trace until we find the first function not inside of the spark
     // package. We track the last (shallowest) contiguous Spark method. This might be an RDD
     // transformation, a SparkContext function (such as parallelize), or anything else that leads
@@ -1396,13 +1396,16 @@ private[spark] object Utils extends Logging {
           !ste.getMethodName.contains("getStackTrace")) {
         if (insideSpark) {
           if (skipClass(ste.getClassName)) {
-            lastSparkMethod = if (ste.getMethodName == "<init>") {
-              // Spark method is a constructor; get its class name
-              ste.getClassName.substring(ste.getClassName.lastIndexOf('.') + 1)
-            } else {
-              ste.getMethodName
-            }
-            callStack(0) = ste.toString // Put last Spark method on top of the stack trace.
+            lastSparkMethod =
+              if (ste.getMethodName == "<init>") {
+                // Spark method is a constructor; get its class name
+                ste.getClassName.substring(
+                    ste.getClassName.lastIndexOf('.') + 1)
+              } else {
+                ste.getMethodName
+              }
+            callStack(0) =
+              ste.toString // Put last Spark method on top of the stack trace.
           } else {
             firstUserLine = ste.getLineNumber
             firstUserFile = ste.getFileName
@@ -1509,7 +1512,7 @@ private[spark] object Utils extends Logging {
   /**
     * Clone an object using a Spark serializer.
     */
-  def clone[T : ClassTag](value: T, serializer: SerializerInstance): T = {
+  def clone[T: ClassTag](value: T, serializer: SerializerInstance): T = {
     serializer.deserialize[T](serializer.serialize(value))
   }
 
@@ -2048,7 +2051,7 @@ private[spark] object Utils extends Logging {
     */
   def sparkJavaOpts(conf: SparkConf,
                     filterKey: (String => Boolean) = _ =>
-                        true): Seq[String] = {
+                      true): Seq[String] = {
     conf.getAll.filter { case (k, _) => filterKey(k) }.map {
       case (k, v) => s"-D$k=$v"
     }
@@ -2354,8 +2357,7 @@ private[spark] object Utils extends Logging {
       logWarning(
           "Dynamic Allocation and num executors both set, thus dynamic allocation disabled.")
     }
-    numExecutor == 0 && dynamicAllocationEnabled &&
-    (!isLocalMaster(conf) ||
+    numExecutor == 0 && dynamicAllocationEnabled && (!isLocalMaster(conf) ||
         conf.getBoolean("spark.dynamicAllocation.testing", false))
   }
 

@@ -46,8 +46,8 @@ trait ActionResultTestBase { self: ScalatraBase =>
 
     Ok("Hello, world!",
        headers = Map(
-             headerName -> "application/vnd.ms-excel"
-         ))
+           headerName -> "application/vnd.ms-excel"
+       ))
   }
 
   get("/custom-reason") {

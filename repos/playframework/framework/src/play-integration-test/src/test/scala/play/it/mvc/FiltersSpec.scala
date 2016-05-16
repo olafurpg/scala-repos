@@ -22,11 +22,14 @@ import scala.concurrent._
 import play.api.libs.concurrent.Execution.{defaultContext => ec}
 
 object NettyDefaultFiltersSpec
-    extends DefaultFiltersSpec with NettyIntegrationSpecification
+    extends DefaultFiltersSpec
+    with NettyIntegrationSpecification
 object NettyGlobalFiltersSpec
-    extends GlobalFiltersSpec with NettyIntegrationSpecification
+    extends GlobalFiltersSpec
+    with NettyIntegrationSpecification
 object AkkaDefaultHttpFiltersSpec
-    extends DefaultFiltersSpec with AkkaHttpIntegrationSpecification
+    extends DefaultFiltersSpec
+    with AkkaHttpIntegrationSpecification
 
 trait DefaultFiltersSpec extends FiltersSpec {
 

@@ -13,7 +13,8 @@ import org.jetbrains.plugins.scala.worksheet.actions.TopComponentAction
   * Date: 2/17/14
   */
 class StopWorksheetAction(exec: CompilationProcess)
-    extends AnAction with TopComponentAction {
+    extends AnAction
+    with TopComponentAction {
   override def actionPerformed(e: AnActionEvent) {
     exec.stop()
   }

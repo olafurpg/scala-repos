@@ -18,8 +18,12 @@ import org.scalatest._
 import akka.testkit._
 
 class UntypedProducerTest
-    extends WordSpec with Matchers with BeforeAndAfterAll
-    with BeforeAndAfterEach with SharedCamelSystem with GivenWhenThen {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach
+    with SharedCamelSystem
+    with GivenWhenThen {
   import UntypedProducerTest._
   val timeout = 1 second
   override protected def beforeAll = {
@@ -73,9 +77,9 @@ class UntypedProducerTest
   "An UntypedProducer producing a message to a sync Camel route and then forwarding the response" must {
 
     "produce a message and send a normal response to direct:forward-test-1" in {
-      val producer =
-        system.actorOf(Props[SampleUntypedForwardingProducer],
-                       name = "sample-untyped-forwarding-producer")
+      val producer = system.actorOf(Props[SampleUntypedForwardingProducer],
+                                    name =
+                                      "sample-untyped-forwarding-producer")
 
       mockEndpoint.expectedBodiesReceived("received test")
       producer.tell(CamelMessage("test", Map[String, Any]()), producer)

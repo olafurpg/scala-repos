@@ -58,12 +58,10 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
 
   var producer: KafkaProducer[Integer, String] = null
   def hwFile1 =
-    new OffsetCheckpoint(
-        new File(
+    new OffsetCheckpoint(new File(
             configProps1.logDirs(0), ReplicaManager.HighWatermarkFilename))
   def hwFile2 =
-    new OffsetCheckpoint(
-        new File(
+    new OffsetCheckpoint(new File(
             configProps2.logDirs(0), ReplicaManager.HighWatermarkFilename))
   var servers = Seq.empty[KafkaServer]
 

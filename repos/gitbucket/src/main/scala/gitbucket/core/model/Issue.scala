@@ -24,7 +24,8 @@ trait IssueComponent extends TemplateComponent { self: Profile =>
   }
 
   class Issues(tag: Tag)
-      extends Table[Issue](tag, "ISSUE") with IssueTemplate
+      extends Table[Issue](tag, "ISSUE")
+      with IssueTemplate
       with MilestoneTemplate {
     val openedUserName = column[String]("OPENED_USER_NAME")
     val assignedUserName = column[String]("ASSIGNED_USER_NAME")

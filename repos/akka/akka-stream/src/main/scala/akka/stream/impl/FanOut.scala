@@ -15,11 +15,14 @@ import org.reactivestreams.Subscription
 private[akka] object FanOut {
 
   final case class SubstreamRequestMore(id: Int, demand: Long)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class SubstreamCancel(id: Int)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
   final case class SubstreamSubscribePending(id: Int)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 
   class SubstreamSubscription(val parent: ActorRef, val id: Int)
       extends Subscription {
@@ -38,7 +41,8 @@ private[akka] object FanOut {
 
   final case class ExposedPublishers(
       publishers: immutable.Seq[ActorPublisher[Any]])
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 
   class OutputBunch(outputCount: Int, impl: ActorRef, pump: Pump) {
     private var bunchCancelled = false
@@ -265,7 +269,9 @@ private[akka] object FanOut {
   */
 private[akka] abstract class FanOut(
     val settings: ActorMaterializerSettings, val outputCount: Int)
-    extends Actor with ActorLogging with Pump {
+    extends Actor
+    with ActorLogging
+    with Pump {
   import FanOut._
 
   protected val outputBunch = new OutputBunch(outputCount, self, this)

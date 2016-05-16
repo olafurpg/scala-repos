@@ -64,7 +64,7 @@ class TraceInitializationTest extends FunSuite {
       val client = finagle.Http.client
         .configured(param.Tracer(clientTracer))
         .newService(":" + port, "theClient")
-        (client, server)
+      (client, server)
     }
   }
 
@@ -85,7 +85,7 @@ class TraceInitializationTest extends FunSuite {
         .hostConnectionLimit(1)
         .tracer(clientTracer)
         .build()
-        (client, server)
+      (client, server)
     }
   }
 

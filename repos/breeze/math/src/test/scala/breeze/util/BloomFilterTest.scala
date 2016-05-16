@@ -70,7 +70,7 @@ class BloomFilterTest extends FunSuite with Checkers {
   test("bloom filter mostly returns false for missing things") {
     check {
       (strings: Set[String], strings2: Set[String], _numBuckets: Int,
-      _numHashes: Int) =>
+       _numHashes: Int) =>
         {
           val numHashes = 5
           val numBuckets = 1000

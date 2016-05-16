@@ -77,8 +77,7 @@ class ShoppingCart(userId: String) extends Actor {
   def updateCart(data: LWWMap[LineItem], item: LineItem): LWWMap[LineItem] =
     data.get(item.productId) match {
       case Some(LineItem(_, _, existingQuantity)) ⇒
-        data +
-        (item.productId -> item.copy(
+        data + (item.productId -> item.copy(
                 quantity = existingQuantity + item.quantity))
       case None ⇒ data + (item.productId -> item)
     }

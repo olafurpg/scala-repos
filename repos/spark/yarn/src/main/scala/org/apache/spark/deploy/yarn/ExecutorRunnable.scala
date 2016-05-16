@@ -55,7 +55,8 @@ private[yarn] class ExecutorRunnable(container: Container,
                                      executorCores: Int,
                                      appId: String,
                                      securityMgr: SecurityManager)
-    extends Runnable with Logging {
+    extends Runnable
+    with Logging {
 
   var rpc: YarnRPC = YarnRPC.create(conf)
   var nmClient: NMClient = _
@@ -214,8 +215,7 @@ private[yarn] class ExecutorRunnable(container: Container,
      */
 
     // For log4j configuration to reference
-    javaOpts +=
-    ("-Dspark.yarn.app.container.log.dir=" +
+    javaOpts += ("-Dspark.yarn.app.container.log.dir=" +
         ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 

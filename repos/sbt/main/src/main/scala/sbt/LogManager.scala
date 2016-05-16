@@ -18,12 +18,11 @@ import sbt.util.{AbstractLogger, Level, Logger}
 
 object LogManager {
   def construct(data: Settings[Scope], state: State) =
-    (task: ScopedKey[_], to: PrintWriter) =>
-      {
-        val manager =
-          logManager in task.scope get data getOrElse defaultManager(
-              state.globalLogging.console)
-        manager(data, state, task, to)
+    (task: ScopedKey[_], to: PrintWriter) => {
+      val manager =
+        logManager in task.scope get data getOrElse defaultManager(
+            state.globalLogging.console)
+      manager(data, state, task, to)
     }
   @deprecated(
       "Use defaultManager to explicitly specify standard out.", "0.13.0")
@@ -40,7 +39,7 @@ object LogManager {
                console: ConsoleOut): LogManager =
     withLoggers(
         (task,
-        state) => defaultScreen(console, suppressedMessage(task, state)),
+         state) => defaultScreen(console, suppressedMessage(task, state)),
         extra = extra)
 
   def withScreenLogger(
@@ -48,10 +47,10 @@ object LogManager {
     withLoggers(screen = mk)
 
   def withLoggers(screen: (ScopedKey[_], State) => AbstractLogger = (sk, s) =>
-                      defaultScreen(s.globalLogging.console),
+                    defaultScreen(s.globalLogging.console),
                   backed: PrintWriter => AbstractLogger = defaultBacked(),
                   extra: ScopedKey[_] => Seq[AbstractLogger] = _ =>
-                      Nil): LogManager = new LogManager {
+                    Nil): LogManager = new LogManager {
     def apply(data: Settings[Scope],
               state: State,
               task: ScopedKey[_],

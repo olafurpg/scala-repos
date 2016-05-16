@@ -10,7 +10,9 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 class HttpComponentsClientSpec
-    extends Specification with HttpComponentsClient with EmbeddedJettyContainer
+    extends Specification
+    with HttpComponentsClient
+    with EmbeddedJettyContainer
     with BeforeAfterAll {
 
   def beforeAll = start()

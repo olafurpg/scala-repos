@@ -128,8 +128,8 @@ object CpuProfile {
 
     while (Time.now < end) {
       for (thread <- bean.dumpAllThreads(false, false)
-                        if thread.getThreadState() == state &&
-                    thread.getThreadId() != myId) {
+           if thread.getThreadState() == state &&
+           thread.getThreadId() != myId) {
         val s = thread.getStackTrace().toSeq
         if (s.nonEmpty) {
           val include = state != Thread.State.RUNNABLE || isRunnable(s.head)

@@ -27,7 +27,8 @@ import scalaz.syntax.comonad._
 import java.util.{concurrent => juc}
 
 object XLightWebHttpClientSpecs
-    extends Specification with XLightWebHttpClientModule[Need] {
+    extends Specification
+    with XLightWebHttpClientModule[Need] {
   implicit def M = Need.need
 
   "xlightweb http client" should {

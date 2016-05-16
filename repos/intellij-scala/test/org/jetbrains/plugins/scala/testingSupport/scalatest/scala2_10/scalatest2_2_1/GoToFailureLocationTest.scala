@@ -35,8 +35,8 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
     UsefulTestCase.edt(
         new Runnable() {
       override def run(): Unit =
-        filterRes = filter.applyFilter(
-            errorLocationString, errorLocationString.length)
+        filterRes =
+          filter.applyFilter(errorLocationString, errorLocationString.length)
     })
     assert(filterRes != null)
     assert(filterRes.getFirstHyperlinkInfo != null)

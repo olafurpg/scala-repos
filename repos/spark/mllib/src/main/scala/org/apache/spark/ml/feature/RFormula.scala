@@ -71,7 +71,8 @@ private[feature] trait RFormulaBase extends HasFeaturesCol with HasLabelCol {
   */
 @Experimental
 class RFormula(override val uid: String)
-    extends Estimator[RFormulaModel] with RFormulaBase
+    extends Estimator[RFormulaModel]
+    with RFormulaBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("rFormula"))
@@ -124,10 +125,9 @@ class RFormula(override val uid: String)
         dataset.schema(term) match {
           case column if column.dataType == StringType =>
             val indexCol = tmpColumn("stridx")
-            encoderStages += new StringIndexer()
-              .setInputCol(term)
-              .setOutputCol(indexCol)
-              (term, indexCol)
+            encoderStages +=
+              new StringIndexer().setInputCol(term).setOutputCol(indexCol)
+            (term, indexCol)
           case _ =>
             (term, term)
         }
@@ -208,7 +208,9 @@ class RFormulaModel private[feature](
     override val uid: String,
     private[ml] val resolvedFormula: ResolvedRFormula,
     private[ml] val pipelineModel: PipelineModel)
-    extends Model[RFormulaModel] with RFormulaBase with MLWritable {
+    extends Model[RFormulaModel]
+    with RFormulaBase
+    with MLWritable {
 
   override def transform(dataset: DataFrame): DataFrame = {
     checkCanTransform(dataset.schema)
@@ -337,7 +339,8 @@ object RFormulaModel extends MLReadable[RFormulaModel] {
   */
 private class ColumnPruner(
     override val uid: String, val columnsToPrune: Set[String])
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   def this(columnsToPrune: Set[String]) =
     this(Identifiable.randomUID("columnPruner"), columnsToPrune)
@@ -416,7 +419,8 @@ private class VectorAttributeRewriter(
     override val uid: String,
     val vectorCol: String,
     val prefixesToRewrite: Map[String, String])
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   def this(vectorCol: String, prefixesToRewrite: Map[String, String]) =
     this(Identifiable.randomUID("vectorAttrRewriter"),

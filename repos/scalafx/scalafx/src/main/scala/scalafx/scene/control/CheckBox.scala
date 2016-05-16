@@ -39,7 +39,8 @@ object CheckBox {
 }
 
 class CheckBox(override val delegate: jfxsc.CheckBox = new jfxsc.CheckBox)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.CheckBox] {
+    extends ButtonBase(delegate)
+    with SFXDelegate[jfxsc.CheckBox] {
 
   /**
     * Creates a check box with the specified text as its label.

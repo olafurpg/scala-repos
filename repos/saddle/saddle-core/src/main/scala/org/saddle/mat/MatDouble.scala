@@ -32,7 +32,7 @@ class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
 
   def scalarTag = ScalarTagDouble
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: (Double) => B): Mat[B] =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: (Double) => B): Mat[B] =
     MatImpl.map(this)(f)
 
   def toVec = scalarTag.makeVec(toArray)
@@ -79,8 +79,7 @@ class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
         var i = 0
         var eq = true
         while (eq && i < length) {
-          eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+          eq &&= (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
         }

@@ -14,7 +14,7 @@ private[parser] trait ContentTypeHeader {
   def `content-type` = rule {
     `media-type` ~ EOI ~>
     ((main, sub,
-        params) ⇒ headers.`Content-Type`(contentType(main, sub, params)))
+      params) ⇒ headers.`Content-Type`(contentType(main, sub, params)))
   }
 
   @tailrec private def contentType(

@@ -13,7 +13,8 @@ object ZipWith {
 
   implicit def SuccZipWith[N, S, R](implicit zWith: ZipWith[N, R]) =
     new ZipWith[Succ[N], S => R] {
-      type T = Stream[S] => zWith.T // dependent types replace the associated types functionality
+      type T =
+        Stream[S] => zWith.T // dependent types replace the associated types functionality
     }
 
   // can't use implicitly[ZipWith[Succ[Succ[Zero]], Int => String => Boolean]],

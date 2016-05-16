@@ -264,7 +264,8 @@ abstract class SymbolLoaders {
     * Load contents of a package
     */
   class PackageLoader(classpath: ClassPath[AbstractFile])
-      extends SymbolLoader with FlagAgnosticCompleter {
+      extends SymbolLoader
+      with FlagAgnosticCompleter {
     protected def description = s"package loader ${classpath.name}"
 
     protected def doComplete(root: Symbol) {
@@ -296,7 +297,8 @@ abstract class SymbolLoaders {
     */
   class PackageLoaderUsingFlatClassPath(
       packageName: String, classPath: FlatClassPath)
-      extends SymbolLoader with FlagAgnosticCompleter {
+      extends SymbolLoader
+      with FlagAgnosticCompleter {
     protected def description = {
       val shownPackageName =
         if (packageName == FlatClassPath.RootPackage) "<root package>"
@@ -331,7 +333,8 @@ abstract class SymbolLoaders {
   }
 
   class ClassfileLoader(val classfile: AbstractFile)
-      extends SymbolLoader with FlagAssigningCompleter {
+      extends SymbolLoader
+      with FlagAssigningCompleter {
     private object classfileParser extends {
       val symbolTable: SymbolLoaders.this.symbolTable.type =
         SymbolLoaders.this.symbolTable
@@ -397,7 +400,8 @@ abstract class SymbolLoaders {
   }
 
   class SourcefileLoader(val srcfile: AbstractFile)
-      extends SymbolLoader with FlagAssigningCompleter {
+      extends SymbolLoader
+      with FlagAssigningCompleter {
     protected def description = "source file " + srcfile.toString
     override def fromSource = true
     override def sourcefile = Some(srcfile)

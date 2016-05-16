@@ -97,7 +97,8 @@ sealed trait ProdFunctor[F[_], G[_]]
 }
 
 sealed trait ProdApply[F[_], G[_]]
-    extends Apply[Lambda[X => Prod[F, G, X]]] with ProdFunctor[F, G] {
+    extends Apply[Lambda[X => Prod[F, G, X]]]
+    with ProdFunctor[F, G] {
   def F: Apply[F]
   def G: Apply[G]
   def ap[A, B](f: Prod[F, G, A => B])(fa: Prod[F, G, A]): Prod[F, G, B] =
@@ -107,7 +108,8 @@ sealed trait ProdApply[F[_], G[_]]
 }
 
 sealed trait ProdApplicative[F[_], G[_]]
-    extends Applicative[Lambda[X => Prod[F, G, X]]] with ProdApply[F, G] {
+    extends Applicative[Lambda[X => Prod[F, G, X]]]
+    with ProdApply[F, G] {
   def F: Applicative[F]
   def G: Applicative[G]
   def pure[A](a: A): Prod[F, G, A] = Prod(F.pure(a), G.pure(a))
@@ -122,7 +124,8 @@ sealed trait ProdSemigroupK[F[_], G[_]]
 }
 
 sealed trait ProdMonoidK[F[_], G[_]]
-    extends MonoidK[Lambda[X => Prod[F, G, X]]] with ProdSemigroupK[F, G] {
+    extends MonoidK[Lambda[X => Prod[F, G, X]]]
+    with ProdSemigroupK[F, G] {
   def F: MonoidK[F]
   def G: MonoidK[G]
   override def empty[A]: Prod[F, G, A] =
@@ -130,7 +133,8 @@ sealed trait ProdMonoidK[F[_], G[_]]
 }
 
 sealed trait ProdAlternative[F[_], G[_]]
-    extends Alternative[Lambda[X => Prod[F, G, X]]] with ProdApplicative[F, G]
+    extends Alternative[Lambda[X => Prod[F, G, X]]]
+    with ProdApplicative[F, G]
     with ProdMonoidK[F, G] {
   def F: Alternative[F]
   def G: Alternative[G]

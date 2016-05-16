@@ -14,7 +14,8 @@ import scala.collection.JavaConverters._
 /** @author Stephen Samuel */
 @Component
 class SpringScalatraBootstrap
-    extends ApplicationContextAware with ServletContextAware {
+    extends ApplicationContextAware
+    with ServletContextAware {
 
   @PostConstruct
   def bootstrap() {

@@ -48,8 +48,8 @@ object HelloScalaFX extends JFXApp {
         children = Seq(new Text {
           text = "Scala"
           style = "-fx-font-size: 100pt"
-          fill = new LinearGradient(
-              endX = 0, stops = Stops(PaleGreen, SeaGreen))
+          fill =
+            new LinearGradient(endX = 0, stops = Stops(PaleGreen, SeaGreen))
         }, new Text {
           text = "FX"
           style = "-fx-font-size: 100pt"

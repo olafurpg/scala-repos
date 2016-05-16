@@ -41,7 +41,8 @@ object ColorInput {
 
 class ColorInput(
     override val delegate: jfxse.ColorInput = new jfxse.ColorInput)
-    extends Effect(delegate) with PositionDelegate[jfxse.ColorInput]
+    extends Effect(delegate)
+    with PositionDelegate[jfxse.ColorInput]
     with DimensionDelegate[jfxse.ColorInput]
     with SFXDelegate[jfxse.ColorInput] {
 

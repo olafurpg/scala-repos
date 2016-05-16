@@ -25,8 +25,9 @@ trait ScaladocAnalyzer extends Analyzer {
     override def canAdaptConstantTypeToLiteral = false
 
     override protected def macroImplementationNotFoundMessage(
-        name: Name): String = (super.macroImplementationNotFoundMessage(name) +
-        "\nWhen generating scaladocs for multiple projects at once, consider using -Ymacro-no-expand to disable macro expansions altogether.")
+        name: Name): String =
+      (super.macroImplementationNotFoundMessage(name) +
+          "\nWhen generating scaladocs for multiple projects at once, consider using -Ymacro-no-expand to disable macro expansions altogether.")
 
     override def typedDocDef(docDef: DocDef, mode: Mode, pt: Type): Tree = {
       val sym = docDef.symbol
@@ -94,8 +95,9 @@ trait ScaladocAnalyzer extends Analyzer {
       useCase.aliases = context.scope.toList
       namer.enterSyms(trees)
       typedStats(trees, NoSymbol)
-      useCase.defined = context.scope.toList filterNot
-      (useCase.aliases contains _)
+      useCase.defined =
+        context.scope.toList filterNot
+        (useCase.aliases contains _)
 
       if (settings.debug)
         useCase.defined foreach
@@ -131,7 +133,7 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       if (in.ch == '/') {
         do {
           in.next
-        } while ( (in.ch != CR) && (in.ch != LF) && (in.ch != SU))
+        } while ((in.ch != CR) && (in.ch != LF) && (in.ch != SU))
         true
       } else if (in.ch == '*') {
         docBuffer = null
@@ -175,7 +177,8 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       def parseComment(comment: DocComment) = {
         val nowarnings = settings.nowarn.value
         settings.nowarn.value = true
-        try parseAtSymbol(comment.raw, comment.raw, comment.pos) finally settings.nowarn.value = nowarnings
+        try parseAtSymbol(comment.raw, comment.raw, comment.pos) finally settings.nowarn.value =
+          nowarnings
       }
 
       override def internalLink(sym: Symbol, site: Symbol): Option[LinkTo] =
@@ -224,7 +227,8 @@ abstract class ScaladocSyntaxAnalyzer[G <: Global](val global: G)
       super.skipDocComment()
     }
     override def skipBlockComment(): Unit = {
-      inDocComment = false // ??? this means docBuffer won't receive contents of this comment???
+      inDocComment =
+        false // ??? this means docBuffer won't receive contents of this comment???
       docBuffer = new StringBuilder("/*")
       super.skipBlockComment()
     }

@@ -33,7 +33,9 @@ import org.apache.spark.sql.execution.streaming.{MemorySink, MemoryStream, Strea
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ContinuousQueryManagerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
 
   import AwaitTerminationTester._
   import testImplicits._

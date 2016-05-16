@@ -122,9 +122,12 @@ object ObservableSet extends MutableSetFactory[ObservableSet] {
   * @define SET `Set`
   */
 trait ObservableSet[T]
-    extends Set[T] with SetLike[T, ObservableSet[T]]
-    with GenericSetTemplate[T, ObservableSet] with Builder[T, ObservableSet[T]]
-    with Observable with SFXDelegate[jfxc.ObservableSet[T]] {
+    extends Set[T]
+    with SetLike[T, ObservableSet[T]]
+    with GenericSetTemplate[T, ObservableSet]
+    with Builder[T, ObservableSet[T]]
+    with Observable
+    with SFXDelegate[jfxc.ObservableSet[T]] {
 
   /**
     * The factory companion object that builds instances of class $OS.
@@ -248,6 +251,6 @@ trait ObservableSet[T]
   *                 [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/FXCollections.html FXCollections]].
   */
 class ObservableHashSet[T](
-    override val delegate: jfxc.ObservableSet[T] = jfxc.FXCollections
-        .observableSet(new ju.HashSet[T]))
+    override val delegate: jfxc.ObservableSet[T] =
+      jfxc.FXCollections.observableSet(new ju.HashSet[T]))
     extends ObservableSet[T]

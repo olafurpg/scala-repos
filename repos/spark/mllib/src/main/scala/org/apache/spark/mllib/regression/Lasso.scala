@@ -37,8 +37,11 @@ import org.apache.spark.rdd.RDD
 class LassoModel @Since("1.1.0")(
     @Since("1.0.0") override val weights: Vector,
     @Since("0.8.0") override val intercept: Double)
-    extends GeneralizedLinearModel(weights, intercept) with RegressionModel
-    with Serializable with Saveable with PMMLExportable {
+    extends GeneralizedLinearModel(weights, intercept)
+    with RegressionModel
+    with Serializable
+    with Saveable
+    with PMMLExportable {
 
   override protected def predictPoint(
       dataMatrix: Vector, weightMatrix: Vector, intercept: Double): Double = {
@@ -90,7 +93,8 @@ class LassoWithSGD private (private var stepSize: Double,
                             private var numIterations: Int,
                             private var regParam: Double,
                             private var miniBatchFraction: Double)
-    extends GeneralizedLinearAlgorithm[LassoModel] with Serializable {
+    extends GeneralizedLinearAlgorithm[LassoModel]
+    with Serializable {
 
   private val gradient = new LeastSquaresGradient()
   private val updater = new L1Updater()

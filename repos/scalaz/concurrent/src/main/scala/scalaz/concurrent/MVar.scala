@@ -60,13 +60,13 @@ private[this] class MVarImpl[A](
         p <- readLatch.currentPhase
         r <- reader
         a <- r match {
-          case Some(a) => IO(a)
-          case None =>
-            for {
-              _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
-              a <- read_ // someone has put a value so now we try to read it
-            } yield a
-        }
+              case Some(a) => IO(a)
+              case None =>
+                for {
+                  _ <- readLatch.awaitPhase(p) // we don't have a value so we wait for someone to put one
+                  a <- read_ // someone has put a value so now we try to read it
+                } yield a
+            }
       } yield a
     read_
   }

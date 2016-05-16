@@ -15,7 +15,8 @@ object TestProject extends Build {
     val slf4j =
       Seq("org.slf4j" % "slf4j-log4j12" % "1.1.0") // Uses log4j 1.2.13
     if ((base / "force").exists)
-      slf4j :+ ("log4j" % "log4j" % "1.2.14" force ()) else slf4j
+      slf4j :+ ("log4j" % "log4j" % "1.2.14" force ())
+    else slf4j
   }
 
   def check(ver: String) =

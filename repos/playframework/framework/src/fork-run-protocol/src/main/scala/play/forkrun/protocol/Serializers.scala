@@ -105,7 +105,8 @@ object Serializers {
       Map[String, Source]] = stringMapPickler[Source]
 
   implicit object playExceptionPickler
-      extends Pickler[PlayException] with Unpickler[PlayException] {
+      extends Pickler[PlayException]
+      with Unpickler[PlayException] {
     override def tag: FastTypeTag[PlayException] =
       implicitly[FastTypeTag[PlayException]]
     private val stringOptUnpickler = implicitly[Unpickler[Option[String]]]

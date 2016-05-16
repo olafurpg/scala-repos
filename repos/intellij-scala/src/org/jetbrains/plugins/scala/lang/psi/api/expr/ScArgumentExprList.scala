@@ -64,7 +64,7 @@ trait ScArgumentExprList extends ScArguments {
   def missedLastExpr: Boolean = {
     var child = getLastChild
     while (child != null &&
-    child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
+           child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
       if (child.isInstanceOf[ScExpression]) return false
       child = child.getPrevSibling
     }

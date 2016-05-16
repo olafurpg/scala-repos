@@ -57,8 +57,8 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
       .createTemplateBuilder(commonParent)
       .asInstanceOf[TemplateBuilderImpl]
 
-    val abstractNames = abstracts.map(
-        at => ScTypePresentation.ABSTRACT_TYPE_PREFIX + at.tpt.name)
+    val abstractNames = abstracts.map(at =>
+          ScTypePresentation.ABSTRACT_TYPE_PREFIX + at.tpt.name)
 
     def seekAbstracts(te: ScTypeElement) {
       val visitor = new ScalaRecursiveElementVisitor {
@@ -69,8 +69,7 @@ class ScalaGenerateAnonymousFunctionInsertHandler(
               if (abstractNames.contains(refName)) {
                 val prefixLength =
                   ScTypePresentation.ABSTRACT_TYPE_PREFIX.length
-                val node = abstracts.find(
-                    a =>
+                val node = abstracts.find(a =>
                       ScTypePresentation.ABSTRACT_TYPE_PREFIX +
                       a.tpt.name == refName) match {
                   case Some(abstr) =>

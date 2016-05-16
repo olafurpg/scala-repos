@@ -28,7 +28,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class EndToEndTest
-    extends FunSuite with AssertionsForJUnit with Eventually
+    extends FunSuite
+    with AssertionsForJUnit
+    with Eventually
     with IntegrationPatience {
 
   // turn off failure detector since we don't need it for these tests.

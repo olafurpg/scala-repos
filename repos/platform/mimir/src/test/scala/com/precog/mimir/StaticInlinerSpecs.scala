@@ -28,7 +28,8 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
 trait StaticInlinerSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification
+    with EvaluatorTestSupport[M] {
 
   import dag._
   import instructions._
@@ -312,4 +313,5 @@ trait StaticInlinerSpecs[M[+ _]]
 }
 
 object StaticInlinerSpecs
-    extends StaticInlinerSpecs[YId] with test.YIdInstances
+    extends StaticInlinerSpecs[YId]
+    with test.YIdInstances

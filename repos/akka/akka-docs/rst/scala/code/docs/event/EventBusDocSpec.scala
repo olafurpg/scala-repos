@@ -133,7 +133,8 @@ object EventBusDocSpec {
   final case class Notification(ref: ActorRef, id: Int)
 
   class ActorBusImpl(val system: ActorSystem)
-      extends ActorEventBus with ActorClassifier
+      extends ActorEventBus
+      with ActorClassifier
       with ManagedActorClassification {
     type Event = Notification
 

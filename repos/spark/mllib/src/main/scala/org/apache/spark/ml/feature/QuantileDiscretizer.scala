@@ -34,7 +34,10 @@ import org.apache.spark.util.random.XORShiftRandom
   * Params for [[QuantileDiscretizer]].
   */
 private[feature] trait QuantileDiscretizerBase
-    extends Params with HasInputCol with HasOutputCol with HasSeed {
+    extends Params
+    with HasInputCol
+    with HasOutputCol
+    with HasSeed {
 
   /**
     * Maximum number of buckets (quantiles, or categories) into which data points are grouped. Must
@@ -64,7 +67,8 @@ private[feature] trait QuantileDiscretizerBase
   */
 @Experimental
 final class QuantileDiscretizer(override val uid: String)
-    extends Estimator[Bucketizer] with QuantileDiscretizerBase
+    extends Estimator[Bucketizer]
+    with QuantileDiscretizerBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("quantileDiscretizer"))
@@ -107,7 +111,8 @@ final class QuantileDiscretizer(override val uid: String)
 
 @Since("1.6.0")
 object QuantileDiscretizer
-    extends DefaultParamsReadable[QuantileDiscretizer] with Logging {
+    extends DefaultParamsReadable[QuantileDiscretizer]
+    with Logging {
 
   /**
     * Minimum number of samples required for finding splits, regardless of number of bins.  If

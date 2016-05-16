@@ -222,7 +222,7 @@ class LinkedHashMapFactory(
     s"java.util.LinkedHashMap{$orderName$sizeLimitSting}"
   }
 
-  override def empty[K : ClassTag, V : ClassTag]: ju.LinkedHashMap[K, V] = {
+  override def empty[K: ClassTag, V: ClassTag]: ju.LinkedHashMap[K, V] = {
     withSizeLimit match {
       case Some(limit) =>
         new ju.LinkedHashMap[K, V](16, 0.75f, accessOrder) {

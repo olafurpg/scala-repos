@@ -57,7 +57,8 @@ private[spark] final class ShuffleBlockFetcherIterator(
     blocksByAddress: Seq[(BlockManagerId, Seq[(BlockId, Long)])],
     maxBytesInFlight: Long,
     maxReqsInFlight: Int)
-    extends Iterator[(BlockId, InputStream)] with Logging {
+    extends Iterator[(BlockId, InputStream)]
+    with Logging {
 
   import ShuffleBlockFetcherIterator._
 
@@ -371,10 +372,9 @@ private[spark] final class ShuffleBlockFetcherIterator(
 
   private def fetchUpToMaxBytes(): Unit = {
     // Send fetch requests up to maxBytesInFlight
-    while (fetchRequests.nonEmpty &&
-    (bytesInFlight == 0 ||
-        (reqsInFlight + 1 <= maxReqsInFlight &&
-            bytesInFlight + fetchRequests.front.size <= maxBytesInFlight))) {
+    while (fetchRequests.nonEmpty && (bytesInFlight == 0 ||
+               (reqsInFlight + 1 <= maxReqsInFlight && bytesInFlight +
+                   fetchRequests.front.size <= maxBytesInFlight))) {
       sendRequest(fetchRequests.dequeue())
     }
   }

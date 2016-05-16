@@ -47,10 +47,10 @@ class CallGraphTest extends ClearAfterClass {
 
   def compile(code: String,
               allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+                false): List[ClassNode] = {
     CallGraphTest.notPerRun.foreach(_.clear())
-    compileClasses(compiler)(code, allowMessage = allowMessage)
-      .map(c => byteCodeRepository.classNode(c.name).get)
+    compileClasses(compiler)(code, allowMessage = allowMessage).map(c =>
+          byteCodeRepository.classNode(c.name).get)
   }
 
   def callsInMethod(methodNode: MethodNode): List[MethodInsnNode] =
@@ -123,10 +123,9 @@ class CallGraphTest extends ClearAfterClass {
         "operand stack at the callsite in Test::t1(LC;)I contains more values",
         "operand stack at the callsite in Test::t2(LD;)I contains more values")
     var msgCount = 0
-    val checkMsg = (m: StoreReporter#Info) =>
-      {
-        msgCount += 1
-        ok exists (m.msg contains _)
+    val checkMsg = (m: StoreReporter#Info) => {
+      msgCount += 1
+      ok exists (m.msg contains _)
     }
     val List(cCls, cMod, dCls, testCls) = compile(code, checkMsg)
     assert(msgCount == 6, msgCount)

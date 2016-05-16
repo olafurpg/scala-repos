@@ -67,7 +67,8 @@ import org.apache.spark.shuffle._
   * For more details on these optimizations, see SPARK-7081.
   */
 private[spark] class SortShuffleManager(conf: SparkConf)
-    extends ShuffleManager with Logging {
+    extends ShuffleManager
+    with Logging {
 
   if (!conf.getBoolean("spark.shuffle.spill", true)) {
     logWarning(

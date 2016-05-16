@@ -48,7 +48,8 @@ private[streaming] class ReceiverSupervisorImpl(
     hadoopConf: Configuration,
     checkpointDirOption: Option[String]
 )
-    extends ReceiverSupervisor(receiver, env.conf) with Logging {
+    extends ReceiverSupervisor(receiver, env.conf)
+    with Logging {
 
   private val host = SparkEnv.get.blockManager.blockManagerId.host
   private val executorId = SparkEnv.get.blockManager.blockManagerId.executorId

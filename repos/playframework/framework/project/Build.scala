@@ -107,8 +107,7 @@ object BuildSettings {
       .enablePlugins(PlayLibrary)
       .settings(playCommonSettings: _*)
       .settings(
-          (javacOptions in compile) ~=
-          (_.map {
+          (javacOptions in compile) ~= (_.map {
                 case "1.8" => "1.6"
                 case other => other
               })
@@ -138,8 +137,8 @@ object BuildSettings {
           "-Dscala.version=" + sys.props
             .get("scripted.scala.version")
             .getOrElse((scalaVersion in PlayBuild.PlayProject).value)
-        )
-    )
+      )
+  )
 
   def playFullScriptedSettings: Seq[Setting[_]] =
     ScriptedPlugin.scriptedSettings ++ Seq(
@@ -245,13 +244,13 @@ object PlayBuild extends Build {
     .settings(
         libraryDependencies ++=
           runtime(scalaVersion.value) ++ scalacheckDependencies,
-        sourceGenerators in Compile <+= (
-            version,
-            scalaVersion,
-            sbtVersion,
-            sourceManaged in Compile) map PlayVersion,
+        sourceGenerators in Compile <+=
+          (version,
+         scalaVersion,
+         sbtVersion,
+         sourceManaged in Compile) map PlayVersion,
         sourceDirectories in (Compile, TwirlKeys.compileTemplates) :=
-        (unmanagedSourceDirectories in Compile).value,
+          (unmanagedSourceDirectories in Compile).value,
         TwirlKeys.templateImports += "play.api.templates.PlayMagic._",
         mappings in (Compile, packageSrc) ++= {
           // Add both the templates, useful for end users to read, and the Scala sources that they get compiled to,
@@ -425,8 +424,8 @@ object PlayBuild extends Build {
         libraryDependencies ++= logback,
         parallelExecution in Test := false,
         // quieten deprecation warnings in tests
-        scalacOptions in Test := (scalacOptions in Test).value diff Seq(
-            "-deprecation")
+        scalacOptions in Test :=
+          (scalacOptions in Test).value diff Seq("-deprecation")
     )
     .dependsOn(PlayProject)
 
@@ -435,8 +434,8 @@ object PlayBuild extends Build {
         libraryDependencies ++= playWsDeps,
         parallelExecution in Test := false,
         // quieten deprecation warnings in tests
-        scalacOptions in Test := (scalacOptions in Test).value diff Seq(
-            "-deprecation")
+        scalacOptions in Test :=
+          (scalacOptions in Test).value diff Seq("-deprecation")
     )
     .dependsOn(PlayProject)
     .dependsOn(PlaySpecs2Project % "test")

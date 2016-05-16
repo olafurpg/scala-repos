@@ -263,10 +263,8 @@ class RewriteJoins extends Phase {
           val (sn2, pulled) = pullOut(sn1, s1, illegal)
           if (sn2 eq sn1) (b, Map.empty)
           else {
-            val b2 = b
-              .copy(select = Pure(sn2, ts))
-              .infer()
-              (b2, pulled.map { case (s, n) => (s :: Nil, n) })
+            val b2 = b.copy(select = Pure(sn2, ts)).infer()
+            (b2, pulled.map { case (s, n) => (s :: Nil, n) })
           }
         case n => (n, Map.empty)
       }
@@ -328,8 +326,8 @@ class RewriteJoins extends Phase {
                      j)
         val pull = alsoPull + s1
         val j2b = rearrangeJoinConditions(j2a, pull)
-        val (on1Down, on1Keep) = splitConjunctions(on1).partition(
-            p => hasRefTo(p, Set(s2)) && !hasRefTo(p, pull))
+        val (on1Down, on1Keep) = splitConjunctions(on1).partition(p =>
+              hasRefTo(p, Set(s2)) && !hasRefTo(p, pull))
         val (on2Up, on2Keep) =
           splitConjunctions(j2b.on).partition(p => hasRefTo(p, pull))
         if (on1Down.nonEmpty || on2Up.nonEmpty) {
@@ -403,7 +401,8 @@ class RewriteJoins extends Phase {
       ns.reduceLeft { (p1, p2) =>
         val t1 = p1.nodeType.structural
         Library.And.typed(if (t1.isInstanceOf[OptionType])
-                            t1 else p2.nodeType.structural,
+                            t1
+                          else p2.nodeType.structural,
                           p1,
                           p2)
       }
@@ -411,7 +410,8 @@ class RewriteJoins extends Phase {
   def and(p1Opt: Option[Node], p2: Node): Node = p1Opt.fold(p2) { p1 =>
     val t1 = p1.nodeType.structural
     Library.And.typed(if (t1.isInstanceOf[OptionType])
-                        t1 else p2.nodeType.structural,
+                        t1
+                      else p2.nodeType.structural,
                       p1,
                       p2)
   }

@@ -196,8 +196,9 @@ package Generic1TestsAux {
   trait Pointed1 {
 
     // HACKING the fact that CNil can't be pointed
-    implicit def isCPointedSimpleType: Pointed[
-        ({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ] =
+    implicit def isCPointedSimpleType: Pointed[({
+          type λ[A] = A :+: Const[CNil]#λ[A]
+        })#λ] =
       new Pointed[({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ] {
         def point[A](a: A): A :+: Const[CNil]#λ[A] = Inl(a)
       }
@@ -296,8 +297,8 @@ class Generic1Tests {
 
   @Test
   def testIsHCons1: Unit = {
-    type L[t] = Id[t] :: t :: String :: (t,
-    t) :: List[Option[t]] :: Option[t] :: List[t] :: HNil
+    type L[t] =
+      Id[t] :: t :: String :: (t, t) :: List[Option[t]] :: Option[t] :: List[t] :: HNil
 
     val ihc = the[IsHCons1[L, TC1, TC2]]
     val l: L[Int] =
@@ -600,11 +601,9 @@ class Generic1Tests {
             F, Trivial1, ({ type λ[r[_]] = TC3[r, Option] })#λ]): Unit = ()
     def materialize12[F[_]](implicit ihc: Split1[
             F, Trivial1, ({ type λ[r[_]] = TC3[Option, r] })#λ]): Unit = ()
-    def materialize13[F[_]](
-        implicit ihc: Split1[
+    def materialize13[F[_]](implicit ihc: Split1[
             F, ({ type λ[r[_]] = TC3[r, Option] })#λ, Trivial1]): Unit = ()
-    def materialize14[F[_]](
-        implicit ihc: Split1[
+    def materialize14[F[_]](implicit ihc: Split1[
             F, ({ type λ[r[_]] = TC3[Option, r] })#λ, Trivial1]): Unit = ()
 
     type S[t] = List[Option[t]]

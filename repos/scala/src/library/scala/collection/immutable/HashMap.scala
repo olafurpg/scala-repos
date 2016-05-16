@@ -37,8 +37,11 @@ import parallel.immutable.ParHashMap
     "The implementation details of immutable hash maps make inheriting from them unwise.",
     "2.11.0")
 class HashMap[A, +B]
-    extends AbstractMap[A, B] with Map[A, B] with MapLike[A, B, HashMap[A, B]]
-    with Serializable with CustomParallelizable[(A, B), ParHashMap[A, B]] {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, HashMap[A, B]]
+    with Serializable
+    with CustomParallelizable[(A, B), ParHashMap[A, B]] {
   import HashMap.{nullToEmpty, bufferSize}
 
   override def size: Int = 0

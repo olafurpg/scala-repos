@@ -20,7 +20,7 @@ class AbstractListFactory extends AbstractCollectionFactory with ListFactory {
   override def implementationName: String =
     "java.util.AbstractList"
 
-  override def empty[E : ClassTag]: ju.AbstractList[E] = {
+  override def empty[E: ClassTag]: ju.AbstractList[E] = {
     // inefficient but simple for debugging implementation of AbstractList
     new ju.AbstractList[E] {
 

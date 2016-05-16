@@ -32,10 +32,10 @@ object AkkaStreams {
     * If the splitter flow produces Left, they will be fed into the flow. If it produces Right, they will bypass the
     * flow.
     */
-  def bypassWith[In, FlowIn, Out](splitter: Flow[In, Either[FlowIn, Out], _],
-                                  mergeStrategy: Graph[
-                                      UniformFanInShape[Out, Out],
-                                      _] = onlyFirstCanFinishMerge[Out](2))
+  def bypassWith[In, FlowIn, Out](
+      splitter: Flow[In, Either[FlowIn, Out], _],
+      mergeStrategy: Graph[UniformFanInShape[Out, Out], _] =
+        onlyFirstCanFinishMerge[Out](2))
     : Flow[FlowIn, Out, _] => Flow[In, Out, _] = { flow =>
     val bypasser = Flow.fromGraph(GraphDSL
           .create[FlowShape[Either[FlowIn, Out], Out]]() { implicit builder =>

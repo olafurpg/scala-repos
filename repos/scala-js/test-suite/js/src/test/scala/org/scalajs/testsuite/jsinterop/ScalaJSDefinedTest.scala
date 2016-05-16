@@ -1210,7 +1210,8 @@ class ScalaJSDefinedTest {
   @Test def implement_a_simple_trait_under_separate_compilation(): Unit = {
     @ScalaJSDefined
     class ImplementSimpleTraitSepRun
-        extends js.Object with SepRun.SimpleTrait {
+        extends js.Object
+        with SepRun.SimpleTrait {
       def foo(x: Int): Int = x + 1
     }
 
@@ -1270,7 +1271,8 @@ class ScalaJSDefinedTest {
 
     @ScalaJSDefined
     class ImplExtendsJSClassAndTrait
-        extends NativeParentClass(5) with TraitExtendsJSClass {
+        extends NativeParentClass(5)
+        with TraitExtendsJSClass {
       def foobar(x: Int): Int = x * 3
     }
 

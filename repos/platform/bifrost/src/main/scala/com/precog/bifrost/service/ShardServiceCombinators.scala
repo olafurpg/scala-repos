@@ -187,9 +187,9 @@ object ShardServiceCombinators extends Logging {
       }
       .sequence[({ type λ[α] = Validation[String, α] })#λ, Long]
 
-      (offset.toValidationNel |@| limit.toValidationNel) { (offset, limit) =>
-        limit map ((offset getOrElse 0, _))
-      }
+    (offset.toValidationNel |@| limit.toValidationNel) { (offset, limit) =>
+      limit map ((offset getOrElse 0, _))
+    }
   }
 
   def queryOpts(request: HttpRequest[_]) = {
@@ -216,8 +216,10 @@ object ShardServiceCombinators extends Logging {
 }
 
 trait ShardServiceCombinators
-    extends EitherServiceCombinators with PathServiceCombinators
-    with APIKeyServiceCombinators with Logging {
+    extends EitherServiceCombinators
+    with PathServiceCombinators
+    with APIKeyServiceCombinators
+    with Logging {
   import ShardServiceCombinators._
   import ServiceHandlerUtil._
   import DefaultBijections._
@@ -226,60 +228,60 @@ trait ShardServiceCombinators
 
   def query[B](next: HttpService[ByteChunk,
                                  (APIKey, AccountDetails, Path, Query,
-                                 QueryOptions) => Future[HttpResponse[B]]])(
-      implicit executor: ExecutionContext): HttpService[
-      ByteChunk, ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] = {
+                                  QueryOptions) => Future[HttpResponse[B]]])(
+      implicit executor: ExecutionContext)
+    : HttpService[ByteChunk,
+                  ((APIKey, AccountDetails),
+                   Path) => Future[HttpResponse[B]]] = {
     new DelegatingService[ByteChunk,
                           ((APIKey, AccountDetails),
-                          Path) => Future[HttpResponse[B]],
+                           Path) => Future[HttpResponse[B]],
                           ByteChunk,
                           (APIKey, AccountDetails, Path, Query,
-                          QueryOptions) => Future[HttpResponse[B]]] {
+                           QueryOptions) => Future[HttpResponse[B]]] {
       val delegate = next
       val metadata = NoMetadata
       val service: HttpRequest[ByteChunk] => Validation[
           NotServed,
           ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] =
-        (request: HttpRequest[ByteChunk]) =>
-          {
-            queryOpts(request) flatMap { opts =>
-              def quirrelContent(
-                  request: HttpRequest[ByteChunk]): Option[ByteChunk] =
-                for {
-                  header <- request.headers.header[`Content-Type`]
-                               if header.mimeTypes exists { t =>
-                             t == text / plain ||
-                             (t.maintype == "text" &&
-                                 t.subtype == "x-quirrel-script")
-                           }
-                  content <- request.content
-                } yield content
-
-              next.service(request) map { f =>
-                val serv: ((APIKey, AccountDetails),
-                Path) => Future[HttpResponse[B]] = {
-                  case ((apiKey, account), path) =>
-                    val query: Option[Future[String]] = request.parameters
-                      .get('q)
-                      .filter(_ != null)
-                      .map(Promise.successful)
-                      .orElse(quirrelContent(request).map(ByteChunk
-                                .forceByteArray(_: ByteChunk)
-                                .map(new String(_: Array[Byte], "UTF-8"))))
-
-                    val result: Future[HttpResponse[B]] =
-                      query map { q =>
-                        q flatMap { f(apiKey, account, path, _: String, opts) }
-                      } getOrElse {
-                        Promise.successful(HttpResponse(HttpStatus(
-                                    BadRequest,
-                                    "Neither the query string nor request body contained an identifiable quirrel query.")))
-                      }
-                    result
+        (request: HttpRequest[ByteChunk]) => {
+          queryOpts(request) flatMap { opts =>
+            def quirrelContent(
+                request: HttpRequest[ByteChunk]): Option[ByteChunk] =
+              for {
+                header <- request.headers.header[`Content-Type`]
+                if header.mimeTypes exists { t =>
+                  t == text / plain ||
+                  (t.maintype == "text" && t.subtype == "x-quirrel-script")
                 }
-                serv
+                content <- request.content
+              } yield content
+
+            next.service(request) map { f =>
+              val serv: ((APIKey, AccountDetails),
+                         Path) => Future[HttpResponse[B]] = {
+                case ((apiKey, account), path) =>
+                  val query: Option[Future[String]] = request.parameters
+                    .get('q)
+                    .filter(_ != null)
+                    .map(Promise.successful)
+                    .orElse(quirrelContent(request).map(ByteChunk
+                              .forceByteArray(_: ByteChunk)
+                              .map(new String(_: Array[Byte], "UTF-8"))))
+
+                  val result: Future[HttpResponse[B]] =
+                    query map { q =>
+                      q flatMap { f(apiKey, account, path, _: String, opts) }
+                    } getOrElse {
+                      Promise.successful(HttpResponse(HttpStatus(
+                                  BadRequest,
+                                  "Neither the query string nor request body contained an identifiable quirrel query.")))
+                    }
+                  result
               }
+              serv
             }
+          }
         }
     }
   }
@@ -287,15 +289,14 @@ trait ShardServiceCombinators
   def asyncQuery[B](
       next: HttpService[ByteChunk,
                         (APIKey, AccountDetails, Path, Query,
-                        QueryOptions) => Future[HttpResponse[B]]])(
+                         QueryOptions) => Future[HttpResponse[B]]])(
       implicit executor: ExecutionContext): HttpService[
       ByteChunk, ((APIKey, AccountDetails)) => Future[HttpResponse[B]]] = {
-    new DelegatingService[ByteChunk,
-                          ((APIKey,
-                          AccountDetails)) => Future[HttpResponse[B]],
-                          ByteChunk,
-                          ((APIKey, AccountDetails),
-                          Path) => Future[HttpResponse[B]]] {
+    new DelegatingService[
+        ByteChunk,
+        ((APIKey, AccountDetails)) => Future[HttpResponse[B]],
+        ByteChunk,
+        ((APIKey, AccountDetails), Path) => Future[HttpResponse[B]]] {
       val delegate = query[B](next)
       val service = { (request: HttpRequest[ByteChunk]) =>
         val path =
@@ -319,7 +320,8 @@ trait ShardServiceCombinators
       implicit inj: JValue => B,
       M: Monad[Future]): HttpService[A, APIKey => Future[HttpResponse[B]]] = {
     val service0 =
-      service map { (f: ((APIKey, AccountDetails)) => Future[HttpResponse[B]]) =>
+      service map { (f: ((APIKey, AccountDetails)) => Future[
+          HttpResponse[B]]) =>
         { (v: Validation[String, (APIKey, AccountDetails)]) =>
           v.fold(msg => M.point(forbidden(msg) map inj), f)
         }

@@ -16,7 +16,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * Date: 22.02.2008
   */
 trait ScLiteral
-    extends ScExpression with PsiLiteral with PsiLanguageInjectionHost {
+    extends ScExpression
+    with PsiLiteral
+    with PsiLanguageInjectionHost {
 
   /**
     * This method works only for null literal (to avoid possibly dangerous usage)

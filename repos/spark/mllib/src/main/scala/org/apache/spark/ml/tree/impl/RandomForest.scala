@@ -74,8 +74,7 @@ private[ml] object RandomForest extends Logging {
     val splits = findSplits(retaggedInput, metadata, seed)
     timer.stop("findSplitsBins")
     logDebug("numBins: feature: number of bins")
-    logDebug(
-        Range(0, metadata.numFeatures).map { featureIndex =>
+    logDebug(Range(0, metadata.numFeatures).map { featureIndex =>
       s"\t$featureIndex\t${metadata.numBins(featureIndex)}"
     }.mkString("\n"))
 
@@ -151,8 +150,8 @@ private[ml] object RandomForest extends Logging {
     // Allocate and queue root nodes.
     val topNodes =
       Array.fill[LearningNode](numTrees)(LearningNode.emptyNode(nodeIndex = 1))
-    Range(0, numTrees).foreach(
-        treeIndex => nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
+    Range(0, numTrees).foreach(treeIndex =>
+          nodeQueue.enqueue((treeIndex, topNodes(treeIndex))))
 
     while (nodeQueue.nonEmpty) {
       // Collect some nodes to split, and choose features for each node (if subsampling).
@@ -455,9 +454,10 @@ private[ml] object RandomForest extends Logging {
     /**
       * Do the same thing as binSeqOp, but with nodeIdCache.
       */
-    def binSeqOpWithNodeIdCache(agg: Array[DTStatsAggregator],
-                                dataPoint: (BaggedPoint[TreePoint],
-                                Array[Int])): Array[DTStatsAggregator] = {
+    def binSeqOpWithNodeIdCache(
+        agg: Array[DTStatsAggregator],
+        dataPoint: (BaggedPoint[TreePoint], Array[Int]))
+      : Array[DTStatsAggregator] = {
       treeToNodeToIndexInfo.foreach {
         case (treeIndex, nodeIndexToInfo) =>
           val baggedPoint = dataPoint._1
@@ -486,7 +486,8 @@ private[ml] object RandomForest extends Logging {
         treeToNodeToIndexInfo.values.foreach { nodeIdToNodeInfo =>
           nodeIdToNodeInfo.values.foreach { nodeIndexInfo =>
             assert(nodeIndexInfo.featureSubset.isDefined)
-            mutableNodeToFeatures(nodeIndexInfo.nodeIndexInGroup) = nodeIndexInfo.featureSubset.get
+            mutableNodeToFeatures(nodeIndexInfo.nodeIndexInGroup) =
+              nodeIndexInfo.featureSubset.get
           }
         }
         Some(mutableNodeToFeatures.toMap)
@@ -498,7 +499,8 @@ private[ml] object RandomForest extends Logging {
     nodesForGroup.foreach {
       case (treeIndex, nodesForTree) =>
         nodesForTree.foreach { node =>
-          nodes(treeToNodeToIndexInfo(treeIndex)(node.id).nodeIndexInGroup) = node
+          nodes(treeToNodeToIndexInfo(treeIndex)(node.id).nodeIndexInGroup) =
+            node
         }
     }
 
@@ -763,11 +765,11 @@ private[ml] object RandomForest extends Logging {
                     binAggregates.getImpurityCalculator(nodeFeatureOffset,
                                                         numSplits)
                   rightChildStats.subtract(leftChildStats)
-                  gainAndImpurityStats = calculateImpurityStats(
-                      gainAndImpurityStats,
-                      leftChildStats,
-                      rightChildStats,
-                      binAggregates.metadata)
+                  gainAndImpurityStats =
+                    calculateImpurityStats(gainAndImpurityStats,
+                                           leftChildStats,
+                                           rightChildStats,
+                                           binAggregates.metadata)
                   (splitIdx, gainAndImpurityStats)
               }.maxBy(_._2.gain)
             (splits(featureIndex)(bestFeatureSplitIndex), bestFeatureGainStats)
@@ -783,11 +785,11 @@ private[ml] object RandomForest extends Logging {
                 val rightChildStats = binAggregates
                   .getParentImpurityCalculator()
                   .subtract(leftChildStats)
-                gainAndImpurityStats = calculateImpurityStats(
-                    gainAndImpurityStats,
-                    leftChildStats,
-                    rightChildStats,
-                    binAggregates.metadata)
+                gainAndImpurityStats =
+                  calculateImpurityStats(gainAndImpurityStats,
+                                         leftChildStats,
+                                         rightChildStats,
+                                         binAggregates.metadata)
                 (splitIndex, gainAndImpurityStats)
               }.maxBy(_._2.gain)
             (splits(featureIndex)(bestFeatureSplitIndex), bestFeatureGainStats)
@@ -866,11 +868,11 @@ private[ml] object RandomForest extends Logging {
                   binAggregates.getImpurityCalculator(nodeFeatureOffset,
                                                       lastCategory)
                 rightChildStats.subtract(leftChildStats)
-                gainAndImpurityStats = calculateImpurityStats(
-                    gainAndImpurityStats,
-                    leftChildStats,
-                    rightChildStats,
-                    binAggregates.metadata)
+                gainAndImpurityStats =
+                  calculateImpurityStats(gainAndImpurityStats,
+                                         leftChildStats,
+                                         rightChildStats,
+                                         binAggregates.metadata)
                 (splitIndex, gainAndImpurityStats)
               }.maxBy(_._2.gain)
             val categoriesForSplit = categoriesSortedByCentroid
@@ -962,8 +964,8 @@ private[ml] object RandomForest extends Logging {
         math.min(continuousFeatures.length, input.partitions.length)
 
       input
-        .flatMap(
-            point => continuousFeatures.map(idx => (idx, point.features(idx))))
+        .flatMap(point =>
+              continuousFeatures.map(idx => (idx, point.features(idx))))
         .groupByKey(numPartitions)
         .map {
           case (idx, samples) =>
@@ -1162,11 +1164,11 @@ private[ml] object RandomForest extends Logging {
         nodeQueue.dequeue()
         mutableNodesForGroup.getOrElseUpdate(
             treeIndex, new mutable.ArrayBuffer[LearningNode]()) += node
-        mutableTreeToNodeToIndexInfo.getOrElseUpdate(treeIndex,
-                                                     new mutable.HashMap[
-                                                         Int,
-                                                         NodeIndexInfo]())(
-            node.id) = new NodeIndexInfo(numNodesInGroup, featureSubset)
+        mutableTreeToNodeToIndexInfo.getOrElseUpdate(
+            treeIndex,
+            new mutable.HashMap[Int,
+                                NodeIndexInfo]())(node.id) = new NodeIndexInfo(
+            numNodesInGroup, featureSubset)
       }
       numNodesInGroup += 1
       memUsage += nodeMemUsage
@@ -1174,10 +1176,9 @@ private[ml] object RandomForest extends Logging {
     // Convert mutable maps to immutable ones.
     val nodesForGroup: Map[Int, Array[LearningNode]] =
       mutableNodesForGroup.mapValues(_.toArray).toMap
-    val treeToNodeToIndexInfo = mutableTreeToNodeToIndexInfo
-      .mapValues(_.toMap)
-      .toMap
-      (nodesForGroup, treeToNodeToIndexInfo)
+    val treeToNodeToIndexInfo =
+      mutableTreeToNodeToIndexInfo.mapValues(_.toMap).toMap
+    (nodesForGroup, treeToNodeToIndexInfo)
   }
 
   /**

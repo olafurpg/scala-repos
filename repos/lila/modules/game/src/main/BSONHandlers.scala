@@ -82,8 +82,10 @@ object BSONHandlers {
           status = r.get[Status](status),
           turns = nbTurns,
           startedAtTurn = r intD startedAtTurn,
-          clock = r.getO[Color => Clock](clock)(clockBSONReader(
-                    createdAtValue, wPlayer.berserk, bPlayer.berserk)) map
+          clock =
+            r.getO[Color => Clock](clock)(clockBSONReader(createdAtValue,
+                                                          wPlayer.berserk,
+                                                          bPlayer.berserk)) map
             (_ (Color(0 == nbTurns % 2))),
           positionHashes = r.bytesD(positionHashes).value,
           checkCount = {
@@ -91,37 +93,42 @@ object BSONHandlers {
             CheckCount(~counts.headOption, ~counts.lastOption)
           },
           castleLastMoveTime = r.get[CastleLastMoveTime](castleLastMoveTime)(
-                CastleLastMoveTime.castleLastMoveTimeBSONHandler),
+              CastleLastMoveTime.castleLastMoveTimeBSONHandler),
           daysPerTurn = r intO daysPerTurn,
           binaryMoveTimes = (r bytesO moveTimes) | ByteArray.empty,
           mode = Mode(r boolD rated),
           variant = realVariant,
-          crazyData = (realVariant == Crazyhouse) option r
+          crazyData =
+            (realVariant == Crazyhouse) option r
               .get[Crazyhouse.Data](crazyData),
           next = r strO next,
           bookmarks = r intD bookmarks,
           createdAt = createdAtValue,
           updatedAt = r dateO updatedAt,
-          metadata = Metadata(source = r intO source flatMap Source.apply,
-                              pgnImport = r.getO[PgnImport](pgnImport)(
-                                    PgnImport.pgnImportBSONHandler),
-                              tournamentId = r strO tournamentId,
-                              simulId = r strO simulId,
-                              tvAt = r dateO tvAt,
-                              analysed = r boolD analysed)
+          metadata = Metadata(
+              source = r intO source flatMap Source.apply,
+              pgnImport =
+                r.getO[PgnImport](pgnImport)(PgnImport.pgnImportBSONHandler),
+              tournamentId = r strO tournamentId,
+              simulId = r strO simulId,
+              tvAt = r dateO tvAt,
+              analysed = r boolD analysed)
       )
     }
 
     def writes(w: BSON.Writer, o: Game) = BSONDocument(
         id -> o.id,
         playerIds -> (o.whitePlayer.id + o.blackPlayer.id),
-        playerUids -> w.listO(List(
-                ~o.whitePlayer.userId, ~o.blackPlayer.userId)),
-        whitePlayer -> w.docO(playerBSONHandler write
+        playerUids -> w.listO(List(~o.whitePlayer.userId,
+                                   ~o.blackPlayer.userId)),
+        whitePlayer -> w
+          .docO(playerBSONHandler write
             ((_: Color) =>
                   (_: Player.Id) =>
                     (_: Player.UserId) => (_: Player.Win) => o.whitePlayer)),
-        blackPlayer -> w.docO(playerBSONHandler write
+        blackPlayer -> w
+          .docO(
+            playerBSONHandler write
             ((_: Color) =>
                   (_: Player.Id) =>
                     (_: Player.UserId) => (_: Player.Win) => o.blackPlayer)),

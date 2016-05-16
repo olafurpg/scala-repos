@@ -24,7 +24,8 @@ abstract class DoubleBuffer private[nio](
     _capacity: Int,
     private[nio] val _array: Array[Double],
     private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[DoubleBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[DoubleBuffer] {
 
   private[nio] type ElementType = Double
   private[nio] type BufferType = DoubleBuffer

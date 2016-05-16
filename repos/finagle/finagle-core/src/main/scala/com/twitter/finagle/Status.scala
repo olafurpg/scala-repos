@@ -57,8 +57,8 @@ object Status {
   def worstOf[T](ts: Iterable[T], status: T => Status): Status = {
     var worst: Status = Status.Open
     val itr = ts.iterator
-    while (itr.hasNext &&
-    worst != Status.Closed) worst = Status.worst(worst, status(itr.next()))
+    while (itr.hasNext && worst != Status.Closed) worst =
+      Status.worst(worst, status(itr.next()))
     worst
   }
 
@@ -72,8 +72,8 @@ object Status {
   def bestOf[T](ts: Iterable[T], status: T => Status): Status = {
     var best: Status = Status.Closed
     val itr = ts.iterator
-    while (itr.hasNext &&
-    best != Status.Open) best = Status.best(best, status(itr.next()))
+    while (itr.hasNext && best != Status.Open) best =
+      Status.best(best, status(itr.next()))
     best
   }
 

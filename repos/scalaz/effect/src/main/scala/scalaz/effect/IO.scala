@@ -143,8 +143,7 @@ sealed abstract class IO[A] {
 
   def bracketIO[M[_], B](after: A => IO[Unit])(
       during: A => M[B])(implicit m: MonadControlIO[M]): M[B] =
-    controlIO(
-        (runInIO: RunInBase[M, IO]) =>
+    controlIO((runInIO: RunInBase[M, IO]) =>
           bracket(after)(runInIO.apply compose during))
 
   /** An automatic resource management. */
@@ -301,15 +300,15 @@ object IO extends IOInstances {
       for {
         hs <- hsIORef.read
         _ <- hs.foldRight[IO[Unit]](IO.ioUnit) {
-          case (r, o) =>
-            for {
-              refCnt <- r.refcount.mod(_ - 1)
-              _ <- if (refCnt == 0) r.finalizer else IO.ioUnit
-            } yield ()
-        }
+              case (r, o) =>
+                for {
+                  refCnt <- r.refcount.mod(_ - 1)
+                  _ <- if (refCnt == 0) r.finalizer else IO.ioUnit
+                } yield ()
+            }
       } yield ()
-    newIORef(List[RefCountedFinalizer]())
-      .bracketIO(after)(s => r.apply.value.run(s))
+    newIORef(List[RefCountedFinalizer]()).bracketIO(after)(s =>
+          r.apply.value.run(s))
   }
 
   def tailrecM[A, B](f: A => IO[A \/ B])(a: A): IO[B] =

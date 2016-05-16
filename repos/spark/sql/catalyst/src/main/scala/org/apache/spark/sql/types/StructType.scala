@@ -92,7 +92,8 @@ import org.apache.spark.sql.catalyst.util.quoteIdentifier
   */
 @DeveloperApi
 case class StructType(fields: Array[StructField])
-    extends DataType with Seq[StructField] {
+    extends DataType
+    with Seq[StructField] {
 
   /** No-arg constructor for kryo. */
   def this() = this(Array.empty[StructField])
@@ -369,9 +370,8 @@ object StructType extends AbstractDataType {
   }
 
   protected[sql] def fromAttributes(attributes: Seq[Attribute]): StructType =
-    StructType(
-        attributes.map(
-            a => StructField(a.name, a.dataType, a.nullable, a.metadata)))
+    StructType(attributes.map(a =>
+              StructField(a.name, a.dataType, a.nullable, a.metadata)))
 
   def removeMetadata(key: String, dt: DataType): DataType =
     dt match {

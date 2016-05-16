@@ -20,7 +20,8 @@ trait Iterable[A]
 //                     with GenIterable[A]
     with scala.collection.Iterable[A]
     with GenericTraversableTemplate[A, Iterable]
-    with IterableLike[A, Iterable[A]] with Parallelizable[A, ParIterable[A]] {
+    with IterableLike[A, Iterable[A]]
+    with Parallelizable[A, ParIterable[A]] {
   override def companion: GenericCompanion[Iterable] = Iterable
   protected[this] override def parCombiner =
     ParIterable.newCombiner[A] // if `mutable.IterableLike` gets introduced, please move this there!
@@ -40,4 +41,5 @@ object Iterable extends TraversableFactory[Iterable] {
 
 /** Explicit instantiation of the `Iterable` trait to reduce class file size in subclasses. */
 abstract class AbstractIterable[A]
-    extends scala.collection.AbstractIterable[A] with Iterable[A]
+    extends scala.collection.AbstractIterable[A]
+    with Iterable[A]

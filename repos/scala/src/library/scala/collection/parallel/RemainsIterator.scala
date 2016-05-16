@@ -399,7 +399,9 @@ private[collection] trait AugmentedSeqIterator[+T]
   *  @tparam T          type of the elements iterated.
   */
 trait IterableSplitter[+T]
-    extends AugmentedIterableIterator[T] with Splitter[T] with Signalling
+    extends AugmentedIterableIterator[T]
+    with Splitter[T]
+    with Signalling
     with DelegatedSignalling {
   self =>
 
@@ -464,9 +466,10 @@ trait IterableSplitter[+T]
     protected[this] def takeSeq[PI <: IterableSplitter[T]](sq: Seq[PI])(
         taker: (PI, Int) => PI) = {
       val sizes = sq.scanLeft(0)(_ + _.remaining)
-      val shortened = for ((it, (from, until)) <- sq zip
-      (sizes.init zip sizes.tail)) yield
-        if (until < remaining) it else taker(it, remaining - from)
+      val shortened =
+        for ((it, (from, until)) <- sq zip
+                                   (sizes.init zip sizes.tail)) yield
+          if (until < remaining) it else taker(it, remaining - from)
       shortened filter { _.remaining > 0 }
     }
   }
@@ -574,7 +577,8 @@ trait IterableSplitter[+T]
       val thisit =
         if (selfrem < thatrem)
           self.appendParIterable[U, SeqSplitter[U]](
-              repetition[U](thiselem, thatrem - selfrem).splitter) else self
+              repetition[U](thiselem, thatrem - selfrem).splitter)
+        else self
       val thatit =
         if (selfrem > thatrem)
           that.appendParSeq(repetition(thatelem, selfrem - thatrem).splitter)
@@ -594,7 +598,8 @@ trait IterableSplitter[+T]
   *  @tparam T          type of the elements iterated.
   */
 trait SeqSplitter[+T]
-    extends IterableSplitter[T] with AugmentedSeqIterator[T]
+    extends IterableSplitter[T]
+    with AugmentedSeqIterator[T]
     with PreciseSplitter[T] {
   self =>
   def dup: SeqSplitter[T]
@@ -650,7 +655,8 @@ trait SeqSplitter[+T]
   override def map[S](f: T => S) = new Mapped(f)
 
   class Appended[U >: T, PI <: SeqSplitter[U]](it: PI)
-      extends super.Appended[U, PI](it) with SeqSplitter[U] {
+      extends super.Appended[U, PI](it)
+      with SeqSplitter[U] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[U]]
     override def split: Seq[SeqSplitter[U]] =
       super.split.asInstanceOf[Seq[SeqSplitter[U]]]
@@ -690,7 +696,8 @@ trait SeqSplitter[+T]
     new Appended[U, PI](that)
 
   class Zipped[S](ti: SeqSplitter[S])
-      extends super.Zipped[S](ti) with SeqSplitter[(T, S)] {
+      extends super.Zipped[S](ti)
+      with SeqSplitter[(T, S)] {
     override def dup = super.dup.asInstanceOf[SeqSplitter[(T, S)]]
     override def split: Seq[SeqSplitter[(T, S)]] =
       super.split.asInstanceOf[Seq[SeqSplitter[(T, S)]]]
@@ -712,7 +719,8 @@ trait SeqSplitter[+T]
       val thisit =
         if (selfrem < thatrem)
           self.appendParSeq[U, SeqSplitter[U]](
-              repetition[U](thiselem, thatrem - selfrem).splitter) else self
+              repetition[U](thiselem, thatrem - selfrem).splitter)
+        else self
       val thatit =
         if (selfrem > thatrem)
           that.appendParSeq(repetition(thatelem, selfrem - thatrem).splitter)

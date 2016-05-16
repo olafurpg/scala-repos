@@ -35,7 +35,9 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types._
 
 abstract class HadoopFsRelationTest
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import sqlContext.implicits._
 
   val dataSourceName: String
@@ -145,8 +147,8 @@ abstract class HadoopFsRelationTest
         val schema = new StructType()
           .add("index", IntegerType, nullable = false)
           .add("col", dataType, nullable = true)
-        val rdd = sqlContext.sparkContext.parallelize(
-            (1 to 10).map(i => Row(i, dataGenerator())))
+        val rdd = sqlContext.sparkContext.parallelize((1 to 10).map(i =>
+                  Row(i, dataGenerator())))
         val df =
           sqlContext.createDataFrame(rdd, schema).orderBy("index").coalesce(1)
 
@@ -703,8 +705,8 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+            hadoopConfiguration.set(entry.getKey, entry.getValue))
     }
   }
 
@@ -756,8 +758,8 @@ abstract class HadoopFsRelationTest
     } finally {
       // Hadoop 1 doesn't have `Configuration.unset`
       hadoopConfiguration.clear()
-      clonedConf.asScala.foreach(
-          entry => hadoopConfiguration.set(entry.getKey, entry.getValue))
+      clonedConf.asScala.foreach(entry =>
+            hadoopConfiguration.set(entry.getKey, entry.getValue))
       sqlContext.sparkContext.conf
         .set("spark.speculation", speculationEnabled.toString)
     }

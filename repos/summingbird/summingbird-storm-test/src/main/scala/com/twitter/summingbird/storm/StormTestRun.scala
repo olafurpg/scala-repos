@@ -81,10 +81,11 @@ object StormTestRun {
     apply(topo)
   }
 
-  def simpleRun[T, K, V : Semigroup](
+  def simpleRun[T, K, V: Semigroup](
       original: List[T],
       mkJob: (Producer[Storm, T],
-      Storm#Store[K, V]) => TailProducer[Storm, Any]): TestStore[K, V] = {
+              Storm#Store[K, V]) => TailProducer[Storm, Any])
+    : TestStore[K, V] = {
 
     implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
 
@@ -100,7 +101,7 @@ object StormTestRun {
             "DEFAULT" -> Options()
               .set(CacheSize(4))
               .set(FlushFrequency(Duration.fromMilliseconds(1)))
-          ))
+        ))
 
     apply(job)
     TestStore[K, V](id).getOrElse(

@@ -23,7 +23,7 @@ class SbtNotificationListener
     for {
       project <- Option(id.findProject())
       settings <- Option(SbtLocalSettings.getInstance(project))
-                     if id.getType == ExternalSystemTaskType.RESOLVE_PROJECT
+      if id.getType == ExternalSystemTaskType.RESOLVE_PROJECT
     } {
       settings.lastUpdateTimestamp = System.currentTimeMillis()
     }

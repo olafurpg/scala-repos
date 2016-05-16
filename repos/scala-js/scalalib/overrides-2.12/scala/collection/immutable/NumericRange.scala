@@ -41,7 +41,9 @@ import mutable.{Builder, ListBuffer}
 abstract class NumericRange[T](
     val start: T, val end: T, val step: T, val isInclusive: Boolean)(
     implicit num: Integral[T])
-    extends AbstractSeq[T] with IndexedSeq[T] with Serializable {
+    extends AbstractSeq[T]
+    with IndexedSeq[T]
+    with Serializable {
 
   /** Note that NumericRange must be invariant so that constructs
     *  such as "1L to 10 by 5" do not infer the range type as AnyVal.
@@ -84,8 +86,7 @@ abstract class NumericRange[T](
   // Tests whether a number is within the endpoints, without testing
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: T) =
-    !isEmpty &&
-    ((step > zero && start <= elem && elem <= last) ||
+    !isEmpty && ((step > zero && start <= elem && elem <= last) ||
         (step < zero && last <= elem && elem <= start))
   // Methods like apply throw exceptions on invalid n, but methods like take/drop
   // are forgiving: therefore the checks are with the methods.

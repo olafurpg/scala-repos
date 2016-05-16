@@ -128,10 +128,10 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       productFeatures.get(item)
     }.flatten
 
-    val whiteList: Option[Set[Int]] = query.whiteList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
-    val blackList: Option[Set[Int]] = query.blackList.map(
-        set => set.map(model.itemStringIntMap.get(_)).flatten)
+    val whiteList: Option[Set[Int]] = query.whiteList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
+    val blackList: Option[Set[Int]] = query.blackList.map(set =>
+          set.map(model.itemStringIntMap.get(_)).flatten)
 
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 

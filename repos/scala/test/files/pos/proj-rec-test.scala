@@ -8,5 +8,6 @@ object ProjTest {
 
   type X1 = _0#Type // Ok
   type X2 = _1#Type // Ok
-  type X3 = _2#Type // Compiler error, illegal cyclic reference involving type Type
+  type X3 =
+    _2#Type // Compiler error, illegal cyclic reference involving type Type
 }

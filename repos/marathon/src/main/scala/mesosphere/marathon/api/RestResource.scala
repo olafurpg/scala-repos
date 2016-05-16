@@ -22,9 +22,8 @@ trait RestResource {
 
   protected def unknownGroup(
       id: PathId, version: Option[Timestamp] = None): Response = {
-    notFound(
-        s"Group '$id' does not exist" +
-        version.fold("")(v => s" in version $v"))
+    notFound(s"Group '$id' does not exist" + version.fold("")(v =>
+              s" in version $v"))
   }
 
   protected def unknownTask(id: String): Response =

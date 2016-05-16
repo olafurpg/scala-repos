@@ -40,7 +40,8 @@ private[serverset2] trait ChattyClient extends ZooKeeperClient {
 }
 
 private[serverset2] trait ChattyReader
-    extends ChattyClient with ZooKeeperReader {
+    extends ChattyClient
+    with ZooKeeperReader {
   protected val underlying: ZooKeeperReader
 
   def exists(path: String): Future[Option[Data.Stat]] =
@@ -69,7 +70,8 @@ private[serverset2] trait ChattyReader
 }
 
 private[serverset2] trait ChattyWriter
-    extends ChattyClient with ZooKeeperWriter {
+    extends ChattyClient
+    with ZooKeeperWriter {
   protected val underlying: ZooKeeperWriter
 
   def create(path: String,
@@ -106,7 +108,8 @@ private[serverset2] trait ChattyWriter
 }
 
 private[serverset2] trait ChattyMulti
-    extends ChattyClient with ZooKeeperMulti {
+    extends ChattyClient
+    with ZooKeeperMulti {
   protected val underlying: ZooKeeperMulti
 
   def multi(ops: Seq[Op]): Future[Seq[OpResult]] =
@@ -114,12 +117,16 @@ private[serverset2] trait ChattyMulti
 }
 
 private[serverset2] trait ChattyRW
-    extends ZooKeeperRW with ChattyReader with ChattyWriter {
+    extends ZooKeeperRW
+    with ChattyReader
+    with ChattyWriter {
   protected val underlying: ZooKeeperRW
 }
 
 private[serverset2] trait ChattyRWMulti
-    extends ZooKeeperRWMulti with ChattyReader with ChattyWriter
+    extends ZooKeeperRWMulti
+    with ChattyReader
+    with ChattyWriter
     with ChattyMulti {
   protected val underlying: ZooKeeperRWMulti
 }

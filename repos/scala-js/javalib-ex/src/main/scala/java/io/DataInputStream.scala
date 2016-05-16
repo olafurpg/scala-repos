@@ -6,7 +6,8 @@ import scala.scalajs.js.typedarray._
   *  DataInputStream implementation using JavaScript typed arrays.
   */
 class DataInputStream(in: InputStream)
-    extends FilterInputStream(in) with DataInput {
+    extends FilterInputStream(in)
+    with DataInput {
 
   private var pushedBack: Int = -1
   private var pushedBackMark: Int = -1

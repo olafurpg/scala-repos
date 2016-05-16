@@ -27,7 +27,9 @@ import org.apache.spark.sql.catalyst.util.quietly
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
 class ErrorPositionSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterEach {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterEach {
   import hiveContext.implicits._
 
   override protected def beforeEach(): Unit = {

@@ -22,7 +22,8 @@ import generic._
   *  section on `Mutable Lists` for more information.
   */
 trait LinearSeq[A]
-    extends Seq[A] with scala.collection.LinearSeq[A]
+    extends Seq[A]
+    with scala.collection.LinearSeq[A]
     with GenericTraversableTemplate[A, LinearSeq]
     with LinearSeqLike[A, LinearSeq[A]] {
   override def companion: GenericCompanion[LinearSeq] = LinearSeq

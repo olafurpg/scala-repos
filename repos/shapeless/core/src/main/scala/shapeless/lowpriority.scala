@@ -63,7 +63,8 @@ object LowPriority {
 
 @macrocompat.bundle
 class LowPriorityMacros(val c: whitebox.Context)
-    extends OpenImplicitMacros with LowPriorityTypes {
+    extends OpenImplicitMacros
+    with LowPriorityTypes {
   import c.universe._
 
   def strictTpe = typeOf[Strict[_]].typeConstructor
@@ -82,7 +83,7 @@ class LowPriorityMacros(val c: whitebox.Context)
         c.abort(c.enclosingPosition, "Can't get looked for implicit type")
     }
 
-  def mkLowPriorityIgnoring[T : WeakTypeTag]: Tree =
+  def mkLowPriorityIgnoring[T: WeakTypeTag]: Tree =
     secondOpenImplicitTpe match {
       case Some(tpe) =>
         c.inferImplicitValue(

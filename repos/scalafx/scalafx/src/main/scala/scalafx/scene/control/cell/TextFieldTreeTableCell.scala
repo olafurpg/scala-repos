@@ -100,8 +100,9 @@ object TextFieldTreeTableCell {
   *
   * @define TFTC `TextFieldTreeTableCell`
   */
-class TextFieldTreeTableCell[S, T](override val delegate: jfxscc.TextFieldTreeTableCell[
-        S, T] = new jfxscc.TextFieldTreeTableCell[S, T])
+class TextFieldTreeTableCell[S, T](
+    override val delegate: jfxscc.TextFieldTreeTableCell[S, T] =
+      new jfxscc.TextFieldTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.TextFieldTreeTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.TextFieldTreeTableCell[S, T], T]

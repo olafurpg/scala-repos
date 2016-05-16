@@ -18,7 +18,8 @@ class Tree[KEY, Entry](order: Order[KEY]) {
 
 class TreeMap[KEY, VALUE](_factory: TreeMapFactory[KEY])
     extends Tree[KEY, Tuple2[KEY, VALUE]](_factory.order)
-    with scala.collection.DefaultMap[KEY, VALUE] with Map[KEY, VALUE] {
+    with scala.collection.DefaultMap[KEY, VALUE]
+    with Map[KEY, VALUE] {
   val factory = _factory
   val order = _factory.order;
   def this(newOrder: Order[KEY]) = this(new TreeMapFactory[KEY](newOrder));

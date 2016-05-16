@@ -27,8 +27,7 @@ private[netty3] class SslListenerConnectionHandler(
       ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
     sslHandler
       .handshake()
-      .addListener(
-          new ChannelFutureListener {
+      .addListener(new ChannelFutureListener {
         override def operationComplete(f: ChannelFuture): Unit =
           if (f.isSuccess) {
             SslListenerConnectionHandler. super.channelConnected(ctx, e)

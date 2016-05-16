@@ -129,9 +129,9 @@ object ShowTypeInfoAction {
     typeText(ScType.ofNamedElement(elem, subst))
   }
 
-  private[this] def typeText(
-      optType: Option[ScType],
-      s: ScSubstitutor = ScSubstitutor.empty): Option[String] = {
+  private[this] def typeText(optType: Option[ScType],
+                             s: ScSubstitutor =
+                               ScSubstitutor.empty): Option[String] = {
     optType.map(ScTypePresentation.withoutAliases)
   }
 }

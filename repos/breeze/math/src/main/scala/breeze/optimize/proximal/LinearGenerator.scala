@@ -26,7 +26,8 @@ object LinearGenerator {
   }
 
   def apply(ndim: Int): (DiffFunction[DenseVector[Double]],
-  DenseMatrix[Double], DenseVector[Double]) = {
+                         DenseMatrix[Double],
+                         DenseVector[Double]) = {
     val rand = Rand.gaussian(0, 1)
     val data = DenseMatrix.rand[Double](ndim, ndim, rand)
     val labels = DenseVector.rand[Double](ndim, rand).map { x =>

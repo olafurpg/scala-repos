@@ -16,7 +16,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.concurrent.Future
 
 class MigrationTest
-    extends MarathonSpec with Mockito with Matchers with GivenWhenThen
+    extends MarathonSpec
+    with Mockito
+    with Matchers
+    with GivenWhenThen
     with ScalaFutures {
 
   test("migrations can be filtered by version") {
@@ -124,22 +127,24 @@ class MigrationTest
 
   class Fixture {
     trait StoreWithManagement
-        extends PersistentStore with PersistentStoreManagement
+        extends PersistentStore
+        with PersistentStoreManagement
     val metrics = new Metrics(new MetricRegistry)
     val store = mock[StoreWithManagement]
     val appRepo = mock[AppRepository]
     val groupRepo = mock[GroupRepository]
     val config = mock[MarathonConf]
     val taskRepo = new TaskRepository(
-        new MarathonStore[MarathonTaskState](
-            store = store,
-            metrics = metrics,
-            newState = () =>
-                MarathonTaskState(MarathonTask
-                      .newBuilder()
-                      .setId(UUID.randomUUID().toString)
-                      .build()),
-            prefix = "task:"),
+        new MarathonStore[MarathonTaskState](store = store,
+                                             metrics = metrics,
+                                             newState = () =>
+                                               MarathonTaskState(MarathonTask
+                                                     .newBuilder()
+                                                     .setId(UUID
+                                                           .randomUUID()
+                                                           .toString)
+                                                     .build()),
+                                             prefix = "task:"),
         metrics
     )
     val migration = new Migration(store,

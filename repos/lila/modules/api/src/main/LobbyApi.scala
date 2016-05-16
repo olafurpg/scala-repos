@@ -21,8 +21,8 @@ final class LobbyApi(lobby: ActorRef,
   import makeTimeout.large
 
   def apply(implicit ctx: Context): Fu[JsObject] =
-    (lobby ? HooksFor(ctx.me)).mapTo[Vector[Hook]] zip ctx.me
-      .fold(seekApi.forAnon)(seekApi.forUser) zip
+    (lobby ? HooksFor(ctx.me)).mapTo[Vector[Hook]] zip ctx.me.fold(
+        seekApi.forAnon)(seekApi.forUser) zip
     (ctx.me ?? GameRepo.urgentGames) zip getFilter(ctx) map {
       case (((hooks, seeks), povs), filter) =>
         Json.obj("me" -> ctx.me.map { u =>
@@ -50,8 +50,9 @@ final class LobbyApi(lobby: ActorRef,
         "rated" -> pov.game.rated,
         "opponent" -> Json
           .obj("id" -> pov.opponent.userId,
-               "username" -> lila.game.Namer.playerString(
-                   pov.opponent, withRating = false)(lightUser),
+               "username" -> lila.game.Namer.playerString(pov.opponent,
+                                                          withRating =
+                                                            false)(lightUser),
                "rating" -> pov.opponent.rating,
                "ai" -> pov.opponent.aiLevel)
           .noNull,

@@ -95,7 +95,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
     "unary_-" in {
       assert(-((10.seconds).inSeconds) == -10)
-      assert(-( (Long.MinValue + 1).nanoseconds) == Long.MaxValue.nanoseconds)
+      assert(-((Long.MinValue + 1).nanoseconds) == Long.MaxValue.nanoseconds)
       assert(-(Long.MinValue.nanoseconds) == Duration.Top)
     }
 

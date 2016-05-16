@@ -145,7 +145,8 @@ private[akka] object ClientFSM {
   final case class Connected(channel: Channel)
       extends NoSerializationVerificationNeeded
   final case class ConnectionFailure(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
   case object Disconnected
 }
 
@@ -165,7 +166,8 @@ private[akka] object ClientFSM {
   */
 private[akka] class ClientFSM(
     name: RoleName, controllerAddr: InetSocketAddress)
-    extends Actor with LoggingFSM[ClientFSM.State, ClientFSM.Data]
+    extends Actor
+    with LoggingFSM[ClientFSM.State, ClientFSM.Data]
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ClientFSM._
 
@@ -377,7 +379,8 @@ private[akka] class PlayerHandler(
     val channel = event.getChannel
     log.debug("disconnected from {}", getAddrString(channel))
     fsm ! PoisonPill
-    executor.execute(new Runnable {
+    executor.execute(
+        new Runnable {
       def run = RemoteConnection.shutdown(channel)
     }) // Must be shutdown outside of the Netty IO pool
   }

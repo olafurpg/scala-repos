@@ -79,7 +79,7 @@ class VersionedBatchedStoreTest extends WordSpec {
     temp
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   "The VersionedBatchStore" should {
 

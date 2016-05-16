@@ -11,7 +11,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class StopActorTest
-    extends MarathonActorSupport with FunSuiteLike with Matchers {
+    extends MarathonActorSupport
+    with FunSuiteLike
+    with Matchers {
 
   test("Stop") {
     val promise = Promise[Boolean]()

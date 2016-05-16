@@ -64,23 +64,22 @@ object SessionMaster extends LiftActor with Loggable {
     * to call to destroy the session.
     */
   @volatile
-  var sessionCheckFuncs: List[
-      (Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
-    ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) =>
-      {
-        val now = millis
+  var sessionCheckFuncs: List[(Map[String, SessionInfo],
+                               SessionInfo => Unit) => Unit] =
+    ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) => {
+       val now = millis
 
-        for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
-          if (now - session.lastServiceTime > session.inactivityLength ||
-              session.markedForTermination) {
-            logger.info(" Session " + id + " expired")
-            destroyer(info)
-          } else {
-            session.doCometActorCleanup()
-            session.cleanupUnseenFuncs()
-          }
-        }
-      }) :: Nil
+       for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
+         if (now - session.lastServiceTime > session.inactivityLength ||
+             session.markedForTermination) {
+           logger.info(" Session " + id + " expired")
+           destroyer(info)
+         } else {
+           session.doCometActorCleanup()
+           session.cleanupUnseenFuncs()
+         }
+       }
+     }) :: Nil
 
   def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
     val dead = otherId.map(killedSessions.containsKey(_)) openOr false
@@ -232,22 +231,20 @@ object SessionMaster extends LiftActor with Loggable {
         case SessionInfo(s, _, _, _, _) =>
           killedSessions.put(s.underlyingId, Helpers.millis)
           s.markedForShutDown_? = true
-          Schedule.schedule(() =>
-                              {
-                                try {
-                                  s.doShutDown
-                                  try {
-                                    s.httpSession.foreach(_.unlink(s))
-                                  } catch {
-                                    case e: Exception =>
-                                    // ignore... sometimes you can't do this and it's okay
-                                  }
-                                } catch {
-                                  case e: Exception =>
-                                    logger.warn("Failure in remove session", e)
-                                }
-                            },
-                            0.seconds)
+          Schedule.schedule(() => {
+            try {
+              s.doShutDown
+              try {
+                s.httpSession.foreach(_.unlink(s))
+              } catch {
+                case e: Exception =>
+                // ignore... sometimes you can't do this and it's okay
+              }
+            } catch {
+              case e: Exception =>
+                logger.warn("Failure in remove session", e)
+            }
+          }, 0.seconds)
           lockWrite {
             nsessions.remove(sessionId)
           }
@@ -272,26 +269,22 @@ object SessionMaster extends LiftActor with Loggable {
         f <- sessionCheckFuncs
       } {
         if (Props.inGAE) {
-          f(ses,
-            shutDown =>
-              {
-                if (!shutDown.session.markedForShutDown_?) {
-                  shutDown.session.markedForShutDown_? = true
-                  this.sendMsg(RemoveSession(shutDown.session.underlyingId))
-                }
-            })
+          f(ses, shutDown => {
+            if (!shutDown.session.markedForShutDown_?) {
+              shutDown.session.markedForShutDown_? = true
+              this.sendMsg(RemoveSession(shutDown.session.underlyingId))
+            }
+          })
         } else {
           Schedule.schedule(
               () =>
-                f(ses,
-                  shutDown =>
-                    {
-                      if (!shutDown.session.markedForShutDown_?) {
-                        shutDown.session.markedForShutDown_? = true
+                f(ses, shutDown => {
+                  if (!shutDown.session.markedForShutDown_?) {
+                    shutDown.session.markedForShutDown_? = true
 
-                        this ! RemoveSession(shutDown.session.underlyingId)
-                      }
-                  }),
+                    this ! RemoveSession(shutDown.session.underlyingId)
+                  }
+                }),
               0.seconds)
         }
       }

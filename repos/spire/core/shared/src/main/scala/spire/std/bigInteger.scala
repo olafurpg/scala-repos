@@ -71,7 +71,9 @@ trait BigIntegerIsSigned extends Signed[BigInteger] {
 }
 
 trait BigIntegerIsReal
-    extends IsIntegral[BigInteger] with BigIntegerOrder with BigIntegerIsSigned
+    extends IsIntegral[BigInteger]
+    with BigIntegerOrder
+    with BigIntegerIsSigned
     with Serializable {
   def toDouble(n: BigInteger): Double = n.doubleValue
   def toBigInt(n: BigInteger): BigInt = n
@@ -83,8 +85,11 @@ trait BigIntegerIsMetricSpace extends MetricSpace[BigInteger, BigInteger] {
 
 @SerialVersionUID(0L)
 class BigIntegerAlgebra
-    extends BigIntegerIsEuclideanRing with BigIntegerIsNRoot
-    with BigIntegerIsMetricSpace with BigIntegerIsReal with Serializable
+    extends BigIntegerIsEuclideanRing
+    with BigIntegerIsNRoot
+    with BigIntegerIsMetricSpace
+    with BigIntegerIsReal
+    with Serializable
 
 trait BigIntegerInstances {
   implicit final val BigIntegerAlgebra = new BigIntegerAlgebra

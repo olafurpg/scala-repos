@@ -62,8 +62,8 @@ trait KafkaServerTestHarness extends ZooKeeperTestHarness {
     if (configs.size <= 0)
       throw new KafkaException("Must supply at least one server config.")
     servers = configs.map(TestUtils.createServer(_)).toBuffer
-    brokerList = TestUtils.getBrokerListStrFromServers(
-        servers, securityProtocol)
+    brokerList =
+      TestUtils.getBrokerListStrFromServers(servers, securityProtocol)
     alive = new Array[Boolean](servers.length)
     Arrays.fill(alive, true)
     // We need to set a cluster ACL in some cases here

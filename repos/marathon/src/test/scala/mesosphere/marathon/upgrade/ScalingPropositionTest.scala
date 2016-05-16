@@ -150,10 +150,10 @@ class ScalingPropositionTest extends FunSuite with Matchers {
   // Helper functions
 
   private def createTask(index: Long) =
-    MarathonTestHelper.runningTask(
-        s"task-$index",
-        appVersion = Timestamp(index),
-        startedAt = Timestamp.now().toDateTime.getMillis)
+    MarathonTestHelper.runningTask(s"task-$index",
+                                   appVersion = Timestamp(index),
+                                   startedAt =
+                                     Timestamp.now().toDateTime.getMillis)
 
   private def noConstraintsToMeet(running: Iterable[Task], killCount: Int) =
     Iterable.empty[Task]

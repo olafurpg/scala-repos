@@ -18,7 +18,9 @@ class ResolveArtifactsActor(app: AppDefinition,
                             url2Path: Map[URL, String],
                             promise: Promise[Boolean],
                             storage: StorageProvider)
-    extends Actor with PathFun with Logging {
+    extends Actor
+    with PathFun
+    with Logging {
 
   import mesosphere.marathon.upgrade.ResolveArtifactsActor.DownloadFinished
 

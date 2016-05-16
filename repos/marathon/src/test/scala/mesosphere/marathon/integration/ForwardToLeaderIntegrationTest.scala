@@ -14,7 +14,8 @@ import mesosphere.marathon.io.IO
   * Tests forwarding requests.
   */
 class ForwardToLeaderIntegrationTest
-    extends IntegrationFunSuite with BeforeAndAfter {
+    extends IntegrationFunSuite
+    with BeforeAndAfter {
   // ports to bind to
   private[this] val ports = 10000 to 20000
 

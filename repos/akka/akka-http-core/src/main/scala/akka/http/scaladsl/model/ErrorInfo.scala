@@ -19,7 +19,8 @@ final case class ErrorInfo(summary: String = "", detail: String = "") {
     if (summary.isEmpty) withSummary(fallbackSummary) else this
   def formatPretty =
     if (summary.isEmpty) detail
-    else if (detail.isEmpty) summary else summary + ": " + detail
+    else if (detail.isEmpty) summary
+    else summary + ": " + detail
   def format(withDetail: Boolean): String =
     if (withDetail) formatPretty else summary
 }

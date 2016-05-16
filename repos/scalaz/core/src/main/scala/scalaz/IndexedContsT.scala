@@ -22,8 +22,7 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
   def flatMap[E, B](f: A => IndexedContsT[W, M, O, E, B])(
       implicit W: Cobind[W]): IndexedContsT[W, M, R, E, B] =
     IndexedContsT { wbme =>
-      run(
-          W.cobind(wbme) { wk =>
+      run(W.cobind(wbme) { wk =>
         { a =>
           f(a).run(wk)
         }
@@ -33,16 +32,15 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
   def contramap[I](f: I => O)(
       implicit M: Functor[M], W: Functor[W]): IndexedContsT[W, M, R, I, A] =
     IndexedContsT { wami =>
-      run(
-          W.map(wami) { ami =>
+      run(W.map(wami) { ami =>
         { a =>
           M.map(ami(a))(f)
         }
       })
     }
 
-  def imap[E](f: R => E)(
-      implicit M: Functor[M]): IndexedContsT[W, M, E, O, A] =
+  def imap[E](
+      f: R => E)(implicit M: Functor[M]): IndexedContsT[W, M, E, O, A] =
     IndexedContsT { wamo =>
       M.map(run(wamo))(f)
     }
@@ -77,21 +75,22 @@ final class IndexedContsT[W[_], M[_], R, O, A] private (
 }
 
 object IndexedContsT
-    extends IndexedContsTInstances with IndexedContsTFunctions {
+    extends IndexedContsTInstances
+    with IndexedContsTFunctions {
   def apply[W[_], M[_], R, O, A](
       f: W[A => M[O]] => M[R]): IndexedContsT[W, M, R, O, A] =
     new IndexedContsT[W, M, R, O, A](f)
 }
 
 trait IndexedContsTFunctions {
-  def point[W[_], M[_], R, A](
-      a: => A)(implicit W: Comonad[W]): ContsT[W, M, R, A] =
+  def point[W[_], M[_], R, A](a: => A)(
+      implicit W: Comonad[W]): ContsT[W, M, R, A] =
     ContsT { k =>
       W.copoint(k)(a)
     }
 
-  def liftM[W[_], M[_], R, A](
-      a: => M[A])(implicit W: Comonad[W], M: Bind[M]): ContsT[W, M, R, A] =
+  def liftM[W[_], M[_], R, A](a: => M[A])(
+      implicit W: Comonad[W], M: Bind[M]): ContsT[W, M, R, A] =
     ContsT { k =>
       M.bind(a)(W.copoint(k))
     }
@@ -103,8 +102,7 @@ trait IndexedContsTFunctions {
       def apply[A](
           fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[W, N, R, O, A] =
         IndexedContsT { wk =>
-          f(
-              fa.run(W.map(wk) { k =>
+          f(fa.run(W.map(wk) { k =>
             { x =>
               g(k(x))
             }
@@ -259,7 +257,8 @@ private sealed trait ContsTBind[W[_], M[_], R]
 }
 
 private sealed trait ContsTMonad[W[_], M[_], R]
-    extends Monad[ContsT[W, M, R, ?]] with ContsTBind[W, M, R] {
+    extends Monad[ContsT[W, M, R, ?]]
+    with ContsTBind[W, M, R] {
   implicit val W: Comonad[W]
 
   override def point[A](a: => A) = IndexedContsT.point(a)

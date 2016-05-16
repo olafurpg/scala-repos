@@ -113,9 +113,9 @@ object PlaySettings {
         // all dependencies from outside the project (all dependency jars)
         playDependencyClasspath <<= externalDependencyClasspath in Runtime,
         // all user classes, in this project and any other subprojects that it depends on
-        playReloaderClasspath <<= Classpaths.concatDistinct(
-            exportedProducts in Runtime,
-            internalDependencyClasspath in Runtime),
+        playReloaderClasspath <<=
+          Classpaths.concatDistinct(exportedProducts in Runtime,
+                                    internalDependencyClasspath in Runtime),
         // filter out asset directories from the classpath (supports sbt-web 1.0 and 1.1)
         playReloaderClasspath ~= {
           _.filter(_.get(WebKeys.webModulesLib.key).isEmpty)
@@ -143,7 +143,7 @@ object PlaySettings {
         jsFilter in Assets := new PatternFilter("""[^_].*\.js""".r.pattern),
         WebKeys.stagingDirectory := WebKeys.stagingDirectory.value / "public",
         playAssetsWithCompilation := {
-          val ignore = ( (assets in Assets) ?).value
+          val ignore = ((assets in Assets) ?).value
           (compile in Compile).value
         },
         // Assets for run mode
@@ -162,8 +162,10 @@ object PlaySettings {
           playPackageAssets.value -> ("lib/" + jarName)
         },
         // Assets for testing
-        public in TestAssets := (public in TestAssets).value / assetsPrefix.value,
-        fullClasspath in Test += Attributed.blank((assets in TestAssets).value.getParentFile),
+        public in TestAssets :=
+          (public in TestAssets).value / assetsPrefix.value,
+        fullClasspath in Test +=
+          Attributed.blank((assets in TestAssets).value.getParentFile),
         // Settings
         devSettings := Nil,
         // Native packaging

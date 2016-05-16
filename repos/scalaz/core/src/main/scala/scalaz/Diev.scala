@@ -102,13 +102,13 @@ trait DievImplementation {
                   Coincidence(adjustedPosition)
                 else {
                   if (value < start)
-                    Between(liftedIntervals(adjustedPosition - 1)
-                              .map(_ => adjustedPosition - 1),
+                    Between(liftedIntervals(adjustedPosition - 1).map(_ =>
+                                  adjustedPosition - 1),
                             adjustedPosition.some)
                   else
                     Between(adjustedPosition.some,
-                            liftedIntervals(adjustedPosition + 1)
-                              .map(_ => adjustedPosition + 1))
+                            liftedIntervals(adjustedPosition + 1).map(_ =>
+                                  adjustedPosition + 1))
                 }
               }
             case _ => Between(None, None)
@@ -156,7 +156,7 @@ trait DievImplementation {
                   .map(_ + 1)
                   .orElse(after)
                   .getOrElse(intervals.size)
-              )
+            )
           }
         case (earlyBound @ Between(before, after), Coincidence(endPosition)) =>
           {
@@ -192,7 +192,7 @@ trait DievImplementation {
                   .map(_ + 1)
                   .orElse(otherAfter)
                   .getOrElse(intervals.size)
-              )
+            )
           }
       }
     }
@@ -260,8 +260,8 @@ trait DievImplementation {
       foldLeft[Diev[B]](DieVector[B]())(_ ++ f(_))
 
     def filter(f: A => Boolean): Diev[A] =
-      foldLeft[Diev[A]](DieVector[A]())(
-          (working, value) => if (f(value)) working + value else working)
+      foldLeft[Diev[A]](DieVector[A]())((working, value) =>
+            if (f(value)) working + value else working)
 
     def foreach(f: A => Unit): Unit =
       foldLeft[Unit](())((_, value) => f(value))
@@ -299,17 +299,17 @@ object Diev extends DievInstances {
 sealed abstract class DievInstances extends DievImplementation {
   import std.tuple._, std.vector._
 
-  implicit def dievEqual[A : Equal]: Equal[Diev[A]] =
+  implicit def dievEqual[A: Equal]: Equal[Diev[A]] =
     Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(
         std.vector.vectorEqual[(A, A)])
 
-  implicit def dievMonoid[A : Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
+  implicit def dievMonoid[A: Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
     def append(f1: Diev[A], f2: => Diev[A]) = f1 ++ f2
 
     def zero: Diev[A] = new DieVector[A]()
   }
 
-  implicit def dievShow[A : Show]: Show[Diev[A]] = new Show[Diev[A]] {
+  implicit def dievShow[A: Show]: Show[Diev[A]] = new Show[Diev[A]] {
     override def show(diev: Diev[A]) =
       Show[Vector[(A, A)]].show(diev.intervals)
   }

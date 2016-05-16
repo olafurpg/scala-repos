@@ -5,7 +5,7 @@ import spire.implicits._
 import org.scalatest.FunSuite
 import spire.algebra.Order
 
-class CountingOrder[T : Order] extends Order[T] {
+class CountingOrder[T: Order] extends Order[T] {
   val wrapped = implicitly[Order[T]]
   var count = 0
 

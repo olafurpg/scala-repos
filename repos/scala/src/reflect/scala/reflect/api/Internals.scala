@@ -75,7 +75,7 @@ trait Internals { self: Universe =>
       * }}}
       * @group TagInterop
       */
-    def typeTagToManifest[T : ClassTag](
+    def typeTagToManifest[T: ClassTag](
         mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
       throw new UnsupportedOperationException(
           "This universe does not support tag -> manifest conversions. Use a JavaUniverse, e.g. the scala.reflect.runtime.universe.")
@@ -200,11 +200,11 @@ trait Internals { self: Universe =>
                       pos: Position = NoPosition,
                       flags: FlagSet = NoFlags): TermSymbol
 
-    def newModuleAndClassSymbol(
-        owner: Symbol,
-        name: Name,
-        pos: Position = NoPosition,
-        flags: FlagSet = NoFlags): (ModuleSymbol, ClassSymbol)
+    def newModuleAndClassSymbol(owner: Symbol,
+                                name: Name,
+                                pos: Position = NoPosition,
+                                flags: FlagSet =
+                                  NoFlags): (ModuleSymbol, ClassSymbol)
 
     def newMethodSymbol(owner: Symbol,
                         name: TermName,
@@ -701,9 +701,15 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ClassDef
-      def unapply(tree: Tree)
-        : Option[(Modifiers, TypeName, List[TypeDef], Modifiers, List[List[
-                    ValDef]], List[Tree], List[Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TypeName,
+                                       List[TypeDef],
+                                       Modifiers,
+                                       List[List[ValDef]],
+                                       List[Tree],
+                                       List[Tree],
+                                       ValDef,
+                                       List[Tree])]
     }
 
     val SyntacticTraitDef: SyntacticTraitDefExtractor
@@ -716,8 +722,13 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ClassDef
-      def unapply(tree: Tree): Option[(Modifiers, TypeName, List[TypeDef], List[
-              Tree], List[Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[(Modifiers,
+                                       TypeName,
+                                       List[TypeDef],
+                                       List[Tree],
+                                       List[Tree],
+                                       ValDef,
+                                       List[Tree])]
     }
 
     val SyntacticObjectDef: SyntacticObjectDefExtractor
@@ -729,8 +740,8 @@ trait Internals { self: Universe =>
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): ModuleDef
-      def unapply(tree: Tree): Option[(Modifiers, TermName, List[Tree], List[
-              Tree], ValDef, List[Tree])]
+      def unapply(tree: Tree): Option[
+          (Modifiers, TermName, List[Tree], List[Tree], ValDef, List[Tree])]
     }
 
     val SyntacticPackageObjectDef: SyntacticPackageObjectDefExtractor
@@ -1196,7 +1207,7 @@ trait Internals { self: Universe =>
 
     /** @see [[InternalApi.typeTagToManifest]] */
     @deprecated("Use `internal.typeTagToManifest` instead", "2.11.0")
-    def typeTagToManifest[T : ClassTag](
+    def typeTagToManifest[T: ClassTag](
         mirror: Any, tag: Universe#TypeTag[T]): Manifest[T] =
       internal.typeTagToManifest(mirror, tag)
 

@@ -37,7 +37,8 @@ class SyncProducerTest extends KafkaServerTestHarness {
   private val messageBytes = new Array[Byte](2)
   // turning off controlled shutdown since testProducerCanTimeout() explicitly shuts down request handler pool.
   def generateConfigs() =
-    List(KafkaConfig.fromProps(
+    List(
+        KafkaConfig.fromProps(
             TestUtils.createBrokerConfigs(1, zkConnect, false).head))
 
   private def produceRequest(
@@ -47,8 +48,8 @@ class SyncProducerTest extends KafkaServerTestHarness {
       acks: Int,
       timeout: Int = SyncProducerConfig.DefaultAckTimeoutMs,
       correlationId: Int = 0,
-      clientId: String = SyncProducerConfig.DefaultClientId)
-    : ProducerRequest = {
+      clientId: String =
+        SyncProducerConfig.DefaultClientId): ProducerRequest = {
     TestUtils.produceRequest(
         topic, partition, message, acks, timeout, correlationId, clientId)
   }
@@ -190,7 +191,7 @@ class SyncProducerTest extends KafkaServerTestHarness {
             new ByteBufferMessageSet(
                 compressionCodec = NoCompressionCodec,
                 messages = new Message(
-                      new Array[Byte](configs(0).messageMaxBytes + 1))),
+                    new Array[Byte](configs(0).messageMaxBytes + 1))),
             acks = 0))
 
     // Send another message whose size is large enough to exceed the buffer size so
@@ -204,7 +205,7 @@ class SyncProducerTest extends KafkaServerTestHarness {
               new ByteBufferMessageSet(
                   compressionCodec = NoCompressionCodec,
                   messages = new Message(
-                        new Array[Byte](configs(0).messageMaxBytes + 1))),
+                      new Array[Byte](configs(0).messageMaxBytes + 1))),
               acks = 0))
     } catch {
       case e: java.io.IOException => // success

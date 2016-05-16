@@ -19,7 +19,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScInfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScInfixExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScInfixExpr {
   override def toString: String = "InfixExpression"
 
   override def argumentExpressions: Seq[ScExpression] = {

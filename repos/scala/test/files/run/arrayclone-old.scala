@@ -93,7 +93,7 @@ object PolymorphicArrayClone {
 
   testIt(Array("one", "two"), "one", "two");
 
-  class Mangler[T : Manifest](ts: T*) {
+  class Mangler[T: Manifest](ts: T*) {
     // this will always be a BoxedAnyArray even after we've unboxed its contents.
     val it = ts.toArray[T];
   }

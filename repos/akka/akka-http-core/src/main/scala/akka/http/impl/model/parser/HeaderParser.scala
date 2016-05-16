@@ -15,15 +15,25 @@ import akka.http.scaladsl.model._
 /**
   * INTERNAL API.
   */
-private[http] class HeaderParser(
-    val input: ParserInput,
-    settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
-    extends Parser with DynamicRuleHandler[HeaderParser, HttpHeader :: HNil]
-    with CommonRules with AcceptCharsetHeader with AcceptEncodingHeader
-    with AcceptHeader with AcceptLanguageHeader with CacheControlHeader
-    with ContentDispositionHeader with ContentTypeHeader with CommonActions
-    with IpAddressParsing with LinkHeader with SimpleHeaders
-    with StringBuilding with WebSocketHeaders {
+private[http] class HeaderParser(val input: ParserInput,
+                                 settings: HeaderParser.Settings =
+                                   HeaderParser.DefaultSettings)
+    extends Parser
+    with DynamicRuleHandler[HeaderParser, HttpHeader :: HNil]
+    with CommonRules
+    with AcceptCharsetHeader
+    with AcceptEncodingHeader
+    with AcceptHeader
+    with AcceptLanguageHeader
+    with CacheControlHeader
+    with ContentDispositionHeader
+    with ContentTypeHeader
+    with CommonActions
+    with IpAddressParsing
+    with LinkHeader
+    with SimpleHeaders
+    with StringBuilding
+    with WebSocketHeaders {
   import CharacterClasses._
 
   // http://www.rfc-editor.org/errata_search.php?rfc=7230 errata id 4189
@@ -175,10 +185,9 @@ private[http] object HeaderParser {
     def uriParsingMode: Uri.ParsingMode
     def cookieParsingMode: ParserSettings.CookieParsingMode
   }
-  def Settings(
-      uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed,
-      cookieParsingMode: ParserSettings.CookieParsingMode = ParserSettings.CookieParsingMode.RFC6265)
-    : Settings = {
+  def Settings(uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed,
+               cookieParsingMode: ParserSettings.CookieParsingMode =
+                 ParserSettings.CookieParsingMode.RFC6265): Settings = {
     val _uriParsingMode = uriParsingMode
     val _cookieParsingMode = cookieParsingMode
 

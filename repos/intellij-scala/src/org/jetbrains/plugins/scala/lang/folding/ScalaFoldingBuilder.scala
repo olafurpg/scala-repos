@@ -433,9 +433,8 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
     if (node.getElementType != ScalaElementTypes.IMPORT_STMT) return false
     var next = node.getTreeNext
     var flag = false
-    while (next != null &&
-    (next.getPsi.isInstanceOf[LeafPsiElement] ||
-        next.getElementType == ScalaElementTypes.IMPORT_STMT)) {
+    while (next != null && (next.getPsi.isInstanceOf[LeafPsiElement] ||
+               next.getElementType == ScalaElementTypes.IMPORT_STMT)) {
       if (next.getElementType == ScalaElementTypes.IMPORT_STMT) flag = true
       next = next.getTreeNext
     }
@@ -463,8 +462,8 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
 
   private def isGoodImport(node: ASTNode): Boolean = {
     var prev = node.getTreePrev
-    while (prev != null &&
-    prev.getPsi.isInstanceOf[LeafPsiElement]) prev = prev.getTreePrev
+    while (prev != null && prev.getPsi.isInstanceOf[LeafPsiElement]) prev =
+      prev.getTreePrev
     if (prev == null || prev.getElementType != ScalaElementTypes.IMPORT_STMT)
       true
     else false
@@ -473,9 +472,8 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
   private def getImportEnd(node: ASTNode): Int = {
     var next = node
     var last = next.getTextRange.getEndOffset
-    while (next != null &&
-    (next.getPsi.isInstanceOf[LeafPsiElement] ||
-        next.getElementType == ScalaElementTypes.IMPORT_STMT)) {
+    while (next != null && (next.getPsi.isInstanceOf[LeafPsiElement] ||
+               next.getElementType == ScalaElementTypes.IMPORT_STMT)) {
       if (next.getElementType == ScalaElementTypes.IMPORT_STMT ||
           next.getElementType == ScalaTokenTypes.tSEMICOLON)
         last = next.getTextRange.getEndOffset
@@ -512,8 +510,7 @@ class ScalaFoldingBuilder extends CustomFoldingBuilder with PossiblyDumbAware {
         }
       }
       current = current.getNextSibling
-      if (current != null &&
-          (isCustomRegionStart(current.getText) ||
+      if (current != null && (isCustomRegionStart(current.getText) ||
               isCustomRegionEnd(current.getText))) {
         flag = false
       }

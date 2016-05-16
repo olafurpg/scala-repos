@@ -139,7 +139,8 @@ private[ui] class EventRateUIData(val data: Seq[(Long, Double)]) {
 
 /** Page for Spark Web UI that shows statistics of a streaming job */
 private[ui] class StreamingPage(parent: StreamingTab)
-    extends WebUIPage("") with Logging {
+    extends WebUIPage("")
+    with Logging {
 
   import StreamingPage._
 
@@ -239,7 +240,8 @@ private[ui] class StreamingPage(parent: StreamingTab)
     // Use the max value of "schedulingDelay", "processingTime", and "totalDelay" to make the
     // Y axis ranges same.
     val _maxTime = (for (m1 <- schedulingDelay.max; m2 <- processingTime.max;
-    m3 <- totalDelay.max) yield m1 max m2 max m3).getOrElse(0L)
+                         m3 <- totalDelay.max) yield
+      m1 max m2 max m3).getOrElse(0L)
     // Should start at 0
     val minTime = 0L
     val (maxTime, normalizedUnit) = UIUtils.normalizeDuration(_maxTime)

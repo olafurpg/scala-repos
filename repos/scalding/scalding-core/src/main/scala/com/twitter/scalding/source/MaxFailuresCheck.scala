@@ -20,8 +20,8 @@ import com.twitter.bijection.Injection
 import java.util.concurrent.atomic.AtomicInteger
 
 // TODO: this should actually increment an read a Hadoop counter
-class MaxFailuresCheck[T, U](
-    val maxFailures: Int)(implicit override val injection: Injection[T, U])
+class MaxFailuresCheck[T, U](val maxFailures: Int)(
+    implicit override val injection: Injection[T, U])
     extends CheckedInversion[T, U] {
 
   private val failures = new AtomicInteger(0)

@@ -68,7 +68,8 @@ final class SlackApi(
         SlackMessage(
             username = mod.username,
             icon = "oncoming_police_car",
-            text = s"Let's have a look at <http://lichess.org/@/${user.username}?mod>",
+            text =
+              s"Let's have a look at <http://lichess.org/@/${user.username}?mod>",
             channel = "tavern"))
 
   def deployPre: Funit =
@@ -76,7 +77,8 @@ final class SlackApi(
         SlackMessage(
             username = "deployment",
             icon = "rocket",
-            text = "Lichess will be updated in a few minutes! Fasten your seatbelts.",
+            text =
+              "Lichess will be updated in a few minutes! Fasten your seatbelts.",
             channel = "general"))
 
   def deployPost: Funit =

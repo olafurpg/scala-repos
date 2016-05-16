@@ -101,8 +101,8 @@ object Metadata {
     }
 
   def toTypedMap(set: Set[Metadata]): Map[MetadataType, Metadata] = {
-    set.foldLeft(Map[MetadataType, Metadata]())(
-        (acc, el) => acc + (el.metadataType -> el))
+    set.foldLeft(Map[MetadataType, Metadata]())((acc, el) =>
+          acc + (el.metadataType -> el))
   }
 
   implicit val MetadataSemigroup = new Semigroup[Map[MetadataType, Metadata]] {

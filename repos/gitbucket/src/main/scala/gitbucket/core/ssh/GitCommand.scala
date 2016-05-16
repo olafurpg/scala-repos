@@ -89,7 +89,8 @@ abstract class DefaultGitCommand(val owner: String, val repoName: String)
 }
 
 class DefaultGitUploadPack(owner: String, repoName: String)
-    extends DefaultGitCommand(owner, repoName) with RepositoryService
+    extends DefaultGitCommand(owner, repoName)
+    with RepositoryService
     with AccountService {
 
   override protected def runTask(user: String)(
@@ -109,7 +110,8 @@ class DefaultGitUploadPack(owner: String, repoName: String)
 }
 
 class DefaultGitReceivePack(owner: String, repoName: String, baseUrl: String)
-    extends DefaultGitCommand(owner, repoName) with RepositoryService
+    extends DefaultGitCommand(owner, repoName)
+    with RepositoryService
     with AccountService {
 
   override protected def runTask(user: String)(
@@ -133,7 +135,8 @@ class DefaultGitReceivePack(owner: String, repoName: String, baseUrl: String)
 }
 
 class PluginGitUploadPack(repoName: String, routing: GitRepositoryRouting)
-    extends GitCommand with SystemSettingsService {
+    extends GitCommand
+    with SystemSettingsService {
 
   override protected def runTask(user: String)(
       implicit session: Session): Unit = {
@@ -151,7 +154,8 @@ class PluginGitUploadPack(repoName: String, routing: GitRepositoryRouting)
 }
 
 class PluginGitReceivePack(repoName: String, routing: GitRepositoryRouting)
-    extends GitCommand with SystemSettingsService {
+    extends GitCommand
+    with SystemSettingsService {
 
   override protected def runTask(user: String)(
       implicit session: Session): Unit = {

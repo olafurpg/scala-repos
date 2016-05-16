@@ -19,7 +19,9 @@ import org.scalatest.junit.{JUnitRunner, AssertionsForJUnit}
 
 @RunWith(classOf[JUnitRunner])
 class DefaultClientTest
-    extends FunSuite with Eventually with IntegrationPatience
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
     with AssertionsForJUnit {
   trait StatsReceiverHelper {
     val statsReceiver = new InMemoryStatsReceiver()
@@ -30,7 +32,7 @@ class DefaultClientTest
     val qOut = new AsyncQueue[Int]()
 
     val transporter: (SocketAddress,
-    StatsReceiver) => Future[Transport[Int, Int]] = {
+                      StatsReceiver) => Future[Transport[Int, Int]] = {
       case (_, _) =>
         Future.value(new QueueTransport(qIn, qOut))
     }
@@ -63,11 +65,13 @@ class DefaultClientTest
   }
 
   trait SourcedExceptionHelper
-      extends QueueTransportHelper with SourcedExceptionDispatcherHelper
+      extends QueueTransportHelper
+      with SourcedExceptionDispatcherHelper
       with BaseClientHelper
 
   class DefaultClientHelper
-      extends QueueTransportHelper with SerialDispatcherHelper
+      extends QueueTransportHelper
+      with SerialDispatcherHelper
       with BaseClientHelper
 
   test("DefaultClient should successfully add sourcedexception") {
@@ -91,8 +95,10 @@ class DefaultClientTest
   }
 
   trait TimeoutHelper
-      extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with ServiceHelper {
+      extends TimingHelper
+      with QueueTransportHelper
+      with SerialDispatcherHelper
+      with ServiceHelper {
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
   }
 
@@ -135,8 +141,11 @@ class DefaultClientTest
   }
 
   trait StatsHelper
-      extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with StatsReceiverHelper with ServiceHelper {
+      extends TimingHelper
+      with QueueTransportHelper
+      with SerialDispatcherHelper
+      with StatsReceiverHelper
+      with ServiceHelper {
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
     val client = new DefaultClient[Int, Int](
@@ -217,8 +226,10 @@ class DefaultClientTest
   }
 
   trait DefaultFailureAccrualHelper
-      extends TimingHelper with QueueTransportHelper
-      with FailureAccuralDispatchHelper with StatsReceiverHelper
+      extends TimingHelper
+      with QueueTransportHelper
+      with FailureAccuralDispatchHelper
+      with StatsReceiverHelper
       with ServiceHelper {
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1

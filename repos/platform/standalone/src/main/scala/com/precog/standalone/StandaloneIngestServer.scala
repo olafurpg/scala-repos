@@ -43,14 +43,17 @@ import org.streum.configrity.Configuration
 import scalaz._
 
 object StandaloneIngestServer
-    extends StandaloneIngestServer with AkkaDefaults {
+    extends StandaloneIngestServer
+    with AkkaDefaults {
   val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(executionContext)
   val clock = Clock.System
 }
 
 trait StandaloneIngestServer
-    extends BlueEyesServer with EventService with Logging {
+    extends BlueEyesServer
+    with EventService
+    with Logging {
 
   def clock: Clock
 

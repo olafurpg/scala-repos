@@ -64,7 +64,8 @@ object Pagination {
   */
 class Pagination(
     override val delegate: jfxsc.Pagination = new jfxsc.Pagination)
-    extends Control(delegate) with SFXDelegate[jfxsc.Pagination] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Pagination] {
 
   /**
     * Constructs a new Pagination control with the specified page count.

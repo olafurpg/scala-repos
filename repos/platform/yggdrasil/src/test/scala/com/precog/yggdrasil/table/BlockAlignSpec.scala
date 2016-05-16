@@ -51,7 +51,9 @@ import org.scalacheck.Arbitrary._
 import SampleData._
 
 trait BlockAlignSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+    extends BlockStoreTestSupport[M]
+    with Specification
+    with ScalaCheck {
   self =>
   def testAlign(sample: SampleData) = {
     val module = emptyTestModule
@@ -514,7 +516,9 @@ trait BlockAlignSpec[M[+ _]]
 //object BlockAlignSpec extends TableModuleSpec[Free.Trampoline] with BlockAlignSpec[Free.Trampoline] {
 //  implicit def M = Trampoline.trampolineMonad
 object BlockAlignSpec
-    extends TableModuleSpec[YId] with BlockAlignSpec[YId] with YIdInstances {
+    extends TableModuleSpec[YId]
+    with BlockAlignSpec[YId]
+    with YIdInstances {
   type YggConfig = IdSourceConfig
   val yggConfig = new IdSourceConfig {
     val idSource = new FreshAtomicIdSource

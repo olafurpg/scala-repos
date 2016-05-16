@@ -65,7 +65,8 @@ class NewHadoopRDD[K, V](sc: SparkContext,
                          keyClass: Class[K],
                          valueClass: Class[V],
                          @transient private val _conf: Configuration)
-    extends RDD[(K, V)](sc, Nil) with Logging {
+    extends RDD[(K, V)](sc, Nil)
+    with Logging {
 
   // A Hadoop Configuration can be about 10 KB, which is pretty big, so broadcast it
   private val confBroadcast =
@@ -243,7 +244,7 @@ class NewHadoopRDD[K, V](sc: SparkContext,
 
   /** Maps over a partition, providing the InputSplit that was used as the base of the partition. */
   @DeveloperApi
-  def mapPartitionsWithInputSplit[U : ClassTag](
+  def mapPartitionsWithInputSplit[U: ClassTag](
       f: (InputSplit, Iterator[(K, V)]) => Iterator[U],
       preservesPartitioning: Boolean = false): RDD[U] = {
     new NewHadoopMapPartitionsWithSplitRDD(this, f, preservesPartitioning)
@@ -292,9 +293,9 @@ private[spark] object NewHadoopRDD {
     * the given function rather than the index of the partition.
     */
   private[spark] class NewHadoopMapPartitionsWithSplitRDD[
-      U : ClassTag, T : ClassTag](prev: RDD[T],
-                                  f: (InputSplit, Iterator[T]) => Iterator[U],
-                                  preservesPartitioning: Boolean = false)
+      U: ClassTag, T: ClassTag](prev: RDD[T],
+                                f: (InputSplit, Iterator[T]) => Iterator[U],
+                                preservesPartitioning: Boolean = false)
       extends RDD[U](prev) {
 
     override val partitioner =

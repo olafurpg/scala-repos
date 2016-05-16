@@ -39,10 +39,10 @@ class DistributedProfile(val profiles: RelationalProfile*)
   def createDistributedQueryInterpreter(param: Any, session: Backend#Session) =
     new DistributedQueryInterpreter(param, session)
 
-  type QueryActionExtensionMethods[R, S <: NoStream] = QueryActionExtensionMethodsImpl[
-      R, S]
-  type StreamingQueryActionExtensionMethods[R, T] = StreamingQueryActionExtensionMethodsImpl[
-      R, T]
+  type QueryActionExtensionMethods[R, S <: NoStream] =
+    QueryActionExtensionMethodsImpl[R, S]
+  type StreamingQueryActionExtensionMethods[R, T] =
+    StreamingQueryActionExtensionMethodsImpl[R, T]
 
   def createQueryActionExtensionMethods[R, S <: NoStream](
       tree: Node, param: Any): QueryActionExtensionMethods[R, S] =
@@ -60,10 +60,10 @@ class DistributedProfile(val profiles: RelationalProfile*)
         .asInstanceOf[R]
   }
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedBasicAction[
-      R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] = FixedBasicStreamingAction[
-      R, T, E]
+  type ProfileAction[+R, +S <: NoStream, -E <: Effect] =
+    FixedBasicAction[R, S, E]
+  type StreamingProfileAction[+R, +T, -E <: Effect] =
+    FixedBasicStreamingAction[R, T, E]
 
   class QueryActionExtensionMethodsImpl[R, S <: NoStream](
       tree: Node, param: Any)
@@ -112,8 +112,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
         b ++= fromV.map(
             v =>
               converter
-                .asInstanceOf[
-                    ResultConverter[MemoryResultConverterDomain, Any]]
+                .asInstanceOf[ResultConverter[MemoryResultConverterDomain,
+                                              Any]]
                 .read(v.asInstanceOf[QueryInterpreter.ProductValue]))
         b.result()
       case n => super.run(n)
@@ -122,9 +122,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
     def wrapScalaValue(value: Any, tpe: Type): Any = tpe match {
       case ProductType(ts) =>
         val p = value.asInstanceOf[Product]
-        new ProductValue(
-            (0 until p.productArity)
-              .map(i => wrapScalaValue(p.productElement(i), ts(i)))(
+        new ProductValue((0 until p.productArity).map(i =>
+                  wrapScalaValue(p.productElement(i), ts(i)))(
                 collection.breakOut))
       case CollectionType(_, elType) =>
         val v = value.asInstanceOf[Traversable[_]]
@@ -221,7 +220,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
   * should be opaque to the query compiler. */
 final case class ProfileComputation(
     compiled: Node, profile: RelationalProfile, buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = ProfileComputation
   protected[this] def rebuild = copy()
   override def getDumpInfo =

@@ -68,7 +68,7 @@ class UnionMacros(val c: whitebox.Context) {
   val SymTpe = typeOf[scala.Symbol]
   val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
-  def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(
+  def mkUnionNamedImpl[U <: Coproduct: WeakTypeTag](method: Tree)(
       elems: Tree*): Tree = {
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))

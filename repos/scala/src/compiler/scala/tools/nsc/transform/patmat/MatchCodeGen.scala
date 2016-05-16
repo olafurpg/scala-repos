@@ -174,7 +174,9 @@ trait MatchCodeGen extends Interface {
   }
 
   trait OptimizedCodegen
-      extends CodegenCore with TypedSubstitution with MatchMonadInterface {
+      extends CodegenCore
+      with TypedSubstitution
+      with MatchMonadInterface {
     override def codegen: AbsCodegen = optimizedCodegen
 
     // when we know we're targeting Option, do some inlining the optimizer won't do
@@ -241,7 +243,8 @@ trait MatchCodeGen extends Interface {
       }
 
       class OptimizedCasegen(matchEnd: Symbol, nextCase: Symbol)
-          extends CommonCodegen with Casegen {
+          extends CommonCodegen
+          with Casegen {
         def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
             cases: List[Casegen => Tree],
             matchFailGen: Option[Tree => Tree]): Tree =

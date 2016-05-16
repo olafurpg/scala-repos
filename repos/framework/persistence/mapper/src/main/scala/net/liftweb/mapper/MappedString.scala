@@ -60,7 +60,8 @@ trait HasApplyBoxString[T] {
   def apply(x: String): T
 }
 abstract class MappedString[T <: Mapper[T]](val fieldOwner: T, val maxLen: Int)
-    extends MappedField[String, T] with net.liftweb.util.StringValidators
+    extends MappedField[String, T]
+    with net.liftweb.util.StringValidators
     with HasApplyBoxString[T] {
   private val data: FatLazy[String] = FatLazy(defaultValue) // defaultValue
   private val orgData: FatLazy[String] = FatLazy(defaultValue) // defaultValue

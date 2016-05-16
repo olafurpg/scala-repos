@@ -39,7 +39,8 @@ import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
 class BypassMergeSortShuffleWriterSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   @Mock(answer = RETURNS_SMART_NULLS)
   private var blockManager: BlockManager = _
@@ -234,12 +235,11 @@ class BypassMergeSortShuffleWriterSuite
     )
     intercept[SparkException] {
       writer.write(
-          (0 until 100000).iterator.map(i =>
-                {
-          if (i == 99990) {
-            throw new SparkException("Intentional failure")
-          }
-          (i, i)
+          (0 until 100000).iterator.map(i => {
+        if (i == 99990) {
+          throw new SparkException("Intentional failure")
+        }
+        (i, i)
       }))
     }
     assert(temporaryFilesCreated.nonEmpty)

@@ -16,7 +16,8 @@ import akka.persistence.AtomicWrite
   * In-memory journal for testing purposes only.
   */
 private[persistence] class InmemJournal
-    extends AsyncWriteJournal with InmemMessages {
+    extends AsyncWriteJournal
+    with InmemMessages {
   override def asyncWriteMessages(messages: immutable.Seq[AtomicWrite])
     : Future[immutable.Seq[Try[Unit]]] = {
     for (w ← messages; p ← w.payload) add(p)
@@ -60,11 +61,11 @@ private[persistence] trait InmemMessages {
   var messages = Map.empty[String, Vector[PersistentRepr]]
 
   def add(p: PersistentRepr): Unit =
-    messages = messages +
-    (messages.get(p.persistenceId) match {
-          case Some(ms) ⇒ p.persistenceId -> (ms :+ p)
-          case None ⇒ p.persistenceId -> Vector(p)
-        })
+    messages =
+      messages + (messages.get(p.persistenceId) match {
+            case Some(ms) ⇒ p.persistenceId -> (ms :+ p)
+            case None ⇒ p.persistenceId -> Vector(p)
+          })
 
   def update(pid: String, snr: Long)(
       f: PersistentRepr ⇒ PersistentRepr): Unit =

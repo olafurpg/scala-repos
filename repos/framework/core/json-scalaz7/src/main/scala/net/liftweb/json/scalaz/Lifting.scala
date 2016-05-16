@@ -21,13 +21,13 @@ import net.liftweb.json._
 
 trait Lifting {
   this: Types =>
-  implicit def Func2ToJSON[A : JSONR, B : JSONR, R](z: (A, B) => R) = new {
+  implicit def Func2ToJSON[A: JSONR, B: JSONR, R](z: (A, B) => R) = new {
     def applyJSON(
         a: JValue => Result[A], b: JValue => Result[B]): JValue => Result[R] =
       (json: JValue) => (a(json) |@| b(json))(z)
   }
 
-  implicit def Func3ToJSON[A : JSONR, B : JSONR, C : JSONR, R](
+  implicit def Func3ToJSON[A: JSONR, B: JSONR, C: JSONR, R](
       z: (A, B, C) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
@@ -35,7 +35,7 @@ trait Lifting {
       (json: JValue) => (a(json) |@| b(json) |@| c(json))(z)
   }
 
-  implicit def Func4ToJSON[A : JSONR, B : JSONR, C : JSONR, D : JSONR, R](
+  implicit def Func4ToJSON[A: JSONR, B: JSONR, C: JSONR, D: JSONR, R](
       z: (A, B, C, D) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
@@ -45,7 +45,7 @@ trait Lifting {
   }
 
   implicit def Func5ToJSON[
-      A : JSONR, B : JSONR, C : JSONR, D : JSONR, E : JSONR, R](
+      A: JSONR, B: JSONR, C: JSONR, D: JSONR, E: JSONR, R](
       z: (A, B, C, D, E) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
@@ -57,7 +57,7 @@ trait Lifting {
   }
 
   implicit def Func6ToJSON[
-      A : JSONR, B : JSONR, C : JSONR, D : JSONR, E : JSONR, F : JSONR, R](
+      A: JSONR, B: JSONR, C: JSONR, D: JSONR, E: JSONR, F: JSONR, R](
       z: (A, B, C, D, E, F) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
@@ -70,9 +70,14 @@ trait Lifting {
             z)
   }
 
-  implicit def Func7ToJSON[
-      A : JSONR, B : JSONR, C : JSONR, D : JSONR, E : JSONR, F : JSONR, G : JSONR, R](
-      z: (A, B, C, D, E, F, G) => R) = new {
+  implicit def Func7ToJSON[A: JSONR,
+                           B: JSONR,
+                           C: JSONR,
+                           D: JSONR,
+                           E: JSONR,
+                           F: JSONR,
+                           G: JSONR,
+                           R](z: (A, B, C, D, E, F, G) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
                   c: JValue => Result[C],
@@ -85,9 +90,15 @@ trait Lifting {
                 json))(z)
   }
 
-  implicit def Func8ToJSON[
-      A : JSONR, B : JSONR, C : JSONR, D : JSONR, E : JSONR, F : JSONR, G : JSONR, H : JSONR, R](
-      z: (A, B, C, D, E, F, G, H) => R) = new {
+  implicit def Func8ToJSON[A: JSONR,
+                           B: JSONR,
+                           C: JSONR,
+                           D: JSONR,
+                           E: JSONR,
+                           F: JSONR,
+                           G: JSONR,
+                           H: JSONR,
+                           R](z: (A, B, C, D, E, F, G, H) => R) = new {
     def applyJSON(a: JValue => Result[A],
                   b: JValue => Result[B],
                   c: JValue => Result[C],

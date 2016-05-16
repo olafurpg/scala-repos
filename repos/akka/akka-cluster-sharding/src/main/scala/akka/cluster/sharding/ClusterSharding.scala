@@ -137,7 +137,8 @@ import akka.dispatch.Dispatchers
   *
   */
 object ClusterSharding
-    extends ExtensionId[ClusterSharding] with ExtensionIdProvider {
+    extends ExtensionId[ClusterSharding]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): ClusterSharding = super.get(system)
 
   override def lookup = ClusterSharding

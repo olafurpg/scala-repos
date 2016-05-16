@@ -60,7 +60,8 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
 class TrainValidationSplit @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
     extends Estimator[TrainValidationSplitModel]
-    with TrainValidationSplitParams with Logging {
+    with TrainValidationSplitParams
+    with Logging {
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("tvs"))
@@ -155,7 +156,8 @@ class TrainValidationSplitModel private[ml](
     @Since("1.5.0") override val uid: String,
     @Since("1.5.0") val bestModel: Model[_],
     @Since("1.5.0") val validationMetrics: Array[Double])
-    extends Model[TrainValidationSplitModel] with TrainValidationSplitParams {
+    extends Model[TrainValidationSplitModel]
+    with TrainValidationSplitParams {
 
   @Since("1.5.0")
   override def transform(dataset: DataFrame): DataFrame = {

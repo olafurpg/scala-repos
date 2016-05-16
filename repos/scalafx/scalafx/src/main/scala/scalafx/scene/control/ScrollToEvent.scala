@@ -76,7 +76,8 @@ object ScrollToEvent {
   * @tparam T scroll target type
   */
 class ScrollToEvent[T](override val delegate: jfxsc.ScrollToEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsc.ScrollToEvent[T]] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsc.ScrollToEvent[T]] {
 
   /**
     * Construct a new Event with the specified event source, target and type.

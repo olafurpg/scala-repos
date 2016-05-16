@@ -18,8 +18,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   val TOL = 1E-6
 
   test("Addition is Associative") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       close((a + b) + c, a + (b + c), TOL)
     })
@@ -36,8 +35,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   }
 
   test("Addition Commutes") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, _) = trip
       close(a + b, b + a, TOL)
     })
@@ -106,8 +104,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   }
 
   test("Scalar mult distributes over vector addition") {
-    check(
-        Prop.forAll { (trip: (V, V, V), s: S) =>
+    check(Prop.forAll { (trip: (V, V, V), s: S) =>
       val (a, b, _) = trip
       close((a + b) :* s, (b :* s) + (a :* s), TOL)
     })
@@ -141,8 +138,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   }
 
   test("Scalar mult distributes over field addition") {
-    check(
-        Prop.forAll { (trip: (V, V, V), s: S, t: S) =>
+    check(Prop.forAll { (trip: (V, V, V), s: S, t: S) =>
       val (a, _, _) = trip
       close((a) :* scalars.+(s, t), (a :* s) + (a :* t), 1E-4)
     })
@@ -160,8 +156,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   }
 
   test("Compatibility of scalar multiplication with field multiplication") {
-    check(
-        Prop.forAll { (trip: (V, V, V), s: S, t: S) =>
+    check(Prop.forAll { (trip: (V, V, V), s: S, t: S) =>
       val (a, _, _) = trip
       close((a) :* scalars.*(s, t), a :* s :* t, TOL)
     })
@@ -202,8 +197,7 @@ trait MutableModuleTestBase[V, S] extends FunSuite with Checkers {
   }
 
   test("1 is 1") {
-    check(
-        Prop.forAll { (trip: (V, V, V)) =>
+    check(Prop.forAll { (trip: (V, V, V)) =>
       val (a, b, c) = trip
       close(a :* scalars.one, a, TOL)
     })

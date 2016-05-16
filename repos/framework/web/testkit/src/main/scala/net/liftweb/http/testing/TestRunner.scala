@@ -25,14 +25,13 @@ import net.liftweb.common.{Box, Full, Empty, Failure}
 import net.liftweb.util.{Helpers}
 import scala.collection.mutable.ListBuffer
 
-class TestRunner(
-    clearDB: Box[() => Any],
-    setupDB: Box[() => Any],
-    beforeAssertListeners: List[String => Any],
-    afterAssertListeners: List[(String, Boolean) => Any],
-    beforeTestListeners: List[String => Any],
-    afterTestListeners: List[(String, Boolean, Box[Throwable], List[
-            StackTraceElement]) => Any]) {
+class TestRunner(clearDB: Box[() => Any],
+                 setupDB: Box[() => Any],
+                 beforeAssertListeners: List[String => Any],
+                 afterAssertListeners: List[(String, Boolean) => Any],
+                 beforeTestListeners: List[String => Any],
+                 afterTestListeners: List[(String, Boolean, Box[Throwable],
+                                           List[StackTraceElement]) => Any]) {
   implicit def fToItem(f: () => Any): Item = Item(f)
 
   def setup[T](what: List[Item]): (() => TestResults, (String, () => T) => T) = {
@@ -111,7 +110,7 @@ class TestRunner(
                     e.getFileName != myTrace.getFileName ||
                     e.getMethodName != myTrace.getMethodName)
               .dropRight(2)
-              (false, trace, Full(e))
+            (false, trace, Full(e))
         }
 
         afterTest(testItem.name, success, excp, trace)
@@ -149,7 +148,7 @@ class TestRunner(
                           e.getFileName != myTrace.getFileName ||
                           e.getMethodName != myTrace.getMethodName)
                     .dropRight(2)
-                    (false, trace, Full(e))
+                  (false, trace, Full(e))
               }
 
               afterTest(testItem.name + " thread " + n, success, excp, trace)

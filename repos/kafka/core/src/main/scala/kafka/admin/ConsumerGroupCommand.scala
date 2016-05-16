@@ -400,8 +400,8 @@ object ConsumerGroupCommand {
         val consumer = getConsumer()
         printDescribeHeader()
         consumerSummaries.foreach { consumerSummary =>
-          val topicPartitions = consumerSummary.assignment.map(
-              tp => TopicAndPartition(tp.topic, tp.partition))
+          val topicPartitions = consumerSummary.assignment.map(tp =>
+                TopicAndPartition(tp.topic, tp.partition))
           val partitionOffsets = topicPartitions.flatMap { topicPartition =>
             Option(consumer.committed(new TopicPartition(
                         topicPartition.topic, topicPartition.partition))).map {

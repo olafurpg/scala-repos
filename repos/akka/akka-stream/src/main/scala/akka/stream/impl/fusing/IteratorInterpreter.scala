@@ -42,7 +42,8 @@ private[akka] object IteratorInterpreter {
   }
 
   final case class IteratorDownstream[T]()
-      extends DownstreamBoundaryStageLogic[T] with Iterator[T] {
+      extends DownstreamBoundaryStageLogic[T]
+      with Iterator[T] {
     val in: Inlet[T] = Inlet[T]("IteratorDownstream.in")
     in.id = 0
 

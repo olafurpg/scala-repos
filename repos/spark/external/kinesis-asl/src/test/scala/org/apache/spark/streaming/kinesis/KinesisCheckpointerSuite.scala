@@ -37,8 +37,11 @@ import org.apache.spark.streaming.{Duration, TestSuiteBase}
 import org.apache.spark.util.ManualClock
 
 class KinesisCheckpointerSuite
-    extends TestSuiteBase with MockitoSugar with BeforeAndAfterEach
-    with PrivateMethodTester with Eventually {
+    extends TestSuiteBase
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with PrivateMethodTester
+    with Eventually {
 
   private val workerId = "dummyWorkerId"
   private val shardId = "dummyShardId"

@@ -31,7 +31,9 @@ import org.apache.spark.streaming.util.OpenHashMapBasedStateMap
 import org.apache.spark.util.Utils
 
 class MapWithStateRDDSuite
-    extends SparkFunSuite with RDDCheckpointTester with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with RDDCheckpointTester
+    with BeforeAndAfterAll {
 
   private var sc: SparkContext = null
   private var checkpointDir: File = _
@@ -282,24 +284,23 @@ class MapWithStateRDDSuite
       MapWithStateRDDSuite.touchedStateKeys.clear()
 
       val mappingFunction = (time: Time, key: String, data: Option[Int],
-      state: State[Int]) =>
-        {
+                             state: State[Int]) => {
 
-          // Track the key that has been touched
-          MapWithStateRDDSuite.touchedStateKeys += key
+        // Track the key that has been touched
+        MapWithStateRDDSuite.touchedStateKeys += key
 
-          // If the data is 0, do not do anything with the state
-          // else if the data is 1, increment the state if it exists, or set new state to 0
-          // else if the data is 2, remove the state if it exists
-          data match {
-            case Some(1) =>
-              if (state.exists()) { state.update(state.get + 1) } else
-                state.update(0)
-            case Some(2) =>
-              state.remove()
-            case _ =>
-          }
-          None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
+        // If the data is 0, do not do anything with the state
+        // else if the data is 1, increment the state if it exists, or set new state to 0
+        // else if the data is 2, remove the state if it exists
+        data match {
+          case Some(1) =>
+            if (state.exists()) { state.update(state.get + 1) } else
+              state.update(0)
+          case Some(2) =>
+            state.remove()
+          case _ =>
+        }
+        None.asInstanceOf[Option[Int]] // Do not return anything, not being tested
       }
       val newDataRDD =
         sc.makeRDD(testData).partitionBy(testStateRDD.partitioner.get)
@@ -422,7 +423,7 @@ class MapWithStateRDDSuite
             .emptyRDD[(Int, Int)]
             .partitionBy(partitioner),
           (time: Time,
-          key: Int, value: Option[Int], state: State[Int]) => None,
+           key: Int, value: Option[Int], state: State[Int]) => None,
           Time(10),
           None
       )
@@ -448,7 +449,7 @@ class MapWithStateRDDSuite
 
   /** Assert whether the `mapWithState` operation generates expected results */
   private def assertOperation[
-      K : ClassTag, V : ClassTag, S : ClassTag, T : ClassTag](
+      K: ClassTag, V: ClassTag, S: ClassTag, T: ClassTag](
       testStateRDD: MapWithStateRDD[K, V, S, T],
       newDataRDD: RDD[(K, V)],
       mappingFunction: (Time, K, Option[V], State[S]) => Option[T],
@@ -477,8 +478,7 @@ class MapWithStateRDDSuite
   }
 
   /** Assert whether the [[MapWithStateRDD]] has the expected state and mapped data */
-  private def assertRDD[
-      K : ClassTag, V : ClassTag, S : ClassTag, T : ClassTag](
+  private def assertRDD[K: ClassTag, V: ClassTag, S: ClassTag, T: ClassTag](
       stateRDD: MapWithStateRDD[K, V, S, T],
       expectedStates: Set[(K, S, Int)],
       expectedMappedData: Set[T]): Unit = {

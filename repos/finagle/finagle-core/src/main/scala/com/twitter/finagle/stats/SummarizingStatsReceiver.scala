@@ -75,20 +75,18 @@ class SummarizingStatsReceiver extends StatsReceiverWithCumulativeGauges {
           case (k, xs) =>
             val n = xs.length
             def idx(ptile: Double) =
-              math
-                .floor(ptile * n)
-                .toInt
-              (variableName(k),
-               "n=%d min=%.1f med=%.1f p90=%.1f p95=%.1f p99=%.1f p999=%.1f p9999=%.1f max=%.1f"
-                 .format(n,
-                         xs(0),
-                         xs(n / 2),
-                         xs(idx(.9D)),
-                         xs(idx(.95D)),
-                         xs(idx(.99D)),
-                         xs(idx(.999D)),
-                         xs(idx(.9999D)),
-                         xs(n - 1)))
+              math.floor(ptile * n).toInt
+            (variableName(k),
+             "n=%d min=%.1f med=%.1f p90=%.1f p95=%.1f p99=%.1f p999=%.1f p9999=%.1f max=%.1f"
+               .format(n,
+                       xs(0),
+                       xs(n / 2),
+                       xs(idx(.9D)),
+                       xs(idx(.95D)),
+                       xs(idx(.99D)),
+                       xs(idx(.999D)),
+                       xs(idx(.9999D)),
+                       xs(n - 1)))
         }).toSeq
 
     lazy val tailValues = (statValues map {

@@ -39,7 +39,9 @@ import org.junit.Assert._
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class ZookeeperConsumerConnectorTest
-    extends KafkaServerTestHarness with ZooKeeperTestHarness with Logging {
+    extends KafkaServerTestHarness
+    with ZooKeeperTestHarness
+    with Logging {
   val numNodes = 2
   val numParts = 2
   val topic = "topic1"
@@ -110,8 +112,8 @@ class ZookeeperConsumerConnectorTest
       for (partition <- 0 until numParts) {
         val ms = 0
           .until(messagesPerNode)
-          .map(
-              x => header + server.config.brokerId + "-" + partition + "-" + x)
+          .map(x =>
+                header + server.config.brokerId + "-" + partition + "-" + x)
         messages ++= ms
         import JavaConversions._
         javaProducer.send(ms.map(new KeyedMessage[Int, String](
@@ -138,8 +140,8 @@ class ZookeeperConsumerConnectorTest
   private def toJavaMap(
       scalaMap: Map[String, Int]): java.util.Map[String, java.lang.Integer] = {
     val javaMap = new java.util.HashMap[String, java.lang.Integer]()
-    scalaMap.foreach(
-        m => javaMap.put(m._1, m._2.asInstanceOf[java.lang.Integer]))
+    scalaMap.foreach(m =>
+          javaMap.put(m._1, m._2.asInstanceOf[java.lang.Integer]))
     javaMap
   }
 }

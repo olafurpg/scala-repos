@@ -26,7 +26,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.apache.spark.SparkFunSuite
 
 class SerializationDebuggerSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   import SerializationDebugger.find
 

@@ -74,7 +74,6 @@ class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
       name={funcName}
       value=""
       tabindex={tabIndex.toString}/>
-    
   }
 
   override def toForm: Box[NodeSeq] =

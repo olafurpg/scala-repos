@@ -19,8 +19,12 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 class OffersWantedForReconciliationActorTest
-    extends FunSuite with MarathonActorSupport with Mockito with GivenWhenThen
-    with Matchers with ScalaFutures {
+    extends FunSuite
+    with MarathonActorSupport
+    with Mockito
+    with GivenWhenThen
+    with Matchers
+    with ScalaFutures {
   test("want offers on startup but times out") {
     val f = new Fixture()
 

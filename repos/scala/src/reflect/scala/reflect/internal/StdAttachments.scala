@@ -15,13 +15,13 @@ trait StdAttachments { self: SymbolTable =>
     def setAttachments(
         attachments: scala.reflect.macros.Attachments { type Pos = Position })
       : this.type = { rawatt = attachments; this }
-    def updateAttachment[T : ClassTag](attachment: T): this.type = {
+    def updateAttachment[T: ClassTag](attachment: T): this.type = {
       rawatt = rawatt.update(attachment); this
     }
-    def removeAttachment[T : ClassTag]: this.type = {
+    def removeAttachment[T: ClassTag]: this.type = {
       rawatt = rawatt.remove[T]; this
     }
-    def hasAttachment[T : ClassTag]: Boolean = rawatt.contains[T]
+    def hasAttachment[T: ClassTag]: Boolean = rawatt.contains[T]
 
     // cannot be final due to SynchronizedSymbols
     def pos: Position = rawatt.pos

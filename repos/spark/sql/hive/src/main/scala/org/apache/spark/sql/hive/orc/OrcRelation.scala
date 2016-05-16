@@ -120,7 +120,8 @@ private[orc] class OrcOutputWriter(path: String,
                                    bucketId: Option[Int],
                                    dataSchema: StructType,
                                    context: TaskAttemptContext)
-    extends OutputWriter with HiveInspectors {
+    extends OutputWriter
+    with HiveInspectors {
 
   private val serializer = {
     val table = new Properties()
@@ -217,7 +218,8 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
                                      attributes: Seq[Attribute],
                                      filters: Array[Filter],
                                      @transient inputPaths: Seq[FileStatus])
-    extends Logging with HiveInspectors {
+    extends Logging
+    with HiveInspectors {
 
   private def addColumnIds(dataSchema: StructType,
                            output: Seq[Attribute],

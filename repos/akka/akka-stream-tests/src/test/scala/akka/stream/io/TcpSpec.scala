@@ -589,10 +589,9 @@ class TcpSpec
       val address = temporaryServerAddress()
       val firstClientConnected = Promise[Unit]()
       val takeTwoAndDropSecond = Flow[IncomingConnection]
-        .map(conn ⇒
-              {
-            firstClientConnected.trySuccess(())
-            conn
+        .map(conn ⇒ {
+          firstClientConnected.trySuccess(())
+          conn
         })
         .grouped(2)
         .take(1)

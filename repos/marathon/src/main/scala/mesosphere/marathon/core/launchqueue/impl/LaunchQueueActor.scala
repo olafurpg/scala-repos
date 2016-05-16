@@ -28,10 +28,11 @@ private[launchqueue] object LaunchQueueActor {
   *
   * The methods of that interface are translated to messages in the [[LaunchQueueDelegate]] implementation.
   */
-private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
-                                     appActorProps: (AppDefinition,
-                                     Int) => Props)
-    extends Actor with ActorLogging {
+private[impl] class LaunchQueueActor(
+    launchQueueConfig: LaunchQueueConfig,
+    appActorProps: (AppDefinition, Int) => Props)
+    extends Actor
+    with ActorLogging {
   import LaunchQueueDelegate._
 
   /** Currently active actors by pathId. */
@@ -105,8 +106,8 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
               log.warning(
                   "Got unexpected terminated for app {}: {}", pathId, actorRef)
             case Some(deferredMessages) =>
-              deferredMessages.foreach(
-                  msg => self.tell(msg.message, msg.sender))
+              deferredMessages.foreach(msg =>
+                    self.tell(msg.message, msg.sender))
 
               suspendedLauncherPathIds -= pathId
               suspendedLaunchersMessages -= actorRef
@@ -157,8 +158,8 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
   private[this] def receiveHandleNormalCommands: Receive = {
     case List =>
       import context.dispatcher
-      val scatter = launchers.keys.map(
-          appId => (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
+      val scatter = launchers.keys.map(appId =>
+            (self ? Count(appId)).mapTo[Option[QueuedTaskInfo]])
       val gather: Future[Seq[QueuedTaskInfo]] =
         Future.sequence(scatter).map(_.flatten.to[Seq])
       gather.pipeTo(sender())

@@ -113,9 +113,11 @@ sealed trait AttributeRule
 
 final case class AttrSubNode(attr: String) extends SubNode with AttributeRule
 final case class AttrAppendSubNode(attr: String)
-    extends SubNode with AttributeRule
+    extends SubNode
+    with AttributeRule
 final case class AttrRemoveSubNode(attr: String)
-    extends SubNode with AttributeRule
+    extends SubNode
+    with AttributeRule
 
 final case class SelectThisNode(kids: Boolean) extends SubNode
 
@@ -265,12 +267,15 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
             }) |
         (opt('*') ~ '[' ~> attrName <~ ']' ^^ { name =>
               AttrSubNode(name)
-            }) | ('!' ~ '!' ^^ (a => DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
+            }) | ('!' ~ '!' ^^ (a =>
+                  DontMergeAttributes)) | ('<' ~ '*' ~ '>') ^^
         (a => SurroundKids()) | ('-' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('>' ~ '*' ^^ (a => PrependKidsSubNode())) |
         ('*' ~ '+' ^^ (a => AppendKidsSubNode())) |
-        ('*' ~ '<' ^^ (a => AppendKidsSubNode())) | '*' ^^ (a => KidsSubNode()) | '^' ~ '*' ^^
-        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a => SelectThisNode(false)))
+        ('*' ~ '<' ^^ (a => AppendKidsSubNode())) | '*' ^^ (a =>
+              KidsSubNode()) | '^' ~ '*' ^^
+        (a => SelectThisNode(true)) | '^' ~ '^' ^^ (a =>
+              SelectThisNode(false)))
 
   private lazy val attrName: Parser[String] =
     (letter | '_' | ':') ~ rep(letter | number | '-' | '_' | ':' | '.') ^^ {
@@ -278,26 +283,19 @@ object CssSelectorParser extends PackratParsers with ImplicitConversions {
     }
 
   private lazy val attrConst: Parser[String] = {
-    (('\'' ~> rep(elem("isValid",
-                       (c: Char) =>
-                         {
-                       c != '\'' && c >= ' '
-                   })) <~ '\'') ^^ {
+    (('\'' ~> rep(elem("isValid", (c: Char) => {
+              c != '\'' && c >= ' '
+            })) <~ '\'') ^^ {
           case s => s.mkString
         }) |
-    (('"' ~> rep(elem("isValid",
-                      (c: Char) =>
-                        {
-                      c != '"' && c >= ' '
-                  })) <~ '"') ^^ {
+    (('"' ~> rep(elem("isValid", (c: Char) => {
+              c != '"' && c >= ' '
+            })) <~ '"') ^^ {
           case s => s.mkString
         }) |
-    (rep1(
-            elem("isValid",
-                 (c: Char) =>
-                   {
-                 c != '\'' && c != '"' && c > ' '
-             })) ^^ {
+    (rep1(elem("isValid", (c: Char) => {
+          c != '\'' && c != '"' && c > ' '
+        })) ^^ {
           case s => s.mkString
         })
   }

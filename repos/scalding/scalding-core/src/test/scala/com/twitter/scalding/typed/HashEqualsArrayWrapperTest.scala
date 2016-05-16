@@ -49,7 +49,9 @@ object HashArrayEqualsWrapperLaws {
 }
 
 class HashArrayEqualsWrapperProps
-    extends PropSpec with PropertyChecks with Checkers {
+    extends PropSpec
+    with PropertyChecks
+    with Checkers {
 
   property("Specialized orderings obey all laws for Arrays") {
     check(
@@ -91,7 +93,7 @@ class HashArrayEqualsWrapperProps
 
 class HashArrayEqualsWrapperTest extends FunSuite {
 
-  def testWrap[T : ClassTag](arr: Array[T], expected: Class[_]): Unit = {
+  def testWrap[T: ClassTag](arr: Array[T], expected: Class[_]): Unit = {
     val fn = HashEqualsArrayWrapper.wrapByClassTagFn[T]
     val wrapped = fn(arr)
     assert(wrapped.getClass === expected)

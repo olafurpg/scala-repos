@@ -52,10 +52,11 @@ case class Simul(_id: Simul.ID,
 
   def accept(userId: String, v: Boolean) = Created {
     copy(
-        applicants = applicants map {
-      case a if a is userId => a.copy(accepted = v)
-      case a => a
-    })
+        applicants =
+          applicants map {
+        case a if a is userId => a.copy(accepted = v)
+        case a => a
+      })
   }
 
   def removePairing(userId: String) =
@@ -67,17 +68,19 @@ case class Simul(_id: Simul.ID,
     startable option copy(status = SimulStatus.Started,
                           startedAt = DateTime.now.some,
                           applicants = Nil,
-                          pairings = applicants collect {
-                            case a if a.accepted => SimulPairing(a.player)
-                          },
+                          pairings =
+                            applicants collect {
+                              case a if a.accepted => SimulPairing(a.player)
+                            },
                           hostSeenAt = none)
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
     copy(
-        pairings = pairings collect {
-      case p if p.gameId == gameId => f(p)
-      case p => p
-    }).finishIfDone
+        pairings =
+          pairings collect {
+        case p if p.gameId == gameId => f(p)
+        case p => p
+      }).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
     hasUser(userId) option removeApplicant(userId).removePairing(userId)
@@ -125,26 +128,27 @@ object Simul {
            clock: SimulClock,
            variants: List[Variant],
            color: String): Simul =
-    Simul(_id = Random nextStringUppercase 8,
-          name = RandomName(),
-          status = SimulStatus.Created,
-          clock = clock,
-          hostId = host.id,
-          hostRating = host.perfs.bestRatingIn {
-            variants flatMap { variant =>
-              lila.game.PerfPicker.perfType(
-                  speed = chess.Speed(clock.chessClock.some),
-                  variant = variant,
-                  daysPerTurn = none)
-            }
-          },
-          hostGameId = none,
-          createdAt = DateTime.now,
-          variants = variants,
-          applicants = Nil,
-          pairings = Nil,
-          startedAt = none,
-          finishedAt = none,
-          hostSeenAt = DateTime.now.some,
-          color = color.some)
+    Simul(
+        _id = Random nextStringUppercase 8,
+        name = RandomName(),
+        status = SimulStatus.Created,
+        clock = clock,
+        hostId = host.id,
+        hostRating = host.perfs.bestRatingIn {
+          variants flatMap { variant =>
+            lila.game.PerfPicker.perfType(speed =
+                                            chess.Speed(clock.chessClock.some),
+                                          variant = variant,
+                                          daysPerTurn = none)
+          }
+        },
+        hostGameId = none,
+        createdAt = DateTime.now,
+        variants = variants,
+        applicants = Nil,
+        pairings = Nil,
+        startedAt = none,
+        finishedAt = none,
+        hostSeenAt = DateTime.now.some,
+        color = color.some)
 }

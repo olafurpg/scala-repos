@@ -33,7 +33,8 @@ final case class HttpMethod private[http](
     isSafe: Boolean,
     isIdempotent: Boolean,
     requestEntityAcceptance: RequestEntityAcceptance)
-    extends jm.HttpMethod with SingletonValueRenderable {
+    extends jm.HttpMethod
+    with SingletonValueRenderable {
   override def isEntityAccepted: Boolean =
     requestEntityAcceptance.isEntityAccepted
   override def toString: String = s"HttpMethod($value)"

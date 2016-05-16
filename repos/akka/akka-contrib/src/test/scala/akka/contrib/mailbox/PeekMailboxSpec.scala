@@ -27,7 +27,8 @@ object PeekMailboxSpec {
         PeekMailboxExtension.ack()
     }
     override def preRestart(cause: Throwable, msg: Option[Any]) {
-      for (m ← msg if m == "DIE") context stop self // for testing the case of mailbox.cleanUp
+      for (m ← msg
+           if m == "DIE") context stop self // for testing the case of mailbox.cleanUp
     }
   }
 }
@@ -38,7 +39,8 @@ class PeekMailboxSpec
       mailbox-type = "akka.contrib.mailbox.PeekMailboxType"
       max-retries = 2
     }
-    """) with ImplicitSender {
+    """)
+    with ImplicitSender {
 
   import PeekMailboxSpec._
 

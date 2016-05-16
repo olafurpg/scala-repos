@@ -10,7 +10,9 @@ import com.twitter.util.{Closable, CloseAwaitably, Future, FuturePool, Time}
   */
 class InputStreamReader private[io](
     inputStream: InputStream, maxBufferSize: Int, pool: FuturePool)
-    extends Reader with Closable with CloseAwaitably {
+    extends Reader
+    with Closable
+    with CloseAwaitably {
   private[this] val mutex = new AsyncMutex()
   @volatile private[this] var discarded = false
 

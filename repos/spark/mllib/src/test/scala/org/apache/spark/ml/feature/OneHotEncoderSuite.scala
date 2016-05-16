@@ -28,7 +28,8 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 
 class OneHotEncoderSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   def stringIndexed(): DataFrame = {

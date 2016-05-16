@@ -106,15 +106,14 @@ object JavaLangString {
                              VarRef(Ident("i", Some("i")))(IntType)))(IntType)
                 })(OptimizerHints.empty.withInline(true), None),
             /* def length(): Int = RuntimeString.length(this) */
-            MethodDef(
-                static = false,
-                Ident("length__I", Some("length__I")),
-                Nil,
-                IntType, {
-                  Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
-                        Ident("length__T__I", Some("length__T__I")),
-                        List(This()(ThisType)))(IntType)
-                })(OptimizerHints.empty.withInline(true), None),
+            MethodDef(static = false,
+                      Ident("length__I", Some("length__I")),
+                      Nil,
+                      IntType, {
+                        Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
+                              Ident("length__T__I", Some("length__T__I")),
+                              List(This()(ThisType)))(IntType)
+                      })(OptimizerHints.empty.withInline(true), None),
             /* def subSequence(begin: Int, end: Int): CharSequence =
              *   RuntimeString.subSequence(this, begin, end)
              */

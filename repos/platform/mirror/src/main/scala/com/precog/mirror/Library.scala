@@ -36,7 +36,8 @@ trait LibraryModule extends Binder {
     type Morphism2 = Morphism2Like
 
     abstract class Op1(val namespace: Vector[String], val name: String)
-        extends Op1Like with Morphism1 {
+        extends Op1Like
+        with Morphism1 {
       val opcode = 0x0001 // we really don't care
       val tpe = UnaryOperationType(JUniverseT, JUniverseT)
       val rowLevel = true
@@ -52,7 +53,8 @@ trait LibraryModule extends Binder {
     }
 
     abstract class Reduction(val namespace: Vector[String], val name: String)
-        extends ReductionLike with Morphism1
+        extends ReductionLike
+        with Morphism1
         with ((JValue, JValue) => JValue) {
       val opcode = 0x0001 // we really don't care
       val tpe = UnaryOperationType(JUniverseT, JUniverseT)

@@ -35,7 +35,8 @@ import org.apache.spark.rdd.RDD
 class BisectingKMeansModel private[clustering](
     private[clustering] val root: ClusteringTreeNode
 )
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   /**
     * Leaf cluster centers.

@@ -38,7 +38,8 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 abstract class UserDefinedType[UserType >: Null]
-    extends DataType with Serializable {
+    extends DataType
+    with Serializable {
 
   /** Underlying storage type for this UDT */
   def sqlType: DataType

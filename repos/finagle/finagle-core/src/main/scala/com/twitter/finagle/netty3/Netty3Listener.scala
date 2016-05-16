@@ -256,10 +256,10 @@ case class Netty3Listener[In, Out](
     channelSnooper: Option[ChannelSnooper] = None,
     channelFactory: ServerChannelFactory = Netty3Listener.channelFactory,
     bootstrapOptions: Map[String, Object] = Map(
-          "soLinger" -> (0: java.lang.Integer),
-          "reuseAddress" -> java.lang.Boolean.TRUE,
-          "child.tcpNoDelay" -> java.lang.Boolean.TRUE
-      ),
+        "soLinger" -> (0: java.lang.Integer),
+        "reuseAddress" -> java.lang.Boolean.TRUE,
+        "child.tcpNoDelay" -> java.lang.Boolean.TRUE
+    ),
     channelReadTimeout: Duration = Duration.Top,
     channelWriteCompletionTimeout: Duration = Duration.Top,
     tlsConfig: Option[Netty3ListenerTLSConfig] = None,

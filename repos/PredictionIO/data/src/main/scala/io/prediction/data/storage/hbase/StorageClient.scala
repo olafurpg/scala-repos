@@ -34,7 +34,8 @@ case class HBClient(
 )
 
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
 
   val conf = HBaseConfiguration.create()
 

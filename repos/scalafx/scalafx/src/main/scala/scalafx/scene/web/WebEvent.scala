@@ -98,7 +98,8 @@ object WebEvent {
   * @param delegate JavaFX WebEvent. Since it has no default constructor, there is not default value.
   */
 final class WebEvent[T](override val delegate: jfxsw.WebEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsw.WebEvent[T]] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsw.WebEvent[T]] {
 
   /**
     * Creates a new event object.

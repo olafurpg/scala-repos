@@ -90,11 +90,13 @@ object JmxTool extends Logging {
     val attributesWhitelistExists = options.has(attributesOpt)
     val attributesWhitelist =
       if (attributesWhitelistExists)
-        Some(options.valueOf(attributesOpt).split(",")) else None
+        Some(options.valueOf(attributesOpt).split(","))
+      else None
     val dateFormatExists = options.has(dateFormatOpt)
     val dateFormat =
       if (dateFormatExists)
-        Some(new SimpleDateFormat(options.valueOf(dateFormatOpt))) else None
+        Some(new SimpleDateFormat(options.valueOf(dateFormatOpt)))
+      else None
     val jmxc = JMXConnectorFactory.connect(url, null)
     val mbsc = jmxc.getMBeanServerConnection()
 
@@ -146,7 +148,7 @@ object JmxTool extends Logging {
     for (name <- names) {
       val mbean = mbsc.getMBeanInfo(name)
       for (attrObj <- mbsc.getAttributes(
-          name, mbean.getAttributes.map(_.getName))) {
+                         name, mbean.getAttributes.map(_.getName))) {
         val attr = attrObj.asInstanceOf[Attribute]
         attributesWhitelist match {
           case Some(allowedAttributes) =>

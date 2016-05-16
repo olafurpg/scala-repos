@@ -27,7 +27,9 @@ import akka.testkit.AkkaSpec
 class HttpServerSpec
     extends AkkaSpec("""akka.loggers = []
      akka.loglevel = OFF
-     akka.http.server.request-timeout = infinite""") with Inside { spec ⇒
+     akka.http.server.request-timeout = infinite""")
+    with Inside {
+  spec ⇒
   implicit val materializer = ActorMaterializer()
 
   "The server implementation" should {
@@ -38,8 +40,9 @@ class HttpServerSpec
              |
              |""")
 
-      expectRequest() shouldEqual HttpRequest(
-          uri = "http://example.com/", headers = List(Host("example.com")))
+      expectRequest() shouldEqual HttpRequest(uri = "http://example.com/",
+                                              headers =
+                                                List(Host("example.com")))
     }
 
     "deliver a request as soon as all headers are received" in new TestSetup {
@@ -422,10 +425,10 @@ class HttpServerSpec
              |Host: example.com
              |
              |""")
-      expectRequest() shouldEqual HttpRequest(
-          GET,
-          uri = "http://example.com/",
-          headers = List(Host("example.com")))
+      expectRequest() shouldEqual HttpRequest(GET,
+                                              uri = "http://example.com/",
+                                              headers =
+                                                List(Host("example.com")))
     }
 
     "keep HEAD request when transparent-head-requests are disabled" in new TestSetup {
@@ -435,10 +438,10 @@ class HttpServerSpec
              |Host: example.com
              |
              |""")
-      expectRequest() shouldEqual HttpRequest(
-          HEAD,
-          uri = "http://example.com/",
-          headers = List(Host("example.com")))
+      expectRequest() shouldEqual HttpRequest(HEAD,
+                                              uri = "http://example.com/",
+                                              headers =
+                                                List(Host("example.com")))
     }
 
     "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Strict)" in new TestSetup {
@@ -449,7 +452,7 @@ class HttpServerSpec
       inside(expectRequest()) {
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(entity = HttpEntity.Strict(
-                        ContentTypes.`text/plain(UTF-8)`, ByteString("abcd"))))
+                      ContentTypes.`text/plain(UTF-8)`, ByteString("abcd"))))
           expectResponseWithWipedDate("""|HTTP/1.1 200 OK
                |Server: akka-http/test
                |Date: XXXX
@@ -492,9 +495,9 @@ class HttpServerSpec
       val data = TestPublisher.manualProbe[ByteString]()
       inside(expectRequest()) {
         case HttpRequest(GET, _, _, _, _) ⇒
-          responses.sendNext(HttpResponse(entity = HttpEntity.CloseDelimited(
-                        ContentTypes.`text/plain(UTF-8)`,
-                        Source.fromPublisher(data))))
+          responses.sendNext(HttpResponse(entity =
+                    HttpEntity.CloseDelimited(ContentTypes.`text/plain(UTF-8)`,
+                                              Source.fromPublisher(data))))
           val dataSub = data.expectSubscription()
           dataSub.expectCancellation()
           expectResponseWithWipedDate("""|HTTP/1.1 200 OK
@@ -667,8 +670,9 @@ class HttpServerSpec
              |
              |""".stripMarginWithNewline("\r\n"))
 
-      expectRequest() shouldEqual HttpRequest(
-          uri = "http://example.com/", headers = List(Host("example.com")))
+      expectRequest() shouldEqual HttpRequest(uri = "http://example.com/",
+                                              headers =
+                                                List(Host("example.com")))
 
       responses.expectRequest()
       responses.sendError(new RuntimeException("CRASH BOOM BANG"))
@@ -725,8 +729,9 @@ class HttpServerSpec
              |
              |""")
 
-      expectRequest() shouldEqual HttpRequest(
-          uri = "http://example.com//foo", headers = List(Host("example.com")))
+      expectRequest() shouldEqual HttpRequest(uri = "http://example.com//foo",
+                                              headers =
+                                                List(Host("example.com")))
     }
 
     "use default-host-header for HTTP/1.0 requests" in new TestSetup {
@@ -734,8 +739,9 @@ class HttpServerSpec
              |
              |""")
 
-      expectRequest() shouldEqual HttpRequest(
-          uri = "http://example.com/abc", protocol = HttpProtocols.`HTTP/1.0`)
+      expectRequest() shouldEqual HttpRequest(uri = "http://example.com/abc",
+                                              protocol =
+                                                HttpProtocols.`HTTP/1.0`)
 
       override def settings: ServerSettings =
         super.settings.withDefaultHostHeader(Host("example.com"))
@@ -922,7 +928,7 @@ class HttpServerSpec
                  |""")
 
         implicit class XRequest(request: HttpRequest) {
-          def expectEntity[T <: HttpEntity : ClassTag](bytes: Int) =
+          def expectEntity[T <: HttpEntity: ClassTag](bytes: Int) =
             inside(request) {
               case HttpRequest(POST, _, _, entity: T, _) ⇒
                 entity

@@ -15,7 +15,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class TraceTest
-    extends FunSuite with MockitoSugar with BeforeAndAfter
+    extends FunSuite
+    with MockitoSugar
+    with BeforeAndAfter
     with OneInstancePerTest {
   val Seq(id0, id1, id2) =
     0 until 3 map { i =>
@@ -71,8 +73,7 @@ class TraceTest
     Trace.letId(Trace.nextId) {
       val topId = Trace.id
       Trace.letId(Trace.nextId) {
-        assert(
-            Trace.id match {
+        assert(Trace.id match {
           case TraceId(Some(traceId), Some(parentId), _, None, Flags(0))
               if traceId == topId.traceId && parentId == topId.spanId =>
             true

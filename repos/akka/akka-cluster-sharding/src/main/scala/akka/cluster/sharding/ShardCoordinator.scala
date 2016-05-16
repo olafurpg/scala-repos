@@ -156,7 +156,8 @@ object ShardCoordinator {
   @SerialVersionUID(1L)
   class LeastShardAllocationStrategy(
       rebalanceThreshold: Int, maxSimultaneousRebalance: Int)
-      extends ShardAllocationStrategy with Serializable {
+      extends ShardAllocationStrategy
+      with Serializable {
 
     override def allocateShard(
         requester: ActorRef,
@@ -205,14 +206,16 @@ object ShardCoordinator {
       */
     @SerialVersionUID(1L)
     final case class Register(shardRegion: ActorRef)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * `ShardRegion` in proxy only mode registers to `ShardCoordinator`, until it receives [[RegisterAck]].
       */
     @SerialVersionUID(1L)
     final case class RegisterProxy(shardRegionProxy: ActorRef)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * Acknowledgement from `ShardCoordinator` that [[Register]] or [[RegisterProxy]] was successful.
@@ -227,7 +230,8 @@ object ShardCoordinator {
       */
     @SerialVersionUID(1L)
     final case class GetShardHome(shard: ShardId)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * `ShardCoordinator` replies with this message for [[GetShardHome]] requests.
@@ -374,10 +378,11 @@ object ShardCoordinator {
           val newUnallocatedShards =
             if (rememberEntities) (unallocatedShards + shard)
             else unallocatedShards
-          copy(shards = shards - shard,
-               regions = regions.updated(
-                     region, regions(region).filterNot(_ == shard)),
-               unallocatedShards = newUnallocatedShards)
+          copy(
+              shards = shards - shard,
+              regions =
+                regions.updated(region, regions(region).filterNot(_ == shard)),
+              unallocatedShards = newUnallocatedShards)
       }
     }
   }
@@ -468,7 +473,8 @@ abstract class ShardCoordinator(
     typeName: String,
     settings: ClusterShardingSettings,
     allocationStrategy: ShardCoordinator.ShardAllocationStrategy)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ShardCoordinator._
   import ShardCoordinator.Internal._
   import ShardRegion.ShardId
@@ -501,8 +507,9 @@ abstract class ShardCoordinator(
 
   def isMember(region: ActorRef): Boolean = {
     val regionAddress = region.path.address
-    (region.path.address == self.path.address || cluster.state.members.exists(
-            m ⇒ m.address == regionAddress && m.status == MemberStatus.Up))
+    (region.path.address == self.path.address ||
+        cluster.state.members.exists(m ⇒
+              m.address == regionAddress && m.status == MemberStatus.Up))
   }
 
   def active: Receive =
@@ -680,8 +687,7 @@ abstract class ShardCoordinator(
         context.become(shuttingDown)
 
       case ShardRegion.GetCurrentRegions ⇒
-        val reply = ShardRegion.CurrentRegions(
-            state.regions.keySet.map { ref ⇒
+        val reply = ShardRegion.CurrentRegions(state.regions.keySet.map { ref ⇒
           if (ref.path.address.host.isEmpty) cluster.selfAddress
           else ref.path.address
         })

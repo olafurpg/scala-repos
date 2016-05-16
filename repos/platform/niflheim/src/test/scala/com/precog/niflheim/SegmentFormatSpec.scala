@@ -37,7 +37,9 @@ class V1SegmentFormatSpec extends SegmentFormatSpec {
 }
 
 class VersionedSegmentFormatSpec
-    extends Specification with ScalaCheck with SegmentFormatSupport
+    extends Specification
+    with ScalaCheck
+    with SegmentFormatSupport
     with SegmentFormatMatchers {
   val format = VersionedSegmentFormat(
       Map(
@@ -66,7 +68,9 @@ class VersionedSegmentFormatSpec
 }
 
 trait SegmentFormatSpec
-    extends Specification with ScalaCheck with SegmentFormatSupport
+    extends Specification
+    with ScalaCheck
+    with SegmentFormatSupport
     with SegmentFormatMatchers {
   def format: SegmentFormat
 

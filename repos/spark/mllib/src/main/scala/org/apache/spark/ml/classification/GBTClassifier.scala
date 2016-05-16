@@ -48,7 +48,9 @@ import org.apache.spark.sql.functions._
 final class GBTClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[Vector, GBTClassifier, GBTClassificationModel]
-    with GBTParams with TreeClassifierParams with Logging {
+    with GBTParams
+    with TreeClassifierParams
+    with Logging {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("gbtc"))
@@ -209,7 +211,8 @@ final class GBTClassificationModel private[ml](
     private val _treeWeights: Array[Double],
     @Since("1.6.0") override val numFeatures: Int)
     extends PredictionModel[Vector, GBTClassificationModel]
-    with TreeEnsembleModel with Serializable {
+    with TreeEnsembleModel
+    with Serializable {
 
   require(numTrees > 0, "GBTClassificationModel requires at least 1 tree.")
   require(

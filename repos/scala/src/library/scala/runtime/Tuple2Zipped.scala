@@ -36,7 +36,8 @@ object ZippedTraversable2 {
 
 final class Tuple2Zipped[El1, Repr1, El2, Repr2](
     val colls: (TraversableLike[El1, Repr1], IterableLike[El2, Repr2]))
-    extends AnyVal with ZippedTraversable2[El1, El2] {
+    extends AnyVal
+    with ZippedTraversable2[El1, El2] {
   // This would be better as "private def coll1 = colls._1" but
   // SI-6215 precludes private methods in value classes.
   def map[B, To](f: (El1, El2) => B)(implicit cbf: CBF[Repr1, B, To]): To = {

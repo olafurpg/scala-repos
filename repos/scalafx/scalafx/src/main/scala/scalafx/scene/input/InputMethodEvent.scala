@@ -44,7 +44,8 @@ object InputMethodEvent {
 }
 
 class InputMethodEvent(override val delegate: jfxsi.InputMethodEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.InputMethodEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.InputMethodEvent] {
 
   /**
     * The input method caret position within the composed text.

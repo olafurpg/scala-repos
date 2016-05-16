@@ -50,9 +50,9 @@ object OptionTest extends SpecLite {
   }
 
   object instances {
-    def equal[A : Equal] = Equal[Option[A]]
-    def order[A : Order] = Order[Option[A]]
-    def semigroup[A : Semigroup] = Monoid[Option[A]]
+    def equal[A: Equal] = Equal[Option[A]]
+    def order[A: Order] = Order[Option[A]]
+    def semigroup[A: Semigroup] = Monoid[Option[A]]
     def bindRec[A] = BindRec[Option]
     def monad[A] = Monad[Option]
 
@@ -60,6 +60,6 @@ object OptionTest extends SpecLite {
     def monoidLast[A] = Monoid[Option[A] @@ Last]
 
     // checking absence of ambiguity
-    def equal[A : Order] = Equal[Option[A]]
+    def equal[A: Order] = Equal[Option[A]]
   }
 }

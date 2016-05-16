@@ -87,7 +87,7 @@ sealed trait HttpMessage extends jm.HttpMessage {
   }
 
   /** Returns the first header of the given type if there is one */
-  def header[T <: jm.HttpHeader : ClassTag]: Option[T] = {
+  def header[T <: jm.HttpHeader: ClassTag]: Option[T] = {
     val erasure = classTag[T].runtimeClass
     headers.find(erasure.isInstance).asInstanceOf[Option[T]]
   }
@@ -162,7 +162,8 @@ final class HttpRequest(val method: HttpMethod,
                         val headers: immutable.Seq[HttpHeader],
                         val entity: RequestEntity,
                         val protocol: HttpProtocol)
-    extends jm.HttpRequest with HttpMessage {
+    extends jm.HttpRequest
+    with HttpMessage {
 
   HttpRequest.verifyUri(uri)
   require(entity.isKnownEmpty || method.isEntityAccepted,
@@ -355,7 +356,8 @@ final class HttpResponse(val status: StatusCode,
                          val headers: immutable.Seq[HttpHeader],
                          val entity: ResponseEntity,
                          val protocol: HttpProtocol)
-    extends jm.HttpResponse with HttpMessage {
+    extends jm.HttpResponse
+    with HttpMessage {
 
   require(entity.isKnownEmpty || status.allowsEntity,
           "Responses with this status code must have an empty entity")

@@ -322,8 +322,7 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     */
   def mapConcat[T](f: function.Function[Out, java.lang.Iterable[T]])
     : javadsl.Flow[In, T, Mat] =
-    new Flow(
-        delegate.mapConcat { elem ⇒
+    new Flow(delegate.mapConcat { elem ⇒
       Util.immutableSeq(f(elem))
     })
 
@@ -562,8 +561,10 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     *
     * '''Cancels when''' downstream cancels
     */
-  def sliding(n: Int, step: Int = 1)
-    : javadsl.Flow[In, java.util.List[Out @uncheckedVariance], Mat] =
+  def sliding(
+      n: Int,
+      step: Int =
+        1): javadsl.Flow[In, java.util.List[Out @uncheckedVariance], Mat] =
     new Flow(delegate.sliding(n, step).map(_.asJava)) // TODO optimize to one step
 
   /**
@@ -1568,8 +1569,7 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
       that: Graph[SourceShape[U], Mat2],
       comp: Comparator[U],
       matF: function.Function2[Mat, Mat2, Mat3]): javadsl.Flow[In, U, Mat3] =
-    new Flow(
-        delegate.mergeSortedMat(that)(combinerToScala(matF))(
+    new Flow(delegate.mergeSortedMat(that)(combinerToScala(matF))(
             Ordering.comparatorToOrdering(comp)))
 
   /**
@@ -1946,8 +1946,8 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     *
     * @return A [[RunnableGraph]] that materializes to a Processor when run() is called on it.
     */
-  def toProcessor: RunnableGraph[Processor[
-          In @uncheckedVariance, Out @uncheckedVariance]] = {
+  def toProcessor: RunnableGraph[
+      Processor[In @uncheckedVariance, Out @uncheckedVariance]] = {
     RunnableGraph.fromGraph(delegate.toProcessor)
   }
 }

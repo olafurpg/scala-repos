@@ -61,10 +61,10 @@ class OrphanMacros(val c: whitebox.Context) extends CaseClassMacros {
      """
   }
 
-  def materializeAux[F[_], D, T](
-      proxied: Boolean)(implicit fTag: WeakTypeTag[F[_]],
-                        dTag: WeakTypeTag[D],
-                        tTag: WeakTypeTag[T]): Tree = {
+  def materializeAux[F[_], D, T](proxied: Boolean)(
+      implicit fTag: WeakTypeTag[F[_]],
+      dTag: WeakTypeTag[D],
+      tTag: WeakTypeTag[T]): Tree = {
     val fTcTpe = fTag.tpe.typeConstructor
     val dTpe = dTag.tpe
     val tTpe = tTag.tpe

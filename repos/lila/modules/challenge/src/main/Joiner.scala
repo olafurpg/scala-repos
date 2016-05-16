@@ -42,36 +42,34 @@ private[challenge] final class Joiner(onStart: String => Unit) {
               }
             }
           val game = Game
-            .make(
-                game = chessGame,
-                whitePlayer = makePlayer(chess.White,
-                                         c.finalColor.fold(
-                                             challengerUser,
-                                             destUser)),
-                blackPlayer = makePlayer(chess.Black,
-                                         c.finalColor.fold(destUser, challengerUser)),
-                mode = (realVariant == chess.variant.FromPosition).fold(
+            .make(game = chessGame,
+                  whitePlayer = makePlayer(chess.White,
+                                           c.finalColor.fold(challengerUser,
+                                                             destUser)),
+                  blackPlayer =
+                    makePlayer(chess.Black,
+                               c.finalColor.fold(destUser, challengerUser)),
+                  mode = (realVariant == chess.variant.FromPosition).fold(
                       Mode.Casual, c.mode),
-                variant = realVariant,
-                source = (realVariant == chess.variant.FromPosition).fold(
+                  variant = realVariant,
+                  source = (realVariant == chess.variant.FromPosition).fold(
                       Source.Position, Source.Friend),
-                daysPerTurn = c.daysPerTurn,
-                pgnImport = None)
+                  daysPerTurn = c.daysPerTurn,
+                  pgnImport = None)
             .copy(id = c.id)
             .|> { g =>
               state.fold(g) {
                 case sit @ SituationPlus(Situation(board, _), _) =>
-                  g.copy(
-                      variant = chess.variant.FromPosition,
-                      castleLastMoveTime = g.castleLastMoveTime.copy(
-                            lastMove = board.history.lastMove.map(_.origDest),
-                            castles = board.history.castles
-                        ),
-                      turns = sit.turns)
+                  g.copy(variant = chess.variant.FromPosition,
+                         castleLastMoveTime = g.castleLastMoveTime.copy(
+                             lastMove = board.history.lastMove.map(_.origDest),
+                             castles = board.history.castles
+                         ),
+                         turns = sit.turns)
               }
             }
             .start
-            (GameRepo insertDenormalized game) >>- onStart(game.id) inject Pov(
+          (GameRepo insertDenormalized game) >>- onStart(game.id) inject Pov(
               game, !c.finalColor).some
         }
     }

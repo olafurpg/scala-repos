@@ -17,8 +17,9 @@ import generic._
   *  @define coll linked hash map
   */
 object LinkedHashMap extends MutableMapFactory[LinkedHashMap] {
-  implicit def canBuildFrom[A, B]: CanBuildFrom[
-      Coll, (A, B), LinkedHashMap[A, B]] = new MapCanBuildFrom[A, B]
+  implicit def canBuildFrom[A, B]
+    : CanBuildFrom[Coll, (A, B), LinkedHashMap[A, B]] =
+    new MapCanBuildFrom[A, B]
   def empty[A, B] = new LinkedHashMap[A, B]
 }
 
@@ -46,9 +47,11 @@ object LinkedHashMap extends MutableMapFactory[LinkedHashMap] {
   */
 @SerialVersionUID(1L)
 class LinkedHashMap[A, B]
-    extends AbstractMap[A, B] with Map[A, B]
+    extends AbstractMap[A, B]
+    with Map[A, B]
     with MapLike[A, B, LinkedHashMap[A, B]]
-    with HashTable[A, LinkedEntry[A, B]] with Serializable {
+    with HashTable[A, LinkedEntry[A, B]]
+    with Serializable {
 
   override def empty = LinkedHashMap.empty[A, B]
   override def size = tableSize

@@ -16,8 +16,8 @@ object TextBodyParserSpec extends PlaySpecification {
     def parse(text: String,
               contentType: Option[String],
               encoding: String,
-              bodyParser: BodyParser[String] = BodyParsers.parse.tolerantText)(
-        implicit mat: Materializer) = {
+              bodyParser: BodyParser[String] =
+                BodyParsers.parse.tolerantText)(implicit mat: Materializer) = {
       await(
           bodyParser(FakeRequest().withHeaders(
                   contentType.map(CONTENT_TYPE -> _).toSeq: _*))

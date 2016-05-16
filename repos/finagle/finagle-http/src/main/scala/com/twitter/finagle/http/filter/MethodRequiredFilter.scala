@@ -11,7 +11,7 @@ import com.twitter.util.Future
   */
 class MethodRequiredFilter[REQUEST <: Request](
     val supportedMethods: Set[Method] = Set(
-          Method.Get, Method.Head, Method.Post))
+        Method.Get, Method.Head, Method.Post))
     extends SimpleFilter[REQUEST, Response] {
 
   private[this] val allowedMethods =

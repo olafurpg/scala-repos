@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
   * Date: 07.03.2008
   */
 class ScArgumentExprListImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScArgumentExprList {
+    extends ScalaPsiElementImpl(node)
+    with ScArgumentExprList {
   override def toString: String = "ArgumentList"
 
   def invocationCount: Int = {

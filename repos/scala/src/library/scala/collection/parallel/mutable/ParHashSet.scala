@@ -31,9 +31,11 @@ import scala.collection.parallel.Task
   */
 @SerialVersionUID(1L)
 class ParHashSet[T] private[collection](contents: FlatHashTable.Contents[T])
-    extends ParSet[T] with GenericParTemplate[T, ParHashSet]
+    extends ParSet[T]
+    with GenericParTemplate[T, ParHashSet]
     with ParSetLike[T, ParHashSet[T], scala.collection.mutable.HashSet[T]]
-    with ParFlatHashTable[T] with Serializable {
+    with ParFlatHashTable[T]
+    with Serializable {
   initWithContents(contents)
   // println("----> new par hash set!")
   // java.lang.Thread.dumpStack
@@ -213,8 +215,9 @@ private[mutable] abstract class ParHashSetCombiner[T](
       var curEntry = table(h)
       while (null != curEntry) {
         if (curEntry == newEntry) return 0
-        h = h +
-        1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
+        h =
+          h +
+          1 // we *do not* do `(h + 1) % table.length` here, because we'll never overflow!!
         if (h >= comesBefore) return -1
         curEntry = table(h)
       }

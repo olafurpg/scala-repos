@@ -43,7 +43,8 @@ object CSVRelation extends Logging {
     file.mapPartitionsWithIndex({
       case (split, iter) =>
         new BulkCsvReader(if (params.headerFlag)
-                            iter.filterNot(_ == firstLine) else iter,
+                            iter.filterNot(_ == firstLine)
+                          else iter,
                           params,
                           headers = header)
     }, true)
@@ -138,7 +139,8 @@ private[sql] class CsvOutputWriter(path: String,
                                    dataSchema: StructType,
                                    context: TaskAttemptContext,
                                    params: CSVOptions)
-    extends OutputWriter with Logging {
+    extends OutputWriter
+    with Logging {
 
   // create the Generator without separator inserted between 2 records
   private[this] val text = new Text()

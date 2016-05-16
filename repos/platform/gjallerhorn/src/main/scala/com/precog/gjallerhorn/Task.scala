@@ -105,10 +105,8 @@ abstract class Task(settings: Settings) extends Specification {
         body.format(parent.rootPath + subPath, parent.accountId)
       }
     val result = Http(req OK as.String)
-    val json = JParser
-      .parseFromString(result())
-      .valueOr(throw _)
-      (json \ "apiKey").deserialize[String]
+    val json = JParser.parseFromString(result()).valueOr(throw _)
+    (json \ "apiKey").deserialize[String]
   }
 
   def deleteAPIKey(apiKey: String) {
@@ -184,7 +182,8 @@ abstract class Task(settings: Settings) extends Specification {
           .addQueryParameter("apiKey", authApiKey))()
 
   def grantBody(perms: List[(String, String, List[String])]): String =
-    JObject("permissions" -> JArray(perms.map {
+    JObject(
+        "permissions" -> JArray(perms.map {
       case (accessType, path, owners) =>
         val ids = JArray(owners.map(JString(_)))
         JObject("accessType" -> JString(accessType),

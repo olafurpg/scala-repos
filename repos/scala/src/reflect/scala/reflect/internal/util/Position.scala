@@ -10,7 +10,8 @@ package util
 
 /** @inheritdoc */
 class Position
-    extends scala.reflect.api.Position with InternalPositionImpl
+    extends scala.reflect.api.Position
+    with InternalPositionImpl
     with DeprecatedPosition {
   type Pos = Position
   def pos: Position = this
@@ -167,12 +168,12 @@ private[util] trait InternalPositionImpl { self: Position =>
   def |^(that: Position): Position = (this | that) ^ that.point
   def ^|(that: Position): Position = (this | that) ^ this.point
 
-  def union(pos: Position): Position = (if (!pos.isRange) this
-                                        else if (this.isRange)
-                                          copyRange(
-                                              start = start min pos.start,
-                                              end = end max pos.end)
-                                        else pos)
+  def union(pos: Position): Position =
+    (if (!pos.isRange) this
+     else if (this.isRange)
+       copyRange(start = start min pos.start,
+                 end = end max pos.end)
+     else pos)
 
   def includes(pos: Position): Boolean =
     isRange && pos.isDefined && start <= pos.start && pos.end <= end
@@ -220,10 +221,11 @@ private[util] trait InternalPositionImpl { self: Position =>
     }
   }
   def showDebug: String = toString
-  def show = (if (isOpaqueRange) s"[$start:$end]"
-              else if (isTransparent) s"<$start:$end>"
-              else if (isDefined) s"[$point]"
-              else "[NoPosition]")
+  def show =
+    (if (isOpaqueRange) s"[$start:$end]"
+     else if (isTransparent) s"<$start:$end>"
+     else if (isDefined) s"[$point]"
+     else "[NoPosition]")
 
   private def asOffset(point: Int): Position = Position.offset(source, point)
   private def copyRange(source: SourceFile = source,
@@ -236,9 +238,9 @@ private[util] trait InternalPositionImpl { self: Position =>
     var idx = source.lineToOffset(source.offsetToLine(point))
     var col = 0
     while (idx != point) {
-      col +=
-      (if (source.content(idx) == '\t') Position.tabInc - col % Position.tabInc
-       else 1)
+      col += (if (source.content(idx) == '\t')
+                Position.tabInc - col % Position.tabInc
+              else 1)
       idx += 1
     }
     col + 1

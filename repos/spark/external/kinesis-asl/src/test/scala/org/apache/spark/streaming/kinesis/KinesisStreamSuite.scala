@@ -41,7 +41,9 @@ import org.apache.spark.streaming.scheduler.ReceivedBlockInfo
 import org.apache.spark.util.Utils
 
 abstract class KinesisStreamTests(aggregateTestData: Boolean)
-    extends KinesisFunSuite with Eventually with BeforeAndAfter
+    extends KinesisFunSuite
+    with Eventually
+    with BeforeAndAfter
     with BeforeAndAfterAll {
 
   // This is the name that KCL will use to save metadata to DynamoDB
@@ -301,15 +303,14 @@ abstract class KinesisStreamTests(aggregateTestData: Boolean)
                                 awsCredentials.getAWSSecretKey)
 
     // Verify that the generated RDDs are KinesisBackedBlockRDDs, and collect the data in each batch
-    kinesisStream.foreachRDD((rdd: RDD[Array[Byte]], time: Time) =>
-          {
-        val kRdd = rdd.asInstanceOf[KinesisBackedBlockRDD[Array[Byte]]]
-        val data = rdd.map { bytes =>
-          new String(bytes).toInt
-        }.collect().toSeq
-        collectedData.synchronized {
-          collectedData(time) = (kRdd.arrayOfseqNumberRanges, data)
-        }
+    kinesisStream.foreachRDD((rdd: RDD[Array[Byte]], time: Time) => {
+      val kRdd = rdd.asInstanceOf[KinesisBackedBlockRDD[Array[Byte]]]
+      val data = rdd.map { bytes =>
+        new String(bytes).toInt
+      }.collect().toSeq
+      collectedData.synchronized {
+        collectedData(time) = (kRdd.arrayOfseqNumberRanges, data)
+      }
     })
 
     ssc.remember(Minutes(60)) // remember all the batches so that they are all saved in checkpoint

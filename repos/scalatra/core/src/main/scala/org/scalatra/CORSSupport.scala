@@ -128,11 +128,11 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
     augmentSimpleRequest()
     // 5.2.8
     if (corsConfig.preflightMaxAge > 0)
-      response
-        .headers(AccessControlMaxAgeHeader) = corsConfig.preflightMaxAge.toString
+      response.headers(AccessControlMaxAgeHeader) =
+        corsConfig.preflightMaxAge.toString
     // 5.2.9
-    response
-      .headers(AccessControlAllowMethodsHeader) = corsConfig.allowedMethods mkString ","
+    response.headers(AccessControlAllowMethodsHeader) =
+      corsConfig.allowedMethods mkString ","
     // 5.2.10
     val rh =
       corsConfig.allowedHeaders ++ request
@@ -170,9 +170,8 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
 
   private[this] def isEnabled: Boolean =
     !("Upgrade".equalsIgnoreCase(
-            request.headers.get("Connection").getOrElse("")) &&
-        "WebSocket".equalsIgnoreCase(
-            request.headers.get("Upgrade").getOrElse(""))) &&
+            request.headers.get("Connection").getOrElse("")) && "WebSocket"
+          .equalsIgnoreCase(request.headers.get("Upgrade").getOrElse(""))) &&
     !requestPath.contains("eb_ping") // don't do anything for the ping endpoint
 
   private[this] def isValidRoute: Boolean =
@@ -200,11 +199,9 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
 
   private[this] def isSimpleHeader(header: String): Boolean = {
     val ho = header.blankOption
-    ho.isDefined &&
-    (ho forall { h ⇒
+    ho.isDefined && (ho forall { h ⇒
           val hu = h.toUpperCase(ENGLISH)
-          SimpleHeaders.contains(hu) ||
-          (hu == "CONTENT-TYPE" &&
+          SimpleHeaders.contains(hu) || (hu == "CONTENT-TYPE" &&
               SimpleContentTypes.exists((request.contentType
                     .getOrElse(""))
                     .toUpperCase(ENGLISH)
@@ -251,11 +248,11 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       corsConfig.allowedHeaders.map(_.trim.toUpperCase(ENGLISH))
     val requestedHeaders = for (header <- request.headers.getMulti(
                                              AccessControlRequestHeadersHeader)
-                                             if header.nonBlank) yield
+                                if header.nonBlank) yield
       header.toUpperCase(ENGLISH)
 
-    requestedHeaders.forall(
-        h => isSimpleHeader(h) || allowedHeaders.contains(h))
+    requestedHeaders.forall(h =>
+          isSimpleHeader(h) || allowedHeaders.contains(h))
   }
 
   abstract override def handle(

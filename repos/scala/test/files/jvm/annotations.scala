@@ -164,22 +164,22 @@ object Test4 {
     classOf[Foo8].getDeclaredMethods foreach printSourceAnnotations
     classOf[Foo8].getDeclaredConstructors foreach printParamSourceAnnotations
     classOf[Foo9].getDeclaredFields.sortWith((x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo9].getDeclaredMethods.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo10].getDeclaredFields.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo10].getDeclaredMethods.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo9].getDeclaredMethods.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo10].getDeclaredFields.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo10].getDeclaredMethods.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
     classOf[Foo10].getDeclaredConstructors foreach printParamSourceAnnotations
-    classOf[Foo11].getDeclaredFields.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo11].getDeclaredMethods.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo11].getDeclaredFields.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo11].getDeclaredMethods.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
     classOf[Foo11].getDeclaredConstructors foreach printParamSourceAnnotations
-    classOf[Foo12].getDeclaredFields.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
-    classOf[Foo12].getDeclaredMethods.sortWith(
-        (x, y) => x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo12].getDeclaredFields.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
+    classOf[Foo12].getDeclaredMethods.sortWith((x, y) =>
+          x.toString < y.toString) foreach printSourceAnnotations
     classOf[Foo12].getDeclaredConstructors foreach printParamSourceAnnotations
   }
 }

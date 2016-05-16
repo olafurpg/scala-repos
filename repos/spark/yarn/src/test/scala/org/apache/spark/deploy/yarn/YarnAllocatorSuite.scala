@@ -48,7 +48,9 @@ class MockResolver extends DNSToSwitchMapping {
 }
 
 class YarnAllocatorSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach {
   val conf = new Configuration()
   conf.setClass(
       CommonConfigurationKeysPublic.NET_TOPOLOGY_NODE_SWITCH_MAPPING_IMPL_KEY,

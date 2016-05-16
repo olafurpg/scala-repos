@@ -88,7 +88,8 @@ abstract class PipelineStage extends Params with Logging {
 @Since("1.2.0")
 @Experimental
 class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[PipelineModel] with MLWritable {
+    extends Estimator[PipelineModel]
+    with MLWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("pipeline"))
@@ -298,7 +299,9 @@ object Pipeline extends MLReadable[Pipeline] {
 @Experimental
 class PipelineModel private[ml](@Since("1.4.0") override val uid: String,
                                 @Since("1.4.0") val stages: Array[Transformer])
-    extends Model[PipelineModel] with MLWritable with Logging {
+    extends Model[PipelineModel]
+    with MLWritable
+    with Logging {
 
   /** A Java/Python-friendly auxiliary constructor. */
   private[ml] def this(uid: String, stages: ju.List[Transformer]) = {
@@ -313,8 +316,8 @@ class PipelineModel private[ml](@Since("1.4.0") override val uid: String,
 
   @Since("1.2.0")
   override def transformSchema(schema: StructType): StructType = {
-    stages.foldLeft(schema)(
-        (cur, transformer) => transformer.transformSchema(cur))
+    stages.foldLeft(schema)((cur, transformer) =>
+          transformer.transformSchema(cur))
   }
 
   @Since("1.4.0")

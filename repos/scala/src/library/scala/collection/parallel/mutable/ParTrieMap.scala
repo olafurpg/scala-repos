@@ -35,9 +35,11 @@ import scala.collection.concurrent.TrieMapIterator
   */
 final class ParTrieMap[K, V] private[collection](
     private val ctrie: TrieMap[K, V])
-    extends ParMap[K, V] with GenericParMapTemplate[K, V, ParTrieMap]
+    extends ParMap[K, V]
+    with GenericParMapTemplate[K, V, ParTrieMap]
     with ParMapLike[K, V, ParTrieMap[K, V], TrieMap[K, V]]
-    with ParTrieMapCombiner[K, V] with Serializable {
+    with ParTrieMapCombiner[K, V]
+    with Serializable {
   def this() = this(new TrieMap)
 
   override def mapCompanion: GenericParMapCompanion[ParTrieMap] = ParTrieMap
@@ -186,6 +188,7 @@ object ParTrieMap extends ParMapFactory[ParTrieMap] {
   def newCombiner[K, V]: Combiner[(K, V), ParTrieMap[K, V]] =
     new ParTrieMap[K, V]
 
-  implicit def canBuildFrom[K, V]: CanCombineFrom[
-      Coll, (K, V), ParTrieMap[K, V]] = new CanCombineFromMap[K, V]
+  implicit def canBuildFrom[K, V]
+    : CanCombineFrom[Coll, (K, V), ParTrieMap[K, V]] =
+    new CanCombineFromMap[K, V]
 }

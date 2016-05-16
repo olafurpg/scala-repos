@@ -71,9 +71,8 @@ class MulticlassMetrics @Since("1.1.0")(
     while (i < n) {
       var j = 0
       while (j < n) {
-        values(i + j * n) = confusions
-          .getOrElse((labels(i), labels(j)), 0)
-          .toDouble
+        values(i + j * n) =
+          confusions.getOrElse((labels(i), labels(j)), 0).toDouble
         j += 1
       }
       i += 1

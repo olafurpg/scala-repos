@@ -9,7 +9,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.immutable.Seq
 
 class PersistentVolumeMatcherTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   import scala.collection.JavaConverters._
 
   test("Missing volumes result in NO match") {
@@ -40,7 +43,8 @@ class PersistentVolumeMatcherTest
         "a resident app with persistent volumes and an offer with matching persistent volumes")
     val app = f.appWithPersistentVolume()
     val localVolumeId = Task.LocalVolumeId(app.id, "persistent-volume", "uuid")
-    val tasks = Seq(f.makeTask(
+    val tasks = Seq(
+        f.makeTask(
             app.id,
             Task.Reservation(Seq(localVolumeId), f.taskReservationStateNew)))
     val offer = f.offerWithVolumes(tasks.head.taskId, localVolumeId)

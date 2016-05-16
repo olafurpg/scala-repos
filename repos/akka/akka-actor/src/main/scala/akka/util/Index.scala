@@ -40,7 +40,8 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
       if (set ne null) {
         set.synchronized {
           if (set.isEmpty)
-            retry = true //IF the set is empty then it has been removed, so signal retry
+            retry =
+              true //IF the set is empty then it has been removed, so signal retry
           else {
             //Else add the value to the set and signal that retry is not needed
             added = set add v
@@ -56,7 +57,8 @@ class Index[K, V](val mapSize: Int, val valueComparator: Comparator[V]) {
         if (oldSet ne null) {
           oldSet.synchronized {
             if (oldSet.isEmpty)
-              retry = true //IF the set is empty then it has been removed, so signal retry
+              retry =
+                true //IF the set is empty then it has been removed, so signal retry
             else {
               //Else try to add the value to the set and signal that retry is not needed
               added = oldSet add v

@@ -4,7 +4,7 @@ sealed abstract class CaseInsensitive[A] {
   val original: A
   def foldedCase: A
 
-  final def map[B : FoldCase](f: A => B): CaseInsensitive[B] =
+  final def map[B: FoldCase](f: A => B): CaseInsensitive[B] =
     CaseInsensitive(f(original))
 
   final override def equals(other: Any): Boolean = other match {
@@ -27,8 +27,8 @@ object CaseInsensitive extends CaseInsensitiveInstances {
 }
 
 sealed abstract class CaseInsensitiveInstances {
-  implicit def CaseInsensitiveMonoid[A : FoldCase : Monoid]: Monoid[
-      CaseInsensitive[A]] =
+  implicit def CaseInsensitiveMonoid[A: FoldCase: Monoid]
+    : Monoid[CaseInsensitive[A]] =
     new Monoid[CaseInsensitive[A]] {
       def zero = CaseInsensitive.mk(Monoid[A].zero, Monoid[A].zero)
       def append(a: CaseInsensitive[A], b: => CaseInsensitive[A]) =
@@ -36,19 +36,19 @@ sealed abstract class CaseInsensitiveInstances {
                            Semigroup[A].append(a.foldedCase, b.foldedCase))
     }
 
-  implicit def CaseInsensitiveEqual[A : Equal]: Equal[CaseInsensitive[A]] =
+  implicit def CaseInsensitiveEqual[A: Equal]: Equal[CaseInsensitive[A]] =
     new Equal[CaseInsensitive[A]] {
       def equal(a: CaseInsensitive[A], b: CaseInsensitive[A]) =
         Equal[A].equal(a.foldedCase, b.foldedCase)
     }
 
-  implicit def CaseInsensitiveOrder[A : Order]: Order[CaseInsensitive[A]] =
+  implicit def CaseInsensitiveOrder[A: Order]: Order[CaseInsensitive[A]] =
     new Order[CaseInsensitive[A]] {
       def order(a: CaseInsensitive[A], b: CaseInsensitive[A]) =
         Order[A].order(a.foldedCase, b.foldedCase)
     }
 
-  implicit def CaseInsensitiveShow[A : Show]: Show[CaseInsensitive[A]] =
+  implicit def CaseInsensitiveShow[A: Show]: Show[CaseInsensitive[A]] =
     new Show[CaseInsensitive[A]] {
       override def show(a: CaseInsensitive[A]) = Show[A].show(a.original)
     }

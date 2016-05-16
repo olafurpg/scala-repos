@@ -8,10 +8,11 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
 trait MonadErrorTests[F[_], E]
-    extends ApplicativeErrorTests[F, E] with MonadTests[F] {
+    extends ApplicativeErrorTests[F, E]
+    with MonadTests[F] {
   def laws: MonadErrorLaws[F, E]
 
-  def monadError[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def monadError[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

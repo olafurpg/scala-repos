@@ -40,9 +40,9 @@ class FunctionalBuilder[M[_]](canBuild: FunctionalCanBuild[M]) {
 
     def ~[A21](m3: M[A21]) = new CanBuild21(canBuild(m1, m2), m3)
 
-    def apply[B](
-        f: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15,
-        A16, A17, A18, A19, A20) => B)(implicit fu: Functor[M]): M[B] =
+    def apply[B](f: (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13,
+                     A14, A15, A16, A17, A18, A19, A20) => B)(
+        implicit fu: Functor[M]): M[B] =
       fu.fmap[
           A1 ~ A2 ~ A3 ~ A4 ~ A5 ~ A6 ~ A7 ~ A8 ~ A9 ~ A10 ~ A11 ~ A12 ~ A13 ~ A14 ~ A15 ~ A16 ~ A17 ~ A18 ~ A19 ~ A20,
           B](

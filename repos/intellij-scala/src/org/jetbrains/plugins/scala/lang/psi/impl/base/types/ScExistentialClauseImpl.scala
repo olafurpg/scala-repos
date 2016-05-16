@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * Date: 07.03.2008
   */
 class ScExistentialClauseImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScExistentialClause {
+    extends ScalaPsiElementImpl(node)
+    with ScExistentialClause {
   override def toString: String = "ExistentialClause"
 
   override def processDeclarations(processor: PsiScopeProcessor,

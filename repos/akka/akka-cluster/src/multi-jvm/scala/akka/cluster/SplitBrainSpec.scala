@@ -60,7 +60,8 @@ class SplitBrainWithAccrualFailureDetectorMultiJvmNode5
     extends SplitBrainSpec(failureDetectorPuppet = false)
 
 abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   def this(failureDetectorPuppet: Boolean) =
     this(SplitBrainMultiNodeConfig(failureDetectorPuppet))

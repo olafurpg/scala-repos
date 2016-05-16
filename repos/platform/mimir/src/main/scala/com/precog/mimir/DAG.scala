@@ -665,7 +665,7 @@ trait DAG extends Instructions {
       def update(spec: dag.BucketSpec): Option[S] = None
     }
     object ScopeUpdate {
-      def scopeUpdate[S : ScopeUpdate] = implicitly[ScopeUpdate[S]]
+      def scopeUpdate[S: ScopeUpdate] = implicitly[ScopeUpdate[S]]
 
       implicit def depGraphScopeUpdate = new ScopeUpdate[DepGraph] {
         override def update(node: DepGraph) = Some(node)
@@ -689,7 +689,7 @@ trait DAG extends Instructions {
       def bimap[T](e: E)(fg: DepGraph => T, fs: dag.BucketSpec => T): T
     }
     object EditUpdate {
-      def editUpdate[E : EditUpdate] = implicitly[EditUpdate[E]]
+      def editUpdate[E: EditUpdate] = implicitly[EditUpdate[E]]
 
       implicit def depGraphEditUpdate = new EditUpdate[DepGraph] {
         def edit[T](inScope: Boolean,
@@ -734,7 +734,7 @@ trait DAG extends Instructions {
       * 
       * @return A pair of the whole rewritten DAG and the rewritten scope node.
       */
-    def substituteDown[S : ScopeUpdate, E : EditUpdate](
+    def substituteDown[S: ScopeUpdate, E: EditUpdate](
         scope: S, edit: (E, E)): (DepGraph, S) = {
       import ScopeUpdate._
       import EditUpdate._
@@ -875,7 +875,7 @@ trait DAG extends Instructions {
             for {
               node <- rewritten
               _ <- monadState.modify(
-                  _.copy(rewrittenScope = scopeUpdate[S].update(node)))
+                      _.copy(rewrittenScope = scopeUpdate[S].update(node)))
             } yield node
         }
 
@@ -935,7 +935,7 @@ trait DAG extends Instructions {
           for {
             node <- rewritten
             _ <- monadState.modify(
-                _.copy(rewrittenScope = scopeUpdate[S].update(node)))
+                    _.copy(rewrittenScope = scopeUpdate[S].update(node)))
           } yield node
       }
 
@@ -1161,7 +1161,8 @@ trait DAG extends Instructions {
     }
 
     case class Morph1(mor: Morphism1, parent: DepGraph)(val loc: Line)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       private def specs(policy: IdentityPolicy): Vector[IdentitySpec] =
         policy match {
           case IdentityPolicy.Product(left, right) =>
@@ -1183,9 +1184,10 @@ trait DAG extends Instructions {
       lazy val containsSplitArg = parent.containsSplitArg
     }
 
-    case class Morph2(mor: Morphism2, left: DepGraph, right: DepGraph)(
-        val loc: Line)
-        extends DepGraph with StagingPoint {
+    case class Morph2(
+        mor: Morphism2, left: DepGraph, right: DepGraph)(val loc: Line)
+        extends DepGraph
+        with StagingPoint {
 
       private def specs(policy: IdentityPolicy): Vector[IdentitySpec] =
         policy match {
@@ -1218,7 +1220,8 @@ trait DAG extends Instructions {
     }
 
     case class Distinct(parent: DepGraph)(val loc: Line)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = Identities.Specs(Vector(SynthIds(IdGen.nextInt())))
 
       def uniqueIdentities = true
@@ -1230,9 +1233,10 @@ trait DAG extends Instructions {
       lazy val containsSplitArg = parent.containsSplitArg
     }
 
-    case class AbsoluteLoad(parent: DepGraph, jtpe: JType = JType.JUniverseT)(
-        val loc: Line)
-        extends DepGraph with StagingPoint {
+    case class AbsoluteLoad(
+        parent: DepGraph, jtpe: JType = JType.JUniverseT)(val loc: Line)
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = parent match {
         case Const(CString(path)) => Identities.Specs(Vector(LoadIds(path)))
         case Morph1(expandGlob, Const(CString(path))) =>
@@ -1249,9 +1253,10 @@ trait DAG extends Instructions {
       lazy val containsSplitArg = parent.containsSplitArg
     }
 
-    case class RelativeLoad(parent: DepGraph, jtpe: JType = JType.JUniverseT)(
-        val loc: Line)
-        extends DepGraph with StagingPoint {
+    case class RelativeLoad(
+        parent: DepGraph, jtpe: JType = JType.JUniverseT)(val loc: Line)
+        extends DepGraph
+        with StagingPoint {
       // FIXME we need to use a special RelLoadIds to avoid ambiguities in provenance
       lazy val identities = parent match {
         case Const(CString(path)) => Identities.Specs(Vector(LoadIds(path)))
@@ -1283,7 +1288,8 @@ trait DAG extends Instructions {
     }
 
     case class Reduce(red: Reduction, parent: DepGraph)(val loc: Line)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = Identities.Specs.empty
 
       def uniqueIdentities = false
@@ -1296,7 +1302,8 @@ trait DAG extends Instructions {
     }
 
     case class MegaReduce(reds: List[(TS1, List[Reduction])], parent: DepGraph)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       val loc = parent.loc
 
       lazy val identities = Identities.Specs.empty
@@ -1312,7 +1319,8 @@ trait DAG extends Instructions {
 
     case class Split(
         spec: BucketSpec, child: DepGraph, id: Identifier)(val loc: Line)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = Identities.Specs(Vector(SynthIds(IdGen.nextInt())))
 
       def uniqueIdentities = true
@@ -1391,9 +1399,10 @@ trait DAG extends Instructions {
         data.containsSplitArg || samples.containsSplitArg
     }
 
-    case class IUI(union: Boolean, left: DepGraph, right: DepGraph)(
-        val loc: Line)
-        extends DepGraph with StagingPoint {
+    case class IUI(
+        union: Boolean, left: DepGraph, right: DepGraph)(val loc: Line)
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = (left.identities, right.identities) match {
         case (Identities.Specs(a), Identities.Specs(b)) =>
           Identities.Specs((a, b).zipped map CoproductIds)
@@ -1411,7 +1420,8 @@ trait DAG extends Instructions {
     }
 
     case class Diff(left: DepGraph, right: DepGraph)(val loc: Line)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       lazy val identities = left.identities
 
       def uniqueIdentities = left.uniqueIdentities
@@ -1500,7 +1510,8 @@ trait DAG extends Instructions {
     }
 
     case class Memoize(parent: DepGraph, priority: Int)
-        extends DepGraph with StagingPoint {
+        extends DepGraph
+        with StagingPoint {
       val loc = parent.loc
 
       lazy val identities = parent.identities

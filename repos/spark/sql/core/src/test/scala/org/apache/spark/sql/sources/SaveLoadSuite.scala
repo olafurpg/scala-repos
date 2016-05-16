@@ -28,7 +28,9 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.Utils
 
 class SaveLoadSuite
-    extends DataSourceTest with SharedSQLContext with BeforeAndAfter {
+    extends DataSourceTest
+    with SharedSQLContext
+    with BeforeAndAfter {
   protected override lazy val sql = caseInsensitiveContext.sql _
   private var originalDefaultSource: String = null
   private var path: File = null

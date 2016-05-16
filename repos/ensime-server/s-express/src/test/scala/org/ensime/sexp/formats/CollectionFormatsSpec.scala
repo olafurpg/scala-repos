@@ -8,7 +8,9 @@ import org.ensime.sexp._
 
 // http://docs.scala-lang.org/overviews/collections/overview.html
 class CollectionFormatsSpec
-    extends FormatSpec with ProductFormats with CollectionFormats
+    extends FormatSpec
+    with ProductFormats
+    with CollectionFormats
     with BasicFormats {
 
   val foo = SexpString("foo")

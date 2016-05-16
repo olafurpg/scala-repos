@@ -36,8 +36,12 @@ import BitSetLike.{LogWL, MaxSize}
   */
 @SerialVersionUID(8483111450368547763L)
 class BitSet(protected final var elems: Array[Long])
-    extends AbstractSet[Int] with SortedSet[Int] with scala.collection.BitSet
-    with BitSetLike[BitSet] with SetLike[Int, BitSet] with Serializable {
+    extends AbstractSet[Int]
+    with SortedSet[Int]
+    with scala.collection.BitSet
+    with BitSetLike[BitSet]
+    with SetLike[Int, BitSet]
+    with Serializable {
 
   override def empty = BitSet.empty
 

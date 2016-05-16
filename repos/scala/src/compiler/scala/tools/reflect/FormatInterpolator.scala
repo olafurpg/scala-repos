@@ -413,8 +413,7 @@ abstract class FormatInterpolator {
   class FloatingPointXn(val m: Match, val pos: Position, val argc: Int)
       extends Conversion {
     override def verify =
-      super.verify &&
-      (cc match {
+      super.verify && (cc match {
             case 'a' | 'A' =>
               val badFlags = ",(" filter hasFlag
               noPrecision && badFlags.isEmpty || falsely {

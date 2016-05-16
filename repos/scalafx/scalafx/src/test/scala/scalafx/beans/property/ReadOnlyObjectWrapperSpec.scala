@@ -48,7 +48,9 @@ import scalafx.testutil.RunOnApplicationThread
   */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyObjectWrapperSpec
-    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
+    extends FlatSpec
+    with BeforeAndAfterEach
+    with RunOnApplicationThread {
 
   val bean = new Object()
   var objectProperty: jfxbp.ReadOnlyObjectWrapper[String] = null
@@ -59,8 +61,8 @@ class ReadOnlyObjectWrapperSpec
   override protected def beforeEach() {
     objectProperty = new ReadOnlyObjectWrapper[String](bean, "Test Object")
     objectProperty2 = new ReadOnlyObjectWrapper[String](bean, "Test Object 2")
-    sfxObjectProperty = new ReadOnlyObjectWrapper[String](
-        bean, "SFX Test Object")
+    sfxObjectProperty =
+      new ReadOnlyObjectWrapper[String](bean, "SFX Test Object")
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
   }
 

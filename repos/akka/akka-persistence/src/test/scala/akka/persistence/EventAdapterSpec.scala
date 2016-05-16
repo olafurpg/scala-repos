@@ -82,7 +82,8 @@ object EventAdapterSpec {
 
   class PersistAllIncomingActor(
       name: String, override val journalPluginId: String)
-      extends NamedPersistentActor(name) with PersistentActor {
+      extends NamedPersistentActor(name)
+      with PersistentActor {
 
     var state: List[Any] = Nil
 
@@ -258,10 +259,14 @@ trait NoAdapters {
 // because it always would use the same leveldb directory anyway (based on class name),
 // yet we need different instances of the plugin. For inmem it does not matter, it can survive many instances.
 class InmemEventAdapterSpec
-    extends EventAdapterSpec("inmem") with ReplayPassThrough with NoAdapters
+    extends EventAdapterSpec("inmem")
+    with ReplayPassThrough
+    with NoAdapters
 
 class LeveldbBaseEventAdapterSpec extends EventAdapterSpec("leveldb")
 class LeveldbReplayPassThroughEventAdapterSpec
-    extends EventAdapterSpec("leveldb") with ReplayPassThrough
+    extends EventAdapterSpec("leveldb")
+    with ReplayPassThrough
 class LeveldbNoAdaptersEventAdapterSpec
-    extends EventAdapterSpec("leveldb") with NoAdapters
+    extends EventAdapterSpec("leveldb")
+    with NoAdapters

@@ -42,7 +42,9 @@ import org.apache.spark.util.ThreadUtils
   * The base class for physical operators.
   */
 abstract class SparkPlan
-    extends QueryPlan[SparkPlan] with Logging with Serializable {
+    extends QueryPlan[SparkPlan]
+    with Logging
+    with Serializable {
 
   /**
     * A handle to the SQL Context that was used to create this plan.   Since many operators need
@@ -326,7 +328,8 @@ abstract class SparkPlan
           numPartsToTry = (1.5 * n * partsScanned / buf.size).toInt
         }
       }
-      numPartsToTry = math.max(0, numPartsToTry) // guard against negative num of partitions
+      numPartsToTry =
+        math.max(0, numPartsToTry) // guard against negative num of partitions
 
       val left = n - buf.size
       val p = partsScanned.until(
@@ -353,10 +356,10 @@ abstract class SparkPlan
 
   private[this] def isTesting: Boolean = sys.props.contains("spark.testing")
 
-  protected def newMutableProjection(
-      expressions: Seq[Expression],
-      inputSchema: Seq[Attribute],
-      useSubexprElimination: Boolean = false): () => MutableProjection = {
+  protected def newMutableProjection(expressions: Seq[Expression],
+                                     inputSchema: Seq[Attribute],
+                                     useSubexprElimination: Boolean =
+                                       false): () => MutableProjection = {
     log.debug(s"Creating MutableProj: $expressions, inputSchema: $inputSchema")
     GenerateMutableProjection.generate(
         expressions, inputSchema, useSubexprElimination)

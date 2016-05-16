@@ -120,7 +120,8 @@ private[sbt] object PluginsDebug {
             .map(_.id)
           val actString =
             if (activatedIn.nonEmpty)
-              activatedIn.mkString(": enabled in ", ", ", "") else "" // TODO: deal with large builds
+              activatedIn.mkString(": enabled in ", ", ", "")
+            else "" // TODO: deal with large builds
           s"\n\t${plugin.label}$actString"
         }
         s"In $uri${pluginStrings.mkString}"
@@ -322,8 +323,8 @@ private[sbt] object PluginsDebug {
       // If both A and B must be deactivated, but A transitively depends on B, deactivating B will deactivate A.
       // If A must be deactivated, but one if its (transitively) required plugins isn't present, it won't be activated.
       //   So, in either of these cases, A doesn't need to be considered further and won't be included in this set.
-      val minDeactivate = minAbsentPlugins.filter(
-          p => Plugins.satisfied(p.requires, incrementalModel))
+      val minDeactivate = minAbsentPlugins.filter(p =>
+            Plugins.satisfied(p.requires, incrementalModel))
 
       val deactivate = for (d <- minDeactivate.toList) yield {
         // removing any one of these plugins will deactivate `d`.  TODO: This is not an especially efficient implementation.
@@ -425,8 +426,8 @@ private[sbt] object PluginsDebug {
   private[this] def requiredPlugins(plugins: List[AutoPlugin]) =
     s"Required plugins not present:\n\t${plugins.map(_.label).mkString("\n\t")}"
 
-  private[this] def str[A](list: List[A])(
-      f: A => String, fs: List[A] => String): String =
+  private[this] def str[A](
+      list: List[A])(f: A => String, fs: List[A] => String): String =
     list match {
       case Nil => ""
       case single :: Nil => f(single)

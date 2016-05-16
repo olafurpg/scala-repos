@@ -20,8 +20,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Await, Promise}
 
 class AppStartActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll with Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with Mockito {
 
   var driver: SchedulerDriver = _
   var scheduler: SchedulerActions = _

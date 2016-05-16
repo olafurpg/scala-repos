@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestDuplicateCo
   * @since 11.02.2015.
   */
 class Scalatest2_10_1_9_2_DuplicateConfigTest
-    extends Scalatest2_10_1_9_2_Base with ScalaTestDuplicateConfigTest {}
+    extends Scalatest2_10_1_9_2_Base
+    with ScalaTestDuplicateConfigTest {}

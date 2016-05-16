@@ -23,7 +23,8 @@ trait Bug120B {
   println("B")
 }
 class Bug120C(x: Int)
-    extends Bug120A(Bug120Test.print("one", 1)) with Bug120B {
+    extends Bug120A(Bug120Test.print("one", 1))
+    with Bug120B {
   println("C")
 }
 object Bug120Test {

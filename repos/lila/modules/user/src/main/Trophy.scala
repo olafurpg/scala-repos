@@ -22,7 +22,8 @@ object Trophy {
             key = "zugMiracle",
             name = "Zug miracle",
             icon = none,
-            url = "http://lichess.org/qa/259/how-do-you-get-a-zug-miracle-trophy".some,
+            url =
+              "http://lichess.org/qa/259/how-do-you-get-a-zug-miracle-trophy".some,
             none)
 
     object WayOfBerserk
@@ -66,7 +67,8 @@ object Trophy {
             key = "marathonSurvivor",
             name = "Marathon #1 survivor",
             icon = ",".some,
-            url = "http://lichess.org/blog/VXF45yYAAPQgLH4d/chess-marathon-1".some,
+            url =
+              "http://lichess.org/blog/VXF45yYAAPQgLH4d/chess-marathon-1".some,
             "fire_trophy".some)
 
     object BongcloudWarrior
@@ -74,7 +76,8 @@ object Trophy {
             key = "bongcloudWarrior",
             name = "Bongcloud Warrior",
             icon = "~".some,
-            url = "http://lichess.org/forum/lichess-feedback/bongcloud-trophy".some,
+            url =
+              "http://lichess.org/forum/lichess-feedback/bongcloud-trophy".some,
             "fire_trophy".some)
 
     object Developer

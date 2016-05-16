@@ -471,8 +471,9 @@ private[columnar] case object IntDelta extends CompressionScheme {
 
     override def next(row: MutableRow, ordinal: Int): Unit = {
       val delta = buffer.get()
-      prev = if (delta > Byte.MinValue) prev + delta
-      else ByteBufferHelper.getInt(buffer)
+      prev =
+        if (delta > Byte.MinValue) prev + delta
+        else ByteBufferHelper.getInt(buffer)
       row.setInt(ordinal, prev)
     }
   }
@@ -558,8 +559,9 @@ private[columnar] case object LongDelta extends CompressionScheme {
 
     override def next(row: MutableRow, ordinal: Int): Unit = {
       val delta = buffer.get()
-      prev = if (delta > Byte.MinValue) prev + delta
-      else ByteBufferHelper.getLong(buffer)
+      prev =
+        if (delta > Byte.MinValue) prev + delta
+        else ByteBufferHelper.getLong(buffer)
       row.setLong(ordinal, prev)
     }
   }

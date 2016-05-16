@@ -60,8 +60,7 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
           .orNull
       }
     } else
-      throw EvaluationException(
-          DebuggerBundle.message(
+      throw EvaluationException(DebuggerBundle.message(
               "evaluation.error.surrounded.expression.null"))
   }
 }

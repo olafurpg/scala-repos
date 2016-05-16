@@ -9,7 +9,8 @@ class ClientAdaptor[T](
     val self: Client,
     bijection: Bijection[Buf, T]
 )
-    extends BaseClient[T] with Proxy {
+    extends BaseClient[T]
+    with Proxy {
   def bufferToType(a: Buf): T = bijection(a)
 
   def set(key: String, flags: Int, expiry: Time, value: T): Future[Unit] =

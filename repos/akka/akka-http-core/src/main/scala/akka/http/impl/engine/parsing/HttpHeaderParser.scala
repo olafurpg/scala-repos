@@ -60,11 +60,13 @@ import akka.http.impl.model.parser.CharacterClasses._
 private[engine] final class HttpHeaderParser private (
     val settings: HttpHeaderParser.Settings,
     onIllegalHeader: ErrorInfo ⇒ Unit,
-    private[this] var nodes: Array[Char] = new Array(512), // initial size, can grow as needed
+    private[this] var nodes: Array[Char] =
+      new Array(512), // initial size, can grow as needed
     private[this] var nodeCount: Int = 0,
     private[this] var branchData: Array[Short] = new Array(254 * 3),
     private[this] var branchDataCount: Int = 0,
-    private[this] var values: Array[AnyRef] = new Array(255), // fixed size of 255
+    private[this] var values: Array[AnyRef] =
+      new Array(255), // fixed size of 255
     private[this] var valueCount: Int = 0,
     private[this] var trieIsPrivate: Boolean = false) {
   // signals the trie data can be mutated w/o having to copy first
@@ -275,7 +277,8 @@ private[engine] final class HttpHeaderParser private (
                 val newNodeIx = nodeCount.toShort
                 insertRemainingCharsAsNewNodes(input, value)(
                     cursor, endIx, valueIx, colonIx)
-                branchData(branchIndex) = newNodeIx // make the previously implicit "equals" sub node explicit
+                branchData(branchIndex) =
+                  newNodeIx // make the previously implicit "equals" sub node explicit
               case subNodeIx ⇒ // descend, but advance only on match
                 insert(input, value)(
                     cursor + 1 - math.abs(signum), endIx, subNodeIx, colonIx)
@@ -436,8 +439,8 @@ private[engine] final class HttpHeaderParser private (
     */
   def formatRawTrie: String = {
     def char(c: Char) =
-      (c >> 8).toString +
-      (if ((c & 0xFF) > 0) "/" + (c & 0xFF).toChar else "/Ω")
+      (c >> 8).toString + (if ((c & 0xFF) > 0) "/" + (c & 0xFF).toChar
+                           else "/Ω")
     s"nodes: ${nodes take nodeCount map char mkString ", "}\n" +
     s"branchData: ${branchData take branchDataCount grouped 3 map {
       case Array(a, b, c) ⇒ s"$a/$b/$c"
@@ -500,7 +503,7 @@ private[http] object HttpHeaderParser {
 
   def apply(settings: HttpHeaderParser.Settings)(
       onIllegalHeader: ErrorInfo ⇒ Unit = info ⇒
-          throw IllegalHeaderException(info)) =
+        throw IllegalHeaderException(info)) =
     prime(unprimed(settings, onIllegalHeader))
 
   def unprimed(settings: HttpHeaderParser.Settings,
@@ -659,7 +662,8 @@ private[http] object HttpHeaderParser {
                   if (sb != null)
                     sb.append(c)
                       .append(byteChar(input, ix + 1))
-                      .append(byteChar(input, ix + 2)) else null
+                      .append(byteChar(input, ix + 2))
+                  else null
                 case cc ⇒ appended2(cc)
               }
             } else if ((c & 0xF8) == 0xF0) {
@@ -676,7 +680,8 @@ private[http] object HttpHeaderParser {
                     sb.append(c)
                       .append(byteChar(input, ix + 1))
                       .append(byteChar(input, ix + 2))
-                      .append(byteChar(input, ix + 3)) else null
+                      .append(byteChar(input, ix + 3))
+                  else null
                 case cc ⇒ appended2(cc)
               }
             } else fail(s"Illegal character '${escape(c)}' in header value")

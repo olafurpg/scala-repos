@@ -152,7 +152,8 @@ private[json] class JsonOutputWriter(path: String,
                                      bucketId: Option[Int],
                                      dataSchema: StructType,
                                      context: TaskAttemptContext)
-    extends OutputWriter with Logging {
+    extends OutputWriter
+    with Logging {
 
   private[this] val writer = new CharArrayWriter()
   // create the Generator without separator inserted between 2 records

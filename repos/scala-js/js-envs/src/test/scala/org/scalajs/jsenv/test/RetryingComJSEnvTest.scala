@@ -53,7 +53,8 @@ class RetryingComJSEnvTest extends JSEnvTest with ComTests {
     }
 
     private class FailingComJSRunner(baseRunner: ComJSRunner)
-        extends DummyJSRunner with ComJSRunner {
+        extends DummyJSRunner
+        with ComJSRunner {
 
       def future: Future[Unit] = baseRunner.future
 

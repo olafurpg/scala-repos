@@ -49,7 +49,8 @@ import spire.math.ULong
   */
 class RandomAccessFile(file: File, arg0: String = "r")(
     implicit converter: ByteConverter = ByteConverterBigEndian)
-    extends DataInput with DataOutput
+    extends DataInput
+    with DataOutput
     with Closeable /*extends java.io.RandomAccessFile(file, arg0)*/ {
 
   def this(filename: String, arg0: String)(implicit converter: ByteConverter) =

@@ -175,9 +175,8 @@ class LBFGSB(lowerBounds: DenseVector[Double],
       c = c + p :* deltaT
 
       val bRowOfW: DenseVector[Double] = W(b, ::).t
-      fDerivative +=
-        deltaT * fSecondDerivative + g(b) * g(b) + theta * g(b) * zb -
-      (bRowOfW.t :* g(b)) * (M * c)
+      fDerivative += deltaT * fSecondDerivative + g(b) * g(b) +
+      theta * g(b) * zb - (bRowOfW.t :* g(b)) * (M * c)
       fSecondDerivative += -1.0 * theta * g(b) * g(b) - 2.0 *
       (g(b) * (bRowOfW.dot(M * p))) - g(b) * g(b) * (bRowOfW.t * (M * bRowOfW))
       p += (bRowOfW :* g(b));
@@ -196,8 +195,8 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     oldT += dtMin
 
     for (sortIdx <- i until n) {
-      xCauchy(sortedIndeces(sortIdx)) = x(sortedIndeces(sortIdx)) + oldT * d(
-          sortedIndeces(sortIdx))
+      xCauchy(sortedIndeces(sortIdx)) =
+        x(sortedIndeces(sortIdx)) + oldT * d(sortedIndeces(sortIdx))
     }
 
     c += p :* dtMin
@@ -217,13 +216,14 @@ class LBFGSB(lowerBounds: DenseVector[Double],
                           freeVarIndex: Array[Int]) = {
     var starAlpha = 1.0
     for ((vIdx, i) <- freeVarIndex.zipWithIndex) {
-      starAlpha = if (0 < du(i)) {
-        math.max(starAlpha,
-                 math.min(upperBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
-      } else {
-        math.max(starAlpha,
-                 math.min(lowerBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
-      }
+      starAlpha =
+        if (0 < du(i)) {
+          math.max(starAlpha,
+                   math.min(upperBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
+        } else {
+          math.max(starAlpha,
+                   math.min(lowerBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
+        }
     }
 
     starAlpha
@@ -301,9 +301,9 @@ class LBFGSB(lowerBounds: DenseVector[Double],
         //m <= k discard the oldest yk and sk
         history.copy(
             yHistory = DenseMatrix.horzcat(
-                  yHistory(::, 1 until m), newY.toDenseMatrix.t),
+                yHistory(::, 1 until m), newY.toDenseMatrix.t),
             sHistory = DenseMatrix.horzcat(
-                  sHistory(::, 1 until m), newS.toDenseMatrix.t)
+                sHistory(::, 1 until m), newS.toDenseMatrix.t)
         )
       }
     }

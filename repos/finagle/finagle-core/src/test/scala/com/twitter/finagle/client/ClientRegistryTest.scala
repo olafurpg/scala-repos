@@ -31,8 +31,12 @@ class crtnamer extends Namer {
 
 @RunWith(classOf[JUnitRunner])
 class ClientRegistryTest
-    extends FunSuite with StringClient with Eventually with IntegrationPatience
-    with BeforeAndAfter with MockitoSugar {
+    extends FunSuite
+    with StringClient
+    with Eventually
+    with IntegrationPatience
+    with BeforeAndAfter
+    with MockitoSugar {
 
   trait Ctx {
     val sr = new InMemoryStatsReceiver

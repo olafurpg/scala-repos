@@ -143,21 +143,20 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
     val fileName = ActivatorRepoProcessor.templateFileName(templateId)
     val cachedTemplate = new File(getCacheDataPath, fileName)
 
-    val myOnError = (a: String) =>
-      {
+    val myOnError = (a: String) => {
 
-        hasError = true
+      hasError = true
 
-        if (!cachedTemplate.exists()) {
-          onError(a)
-          return
-        }
+      if (!cachedTemplate.exists()) {
+        onError(a)
+        return
+      }
 
-        try {
-          FileUtil.copy(cachedTemplate, pathTo)
-        } catch {
-          case _: IOException => onError(a)
-        }
+      try {
+        FileUtil.copy(cachedTemplate, pathTo)
+      } catch {
+        case _: IOException => onError(a)
+      }
     }
 
     ActivatorRepoProcessor.downloadTemplateFromRepo(

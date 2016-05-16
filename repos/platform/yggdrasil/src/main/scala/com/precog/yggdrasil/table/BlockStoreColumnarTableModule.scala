@@ -64,7 +64,9 @@ trait BlockStoreColumnarTableModuleConfig {
 }
 
 trait BlockStoreColumnarTableModule[M[+ _]]
-    extends ColumnarTableModule[M] with YggConfigComponent { self =>
+    extends ColumnarTableModule[M]
+    with YggConfigComponent {
+  self =>
 
   protected lazy val blockModuleLogger = LoggerFactory.getLogger(
       "com.precog.yggdrasil.table.BlockStoreColumnarTableModule")
@@ -168,7 +170,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
           val comparatorMatrix = Array.ofDim[RowComparator](size, size)
 
           for (Cell(i, _, s) <- initialCells; Cell(i0, _, s0) <- initialCells
-                                                                    if i != i0) {
+               if i != i0) {
             comparatorMatrix(i)(i0) = Slice.rowComparatorFor(s, s0)(keyf)
           }
 
@@ -351,12 +353,10 @@ trait BlockStoreColumnarTableModule[M[+ _]]
         case None =>
           // Open a JDBM3 DB for use in sorting under a temp directory
           val dbFile = new File(newScratchDir(), prefix)
-          val db = DBMaker
-            .openFile(dbFile.getCanonicalPath)
-            .make()
-            (dbFile,
-             db,
-             JDBMState(prefix, Some((dbFile, db)), indices, insertCount))
+          val db = DBMaker.openFile(dbFile.getCanonicalPath).make()
+          (dbFile,
+           db,
+           JDBMState(prefix, Some((dbFile, db)), indices, insertCount))
       }
     }
     object JDBMState {
@@ -699,8 +699,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                     lhead.mapColumns(cf.util.filter(0, lhead.size, leq)))
                 lemission map { e =>
                   for {
-                    nextLeftWriteState <- writeAlignedSlices(
-                        lkey, e, leftWriteState, "alignLeft", SortAscending)
+                    nextLeftWriteState <- writeAlignedSlices(lkey,
+                                                             e,
+                                                             leftWriteState,
+                                                             "alignLeft",
+                                                             SortAscending)
                     resultWriteStates <- next(nextLeftWriteState,
                                               rightWriteState)
                   } yield resultWriteStates
@@ -771,8 +774,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                     rhead.mapColumns(cf.util.filter(0, rhead.size, req)))
                 remission map { e =>
                   for {
-                    nextRightWriteState <- writeAlignedSlices(
-                        rkey, e, rightWriteState, "alignRight", SortAscending)
+                    nextRightWriteState <- writeAlignedSlices(rkey,
+                                                              e,
+                                                              rightWriteState,
+                                                              "alignRight",
+                                                              SortAscending)
                     resultWriteStates <- next(leftWriteState,
                                               nextRightWriteState)
                   } yield resultWriteStates
@@ -1152,7 +1158,8 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                                       count)
 
           (sliceIndex,
-           openedJdbmState.copy(indices = openedJdbmState.indices +
+           openedJdbmState.copy(indices =
+                                  openedJdbmState.indices +
                                   (indexMapKey -> sliceIndex),
                                 insertCount = count))
       } map {
@@ -1170,8 +1177,8 @@ trait BlockStoreColumnarTableModule[M[+ _]]
           val newIndex = index.copy(
               count = index.count + (newInsertCount - jdbmState.insertCount))
 
-          jdbmState.copy(indices = jdbmState.indices +
-                           (indexMapKey -> newIndex),
+          jdbmState.copy(indices =
+                           jdbmState.indices + (indexMapKey -> newIndex),
                          insertCount = newInsertCount)
       } getOrElse {
         // sort k/vslice and shove into SortedSlice.
@@ -1189,8 +1196,8 @@ trait BlockStoreColumnarTableModule[M[+ _]]
                                       vrefs.toArray,
                                       vslice0.size)
 
-        jdbmState.copy(indices = jdbmState.indices +
-                         (indexMapKey -> sortedSlice),
+        jdbmState.copy(indices =
+                         jdbmState.indices + (indexMapKey -> sortedSlice),
                        insertCount = 0)
       }
     }
@@ -1392,8 +1399,9 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       * less than `limit` rows, it will be converted to an `InternalTable`,
       * otherwise it will stay an `ExternalTable`.
       */
-    def toInternalTable(limit: Int = yggConfig.maxSliceSize)
-      : EitherT[M, ExternalTable, InternalTable]
+    def toInternalTable(
+        limit: Int =
+          yggConfig.maxSliceSize): EitherT[M, ExternalTable, InternalTable]
 
     /**
       * Forces a table to an external table, possibly de-optimizing it.
@@ -1409,8 +1417,7 @@ trait BlockStoreColumnarTableModule[M[+ _]]
     // TODO assert that this table only has one row
 
     def toInternalTable(limit: Int): EitherT[M, ExternalTable, InternalTable] = {
-      EitherT(
-          slices.toStream map { slices1 =>
+      EitherT(slices.toStream map { slices1 =>
         \/-(new InternalTable(Slice.concat(slices1.toList).takeRange(0, 1)))
       })
     }
@@ -1566,11 +1573,11 @@ trait BlockStoreColumnarTableModule[M[+ _]]
       }
     }
 
-    protected def writeSorted(
-        groupKeys: Seq[TransSpec1],
-        valueSpec: TransSpec1,
-        sortOrder: DesiredSortOrder = SortAscending,
-        unique: Boolean = false): M[(List[String], IndexMap)] = {
+    protected def writeSorted(groupKeys: Seq[TransSpec1],
+                              valueSpec: TransSpec1,
+                              sortOrder: DesiredSortOrder = SortAscending,
+                              unique: Boolean =
+                                false): M[(List[String], IndexMap)] = {
       import sortMergeEngine._
 
       // If we don't want unique key values (e.g. preserve duplicates), we need to add

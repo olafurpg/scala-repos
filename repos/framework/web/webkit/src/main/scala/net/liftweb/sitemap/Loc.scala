@@ -67,8 +67,7 @@ trait Loc[T] {
     * Given a value calculate the HREF to this item
     */
   def calcHref(in: T): String =
-    appendQueryParameters(link.createPath(in),
-                          Full(in))
+    appendQueryParameters(link.createPath(in), Full(in))
 
   /**
     * Calculate HREF to this item using currentValue
@@ -172,8 +171,8 @@ trait Loc[T] {
   override def toString =
     "Loc(" + name + ", " + link + ", " + text + ", " + params + ")"
 
-  type LocRewrite = Box[PartialFunction[
-          RewriteRequest, (RewriteResponse, Box[T])]]
+  type LocRewrite =
+    Box[PartialFunction[RewriteRequest, (RewriteResponse, Box[T])]]
 
   def rewrite: LocRewrite = Empty
 
@@ -235,7 +234,7 @@ trait Loc[T] {
     * Find the stateless calculation Loc params
     */
   protected def findStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+                                    Box[Loc.CalcParamStateless[T]]) =
     (allParams.collect {
       case v @ Loc.CalcStateless(_) => v
     }.headOption, allParams.collect {
@@ -246,10 +245,11 @@ trait Loc[T] {
     * The cached Loc params
     */
   protected lazy val _foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) = findStatelessCalc
+                                           Box[Loc.CalcParamStateless[T]]) =
+    findStatelessCalc
 
   protected def foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+                                     Box[Loc.CalcParamStateless[T]]) =
     if (Props.devMode) findStatelessCalc else _foundStatelessCalc
 
   /**
@@ -721,7 +721,8 @@ object Loc {
     * the function is invoked.
     */
   class Snippet(val name: String, _func: => NodeSeq => NodeSeq)
-      extends ValueSnippets[Any] with AnyLocParam {
+      extends ValueSnippets[Any]
+      with AnyLocParam {
 
     /**
       * The NodeSeq => NodeSeq function 
@@ -759,7 +760,8 @@ object Loc {
     */
   trait LocSnippets
       extends PartialFunction[String, NodeSeq => NodeSeq]
-      with ValueSnippets[Any] with AnyLocParam {
+      with ValueSnippets[Any]
+      with AnyLocParam {
     def snippets = {
       case (s, _) if isDefinedAt(s) => apply(s)
     }
@@ -957,12 +959,11 @@ object Loc {
   }
 
   implicit def strToFailMsg(in: => String): FailMsg =
-    () =>
-      {
-        RedirectWithState(
-            LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
-            RedirectState(Empty, in -> NoticeType.Error)
-        )
+    () => {
+      RedirectWithState(
+          LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
+          RedirectState(Empty, in -> NoticeType.Error)
+      )
     }
 
   implicit def strFuncToFailMsg(in: () => String): FailMsg = strToFailMsg(in())

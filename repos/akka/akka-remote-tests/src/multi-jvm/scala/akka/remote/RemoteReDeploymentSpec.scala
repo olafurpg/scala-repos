@@ -97,7 +97,8 @@ abstract class RemoteReDeploymentSlowMultiJvmSpec
 }
 
 abstract class RemoteReDeploymentMultiJvmSpec
-    extends MultiNodeSpec(RemoteReDeploymentMultiJvmSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteReDeploymentMultiJvmSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   def sleepAfterKill: FiniteDuration

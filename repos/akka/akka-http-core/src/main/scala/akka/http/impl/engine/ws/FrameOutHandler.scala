@@ -176,6 +176,6 @@ private[http] object FrameOutHandler {
   def create(serverSide: Boolean,
              closeTimeout: FiniteDuration,
              log: LoggingAdapter): Flow[Input, FrameStart, NotUsed] =
-    Flow[Input].transform(
-        () ⇒ new FrameOutHandler(serverSide, closeTimeout, log))
+    Flow[Input].transform(() ⇒
+          new FrameOutHandler(serverSide, closeTimeout, log))
 }

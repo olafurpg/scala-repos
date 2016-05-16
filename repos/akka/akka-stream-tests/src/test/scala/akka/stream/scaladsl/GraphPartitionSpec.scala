@@ -50,8 +50,7 @@ class GraphPartitionSpec extends AkkaSpec {
       val c2 = TestSubscriber.probe[String]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           val partition = b.add(Partition[String](2, {
             case s if (s.length > 4) ⇒ 0
             case _ ⇒ 1

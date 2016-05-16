@@ -120,15 +120,14 @@ object BackendReporting {
              .mkString(
                  "\nNote that the following parent classes could not be found on the classpath: ",
                  ", ",
-                 "")) +
-        (if (javaDef.isEmpty) ""
-         else
-           javaDef
-             .map(_.internalName)
-             .mkString(
-                 "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
-                 ",",
-                 ""))
+                 "")) + (if (javaDef.isEmpty) ""
+                         else
+                           javaDef
+                             .map(_.internalName)
+                             .mkString(
+                                 "\nNote that the following parent classes are defined in Java sources (mixed compilation), no bytecode is available: ",
+                                 ",",
+                                 ""))
 
       case FieldNotFound(name, descriptor, ownerInternalName, missingClass) =>
         s"The field node $name$descriptor could not be found because the classfile $ownerInternalName cannot be found on the classpath." +

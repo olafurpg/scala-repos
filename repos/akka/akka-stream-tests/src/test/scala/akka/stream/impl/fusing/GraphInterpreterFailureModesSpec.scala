@@ -5,7 +5,8 @@ import akka.testkit.EventFilter
 import akka.testkit.AkkaSpec
 
 class GraphInterpreterFailureModesSpec
-    extends AkkaSpec with GraphInterpreterSpecKit {
+    extends AkkaSpec
+    with GraphInterpreterSpecKit {
 
   "GraphInterpreter" must {
 

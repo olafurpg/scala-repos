@@ -60,7 +60,8 @@ trait BlockStoreTestModule[M[+ _]] extends BaseBlockStoreTestModule[M] {
   def newGroupId = "groupId(" + groupId.getAndIncrement + ")"
 
   class YggConfig
-      extends IdSourceConfig with BlockStoreColumnarTableModuleConfig
+      extends IdSourceConfig
+      with BlockStoreColumnarTableModuleConfig
       with ColumnarTableModuleConfig {
     val idSource = new FreshAtomicIdSource
 
@@ -76,7 +77,8 @@ trait BlockStoreTestModule[M[+ _]] extends BaseBlockStoreTestModule[M] {
 }
 
 trait BaseBlockStoreTestModule[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with SliceColumnarTableModule[M]
+    extends ColumnarTableModuleTestSupport[M]
+    with SliceColumnarTableModule[M]
     with StubProjectionModule[M, Slice] {
 
   import trans._
@@ -108,7 +110,8 @@ trait BaseBlockStoreTestModule[M[+ _]]
         blocks.filterNot(_.isEmpty) match {
           case x #:: xs =>
             if ((x.toJson(x.size - 1).getOrElse(JUndefined) \ "key") > id)
-              Some(x) else findBlockAfter(id, xs)
+              Some(x)
+            else findBlockAfter(id, xs)
 
           case _ => None
         }

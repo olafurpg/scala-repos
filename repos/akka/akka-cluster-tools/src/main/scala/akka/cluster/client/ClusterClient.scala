@@ -58,17 +58,15 @@ object ClusterClientSettings {
     new ClusterClientSettings(
         initialContacts,
         establishingGetContactsInterval = config
-            .getDuration("establishing-get-contacts-interval", MILLISECONDS)
-            .millis,
-        refreshContactsInterval = config
-            .getDuration("refresh-contacts-interval", MILLISECONDS)
-            .millis,
-        heartbeatInterval = config
-            .getDuration("heartbeat-interval", MILLISECONDS)
-            .millis,
+          .getDuration("establishing-get-contacts-interval", MILLISECONDS)
+          .millis,
+        refreshContactsInterval =
+          config.getDuration("refresh-contacts-interval", MILLISECONDS).millis,
+        heartbeatInterval =
+          config.getDuration("heartbeat-interval", MILLISECONDS).millis,
         acceptableHeartbeatPause = config
-            .getDuration("acceptable-heartbeat-pause", MILLISECONDS)
-            .millis,
+          .getDuration("acceptable-heartbeat-pause", MILLISECONDS)
+          .millis,
         bufferSize = config.getInt("buffer-size"),
         reconnectTimeout = config.getString("reconnect-timeout") match {
           case "off" ⇒ None
@@ -187,13 +185,14 @@ final class ClusterClientSettings(
 
   private def copy(
       initialContacts: Set[ActorPath] = initialContacts,
-      establishingGetContactsInterval: FiniteDuration = establishingGetContactsInterval,
+      establishingGetContactsInterval: FiniteDuration =
+        establishingGetContactsInterval,
       refreshContactsInterval: FiniteDuration = refreshContactsInterval,
       heartbeatInterval: FiniteDuration = heartbeatInterval,
       acceptableHeartbeatPause: FiniteDuration = acceptableHeartbeatPause,
       bufferSize: Int = bufferSize,
-      reconnectTimeout: Option[FiniteDuration] = reconnectTimeout)
-    : ClusterClientSettings =
+      reconnectTimeout: Option[FiniteDuration] =
+        reconnectTimeout): ClusterClientSettings =
     new ClusterClientSettings(initialContacts,
                               establishingGetContactsInterval,
                               refreshContactsInterval,
@@ -277,7 +276,8 @@ object ClusterClient {
   * nature of the actors involved.
   */
 final class ClusterClient(settings: ClusterClientSettings)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import ClusterClient._
   import ClusterClient.Internal._
@@ -305,7 +305,8 @@ final class ClusterClient(settings: ClusterClientSettings)
 
   def scheduleRefreshContactsTick(interval: FiniteDuration): Unit = {
     refreshContactsTask foreach { _.cancel() }
-    refreshContactsTask = Some(context.system.scheduler
+    refreshContactsTask = Some(
+        context.system.scheduler
           .schedule(interval, interval, self, RefreshContactsTick))
   }
 
@@ -418,7 +419,8 @@ final class ClusterClient(settings: ClusterClientSettings)
 }
 
 object ClusterClientReceptionist
-    extends ExtensionId[ClusterClientReceptionist] with ExtensionIdProvider {
+    extends ExtensionId[ClusterClientReceptionist]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): ClusterClientReceptionist =
     super.get(system)
 
@@ -529,8 +531,8 @@ object ClusterReceptionistSettings {
         role = roleOption(config.getString("role")),
         numberOfContacts = config.getInt("number-of-contacts"),
         responseTunnelReceiveTimeout = config
-            .getDuration("response-tunnel-receive-timeout", MILLISECONDS)
-            .millis)
+          .getDuration("response-tunnel-receive-timeout", MILLISECONDS)
+          .millis)
 
   /**
     * Java API: Create settings from the default configuration
@@ -582,8 +584,8 @@ final class ClusterReceptionistSettings(
   private def copy(
       role: Option[String] = role,
       numberOfContacts: Int = numberOfContacts,
-      responseTunnelReceiveTimeout: FiniteDuration = responseTunnelReceiveTimeout)
-    : ClusterReceptionistSettings =
+      responseTunnelReceiveTimeout: FiniteDuration =
+        responseTunnelReceiveTimeout): ClusterReceptionistSettings =
     new ClusterReceptionistSettings(
         role, numberOfContacts, responseTunnelReceiveTimeout)
 }
@@ -609,16 +611,19 @@ object ClusterReceptionist {
   private[akka] object Internal {
     @SerialVersionUID(1L)
     case object GetContacts
-        extends ClusterClientMessage with DeadLetterSuppression
+        extends ClusterClientMessage
+        with DeadLetterSuppression
     @SerialVersionUID(1L)
     final case class Contacts(contactPoints: immutable.IndexedSeq[String])
         extends ClusterClientMessage
     @SerialVersionUID(1L)
     case object Heartbeat
-        extends ClusterClientMessage with DeadLetterSuppression
+        extends ClusterClientMessage
+        with DeadLetterSuppression
     @SerialVersionUID(1L)
     case object HeartbeatRsp
-        extends ClusterClientMessage with DeadLetterSuppression
+        extends ClusterClientMessage
+        with DeadLetterSuppression
     @SerialVersionUID(1L)
     case object Ping extends DeadLetterSuppression
 
@@ -627,7 +632,8 @@ object ClusterReceptionist {
       * inbound connections from other cluster nodes to the client.
       */
     class ClientResponseTunnel(client: ActorRef, timeout: FiniteDuration)
-        extends Actor with ActorLogging {
+        extends Actor
+        with ActorLogging {
       context.setReceiveTimeout(timeout)
       def receive = {
         case Ping ⇒ // keep alive from client
@@ -666,7 +672,8 @@ object ClusterReceptionist {
   */
 final class ClusterReceptionist(
     pubSubMediator: ActorRef, settings: ClusterReceptionistSettings)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import DistributedPubSubMediator.{Send, SendToAll, Publish}
 
@@ -743,8 +750,8 @@ final class ClusterReceptionist(
       // is the same from all nodes (most of the time) and it also
       // load balances the client connections among the nodes in the cluster.
       if (numberOfContacts >= nodes.size) {
-        val contacts = Contacts(nodes.map(
-                a ⇒ self.path.toStringWithAddress(a))(collection.breakOut))
+        val contacts = Contacts(nodes.map(a ⇒
+                  self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
           log.debug("Client [{}] gets contactPoints [{}] (all nodes)",
                     sender().path,
@@ -760,8 +767,8 @@ final class ClusterReceptionist(
           if (first.size == numberOfContacts) first
           else first union nodes.take(numberOfContacts - first.size)
         }
-        val contacts = Contacts(slice.map(
-                a ⇒ self.path.toStringWithAddress(a))(collection.breakOut))
+        val contacts = Contacts(slice.map(a ⇒
+                  self.path.toStringWithAddress(a))(collection.breakOut))
         if (log.isDebugEnabled)
           log.debug("Client [{}] gets contactPoints [{}]",
                     sender().path,
@@ -770,10 +777,11 @@ final class ClusterReceptionist(
       }
 
     case state: CurrentClusterState ⇒
-      nodes = nodes.empty union state.members.collect {
-        case m if m.status != MemberStatus.Joining && matchingRole(m) ⇒
-          m.address
-      }
+      nodes =
+        nodes.empty union state.members.collect {
+          case m if m.status != MemberStatus.Joining && matchingRole(m) ⇒
+            m.address
+        }
       consistentHash = ConsistentHash(nodes, virtualNodesFactor)
 
     case MemberUp(m) ⇒

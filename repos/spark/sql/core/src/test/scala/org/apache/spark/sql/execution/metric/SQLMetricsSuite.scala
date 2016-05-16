@@ -38,10 +38,9 @@ class SQLMetricsSuite extends SparkFunSuite with SharedSQLContext {
 
   test("LongSQLMetric should not box Long") {
     val l = SQLMetrics.createLongMetric(sparkContext, "long")
-    val f = () =>
-      {
-        l += 1L
-        l.add(1L)
+    val f = () => {
+      l += 1L
+      l.add(1L)
     }
     val cl = BoxingFinder.getClassReader(f.getClass)
     val boxingFinder = new BoxingFinder()

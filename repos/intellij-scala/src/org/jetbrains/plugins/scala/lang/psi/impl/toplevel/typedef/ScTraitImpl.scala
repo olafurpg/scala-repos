@@ -29,8 +29,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
                            nodeType: IElementType,
                            node: ASTNode)
-    extends ScTypeDefinitionImpl(stub, nodeType, node) with ScTrait
-    with ScTypeParametersOwner with ScTemplateDefinition {
+    extends ScTypeDefinitionImpl(stub, nodeType, node)
+    with ScTrait
+    with ScTypeParametersOwner
+    with ScTemplateDefinition {
   override def additionalJavaNames: Array[String] = {
     Array(fakeCompanionClass.getName) //do not add fakeCompanionModule => will build tree from stubs everywhere
   }

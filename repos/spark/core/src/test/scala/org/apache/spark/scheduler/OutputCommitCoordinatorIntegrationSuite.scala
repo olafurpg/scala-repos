@@ -30,7 +30,9 @@ import org.apache.spark.util.Utils
   * See also: [[OutputCommitCoordinatorSuite]] for unit tests that use mocks.
   */
 class OutputCommitCoordinatorIntegrationSuite
-    extends SparkFunSuite with LocalSparkContext with Timeouts {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Timeouts {
 
   override def beforeAll(): Unit = {
     super.beforeAll()

@@ -74,27 +74,40 @@ object Setup extends LilaController with TheftPrevention {
                   userId ?? UserRepo.byId flatMap {
                     destUser =>
                       import lila.challenge.Challenge._
-                      val challenge = lila.challenge.Challenge.make(
-                          variant = config.variant,
-                          initialFen = config.fen,
-                          timeControl = config.makeClock map { c =>
-                            TimeControl.Clock(c.limit, c.increment)
-                          } orElse config.makeDaysPerTurn.map {
-                            TimeControl.Correspondence.apply
-                          } getOrElse TimeControl.Unlimited,
-                          mode = config.mode,
-                          color = config.color.name,
-                          challenger = (ctx.me, HTTPRequest sid req) match {
-                            case (Some(user), _) => Right(user)
-                            case (_, Some(sid)) => Left(sid)
-                            case _ => Left("no_sid")
-                          },
-                          destUser = destUser,
-                          rematchOf = none)
+                      val challenge =
+                        lila.challenge.Challenge.make(variant = config.variant,
+                                                      initialFen = config.fen,
+                                                      timeControl =
+                                                        config.makeClock map {
+                                                          c =>
+                                                            TimeControl.Clock(
+                                                                c.limit,
+                                                                c.increment)
+                                                        } orElse config.makeDaysPerTurn.map {
+                                                          TimeControl.Correspondence.apply
+                                                        } getOrElse TimeControl.Unlimited,
+                                                      mode = config.mode,
+                                                      color =
+                                                        config.color.name,
+                                                      challenger =
+                                                        (ctx.me,
+                                                         HTTPRequest sid req) match {
+                                                          case (Some(user),
+                                                                _) =>
+                                                            Right(user)
+                                                          case (_,
+                                                                Some(sid)) =>
+                                                            Left(sid)
+                                                          case _ =>
+                                                            Left("no_sid")
+                                                        },
+                                                      destUser = destUser,
+                                                      rematchOf = none)
                       env.processor.saveFriendConfig(config) >>
                       (Env.challenge.api create challenge) >> negotiate(
-                          html = fuccess(Redirect(routes.Round.watcher(
-                                        challenge.id, "white"))),
+                          html =
+                            fuccess(Redirect(routes.Round.watcher(challenge.id,
+                                                                  "white"))),
                           api = _ => Challenge showChallenge challenge)
                   }
               }
@@ -126,9 +139,9 @@ object Setup extends LilaController with TheftPrevention {
           .bindFromRequest
           .fold(
               err =>
-                negotiate(
-                    html = BadRequest(errorsAsJson(err).toString).fuccess,
-                    api = _ => BadRequest(errorsAsJson(err)).fuccess),
+                negotiate(html =
+                            BadRequest(errorsAsJson(err).toString).fuccess,
+                          api = _ => BadRequest(errorsAsJson(err)).fuccess),
               config =>
                 (ctx.userId ?? Env.relation.api.fetchBlocking) flatMap {
                   blocking =>
@@ -180,10 +193,9 @@ object Setup extends LilaController with TheftPrevention {
       .filter(ctx)
       .bindFromRequest
       .fold[Fu[Result]](
-          f =>
-            {
-              logger.branch("setup").warn(f.errors.toString)
-              BadRequest(()).fuccess
+          f => {
+            logger.branch("setup").warn(f.errors.toString)
+            BadRequest(()).fuccess
           },
           config => JsonOk(env.processor filter config inject config.render)
       )
@@ -196,8 +208,8 @@ object Setup extends LilaController with TheftPrevention {
     }
   }
 
-  private def process[A](form: Context => Form[A])(
-      op: A => BodyContext[_] => Fu[Pov]) =
+  private def process[A](
+      form: Context => Form[A])(op: A => BodyContext[_] => Fu[Pov]) =
     OpenBody { implicit ctx =>
       PostRateLimit(ctx.req.remoteAddress) {
         implicit val req = ctx.body
@@ -212,7 +224,7 @@ object Setup extends LilaController with TheftPrevention {
                 negotiate(
                     html = fuccess(redirectPov(pov)),
                     api = apiVersion =>
-                        Env.api.roundApi.player(pov, apiVersion) map { data =>
+                      Env.api.roundApi.player(pov, apiVersion) map { data =>
                         Created(data) as JSON
                     }
                 )

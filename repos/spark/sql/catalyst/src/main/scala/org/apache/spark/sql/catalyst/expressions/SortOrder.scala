@@ -41,7 +41,8 @@ case object Descending extends SortDirection {
   * transformations over expression will descend into its child.
   */
 case class SortOrder(child: Expression, direction: SortDirection)
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression
+    with Unevaluable {
 
   /** Sort order is not foldable because we don't have an eval for it. */
   override def foldable: Boolean = false

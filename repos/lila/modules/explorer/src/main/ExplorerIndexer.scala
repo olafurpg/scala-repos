@@ -147,10 +147,10 @@ private final class ExplorerIndexer(
       blackRating <- stableRating(game.blackPlayer)
       minPlayerRating = if (game.variant.exotic) 1400 else 1500
       minAverageRating = if (game.variant.exotic) 1520 else 1600
-          if whiteRating >= minPlayerRating
+      if whiteRating >= minPlayerRating
       if blackRating >= minPlayerRating
       averageRating = (whiteRating + blackRating) / 2
-          if averageRating >= minAverageRating
+      if averageRating >= minAverageRating
       if probability(game, averageRating) > nextFloat
       if valid(game)
     } yield

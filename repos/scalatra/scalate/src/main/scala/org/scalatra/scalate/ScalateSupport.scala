@@ -282,7 +282,8 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     val context = createRenderContext(out)
     val attrs =
       templateAttributes ++
-      (defaultLayoutPath map (p => Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
+      (defaultLayoutPath map (p =>
+                Map("layout" -> p) ++ Map(attributes: _*)) getOrElse Map(
               attributes: _*))
 
     attrs foreach {
@@ -309,9 +310,9 @@ trait ScalateSupport extends org.scalatra.servlet.ServletBase {
     * Finds a template for a path.  Delegates to a TemplateFinder, and if
     * that fails, tries again with `/defaultIndexName` appended.
     */
-  protected def findTemplate(
-      path: String, extensionSet: Set[String] = templateEngine.extensions)
-    : Option[String] = {
+  protected def findTemplate(path: String,
+                             extensionSet: Set[String] =
+                               templateEngine.extensions): Option[String] = {
     val finder = new TemplateFinder(templateEngine) {
       override lazy val extensions = extensionSet
     }

@@ -40,8 +40,7 @@ class HttpMuxer(
   def withHandler(
       pattern: String, service: Service[Request, Response]): HttpMuxer = {
     val norm = normalize(pattern)
-    new HttpMuxer(
-        handlers.filterNot { case (pat, _) => pat == norm } :+
+    new HttpMuxer(handlers.filterNot { case (pat, _) => pat == norm } :+
         ((norm, service)))
   }
 

@@ -13,13 +13,14 @@ import breeze.util.SerializableLogging
   *
   * @author dlwh
   */
-class TruncatedNewtonMinimizer[T, H](
-    maxIterations: Int = -1,
-    tolerance: Double = 1E-6,
-    l2Regularization: Double = 0,
-    m: Int = 0)(implicit space: MutableVectorField[T, Double],
-                mult: OpMulMatrix.Impl2[H, T, T])
-    extends Minimizer[T, SecondOrderFunction[T, H]] with SerializableLogging {
+class TruncatedNewtonMinimizer[T, H](maxIterations: Int = -1,
+                                     tolerance: Double = 1E-6,
+                                     l2Regularization: Double = 0,
+                                     m: Int = 0)(
+    implicit space: MutableVectorField[T, Double],
+    mult: OpMulMatrix.Impl2[H, T, T])
+    extends Minimizer[T, SecondOrderFunction[T, H]]
+    with SerializableLogging {
 
   def minimize(f: SecondOrderFunction[T, H], initial: T): T =
     iterations(f, initial).takeUpToWhere(_.converged).last.x
@@ -76,11 +77,11 @@ class TruncatedNewtonMinimizer[T, H](
   def iterations(f: SecondOrderFunction[T, H], initial: T): Iterator[State] = {
     Iterator.iterate(initialState(f, initial)) { (state: State) =>
       import state._
-      val cg =
-        new ConjugateGradient[T, H](maxNormValue = delta,
-                                    tolerance = .1 * norm(adjGrad),
-                                    maxIterations = 400,
-                                    normSquaredPenalty = l2Regularization)
+      val cg = new ConjugateGradient[T, H](maxNormValue = delta,
+                                           tolerance = .1 * norm(adjGrad),
+                                           maxIterations = 400,
+                                           normSquaredPenalty =
+                                             l2Regularization)
       // todo see if we can use something other than zeros as an initializer?
       val initStep = chooseDescentDirection(state)
       val (step, residual) =
@@ -130,7 +131,8 @@ class TruncatedNewtonMinimizer[T, H](
           if (adjNewV < -1.0e+32 ||
               (math.abs(actualReduction) <= math.abs(adjNewV) * 1.0e-12 &&
                   math.abs(predictedReduction) <= math.abs(adjNewV) * 1.0e-12))
-            true else false
+            true
+          else false
         val newHistory = updateHistory(x_new, adjNewG, adjNewV, state)
         val this_iter = if (state.accept == true) iter + 1 else iter
         State(this_iter,
@@ -151,7 +153,8 @@ class TruncatedNewtonMinimizer[T, H](
           if (adjFval < -1.0e+32 ||
               (math.abs(actualReduction) <= math.abs(adjFval) * 1.0e-12 &&
                   math.abs(predictedReduction) <= math.abs(adjFval) * 1.0e-12))
-            true else false
+            true
+          else false
         logger.info(
             "Reject %d d=%.2f resNorm=%.2f pred=%.2f actual=%.2f".format(
                 iter,

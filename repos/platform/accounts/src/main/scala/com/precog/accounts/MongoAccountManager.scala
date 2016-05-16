@@ -150,8 +150,8 @@ abstract class MongoAccountManager(
     }
   }
 
-  private def findAll[A](
-      collection: String)(implicit extract: Extractor[A]): Future[Seq[A]] =
+  private def findAll[A](collection: String)(
+      implicit extract: Extractor[A]): Future[Seq[A]] =
     database(selectAll.from(collection)) map {
       _.map(_.deserialize(extract)).toSeq
     }
@@ -221,9 +221,10 @@ abstract class MongoAccountManager(
       case ot @ Some(account) =>
         for {
           _ <- database(insert(account.serialize.asInstanceOf[JObject])
-                .into(settings.deletedAccounts))
-          _ <- database(
-              remove.from(settings.accounts).where("accountId" === accountId))
+                    .into(settings.deletedAccounts))
+          _ <- database(remove
+                    .from(settings.accounts)
+                    .where("accountId" === accountId))
         } yield { ot }
       case None =>
         M.point(None)

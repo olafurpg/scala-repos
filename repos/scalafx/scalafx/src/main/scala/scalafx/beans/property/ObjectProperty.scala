@@ -161,9 +161,10 @@ object ObjectProperty {
   * This assumes that will not provide property type but let Scala compiler infer correct one.
   */
 class ObjectProperty[T <: Any](
-    override val delegate: jfxbp.ObjectProperty[T] = new jfxbp.SimpleObjectProperty[
-          T])
-    extends ReadOnlyObjectProperty[T](delegate) with Property[T, T]
+    override val delegate: jfxbp.ObjectProperty[T] =
+      new jfxbp.SimpleObjectProperty[T])
+    extends ReadOnlyObjectProperty[T](delegate)
+    with Property[T, T]
     with SFXDelegate[jfxbp.ObjectProperty[T]] {
 
   def this(bean: Object, name: String) =

@@ -97,7 +97,8 @@ object Monoid {
     }
 
   private trait ApplicativeMonoid[F[_], M]
-      extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
+      extends Monoid[F[M]]
+      with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
     implicit def M: Monoid[M]
     val zero = F.point(M.zero)

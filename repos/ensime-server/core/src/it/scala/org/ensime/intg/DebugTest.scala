@@ -14,8 +14,10 @@ import org.scalatest.Matchers
 
 // must be refreshing as the tests don't clean up after themselves properly
 class DebugTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture
     with DebugTestUtils {
 
   val original = EnsimeConfigFixture.DebugTestProject.copy(

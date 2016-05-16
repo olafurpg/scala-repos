@@ -126,14 +126,12 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
         val pickler = scala.pickling.internal.currentRuntime.picklers
           .genPickler(clazz.getClassLoader, clazz, tag)
           .asInstanceOf[Pickler[Any]]
-          (tag, pickler)
+        (tag, pickler)
       }
 
-    builder.putField(name,
-                     b =>
-                       {
-                         pickler1.pickle(value, b)
-                     })
+    builder.putField(name, b => {
+      pickler1.pickle(value, b)
+    })
   }
 
   def pickle(picklee: (Any, Any), builder: PBuilder): Unit = {

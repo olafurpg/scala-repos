@@ -29,7 +29,8 @@ class TestConductorMultiJvmNode1 extends TestConductorSpec
 class TestConductorMultiJvmNode2 extends TestConductorSpec
 
 class TestConductorSpec
-    extends MultiNodeSpec(TestConductorMultiJvmSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(TestConductorMultiJvmSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import TestConductorMultiJvmSpec._

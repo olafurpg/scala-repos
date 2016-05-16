@@ -142,7 +142,8 @@ object ContentFactory {
         items = Seq(
             new Button { thisButton =>
               text = "Save SBT Project..."
-              tooltip = "Save sample code in a new project that can be build and run with SBT"
+              tooltip =
+                "Save sample code in a new project that can be build and run with SBT"
               onAction = (ae: ActionEvent) =>
                 try {
                   val initialDir = SBTProjectBuilder.parentDir
@@ -156,18 +157,19 @@ object ContentFactory {
                     case Some(projectDir) =>
                       SBTProjectBuilder.createSampleProject(
                           projectDir, exampleInfo)
-                      SBTProjectBuilder.parentDir = projectDir.getCanonicalFile.getParentFile
+                      SBTProjectBuilder.parentDir =
+                        projectDir.getCanonicalFile.getParentFile
                     case _ =>
                   }
                 } catch {
                   case t: Throwable =>
                     val stage = thisButton.scene().window().asInstanceOf[Stage]
-                    showError(
-                        stage,
-                        title = thisButton.text(),
-                        header = "Error saving sample SBT project",
-                        message = t.getClass.getName + ": " + t.getMessage,
-                        t)
+                    showError(stage,
+                              title = thisButton.text(),
+                              header = "Error saving sample SBT project",
+                              message =
+                                t.getClass.getName + ": " + t.getMessage,
+                              t)
               }
             },
             new Button { thisButton =>
@@ -182,12 +184,12 @@ object ContentFactory {
                 } catch {
                   case t: Throwable =>
                     val stage = thisButton.scene().window().asInstanceOf[Stage]
-                    showError(
-                        stage,
-                        title = thisButton.text(),
-                        header = "Error copying source to clipboard",
-                        message = t.getClass.getName + ": " + t.getMessage,
-                        t)
+                    showError(stage,
+                              title = thisButton.text(),
+                              header = "Error copying source to clipboard",
+                              message =
+                                t.getClass.getName + ": " + t.getMessage,
+                              t)
               }
             }
         )

@@ -64,7 +64,8 @@ object KeyEvent {
 }
 
 class KeyEvent(override val delegate: jfxsi.KeyEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.KeyEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.KeyEvent] {
 
   /**
     * The unicode character associated with the key typed event.

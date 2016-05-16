@@ -141,8 +141,8 @@ class DelayedFetch(delayMs: Long,
     val logReadResults = replicaManager.readFromLocalLog(
         fetchMetadata.fetchOnlyLeader,
         fetchMetadata.fetchOnlyCommitted,
-        fetchMetadata.fetchPartitionStatus.mapValues(
-            status => status.fetchInfo))
+        fetchMetadata.fetchPartitionStatus.mapValues(status =>
+              status.fetchInfo))
 
     val fetchPartitionData = logReadResults.mapValues(result =>
           FetchResponsePartitionData(

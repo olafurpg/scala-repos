@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin
   */
 class ScFunctionExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScFunctionExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScFunctionExpr {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

@@ -37,7 +37,8 @@ import org.apache.spark.rdd.RDD
 @Since("1.5.0")
 @Experimental
 class AssociationRules private[fpm](private var minConfidence: Double)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   /**
     * Constructs a default instance with default parameters {minConfidence = 0.8}.
@@ -62,7 +63,7 @@ class AssociationRules private[fpm](private var minConfidence: Double)
     *
     */
   @Since("1.5.0")
-  def run[Item : ClassTag](
+  def run[Item: ClassTag](
       freqItemsets: RDD[FreqItemset[Item]]): RDD[Rule[Item]] = {
     // For candidate rule X => Y, generate (X, (Y, freq(X union Y)))
     val candidates = freqItemsets.flatMap { itemset =>

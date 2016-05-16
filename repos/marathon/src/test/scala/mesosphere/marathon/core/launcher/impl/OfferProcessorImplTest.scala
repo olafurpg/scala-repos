@@ -17,7 +17,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class OfferProcessorImplTest
-    extends MarathonSpec with GivenWhenThen with Mockito {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito {
   private[this] val offer = MarathonTestHelper.makeBasicOffer().build()
   private[this] val offerId = offer.getId
   private val appId: PathId = PathId("/testapp")

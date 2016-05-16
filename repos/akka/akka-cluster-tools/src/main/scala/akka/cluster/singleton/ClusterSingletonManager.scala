@@ -41,10 +41,10 @@ object ClusterSingletonManagerSettings {
     new ClusterSingletonManagerSettings(
         singletonName = config.getString("singleton-name"),
         role = roleOption(config.getString("role")),
-        removalMargin = Duration.Zero, // defaults to ClusterSettins.DownRemovalMargin
-        handOverRetryInterval = config
-            .getDuration("hand-over-retry-interval", MILLISECONDS)
-            .millis)
+        removalMargin =
+          Duration.Zero, // defaults to ClusterSettins.DownRemovalMargin
+        handOverRetryInterval =
+          config.getDuration("hand-over-retry-interval", MILLISECONDS).millis)
 
   /**
     * Java API: Create settings from the default configuration
@@ -109,12 +109,11 @@ final class ClusterSingletonManagerSettings(
       retryInterval: FiniteDuration): ClusterSingletonManagerSettings =
     copy(handOverRetryInterval = retryInterval)
 
-  private def copy(
-      singletonName: String = singletonName,
-      role: Option[String] = role,
-      removalMargin: FiniteDuration = removalMargin,
-      handOverRetryInterval: FiniteDuration = handOverRetryInterval)
-    : ClusterSingletonManagerSettings =
+  private def copy(singletonName: String = singletonName,
+                   role: Option[String] = role,
+                   removalMargin: FiniteDuration = removalMargin,
+                   handOverRetryInterval: FiniteDuration =
+                     handOverRetryInterval): ClusterSingletonManagerSettings =
     new ClusterSingletonManagerSettings(
         singletonName, role, removalMargin, handOverRetryInterval)
 }
@@ -159,7 +158,8 @@ object ClusterSingletonManager {
       * are expected replies.
       */
     case object HandOverToMe
-        extends ClusterSingletonMessage with DeadLetterSuppression
+        extends ClusterSingletonMessage
+        with DeadLetterSuppression
 
     /**
       * Confirmation by the previous oldest that the hand
@@ -183,7 +183,8 @@ object ClusterSingletonManager {
       * oldest.
       */
     case object TakeOverFromMe
-        extends ClusterSingletonMessage with DeadLetterSuppression
+        extends ClusterSingletonMessage
+        with DeadLetterSuppression
 
     final case class HandOverRetry(count: Int)
     final case class TakeOverRetry(count: Int)
@@ -275,10 +276,10 @@ object ClusterSingletonManager {
       }
 
       def handleInitial(state: CurrentClusterState): Unit = {
-        membersByAge = immutable.SortedSet.empty(ageOrdering) union state.members
-          .filter(m ⇒
-              (m.status == MemberStatus.Up ||
-                  m.status == MemberStatus.Leaving) && matchingRole(m))
+        membersByAge =
+          immutable.SortedSet.empty(ageOrdering) union state.members.filter(m ⇒
+                (m.status == MemberStatus.Up ||
+                    m.status == MemberStatus.Leaving) && matchingRole(m))
         val safeToBeOldest = !state.members.exists { m ⇒
           (m.status == MemberStatus.Down || m.status == MemberStatus.Exiting)
         }
@@ -312,8 +313,7 @@ object ClusterSingletonManager {
         case state: CurrentClusterState ⇒ handleInitial(state)
         case MemberUp(m) ⇒ add(m)
         case mEvent: MemberEvent
-            if
-            (mEvent.isInstanceOf[MemberExited] ||
+            if (mEvent.isInstanceOf[MemberExited] ||
                 mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
         case GetNext if changes.isEmpty ⇒
@@ -335,8 +335,7 @@ object ClusterSingletonManager {
             context.unbecome()
           }
         case mEvent: MemberEvent
-            if
-            (mEvent.isInstanceOf[MemberExited] ||
+            if (mEvent.isInstanceOf[MemberExited] ||
                 mEvent.isInstanceOf[MemberRemoved]) ⇒
           remove(mEvent.member)
           if (changes.nonEmpty) {
@@ -450,9 +449,10 @@ class ClusterSingletonManager(singletonProps: Props,
     removed += address -> (Deadline.now + 15.minutes)
 
   def cleanupOverdueNotMemberAnyMore(): Unit = {
-    removed = removed filter {
-      case (address, deadline) ⇒ deadline.hasTimeLeft
-    }
+    removed =
+      removed filter {
+        case (address, deadline) ⇒ deadline.hasTimeLeft
+      }
   }
 
   def logInfo(message: String): Unit =
@@ -497,9 +497,9 @@ class ClusterSingletonManager(singletonProps: Props,
 
   when(Start) {
     case Event(StartOldestChangedBuffer, _) ⇒
-      oldestChangedBuffer = context.actorOf(
-          Props(classOf[OldestChangedBuffer], role)
-            .withDispatcher(context.props.dispatcher))
+      oldestChangedBuffer =
+        context.actorOf(Props(classOf[OldestChangedBuffer], role)
+              .withDispatcher(context.props.dispatcher))
       getNextOldestChanged()
       stay
 

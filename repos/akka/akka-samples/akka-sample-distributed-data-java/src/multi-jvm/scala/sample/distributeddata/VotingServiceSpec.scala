@@ -30,7 +30,8 @@ class VotingServiceSpecMultiJvmNode2 extends VotingServiceSpec
 class VotingServiceSpecMultiJvmNode3 extends VotingServiceSpec
 
 class VotingServiceSpec
-    extends MultiNodeSpec(VotingServiceSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(VotingServiceSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import VotingServiceSpec._
 

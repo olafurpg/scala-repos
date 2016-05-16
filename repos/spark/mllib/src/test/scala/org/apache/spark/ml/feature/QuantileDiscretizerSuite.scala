@@ -24,7 +24,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{Row, SQLContext}
 
 class QuantileDiscretizerSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   import org.apache.spark.ml.feature.QuantileDiscretizerSuite._
@@ -64,8 +65,9 @@ class QuantileDiscretizerSuite
                                  Double.PositiveInfinity),
         Array(Double.NegativeInfinity) -> Array(
             Double.NegativeInfinity, 0, Double.PositiveInfinity),
-        Array(Double.PositiveInfinity) -> Array(
-            Double.NegativeInfinity, 0, Double.PositiveInfinity),
+        Array(Double.PositiveInfinity) -> Array(Double.NegativeInfinity,
+                                                0,
+                                                Double.PositiveInfinity),
         Array(Double.NegativeInfinity, Double.PositiveInfinity) -> Array(
             Double.NegativeInfinity, 0, Double.PositiveInfinity),
         Array(0.0) -> Array(Double.NegativeInfinity,

@@ -36,7 +36,10 @@ import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
   * Params for [[ChiSqSelector]] and [[ChiSqSelectorModel]].
   */
 private[feature] trait ChiSqSelectorParams
-    extends Params with HasFeaturesCol with HasOutputCol with HasLabelCol {
+    extends Params
+    with HasFeaturesCol
+    with HasOutputCol
+    with HasLabelCol {
 
   /**
     * Number of features that selector will select (ordered by statistic value descending). If the
@@ -63,7 +66,8 @@ private[feature] trait ChiSqSelectorParams
   */
 @Experimental
 final class ChiSqSelector(override val uid: String)
-    extends Estimator[ChiSqSelectorModel] with ChiSqSelectorParams
+    extends Estimator[ChiSqSelectorModel]
+    with ChiSqSelectorParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("chiSqSelector"))
@@ -114,7 +118,8 @@ object ChiSqSelector extends DefaultParamsReadable[ChiSqSelector] {
 final class ChiSqSelectorModel private[ml](
     override val uid: String,
     private val chiSqSelector: feature.ChiSqSelectorModel)
-    extends Model[ChiSqSelectorModel] with ChiSqSelectorParams
+    extends Model[ChiSqSelectorModel]
+    with ChiSqSelectorParams
     with MLWritable {
 
   import ChiSqSelectorModel._

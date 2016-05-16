@@ -42,7 +42,8 @@ import org.apache.spark.util.random.XORShiftRandom
 class PowerIterationClusteringModel @Since("1.3.0")(
     @Since("1.3.0") val k: Int,
     @Since("1.3.0") val assignments: RDD[PowerIterationClustering.Assignment])
-    extends Saveable with Serializable {
+    extends Saveable
+    with Serializable {
 
   @Since("1.4.0")
   override def save(sc: SparkContext, path: String): Unit = {
@@ -221,7 +222,8 @@ class PowerIterationClustering private[clustering](
     * A Java-friendly version of [[PowerIterationClustering.run]].
     */
   @Since("1.3.0")
-  def run(similarities: JavaRDD[
+  def run(
+      similarities: JavaRDD[
           (java.lang.Long, java.lang.Long, java.lang.Double)])
     : PowerIterationClusteringModel = {
     run(similarities.rdd.asInstanceOf[RDD[(Long, Long, Double)]])
@@ -262,22 +264,18 @@ object PowerIterationClustering extends Logging {
     */
   private[clustering] def normalize(
       graph: Graph[Double, Double]): Graph[Double, Double] = {
-    val vD = graph.aggregateMessages[Double](
-        sendMsg = ctx =>
-            {
-            val i = ctx.srcId
-            val j = ctx.dstId
-            val s = ctx.attr
-            if (s < 0.0) {
-              throw new SparkException(
-                  "Similarity must be nonnegative but found s($i, $j) = $s.")
-            }
-            if (s > 0.0) {
-              ctx.sendToSrc(s)
-            }
-        },
-        mergeMsg = _ + _,
-        TripletFields.EdgeOnly)
+    val vD = graph.aggregateMessages[Double](sendMsg = ctx => {
+      val i = ctx.srcId
+      val j = ctx.dstId
+      val s = ctx.attr
+      if (s < 0.0) {
+        throw new SparkException(
+            "Similarity must be nonnegative but found s($i, $j) = $s.")
+      }
+      if (s > 0.0) {
+        ctx.sendToSrc(s)
+      }
+    }, mergeMsg = _ + _, TripletFields.EdgeOnly)
     Graph(vD, graph.edges).mapTriplets(
         e => e.attr / math.max(e.srcAttr, MLUtils.EPSILON),
         new TripletFields( /* useSrc */ true,
@@ -303,12 +301,9 @@ object PowerIterationClustering extends Logging {
         }
     }
     val gA = Graph.fromEdges(edges, 0.0)
-    val vD = gA.aggregateMessages[Double](sendMsg = ctx =>
-                                              {
-                                              ctx.sendToSrc(ctx.attr)
-                                          },
-                                          mergeMsg = _ + _,
-                                          TripletFields.EdgeOnly)
+    val vD = gA.aggregateMessages[Double](sendMsg = ctx => {
+      ctx.sendToSrc(ctx.attr)
+    }, mergeMsg = _ + _, TripletFields.EdgeOnly)
     Graph(vD, gA.edges).mapTriplets(
         e => e.attr / math.max(e.srcAttr, MLUtils.EPSILON),
         new TripletFields( /* useSrc */ true,
@@ -326,15 +321,13 @@ object PowerIterationClustering extends Logging {
   private[clustering] def randomInit(
       g: Graph[Double, Double]): Graph[Double, Double] = {
     val r = g.vertices
-      .mapPartitionsWithIndex((part, iter) =>
-                                {
-                                  val random = new XORShiftRandom(part)
-                                  iter.map {
-                                    case (id, _) =>
-                                      (id, random.nextGaussian())
-                                  }
-                              },
-                              preservesPartitioning = true)
+      .mapPartitionsWithIndex((part, iter) => {
+        val random = new XORShiftRandom(part)
+        iter.map {
+          case (id, _) =>
+            (id, random.nextGaussian())
+        }
+      }, preservesPartitioning = true)
       .cache()
     val sum = r.values.map(math.abs).sum()
     val v0 = r.mapValues(x => x / sum)

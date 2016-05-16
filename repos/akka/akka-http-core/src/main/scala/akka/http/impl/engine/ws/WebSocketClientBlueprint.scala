@@ -120,7 +120,8 @@ object WebSocketClientBlueprint {
                           s"unexpected element of type ${other.getClass}")
                   }
                 case Left(problem) ⇒
-                  result.success(InvalidUpgradeResponse(
+                  result.success(
+                      InvalidUpgradeResponse(
                           response,
                           s"WebSocket server at $uri returned $problem"))
                   ctx.fail(new IllegalArgumentException(

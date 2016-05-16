@@ -21,7 +21,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     }
     val title =
       if (withTitle)
-        """data-hint="Rating progression over the last twelve games"""" else ""
+        """data-hint="Rating progression over the last twelve games""""
+      else ""
     val klass = if (withTitle) "progress hint--bottom" else "progress"
     s"""<span $title class="$klass">$span</span>"""
   }

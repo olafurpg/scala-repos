@@ -46,7 +46,8 @@ class StreamingLinearRegressionWithSGD private[mllib](
     private var regParam: Double,
     private var miniBatchFraction: Double)
     extends StreamingLinearAlgorithm[
-        LinearRegressionModel, LinearRegressionWithSGD] with Serializable {
+        LinearRegressionModel, LinearRegressionWithSGD]
+    with Serializable {
 
   /**
     * Construct a StreamingLinearRegression object with default parameters:

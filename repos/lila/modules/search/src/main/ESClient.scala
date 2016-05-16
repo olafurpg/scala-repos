@@ -4,9 +4,9 @@ import play.api.libs.json._
 
 sealed trait ESClient {
 
-  def search[Q : Writes](query: Q, from: From, size: Size): Fu[SearchResponse]
+  def search[Q: Writes](query: Q, from: From, size: Size): Fu[SearchResponse]
 
-  def count[Q : Writes](query: Q): Fu[CountResponse]
+  def count[Q: Writes](query: Q): Fu[CountResponse]
 
   def store(id: Id, doc: JsObject): Funit
 
@@ -25,14 +25,14 @@ final class ESClientHttp(
     HTTP(s"store/${index.name}/${id.value}", doc)
   }
 
-  def search[Q : Writes](query: Q, from: From, size: Size) =
+  def search[Q: Writes](query: Q, from: From, size: Size) =
     monitor("search") {
       HTTP(s"search/${index.name}/${from.value}/${size.value}",
            query,
            SearchResponse.apply)
     }
 
-  def count[Q : Writes](query: Q) = monitor("count") {
+  def count[Q: Writes](query: Q) = monitor("count") {
     HTTP(s"count/${index.name}", query, CountResponse.apply)
   }
 
@@ -51,7 +51,7 @@ final class ESClientHttp(
       case (Id(id), doc) => id -> JsString(Json.stringify(doc))
     }))
 
-  private[search] def HTTP[D : Writes, R](
+  private[search] def HTTP[D: Writes, R](
       url: String, data: D, read: String => R): Fu[R] =
     WS.url(s"$endpoint/$url").post(Json toJson data) flatMap {
       case res if res.status == 200 => fuccess(read(res.body))
@@ -67,9 +67,9 @@ final class ESClientHttp(
 }
 
 final class ESClientStub extends ESClient {
-  def search[Q : Writes](query: Q, from: From, size: Size) =
+  def search[Q: Writes](query: Q, from: From, size: Size) =
     fuccess(SearchResponse(Nil))
-  def count[Q : Writes](query: Q) = fuccess(CountResponse(0))
+  def count[Q: Writes](query: Q) = fuccess(CountResponse(0))
   def store(id: Id, doc: JsObject) = funit
   def storeBulk(docs: Seq[(Id, JsObject)]) = funit
   def deleteById(id: Id) = funit

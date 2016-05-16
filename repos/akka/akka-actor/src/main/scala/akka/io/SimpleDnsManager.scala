@@ -9,7 +9,8 @@ import akka.routing.FromConfig
 import scala.concurrent.duration.Duration
 
 class SimpleDnsManager(val ext: DnsExt)
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics]
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics]
     with ActorLogging {
 
   import context._

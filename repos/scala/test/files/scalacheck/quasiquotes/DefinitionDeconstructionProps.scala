@@ -4,9 +4,14 @@ internal.reificationSupport.SyntacticClassDef
 
 object DefinitionDeconstructionProps
     extends QuasiquoteProperties("definition deconstruction")
-    with TraitDeconstruction with ClassDeconstruction with ObjectDeconstruction
-    with ModsDeconstruction with ValVarDeconstruction with DefDeconstruction
-    with PackageDeconstruction with ImportDeconstruction
+    with TraitDeconstruction
+    with ClassDeconstruction
+    with ObjectDeconstruction
+    with ModsDeconstruction
+    with ValVarDeconstruction
+    with DefDeconstruction
+    with PackageDeconstruction
+    with ImportDeconstruction
 
 trait TraitDeconstruction { self: QuasiquoteProperties =>
   property("exhaustive trait matcher") = test {
@@ -298,7 +303,7 @@ trait ImportDeconstruction { self: QuasiquoteProperties =>
 
   property("unquote names into import selector") = forAll {
     (expr: Tree, plain: TermName, oldname: TermName, newname: TermName,
-    discard: TermName) =>
+     discard: TermName) =>
       val Import(expr1,
                  List(ImportSelector(plain11, _, plain12, _),
                       ImportSelector(oldname1, _, newname1, _),

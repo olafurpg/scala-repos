@@ -11,8 +11,12 @@ import javac._
 /** An nsc sub-component.
   */
 abstract class SyntaxAnalyzer
-    extends SubComponent with Parsers with MarkupParsers with Scanners
-    with JavaParsers with JavaScanners {
+    extends SubComponent
+    with Parsers
+    with MarkupParsers
+    with Scanners
+    with JavaParsers
+    with JavaScanners {
   import global._
 
   val phaseName = "parser"
@@ -29,9 +33,10 @@ abstract class SyntaxAnalyzer
     def currentDepth = depth
 
     /** Prune this tree and all trees beneath it. Can be overridden. */
-    def prune(md: MemberDef): Boolean = (md.mods.isSynthetic ||
-        md.mods.isParamAccessor || nme.isConstructorName(md.name) ||
-        (md.name containsName nme.ANON_CLASS_NAME))
+    def prune(md: MemberDef): Boolean =
+      (md.mods.isSynthetic || md.mods.isParamAccessor ||
+          nme.isConstructorName(md.name) ||
+          (md.name containsName nme.ANON_CLASS_NAME))
 
     override def traverse(t: Tree): Unit = t match {
       case md: MemberDef if prune(md) =>

@@ -87,7 +87,7 @@ trait SegmentFormatSupport {
     }
   }
 
-  def genArray[A : Manifest](length: Int, g: Gen[A]): Gen[Array[A]] =
+  def genArray[A: Manifest](length: Int, g: Gen[A]): Gen[Array[A]] =
     for {
       values <- listOfN(length, g)
     } yield {

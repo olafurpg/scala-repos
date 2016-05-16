@@ -27,7 +27,9 @@ import org.apache.spark.scheduler.local.LocalBackend
 import org.apache.spark.util.Utils
 
 class SparkContextSchedulerCreationSuite
-    extends SparkFunSuite with LocalSparkContext with PrivateMethodTester
+    extends SparkFunSuite
+    with LocalSparkContext
+    with PrivateMethodTester
     with Logging {
 
   def createTaskScheduler(master: String): TaskSchedulerImpl =

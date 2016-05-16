@@ -126,18 +126,18 @@ trait Encoder[T] {
   /**
     * Creates an array of arbitrary type with the index's size.
     */
-  def mkArray[V : ClassTag] = new Array[V](index.size)
+  def mkArray[V: ClassTag] = new Array[V](index.size)
 
   /**
     * Fills an array of arbitrary type with the value provided and with the index's size.
     */
-  def fillArray[V : ClassTag](default: => V): Array[V] =
+  def fillArray[V: ClassTag](default: => V): Array[V] =
     Array.fill(index.size)(default)
 
   /**
     * Fills an array of arbitrary type by tabulating the function
     */
-  def tabulateArray[V : ClassTag](f: T => V): Array[V] = {
+  def tabulateArray[V: ClassTag](f: T => V): Array[V] = {
     val arr = new Array[V](index.size)
     for ((e, i) <- index.pairs) {
       arr(i) = f(e)
@@ -158,10 +158,10 @@ trait Encoder[T] {
     Map.empty ++ array.zipWithIndex.map { case (v, i) => (index.get(i), v) }
   }
 
-  def fillSparseArrayMap[V : ClassTag : Zero](default: => V) =
+  def fillSparseArrayMap[V: ClassTag: Zero](default: => V) =
     new SparseArrayMap[V](index.size, default)
 
-  def mkSparseArray[V : ClassTag : Zero] = new SparseArray[V](index.size)
+  def mkSparseArray[V: ClassTag: Zero] = new SparseArray[V](index.size)
   def decode[V](array: SparseArray[V]): Map[T, V] = {
     Map.empty ++ array.iterator.map { case (i, v) => (index.get(i), v) }
   }
@@ -172,5 +172,6 @@ object Encoder {
 
   @SerialVersionUID(1)
   private class SimpleEncoder[T](val index: Index[T])
-      extends Encoder[T] with Serializable
+      extends Encoder[T]
+      with Serializable
 }

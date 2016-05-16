@@ -973,12 +973,13 @@ private[finagle] class KetamaPartitionedClient(
   private case class Node(node: KetamaNode[Client], var state: NodeState.Value)
 
   // exposed for testing
-  private[memcached] val ketamaNodeGrp: Group[(KetamaClientKey, KetamaNode[
-          Client])] = cacheNodeGroup.map { node =>
-    val key = KetamaClientKey.fromCacheNode(node)
-    val underlying = TwemcacheClient(newService(node))
-    key -> KetamaNode(key.identifier, node.weight, underlying)
-  }
+  private[memcached] val ketamaNodeGrp: Group[(KetamaClientKey,
+                                               KetamaNode[Client])] =
+    cacheNodeGroup.map { node =>
+      val key = KetamaClientKey.fromCacheNode(node)
+      val underlying = TwemcacheClient(newService(node))
+      key -> KetamaNode(key.identifier, node.weight, underlying)
+    }
 
   @volatile private[this] var ketamaNodeSnap = ketamaNodeGrp()
   @volatile private[this] var nodes =

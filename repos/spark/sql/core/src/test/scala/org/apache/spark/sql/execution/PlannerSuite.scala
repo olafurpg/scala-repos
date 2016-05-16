@@ -306,9 +306,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(!rightPartitioning.compatibleWith(leftPartitioning))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = leftPartitioning),
-              DummySparkPlan(outputPartitioning = rightPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = leftPartitioning),
+            DummySparkPlan(outputPartitioning = rightPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -328,11 +328,11 @@ class PlannerSuite extends SharedSQLContext {
     val distribution = ClusteredDistribution(clustering)
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(
-                  outputPartitioning = HashPartitioning(clustering, 1)),
-              DummySparkPlan(
-                  outputPartitioning = HashPartitioning(clustering, 2))
-          ),
+            DummySparkPlan(
+                outputPartitioning = HashPartitioning(clustering, 1)),
+            DummySparkPlan(
+                outputPartitioning = HashPartitioning(clustering, 2))
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -350,9 +350,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = childPartitioning),
-              DummySparkPlan(outputPartitioning = childPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = childPartitioning),
+            DummySparkPlan(outputPartitioning = childPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -372,9 +372,9 @@ class PlannerSuite extends SharedSQLContext {
     assert(childPartitioning.satisfies(distribution))
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = childPartitioning),
-              DummySparkPlan(outputPartitioning = childPartitioning)
-          ),
+            DummySparkPlan(outputPartitioning = childPartitioning),
+            DummySparkPlan(outputPartitioning = childPartitioning)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(Seq.empty, Seq.empty)
     )
@@ -397,9 +397,9 @@ class PlannerSuite extends SharedSQLContext {
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     val inputPlan = DummySparkPlan(
         children = Seq(
-              DummySparkPlan(outputPartitioning = SinglePartition),
-              DummySparkPlan(outputPartitioning = SinglePartition)
-          ),
+            DummySparkPlan(outputPartitioning = SinglePartition),
+            DummySparkPlan(outputPartitioning = SinglePartition)
+        ),
         requiredChildDistribution = Seq(distribution, distribution),
         requiredChildOrdering = Seq(outputOrdering, outputOrdering)
     )
@@ -434,7 +434,8 @@ class PlannerSuite extends SharedSQLContext {
     val orderingB = SortOrder(Literal(2), Ascending)
     assert(orderingA != orderingB)
     val inputPlan = DummySparkPlan(
-        children = DummySparkPlan(outputOrdering = Seq(orderingA, orderingB)) :: Nil,
+        children =
+          DummySparkPlan(outputOrdering = Seq(orderingA, orderingB)) :: Nil,
         requiredChildOrdering = Seq(Seq(orderingA)),
         requiredChildDistribution = Seq(UnspecifiedDistribution)
     )
@@ -473,10 +474,11 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = ShuffleExchange(
         finalPartitioning,
-        DummySparkPlan(children = DummySparkPlan(
-                             outputPartitioning = childPartitioning) :: Nil,
-                       requiredChildDistribution = Seq(distribution),
-                       requiredChildOrdering = Seq(Seq.empty)),
+        DummySparkPlan(
+            children =
+              DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+            requiredChildDistribution = Seq(distribution),
+            requiredChildOrdering = Seq(Seq.empty)),
         None)
 
     val outputPlan =
@@ -496,10 +498,11 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val inputPlan = ShuffleExchange(
         finalPartitioning,
-        DummySparkPlan(children = DummySparkPlan(
-                             outputPartitioning = childPartitioning) :: Nil,
-                       requiredChildDistribution = Seq(distribution),
-                       requiredChildOrdering = Seq(Seq.empty)),
+        DummySparkPlan(
+            children =
+              DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+            requiredChildDistribution = Seq(distribution),
+            requiredChildOrdering = Seq(Seq.empty)),
         None)
 
     val outputPlan =
@@ -519,10 +522,11 @@ class PlannerSuite extends SharedSQLContext {
     assert(!childPartitioning.satisfies(distribution))
     val shuffle = ShuffleExchange(
         finalPartitioning,
-        DummySparkPlan(children = DummySparkPlan(
-                             outputPartitioning = childPartitioning) :: Nil,
-                       requiredChildDistribution = Seq(distribution),
-                       requiredChildOrdering = Seq(Seq.empty)),
+        DummySparkPlan(
+            children =
+              DummySparkPlan(outputPartitioning = childPartitioning) :: Nil,
+            requiredChildDistribution = Seq(distribution),
+            requiredChildOrdering = Seq(Seq.empty)),
         None)
 
     val inputPlan = SortMergeJoin(Literal(1) :: Nil,

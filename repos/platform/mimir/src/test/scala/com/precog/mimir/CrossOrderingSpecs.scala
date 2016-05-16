@@ -26,7 +26,9 @@ import org.specs2.mutable._
 import com.precog.yggdrasil._
 
 object CrossOrderingSpecs
-    extends Specification with CrossOrdering with FNDummyModule {
+    extends Specification
+    with CrossOrdering
+    with FNDummyModule {
   import instructions._
   import dag._
   import TableModule.CrossOrder._

@@ -59,8 +59,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
       val sym = ts.head.typeSymbol
       require(ts.tail forall (_.typeSymbol == sym), ts)
       for (p <- sym.typeParams; in <- sym.typeParams;
-                                         if in.info.bounds contains p) yield
-            p -> in
+           if in.info.bounds contains p) yield p -> in
     }
   }
 
@@ -72,8 +71,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     def fbounds = findRecursiveBounds(ts) map (_._2)
     def isRecursive = typeSym.typeParams exists fbounds.contains
 
-    isRecursive &&
-    (transposeSafe(tsElimSub map (_.normalize.typeArgs)) match {
+    isRecursive && (transposeSafe(tsElimSub map (_.normalize.typeArgs)) match {
           case Some(arggsTransposed) =>
             val mergedTypeArgs = (tp match {
               case et: ExistentialType => et.underlying; case _ => tp
@@ -263,15 +261,15 @@ private[internal] trait GlbLubs { self: SymbolTable =>
     *  and call the analyzerPlugin method annotationsLub so it can
     *  be further altered. Otherwise, the regular lub.
     */
-  def weakLub(tps: List[Type]): Type = (if (tps.isEmpty) NothingTpe
-                                        else if (tps forall isNumericValueType)
-                                          numericLub(tps)
-                                        else if (tps exists typeHasAnnotations)
-                                          annotationsLub(
-                                              lub(tps map
-                                                  (_.withoutAnnotations)),
-                                              tps)
-                                        else lub(tps))
+  def weakLub(tps: List[Type]): Type =
+    (if (tps.isEmpty) NothingTpe
+     else if (tps forall isNumericValueType)
+       numericLub(tps)
+     else if (tps exists typeHasAnnotations)
+       annotationsLub(lub(tps map
+                          (_.withoutAnnotations)),
+                      tps)
+     else lub(tps))
 
   def numericLub(ts: List[Type]) =
     ts reduceLeft
@@ -357,9 +355,10 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           val lubRefined = refinedType(lubParents, lubOwner)
           val lubThisType = lubRefined.typeSymbol.thisType
           val narrowts = ts map (_.narrow)
-          def excludeFromLub(sym: Symbol) = (sym.isClass ||
-              sym.isConstructor || !sym.isPublic || isGetClass(sym) ||
-              sym.isFinal || narrowts.exists(t => !refines(t, sym)))
+          def excludeFromLub(sym: Symbol) =
+            (sym.isClass || sym.isConstructor || !sym.isPublic ||
+                isGetClass(sym) || sym.isFinal ||
+                narrowts.exists(t => !refines(t, sym)))
           def lubsym(proto: Symbol): Symbol = {
             val prototp = lubThisType.memberInfo(proto)
             val syms =
@@ -396,8 +395,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
           }
           def refines(tp: Type, sym: Symbol): Boolean = {
             val syms = tp.nonPrivateMember(sym.name).alternatives
-            !syms.isEmpty &&
-            (syms forall
+            !syms.isEmpty && (syms forall
                 (alt =>
                       // todo alt != sym is strictly speaking not correct, but without it we lose
                       // efficiency.
@@ -542,8 +540,10 @@ private[internal] trait GlbLubs { self: SymbolTable =>
             def glbsym(proto: Symbol): Symbol = {
               val prototp = glbThisType.memberInfo(proto)
               val syms = for (t <- ts;
-              alt <- (t.nonPrivateMember(proto.name).alternatives)
-                        if glbThisType.memberInfo(alt) matches prototp) yield
+                              alt <- (t
+                                      .nonPrivateMember(proto.name)
+                                      .alternatives)
+                              if glbThisType.memberInfo(alt) matches prototp) yield
                 alt
               val symtypes = syms map glbThisType.memberInfo
               assert(!symtypes.isEmpty)
@@ -567,7 +567,7 @@ private[internal] trait GlbLubs { self: SymbolTable =>
                     if (symbounds.isEmpty) TypeBounds.empty
                     else glbBounds(symbounds)
                   for (t <- symtypes
-                               if !isTypeBound(t)) if (result.bounds containsType t)
+                       if !isTypeBound(t)) if (result.bounds containsType t)
                     result = t
                   else throw GlbFailure
                   result

@@ -34,11 +34,13 @@ object ExceptionHandler {
       def apply(error: Throwable) = pf(error)
       def withFallback(that: ExceptionHandler): ExceptionHandler =
         if (!knownToBeSealed)
-          ExceptionHandler(knownToBeSealed = false)(this orElse that) else this
+          ExceptionHandler(knownToBeSealed = false)(this orElse that)
+        else this
       def seal(settings: RoutingSettings): ExceptionHandler =
         if (!knownToBeSealed)
           ExceptionHandler(knownToBeSealed = true)(
-              this orElse default(settings)) else this
+              this orElse default(settings))
+        else this
     }
 
   def default(settings: RoutingSettings): ExceptionHandler =

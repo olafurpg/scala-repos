@@ -83,25 +83,25 @@ object KryoInstantiator extends Serializable {
   }
 }
 
-case class ServerConfig(
-    batch: String = "",
-    engineInstanceId: String = "",
-    engineId: Option[String] = None,
-    engineVersion: Option[String] = None,
-    engineVariant: String = "",
-    env: Option[String] = None,
-    ip: String = "0.0.0.0",
-    port: Int = 8000,
-    feedback: Boolean = false,
-    eventServerIp: String = "0.0.0.0",
-    eventServerPort: Int = 7070,
-    accessKey: Option[String] = None,
-    logUrl: Option[String] = None,
-    logPrefix: Option[String] = None,
-    logFile: Option[String] = None,
-    verbose: Boolean = false,
-    debug: Boolean = false,
-    jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+case class ServerConfig(batch: String = "",
+                        engineInstanceId: String = "",
+                        engineId: Option[String] = None,
+                        engineVersion: Option[String] = None,
+                        engineVariant: String = "",
+                        env: Option[String] = None,
+                        ip: String = "0.0.0.0",
+                        port: Int = 8000,
+                        feedback: Boolean = false,
+                        eventServerIp: String = "0.0.0.0",
+                        eventServerPort: Int = 7070,
+                        accessKey: Option[String] = None,
+                        logUrl: Option[String] = None,
+                        logPrefix: Option[String] = None,
+                        logFile: Option[String] = None,
+                        verbose: Boolean = false,
+                        debug: Boolean = false,
+                        jsonExtractor: JsonExtractorOption =
+                          JsonExtractorOption.Both)
 
 case class StartServer()
 case class BindServer()
@@ -284,7 +284,9 @@ class MasterActor(sc: ServerConfig,
                   engineInstance: EngineInstance,
                   engineFactoryName: String,
                   manifest: EngineManifest)
-    extends Actor with SSLConfiguration with KeyAuthentication {
+    extends Actor
+    with SSLConfiguration
+    with KeyAuthentication {
   val log = Logging(context.system, this)
   implicit val system = context.system
   var sprayHttpListener: Option[ActorRef] = None
@@ -331,11 +333,11 @@ class MasterActor(sc: ServerConfig,
     case x: BindServer =>
       currentServerActor map { actor =>
         val settings = ServerSettings(system)
-        IO(Http) ! Http.Bind(
-            actor,
-            interface = sc.ip,
-            port = sc.port,
-            settings = Some(settings.copy(sslEncryption = true)))
+        IO(Http) ! Http.Bind(actor,
+                             interface = sc.ip,
+                             port = sc.port,
+                             settings =
+                               Some(settings.copy(sslEncryption = true)))
       } getOrElse {
         log.error("Cannot bind a non-existing server backend.")
       }
@@ -360,11 +362,11 @@ class MasterActor(sc: ServerConfig,
         sprayHttpListener.map { l =>
           l ! Http.Unbind(5.seconds)
           val settings = ServerSettings(system)
-          IO(Http) ! Http.Bind(
-              actor,
-              interface = sc.ip,
-              port = sc.port,
-              settings = Some(settings.copy(sslEncryption = true)))
+          IO(Http) ! Http.Bind(actor,
+                               interface = sc.ip,
+                               port = sc.port,
+                               settings =
+                                 Some(settings.copy(sslEncryption = true)))
           currentServerActor.get ! Kill
           currentServerActor = Some(actor)
         } getOrElse {
@@ -429,7 +431,9 @@ class ServerActor[Q, P](val args: ServerConfig,
                         val models: Seq[Any],
                         val serving: BaseServing[Q, P],
                         val servingParams: Params)
-    extends Actor with HttpService with KeyAuthentication {
+    extends Actor
+    with HttpService
+    with KeyAuthentication {
   val serverStartTime = DateTime.now
   val log = Logging(context.system, this)
 
@@ -634,9 +638,11 @@ class ServerActor[Q, P](val args: ServerConfig,
               // Bookkeeping
               val servingEndTime = DateTime.now
               lastServingSec =
-              (servingEndTime.getMillis - servingStartTime.getMillis) / 1000.0
-              avgServingSec = ((avgServingSec * requestCount) + lastServingSec) /
-              (requestCount + 1)
+                (servingEndTime.getMillis -
+                    servingStartTime.getMillis) / 1000.0
+              avgServingSec =
+                ((avgServingSec * requestCount) + lastServingSec) /
+                (requestCount + 1)
               requestCount += 1
 
               respondWithMediaType(`application/json`) {
@@ -726,9 +732,10 @@ class ServerActor[Q, P](val args: ServerConfig,
             val pluginName = segments(1)
             pluginType match {
               case EngineServerPlugin.outputSniffer =>
-                pluginsActorRef ? PluginsActor.HandleREST(
-                    pluginName = pluginName,
-                    pluginArgs = pluginArgs) map {
+                pluginsActorRef ? PluginsActor.HandleREST(pluginName =
+                                                            pluginName,
+                                                          pluginArgs =
+                                                            pluginArgs) map {
                   _.asInstanceOf[String]
                 }
             }

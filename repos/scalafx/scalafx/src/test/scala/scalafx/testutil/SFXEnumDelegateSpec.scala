@@ -98,8 +98,8 @@ abstract class SFXEnumDelegateSpec[
    * companions objects. Therefore, "valueOf" is being excluded from methods search.
    */
   protected override def isSpecialMethodName(name: String) =
-    super.isImplementation(name) || (name == "values") || (name == "valueOf") ||
-    name.startsWith("is") || name.startsWith("get")
+    super.isImplementation(name) || (name == "values") ||
+    (name == "valueOf") || name.startsWith("is") || name.startsWith("get")
 
   // Simply it gets the first constant available.
   override protected def getScalaClassInstance = companion.values.toList.head

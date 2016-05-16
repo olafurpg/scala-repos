@@ -158,7 +158,7 @@ object Xor extends XorInstances with XorFunctions {
 }
 
 private[data] sealed abstract class XorInstances extends XorInstances1 {
-  implicit def xorOrder[A : Order, B : Order]: Order[A Xor B] =
+  implicit def xorOrder[A: Order, B: Order]: Order[A Xor B] =
     new Order[A Xor B] {
       def compare(x: A Xor B, y: A Xor B): Int = x compare y
       override def partialCompare(x: A Xor B, y: A Xor B): Double =
@@ -188,8 +188,8 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
           case Xor.Right(b) => G.map(g(b))(Xor.right)
         }
 
-      def bifoldLeft[A, B, C](
-          fab: Xor[A, B], c: C)(f: (C, A) => C, g: (C, B) => C): C =
+      def bifoldLeft[A, B, C](fab: Xor[A, B], c: C)(
+          f: (C, A) => C, g: (C, B) => C): C =
         fab match {
           case Xor.Left(a) => f(c, a)
           case Xor.Right(b) => g(c, b)
@@ -203,8 +203,8 @@ private[data] sealed abstract class XorInstances extends XorInstances1 {
         }
     }
 
-  implicit def xorInstances[
-      A]: Traverse[A Xor ?] with MonadError[Xor[A, ?], A] =
+  implicit def xorInstances[A]
+    : Traverse[A Xor ?] with MonadError[Xor[A, ?], A] =
     new Traverse[A Xor ?] with MonadError[Xor[A, ?], A] {
       def traverse[F[_]: Applicative, B, C](fa: A Xor B)(
           f: B => F[C]): F[A Xor C] = fa.traverse(f)
@@ -239,8 +239,8 @@ private[data] sealed abstract class XorInstances1 extends XorInstances2 {
       def combine(x: A Xor B, y: A Xor B): A Xor B = x combine y
     }
 
-  implicit def xorPartialOrder[
-      A : PartialOrder, B : PartialOrder]: PartialOrder[A Xor B] =
+  implicit def xorPartialOrder[A: PartialOrder, B: PartialOrder]
+    : PartialOrder[A Xor B] =
     new PartialOrder[A Xor B] {
       def partialCompare(x: A Xor B, y: A Xor B): Double = x partialCompare y
       override def eqv(x: A Xor B, y: A Xor B): Boolean = x === y
@@ -248,7 +248,7 @@ private[data] sealed abstract class XorInstances1 extends XorInstances2 {
 }
 
 private[data] sealed abstract class XorInstances2 {
-  implicit def xorEq[A : Eq, B : Eq]: Eq[A Xor B] =
+  implicit def xorEq[A: Eq, B: Eq]: Eq[A Xor B] =
     new Eq[A Xor B] {
       def eqv(x: A Xor B, y: A Xor B): Boolean = x === y
     }

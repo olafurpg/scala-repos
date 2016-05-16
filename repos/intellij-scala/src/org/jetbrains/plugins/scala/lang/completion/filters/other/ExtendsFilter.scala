@@ -53,9 +53,9 @@ class ExtendsFilter extends ElementFilter {
 
   private def getPrevSiblingNotWhitespace(element: PsiElement): PsiElement = {
     var prev = element.getPrevSibling
-    while (prev != null &&
-    (prev.isInstanceOf[PsiWhiteSpace] ||
-        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev = prev.getPrevSibling
+    while (prev != null && (prev.isInstanceOf[PsiWhiteSpace] ||
+               prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev =
+      prev.getPrevSibling
     prev
   }
 }

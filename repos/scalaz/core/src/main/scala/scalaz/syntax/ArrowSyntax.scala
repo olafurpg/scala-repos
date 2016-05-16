@@ -24,7 +24,10 @@ sealed trait ToArrowOps0 {
 }
 
 trait ToArrowOps
-    extends ToArrowOps0 with ToSplitOps with ToStrongOps with ToCategoryOps {
+    extends ToArrowOps0
+    with ToSplitOps
+    with ToStrongOps
+    with ToCategoryOps {
 
   implicit def ToArrowOps[F[_, _], A, B](v: F[A, B])(implicit F0: Arrow[F]) =
     new ArrowOps[F, A, B](v)
@@ -39,7 +42,9 @@ trait ToArrowOps
 }
 
 trait ArrowSyntax[F[_, _]]
-    extends SplitSyntax[F] with StrongSyntax[F] with CategorySyntax[F] {
+    extends SplitSyntax[F]
+    with StrongSyntax[F]
+    with CategorySyntax[F] {
   implicit def ToArrowOps[A, B](v: F[A, B]): ArrowOps[F, A, B] =
     new ArrowOps[F, A, B](v)(ArrowSyntax.this.F)
 

@@ -38,7 +38,8 @@ class BaseOrdering extends Ordering[InternalRow] {
   * Generates bytecode for an [[Ordering]] of rows for a given set of expressions.
   */
 object GenerateOrdering
-    extends CodeGenerator[Seq[SortOrder], Ordering[InternalRow]] with Logging {
+    extends CodeGenerator[Seq[SortOrder], Ordering[InternalRow]]
+    with Logging {
 
   protected def canonicalize(in: Seq[SortOrder]): Seq[SortOrder] =
     in.map(ExpressionCanonicalizer.execute(_).asInstanceOf[SortOrder])

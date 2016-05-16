@@ -34,11 +34,13 @@ trait IntOperators extends Operators[Int] {
   def flatMapFunctions = List(
       (n: Int) =>
         if (n < 0) List()
-        else if (n % 2 == 0) List(1, 2, 3) else List(4, 5, 6),
+        else if (n % 2 == 0) List(1, 2, 3)
+        else List(4, 5, 6),
       (n: Int) => List[Int](),
       (n: Int) =>
         if (n == 0) List(1, 2, 3, 4, 5)
-        else if (n < 0) List(1, 2, 3) else List()
+        else if (n < 0) List(1, 2, 3)
+        else List()
   )
   def filterPredicates = List(
       _ % 2 == 0,

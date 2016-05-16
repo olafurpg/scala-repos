@@ -99,8 +99,8 @@ object Templates {
           val mappings: Seq[(File, File)] = templateSourcesList.flatMap {
             case templateSources: TemplateSources =>
               val relativeMappings: Seq[(File, String)] =
-                templateSources.sourceDirs.flatMap(
-                    dir => dir.***.filter(fileFilter(_)) x relativeTo(dir))
+                templateSources.sourceDirs.flatMap(dir =>
+                      dir.***.filter(fileFilter(_)) x relativeTo(dir))
               // Rebase the files onto the target directory, also filtering out ignored files
               relativeMappings.collect {
                 case (orig, targ) if !ignore.contains(orig.getName) =>
@@ -250,8 +250,9 @@ object Templates {
               val status: Future[TemplateStatus] = for {
                 _ <- timeout(2.seconds)
                 resp <- clientCall(statusUrl)
-                  .withHeaders("Accept" -> "application/json,text/html;q=0.9")
-                  .get()
+                         .withHeaders(
+                             "Accept" -> "application/json,text/html;q=0.9")
+                         .get()
               } yield {
                 resp.header("Content-Type") match {
                   case Some(json) if json.startsWith("application/json") =>
@@ -295,25 +296,24 @@ object Templates {
                 case (name, key) =>
                   clientCall("/activator/template/publish")
                     .post(s"url=http://downloads.typesafe.com/$key")
-                    .flatMap {
-                      resp =>
-                        if (resp.status != 200) {
-                          logger.error("Error publishing template " + name)
-                          logger.error("Status code was: " + resp.status)
-                          logger.error("Body was: " + resp.body)
-                          throw new RuntimeException(
-                              "Error publishing template")
-                        }
-                        val js = resp.json
-                        val uuid = (js \ "uuid").as[String]
-                        val statusUrl = (for {
+                    .flatMap { resp =>
+                      if (resp.status != 200) {
+                        logger.error("Error publishing template " + name)
+                        logger.error("Status code was: " + resp.status)
+                        logger.error("Body was: " + resp.body)
+                        throw new RuntimeException("Error publishing template")
+                      }
+                      val js = resp.json
+                      val uuid = (js \ "uuid").as[String]
+                      val statusUrl =
+                        (for {
                           links <- (js \ "_links").asOpt[JsObject]
                           status <- (links \ "activator/templates/status")
-                            .asOpt[JsObject]
+                                     .asOpt[JsObject]
                           url <- (status \ "href").asOpt[String]
                         } yield
                           url).getOrElse(s"/activator/template/status/$uuid")
-                        waitUntilNotPending(uuid, statusUrl)
+                      waitUntilNotPending(uuid, statusUrl)
                     }
                     .map(result => (name, key, result))
               }
@@ -385,22 +385,24 @@ object Templates {
     import Parsers._
     val templateSourcesList: Seq[TemplateSources] =
       Project.extract(state).get(Templates.templates)
-    val templateParser = Parsers.OpOrID
-      .examples(templateSourcesList.map(_.name): _*)
-      .flatMap { name =>
-        templateSourcesList.find(_.name == name) match {
-          case Some(templateSources) => success(templateSources)
-          case None => failure("No template with name " + name)
-        }
+    val templateParser =
+      Parsers.OpOrID.examples(templateSourcesList.map(_.name): _*).flatMap {
+        name =>
+          templateSourcesList.find(_.name == name) match {
+            case Some(templateSources) => success(templateSources)
+            case None => failure("No template with name " + name)
+          }
       }
-      (Space ~> rep1sep(templateParser, Space)) ~
+    (Space ~> rep1sep(templateParser, Space)) ~
     (token(Space ~> matched(state.combinedParser)) ?? "")
   }
 
   private class TemplateBuildFailed(template: String)
-      extends RuntimeException(template) with FeedbackProvidedException
+      extends RuntimeException(template)
+      with FeedbackProvidedException
   private class TemplatePublishFailed
-      extends RuntimeException with FeedbackProvidedException
+      extends RuntimeException
+      with FeedbackProvidedException
 
   private object StdOutLogger {
     def apply(log: String => Unit) = new ProcessLogger {

@@ -39,7 +39,8 @@ import scala.collection.mutable
   */
 class ScImportStmtImpl private (
     stub: StubElement[ScImportStmt], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportStmt {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScImportStmt {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScImportStmtStub) = {
     this(stub, ScalaElementTypes.IMPORT_STMT, null)
@@ -326,8 +327,8 @@ class ScImportStmtImpl private (
                           }
                         }
                         calculateRefType(isElementInPo).foreach { tp =>
-                          newState = newState.put(
-                              BaseProcessor.FROM_TYPE_KEY, tp)
+                          newState =
+                            newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
                         }
 
                         processor.execute(element, newState)
@@ -341,12 +342,12 @@ class ScImportStmtImpl private (
                       .put(ImportUsed.key, newImportsUsed)
                       .put(ScSubstitutor.key, subst)
 
-                      (elem, processor) match {
+                    (elem, processor) match {
                       case (cl: PsiClass, processor: BaseProcessor)
                           if !cl.isInstanceOf[ScTemplateDefinition] =>
                         calculateRefType(checkResolve(next)).foreach { tp =>
-                          newState = newState.put(
-                              BaseProcessor.FROM_TYPE_KEY, tp)
+                          newState =
+                            newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
                         }
                         if (!processor.processType(
                                 new ScDesignatorType(cl, true),

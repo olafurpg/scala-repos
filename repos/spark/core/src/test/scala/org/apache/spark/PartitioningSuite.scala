@@ -26,7 +26,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util.StatCounter
 
 class PartitioningSuite
-    extends SparkFunSuite with SharedSparkContext with PrivateMethodTester {
+    extends SparkFunSuite
+    with SharedSparkContext
+    with PrivateMethodTester {
 
   test("HashPartitioner equality") {
     val p2 = new HashPartitioner(2)

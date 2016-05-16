@@ -136,7 +136,8 @@ object S extends S {
     */
   private final class BinFuncHolder(
       val func: FileParamHolder => Any, val owner: Box[String])
-      extends AFuncHolder with Serializable {
+      extends AFuncHolder
+      with Serializable {
     def apply(in: List[String]) {
       logger.info(
           "You attempted to call a 'File Upload' function with a normal parameter.  Did you forget to 'enctype' to 'multipart/form-data'?")
@@ -168,7 +169,8 @@ object S extends S {
     */
   private final class SFuncHolder(
       val func: String => Any, val owner: Box[String])
-      extends AFuncHolder with Serializable {
+      extends AFuncHolder
+      with Serializable {
     def this(func: String => Any) = this(func, Empty)
 
     def apply(in: List[String]): Any = in.headOption.toList.map(func(_))
@@ -188,7 +190,8 @@ object S extends S {
     */
   private final class LFuncHolder(
       val func: List[String] => Any, val owner: Box[String])
-      extends AFuncHolder with Serializable {
+      extends AFuncHolder
+      with Serializable {
     def apply(in: List[String]): Any = func(in)
   }
 
@@ -204,7 +207,8 @@ object S extends S {
     * takes zero arguments and returns an Any.
     */
   private final class NFuncHolder(val func: () => Any, val owner: Box[String])
-      extends AFuncHolder with Serializable {
+      extends AFuncHolder
+      with Serializable {
     def apply(in: List[String]): Any = in.headOption.toList.map(s => func())
   }
 
@@ -212,7 +216,8 @@ object S extends S {
     * Abstrats a function that is executed on HTTP requests from client.
     */
   sealed trait AFuncHolder
-      extends Function1[List[String], Any] with Serializable {
+      extends Function1[List[String], Any]
+      with Serializable {
     def owner: Box[String]
 
     def apply(in: List[String]): Any
@@ -271,8 +276,7 @@ object S extends S {
       LFuncHolder(f)
 
     implicit def boolToAF(f: Boolean => Any): AFuncHolder =
-      LFuncHolder(
-          lst =>
+      LFuncHolder(lst =>
             f(lst.foldLeft(false)((v, str) => v || Helpers.toBoolean(str))))
   }
 }
@@ -336,8 +340,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * @see # attrs
     * @see # attr
     */
-  private val _attrs = new ThreadGlobal[(MetaData, List[(Either[
-              String, (String, String)], String)])]
+  private val _attrs =
+    new ThreadGlobal[(MetaData,
+                      List[(Either[String, (String, String)], String)])]
 
   /**
     * Holds the per-request LiftSession instance.
@@ -469,7 +474,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def receivedCookies: List[HTTPCookie] =
     for (rc <- Box.legacyNullTest(_responseCookies.value).toList;
-    c <- rc.inCookies) yield c.clone().asInstanceOf[HTTPCookie]
+         c <- rc.inCookies) yield c.clone().asInstanceOf[HTTPCookie]
 
   /**
     * Finds a cookie with the given name that was sent in the request.
@@ -591,8 +596,9 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   // TODO: Is this used anywhere? - DCB
   def templateFromTemplateAttr: Box[NodeSeq] =
     for (templateName <- attr("template") ?~ "Template Attribute missing";
-    tmplList = templateName.roboSplit("/");
-    template <- Templates(tmplList) ?~ "couldn't find template") yield template
+         tmplList = templateName.roboSplit("/");
+         template <- Templates(tmplList) ?~ "couldn't find template") yield
+      template
 
   /**
     * Returns the Locale for this request based on the LiftRules.localeCalculator
@@ -875,7 +881,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     for {
       session <- session ?~ "Comet lookup and creation requires a session."
       cometActor <- session.findOrCreateComet(
-          cometType, cometName, cometHtml, cometAttributes)
+                       cometType, cometName, cometHtml, cometAttributes)
     } yield {
       if (receiveUpdatesOnPage) addComet(cometActor)
 
@@ -903,7 +909,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     for {
       session <- session ?~ "Comet lookup and creation requires a session."
       cometActor <- session.findOrCreateComet[T](
-          cometName, cometHtml, cometAttributes)
+                       cometName, cometHtml, cometAttributes)
     } yield {
       if (receiveUpdatesOnPage) addComet(cometActor)
 
@@ -970,7 +976,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
                 !currentCometActor.isDefined
             )
             .cmd
-        )
+      )
     } else {
       Nil
     }
@@ -1540,8 +1546,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
   private[http] def unsetSnippetForClass(cls: String): Unit =
     _statefulSnip.set(_statefulSnip.is - cls)
 
-  private var _queryAnalyzer: List[
-      (Box[Req], Long, List[(String, Long)]) => Any] = Nil
+  private var _queryAnalyzer: List[(Box[Req], Long,
+                                    List[(String, Long)]) => Any] = Nil
 
   /**
     * Add a query analyzer (passed queries for analysis or logging). The analyzer
@@ -1722,7 +1728,7 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   def getRequestHeader(name: String): Box[String] =
     for (req <- request;
-    hdr <- req.header(name)) yield hdr
+         hdr <- req.header(name)) yield hdr
 
   /**
     * Sets the document type for the response. If this is not set, the DocType for Lift responses
@@ -1865,8 +1871,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     */
   private def getCookies(request: Box[HTTPRequest]): List[HTTPCookie] =
     for (r <- (request).toList;
-    ca <- Box.legacyNullTest(r.cookies).toList;
-    c <- ca) yield c
+         ca <- Box.legacyNullTest(r.cookies).toList;
+         c <- ca) yield c
 
   private def _init[B](request: Box[Req], session: LiftSession)(
       f: () => B): B = {
@@ -2264,13 +2270,12 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * A function that will eagerly evaluate a template.
     */
   def eagerEval: NodeSeq => NodeSeq =
-    ns =>
-      {
-        S.session match {
-          case Full(session) =>
-            session.processSurroundAndInclude("Eager Eval", ns)
-          case _ => ns
-        }
+    ns => {
+      S.session match {
+        case Full(session) =>
+          session.processSurroundAndInclude("Eager Eval", ns)
+        case _ => ns
+      }
     }
 
   /**
@@ -2898,8 +2903,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
       (JsonCall(key),
        JsCmds.Run(
            name
-             .map(
-                 n => onErrorFunc + "/* JSON Func " + n + " $$ " + key + " */")
+             .map(n =>
+                   onErrorFunc + "/* JSON Func " + n + " $$ " + key + " */")
              .openOr("") + "function " + key + "(obj) {lift.ajax(" +
            "'" + key + "='+ encodeURIComponent(" +
            LiftRules.jsArtifacts.jsonStringify(JE.JsRaw("obj")).toJsCmd +
@@ -2996,8 +3001,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * return a JsCmd to be sent back to the browser. Note that if the
     * passed JSON does not parse, the function will not be invoked.
     */
-  def jsonFmapFunc[T](in: JValue => JsCmd)(f: String => T)(
-      implicit dummy: AvoidTypeErasureIssues1): T = {
+  def jsonFmapFunc[T](in: JValue => JsCmd)(
+      f: String => T)(implicit dummy: AvoidTypeErasureIssues1): T = {
     import json._
 
     val name = formFuncName
@@ -3019,8 +3024,8 @@ trait S extends HasParams with Loggable with UserAgentCalculator {
     * Returns the HTTP parameter having 'n' name
     */
   def param(n: String): Box[String] =
-    paramsForComet.get.get(n).flatMap(_.headOption) orElse request.flatMap(
-        r => Box(r.param(n)))
+    paramsForComet.get.get(n).flatMap(_.headOption) orElse request.flatMap(r =>
+          Box(r.param(n)))
 
   /**
     * Set the paramsForComet and run the function

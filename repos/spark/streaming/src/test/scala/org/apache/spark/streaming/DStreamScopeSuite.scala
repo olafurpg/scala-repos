@@ -31,7 +31,9 @@ import org.apache.spark.util.ManualClock
   * Tests whether scope information is passed from DStream operations to RDDs correctly.
   */
 class DStreamScopeSuite
-    extends SparkFunSuite with BeforeAndAfter with BeforeAndAfterAll {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with BeforeAndAfterAll {
   private var ssc: StreamingContext = null
   private val batchDuration: Duration = Seconds(1)
 

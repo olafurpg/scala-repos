@@ -176,8 +176,8 @@ object Scalding {
     * Useful when using TextLine, for example, where the lines need to be
     * parsed before you can extract the timestamps.
     */
-  def mappedPipeFactory[T, U](factory: (DateRange) => Mappable[T])(fn: T => U)(
-      implicit timeOf: TimeExtractor[U]): PipeFactory[U] =
+  def mappedPipeFactory[T, U](factory: (DateRange) => Mappable[T])(
+      fn: T => U)(implicit timeOf: TimeExtractor[U]): PipeFactory[U] =
     optionMappedPipeFactory(factory)(t => Some(fn(t)))
 
   /**
@@ -232,7 +232,7 @@ object Scalding {
         }
     }
 
-  def sourceFromMappable[T : TimeExtractor : Manifest](
+  def sourceFromMappable[T: TimeExtractor: Manifest](
       factory: (DateRange) => Mappable[T]): Producer[Scalding, T] =
     Producer.source[Scalding, T](pipeFactory(factory))
 
@@ -291,11 +291,10 @@ object Scalding {
     }
   }
 
-  private def getOrElse[T <: AnyRef : ClassTag](
-      options: Map[String, Options],
-      names: List[String],
-      producer: Producer[Scalding, _],
-      default: => T): T =
+  private def getOrElse[T <: AnyRef: ClassTag](options: Map[String, Options],
+                                               names: List[String],
+                                               producer: Producer[Scalding, _],
+                                               default: => T): T =
     Options.getFirst[T](options, names) match {
       case None =>
         logger.debug(
@@ -462,13 +461,13 @@ object Scalding {
                 // Handle the Option[Producer] return value from getLoopInputs properly.
                 // If there was no producer returned, pass an empty TypedPipe to the join for that part.
                 flowToPipe <- deltaLogOpt.map { del =>
-                  leftPf.join(del).map {
-                    case (ftpA, ftpB) =>
-                      Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
-                  }
-                }.getOrElse(leftPf.map { p =>
-                  p.map((_, TypedPipe.empty))
-                }) // no extra producer for store
+                               leftPf.join(del).map {
+                                 case (ftpA, ftpB) =>
+                                   Scalding.joinFP(ftpA, ftpB) // extra producer for store, join the two FlowToPipes
+                               }
+                             }.getOrElse(leftPf.map { p =>
+                               p.map((_, TypedPipe.empty))
+                             }) // no extra producer for store
                 servOut = flowToPipe.map {
                   case (lpipe, dpipe) =>
                     InternalService.loopJoin[Timestamp, K, V, U](
@@ -697,7 +696,8 @@ class Scalding(val jobName: String,
                @transient val options: Map[String, Options],
                @transient transformConfig: Config => Config,
                @transient passedRegistrars: List[IKryoRegistrar])
-    extends Platform[Scalding] with java.io.Serializable {
+    extends Platform[Scalding]
+    with java.io.Serializable {
 
   type Source[T] = PipeFactory[T]
   type Store[K, V] = scalding.Store[K, V]

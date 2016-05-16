@@ -105,7 +105,8 @@ trait CSRFTokenSigner {
   * It is also not used anywhere internally to the Play code base.
   */
 @deprecated(
-    message = "This method is deprecated and will be removed in future versions.",
+    message =
+      "This method is deprecated and will be removed in future versions.",
     since = "2.5.0")
 trait AESCrypter {
 
@@ -129,7 +130,8 @@ trait AESCrypter {
     * @return An hexadecimal encrypted string.
     */
   @deprecated(
-      message = "This method is deprecated and will be removed in future versions.",
+      message =
+        "This method is deprecated and will be removed in future versions.",
       since = "2.5.0")
   def encryptAES(value: String): String
 
@@ -154,7 +156,8 @@ trait AESCrypter {
     * @return An hexadecimal encrypted string.
     */
   @deprecated(
-      message = "This method is deprecated and will be removed in future versions.",
+      message =
+        "This method is deprecated and will be removed in future versions.",
       since = "2.5.0")
   def encryptAES(value: String, privateKey: String): String
 
@@ -173,7 +176,8 @@ trait AESCrypter {
     * @return The decrypted String.
     */
   @deprecated(
-      message = "This method is deprecated and will be removed in future versions.",
+      message =
+        "This method is deprecated and will be removed in future versions.",
       since = "2.5.0")
   def decryptAES(value: String): String
 
@@ -195,7 +199,8 @@ trait AESCrypter {
     * @return The decrypted String.
     */
   @deprecated(
-      message = "This method is deprecated and will be removed in future versions.",
+      message =
+        "This method is deprecated and will be removed in future versions.",
       since = "2.5.0")
   def decryptAES(value: String, privateKey: String): String
 }
@@ -233,8 +238,8 @@ class HMACSHA1CookieSigner @Inject()(config: CryptoConfig)
     * @return A hexadecimal encoded signature.
     */
   def sign(message: String, key: Array[Byte]): String = {
-    val mac = config.provider.fold(Mac.getInstance("HmacSHA1"))(
-        p => Mac.getInstance("HmacSHA1", p))
+    val mac = config.provider.fold(Mac.getInstance("HmacSHA1"))(p =>
+          Mac.getInstance("HmacSHA1", p))
     mac.init(new SecretKeySpec(key, "HmacSHA1"))
     Codecs.toHexString(mac.doFinal(message.getBytes("utf-8")))
   }

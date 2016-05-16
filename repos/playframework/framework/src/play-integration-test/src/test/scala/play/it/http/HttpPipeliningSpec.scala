@@ -16,12 +16,15 @@ import akka.pattern.after
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object NettyHttpPipeliningSpec
-    extends HttpPipeliningSpec with NettyIntegrationSpecification
+    extends HttpPipeliningSpec
+    with NettyIntegrationSpecification
 object AkkaHttpHttpPipeliningSpec
-    extends HttpPipeliningSpec with AkkaHttpIntegrationSpecification
+    extends HttpPipeliningSpec
+    with AkkaHttpIntegrationSpecification
 
 trait HttpPipeliningSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   val actorSystem = akka.actor.ActorSystem()
 
@@ -66,7 +69,7 @@ trait HttpPipeliningSpec
                           interval = 50.milliseconds,
                           tick = "chunk")
                     .take(3))
-            )
+          )
         case "/short" => Accumulator.done(Results.Ok("short"))
         case _ => Accumulator.done(Results.NotFound)
       }

@@ -34,8 +34,10 @@ import scala.collection.mutable.ArrayBuffer
 class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
                                nodeType: IElementType,
                                node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScPackaging
-    with ScImportsHolder with ScDeclarationSequenceHolder {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScPackaging
+    with ScImportsHolder
+    with ScDeclarationSequenceHolder {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScPackageContainerStub) = {

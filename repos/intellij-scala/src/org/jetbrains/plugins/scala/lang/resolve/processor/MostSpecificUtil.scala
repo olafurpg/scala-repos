@@ -69,8 +69,7 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
   }
 
   def nextLayerSpecificForImplicitParameters(
-      filterRest: Option[ScalaResolveResult],
-      rest: Seq[ScalaResolveResult])
+      filterRest: Option[ScalaResolveResult], rest: Seq[ScalaResolveResult])
     : (Option[ScalaResolveResult], Seq[ScalaResolveResult]) = {
     def update(
         r: ScalaResolveResult): InnerScalaResolveResult[ScalaResolveResult] = {
@@ -96,31 +95,27 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
 
   def mostSpecificForImplicit(applicable: Set[ImplicitResolveResult])
     : Option[ImplicitResolveResult] = {
-    mostSpecificGeneric(
-        applicable.map(r =>
-              {
-            var callByName = false
-            def checkCallByName(clauses: Seq[ScParameterClause]): Unit = {
-              if (clauses.length > 0 && clauses(0).parameters.length == 1 &&
-                  clauses(0).parameters(0).isCallByNameParameter) {
-                callByName = true
-              }
-            }
-            r.element match {
-              case f: ScFunction => checkCallByName(f.paramClauses.clauses)
-              case f: ScPrimaryConstructor =>
-                checkCallByName(f.effectiveParameterClauses)
-              case _ =>
-            }
-            new InnerScalaResolveResult(
-                r.element,
-                None,
-                r,
-                r.implicitDependentSubst followed r.subst,
-                callByName,
-                implicitCase = true)
-        }),
-        noImplicit = true).map(_.repr)
+    mostSpecificGeneric(applicable.map(r => {
+      var callByName = false
+      def checkCallByName(clauses: Seq[ScParameterClause]): Unit = {
+        if (clauses.length > 0 && clauses(0).parameters.length == 1 &&
+            clauses(0).parameters(0).isCallByNameParameter) {
+          callByName = true
+        }
+      }
+      r.element match {
+        case f: ScFunction => checkCallByName(f.paramClauses.clauses)
+        case f: ScPrimaryConstructor =>
+          checkCallByName(f.effectiveParameterClauses)
+        case _ =>
+      }
+      new InnerScalaResolveResult(r.element,
+                                  None,
+                                  r,
+                                  r.implicitDependentSubst followed r.subst,
+                                  callByName,
+                                  implicitCase = true)
+    }), noImplicit = true).map(_.repr)
   }
 
   private class InnerScalaResolveResult[T](
@@ -177,7 +172,7 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                 Left(
                     params.map(p =>
                           p.copy(paramType = ScExistentialType(
-                                    s.subst(p.paramType), arguments))))
+                                  s.subst(p.paramType), arguments))))
               }
             case ScTypePolymorphicType(internal, typeParams) =>
               if (!existential) {
@@ -253,10 +248,10 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
               }
             val i: Int =
               if (params1.length > 0) 0.max(length - params1.length) else 0
-            val default: Expression = new Expression(
-                if (params1.length > 0)
-                  params1.last.paramType else types.Nothing,
-                elem)
+            val default: Expression = new Expression(if (params1.length > 0)
+                                                       params1.last.paramType
+                                                     else types.Nothing,
+                                                     elem)
             val exprs: Seq[Expression] =
               params1.map(p => new Expression(p.paramType, elem)) ++ Seq.fill(
                   i)(default)
@@ -297,27 +292,25 @@ case class MostSpecificUtil(elem: PsiElement, length: Int) {
                   }
                   hasRecursiveTypeParameters
                 }
-                typeParams.foreach(
-                    tp =>
-                      {
-                    if (tp.lowerType() != types.Nothing) {
-                      val substedLower = uSubst.subst(tp.lowerType())
-                      if (!hasRecursiveTypeParameters(tp.lowerType())) {
-                        u = u.addLower(
-                            (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-                            substedLower,
-                            additional = true)
-                      }
+                typeParams.foreach(tp => {
+                  if (tp.lowerType() != types.Nothing) {
+                    val substedLower = uSubst.subst(tp.lowerType())
+                    if (!hasRecursiveTypeParameters(tp.lowerType())) {
+                      u = u.addLower(
+                          (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+                          substedLower,
+                          additional = true)
                     }
-                    if (tp.upperType() != types.Any) {
-                      val substedUpper = uSubst.subst(tp.upperType())
-                      if (!hasRecursiveTypeParameters(tp.upperType())) {
-                        u = u.addUpper(
-                            (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
-                            substedUpper,
-                            additional = true)
-                      }
+                  }
+                  if (tp.upperType() != types.Any) {
+                    val substedUpper = uSubst.subst(tp.upperType())
+                    if (!hasRecursiveTypeParameters(tp.upperType())) {
+                      u = u.addUpper(
+                          (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
+                          substedUpper,
+                          additional = true)
                     }
+                  }
                 })
               case None => return false
             }

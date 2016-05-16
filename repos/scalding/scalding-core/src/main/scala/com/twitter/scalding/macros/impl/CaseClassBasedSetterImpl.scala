@@ -109,7 +109,8 @@ object CaseClassBasedSetterImpl {
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
           OptionSetter(matchField(innerType))
         case tpe
-            if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
+            if (tpe.typeSymbol.isClass &&
+                tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassSetter(
               expandMethod(normalized(tpe)).map {
             case (fn, tpe) =>

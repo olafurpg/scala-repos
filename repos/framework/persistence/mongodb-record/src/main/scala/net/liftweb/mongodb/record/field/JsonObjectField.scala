@@ -31,7 +31,8 @@ import com.mongodb.DBObject
 abstract class JsonObjectField[OwnerType <: BsonRecord[OwnerType],
                                JObjectType <: JsonObject[JObjectType]](
     rec: OwnerType, valueMeta: JsonObjectMeta[JObjectType])
-    extends Field[JObjectType, OwnerType] with MandatoryTypedField[JObjectType]
+    extends Field[JObjectType, OwnerType]
+    with MandatoryTypedField[JObjectType]
     with MongoFieldFlavor[JObjectType] {
 
   def owner = rec

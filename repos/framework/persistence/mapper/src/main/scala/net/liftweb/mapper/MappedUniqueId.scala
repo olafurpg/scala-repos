@@ -44,10 +44,10 @@ abstract class MappedBirthYear[T <: Mapper[T]](owner: T, minAge: Int)
     val end = (year(now) - minAge)
     val start = end - 100
     Full(
-        SHtml.selectObj(
-            (start to end).toList.reverse.map(y => (y, y.toString)),
-            Full(get),
-            this.set) % ("id" -> fieldId))
+        SHtml.selectObj((start to end).toList.reverse.map(y =>
+                              (y, y.toString)),
+                        Full(get),
+                        this.set) % ("id" -> fieldId))
   }
 }
 
@@ -70,7 +70,8 @@ object Genders extends Enumeration {
 
 abstract class MappedStringIndex[T <: Mapper[T]](
     override val fieldOwner: T, override val maxLen: Int)
-    extends MappedUniqueId[T](fieldOwner, maxLen) with IndexedField[String] {
+    extends MappedUniqueId[T](fieldOwner, maxLen)
+    with IndexedField[String] {
 
   override def writePermission_? = false // not writable
 

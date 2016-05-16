@@ -97,7 +97,8 @@ trait NingWSComponents {
       maxConnectionsPerHost = ahcWsClientConfig.maxConnectionsPerHost,
       maxConnectionsTotal = ahcWsClientConfig.maxConnectionsTotal,
       maxConnectionLifetime = ahcWsClientConfig.maxConnectionLifetime,
-      idleConnectionInPoolTimeout = ahcWsClientConfig.idleConnectionInPoolTimeout,
+      idleConnectionInPoolTimeout =
+        ahcWsClientConfig.idleConnectionInPoolTimeout,
       maxNumberOfRedirects = ahcWsClientConfig.maxNumberOfRedirects,
       maxRequestRetry = ahcWsClientConfig.maxRequestRetry,
       disableUrlEncoding = ahcWsClientConfig.disableUrlEncoding,

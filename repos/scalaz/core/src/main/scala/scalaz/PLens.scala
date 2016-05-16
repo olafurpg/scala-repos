@@ -165,15 +165,13 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
       that: PLensFamily[C1, C2, A1, A2]): PLensFamily[C1, C2, B1, B2] =
     plensFamily(
         c =>
-          (that run c).flatMap(x =>
-                {
-          val (ac, a) = x.run
-          run(a) map
-          (y =>
-                {
-                  val (ba, b) = y.run
-                  IndexedStore(ac compose ba, b)
-              })
+          (that run c).flatMap(x => {
+        val (ac, a) = x.run
+        run(a) map
+        (y => {
+              val (ba, b) = y.run
+              IndexedStore(ac compose ba, b)
+            })
       }))
 
   /** alias for `compose` */
@@ -286,34 +284,47 @@ trait PLensFamilyFunctions extends PLensInstances {
 
   def tuple3PLensFamily[S1, S2, A, B, C](
       lens: PLensFamily[S1, S2, (A, B, C), (A, B, C)])
-    : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B],
-    PLensFamily[S1, S2, C, C]) =
+    : (PLensFamily[S1, S2, A, A],
+       PLensFamily[S1, S2, B, B],
+       PLensFamily[S1, S2, C, C]) =
     PLensFamilyUnzip[S1, S2].unzip3(lens.xmapbB(tuple3B))
 
   def tuple4PLensFamily[S1, S2, A, B, C, D](
       lens: PLensFamily[S1, S2, (A, B, C, D), (A, B, C, D)])
-    : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B],
-    PLensFamily[S1, S2, C, C], PLensFamily[S1, S2, D, D]) =
+    : (PLensFamily[S1, S2, A, A],
+       PLensFamily[S1, S2, B, B],
+       PLensFamily[S1, S2, C, C],
+       PLensFamily[S1, S2, D, D]) =
     PLensFamilyUnzip[S1, S2].unzip4(lens.xmapbB(tuple4B))
 
   def tuple5PLensFamily[S1, S2, A, B, C, D, E](
       lens: PLensFamily[S1, S2, (A, B, C, D, E), (A, B, C, D, E)])
-    : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B], PLensFamily[
-        S1, S2, C, C], PLensFamily[S1, S2, D, D], PLensFamily[S1, S2, E, E]) =
+    : (PLensFamily[S1, S2, A, A],
+       PLensFamily[S1, S2, B, B],
+       PLensFamily[S1, S2, C, C],
+       PLensFamily[S1, S2, D, D],
+       PLensFamily[S1, S2, E, E]) =
     PLensFamilyUnzip[S1, S2].unzip5(lens.xmapbB(tuple5B))
 
   def tuple6PLensFamily[S1, S2, A, B, C, D, E, H](
       lens: PLensFamily[S1, S2, (A, B, C, D, E, H), (A, B, C, D, E, H)])
-    : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B],
-    PLensFamily[S1, S2, C, C], PLensFamily[S1, S2, D, D],
-    PLensFamily[S1, S2, E, E], PLensFamily[S1, S2, H, H]) =
+    : (PLensFamily[S1, S2, A, A],
+       PLensFamily[S1, S2, B, B],
+       PLensFamily[S1, S2, C, C],
+       PLensFamily[S1, S2, D, D],
+       PLensFamily[S1, S2, E, E],
+       PLensFamily[S1, S2, H, H]) =
     PLensFamilyUnzip[S1, S2].unzip6(lens.xmapbB(tuple6B))
 
   def tuple7PLensFamily[S1, S2, A, B, C, D, E, H, I](
       lens: PLensFamily[S1, S2, (A, B, C, D, E, H, I), (A, B, C, D, E, H, I)])
-    : (PLensFamily[S1, S2, A, A], PLensFamily[S1, S2, B, B],
-    PLensFamily[S1, S2, C, C], PLensFamily[S1, S2, D, D], PLensFamily[
-        S1, S2, E, E], PLensFamily[S1, S2, H, H], PLensFamily[S1, S2, I, I]) =
+    : (PLensFamily[S1, S2, A, A],
+       PLensFamily[S1, S2, B, B],
+       PLensFamily[S1, S2, C, C],
+       PLensFamily[S1, S2, D, D],
+       PLensFamily[S1, S2, E, E],
+       PLensFamily[S1, S2, H, H],
+       PLensFamily[S1, S2, I, I]) =
     PLensFamilyUnzip[S1, S2].unzip7(lens.xmapbB(tuple7B))
 
   def eitherLensFamily[S1, S2, A, B](l: PLensFamily[S1, S2, A \/ B, A \/ B])
@@ -325,38 +336,32 @@ trait PLensFamilyFunctions extends PLensInstances {
 
   import LazyOption._
 
-  def lazySomePLensFamily[A1, A2]: PLensFamily[
-      LazyOption[A1], LazyOption[A2], A1, A2] =
+  def lazySomePLensFamily[A1, A2]
+    : PLensFamily[LazyOption[A1], LazyOption[A2], A1, A2] =
     plensFamily(_.fold(z => Some(IndexedStore(lazySome(_), z)), None))
 
   import LazyEither._
 
-  def lazyLeftPLensFamily[A1, A2, B]: PLensFamily[
-      LazyEither[A1, B], LazyEither[A2, B], A1, A2] =
+  def lazyLeftPLensFamily[A1, A2, B]
+    : PLensFamily[LazyEither[A1, B], LazyEither[A2, B], A1, A2] =
     plensFamily(_.fold(a => Some(IndexedStore(lazyLeft(_), a)), _ => None))
 
-  def lazyRightPLensFamily[A, B1, B2]: PLensFamily[
-      LazyEither[A, B1], LazyEither[A, B2], B1, B2] =
+  def lazyRightPLensFamily[A, B1, B2]
+    : PLensFamily[LazyEither[A, B1], LazyEither[A, B2], B1, B2] =
     plensFamily(_.fold(_ => None, b => Some(IndexedStore(lazyRight(_), b))))
 
-  def factorPLensFamily[A1, A2, B1, B2, C1, C2]: PLensFamily[((A1, B1) \/ (A1,
-                                                             C1)),
-                                                             ((A2, B2) \/ (A2,
-                                                             C2)),
-                                                             (A1, B1 \/ C1),
-                                                             (A2, B2 \/ C2)] =
+  def factorPLensFamily[A1, A2, B1, B2, C1, C2]
+    : PLensFamily[((A1, B1) \/ (A1, C1)),
+                  ((A2, B2) \/ (A2, C2)),
+                  (A1, B1 \/ C1),
+                  (A2, B2 \/ C2)] =
     ~LensFamily.factorLensFamily
 
-  def distributePLensFamily[A1, A2, B1, B2, C1, C2]: PLensFamily[(A1,
-                                                                 B1 \/ C1),
-                                                                 (A2,
-                                                                 B2 \/ C2),
-                                                                 ((A1,
-                                                                 B1) \/ (A1,
-                                                                 C1)),
-                                                                 ((A2,
-                                                                 B2) \/ (A2,
-                                                                 C2))] =
+  def distributePLensFamily[A1, A2, B1, B2, C1, C2]
+    : PLensFamily[(A1, B1 \/ C1),
+                  (A2, B2 \/ C2),
+                  ((A1, B1) \/ (A1, C1)),
+                  ((A2, B2) \/ (A2, C2))] =
     ~LensFamily.distributeLensFamily
 }
 
@@ -431,13 +436,22 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     PLensFamilyUnzip[S, S].unzip5(lens.xmapbB(tuple5B))
 
   def tuple6PLens[S, A, B, C, D, E, H](
-      lens: PLens[S, (A, B, C, D, E, H)]): (PLens[S, A], PLens[S, B],
-  PLens[S, C], PLens[S, D], PLens[S, E], PLens[S, H]) =
+      lens: PLens[S, (A, B, C, D, E, H)]): (PLens[S, A],
+                                            PLens[S, B],
+                                            PLens[S, C],
+                                            PLens[S, D],
+                                            PLens[S, E],
+                                            PLens[S, H]) =
     PLensFamilyUnzip[S, S].unzip6(lens.xmapbB(tuple6B))
 
   def tuple7PLens[S, A, B, C, D, E, H, I](
-      lens: PLens[S, (A, B, C, D, E, H, I)]): (PLens[S, A], PLens[S, B],
-  PLens[S, C], PLens[S, D], PLens[S, E], PLens[S, H], PLens[S, I]) =
+      lens: PLens[S, (A, B, C, D, E, H, I)]): (PLens[S, A],
+                                               PLens[S, B],
+                                               PLens[S, C],
+                                               PLens[S, D],
+                                               PLens[S, E],
+                                               PLens[S, H],
+                                               PLens[S, I]) =
     PLensFamilyUnzip[S, S].unzip7(lens.xmapbB(tuple7B))
 
   def eitherLens[S, A, B](l: S @?> (A \/ B)): (S @?> A, S @?> B) =
@@ -478,9 +492,8 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V = {
     @annotation.tailrec
-    def lookupr(
-        t: (List[(K, V)], (K, V),
-        List[(K, V)])): Option[(List[(K, V)], (K, V), List[(K, V)])] =
+    def lookupr(t: (List[(K, V)], (K, V), List[(K, V)]))
+      : Option[(List[(K, V)], (K, V), List[(K, V)])] =
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _, Nil) => None
@@ -495,7 +508,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     }
   }
 
-  def listLookupPLens[K : Equal, V](k: K): List[(K, V)] @?> V =
+  def listLookupPLens[K: Equal, V](k: K): List[(K, V)] @?> V =
     listLookupByPLens(Equal[K].equal(k, _))
 
   def vectorHeadPLens[A]: Vector[A] @?> A =
@@ -505,8 +518,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     plens(v => v.lift(n) map (a => Store(x => v patch (n, Vector(x), 1), a)))
 
   def vectorLastPLens[A]: Vector[A] @?> A =
-    plens(
-        v =>
+    plens(v =>
           v.lastOption map
           (a => Store(x => v patch (v.length - 1, Vector(x), 1), a)))
 
@@ -531,9 +543,8 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
     @annotation.tailrec
-    def lookupr(
-        t: (Stream[(K, V)], (K, V),
-        Stream[(K, V)])): Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
+    def lookupr(t: (Stream[(K, V)], (K, V), Stream[(K, V)]))
+      : Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
       t match {
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _, Stream.Empty) => None
@@ -548,7 +559,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     }
   }
 
-  def streamLookupPLens[K : Equal, V](k: K): Stream[(K, V)] @?> V =
+  def streamLookupPLens[K: Equal, V](k: K): Stream[(K, V)] @?> V =
     streamLookupByPLens(Equal[K].equal(k, _))
 
   def ephemeralStreamHeadPLens[A]: EphemeralStream[A] @?> A =
@@ -590,7 +601,7 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       })
   }
 
-  def ephemeralStreamLookupPLens[K : Equal, V](
+  def ephemeralStreamLookupPLens[K: Equal, V](
       k: K): EphemeralStream[(K, V)] @?> V =
     ephemeralStreamLookupByPLens(Equal[K].equal(k, _))
 
@@ -624,24 +635,22 @@ abstract class PLensInstances {
             plensFamily(
                 x =>
                   a run x map
-                  (c =>
-                        {
-                      val (p, q) = c.pos
-                      IndexedStore(a => c.put((a, q)): R, p)
+                  (c => {
+                    val (p, q) = c.pos
+                    IndexedStore(a => c.put((a, q)): R, p)
                   })),
             plensFamily(
                 x =>
                   a run x map
-                  (c =>
-                        {
-                      val (p, q) = c.pos
-                      IndexedStore(a => c.put((p, a)): R, q)
+                  (c => {
+                    val (p, q) = c.pos
+                    IndexedStore(a => c.put((p, a)): R, q)
                   }))
         )
     }
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
-  case class NumericPLens[S, N : Numeric](lens: S @?> N, num: Numeric[N]) {
+  case class NumericPLens[S, N: Numeric](lens: S @?> N, num: Numeric[N]) {
     def +=(that: N): PState[S, N] =
       lens %= (num.plus(_, that))
 
@@ -652,7 +661,7 @@ abstract class PLensInstances {
       lens %= (num.times(_, that))
   }
 
-  implicit def numericPLens[S, N : Numeric](lens: S @?> N) =
+  implicit def numericPLens[S, N: Numeric](lens: S @?> N) =
     NumericPLens[S, N](lens, implicitly[Numeric[N]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -661,7 +670,7 @@ abstract class PLensInstances {
       lens %= (frac.div(_, that))
   }
 
-  implicit def fractionalPLens[S, F : Fractional](lens: S @?> F) =
+  implicit def fractionalPLens[S, F: Fractional](lens: S @?> F) =
     FractionalPLens[S, F](lens, implicitly[Fractional[F]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
@@ -670,7 +679,7 @@ abstract class PLensInstances {
       lens %= (ig.quot(_, that))
   }
 
-  implicit def integralPLens[S, I : Integral](lens: S @?> I) =
+  implicit def integralPLens[S, I: Integral](lens: S @?> I) =
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
 }
 

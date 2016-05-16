@@ -399,50 +399,57 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
   /** Set the `explaintypes` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setExplaintypes(input: String) {
-    explaintypes = Flag toBoolean input orElse buildError(
-        "Unknown explaintypes flag '" + input + "'")
+    explaintypes =
+      Flag toBoolean input orElse buildError(
+          "Unknown explaintypes flag '" + input + "'")
   }
 
   /** Set the `deprecation` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setDeprecation(input: String) {
-    deprecation = Flag toBoolean input orElse buildError(
-        "Unknown deprecation flag '" + input + "'")
+    deprecation =
+      Flag toBoolean input orElse buildError(
+          "Unknown deprecation flag '" + input + "'")
   }
 
   /** Set the `nobootcp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNobootcp(input: String) {
-    nobootcp = Flag toBoolean input orElse buildError(
-        "Unknown nobootcp flag '" + input + "'")
+    nobootcp =
+      Flag toBoolean input orElse buildError(
+          "Unknown nobootcp flag '" + input + "'")
   }
 
   /** Set the `nowarn` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setNowarn(input: String) {
-    nowarn = Flag toBoolean input orElse buildError(
-        "Unknown nowarn flag '" + input + "'")
+    nowarn =
+      Flag toBoolean input orElse buildError(
+          "Unknown nowarn flag '" + input + "'")
   }
 
   /** Set the `optimise` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setOptimise(input: String) {
-    optimise = Flag toBoolean input orElse buildError(
-        "Unknown optimisation flag '" + input + "'")
+    optimise =
+      Flag toBoolean input orElse buildError(
+          "Unknown optimisation flag '" + input + "'")
   }
 
   /** Set the `unchecked` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUnchecked(input: String) {
-    unchecked = Flag toBoolean input orElse buildError(
-        "Unknown unchecked flag '" + input + "'")
+    unchecked =
+      Flag toBoolean input orElse buildError(
+          "Unknown unchecked flag '" + input + "'")
   }
 
   /** Set the `usejavacp` info attribute.
     *  @param input One of the flags `yes/no` or `on/off`. */
   def setUsejavacp(input: String) {
-    usejavacp = Flag toBoolean input orElse buildError(
-        "Unknown usejavacp flag '" + input + "'")
+    usejavacp =
+      Flag toBoolean input orElse buildError(
+          "Unknown usejavacp flag '" + input + "'")
   }
 
   /** Sets the `failonerror` attribute. Used by [[http://ant.apache.org Ant]].
@@ -613,7 +620,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     // If force is false, only files were the .class file in destination is
     // older than the .scala file will be used.
     val sourceFiles: List[File] = for (originDir <- getOrigin;
-    originFile <- getOriginFiles(originDir)) yield {
+                                       originFile <- getOriginFiles(originDir)) yield {
       log(originFile, Project.MSG_DEBUG)
       nameToFile(originDir)(originFile)
     }
@@ -668,9 +675,8 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
       case "none" =>
       case x =>
         val depFilePath = SPath(x)
-        command.settings.dependenciesFile.value = SPath(getProject.getBaseDir).normalize
-          .resolve(depFilePath)
-          .path
+        command.settings.dependenciesFile.value =
+          SPath(getProject.getBaseDir).normalize.resolve(depFilePath).path
     }
 
     (command.settings, sourceFiles, javaOnly)
@@ -728,8 +734,7 @@ class Scalac extends ScalaMatchingTask with ScalacShared {
     }
     val res = execWithArgFiles(java, List(writeSettings().getAbsolutePath))
     if (failonerror && res != 0)
-      buildError(
-          "Compilation failed because of an internal compiler error;" +
+      buildError("Compilation failed because of an internal compiler error;" +
           " see the error output for details.")
   }
 

@@ -213,8 +213,7 @@ class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
 
       zkState() = WatchState.SessionState(SessionState.SyncConnected)
       eventually {
-        assert(
-            watchedZk.value.opq == Seq(
+        assert(watchedZk.value.opq == Seq(
                 AddAuthInfo("digest", Buf.Utf8(authInfo)),
                 Close(Time.Bottom),
                 AddAuthInfo("digest", Buf.Utf8(authInfo))

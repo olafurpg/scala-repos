@@ -365,9 +365,9 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
   final def to[C[_]] = new To[C]()
 
   final class To[C[_]] private[PositionedResult]() {
-    def apply[R](
-        gr: GetResult[R])(implicit session: JdbcBackend#Session,
-                          canBuildFrom: CanBuildFrom[Nothing, R, C[R]]) =
+    def apply[R](gr: GetResult[R])(
+        implicit session: JdbcBackend#Session,
+        canBuildFrom: CanBuildFrom[Nothing, R, C[R]]) =
       build[C, R](gr)
   }
 }
@@ -377,7 +377,8 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
   */
 abstract class PositionedResultIterator[+T](
     val pr: PositionedResult, maxRows: Int, autoClose: Boolean)
-    extends ReadAheadIterator[T] with CloseableIterator[T] {
+    extends ReadAheadIterator[T]
+    with CloseableIterator[T] {
 
   private[this] var closed = false
   private[this] var readRows = 0

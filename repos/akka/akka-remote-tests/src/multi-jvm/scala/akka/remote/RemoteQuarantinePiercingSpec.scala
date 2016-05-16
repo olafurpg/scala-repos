@@ -42,7 +42,8 @@ class RemoteQuarantinePiercingMultiJvmNode2
     extends RemoteQuarantinePiercingSpec
 
 abstract class RemoteQuarantinePiercingSpec
-    extends MultiNodeSpec(RemoteQuarantinePiercingSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteQuarantinePiercingSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteQuarantinePiercingSpec._

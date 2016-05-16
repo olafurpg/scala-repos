@@ -8,7 +8,8 @@ import com.intellij.psi.ResolveResult
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 
 trait ScStableCodeReferenceElement
-    extends ScReferenceElement with ScPathElement {
+    extends ScReferenceElement
+    with ScPathElement {
   def qualifier: Option[ScStableCodeReferenceElement] =
     getFirstChild match {
       case s: ScStableCodeReferenceElement => Some(s)

@@ -192,8 +192,8 @@ class ScalaWSSpec extends PlaySpecification with Results with AfterAll {
 
       "post with multipart/form encoded body" in withServer {
         case ("POST", "/") =>
-          Action(BodyParsers.parse.multipartFormData)(
-              r => Ok(r.body.asFormUrlEncoded("key").head))
+          Action(BodyParsers.parse.multipartFormData)(r =>
+                Ok(r.body.asFormUrlEncoded("key").head))
       } { ws =>
         import play.api.mvc.MultipartFormData._
         val response = //#multipart-encoded

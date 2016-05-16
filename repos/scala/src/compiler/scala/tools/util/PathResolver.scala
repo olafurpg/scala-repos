@@ -177,9 +177,9 @@ object PathResolver {
 
   @deprecated(
       "This method is no longer used be scalap and will be deleted", "2.11.5")
-  def fromPathString(
-      path: String,
-      context: JavaContext = DefaultJavaContext): JavaClassPath = {
+  def fromPathString(path: String,
+                     context: JavaContext =
+                       DefaultJavaContext): JavaClassPath = {
     val s = new Settings()
     s.classpath.value = path
     new PathResolver(s, context).result
@@ -267,7 +267,8 @@ abstract class PathResolverBase[
       * TODO: we should refactor this as a separate -bootstrap option to have a clean implementation, no? */
     def sourcePath =
       if (!settings.isScaladoc)
-        cmdLineOrElse("sourcepath", Defaults.scalaSourcePath) else ""
+        cmdLineOrElse("sourcepath", Defaults.scalaSourcePath)
+      else ""
 
     def userClassPath =
       settings.classpath.value // default is specified by settings and can be overridden there

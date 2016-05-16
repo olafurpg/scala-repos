@@ -105,8 +105,8 @@ private[prediction] case class EventOp(
     EventOp(
         setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
         unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
-        deleteEntity = (deleteEntity ++ that.deleteEntity)
-            .reduceOption(_ ++ _),
+        deleteEntity =
+          (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _),
         firstUpdated = firstUp,
         lastUpdated = lastUp
     )

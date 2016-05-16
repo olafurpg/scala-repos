@@ -83,7 +83,7 @@ class TungstenAggregationIterator(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     newMutableProjection: (Seq[Expression],
-    Seq[Attribute]) => (() => MutableProjection),
+                           Seq[Attribute]) => (() => MutableProjection),
     originalInputAttributes: Seq[Attribute],
     inputIter: Iterator[InternalRow],
     testFallbackStartsAt: Option[Int],
@@ -96,7 +96,8 @@ class TungstenAggregationIterator(
                                 aggregateAttributes,
                                 initialInputBufferOffset,
                                 resultExpressions,
-                                newMutableProjection) with Logging {
+                                newMutableProjection)
+    with Logging {
 
   ///////////////////////////////////////////////////////////////////////////
   // Part 1: Initializing aggregate functions.

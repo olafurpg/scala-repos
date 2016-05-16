@@ -26,7 +26,8 @@ import org.apache.spark.rpc._
   */
 private[spark] class WorkerWatcher(
     override val rpcEnv: RpcEnv, workerUrl: String, isTesting: Boolean = false)
-    extends RpcEndpoint with Logging {
+    extends RpcEndpoint
+    with Logging {
 
   logInfo(s"Connecting to worker $workerUrl")
   if (!isTesting) {

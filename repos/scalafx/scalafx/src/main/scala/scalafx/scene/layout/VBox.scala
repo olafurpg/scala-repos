@@ -76,7 +76,8 @@ object VBox {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/VBox.html]]
   */
 class VBox(override val delegate: jfxsl.VBox = new jfxsl.VBox)
-    extends Pane(delegate) with AlignmentDelegate[jfxsl.VBox]
+    extends Pane(delegate)
+    with AlignmentDelegate[jfxsl.VBox]
     with SFXDelegate[jfxsl.VBox] {
 
   /**

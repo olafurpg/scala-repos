@@ -15,7 +15,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class MigrationTo0_13Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   test("migrate tasks in zk") {
     val f = new Fixture
@@ -162,11 +164,10 @@ class MigrationTo0_13Test
         store = state,
         metrics = metrics,
         newState = () =>
-            MarathonTaskState(
-                MarathonTask
-                  .newBuilder()
-                  .setId(UUID.randomUUID().toString)
-                  .build()),
+          MarathonTaskState(MarathonTask
+                .newBuilder()
+                .setId(UUID.randomUUID().toString)
+                .build()),
         prefix = TaskRepository.storePrefix)
     lazy val taskRepo = {
       val metrics = new Metrics(new MetricRegistry)
@@ -176,7 +177,8 @@ class MigrationTo0_13Test
         store = state,
         metrics = metrics,
         newState = () => new FrameworkId(UUID.randomUUID().toString),
-        prefix = "" // don't set the prefix so we don't have to use PersistentStore for testing
+        prefix =
+          "" // don't set the prefix so we don't have to use PersistentStore for testing
     )
 
     lazy val migration = new MigrationTo0_13(taskRepo, state)

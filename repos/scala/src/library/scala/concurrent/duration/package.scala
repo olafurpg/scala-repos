@@ -45,19 +45,22 @@ package object duration {
     (d.length, d.unit)
 
   implicit final class DurationInt(private val n: Int)
-      extends AnyVal with DurationConversions {
+      extends AnyVal
+      with DurationConversions {
     override protected def durationIn(unit: TimeUnit): FiniteDuration =
       Duration(n.toLong, unit)
   }
 
   implicit final class DurationLong(private val n: Long)
-      extends AnyVal with DurationConversions {
+      extends AnyVal
+      with DurationConversions {
     override protected def durationIn(unit: TimeUnit): FiniteDuration =
       Duration(n, unit)
   }
 
   implicit final class DurationDouble(private val d: Double)
-      extends AnyVal with DurationConversions {
+      extends AnyVal
+      with DurationConversions {
     override protected def durationIn(unit: TimeUnit): FiniteDuration =
       Duration(d, unit) match {
         case f: FiniteDuration => f

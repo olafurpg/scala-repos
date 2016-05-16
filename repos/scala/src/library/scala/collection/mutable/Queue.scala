@@ -30,8 +30,10 @@ import generic._
   *  @define willNotTerminateInf
   */
 class Queue[A]
-    extends MutableList[A] with LinearSeqOptimized[A, Queue[A]]
-    with GenericTraversableTemplate[A, Queue] with Cloneable[Queue[A]]
+    extends MutableList[A]
+    with LinearSeqOptimized[A, Queue[A]]
+    with GenericTraversableTemplate[A, Queue]
+    with Cloneable[Queue[A]]
     with Serializable {
   override def companion: GenericCompanion[Queue] = Queue
 

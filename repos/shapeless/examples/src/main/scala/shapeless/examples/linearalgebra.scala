@@ -68,8 +68,8 @@ object LinearAlgebraExamples extends App {
 
   type V1 = Newtype[Tuple1[Double], VectorOps[_1, Tuple1[Double]]]
   type V2 = Newtype[(Double, Double), VectorOps[_2, (Double, Double)]]
-  type V3 = Newtype[
-      (Double, Double, Double), VectorOps[_3, (Double, Double, Double)]]
+  type V3 =
+    Newtype[(Double, Double, Double), VectorOps[_3, (Double, Double, Double)]]
 
   val v1 = Vector(1.0)
   typed[V1](v1)

@@ -128,7 +128,7 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
     } {
       for {
         (clientWhich, clientIface, clientClosable) <- clients(
-            pf, clientId, port)
+                                                         pf, clientId, port)
       } withClue(
           s"Server ($serverWhich) Client ($clientWhich) clientId $clientId protocolFactory $pf"
       ) {
@@ -541,10 +541,11 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
               .reportTo(sr)
               .bindTo(new InetSocketAddress(0))
               .build(new Echo.FinagledService(fi, Protocols.binaryFactory())))
-    )
+  )
 
-  private[this] val clients: Seq[
-      (String, (StatsReceiver, Address) => Echo.FutureIface)] = Seq(
+  private[this] val clients: Seq[(String,
+                                  (StatsReceiver,
+                                   Address) => Echo.FutureIface)] = Seq(
       "Thrift.client" ->
       ((sr, addr) =>
             Thrift.client
@@ -562,15 +563,14 @@ class EndToEndTest extends FunSuite with ThriftTest with BeforeAndAfter {
                   .build())),
       "ClientBuilder(codec)" ->
       ((sr, addr) =>
-            new Echo.FinagledClient(
-                ClientBuilder()
+            new Echo.FinagledClient(ClientBuilder()
                   .codec(ThriftClientFramedCodec())
                   .name("client")
                   .hostConnectionLimit(1)
                   .reportTo(sr)
                   .dest(Name.bound(addr))
                   .build()))
-    )
+  )
 
   for {
     (s, server) <- servers

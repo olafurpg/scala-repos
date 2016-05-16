@@ -998,7 +998,8 @@ bars foreach {case (x, y) => list.add(x + y)}
   }
 
   def testSCL2469(): Unit = {
-    getCommonSettings.VARIABLE_ANNOTATION_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
+    getCommonSettings.VARIABLE_ANNOTATION_WRAP =
+      CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
         |class Test {
@@ -1047,7 +1048,8 @@ bars foreach {case (x, y) => list.add(x + y)}
   }
 
   def testSCL2571_1(): Unit = {
-    getCommonSettings.EXTENDS_KEYWORD_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
+    getCommonSettings.EXTENDS_KEYWORD_WRAP =
+      CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
         |class Foo extends Object with Thread {
@@ -1070,7 +1072,8 @@ bars foreach {case (x, y) => list.add(x + y)}
   }
 
   def testSCL2571_2(): Unit = {
-    getCommonSettings.EXTENDS_KEYWORD_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
+    getCommonSettings.EXTENDS_KEYWORD_WRAP =
+      CommonCodeStyleSettings.WRAP_ALWAYS
     getCommonSettings.EXTENDS_LIST_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
@@ -1096,7 +1099,8 @@ bars foreach {case (x, y) => list.add(x + y)}
   }
 
   def testSCL2999(): Unit = {
-    getCommonSettings.EXTENDS_LIST_WRAP = CommonCodeStyleSettings.WRAP_ON_EVERY_ITEM
+    getCommonSettings.EXTENDS_LIST_WRAP =
+      CommonCodeStyleSettings.WRAP_ON_EVERY_ITEM
     getScalaSettings.WRAP_BEFORE_WITH_KEYWORD = true
     getCommonSettings.getIndentOptions.CONTINUATION_INDENT_SIZE = 4
 

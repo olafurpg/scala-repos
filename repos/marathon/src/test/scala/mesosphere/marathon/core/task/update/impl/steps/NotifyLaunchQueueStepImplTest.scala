@@ -14,7 +14,10 @@ import org.scalatest.{GivenWhenThen, Matchers, FunSuite}
 import scala.concurrent.Future
 
 class NotifyLaunchQueueStepImplTest
-    extends FunSuite with Matchers with GivenWhenThen with Mockito
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with Mockito
     with ScalaFutures {
   test("name") {
     new Fixture().step.name should equal("notifyLaunchQueue")

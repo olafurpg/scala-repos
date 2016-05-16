@@ -17,7 +17,8 @@ class EnvironmentFilterSpec extends ScalatraSpec {
     "The dev filter should" ^ "return 'development' as the environment" ! env(
         "dev", "DEVELOPMENT") ^ "be development mode" ! isDevMode(
         "dev",
-        expected = true) ^ p ^ "The prod filter should" ^ "return 'production' as the environment" ! env(
+        expected =
+          true) ^ p ^ "The prod filter should" ^ "return 'production' as the environment" ! env(
         "prod", "production") ^ "not be development mode" ! isDevMode(
         "prod", expected = false) ^ end
 

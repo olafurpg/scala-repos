@@ -39,7 +39,8 @@ private[spark] case class TimeStampedValue[V](value: V, timestamp: Long)
   */
 private[spark] class TimeStampedHashMap[A, B](
     updateTimeStampOnGet: Boolean = false)
-    extends mutable.Map[A, B]() with Logging {
+    extends mutable.Map[A, B]()
+    with Logging {
 
   private val internalMap = new ConcurrentHashMap[A, TimeStampedValue[B]]()
 

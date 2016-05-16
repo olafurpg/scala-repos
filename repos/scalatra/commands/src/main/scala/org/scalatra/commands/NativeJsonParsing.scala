@@ -6,7 +6,8 @@ import javax.servlet.http.HttpServletRequest
 import org.scalatra.json.{NativeJsonSupport, NativeJsonValueReaderProperty}
 
 trait NativeJsonParsing
-    extends CommandSupport with NativeJsonValueReaderProperty {
+    extends CommandSupport
+    with NativeJsonValueReaderProperty {
   self: NativeJsonSupport with CommandSupport =>
   type CommandType = JsonCommand
 

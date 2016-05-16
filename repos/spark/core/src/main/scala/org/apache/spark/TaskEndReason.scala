@@ -190,7 +190,8 @@ case class ExceptionFailure(
   * but the stacktrace and message will be preserved correctly in SparkException.
   */
 private[spark] class ThrowableSerializationWrapper(var exception: Throwable)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
   private def writeObject(out: ObjectOutputStream): Unit = {
     out.writeObject(exception)
   }

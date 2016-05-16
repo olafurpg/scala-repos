@@ -17,7 +17,9 @@ import scala.concurrent.duration._
 
 class AtmosphereSpecServlet(
     implicit override protected val scalatraActorSystem: ActorSystem)
-    extends ScalatraServlet with JacksonJsonSupport with SessionSupport
+    extends ScalatraServlet
+    with JacksonJsonSupport
+    with SessionSupport
     with AtmosphereSupport {
 
   implicit protected def jsonFormats: Formats = DefaultFormats

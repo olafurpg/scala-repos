@@ -6,8 +6,8 @@ import scala.xml._
 object InfoTest extends Build {
   lazy val root =
     Project("root", file(".")) settings
-    (ivyPaths <<= (baseDirectory, target)(
-            (dir, t) => new IvyPaths(dir, Some(t / "ivy-cache"))), ivyXML <<=
+    (ivyPaths <<= (baseDirectory, target)((dir, t) =>
+              new IvyPaths(dir, Some(t / "ivy-cache"))), ivyXML <<=
           (customInfo, organization, moduleName, version) apply inlineXML,
         scalaVersion := "2.9.1", projectID ~= (_ cross false),
         customInfo <<= baseDirectory { _ / "info" exists },
@@ -41,9 +41,11 @@ object InfoTest extends Build {
       if (!deliveredWithCustom(d))
         sys.error(
             "Expected 'license' and 'description' tags in info tag, got: \n" +
-            (d \ "info")) else ()
+            (d \ "info"))
+      else ()
     } else if (deliveredWithCustom(d))
-      sys.error("Expected empty 'info' tag, got: \n" + (d \ "info")) else ()
+      sys.error("Expected empty 'info' tag, got: \n" + (d \ "info"))
+    else ()
   }
   def deliveredWithCustom(d: NodeSeq) =
     (d \ "info" \ "license").nonEmpty && (d \ "info" \ "description").nonEmpty

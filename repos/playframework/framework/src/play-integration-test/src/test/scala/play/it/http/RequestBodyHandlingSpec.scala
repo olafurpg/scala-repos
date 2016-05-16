@@ -15,12 +15,15 @@ import scala.concurrent.Future
 import scala.util.Random
 
 object NettyRequestBodyHandlingSpec
-    extends RequestBodyHandlingSpec with NettyIntegrationSpecification
+    extends RequestBodyHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpRequestBodyHandlingSpec
-    extends RequestBodyHandlingSpec with AkkaHttpIntegrationSpecification
+    extends RequestBodyHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait RequestBodyHandlingSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification
+    with ServerIntegrationSpecification {
 
   sequential
 

@@ -16,9 +16,11 @@ object PersistentActorFailureSpec {
   import PersistentActorSpec.{Cmd, Evt, ExamplePersistentActor}
 
   class SimulatedException(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
   class SimulatedSerializationException(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
 
   class FailingInmemJournal extends InmemJournal {
 
@@ -161,9 +163,11 @@ class PersistentActorFailureSpec
         PersistenceSpec.config(
             "inmem",
             "SnapshotFailureRobustnessSpec",
-            extraConfig = Some("""
+            extraConfig =
+              Some("""
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorFailureSpec$FailingInmemJournal"
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
 
   import PersistentActorFailureSpec._
   import PersistentActorSpec._

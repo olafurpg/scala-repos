@@ -97,8 +97,9 @@ object Test extends App {
     })
     locally(sym.newClassSymbol(tyname, pos, flags): ClassSymbol)
     locally(sym.newMethodSymbol(tename, pos, flags): MethodSymbol)
-    locally(sym.newModuleAndClassSymbol(name, pos, flags): (ModuleSymbol,
-        ClassSymbol))
+    locally(
+        sym.newModuleAndClassSymbol(name, pos, flags): (ModuleSymbol,
+                                                        ClassSymbol))
     locally(newScopeWith(sym, sym, sym): Scope)
     locally(sym.newTermSymbol(tename, pos, flags): TermSymbol)
     locally(sym.newTypeSymbol(tyname, pos, flags): TypeSymbol)

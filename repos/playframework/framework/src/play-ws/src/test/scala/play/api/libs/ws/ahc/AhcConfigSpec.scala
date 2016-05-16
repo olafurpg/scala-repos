@@ -415,9 +415,9 @@ object AhcConfigSpec extends Specification with Mockito {
           // User specifies list with deprecated ciphers...
           val enabledCiphers = Seq("badone", "goodone", "goodtwo")
 
-          val sslConfig =
-            SSLConfig(enabledCipherSuites = Some(enabledCiphers),
-                      loose = SSLLooseConfig(allowWeakCiphers = true))
+          val sslConfig = SSLConfig(enabledCipherSuites = Some(enabledCiphers),
+                                    loose =
+                                      SSLLooseConfig(allowWeakCiphers = true))
           val wsConfig = defaultWsConfig.copy(ssl = sslConfig)
           val config = defaultConfig.copy(wsClientConfig = wsConfig)
           val builder = new AhcConfigBuilder(config)

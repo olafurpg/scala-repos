@@ -18,7 +18,8 @@ import scala.annotation.tailrec
   * Date: 11/09/2015
   */
 trait ScModificationTrackerOwner
-    extends ScalaPsiElement with PsiModifiableCodeBlock {
+    extends ScalaPsiElement
+    with PsiModifiableCodeBlock {
   private val blockModificationCount = new AtomicLong(0L)
 
   def rawModificationCount: Long = blockModificationCount.get()

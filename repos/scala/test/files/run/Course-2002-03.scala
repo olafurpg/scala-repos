@@ -217,11 +217,10 @@ object M8 {
       val buffer: StringBuilder = new StringBuilder();
       buffer.append('[');
       foreach(
-          i =>
-            {
-          if (buffer.length > 1) { buffer.append(','); () }; // !!! ; ()
-          buffer.append(i);
-          ()
+          i => {
+        if (buffer.length > 1) { buffer.append(','); () }; // !!! ; ()
+        buffer.append(i);
+        ()
       });
       buffer.append(']');
       buffer.toString();

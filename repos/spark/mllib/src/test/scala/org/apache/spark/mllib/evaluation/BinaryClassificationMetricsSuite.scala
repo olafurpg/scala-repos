@@ -22,7 +22,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
 class BinaryClassificationMetricsSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private def areWithinEpsilon(x: (Double, Double)): Boolean =
     x._1 ~= (x._2) absTol 1E-5
@@ -183,7 +184,8 @@ class BinaryClassificationMetricsSuite
     val downsampledROC = downsampled.roc().collect().sorted.toList
     assert(
         // May have to add 1 if the sample factor didn't divide evenly
-        2 + (numBins + (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
+        2 + (numBins +
+            (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
     assert(
         List(
             (0.0, 0.0),

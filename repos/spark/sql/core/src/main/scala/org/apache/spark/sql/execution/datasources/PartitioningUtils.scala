@@ -208,8 +208,9 @@ private[sql] object PartitioningUtils {
         //  - After we get the new currentPath, this new currentPath represent the top level dir
         //    i.e. currentPath.getParent == null. For the example of "/table/a=1/",
         //    the top level dir is "/table".
-        finished = (maybeColumn.isEmpty && !columns.isEmpty) ||
-        currentPath.getParent == null
+        finished =
+          (maybeColumn.isEmpty && !columns.isEmpty) ||
+          currentPath.getParent == null
 
         if (!finished) {
           // For the above example, currentPath will be "/table/".

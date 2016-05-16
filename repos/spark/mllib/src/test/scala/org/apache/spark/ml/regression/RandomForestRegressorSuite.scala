@@ -31,7 +31,8 @@ import org.apache.spark.sql.DataFrame
   * Test suite for [[RandomForestRegressor]].
   */
 class RandomForestRegressorSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   import RandomForestRegressorSuite.compareAPIs
 

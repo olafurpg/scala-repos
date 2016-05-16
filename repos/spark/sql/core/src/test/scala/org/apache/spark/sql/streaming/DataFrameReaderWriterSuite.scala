@@ -59,7 +59,9 @@ class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
 }
 
 class DataFrameReaderWriterSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
   import testImplicits._
 
   after {

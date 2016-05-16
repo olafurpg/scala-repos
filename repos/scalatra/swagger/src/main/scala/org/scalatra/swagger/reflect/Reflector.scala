@@ -65,9 +65,9 @@ object Reflector {
     describe(scalaTypeOf(clazz))
   def describe(fqn: String): Option[ObjectDescriptor] =
     scalaTypeOf(fqn) map (describe(_))
-  def describe(
-      st: ScalaType,
-      paranamer: ParameterNameReader = ParanamerReader): ObjectDescriptor =
+  def describe(st: ScalaType,
+               paranamer: ParameterNameReader =
+                 ParanamerReader): ObjectDescriptor =
     descriptors(st, createDescriptor(_, paranamer))
 
   def resolveClass[X <: AnyRef](
@@ -98,8 +98,9 @@ object Reflector {
     }
 
   private[reflect] def createDescriptor(
-      tpe: ScalaType, paramNameReader: ParameterNameReader = ParanamerReader)
-    : ObjectDescriptor = {
+      tpe: ScalaType,
+      paramNameReader: ParameterNameReader =
+        ParanamerReader): ObjectDescriptor = {
     if (tpe.isPrimitive) {
       PrimitiveDescriptor(tpe.simpleName, tpe.fullName, tpe)
     } else {
@@ -150,13 +151,13 @@ object Reflector {
         fields(tpe.erasure)
       }
 
-      def ctorParamType(
-          name: String,
-          index: Int,
-          owner: ScalaType,
-          ctorParameterNames: List[String],
-          t: Type,
-          container: Option[(ScalaType, List[Int])] = None): ScalaType = {
+      def ctorParamType(name: String,
+                        index: Int,
+                        owner: ScalaType,
+                        ctorParameterNames: List[String],
+                        t: Type,
+                        container: Option[(ScalaType, List[Int])] =
+                          None): ScalaType = {
         val idxes = container.map(_._2.reverse)
         t match {
           case v: TypeVariable[_] =>

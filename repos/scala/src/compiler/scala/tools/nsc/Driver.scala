@@ -40,7 +40,8 @@ abstract class Driver {
 
   def process(args: Array[String]): Boolean = {
     val ss = new Settings(scalacError)
-    reporter = new ConsoleReporter(ss) // for reporting early config errors, before compiler is constructed
+    reporter =
+      new ConsoleReporter(ss) // for reporting early config errors, before compiler is constructed
     command = new CompilerCommand(args.toList, ss)
     settings = command.settings
 

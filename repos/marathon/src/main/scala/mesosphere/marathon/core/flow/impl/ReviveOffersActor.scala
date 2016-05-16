@@ -35,7 +35,8 @@ private[impl] class ReviveOffersActor(
     marathonEventStream: EventStream,
     offersWanted: Observable[Boolean],
     driverHolder: MarathonSchedulerDriverHolder)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[impl] var subscription: Subscription = _
   private[impl] var offersCurrentlyWanted: Boolean = false

@@ -41,7 +41,8 @@ object DisplacementMap {
 
 class DisplacementMap(
     override val delegate: jfxse.DisplacementMap = new jfxse.DisplacementMap)
-    extends Effect(delegate) with InputDelegate[jfxse.DisplacementMap]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.DisplacementMap]
     with SFXDelegate[jfxse.DisplacementMap] {
 
   /**

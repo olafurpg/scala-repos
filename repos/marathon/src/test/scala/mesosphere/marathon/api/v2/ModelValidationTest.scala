@@ -17,7 +17,9 @@ import play.api.libs.json.{JsObject, Json}
 import scala.collection.immutable.Seq
 
 class ModelValidationTest
-    extends MarathonSpec with Matchers with BeforeAndAfterAll
+    extends MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
     with OptionValues {
 
   test("A group update should pass validation") {
@@ -108,13 +110,14 @@ class ModelValidationTest
 
   test(
       "Validators should not produce 'value' string at the end of description.") {
-    val group = Group(
-        "/test".toPath,
-        groups = Set(Group("/test/group1".toPath,
-                           Set(AppDefinition("/test/group1/valid".toPath,
-                                             cmd = Some("foo")),
-                               AppDefinition("/test/group1/invalid".toPath))),
-                     Group("/test/group2".toPath)))
+    val group =
+      Group("/test".toPath,
+            groups =
+              Set(Group("/test/group1".toPath,
+                        Set(AppDefinition("/test/group1/valid".toPath,
+                                          cmd = Some("foo")),
+                            AppDefinition("/test/group1/invalid".toPath))),
+                  Group("/test/group2".toPath)))
 
     validate(group) match {
       case Success => fail()
@@ -129,14 +132,14 @@ class ModelValidationTest
     AppDefinition(
         id,
         container = Some(
-              Container(
-                  docker = Some(Docker(
-                            image = "demothing",
-                            network = Some(Network.BRIDGE),
-                            portMappings = Some(Seq(PortMapping(
-                                          2000, servicePort = servicePort)))
-                        ))
-              ))
+            Container(
+                docker = Some(Docker(
+                        image = "demothing",
+                        network = Some(Network.BRIDGE),
+                        portMappings = Some(
+                            Seq(PortMapping(2000, servicePort = servicePort)))
+                    ))
+            ))
     )
 
   case class ImportantTitle(name: String)

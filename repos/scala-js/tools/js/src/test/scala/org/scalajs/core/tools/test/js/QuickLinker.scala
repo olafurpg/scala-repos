@@ -20,8 +20,7 @@ object QuickLinker {
   /** Link the Scala.js test suite on Node.js */
   @JSExport
   def linkTestSuiteNode(irFilesAndJars: String*): String = {
-    val semantics = Semantics.Defaults.withRuntimeClassName(
-        _.fullName match {
+    val semantics = Semantics.Defaults.withRuntimeClassName(_.fullName match {
       case "org.scalajs.testsuite.compiler.ReflectionTest$RenamedTestClass" =>
         "renamed.test.Class"
       case fullName =>

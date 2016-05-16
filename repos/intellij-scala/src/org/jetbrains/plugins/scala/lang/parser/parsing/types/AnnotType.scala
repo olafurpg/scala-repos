@@ -25,7 +25,7 @@ object AnnotType {
     if (SimpleType.parse(builder, isPattern, multipleSQBrackets)) {
       val annotationsMarker = builder.mark
       while (!builder.newlineBeforeCurrentToken &&
-      Annotation.parse(builder, countLinesAfterAnnotation = false)) {
+             Annotation.parse(builder, countLinesAfterAnnotation = false)) {
         isAnnotation = true
       }
 

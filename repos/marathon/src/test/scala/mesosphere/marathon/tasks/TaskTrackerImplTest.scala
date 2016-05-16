@@ -26,7 +26,9 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection._
 
 class TaskTrackerImplTest
-    extends MarathonSpec with Matchers with GivenWhenThen
+    extends MarathonSpec
+    with Matchers
+    with GivenWhenThen
     with MarathonShutdownHookSupport {
 
   import scala.concurrent.ExecutionContext.Implicits.global

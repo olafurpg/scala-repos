@@ -216,8 +216,8 @@ object SparkBuild extends PomBuild {
                 Resolver.ivyStylePatterns)
         ),
         externalResolvers := resolvers.value,
-        otherResolvers <<= SbtPomKeys.mvnLocalRepository(
-            dotM2 => Seq(Resolver.file("dotM2", dotM2))),
+        otherResolvers <<= SbtPomKeys.mvnLocalRepository(dotM2 =>
+              Seq(Resolver.file("dotM2", dotM2))),
         publishLocalConfiguration in MavenCompile <<=
           (packagedArtifacts, deliverLocal, ivyLoggingLevel) map {
           (arts, _, level) =>
@@ -887,7 +887,7 @@ object Java8TestSettings {
       javacJVMVersion := "1.8",
       // Targeting Java 8 bytecode is only supported in Scala 2.11.4 and higher:
       scalacJVMVersion :=
-      (if (System.getProperty("scala-2.10") == "true") "1.7" else "1.8")
+        (if (System.getProperty("scala-2.10") == "true") "1.7" else "1.8")
   )
 }
 

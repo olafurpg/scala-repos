@@ -4,5 +4,5 @@ trait Equal[-A] {
 object Test {
   implicit def TraversableEqual[
       CC[X] <: collection.TraversableLike[X, CC[X]] with Traversable[X],
-      A : Equal]: Equal[CC[A]] = error("")
+      A: Equal]: Equal[CC[A]] = error("")
 }

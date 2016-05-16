@@ -7,8 +7,7 @@ object Test extends App {
 
   def typed[T](t: => T) {}
   def testTraversableLike = {
-    class FilterMapImpl[
-        A, Repr](val r: GenTraversableLike[A, Repr]) /* extends AnyVal */ {
+    class FilterMapImpl[A, Repr](val r: GenTraversableLike[A, Repr]) /* extends AnyVal */ {
       final def filterMap[B, That](f: A => Option[B])(
           implicit cbf: CanBuildFrom[Repr, B, That]): That =
         r.flatMap(f(_).toSeq)
@@ -37,8 +36,7 @@ object Test extends App {
     println(fms2)
   }
   def testTraversableOnce = {
-    class FilterMapImpl[
-        A, Repr](val r: GenTraversableOnce[A]) /* extends AnyVal */ {
+    class FilterMapImpl[A, Repr](val r: GenTraversableOnce[A]) /* extends AnyVal */ {
       final def filterMap[B, That](f: A => Option[B])(
           implicit cbf: CanBuildFrom[Repr, B, That]): That = {
         val b = cbf()

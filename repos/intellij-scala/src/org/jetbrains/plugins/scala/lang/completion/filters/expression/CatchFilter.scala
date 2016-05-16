@@ -23,8 +23,8 @@ class CatchFilter extends ElementFilter {
       var i = getPrevNotWhitespaceAndComment(
           context.getTextRange.getStartOffset - 1, context)
       var leaf1 = getLeafByOffset(i, context)
-      while (leaf1 != null &&
-      !leaf1.isInstanceOf[ScTryBlock]) leaf1 = leaf1.getParent
+      while (leaf1 != null && !leaf1.isInstanceOf[ScTryBlock]) leaf1 =
+        leaf1.getParent
       if (leaf1 == null) return false
       if (leaf1.getTextRange.getEndOffset != i + 1) return false
       i = getNextNotWhitespaceAndComment(
@@ -45,9 +45,8 @@ class CatchFilter extends ElementFilter {
   def getPrevNotWhitespaceAndComment(index: Int, context: PsiElement): Int = {
     var i = index
     if (i < 0) return 0
-    while (i > 0 &&
-    (context.getContainingFile.getText.charAt(i) == ' ' ||
-        context.getContainingFile.getText.charAt(i) == '\n')) i = i - 1
+    while (i > 0 && (context.getContainingFile.getText.charAt(i) == ' ' ||
+               context.getContainingFile.getText.charAt(i) == '\n')) i = i - 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
       return getPrevNotWhitespaceAndComment(
@@ -61,8 +60,8 @@ class CatchFilter extends ElementFilter {
     if (i >= context.getContainingFile.getTextLength - 1)
       return context.getContainingFile.getTextLength - 2
     while (i < context.getContainingFile.getText.length - 1 &&
-    (context.getContainingFile.getText.charAt(i) == ' ' ||
-        context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
+           (context.getContainingFile.getText.charAt(i) == ' ' ||
+               context.getContainingFile.getText.charAt(i) == '\n')) i = i + 1
     val leaf = getLeafByOffset(i, context)
     if (leaf.isInstanceOf[PsiComment] || leaf.isInstanceOf[ScDocComment])
       return getNextNotWhitespaceAndComment(

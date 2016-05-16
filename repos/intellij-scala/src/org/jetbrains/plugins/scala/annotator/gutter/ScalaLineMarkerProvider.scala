@@ -36,7 +36,8 @@ import scala.collection.{Seq, mutable}
   */
 class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
                               colorsManager: EditorColorsManager)
-    extends LineMarkerProvider with ScalaSeparatorProvider {
+    extends LineMarkerProvider
+    with ScalaSeparatorProvider {
 
   def getLineMarkerInfo(element: PsiElement): LineMarkerInfo[_ <: PsiElement] = {
     if (!element.isValid) return null
@@ -115,7 +116,8 @@ class ScalaLineMarkerProvider(daemonSettings: DaemonCodeAnalyzerSettings,
             .toSeq
           val icon =
             if (GutterUtil.isOverrides(method, signatures))
-              OVERRIDING_METHOD_ICON else IMPLEMENTING_METHOD_ICON
+              OVERRIDING_METHOD_ICON
+            else IMPLEMENTING_METHOD_ICON
           val typez = ScalaMarkerType.OVERRIDING_MEMBER
           if (signatures.nonEmpty) {
             return marker(method.nameId, icon, typez)
@@ -261,7 +263,7 @@ private object GutterUtil {
       members: ArrayBuffer[PsiElement],
       result: util.Collection[LineMarkerInfo[_ <: PsiElement]]) {
     for (member <- members if !member.isInstanceOf[PsiMethod] ||
-                  !member.asInstanceOf[PsiMethod].isConstructor) {
+         !member.asInstanceOf[PsiMethod].isConstructor) {
       ProgressManager.checkCanceled()
       val offset = member.getTextOffset
       val members = member match {

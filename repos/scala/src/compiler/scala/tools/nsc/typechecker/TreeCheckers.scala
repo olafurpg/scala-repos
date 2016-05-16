@@ -130,7 +130,7 @@ abstract class TreeCheckers extends Analyzer {
         if (s1 contains s2) ()
         else
           movedMsgs +=
-          ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s".format(
+            ("\n** %s moved:\n** Previously:\n%s\n** Currently:\n%s".format(
                   ownerstr(sym), s1 mkString ", ", s2))
       }
     }
@@ -175,13 +175,14 @@ abstract class TreeCheckers extends Analyzer {
   lazy val tpeOfTree = mutable.HashMap[Tree, Type]()
   private lazy val reportedAlready = mutable.HashSet[(Tree, Symbol)]()
 
-  def posstr(p: Position): String = (if (p eq null) ""
-                                     else {
-                                       try p.source.path + ":" + p.line catch {
-                                         case _: UnsupportedOperationException =>
-                                           p.toString
-                                       }
-                                     })
+  def posstr(p: Position): String =
+    (if (p eq null) ""
+     else {
+       try p.source.path + ":" + p.line catch {
+         case _: UnsupportedOperationException =>
+           p.toString
+       }
+     })
 
   def errorFn(pos: Position, msg: Any): Unit =
     reporter.warning(pos, "[check: %s] %s".format(phase.prev, msg))
@@ -406,8 +407,8 @@ abstract class TreeCheckers extends Analyzer {
         val treeTpe = typeOf(tree)
 
         def isOk(sym: Symbol) =
-          treeSym hasTransOwner sym.enclosingSuchThat(
-              x => !x.isTypeParameterOrSkolem) // account for higher order type params
+          treeSym hasTransOwner sym.enclosingSuchThat(x =>
+                !x.isTypeParameterOrSkolem) // account for higher order type params
         def isEligible(sym: Symbol) =
           (sym ne NoSymbol) && (sym.isTypeParameter || sym.isLocalToBlock)
         val referencedSymbols =
@@ -482,8 +483,8 @@ abstract class TreeCheckers extends Analyzer {
         case _ =>
           tpeOfTree get tree foreach { oldtpe =>
             if (tree.tpe eq null)
-              errorFn(s"tree.tpe=null for " + tree.shortClass +
-                  " (symbol: " + classString(tree.symbol) + " " +
+              errorFn(s"tree.tpe=null for " + tree.shortClass + " (symbol: " +
+                  classString(tree.symbol) + " " +
                   signature(tree.symbol) + "), last seen tpe was " + oldtpe)
             else if (oldtpe =:= tree.tpe) ()
             else typesDiffer(tree, oldtpe, tree.tpe)

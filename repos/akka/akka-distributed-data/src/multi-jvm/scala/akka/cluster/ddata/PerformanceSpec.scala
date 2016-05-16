@@ -55,7 +55,8 @@ class PerformanceSpecMultiJvmNode4 extends PerformanceSpec
 class PerformanceSpecMultiJvmNode5 extends PerformanceSpec
 
 class PerformanceSpec
-    extends MultiNodeSpec(PerformanceSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(PerformanceSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import PerformanceSpec._
   import Replicator._
@@ -78,9 +79,9 @@ class PerformanceSpec
   def repeat(description: String,
              keys: Iterable[ORSetKey[Int]],
              n: Int,
-             expectedAfterReplication: Option[Set[Int]] = None)(
-      block: (ORSetKey[Int], Int, ActorRef) ⇒ Unit,
-      afterEachKey: ORSetKey[Int] ⇒ Unit = _ ⇒ ()): Unit = {
+             expectedAfterReplication: Option[Set[Int]] =
+               None)(block: (ORSetKey[Int], Int, ActorRef) ⇒ Unit,
+                     afterEachKey: ORSetKey[Int] ⇒ Unit = _ ⇒ ()): Unit = {
 
     keys.foreach { key ⇒
       val startTime = System.nanoTime()

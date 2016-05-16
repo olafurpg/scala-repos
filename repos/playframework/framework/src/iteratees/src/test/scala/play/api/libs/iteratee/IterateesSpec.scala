@@ -8,7 +8,8 @@ import scala.concurrent.{Future, ExecutionContext}
 import scala.util.{Failure, Try}
 
 object IterateesSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   def checkFoldResult[A, E](i: Iteratee[A, E], expected: Step[A, E]) = {
@@ -96,10 +97,10 @@ object IterateesSpec
     "fold input with fold1" in {
       mustExecute(1) { foldEC =>
         mustTranslate3To(5)(it =>
-              Iteratee.flatten(
-                  it.fold1((a, i) => Future.successful(Done(a + 2, i)),
-                           _ => ???,
-                           (_, _) => ???)(foldEC)))
+              Iteratee.flatten(it.fold1((a, i) =>
+                                          Future.successful(Done(a + 2, i)),
+                                        _ => ???,
+                                        (_, _) => ???)(foldEC)))
       }
     }
 
@@ -186,8 +187,8 @@ object IterateesSpec
       mustExecute(1) { flatMapEC =>
         await(
             Done(3, Input.El(List(1, 2)))
-              .flatMapTraversable(
-                  _ => Done[List[Int], Int](4, Input.El(List(3, 4))))(
+              .flatMapTraversable(_ =>
+                    Done[List[Int], Int](4, Input.El(List(3, 4))))(
                   implicitly[List[Int] => scala.collection.TraversableLike[
                           Int, List[Int]]],
                   implicitly[scala.collection.generic.CanBuildFrom[List[Int],
@@ -320,8 +321,8 @@ object IterateesSpec
 
     "fold input" in {
       mustExecute(4) { foldEC =>
-        await(Enumerator(1, 2, 3, 4) |>>> Iteratee.foldM[Int, Int](0)((x,
-                y) => Future.successful(x + y))(foldEC)) must equalTo(10)
+        await(Enumerator(1, 2, 3, 4) |>>> Iteratee.foldM[Int, Int](0)((x, y) =>
+                  Future.successful(x + y))(foldEC)) must equalTo(10)
       }
     }
   }
@@ -350,8 +351,8 @@ object IterateesSpec
     "fold input" in {
       mustExecute(4) { foldEC =>
         await(Enumerator(1, 2, 3, 4) |>>> Iteratee
-              .fold1[Int, Int](Future.successful(0))((x,
-                y) => Future.successful(x + y))(foldEC)) must equalTo(10)
+              .fold1[Int, Int](Future.successful(0))((x, y) =>
+                  Future.successful(x + y))(foldEC)) must equalTo(10)
       }
     }
   }
@@ -748,7 +749,7 @@ object IterateesSpec
         Iterator.range(0, tooManyArrays).map(_ => new Array[Byte](arraySize))
       import play.api.libs.iteratee.Execution.Implicits.defaultExecutionContext
       await(Enumerator.enumerate(iterator) |>>> Iteratee.ignore[Array[Byte]]) must_==
-      (())
+        (())
     }
   }
 }

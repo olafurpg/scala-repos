@@ -67,8 +67,13 @@ object Join {
       : Aux[I, L1, L2, Unit, Acc, I, Out] = `n/a`
 
     // if R <: HList and L1 non-empty move head of L1 to Acc
-    implicit def iter1[
-        I <: HList, H, T <: HList, L2 <: HList, R <: HList, Acc <: HList, Out <: HList](
+    implicit def iter1[I <: HList,
+                       H,
+                       T <: HList,
+                       L2 <: HList,
+                       R <: HList,
+                       Acc <: HList,
+                       Out <: HList](
         implicit x: Aux[I, T, L2, R, H :: Acc, I, Out])
       : Aux[I, H :: T, L2, R, Acc, I, Out] = `n/a`
 
@@ -84,14 +89,27 @@ object Join {
       : Aux[I, HNil, HNil, R, Acc, I, Out] = `n/a`
 
     // if R <: Rule and L1 non-empty move head of L1 to Acc
-    implicit def iterRule1[
-        I <: HList, L2 <: HList, I2 <: HList, O2 <: HList, In0 <: HList, Acc <: HList, Out0 <: HList, H, T <: HList](
+    implicit def iterRule1[I <: HList,
+                           L2 <: HList,
+                           I2 <: HList,
+                           O2 <: HList,
+                           In0 <: HList,
+                           Acc <: HList,
+                           Out0 <: HList,
+                           H,
+                           T <: HList](
         implicit x: Aux[I, T, L2, Rule[I2, O2], H :: Acc, In0, Out0])
       : Aux[I, H :: T, L2, Rule[I2, O2], HNil, In0, Out0] = `n/a`
 
     // if R <: Rule and L1 empty and Acc non-empty move head of Acc to L2
-    implicit def iterRule2[
-        I <: HList, L2 <: HList, I2 <: HList, O2 <: HList, In0 <: HList, Out0 <: HList, H, T <: HList](
+    implicit def iterRule2[I <: HList,
+                           L2 <: HList,
+                           I2 <: HList,
+                           O2 <: HList,
+                           In0 <: HList,
+                           Out0 <: HList,
+                           H,
+                           T <: HList](
         implicit x: Aux[I, HNil, H :: L2, Rule[I2, O2], T, In0, Out0])
       : Aux[I, HNil, L2, Rule[I2, O2], H :: T, In0, Out0] = `n/a`
 

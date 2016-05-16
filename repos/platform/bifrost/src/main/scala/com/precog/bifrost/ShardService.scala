@@ -48,7 +48,7 @@ import blueeyes.core.http.MimeTypes._
 import blueeyes.core.service._
 import blueeyes.BlueEyesServiceBuilder
 
-import blueeyes.core.data.{ DefaultBijections, ByteChunk }
+import blueeyes.core.data.{DefaultBijections, ByteChunk}
 import blueeyes.core.http.{HttpHeaders, HttpRequest, HttpResponse}
 import blueeyes.core.service.CustomHttpService
 
@@ -58,8 +58,8 @@ import blueeyes.json.JValue
 import DefaultBijections._
 
 import java.util.Arrays
-import java.nio.{ CharBuffer, ByteBuffer }
-import java.nio.charset.{ Charset, CoderResult }
+import java.nio.{CharBuffer, ByteBuffer}
+import java.nio.charset.{Charset, CoderResult}
 
 import org.streum.configrity.Configuration
 
@@ -74,21 +74,20 @@ object ShardStateOptions {
   case object DisableAsyncQueries extends ShardStateOptions
 }
 
-case class ShardState(
-    platform: ManagedPlatform,
-    apiKeyFinder: APIKeyFinder[Future],
-    accountFinder: AccountFinder[Future],
-    scheduler: Scheduler[Future],
-    jobManager: JobManager[Future],
-    clock: Clock,
-    stoppable: Stoppable,
-    options: ShardStateOptions = ShardStateOptions.NoOptions) {
-}
+case class ShardState(platform: ManagedPlatform,
+                      apiKeyFinder: APIKeyFinder[Future],
+                      accountFinder: AccountFinder[Future],
+                      scheduler: Scheduler[Future],
+                      jobManager: JobManager[Future],
+                      clock: Clock,
+                      stoppable: Stoppable,
+                      options: ShardStateOptions =
+                        ShardStateOptions.NoOptions) {}
 
-trait ShardService extends
-    BlueEyesServiceBuilder with
-    ShardServiceCombinators with
-    Logging {
+trait ShardService
+    extends BlueEyesServiceBuilder
+    with ShardServiceCombinators
+    with Logging {
 
   import ShardStateOptions.DisableAsyncQueries
 
@@ -96,32 +95,36 @@ trait ShardService extends
   implicit def M: Monad[Future]
 
   val timeout = Timeout(120000)
+
   /**
-   * This provides the configuration for the service and expects a `ShardState`
-   * in return. The exact `ShardState` can be either a `BasicShardState` or a
-   * all features, including async queries and detailed query output are
-   * enabled. Otherwise, if only a `BasicShardState` is returned, then only
-   * basic synchronous queries will be allowed.
-   *
-   * On service startup, the platform's `startup` method will be
-   * called.
-   */
+    * This provides the configuration for the service and expects a `ShardState`
+    * in return. The exact `ShardState` can be either a `BasicShardState` or a
+    * all features, including async queries and detailed query output are
+    * enabled. Otherwise, if only a `BasicShardState` is returned, then only
+    * basic synchronous queries will be allowed.
+    *
+    * On service startup, the platform's `startup` method will be
+    * called.
+    */
   def configureShardState(config: Configuration): Future[ShardState]
 
   def optionsResponse = CORSHeaders.apply[ByteChunk, Future](M)
 
   private def queryResultToByteChunk: QueryResult => ByteChunk = {
     val utf8 = Charset.forName("UTF-8")
-    (qr: QueryResult) => qr match {
-      case Left(jv) => Left(jv.renderCompact.getBytes(utf8))
-      case Right(stream) => Right(VFSModule.bufferOutput(stream))
-    }
+    (qr: QueryResult) =>
+      qr match {
+        case Left(jv) => Left(jv.renderCompact.getBytes(utf8))
+        case Right(stream) => Right(VFSModule.bufferOutput(stream))
+      }
   }
 
   //private def cf = implicitly[ByteChunk => Future[JValue]]
 
-  def shardService[F[+_]](service: HttpService[ByteChunk, F[Future[HttpResponse[QueryResult]]]])(implicit
-      F: Functor[F]): HttpService[ByteChunk, F[Future[HttpResponse[ByteChunk]]]] = {
+  def shardService[F[+ _]](
+      service: HttpService[ByteChunk, F[Future[HttpResponse[QueryResult]]]])(
+      implicit F: Functor[F])
+    : HttpService[ByteChunk, F[Future[HttpResponse[ByteChunk]]]] = {
     service map { _ map { _ map { _ map queryResultToByteChunk } } }
   }
 
@@ -131,12 +134,15 @@ trait ShardService extends
         path("/queries") {
           path("/'jobId") {
             get(new AsyncQueryResultServiceHandler(state.jobManager)) ~
-            delete(new QueryDeleteHandler[ByteChunk](state.jobManager, state.clock))
+            delete(new QueryDeleteHandler[ByteChunk](state.jobManager,
+                                                     state.clock))
           } ~
           requireAccount(state.accountFinder) {
             // async handler *always* returns a JSON object containing the job ID
-            shardService[({ type λ[+α] = (((APIKey, AccountDetails)) => α) })#λ] {
-              asyncQuery(post(new AsyncQueryServiceHandler(state.platform.asynchronous)))
+            shardService[
+                ({ type λ[+α] = (((APIKey, AccountDetails)) => α) })#λ] {
+              asyncQuery(post(new AsyncQueryServiceHandler(
+                          state.platform.asynchronous)))
             }
           }
         }
@@ -145,12 +151,15 @@ trait ShardService extends
   }
 
   private def syncHandler(state: ShardState) = {
-    val queryService = new SyncQueryServiceHandler(state.platform.synchronous, state.jobManager, SyncResultFormat.Simple)
+    val queryService = new SyncQueryServiceHandler(
+        state.platform.synchronous, state.jobManager, SyncResultFormat.Simple)
     jsonp {
       jsonAPIKey(state.apiKeyFinder) {
         requireAccount(state.accountFinder) {
           dataPath("/analytics/fs") {
-            shardService[({ type λ[+α] = (((APIKey, AccountDetails), Path) => α) })#λ] {
+            shardService[({
+                  type λ[+α] = (((APIKey, AccountDetails), Path) => α)
+                })#λ] {
               query[QueryResult] {
                 {
                   get { queryService } ~
@@ -159,28 +168,43 @@ trait ShardService extends
               }
             } ~
             options {
-              (request: HttpRequest[ByteChunk]) => (a: (APIKey, AccountDetails), p: Path) => optionsResponse
+              (request: HttpRequest[ByteChunk]) =>
+                (a: (APIKey, AccountDetails), p: Path) =>
+                  optionsResponse
             }
           }
         } ~
         dataPath("/metadata/fs") {
           get {
-            produce(application/json)(
-              new BrowseServiceHandler[ByteChunk](state.platform.vfs) map { _ map { _ map { _ map { jvalueToChunk } } } }
-            )(ResponseModifier.responseFG[({ type λ[α] = (APIKey, Path) => α })#λ, Future, ByteChunk])
+            produce(application / json)(
+                new BrowseServiceHandler[ByteChunk](state.platform.vfs) map {
+                  _ map { _ map { _ map { jvalueToChunk } } }
+                }
+            )(ResponseModifier
+                  .responseFG[({ type λ[α] = (APIKey, Path) => α })#λ,
+                              Future,
+                              ByteChunk])
           } ~
           options {
-            (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) => optionsResponse
+            (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) =>
+              optionsResponse
           }
         } ~
         dataPath("/meta/fs") {
           get {
-            produce(application/json)(
-              new BrowseServiceHandler[ByteChunk](state.platform.vfs, legacy = true) map { _ map { _ map { _ map { jvalueToChunk } } } }
-            )(ResponseModifier.responseFG[({ type λ[α] = (APIKey, Path) => α })#λ, Future, ByteChunk])
+            produce(application / json)(
+                new BrowseServiceHandler[ByteChunk](state.platform.vfs,
+                                                    legacy = true) map {
+                  _ map { _ map { _ map { jvalueToChunk } } }
+                }
+            )(ResponseModifier
+                  .responseFG[({ type λ[α] = (APIKey, Path) => α })#λ,
+                              Future,
+                              ByteChunk])
           } ~
           options {
-            (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) => optionsResponse
+            (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) =>
+              optionsResponse
           }
         } ~ dataHandler(state)
       }
@@ -194,10 +218,18 @@ trait ShardService extends
       jvalue[ByteChunk] {
         path("/scheduled/") {
           jsonAPIKey(state.apiKeyFinder) {
-            post { new AddScheduledQueryServiceHandler(state.scheduler, state.apiKeyFinder, state.accountFinder, state.clock) }
+            post {
+              new AddScheduledQueryServiceHandler(state.scheduler,
+                                                  state.apiKeyFinder,
+                                                  state.accountFinder,
+                                                  state.clock)
+            }
           } ~
           path("'scheduleId") {
-            get { new ScheduledQueryStatusServiceHandler[Future[JValue]](state.scheduler) } ~
+            get {
+              new ScheduledQueryStatusServiceHandler[Future[JValue]](
+                  state.scheduler)
+            } ~
             delete { new DeleteScheduledQueryServiceHandler(state.scheduler) }
           }
         }
@@ -210,8 +242,12 @@ trait ShardService extends
       requireAccount(state.accountFinder) {
         dataPath("/analysis/fs") {
           get {
-            shardService[({ type λ[+α] = ((APIKey, AccountDetails), Path) => α })#λ] {
-              new AnalysisServiceHandler(state.platform, state.scheduler, state.clock)
+            shardService[({
+                  type λ[+α] = ((APIKey, AccountDetails), Path) => α
+                })#λ] {
+              new AnalysisServiceHandler(state.platform,
+                                         state.scheduler,
+                                         state.clock)
             }
           }
         }
@@ -238,7 +274,9 @@ trait ShardService extends
           import CORSHeaderHandler.allowOrigin
           allowOrigin("*", executionContext) {
             asyncHandler(state) ~ syncHandler(state) ~ analysisHandler(state) ~
-            ifRequest { _: HttpRequest[ByteChunk] => state.scheduler.enabled } {
+            ifRequest { _: HttpRequest[ByteChunk] =>
+              state.scheduler.enabled
+            } {
               scheduledHandler(state)
             }
           }

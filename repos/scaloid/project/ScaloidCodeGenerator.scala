@@ -215,9 +215,10 @@ class ScaloidCodeGenerator(
 
   def commonListener(l: AndroidListener, args: String = "") = {
     val dp = if (l.isDeprecated) deprecatedDecl else ""
-    dp + "@inline def " + l.name +
-    (if (l.retType.name == "Unit") s"[U](f: $args => U): This = {"
-     else s"(f: $args => ${genType(l.retType)}): This = {") +
+    dp + "@inline def " + l.name + (if (l.retType.name == "Unit")
+                                      s"[U](f: $args => U): This = {"
+                                    else
+                                      s"(f: $args => ${genType(l.retType)}): This = {") +
     s"\n  basis.${l.setter}(new ${l.callbackClassName} {"
   }
 
@@ -265,7 +266,8 @@ class ScaloidCodeGenerator(
     prop.getter.fold(if (prop.nameClashes) "" else noGetter(prop.name)) {
       getter =>
         val dp = if (getter.isDeprecated) deprecatedDecl else ""
-        methodScalaDoc(getter) + s"\n$dp@inline${if (getter.isOverride) " override"
+        methodScalaDoc(getter) +
+        s"\n$dp@inline${if (getter.isOverride) " override"
         else ""} def ${safeIdent(prop.name)} = basis.${getter.name}\n"
     }
 
@@ -358,10 +360,9 @@ class ScaloidCodeGenerator(
       }
 
   def paramedType(tpe: ScalaType, define: Boolean = false): String =
-    tpe.name +
-    (if (define || !tpe.isVar)
-       " <: " + tpe.bounds.map(genType).mkString(" with ")
-     else "")
+    tpe.name + (if (define || !tpe.isVar)
+                  " <: " + tpe.bounds.map(genType).mkString(" with ")
+                else "")
 
   def paramedTypes(pTypes: List[ScalaType], define: Boolean = false) =
     if (pTypes.isEmpty) ""

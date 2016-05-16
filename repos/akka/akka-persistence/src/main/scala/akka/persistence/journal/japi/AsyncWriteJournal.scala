@@ -15,7 +15,9 @@ import scala.util.Failure
   * Java API: abstract journal, optimized for asynchronous, non-blocking writes.
   */
 abstract class AsyncWriteJournal
-    extends AsyncRecovery with SAsyncWriteJournal with AsyncWritePlugin {
+    extends AsyncRecovery
+    with SAsyncWriteJournal
+    with AsyncWritePlugin {
   import SAsyncWriteJournal.successUnit
   import context.dispatcher
 

@@ -34,7 +34,7 @@ object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
 
           val undefined = for {
             member <- getMembersToImplement(definition)
-                         if !member.isInstanceOf[ScAliasMember] // See SCL-2887
+            if !member.isInstanceOf[ScAliasMember] // See SCL-2887
           } yield {
             try {
               (member.getText, member.getParentNodeDelegate.getText)

@@ -180,9 +180,9 @@ class GenericTests {
     typed[Generic[(Int, String)] { type Repr = Int :: String :: HNil }](gen2)
 
     val gen3 = Generic[(Int, String, Boolean)]
-    typed[
-        Generic[(Int, String, Boolean)] { type Repr = Int :: String :: Boolean :: HNil }](
-        gen3)
+    typed[Generic[(Int, String, Boolean)] {
+          type Repr = Int :: String :: Boolean :: HNil
+        }](gen3)
   }
 
   @Test

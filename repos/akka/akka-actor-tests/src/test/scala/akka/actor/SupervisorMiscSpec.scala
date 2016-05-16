@@ -28,7 +28,8 @@ object SupervisorMiscSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class SupervisorMiscSpec
-    extends AkkaSpec(SupervisorMiscSpec.config) with DefaultTimeout {
+    extends AkkaSpec(SupervisorMiscSpec.config)
+    with DefaultTimeout {
 
   "A Supervisor" must {
 
@@ -40,8 +41,7 @@ class SupervisorMiscSpec
                         maxNrOfRetries = 3, withinTimeRange = 5 seconds)(List(
                             classOf[Exception])))))
 
-        val workerProps = Props(
-            new Actor {
+        val workerProps = Props(new Actor {
           override def postRestart(cause: Throwable) {
             countDownLatch.countDown()
           }

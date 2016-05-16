@@ -26,7 +26,7 @@ object IntervalSeqArbitrary {
     for {
       initial <- Gen.oneOf(true, false)
       edges <- Gen.resize(
-          count, Gen.containerOf[Array, Int](Gen.choose(min, max)))
+                  count, Gen.containerOf[Array, Int](Gen.choose(min, max)))
       support = edges.sorted.distinct
       kind <- Gen.containerOfN[Array, Int](support.length, Gen.oneOf(0, 1, 2))
     } yield makeProfileXor(initial, support, kind)

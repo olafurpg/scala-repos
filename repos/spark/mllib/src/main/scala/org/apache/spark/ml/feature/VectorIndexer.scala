@@ -38,7 +38,9 @@ import org.apache.spark.util.collection.OpenHashSet
 
 /** Private trait for params for VectorIndexer and VectorIndexerModel */
 private[ml] trait VectorIndexerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /**
     * Threshold for the number of values a categorical feature can take.
@@ -98,7 +100,8 @@ private[ml] trait VectorIndexerParams
   */
 @Experimental
 class VectorIndexer(override val uid: String)
-    extends Estimator[VectorIndexerModel] with VectorIndexerParams
+    extends Estimator[VectorIndexerModel]
+    with VectorIndexerParams
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vecIdx"))
@@ -278,7 +281,8 @@ class VectorIndexerModel private[ml](
     override val uid: String,
     val numFeatures: Int,
     val categoryMaps: Map[Int, Map[Double, Int]])
-    extends Model[VectorIndexerModel] with VectorIndexerParams
+    extends Model[VectorIndexerModel]
+    with VectorIndexerParams
     with MLWritable {
 
   import VectorIndexerModel._
@@ -355,7 +359,7 @@ class VectorIndexerModel private[ml](
           var catFeatureIdx = 0 // index into sortedCatFeatureIndices
           var k = 0 // index into non-zero elements of sparse vector
           while (catFeatureIdx < sortedCatFeatureIndices.length &&
-          k < tmpv.indices.length) {
+                 k < tmpv.indices.length) {
             val featureIndex = sortedCatFeatureIndices(catFeatureIdx)
             if (featureIndex < tmpv.indices(k)) {
               catFeatureIdx += 1

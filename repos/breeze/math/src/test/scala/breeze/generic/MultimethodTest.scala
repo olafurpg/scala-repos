@@ -29,7 +29,8 @@ class MultimethodTest extends FunSuite with Checkers {
   trait DM extends M
 
   class MM
-      extends Multimethod2[Function2, T, T, Symbol] with ((T, T) => Symbol)
+      extends Multimethod2[Function2, T, T, Symbol]
+      with ((T, T) => Symbol)
   class MMPrim
       extends Multimethod2[Function2, T, Double, Symbol]
       with ((T, Double) => Symbol)

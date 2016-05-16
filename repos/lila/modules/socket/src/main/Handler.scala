@@ -15,8 +15,8 @@ import Step.openingWriter
 object Handler {
 
   type Controller = PartialFunction[(String, JsObject), Unit]
-  type Connecter = PartialFunction[
-      Any, (Controller, JsEnumerator, SocketMember)]
+  type Connecter =
+    PartialFunction[Any, (Controller, JsEnumerator, SocketMember)]
 
   val emptyController: Controller = PartialFunction.empty
 

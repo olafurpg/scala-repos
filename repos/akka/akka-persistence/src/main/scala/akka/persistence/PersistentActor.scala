@@ -168,7 +168,9 @@ trait PersistentActor extends Eventsourced with PersistenceIdentity {
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class UntypedPersistentActor
-    extends UntypedActor with Eventsourced with PersistenceIdentity {
+    extends UntypedActor
+    with Eventsourced
+    with PersistenceIdentity {
 
   final def onReceive(message: Any) = onReceiveCommand(message)
 
@@ -258,8 +260,8 @@ abstract class UntypedPersistentActor
     * @param handler handler for each persisted `events`
     */
   def persistAllAsync[A](events: JIterable[A], handler: Procedure[A]): Unit =
-    super [Eventsourced].persistAllAsync(Util.immutableSeq(events))(
-        event ⇒ handler(event))
+    super [Eventsourced].persistAllAsync(Util.immutableSeq(events))(event ⇒
+          handler(event))
 
   /**
     * Defer the handler execution until all pending handlers have been executed.
@@ -311,7 +313,9 @@ abstract class UntypedPersistentActor
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class AbstractPersistentActor
-    extends AbstractActor with PersistentActor with Eventsourced {
+    extends AbstractActor
+    with PersistentActor
+    with Eventsourced {
 
   /**
     * Java API: asynchronously persists `event`. On successful persistence, `handler` is called with the

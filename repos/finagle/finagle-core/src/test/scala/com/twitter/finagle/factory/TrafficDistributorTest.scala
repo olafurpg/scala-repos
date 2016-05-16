@@ -352,7 +352,7 @@ class TrafficDistributorTest extends FunSuite {
         dest = Activity(dest),
         newEndpoint = newEndpoint,
         newBalancer = DefaultBalancerFactory.newBalancer(
-              _, NullStatsReceiver, new NoBrokersAvailableException("test")),
+            _, NullStatsReceiver, new NoBrokersAvailableException("test")),
         eagerEviction = true,
         statsReceiver = NullStatsReceiver,
         rng = Rng("seed".hashCode)

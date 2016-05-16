@@ -52,7 +52,8 @@ trait MongoDocument[BaseDocument] extends JsonObject[BaseDocument] {
  * extend case class companion objects with this trait
  */
 trait MongoDocumentMeta[BaseDocument]
-    extends JsonObjectMeta[BaseDocument] with MongoMeta[BaseDocument] {
+    extends JsonObjectMeta[BaseDocument]
+    with MongoMeta[BaseDocument] {
 
   /**
     * Override this to specify a ConnectionIdentifier.
@@ -126,13 +127,12 @@ trait MongoDocumentMeta[BaseDocument]
     import scala.collection.JavaConversions._
 
     MongoDB.useCollection(connectionIdentifier, collectionName)(
-        coll =>
-          {
+        coll => {
 
-        /** Mongo Cursors are both Iterable and Iterator,
-          * so we need to reduce ambiguity for implicits
-          */
-        (coll.find: Iterator[DBObject]).map(create).toList
+      /** Mongo Cursors are both Iterable and Iterator,
+        * so we need to reduce ambiguity for implicits
+        */
+      (coll.find: Iterator[DBObject]).map(create).toList
     })
   }
 
@@ -146,28 +146,21 @@ trait MongoDocumentMeta[BaseDocument]
 
     val findOpts = opts.toList
 
-    MongoDB.useCollection(connectionIdentifier, collectionName)(coll =>
-          {
-        val cur = coll
-          .find(qry)
-          .limit(
-              findOpts
-                .find(_.isInstanceOf[Limit])
-                .map(x => x.value)
-                .getOrElse(0)
-            )
-          .skip(
-              findOpts
-                .find(_.isInstanceOf[Skip])
-                .map(x => x.value)
-                .getOrElse(0)
-            )
-        sort.foreach(s => cur.sort(s))
+    MongoDB.useCollection(connectionIdentifier, collectionName)(coll => {
+      val cur = coll
+        .find(qry)
+        .limit(
+            findOpts.find(_.isInstanceOf[Limit]).map(x => x.value).getOrElse(0)
+        )
+        .skip(
+            findOpts.find(_.isInstanceOf[Skip]).map(x => x.value).getOrElse(0)
+        )
+      sort.foreach(s => cur.sort(s))
 
-        /** Mongo Cursors are both Iterable and Iterator,
-          * so we need to reduce ambiguity for implicits
-          */
-        (cur: Iterator[DBObject]).map(create).toList
+      /** Mongo Cursors are both Iterable and Iterator,
+        * so we need to reduce ambiguity for implicits
+        */
+      (cur: Iterator[DBObject]).map(create).toList
     })
   }
 
@@ -217,10 +210,8 @@ trait MongoDocumentMeta[BaseDocument]
    * Save a document to the db
    */
   def save(in: BaseDocument) {
-    MongoDB.use(connectionIdentifier)(
-        db =>
-          {
-        save(in, db)
+    MongoDB.use(connectionIdentifier)(db => {
+      save(in, db)
     })
   }
 
@@ -242,10 +233,8 @@ trait MongoDocumentMeta[BaseDocument]
    * Update document with a JObject query
    */
   def update(qry: JObject, newbd: BaseDocument, opts: UpdateOption*) {
-    MongoDB.use(connectionIdentifier)(
-        db =>
-          {
-        update(qry, newbd, db, opts: _*)
+    MongoDB.use(connectionIdentifier)(db => {
+      update(qry, newbd, db, opts: _*)
     })
   }
 }

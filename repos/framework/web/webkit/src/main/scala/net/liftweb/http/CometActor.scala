@@ -277,7 +277,8 @@ trait ListenerManager { self: SimpleActor[Any] =>
   * to get a Java-usable LiftActorJ with ListenerManager
   */
 abstract class LiftActorJWithListenerManager
-    extends LiftActorJ with ListenerManager {
+    extends LiftActorJ
+    with ListenerManager {
   protected override def messageHandler: PartialFunction[Any, Unit] =
     highPriority orElse mediumPriority orElse listenerService orElse lowPriority orElse _messageHandler
 }
@@ -314,7 +315,8 @@ trait CometListener extends BaseCometActor { self: BaseCometActor =>
 }
 
 trait LiftCometActor
-    extends TypedActor[Any, Any] with ForwardableActor[Any, Any]
+    extends TypedActor[Any, Any]
+    with ForwardableActor[Any, Any]
     with Dependent {
   def uniqueId: String
 
@@ -438,7 +440,8 @@ abstract class CometActorJ extends LiftActorJ with CometActor {
   * CometListeners
   */
 abstract class CometActorJWithCometListener
-    extends CometActorJ with CometListener {
+    extends CometActorJ
+    with CometListener {
   override def lowPriority = _messageHandler
 }
 
@@ -460,7 +463,9 @@ trait MessageCometActor extends BaseCometActor {
   * Takes care of the plumbing for building Comet-based Web Apps
   */
 trait BaseCometActor
-    extends LiftActor with LiftCometActor with CssBindImplicits {
+    extends LiftActor
+    with LiftCometActor
+    with CssBindImplicits {
   private val logger = Logger(classOf[CometActor])
   val uniqueId = Helpers.nextFuncName
   private var spanId = uniqueId
@@ -541,10 +546,9 @@ trait BaseCometActor
     new ListBuffer[(NoticeType.Value, NodeSeq, Box[String])]
 
   private var _deltaPruner: (BaseCometActor,
-  List[Delta]) => List[Delta] = (actor, d) =>
-    {
-      val m = Helpers.millis
-      d.filter(d => (m - d.timestamp) < 120000L)
+                             List[Delta]) => List[Delta] = (actor, d) => {
+    val m = Helpers.millis
+    d.filter(d => (m - d.timestamp) < 120000L)
   }
 
   private var _theSession: LiftSession = _
@@ -986,7 +990,7 @@ trait BaseCometActor
     case ShutdownIfPastLifespan =>
       for {
         ls <- lifespan if listeners.isEmpty &&
-             (lastListenerTime + ls.millis + 1000l) < millis
+        (lastListenerTime + ls.millis + 1000l) < millis
       } {
         this ! ShutDown
       }
@@ -1447,11 +1451,11 @@ private[http] class XmlOrJsCmd(
          notices)
 
   val xml = _xml.flatMap(content =>
-        S.session.map(
-            s => s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
+        S.session.map(s =>
+              s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
   val fixedXhtml = _fixedXhtml.flatMap(content =>
-        S.session.map(
-            s => s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
+        S.session.map(s =>
+              s.processSurroundAndInclude("JS SetHTML id: " + id, content)))
 
   /**
     * Returns the JsCmd that will be sent to client

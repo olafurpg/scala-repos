@@ -163,8 +163,8 @@ class ScalaIntroduceParameterDialog(project: Project,
     typeCombobox = new ComboBox()
     val typeLabel = new JLabel("Type:")
     typeLabel.setLabelFor(typeCombobox)
-    typeMap = ScalaRefactoringUtil.getCompatibleTypeNames(
-        introduceData.possibleTypes)
+    typeMap =
+      ScalaRefactoringUtil.getCompatibleTypeNames(introduceData.possibleTypes)
     for (typeName <- typeMap.keySet.asScala) {
       JListCompatibility.addItem(typeCombobox, typeName)
     }
@@ -201,8 +201,8 @@ class ScalaIntroduceParameterDialog(project: Project,
     defaultForIntroducedTextField.addDocumentListener(
         new DocumentAdapter {
       override def documentChanged(e: DocumentEvent): Unit = {
-        introducedParamTableItem.foreach(
-            _.parameter.defaultValue = defaultForIntroducedTextField.getText.trim)
+        introducedParamTableItem.foreach(_.parameter.defaultValue =
+              defaultForIntroducedTextField.getText.trim)
       }
     })
     IJSwingUtilities.adjustComponentsOnMac(

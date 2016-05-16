@@ -60,12 +60,12 @@ trait BiNaturalTransformation[-F[_, _], +G[_, _]] { self =>
 
 /** A constrained natural transformation */
 trait ConstrainedNaturalTransformation[F[_], G[_], E[_]] {
-  def apply[A : E](f: F[A]): G[A]
+  def apply[A: E](f: F[A]): G[A]
 }
 
 /** A constrained transformation natural in both sides of a bifunctor */
 trait BiConstrainedNaturalTransformation[F[_, _], G[_, _], C[_], E[_]] {
-  def apply[A : C, B : E](f: F[A, B]): G[A, B]
+  def apply[A: C, B: E](f: F[A, B]): G[A, B]
 }
 
 trait DiNaturalTransformation[F[_, _], G[_, _]] {

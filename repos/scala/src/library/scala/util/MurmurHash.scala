@@ -184,13 +184,12 @@ object MurmurHash {
     var a, b, n = 0
     var c = 1
     xs.seq.foreach(
-        i =>
-          {
-        val h = i.##
-        a += h
-        b ^= h
-        if (h != 0) c *= h
-        n += 1
+        i => {
+      val h = i.##
+      a += h
+      b ^= h
+      if (h != 0) c *= h
+      n += 1
     })
     var h = startHash(seed * n)
     h = extendHash(h, a, storedMagicA(0), storedMagicB(0))

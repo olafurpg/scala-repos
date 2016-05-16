@@ -48,8 +48,7 @@ final case class QueryT[Q[+ _], M[+ _], +A](run: M[Q[A]]) {
 
   def flatMap[B](f: A => QueryT[Q, M, B])(
       implicit M: Monad[M], Q: SwappableMonad[Q]): QueryT[Q, M, B] = {
-    QueryT(
-        run flatMap { (state0: Q[A]) =>
+    QueryT(run flatMap { (state0: Q[A]) =>
       Q.swap(state0 map f map (_.run)) map { _ flatMap identity }
     })
   }

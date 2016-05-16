@@ -27,7 +27,8 @@ import akka.protobuf.MessageLite
   */
 private[akka] class ClusterShardingMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
   import ShardCoordinator.Internal._
   import Shard.{GetShardStats, ShardStats}
   import Shard.{State ⇒ EntityState, EntityStarted, EntityStopped}

@@ -61,10 +61,9 @@ object FailureAccrualFactory {
       perturbation: Float = 0.1f,
       rand: Random = rng
   ): () => Duration =
-    () =>
-      {
-        val ms = markDeadFor.inMilliseconds
-        (ms + ms * rand.nextFloat() * perturbation).toInt.milliseconds
+    () => {
+      val ms = markDeadFor.inMilliseconds
+      (ms + ms * rand.nextFloat() * perturbation).toInt.milliseconds
     }
 
   val role = Stack.Role("FailureAccrual")
@@ -112,8 +111,7 @@ object FailureAccrualFactory {
     *      for more details.
     */
   def Param(numFailures: Int, markDeadFor: () => Duration): Param =
-    Param.Configured(
-        () =>
+    Param.Configured(() =>
           FailureAccrualPolicy.consecutiveFailures(
               numFailures, Backoff.fromFunction(markDeadFor)))
 
@@ -127,8 +125,7 @@ object FailureAccrualFactory {
     *      for more details.
     */
   def Param(numFailures: Int, markDeadFor: Duration): Param =
-    Param.Configured(
-        () =>
+    Param.Configured(() =>
           FailureAccrualPolicy.consecutiveFailures(
               numFailures, Backoff.const(markDeadFor)))
 

@@ -124,8 +124,7 @@ class Signature(val name: String,
     }
 
     ScalaPsiUtil.convertMemberName(name) == ScalaPsiUtil.convertMemberName(
-        other.name) &&
-    ((typeParams.length == other.typeParams.length &&
+        other.name) && ((typeParams.length == other.typeParams.length &&
             paramTypesEquiv(other)) ||
         (paramLength == other.paramLength && javaErasedEquiv(other))) &&
     fieldCheck(other)
@@ -245,9 +244,10 @@ object Signature {
     while (iterator1.hasNext && iterator2.hasNext) {
       val (tp1, tp2) = (iterator1.next(), iterator2.next())
 
-      res = res bindT
-      ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
-          ScTypeParameterType.toTypeParameterType(tp1))
+      res =
+        res bindT
+        ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
+            ScTypeParameterType.toTypeParameterType(tp1))
     }
     res
   }

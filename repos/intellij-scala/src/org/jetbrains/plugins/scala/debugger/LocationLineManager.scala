@@ -175,8 +175,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
           }
         }
 
-        val iconst_0Locations = caseLineLocations.filter(
-            l => BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
+        val iconst_0Locations = caseLineLocations.filter(l =>
+              BytecodeUtil.isIconst_0(l.codeIndex().toInt, bytecodes))
 
         iconst_0Locations.foreach { l =>
           cacheCustomLine(l, -1)
@@ -200,8 +200,8 @@ trait LocationLineManager { self: ScalaPositionManager =>
             _.filter(!customizedLocationsCache.contains(_)))
         val repeating = notCustomizedYet.filter(_.size > 1)
         val lastLocations = repeating.map(_.last)
-        val withStoreCode = for (loc <- lastLocations; code <- storeCode(loc)) yield
-          (loc, code)
+        val withStoreCode =
+          for (loc <- lastLocations; code <- storeCode(loc)) yield (loc, code)
         val (locationsToSkip, codes) = withStoreCode.unzip
         if (codes.distinct.size != 1) return
 
@@ -259,7 +259,7 @@ trait LocationLineManager { self: ScalaPositionManager =>
         for {
           m <- methods
           caseLinesLocations = caseLines.map(locationsOfLine(m, _))
-              if caseLinesLocations.exists(_.nonEmpty)
+          if caseLinesLocations.exists(_.nonEmpty)
         } {
           skipTypeCheckOptimization(m, caseLinesLocations.flatten)
           skipReturnValueAssignment(m, caseLinesLocations)

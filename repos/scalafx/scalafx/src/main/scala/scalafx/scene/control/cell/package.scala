@@ -174,8 +174,8 @@ package object cell {
     * @tparam J Original Java type used by converter.
     */
   type StateSelectable[J] = {
-    def selectedStateCallbackProperty(): jfxbp.ObjectProperty[jfxu.Callback[
-            J, jfxbv.ObservableValue[java.lang.Boolean]]]
+    def selectedStateCallbackProperty(): jfxbp.ObjectProperty[
+        jfxu.Callback[J, jfxbv.ObservableValue[java.lang.Boolean]]]
   }
 
   /**

@@ -7,7 +7,8 @@ import cats.syntax.all._
   * Laws that must be obeyed by any `MonadCombine`.
   */
 trait MonadCombineLaws[F[_]]
-    extends MonadFilterLaws[F] with AlternativeLaws[F] {
+    extends MonadFilterLaws[F]
+    with AlternativeLaws[F] {
   implicit override def F: MonadCombine[F]
 
   def monadCombineLeftDistributivity[A, B](

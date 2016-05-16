@@ -5,7 +5,7 @@ import makeTimeout.large
 
 import play.api.libs.json.Writes
 
-final class PaginatorBuilder[A, Q : Writes](
+final class PaginatorBuilder[A, Q: Writes](
     searchApi: SearchReadApi[A, Q], maxPerPage: Int) {
 
   def apply(query: Q, page: Int): Fu[Paginator[A]] =

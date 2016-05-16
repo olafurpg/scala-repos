@@ -17,11 +17,11 @@ import scala.util.control.NonFatal
   * @param serverProvider *Experimental API; subject to change* The type of
   * server to use. If not provided, uses Play's default provider.
   */
-case class TestServer(
-    port: Int,
-    application: Application = GuiceApplicationBuilder().build(),
-    sslPort: Option[Int] = None,
-    serverProvider: Option[ServerProvider] = None) {
+case class TestServer(port: Int,
+                      application: Application =
+                        GuiceApplicationBuilder().build(),
+                      sslPort: Option[Int] = None,
+                      serverProvider: Option[ServerProvider] = None) {
 
   private var testServerProcess: TestServerProcess = _
 

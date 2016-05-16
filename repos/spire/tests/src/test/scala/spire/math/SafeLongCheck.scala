@@ -10,7 +10,9 @@ import prop._
 import spire.util.Opt
 
 class SafeLongCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   import SafeLong.zero
 

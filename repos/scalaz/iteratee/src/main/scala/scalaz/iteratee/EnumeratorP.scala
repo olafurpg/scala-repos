@@ -135,13 +135,13 @@ trait EnumeratorPFunctions {
       }
     }
 
-  def mergeE[E : Order, F[_]: Monad] = liftE2[E, E, E, F] {
+  def mergeE[E: Order, F[_]: Monad] = liftE2[E, E, E, F] {
     new ForallM[λ[β[_] => Enumeratee2T[E, E, E, β]]] {
       def apply[G[_]: Monad] = mergeI[E, G]
     }
   }
 
-  def mergeAll[E : Order, F[_]: Monad](
+  def mergeAll[E: Order, F[_]: Monad](
       enumerators: EnumeratorP[E, F]*): EnumeratorP[E, F] = {
     @tailrec
     def mergeOne(

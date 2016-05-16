@@ -23,7 +23,9 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 import org.apache.spark.SparkFunSuite
 
 class ContainerPlacementStrategySuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterEach {
 
   private val yarnAllocatorSuite = new YarnAllocatorSuite
   import yarnAllocatorSuite._

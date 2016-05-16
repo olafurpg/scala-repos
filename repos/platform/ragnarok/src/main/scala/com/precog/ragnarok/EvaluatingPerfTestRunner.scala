@@ -47,7 +47,9 @@ import scalaz._
 import scalaz.syntax.monad._
 
 trait PerfTestRunnerConfig
-    extends BaseConfig with IdSourceConfig with ColumnarTableModuleConfig {
+    extends BaseConfig
+    with IdSourceConfig
+    with ColumnarTableModuleConfig {
 
   def optimize: Boolean
   def apiKey: APIKey
@@ -67,7 +69,8 @@ trait EvaluatingPerfTestRunnerConfig extends PerfTestRunnerConfig {
 }
 
 trait EvaluatingPerfTestRunner[M[+ _], T]
-    extends ParseEvalStack[M] with IdSourceScannerModule
+    extends ParseEvalStack[M]
+    with IdSourceScannerModule
     with PerfTestRunner[M, T] {
 
   type Result = Int
@@ -111,9 +114,9 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
         case Right(dag) =>
           for {
             table <- Evaluator(M).eval(
-                dag, dummyEvaluationContext, yggConfig.optimize)
+                        dag, dummyEvaluationContext, yggConfig.optimize)
             size <- Timing.timeM("Counting stream")(
-                countStream(table.renderJson("", ",", "")))
+                       countStream(table.renderJson("", ",", "")))
           } yield size
       }
     } catch {

@@ -40,9 +40,8 @@ import org.apache.spark.streaming.rdd.{MapWithStateRDD, MapWithStateRDDRecord}
   * @tparam MappedType Class of the mapped data
   */
 @Experimental
-sealed abstract class MapWithStateDStream[
-    KeyType, ValueType, StateType, MappedType : ClassTag](
-    ssc: StreamingContext)
+sealed abstract class MapWithStateDStream[KeyType, ValueType, StateType,
+    MappedType: ClassTag](ssc: StreamingContext)
     extends DStream[MappedType](ssc) {
 
   /** Return a pair DStream where each RDD is the snapshot of the state of all the keys. */
@@ -50,10 +49,10 @@ sealed abstract class MapWithStateDStream[
 }
 
 /** Internal implementation of the [[MapWithStateDStream]] */
-private[streaming] class MapWithStateDStreamImpl[KeyType : ClassTag,
-                                                 ValueType : ClassTag,
-                                                 StateType : ClassTag,
-                                                 MappedType : ClassTag](
+private[streaming] class MapWithStateDStreamImpl[KeyType: ClassTag,
+                                                 ValueType: ClassTag,
+                                                 StateType: ClassTag,
+                                                 MappedType: ClassTag](
     dataStream: DStream[(KeyType, ValueType)],
     spec: StateSpecImpl[KeyType, ValueType, StateType, MappedType])
     extends MapWithStateDStream[KeyType, ValueType, StateType, MappedType](
@@ -111,7 +110,7 @@ private[streaming] class MapWithStateDStreamImpl[KeyType : ClassTag,
   * @tparam E   Type of the mapped data
   */
 private[streaming] class InternalMapWithStateDStream[
-    K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
+    K: ClassTag, V: ClassTag, S: ClassTag, E: ClassTag](
     parent: DStream[(K, V)], spec: StateSpecImpl[K, V, S, E])
     extends DStream[MapWithStateRDDRecord[K, S, E]](parent.context) {
 
@@ -133,7 +132,8 @@ private[streaming] class InternalMapWithStateDStream[
   /** Override the default checkpoint duration */
   override def initialize(time: Time): Unit = {
     if (checkpointDuration == null) {
-      checkpointDuration = slideDuration * DEFAULT_CHECKPOINT_DURATION_MULTIPLIER
+      checkpointDuration =
+        slideDuration * DEFAULT_CHECKPOINT_DURATION_MULTIPLIER
     }
     super.initialize(time)
   }

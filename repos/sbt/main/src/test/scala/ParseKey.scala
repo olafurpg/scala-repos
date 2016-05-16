@@ -21,65 +21,64 @@ object ParseKey extends Properties("Key parser test") {
   implicit val gstructure = genStructure
 
   property(
-      "An explicitly specified axis is always parsed to that explicit value") = forAllNoShrink(
-      structureDefinedKey) { (skm: StructureKeyMask) =>
-    import skm.{structure, key, mask}
+      "An explicitly specified axis is always parsed to that explicit value") =
+    forAllNoShrink(structureDefinedKey) { (skm: StructureKeyMask) =>
+      import skm.{structure, key, mask}
 
-    val expected = resolve(structure, key, mask)
-    val string = displayMasked(key, mask)
+      val expected = resolve(structure, key, mask)
+      val string = displayMasked(key, mask)
 
-    ("Key: " + displayFull(key)) |: parseExpected(
-        structure, string, expected, mask)
-  }
-
-  property("An unspecified project axis resolves to the current project") = forAllNoShrink(
-      structureDefinedKey) { (skm: StructureKeyMask) =>
-    import skm.{structure, key}
-
-    val mask = skm.mask.copy(project = false)
-    val string = displayMasked(key, mask)
-
-    ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
-    ("Current: " + structure.current) |: parse(structure, string) {
-      case Left(err) => false
-      case Right(sk) => sk.scope.project == Select(structure.current)
+      ("Key: " + displayFull(key)) |: parseExpected(
+          structure, string, expected, mask)
     }
-  }
 
-  property("An unspecified task axis resolves to Global") = forAllNoShrink(
-      structureDefinedKey) { (skm: StructureKeyMask) =>
-    import skm.{structure, key}
-    val mask = skm.mask.copy(task = false)
-    val string = displayMasked(key, mask)
+  property("An unspecified project axis resolves to the current project") =
+    forAllNoShrink(structureDefinedKey) { (skm: StructureKeyMask) =>
+      import skm.{structure, key}
 
-    ("Key: " + displayFull(key)) |: ("Mask: " + mask) |: parse(structure,
-                                                               string) {
-      case Left(err) => false
-      case Right(sk) => sk.scope.task == Global
-    }
-  }
-
-  property(
-      "An unspecified configuration axis resolves to the first configuration directly defining the key or else Global") = forAllNoShrink(
-      structureDefinedKey) { (skm: StructureKeyMask) =>
-    import skm.{structure, key}
-    val mask = ScopeMask(config = false)
-    val string = displayMasked(key, mask)
-    val resolvedConfig = Resolve
-      .resolveConfig(structure.extra, key.key, mask)(key.scope)
-      .config
+      val mask = skm.mask.copy(project = false)
+      val string = displayMasked(key, mask)
 
       ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
-    ("Expected configuration: " +
-        resolvedConfig.map(_.name)) |: parse(structure, string) {
-      case Right(sk) => sk.scope.config == resolvedConfig
-      case Left(err) => false
+      ("Current: " + structure.current) |: parse(structure, string) {
+        case Left(err) => false
+        case Right(sk) => sk.scope.project == Select(structure.current)
+      }
     }
-  }
+
+  property("An unspecified task axis resolves to Global") =
+    forAllNoShrink(structureDefinedKey) { (skm: StructureKeyMask) =>
+      import skm.{structure, key}
+      val mask = skm.mask.copy(task = false)
+      val string = displayMasked(key, mask)
+
+      ("Key: " + displayFull(key)) |: ("Mask: " + mask) |: parse(structure,
+                                                                 string) {
+        case Left(err) => false
+        case Right(sk) => sk.scope.task == Global
+      }
+    }
+
+  property(
+      "An unspecified configuration axis resolves to the first configuration directly defining the key or else Global") =
+    forAllNoShrink(structureDefinedKey) { (skm: StructureKeyMask) =>
+      import skm.{structure, key}
+      val mask = ScopeMask(config = false)
+      val string = displayMasked(key, mask)
+      val resolvedConfig =
+        Resolve.resolveConfig(structure.extra, key.key, mask)(key.scope).config
+
+      ("Key: " + displayFull(key)) |: ("Mask: " + mask) |:
+      ("Expected configuration: " +
+          resolvedConfig.map(_.name)) |: parse(structure, string) {
+        case Right(sk) => sk.scope.config == resolvedConfig
+        case Left(err) => false
+      }
+    }
 
   lazy val structureDefinedKey: Gen[StructureKeyMask] = structureKeyMask { s =>
     for (scope <- TestBuild.scope(s.env);
-    key <- oneOf(s.allAttributeKeys.toSeq)) yield ScopedKey(scope, key)
+         key <- oneOf(s.allAttributeKeys.toSeq)) yield ScopedKey(scope, key)
   }
   def structureKeyMask(genKey: Structure => Gen[ScopedKey[_]])(
       implicit maskGen: Gen[ScopeMask],

@@ -59,8 +59,7 @@ import scala.collection.JavaConverters._
   *
   */
 private[kafka] class ZookeeperConsumerConnector(
-    val config: ConsumerConfig,
-    val enableFetcher: Boolean) // for testing only
+    val config: ConsumerConfig, val enableFetcher: Boolean) // for testing only
     extends ConsumerConnector {
 
   private val underlying =

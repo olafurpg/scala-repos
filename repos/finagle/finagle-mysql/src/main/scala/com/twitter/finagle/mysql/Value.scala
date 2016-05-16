@@ -67,7 +67,8 @@ private[mysql] trait Extractable[A] {
   */
 class TimestampValue(
     val injectionTimeZone: TimeZone, val extractionTimeZone: TimeZone)
-    extends Injectable[Timestamp] with Extractable[Timestamp] {
+    extends Injectable[Timestamp]
+    with Extractable[Timestamp] {
 
   /**
     * Injects a [[java.sql.Timestamp]] into a
@@ -323,7 +324,8 @@ object DateValue extends Injectable[Date] with Extractable[Date] {
 }
 
 object BigDecimalValue
-    extends Injectable[BigDecimal] with Extractable[BigDecimal] {
+    extends Injectable[BigDecimal]
+    with Extractable[BigDecimal] {
   def apply(b: BigDecimal): Value = {
     val str = b.toString.getBytes(Charset(Charset.Binary))
     RawValue(Type.NewDecimal, Charset.Binary, true, str)

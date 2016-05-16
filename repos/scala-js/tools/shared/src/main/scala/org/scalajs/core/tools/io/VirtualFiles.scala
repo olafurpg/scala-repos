@@ -121,7 +121,8 @@ object VirtualJSFile {
 }
 
 trait WritableVirtualJSFile
-    extends WritableVirtualTextFile with VirtualJSFile {
+    extends WritableVirtualTextFile
+    with VirtualJSFile {
   def sourceMapWriter: Writer
 }
 
@@ -145,7 +146,8 @@ trait VirtualScalaJSIRFile extends VirtualFile {
 /** Base trait for virtual Scala.js IR files that are serialized as binary file.
   */
 trait VirtualSerializedScalaJSIRFile
-    extends VirtualBinaryFile with VirtualScalaJSIRFile {
+    extends VirtualBinaryFile
+    with VirtualScalaJSIRFile {
 
   /** Class info of this file. */
   override def info: ir.Infos.ClassInfo = {
@@ -177,7 +179,7 @@ trait VirtualSerializedScalaJSIRFile
       val tree = ir.Serializers
         .deserialize(stream, version)
         .asInstanceOf[ir.Trees.ClassDef]
-        (info, tree)
+      (info, tree)
     } catch {
       case e: IOException =>
         throw new IOException(s"Failed to deserialize $path", e)

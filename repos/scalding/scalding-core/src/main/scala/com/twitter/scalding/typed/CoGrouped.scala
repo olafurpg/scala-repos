@@ -48,12 +48,13 @@ object CoGroupable {
   /*
    * This is the default empty join function needed for CoGroupable and HashJoinable
    */
-  def castingJoinFunction[V]: (Any, Iterator[CTuple],
-  Seq[Iterable[CTuple]]) => Iterator[V] = { (k, iter, empties) =>
-    assert(
-        empties.isEmpty,
-        "this join function should never be called with non-empty right-most")
-    iter.map(_.getObject(Grouped.ValuePosition).asInstanceOf[V])
+  def castingJoinFunction[V]
+    : (Any, Iterator[CTuple], Seq[Iterable[CTuple]]) => Iterator[V] = {
+    (k, iter, empties) =>
+      assert(
+          empties.isEmpty,
+          "this join function should never be called with non-empty right-most")
+      iter.map(_.getObject(Grouped.ValuePosition).asInstanceOf[V])
   }
 }
 
@@ -61,7 +62,9 @@ object CoGroupable {
   * Represents something than can be CoGrouped with another CoGroupable
   */
 trait CoGroupable[K, +R]
-    extends HasReducers with HasDescription with java.io.Serializable {
+    extends HasReducers
+    with HasDescription
+    with java.io.Serializable {
 
   /**
     * This is the list of mapped pipes, just before the (reducing) joinFunction is applied
@@ -79,7 +82,7 @@ trait CoGroupable[K, +R]
     * would actually help anyone for it to be type-safe
     */
   protected def joinFunction: (K, Iterator[CTuple],
-  Seq[Iterable[CTuple]]) => Iterator[R]
+                               Seq[Iterable[CTuple]]) => Iterator[R]
 
   /**
     * Smaller is about average values/key not total size (that does not matter, but is
@@ -141,8 +144,10 @@ trait CoGroupable[K, +R]
 }
 
 trait CoGrouped[K, +R]
-    extends KeyedListLike[K, R, CoGrouped] with CoGroupable[K, R]
-    with WithReducers[CoGrouped[K, R]] with WithDescription[CoGrouped[K, R]] {
+    extends KeyedListLike[K, R, CoGrouped]
+    with CoGroupable[K, R]
+    with WithReducers[CoGrouped[K, R]]
+    with WithDescription[CoGrouped[K, R]] {
   override def withReducers(reds: Int) = {
     val self = this // the usual self => trick leads to serialization errors
     val joinF =
@@ -342,7 +347,7 @@ abstract class CoGroupedJoiner[K](
     inputSize: Int,
     getter: TupleGetter[K],
     @transient inJoinFunction: (K, Iterator[CTuple],
-    Seq[Iterable[CTuple]]) => Iterator[Any])
+                                Seq[Iterable[CTuple]]) => Iterator[Any])
     extends CJoiner {
 
   /**
@@ -395,10 +400,11 @@ abstract class CoGroupedJoiner[K](
 }
 
 // If all the input pipes are unique, this works:
-class DistinctCoGroupJoiner[K](count: Int,
-                               getter: TupleGetter[K],
-                               @transient joinF: (K, Iterator[CTuple],
-                               Seq[Iterable[CTuple]]) => Iterator[Any])
+class DistinctCoGroupJoiner[K](
+    count: Int,
+    getter: TupleGetter[K],
+    @transient joinF: (K, Iterator[CTuple],
+                       Seq[Iterable[CTuple]]) => Iterator[Any])
     extends CoGroupedJoiner[K](count, getter, joinF) {
   val distinctSize = count
   def distinctIndexOf(idx: Int) = idx

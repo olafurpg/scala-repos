@@ -149,8 +149,8 @@ object Pickler {
   }
 
   private def errorExpected(rd: Lexer, msg: => String) =
-    new UnpickleFailure("expected: " + msg + "\n" + "found   : " + rd.token,
-                        rd)
+    new UnpickleFailure(
+        "expected: " + msg + "\n" + "found   : " + rd.token, rd)
 
   private def nextSuccess[T](rd: Lexer, result: T) = {
     rd.nextToken()
@@ -159,7 +159,7 @@ object Pickler {
 
   /** The implicit `Pickler` value for type `T`. Equivalent to `implicitly[Pickler[T]]`.
     */
-  def pkl[T : Pickler] = implicitly[Pickler[T]]
+  def pkl[T: Pickler] = implicitly[Pickler[T]]
 
   /** A class representing `~`-pairs */
   case class ~[+S, +T](fst: S, snd: T)
@@ -221,7 +221,7 @@ object Pickler {
     }
     def unpickle(rd: Lexer) =
       for (x <- p.unpickle(rd);
-      y <- { rd.accept(','); qq.unpickle(rd).requireSuccess }) yield x ~ y
+           y <- { rd.accept(','); qq.unpickle(rd).requireSuccess }) yield x ~ y
   }
 
   /** Same as `p | q`
@@ -273,7 +273,7 @@ object Pickler {
     *  What's usually done instead is that the iterator pickler is wrapped and labelled
     *  to handle other kinds of sequences.
     */
-  implicit def iterPickler[T : Pickler]: Pickler[Iterator[T]] =
+  implicit def iterPickler[T: Pickler]: Pickler[Iterator[T]] =
     new Pickler[Iterator[T]] {
       lazy val p = pkl[T]
       def pickle(wr: Writer, xs: Iterator[T]) {
@@ -352,7 +352,7 @@ object Pickler {
   }
 
   /** A pickler for pairs, represented as `~`-pairs */
-  implicit def tuple2Pickler[T1 : Pickler, T2 : Pickler]: Pickler[(T1, T2)] =
+  implicit def tuple2Pickler[T1: Pickler, T2: Pickler]: Pickler[(T1, T2)] =
     (pkl[T1] ~ pkl[T2]).wrapped { case x1 ~ x2 => (x1, x2) } {
       case (x1, x2) => x1 ~ x2
     }.labelled("tuple2")
@@ -367,7 +367,7 @@ object Pickler {
     }.labelled("tuple3")
 
   /** A pickler for list values */
-  implicit def listPickler[T : Pickler]: Pickler[List[T]] =
+  implicit def listPickler[T: Pickler]: Pickler[List[T]] =
     iterPickler[T].wrapped { _.toList } { _.iterator }.labelled("scala.List")
 }
 

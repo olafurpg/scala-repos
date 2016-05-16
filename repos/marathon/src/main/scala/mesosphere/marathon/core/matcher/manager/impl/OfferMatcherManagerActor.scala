@@ -85,7 +85,8 @@ private[impl] class OfferMatcherManagerActor private (
     clock: Clock,
     conf: OfferMatcherManagerConfig,
     offersWantedObserver: Observer[Boolean])
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   private[this] var launchTokens: Int = 0
 

@@ -73,7 +73,8 @@ class ClusterSingletonManagerChaosMultiJvmNode7
 
 class ClusterSingletonManagerChaosSpec
     extends MultiNodeSpec(ClusterSingletonManagerChaosSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterSingletonManagerChaosSpec._
 
   override def initialParticipants = roles.size

@@ -70,12 +70,12 @@ class LibraryInjectorTest extends ModuleTestCase with ScalaVersion {
 
   override def setUpModule(): Unit = {
     super.setUpModule()
-    scalaLibraryLoader = new ScalaLibraryLoader(
-        getProject,
-        getModule,
-        myProject.getBasePath,
-        isIncludeReflectLibrary = true,
-        javaSdk = Some(getTestProjectJdk))
+    scalaLibraryLoader = new ScalaLibraryLoader(getProject,
+                                                getModule,
+                                                myProject.getBasePath,
+                                                isIncludeReflectLibrary = true,
+                                                javaSdk =
+                                                  Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
     addLibrary(testData(getTestName(false))

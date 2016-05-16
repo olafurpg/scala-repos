@@ -179,8 +179,8 @@ class GraphMatValueSpec extends AkkaSpec {
         "produce NotUsed when starting from Flow.via with transformation" in {
           var done = false
           Source.empty
-            .viaMat(Flow[Int].via(Flow[Int].mapMaterializedValue(
-                        _ ⇒ done = true)))(Keep.right)
+            .viaMat(Flow[Int].via(Flow[Int].mapMaterializedValue(_ ⇒
+                          done = true)))(Keep.right)
             .to(Sink.ignore)
             .run() should ===(akka.NotUsed)
           done should ===(true)

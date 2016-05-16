@@ -62,7 +62,8 @@ case class MapPartitions(func: Iterator[Any] => Iterator[Any],
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 
   override protected def doExecute(): RDD[InternalRow] = {
@@ -81,7 +82,8 @@ case class AppendColumns(func: Any => Any,
                          deserializer: Expression,
                          serializer: Seq[NamedExpression],
                          child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] =
     child.output ++ serializer.map(_.toAttribute)
@@ -118,7 +120,8 @@ case class MapGroups(func: (Any, Iterator[Any]) => TraversableOnce[Any],
                      groupingAttributes: Seq[Attribute],
                      dataAttributes: Seq[Attribute],
                      child: SparkPlan)
-    extends UnaryNode with ObjectOperator {
+    extends UnaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 
@@ -162,7 +165,8 @@ case class CoGroup(
     rightAttr: Seq[Attribute],
     left: SparkPlan,
     right: SparkPlan)
-    extends BinaryNode with ObjectOperator {
+    extends BinaryNode
+    with ObjectOperator {
 
   override def output: Seq[Attribute] = serializer.map(_.toAttribute)
 

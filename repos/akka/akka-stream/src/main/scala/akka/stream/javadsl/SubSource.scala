@@ -145,8 +145,7 @@ class SubSource[+Out, +Mat](
     */
   def mapConcat[T](
       f: function.Function[Out, java.lang.Iterable[T]]): SubSource[T, Mat] =
-    new SubSource(
-        delegate.mapConcat { elem ⇒
+    new SubSource(delegate.mapConcat { elem ⇒
       Util.immutableSeq(f(elem))
     })
 
@@ -381,9 +380,9 @@ class SubSource[+Out, +Mat](
     new SubSource(delegate.limitWeighted(n)(costFn.apply))
   }
 
-  def sliding(
-      n: Int,
-      step: Int = 1): SubSource[java.util.List[Out @uncheckedVariance], Mat] =
+  def sliding(n: Int,
+              step: Int =
+                1): SubSource[java.util.List[Out @uncheckedVariance], Mat] =
     new SubSource(delegate.sliding(n, step).map(_.asJava)) // TODO optimize to one step
 
   /**

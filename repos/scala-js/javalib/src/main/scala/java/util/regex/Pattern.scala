@@ -28,8 +28,8 @@ final class Pattern private (
        * jsRegExp and create a new one from there.
        */
       val jsFlags = {
-        (if (jsRegExp.global) "g" else "") +
-        (if (jsRegExp.ignoreCase) "i" else "") +
+        (if (jsRegExp.global) "g" else "") + (if (jsRegExp.ignoreCase) "i"
+                                              else "") +
         (if (jsRegExp.multiline) "m" else "")
       }
       new js.RegExp(jsRegExp.source, jsFlags)
@@ -51,7 +51,7 @@ final class Pattern private (
     var prevEnd = 0
 
     // Actually split original string
-    while ( (result.length < lim - 1) && matcher.find()) {
+    while ((result.length < lim - 1) && matcher.find()) {
       result.push(inputStr.substring(prevEnd, matcher.start))
       prevEnd = matcher.end
     }
@@ -116,8 +116,7 @@ object Pattern {
     var i = 0
     while (i < s.length) {
       val c = s.charAt(i)
-      result +=
-      ((c: @switch) match {
+      result += ((c: @switch) match {
             case '\\' | '.' | '(' | ')' | '[' | ']' | '{' | '}' | '|' | '?' |
                 '*' | '+' | '^' | '$' =>
               "\\" + c

@@ -43,9 +43,8 @@ trait BitVectorOps {
 
   @expand
   @expand.valify
-  implicit def bv_bv_Op[
-      @expand.args(OpAnd, OpOr, OpXor) Op <: OpType](implicit @expand.sequence[
-          Op]({ _ and _ }, { _ or _ }, { _ xor _ }) op: Op.InPlaceImpl2[
+  implicit def bv_bv_Op[@expand.args(OpAnd, OpOr, OpXor) Op <: OpType](
+      implicit @expand.sequence[Op]({ _ and _ }, { _ or _ }, { _ xor _ }) op: Op.InPlaceImpl2[
           java.util.BitSet, java.util.BitSet])
     : Op.Impl2[BitVector, BitVector, BitVector] =
     new Op.Impl2[BitVector, BitVector, BitVector] {

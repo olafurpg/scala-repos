@@ -27,7 +27,9 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite}
 
 class MesosSchedulerUtilsSuite
-    extends SparkFunSuite with Matchers with MockitoSugar {
+    extends SparkFunSuite
+    with Matchers
+    with MockitoSugar {
 
   // scalastyle:off structural.type
   // this is the documented way of generating fixtures in scalatest

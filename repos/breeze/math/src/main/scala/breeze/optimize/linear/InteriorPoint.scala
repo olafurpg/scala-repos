@@ -105,7 +105,7 @@ object InteriorPoint {
 
   private def lineSearch(x: DenseVector[Double], dx: Vector[Double]): Double = {
     var alpha = 1.0
-    while ( (x + dx * alpha).valuesIterator.exists(_ < 0)) alpha *= .8
+    while ((x + dx * alpha).valuesIterator.exists(_ < 0)) alpha *= .8
     alpha
   }
 

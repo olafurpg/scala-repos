@@ -35,7 +35,9 @@ import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart}
   * in both FIFO and fair scheduling modes.
   */
 class JobCancellationSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfter
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfter
     with LocalSparkContext {
 
   override def afterEach() {

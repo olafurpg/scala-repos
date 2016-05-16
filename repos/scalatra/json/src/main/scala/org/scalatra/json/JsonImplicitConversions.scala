@@ -70,7 +70,7 @@ object JsonConversions {
 
   class JsonValConversion[JValue](source: JValue) {
     private type JsonTypeConverter[T] = TypeConverter[JValue, T]
-    def as[T : JsonTypeConverter]: Option[T] =
+    def as[T: JsonTypeConverter]: Option[T] =
       implicitly[TypeConverter[JValue, T]].apply(source)
   }
 

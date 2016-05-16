@@ -315,8 +315,8 @@ object Character {
     isHighSurrogate(high) && isLowSurrogate(low)
 
   @inline def toCodePoint(high: scala.Char, low: scala.Char): Int =
-    ((high & SurrogateUsefulPartMask) << 10) + (low & SurrogateUsefulPartMask) +
-    0x10000
+    ((high & SurrogateUsefulPartMask) << 10) +
+    (low & SurrogateUsefulPartMask) + 0x10000
 
   // --- End of UTF-16 surrogate pairs handling ---
 

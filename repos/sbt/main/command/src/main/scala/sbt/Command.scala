@@ -75,8 +75,8 @@ object Command {
     single(name, Help(name, briefHelp, detail))(f)
   def single(name: String, help: Help = Help.empty)(
       f: (State, String) => State): Command =
-    make(name, help)(
-        state => token(trimmed(spacedAny(name)) map apply1(f, state)))
+    make(name, help)(state =>
+          token(trimmed(spacedAny(name)) map apply1(f, state)))
 
   def custom(
       parser: State => Parser[() => State], help: Help = Help.empty): Command =

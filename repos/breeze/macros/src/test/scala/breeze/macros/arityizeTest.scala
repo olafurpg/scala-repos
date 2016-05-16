@@ -70,8 +70,8 @@ class arityizeTest extends FunSuite {
     trait LiteralRow[K, V] {}
 
     @arityize(6)
-    implicit def tuple[V]: LiteralRow[
-        Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
+    implicit def tuple[V]
+      : LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
       new LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] {
         def foreach[X](
             tup: Tuple[V @arityize.repeat] @arityize.relative(tuple),

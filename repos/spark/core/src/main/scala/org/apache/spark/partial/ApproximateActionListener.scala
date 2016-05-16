@@ -78,8 +78,8 @@ private[spark] class ApproximateActionListener[T, U, R](
       } else if (finishedTasks == totalTasks) {
         return new PartialResult(evaluator.currentResult(), true)
       } else if (time >= finishTime) {
-        resultObject = Some(
-            new PartialResult(evaluator.currentResult(), false))
+        resultObject =
+          Some(new PartialResult(evaluator.currentResult(), false))
         return resultObject.get
       } else {
         this.wait(finishTime - time)

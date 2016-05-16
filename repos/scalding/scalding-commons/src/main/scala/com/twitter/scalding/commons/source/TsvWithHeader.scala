@@ -31,7 +31,9 @@ import org.apache.hadoop.fs.{FileSystem, Path}
   * Header file format: tab separated column names.
   */
 class TsvWithHeader(p: String, f: Fields = Fields.UNKNOWN)(implicit mode: Mode)
-    extends FixedPathSource(p) with DelimitedScheme with FieldConversions {
+    extends FixedPathSource(p)
+    with DelimitedScheme
+    with FieldConversions {
   val headerPath = p.replaceAll("/+$", "") + ".HEADER"
 
   // make it lazy so as to only do once

@@ -33,7 +33,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeParsingSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -399,4 +400,5 @@ trait TimeParsingSpecs[M[+ _]]
 }
 
 object TimeParsingSpecs
-    extends TimeParsingSpecs[test.YId] with test.YIdInstances
+    extends TimeParsingSpecs[test.YId]
+    with test.YIdInstances

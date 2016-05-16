@@ -22,7 +22,8 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types._
 
 class ArithmeticExpressionSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite
+    with ExpressionEvalHelper {
 
   import IntegralLiteralTestUtils._
 

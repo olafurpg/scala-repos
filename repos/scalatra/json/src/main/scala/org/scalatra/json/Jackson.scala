@@ -8,7 +8,9 @@ import org.json4s._
 import org.scalatra.util.RicherString._
 
 trait JacksonJsonSupport
-    extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult {
+    extends JsonSupport[JValue]
+    with JacksonJsonOutput
+    with JValueResult {
 
   override def initialize(config: ConfigT): Unit = {
     super.initialize(config)

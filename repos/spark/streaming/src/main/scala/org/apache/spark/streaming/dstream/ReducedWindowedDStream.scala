@@ -25,7 +25,7 @@ import org.apache.spark.rdd.{CoGroupedRDD, RDD}
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Duration, Interval, Time}
 
-private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
+private[streaming] class ReducedWindowedDStream[K: ClassTag, V: ClassTag](
     parent: DStream[(K, V)],
     reduceFunc: (V, V) => V,
     invReduceFunc: (V, V) => V,
@@ -130,45 +130,43 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
     val numOldValues = oldRDDs.size
     val numNewValues = newRDDs.size
 
-    val mergeValues = (arrayOfValues: Array[Iterable[V]]) =>
-      {
-        if (arrayOfValues.length != 1 + numOldValues + numNewValues) {
-          throw new Exception(
-              "Unexpected number of sequences of reduced values")
-        }
-        // Getting reduced values "old time steps" that will be removed from current window
-        val oldValues = (1 to numOldValues)
-          .map(i => arrayOfValues(i))
-          .filter(!_.isEmpty)
-          .map(_.head)
-        // Getting reduced values "new time steps"
-        val newValues = (1 to numNewValues)
-          .map(i => arrayOfValues(numOldValues + i))
-          .filter(!_.isEmpty)
-          .map(_.head)
+    val mergeValues = (arrayOfValues: Array[Iterable[V]]) => {
+      if (arrayOfValues.length != 1 + numOldValues + numNewValues) {
+        throw new Exception("Unexpected number of sequences of reduced values")
+      }
+      // Getting reduced values "old time steps" that will be removed from current window
+      val oldValues = (1 to numOldValues)
+        .map(i => arrayOfValues(i))
+        .filter(!_.isEmpty)
+        .map(_.head)
+      // Getting reduced values "new time steps"
+      val newValues = (1 to numNewValues)
+        .map(i => arrayOfValues(numOldValues + i))
+        .filter(!_.isEmpty)
+        .map(_.head)
 
-        if (arrayOfValues(0).isEmpty) {
-          // If previous window's reduce value does not exist, then at least new values should exist
-          if (newValues.isEmpty) {
-            throw new Exception(
-                "Neither previous window has value for key, nor new values found. " +
-                "Are you sure your key class hashes consistently?")
-          }
-          // Reduce the new values
-          newValues.reduce(reduceF) // return
-        } else {
-          // Get the previous window's reduced value
-          var tempValue = arrayOfValues(0).head
-          // If old values exists, then inverse reduce then from previous value
-          if (!oldValues.isEmpty) {
-            tempValue = invReduceF(tempValue, oldValues.reduce(reduceF))
-          }
-          // If new values exists, then reduce them with previous value
-          if (!newValues.isEmpty) {
-            tempValue = reduceF(tempValue, newValues.reduce(reduceF))
-          }
-          tempValue // return
+      if (arrayOfValues(0).isEmpty) {
+        // If previous window's reduce value does not exist, then at least new values should exist
+        if (newValues.isEmpty) {
+          throw new Exception(
+              "Neither previous window has value for key, nor new values found. " +
+              "Are you sure your key class hashes consistently?")
         }
+        // Reduce the new values
+        newValues.reduce(reduceF) // return
+      } else {
+        // Get the previous window's reduced value
+        var tempValue = arrayOfValues(0).head
+        // If old values exists, then inverse reduce then from previous value
+        if (!oldValues.isEmpty) {
+          tempValue = invReduceF(tempValue, oldValues.reduce(reduceF))
+        }
+        // If new values exists, then reduce them with previous value
+        if (!newValues.isEmpty) {
+          tempValue = reduceF(tempValue, newValues.reduce(reduceF))
+        }
+        tempValue // return
+      }
     }
 
     val mergedValuesRDD = cogroupedRDD

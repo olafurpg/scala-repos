@@ -342,7 +342,8 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object MinTimeOf
-        extends Op2F2(TimeNamespace, "minTimeOf") with ExtremeTime {
+        extends Op2F2(TimeNamespace, "minTimeOf")
+        with ExtremeTime {
       def computeExtreme(t1: DateTime, t2: DateTime): DateTime = {
         val res: Int = NumericComparisons.compare(t1, t2)
         if (res < 0) t1
@@ -351,7 +352,8 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object MaxTimeOf
-        extends Op2F2(TimeNamespace, "maxTimeOf") with ExtremeTime {
+        extends Op2F2(TimeNamespace, "maxTimeOf")
+        with ExtremeTime {
       def computeExtreme(t1: DateTime, t2: DateTime): DateTime = {
         val res: Int = NumericComparisons.compare(t1, t2)
         if (res > 0) t1
@@ -407,7 +409,8 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object MonthsPlus
-        extends Op2F2(TimeNamespace, "monthsPlus") with TimePlus {
+        extends Op2F2(TimeNamespace, "monthsPlus")
+        with TimePlus {
       def plus(d: DateTime, i: Int) = d.plus(Period.months(i))
     }
 
@@ -424,17 +427,20 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object MinutesPlus
-        extends Op2F2(TimeNamespace, "minutesPlus") with TimePlus {
+        extends Op2F2(TimeNamespace, "minutesPlus")
+        with TimePlus {
       def plus(d: DateTime, i: Int) = d.plus(Period.minutes(i))
     }
 
     object SecondsPlus
-        extends Op2F2(TimeNamespace, "secondsPlus") with TimePlus {
+        extends Op2F2(TimeNamespace, "secondsPlus")
+        with TimePlus {
       def plus(d: DateTime, i: Int) = d.plus(Period.seconds(i))
     }
 
     object MillisPlus
-        extends Op2F2(TimeNamespace, "millisPlus") with TimePlus {
+        extends Op2F2(TimeNamespace, "millisPlus")
+        with TimePlus {
       def plus(d: DateTime, i: Int) = d.plus(Period.millis(i))
     }
 
@@ -473,49 +479,57 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object YearsBetween
-        extends Op2F2(TimeNamespace, "yearsBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "yearsBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Years.yearsBetween(d1, d2).getYears
     }
 
     object MonthsBetween
-        extends Op2F2(TimeNamespace, "monthsBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "monthsBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Months.monthsBetween(d1, d2).getMonths
     }
 
     object WeeksBetween
-        extends Op2F2(TimeNamespace, "weeksBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "weeksBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Weeks.weeksBetween(d1, d2).getWeeks
     }
 
     object DaysBetween
-        extends Op2F2(TimeNamespace, "daysBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "daysBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Days.daysBetween(d1, d2).getDays
     }
 
     object HoursBetween
-        extends Op2F2(TimeNamespace, "hoursBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "hoursBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Hours.hoursBetween(d1, d2).getHours
     }
 
     object MinutesBetween
-        extends Op2F2(TimeNamespace, "minutesBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "minutesBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Minutes.minutesBetween(d1, d2).getMinutes
     }
 
     object SecondsBetween
-        extends Op2F2(TimeNamespace, "secondsBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "secondsBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) =
         Seconds.secondsBetween(d1, d2).getSeconds
     }
 
     object MillisBetween
-        extends Op2F2(TimeNamespace, "millisBetween") with TimeBetween {
+        extends Op2F2(TimeNamespace, "millisBetween")
+        with TimeBetween {
       def between(d1: DateTime, d2: DateTime) = d2.getMillis - d1.getMillis
     }
 
@@ -660,22 +674,26 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object QuarterOfYear
-        extends Op1F1(TimeNamespace, "quarter") with TimeFraction {
+        extends Op1F1(TimeNamespace, "quarter")
+        with TimeFraction {
       def fraction(d: DateTime) = ((d.monthOfYear.get - 1) / 3) + 1
     }
 
     object MonthOfYear
-        extends Op1F1(TimeNamespace, "monthOfYear") with TimeFraction {
+        extends Op1F1(TimeNamespace, "monthOfYear")
+        with TimeFraction {
       def fraction(d: DateTime) = d.monthOfYear.get
     }
 
     object WeekOfYear
-        extends Op1F1(TimeNamespace, "weekOfYear") with TimeFraction {
+        extends Op1F1(TimeNamespace, "weekOfYear")
+        with TimeFraction {
       def fraction(d: DateTime) = d.weekOfWeekyear.get
     }
 
     object WeekOfMonth
-        extends Op1F1(TimeNamespace, "weekOfMonth") with TimeFraction {
+        extends Op1F1(TimeNamespace, "weekOfMonth")
+        with TimeFraction {
       def fraction(newTime: DateTime) = {
         val dayOfMonth = newTime.dayOfMonth().get
         val firstDate = newTime.withDayOfMonth(1)
@@ -686,37 +704,44 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object DayOfYear
-        extends Op1F1(TimeNamespace, "dayOfYear") with TimeFraction {
+        extends Op1F1(TimeNamespace, "dayOfYear")
+        with TimeFraction {
       def fraction(d: DateTime) = d.dayOfYear.get
     }
 
     object DayOfMonth
-        extends Op1F1(TimeNamespace, "dayOfMonth") with TimeFraction {
+        extends Op1F1(TimeNamespace, "dayOfMonth")
+        with TimeFraction {
       def fraction(d: DateTime) = d.dayOfMonth.get
     }
 
     object DayOfWeek
-        extends Op1F1(TimeNamespace, "dayOfWeek") with TimeFraction {
+        extends Op1F1(TimeNamespace, "dayOfWeek")
+        with TimeFraction {
       def fraction(d: DateTime) = d.dayOfWeek.get
     }
 
     object HourOfDay
-        extends Op1F1(TimeNamespace, "hourOfDay") with TimeFraction {
+        extends Op1F1(TimeNamespace, "hourOfDay")
+        with TimeFraction {
       def fraction(d: DateTime) = d.hourOfDay.get
     }
 
     object MinuteOfHour
-        extends Op1F1(TimeNamespace, "minuteOfHour") with TimeFraction {
+        extends Op1F1(TimeNamespace, "minuteOfHour")
+        with TimeFraction {
       def fraction(d: DateTime) = d.minuteOfHour.get
     }
 
     object SecondOfMinute
-        extends Op1F1(TimeNamespace, "secondOfMinute") with TimeFraction {
+        extends Op1F1(TimeNamespace, "secondOfMinute")
+        with TimeFraction {
       def fraction(d: DateTime) = d.secondOfMinute.get
     }
 
     object MillisOfSecond
-        extends Op1F1(TimeNamespace, "millisOfSecond") with TimeFraction {
+        extends Op1F1(TimeNamespace, "millisOfSecond")
+        with TimeFraction {
       def fraction(d: DateTime) = d.millisOfSecond.get
     }
 
@@ -743,38 +768,45 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object YearMonth
-        extends Op1F1(TimeNamespace, "yearMonth") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "yearMonth")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.yearMonth()
     }
 
     object YearDayOfYear
-        extends Op1F1(TimeNamespace, "yearDayOfYear") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "yearDayOfYear")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.ordinalDate()
     }
 
     object MonthDay
-        extends Op1F1(TimeNamespace, "monthDay") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "monthDay")
+        with TimeTruncation {
       val fmt = DateTimeFormat.forPattern("MM-dd")
     }
 
     object DateHour
-        extends Op1F1(TimeNamespace, "dateHour") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "dateHour")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.dateHour()
     }
 
     object DateHourMin
-        extends Op1F1(TimeNamespace, "dateHourMin") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "dateHourMin")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.dateHourMinute()
       override val deprecation = Some("use dateHourMinute instead")
     }
 
     object DateHourMinute
-        extends Op1F1(TimeNamespace, "dateHourMinute") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "dateHourMinute")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.dateHourMinute()
     }
 
     object DateHourMinSec
-        extends Op1F1(TimeNamespace, "dateHourMinSec") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "dateHourMinSec")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.dateHourMinuteSecond()
       override val deprecation = Some("use dateHourMinuteSecond instead")
     }
@@ -799,34 +831,40 @@ trait TimeLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     }
 
     object TimeWithZone
-        extends Op1F1(TimeNamespace, "timeWithZone") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "timeWithZone")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.time()
     }
 
     object TimeWithoutZone
-        extends Op1F1(TimeNamespace, "timeWithoutZone") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "timeWithoutZone")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.hourMinuteSecondMillis()
     }
 
     object HourMin
-        extends Op1F1(TimeNamespace, "hourMin") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "hourMin")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.hourMinute()
       override val deprecation = Some("use hourMinute instead")
     }
 
     object HourMinute
-        extends Op1F1(TimeNamespace, "hourMinute") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "hourMinute")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.hourMinute()
     }
 
     object HourMinSec
-        extends Op1F1(TimeNamespace, "hourMinSec") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "hourMinSec")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.hourMinuteSecond()
       override val deprecation = Some("use hourMinuteSecond instead")
     }
 
     object HourMinuteSecond
-        extends Op1F1(TimeNamespace, "hourMinuteSecond") with TimeTruncation {
+        extends Op1F1(TimeNamespace, "hourMinuteSecond")
+        with TimeTruncation {
       val fmt = ISODateTimeFormat.hourMinuteSecond()
     }
   }

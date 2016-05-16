@@ -33,9 +33,8 @@ case class OptionalUnzip2[P1 <: Platform[P1], P2 <: Platform[P2]]() {
         val alsol = for (e <- le; r <- lr) yield
           e.asInstanceOf[TailProducer[P1, Any]].also(r)
         val alsor = for (e <- re; r <- rr) yield
-          e.asInstanceOf[TailProducer[P2, Any]]
-            .also(r)
-          (alsol, alsor)
+          e.asInstanceOf[TailProducer[P2, Any]].also(r)
+        (alsol, alsor)
 
       case NamedProducer(producer, id) =>
         val (l, r) = apply(producer)

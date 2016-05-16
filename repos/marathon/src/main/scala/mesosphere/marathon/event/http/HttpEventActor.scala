@@ -67,7 +67,9 @@ class HttpEventActor(conf: HttpEventConfiguration,
                      subscribersKeeper: ActorRef,
                      metrics: HttpEventActorMetrics,
                      clock: Clock)
-    extends Actor with ActorLogging with PlayJsonSupport {
+    extends Actor
+    with ActorLogging
+    with PlayJsonSupport {
 
   implicit val timeout = HttpEventModule.timeout
   def pipeline(

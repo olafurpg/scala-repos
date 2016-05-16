@@ -74,8 +74,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
             putField(
                 q"picklee.${newTermName(y.methodName)}", staticallyElided, tpe)
           else {
-            val result = reflectivelyGet(newTermName("picklee"), y)(
-                fm =>
+            val result = reflectivelyGet(newTermName("picklee"), y)(fm =>
                   putField(
                       q"${fm}.asInstanceOf[${y.returnType(u).asInstanceOf[c.Type]}]",
                       staticallyElided,
@@ -183,7 +182,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
           _root_.scala.pickling.Defaults.nullPickler.pickle(null, builder)
         } else $pickleLogic"""
 
-  def genPicklerLogic[T : c.WeakTypeTag](picklerAst: PicklerAst): c.Tree = {
+  def genPicklerLogic[T: c.WeakTypeTag](picklerAst: PicklerAst): c.Tree = {
     // TODO - The pickler logic should actually check to make sure the thing passed is actually a FOO, and
     //        If it is not, we delegate to a runtime pickler.
     //        ALTHOUGH, we could, instead, delegate that as function of the AST that we can encode, so
@@ -193,8 +192,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     checkNullPickle(generatePickleImplFromAst(picklerAst))
   }
 
-  def genUnpicklerLogic[T : c.WeakTypeTag](
-      unpicklerAst: UnpicklerAst): c.Tree = {
+  def genUnpicklerLogic[T: c.WeakTypeTag](unpicklerAst: UnpicklerAst): c.Tree = {
     // TODO - Make sure this lines up with existing unpickler logic
     val unpickleLogic = generateUnpickleImplFromAst(unpicklerAst)
     // Handle null + Ref types first
@@ -219,7 +217,8 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     // TODO - is this the right place to do this?
     val staticHint =
       if (tpe.isEffectivelyFinal)
-        q"$readerName.hintElidedType($unpicklerName.tag)" else q"";
+        q"$readerName.hintElidedType($unpicklerName.tag)"
+      else q"";
 
     val resultName = c.fresh(newTermName("result"))
     // TODO - may be able to drop locally.
@@ -425,7 +424,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
   /** generates the tree which will construct + return a new instance of a Pickler class, capable of
     * pickling an instance of type T, using the behavior outlined by the PicklerAst.
     */
-  def generatePicklerClass[T : c.WeakTypeTag](picklerAst: PicklerAst): c.Tree = {
+  def generatePicklerClass[T: c.WeakTypeTag](picklerAst: PicklerAst): c.Tree = {
     val tpe = computeType[T]
     val picklerName = c.fresh((syntheticBaseName(tpe) + "Pickler"): TermName)
     val createTagTree = super [FastTypeTagMacros].impl[T]
@@ -441,7 +440,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
     """
   }
 
-  def generateUnpicklerClass[T : c.WeakTypeTag](
+  def generateUnpicklerClass[T: c.WeakTypeTag](
       unpicklerAst: UnpicklerAst): c.Tree = {
     val tpe = computeType[T]
     val unpicklerName =
@@ -459,7 +458,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
      """
   }
 
-  def generatePicklerUnpicklerClass[T : c.WeakTypeTag](
+  def generatePicklerUnpicklerClass[T: c.WeakTypeTag](
       impl: PickleUnpickleImplementation): c.Tree = {
     val tpe = computeType[T]
     val name = c.fresh((syntheticBaseName(tpe) + "PicklerUnpickler"): TermName)
@@ -494,7 +493,7 @@ private[pickling] trait SourceGenerator extends Macro with FastTypeTagMacros {
             """
   }
 
-  def computeType[T : c.WeakTypeTag]: Type = {
+  def computeType[T: c.WeakTypeTag]: Type = {
     val originalTpe = weakTypeOf[T]
     // Note: this makes it so modules work, things like foo.type.
     //       For some reason we get an issue with not having == defined on Class[_] otherwise.

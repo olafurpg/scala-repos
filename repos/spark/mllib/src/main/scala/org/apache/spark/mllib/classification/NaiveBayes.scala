@@ -48,7 +48,9 @@ class NaiveBayesModel private[spark](
     @Since("0.9.0") val pi: Array[Double],
     @Since("0.9.0") val theta: Array[Array[Double]],
     @Since("1.4.0") val modelType: String)
-    extends ClassificationModel with Serializable with Saveable {
+    extends ClassificationModel
+    with Serializable
+    with Saveable {
 
   import NaiveBayes.{Bernoulli, Multinomial, supportedModelTypes}
 
@@ -327,7 +329,8 @@ object NaiveBayesModel extends Loader[NaiveBayesModel] {
 @Since("0.9.0")
 class NaiveBayes private (
     private var lambda: Double, private var modelType: String)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   import NaiveBayes.{Bernoulli, Multinomial}
 
@@ -371,28 +374,26 @@ class NaiveBayes private (
     */
   @Since("0.9.0")
   def run(data: RDD[LabeledPoint]): NaiveBayesModel = {
-    val requireNonnegativeValues: Vector => Unit = (v: Vector) =>
-      {
-        val values = v match {
-          case sv: SparseVector => sv.values
-          case dv: DenseVector => dv.values
-        }
-        if (!values.forall(_ >= 0.0)) {
-          throw new SparkException(
-              s"Naive Bayes requires nonnegative feature values but found $v.")
-        }
+    val requireNonnegativeValues: Vector => Unit = (v: Vector) => {
+      val values = v match {
+        case sv: SparseVector => sv.values
+        case dv: DenseVector => dv.values
+      }
+      if (!values.forall(_ >= 0.0)) {
+        throw new SparkException(
+            s"Naive Bayes requires nonnegative feature values but found $v.")
+      }
     }
 
-    val requireZeroOneBernoulliValues: Vector => Unit = (v: Vector) =>
-      {
-        val values = v match {
-          case sv: SparseVector => sv.values
-          case dv: DenseVector => dv.values
-        }
-        if (!values.forall(v => v == 0.0 || v == 1.0)) {
-          throw new SparkException(
-              s"Bernoulli naive Bayes requires 0 or 1 feature values but found $v.")
-        }
+    val requireZeroOneBernoulliValues: Vector => Unit = (v: Vector) => {
+      val values = v match {
+        case sv: SparseVector => sv.values
+        case dv: DenseVector => dv.values
+      }
+      if (!values.forall(v => v == 0.0 || v == 1.0)) {
+        throw new SparkException(
+            s"Bernoulli naive Bayes requires 0 or 1 feature values but found $v.")
+      }
     }
 
     // Aggregates term frequencies per label.
@@ -401,26 +402,23 @@ class NaiveBayes private (
     val aggregated = data
       .map(p => (p.label, p.features))
       .combineByKey[(Long, DenseVector)](
-          createCombiner = (v: Vector) =>
-              {
-              if (modelType == Bernoulli) {
-                requireZeroOneBernoulliValues(v)
-              } else {
-                requireNonnegativeValues(v)
-              }
-              (1L, v.copy.toDense)
-          },
-          mergeValue = (c: (Long, DenseVector), v: Vector) =>
-              {
+          createCombiner = (v: Vector) => {
+            if (modelType == Bernoulli) {
+              requireZeroOneBernoulliValues(v)
+            } else {
               requireNonnegativeValues(v)
-              BLAS.axpy(1.0, v, c._2)
-              (c._1 + 1L, c._2)
+            }
+            (1L, v.copy.toDense)
           },
-          mergeCombiners = (c1: (Long, DenseVector), c2: (Long,
-            DenseVector)) =>
-              {
-              BLAS.axpy(1.0, c2._2, c1._2)
-              (c1._1 + c2._1, c1._2)
+          mergeValue = (c: (Long, DenseVector), v: Vector) => {
+            requireNonnegativeValues(v)
+            BLAS.axpy(1.0, v, c._2)
+            (c._1 + 1L, c._2)
+          },
+          mergeCombiners = (c1: (Long, DenseVector),
+                            c2: (Long, DenseVector)) => {
+            BLAS.axpy(1.0, c2._2, c1._2)
+            (c1._1 + c2._1, c1._2)
           }
       )
       .collect()

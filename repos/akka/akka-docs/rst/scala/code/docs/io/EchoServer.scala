@@ -77,7 +77,8 @@ object EchoHandler {
 }
 
 class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import Tcp._
   import EchoHandler._
@@ -221,7 +222,8 @@ class EchoHandler(connection: ActorRef, remote: InetSocketAddress)
 
 //#simple-echo-handler
 class SimpleEchoHandler(connection: ActorRef, remote: InetSocketAddress)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import Tcp._
 

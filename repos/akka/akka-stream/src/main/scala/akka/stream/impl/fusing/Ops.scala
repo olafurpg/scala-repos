@@ -404,7 +404,7 @@ private[akka] final case class Buffer[T](
     else ctx.absorbTermination()
 
   val enqueueAction: (DetachedContext[T],
-  T) ⇒ UpstreamDirective = overflowStrategy match {
+                      T) ⇒ UpstreamDirective = overflowStrategy match {
     case DropHead ⇒
       (ctx, elem) ⇒
         if (buffer.isFull) buffer.dropHead()
@@ -770,22 +770,19 @@ private[akka] final case class MapAsyncUnordered[In, Out](
         else if (isClosed(in) && todo == 0) completeStage()
         else if (!hasBeenPulled(in)) tryPull(in)
 
-      val futureCB = getAsyncCallback(
-          (result: Try[Out]) ⇒
-            {
-          inFlight -= 1
-          result match {
-            case Failure(ex) ⇒ failOrPull(ex)
-            case Success(elem) ⇒
-              if (elem == null) {
-                val ex =
-                  ReactiveStreamsCompliance.elementMustNotBeNullException
-                failOrPull(ex)
-              } else if (isAvailable(out)) {
-                if (!hasBeenPulled(in)) tryPull(in)
-                push(out, elem)
-              } else buffer.enqueue(elem)
-          }
+      val futureCB = getAsyncCallback((result: Try[Out]) ⇒ {
+        inFlight -= 1
+        result match {
+          case Failure(ex) ⇒ failOrPull(ex)
+          case Success(elem) ⇒
+            if (elem == null) {
+              val ex = ReactiveStreamsCompliance.elementMustNotBeNullException
+              failOrPull(ex)
+            } else if (isAvailable(out)) {
+              if (!hasBeenPulled(in)) tryPull(in)
+              push(out, elem)
+            } else buffer.enqueue(elem)
+        }
       }).invoke _
 
       setHandler(in, new InHandler {

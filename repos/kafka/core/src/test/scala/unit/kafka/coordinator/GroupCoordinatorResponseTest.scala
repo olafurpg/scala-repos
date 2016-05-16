@@ -80,8 +80,8 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
 
     // make two partitions of the group topic to make sure some partitions are not owned by the coordinator
     val ret = mutable.Map[String, Map[Int, Seq[Int]]]()
-    ret +=
-    (TopicConstants.GROUP_METADATA_TOPIC_NAME -> Map(0 -> Seq(1), 1 -> Seq(1)))
+    ret += (TopicConstants.GROUP_METADATA_TOPIC_NAME -> Map(0 -> Seq(1),
+                                                            1 -> Seq(1)))
 
     replicaManager = EasyMock.createNiceMock(classOf[ReplicaManager])
 
@@ -926,7 +926,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
   }
 
   private def setupJoinGroupCallback: (Future[JoinGroupResult],
-  JoinGroupCallback) = {
+                                       JoinGroupCallback) = {
     val responsePromise = Promise[JoinGroupResult]
     val responseFuture = responsePromise.future
     val responseCallback: JoinGroupCallback = responsePromise.success(_)
@@ -934,7 +934,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
   }
 
   private def setupSyncGroupCallback: (Future[SyncGroupCallbackParams],
-  SyncGroupCallback) = {
+                                       SyncGroupCallback) = {
     val responsePromise = Promise[SyncGroupCallbackParams]
     val responseFuture = responsePromise.future
     val responseCallback: SyncGroupCallback = (assignment, errorCode) =>
@@ -943,7 +943,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
   }
 
   private def setupHeartbeatCallback: (Future[HeartbeatCallbackParams],
-  HeartbeatCallback) = {
+                                       HeartbeatCallback) = {
     val responsePromise = Promise[HeartbeatCallbackParams]
     val responseFuture = responsePromise.future
     val responseCallback: HeartbeatCallback = errorCode =>
@@ -952,7 +952,7 @@ class GroupCoordinatorResponseTest extends JUnitSuite {
   }
 
   private def setupCommitOffsetsCallback: (Future[CommitOffsetCallbackParams],
-  CommitOffsetCallback) = {
+                                           CommitOffsetCallback) = {
     val responsePromise = Promise[CommitOffsetCallbackParams]
     val responseFuture = responsePromise.future
     val responseCallback: CommitOffsetCallback = offsets =>

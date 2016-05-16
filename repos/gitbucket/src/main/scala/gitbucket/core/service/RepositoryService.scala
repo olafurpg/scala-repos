@@ -143,15 +143,16 @@ trait RepositoryService { self: AccountService =>
           x.copy(
               userName = newUserName,
               repositoryName = newRepositoryName,
-              milestoneId = x.milestoneId.map { id =>
-                newMilestones
-                  .find(_.title == milestones
-                        .find(_.milestoneId == id)
-                        .get
-                        .title)
-                  .get
-                  .milestoneId
-              }
+              milestoneId =
+                x.milestoneId.map { id =>
+                  newMilestones
+                    .find(_.title == milestones
+                          .find(_.milestoneId == id)
+                          .get
+                          .title)
+                    .get
+                    .milestoneId
+                }
           )
         }: _*)
 
@@ -192,8 +193,7 @@ trait RepositoryService { self: AccountService =>
           .map(x => (x.labelName, x.labelId))
           .list
           .toMap
-        IssueLabels.insertAll(
-            issueLabels.map(x =>
+        IssueLabels.insertAll(issueLabels.map(x =>
                   x.copy(
                       labelId = newLabelMap(oldLabelMap(x.labelId)),
                       userName = newUserName,
@@ -235,7 +235,7 @@ trait RepositoryService { self: AccountService =>
                              s"[issue:${newUserName}/${newRepositoryName}#")
                     .replace(s"[commit:${oldUserName}/${oldRepositoryName}@",
                              s"[commit:${newUserName}/${newRepositoryName}@")
-                )
+              )
         }
       }
     }
@@ -355,8 +355,7 @@ trait RepositoryService { self: AccountService =>
       userName: String, withoutPhysicalInfo: Boolean = false)(
       implicit s: Session): List[RepositoryInfo] = {
     Repositories.filter { t1 =>
-      (t1.userName === userName.bind) ||
-      (Collaborators.filter { t2 =>
+      (t1.userName === userName.bind) || (Collaborators.filter { t2 =>
             t2.byRepository(t1.userName, t1.repositoryName) &&
             (t2.collaboratorName === userName.bind)
           } exists)
@@ -430,8 +429,8 @@ trait RepositoryService { self: AccountService =>
     }
   }
 
-  private def getRepositoryManagers(userName: String)(
-      implicit s: Session): Seq[String] =
+  private def getRepositoryManagers(
+      userName: String)(implicit s: Session): Seq[String] =
     if (getAccountByUserName(userName).exists(_.isGroupAccount)) {
       getGroupMembers(userName).collect {
         case x if (x.isManager) => x.userName

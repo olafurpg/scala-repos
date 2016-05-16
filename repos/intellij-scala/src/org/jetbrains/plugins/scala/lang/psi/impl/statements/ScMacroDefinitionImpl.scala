@@ -23,7 +23,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   */
 class ScMacroDefinitionImpl private (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScMacroDefinition {
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScMacroDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScFunctionStub) = {

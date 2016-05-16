@@ -170,8 +170,7 @@ class DoubleTest {
 
   @Test def longBitsToDouble(): Unit = {
     def isZero(v: Double, neg: Boolean): Boolean = {
-      (v == 0.0) &&
-      (1 / v ==
+      (v == 0.0) && (1 / v ==
           (if (neg) Double.NegativeInfinity
            else Double.PositiveInfinity))
     }

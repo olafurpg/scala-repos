@@ -129,11 +129,11 @@ trait PEvents extends Serializable {
     */
   @deprecated("Use PEventStore.aggregateProperties() instead.", "0.9.2")
   @Experimental
-  def extractEntityMap[A : ClassTag](appId: Int,
-                                     entityType: String,
-                                     startTime: Option[DateTime] = None,
-                                     untilTime: Option[DateTime] = None,
-                                     required: Option[Seq[String]] = None)(
+  def extractEntityMap[A: ClassTag](appId: Int,
+                                    entityType: String,
+                                    startTime: Option[DateTime] = None,
+                                    untilTime: Option[DateTime] = None,
+                                    required: Option[Seq[String]] = None)(
       sc: SparkContext)(extract: DataMap => A): EntityMap[A] = {
     val idToData: Map[String, A] = aggregateProperties(
         appId = appId,

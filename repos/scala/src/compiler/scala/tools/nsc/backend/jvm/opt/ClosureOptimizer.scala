@@ -94,8 +94,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
     // cannot be rewritten, for example because the lambda body method is not accessible, issue a
     // warning. The `toList` in the next line prevents modifying closureInstantiations while
     // iterating it: minimalRemoveUnreachableCode (called in the loop) removes elements.
-    for (method <- closureInstantiations.keysIterator.toList if AsmAnalyzer
-                    .sizeOKForBasicValue(method)) closureInstantiations.get(
+    for (method <- closureInstantiations.keysIterator.toList
+         if AsmAnalyzer.sizeOKForBasicValue(method)) closureInstantiations.get(
         method) match {
       case Some(closureInitsBeforeDCE) if closureInitsBeforeDCE.nonEmpty =>
         val ownerClass = closureInitsBeforeDCE.head._2.ownerClass.internalName
@@ -182,15 +182,17 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
           // method as the allocation) should have access too.
           val bodyAccessible: Either[OptimizerWarning, Boolean] = for {
             (bodyMethodNode, declClass) <- byteCodeRepository.methodNode(
-                lambdaBodyHandle.getOwner,
-                lambdaBodyHandle.getName,
-                lambdaBodyHandle.getDesc): Either[
-                OptimizerWarning, (MethodNode, InternalName)]
+                                              lambdaBodyHandle.getOwner,
+                                              lambdaBodyHandle.getName,
+                                              lambdaBodyHandle.getDesc): Either[
+                                              OptimizerWarning,
+                                              (MethodNode, InternalName)]
             isAccessible <- inliner.memberIsAccessible(
-                bodyMethodNode.access,
-                classBTypeFromParsedClassfile(declClass),
-                classBTypeFromParsedClassfile(lambdaBodyHandle.getOwner),
-                ownerClass)
+                               bodyMethodNode.access,
+                               classBTypeFromParsedClassfile(declClass),
+                               classBTypeFromParsedClassfile(
+                                   lambdaBodyHandle.getOwner),
+                               ownerClass)
           } yield {
             isAccessible
           }
@@ -345,7 +347,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
           //     this is ensured by the `isSamInvocation` filter in this file
           //   - implMethodArgTypes is the same as the arg types in the IndyLambda's instantiatedMethodType,
           //     this is ensured by the unapply method in LambdaMetaFactoryCall (file CallGraph)
-          res(i) = Some(new TypeInsnNode(
+          res(i) = Some(
+              new TypeInsnNode(
                   CHECKCAST, implMethodArgTypes(i).getInternalName))
         }
       }
@@ -448,7 +451,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
             callee = bodyMethodNode,
             calleeDeclarationClass = bodyDeclClassType,
             safeToInline = canInlineFromSource,
-            safeToRewrite = false, // the lambda body method is not a trait interface method
+            safeToRewrite =
+              false, // the lambda body method is not a trait interface method
             canInlineFromSource = canInlineFromSource,
             annotatedInline = false,
             annotatedNoInline = false,
@@ -471,9 +475,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
         argInfos = argInfos,
         callsiteStackHeight = invocationStackHeight,
         receiverKnownNotNull = true, // see below (*)
-        callsitePosition = originalCallsite
-            .map(_.callsitePosition)
-            .getOrElse(NoPosition),
+        callsitePosition =
+          originalCallsite.map(_.callsitePosition).getOrElse(NoPosition),
         annotatedInline = false,
         annotatedNoInline = false
     )
@@ -509,8 +512,8 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
 
     val localsForCaptures =
       LocalsList.fromTypes(firstCaptureLocal, capturedTypes)
-    closureInit.ownerMethod.maxLocals = firstCaptureLocal +
-    localsForCaptures.size
+    closureInit.ownerMethod.maxLocals =
+      firstCaptureLocal + localsForCaptures.size
 
     insertStoreOps(indy, closureInit.ownerMethod, localsForCaptures, _ => None)
     insertLoadOps(indy, closureInit.ownerMethod, localsForCaptures)
@@ -575,13 +578,12 @@ class ClosureOptimizer[BT <: BTypes](val btypes: BT) {
       */
     def fromTypes(firstLocal: Int, types: Array[Type]): LocalsList = {
       var sizeTwoOffset = 0
-      val locals: List[Local] = types.indices.map(i =>
-            {
-          // The ASM method `type.getOpcode` returns the opcode for operating on a value of `type`.
-          val offset = types(i).getOpcode(ILOAD) - ILOAD
-          val local = Local(firstLocal + i + sizeTwoOffset, offset)
-          if (local.size == 2) sizeTwoOffset += 1
-          local
+      val locals: List[Local] = types.indices.map(i => {
+        // The ASM method `type.getOpcode` returns the opcode for operating on a value of `type`.
+        val offset = types(i).getOpcode(ILOAD) - ILOAD
+        val local = Local(firstLocal + i + sizeTwoOffset, offset)
+        if (local.size == 2) sizeTwoOffset += 1
+        local
       })(collection.breakOut)
       LocalsList(locals)
     }

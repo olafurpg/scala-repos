@@ -47,10 +47,9 @@ trait ExecutionContext {
   private def updateStepConfigWithDescriptions(
       step: BaseFlowStep[JobConf]): Unit = {
     val conf = step.getConfig
-    getIdentifierOpt(ExecutionContext.getDesc(step)).foreach(
-        descriptionString =>
-          {
-        conf.set(Config.StepDescriptions, descriptionString)
+    getIdentifierOpt(ExecutionContext.getDesc(step))
+      .foreach(descriptionString => {
+      conf.set(Config.StepDescriptions, descriptionString)
     })
   }
 

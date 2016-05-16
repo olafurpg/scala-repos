@@ -40,7 +40,7 @@ package OrphansTestDefns {
       override def toString = "CaDeriver.caDerived"
     }
 
-    implicit def derive[T : Generic]: Ca[T] = caDerived.asInstanceOf[Ca[T]]
+    implicit def derive[T: Generic]: Ca[T] = caDerived.asInstanceOf[Ca[T]]
   }
 
   object LowPriorityCaDeriver extends OrphanDeriver[Ca, CaDeriver.type]
@@ -65,7 +65,7 @@ package OrphansTestDefns {
       override def toString = "CbDeriver.cbDerived"
     }
 
-    implicit def derive[T : Generic]: Cb[T] = cbDerived.asInstanceOf[Cb[T]]
+    implicit def derive[T: Generic]: Cb[T] = cbDerived.asInstanceOf[Cb[T]]
   }
 
   object LowPriorityCbDeriver extends OrphanDeriver[Cb, CbDeriver.type]

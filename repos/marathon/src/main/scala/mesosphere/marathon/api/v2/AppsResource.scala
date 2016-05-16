@@ -37,7 +37,8 @@ class AppsResource @Inject()(clock: Clock,
                              val authenticator: Authenticator,
                              val authorizer: Authorizer,
                              groupManager: GroupManager)
-    extends RestResource with AuthResource {
+    extends RestResource
+    with AuthResource {
 
   private[this] val ListApps = """^((?:.+/)|)\*$""".r
 

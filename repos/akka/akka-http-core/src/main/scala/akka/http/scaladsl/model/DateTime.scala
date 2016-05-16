@@ -20,7 +20,8 @@ final case class DateTime private (
     weekday: Int, // the day of the week. Sunday is 0.
     clicks: Long, // milliseconds since January 1, 1970, 00:00:00 GMT
     isLeapYear: Boolean)
-    extends akka.http.javadsl.model.DateTime with Ordered[DateTime]
+    extends akka.http.javadsl.model.DateTime
+    with Ordered[DateTime]
     with Renderable {
 
   /**

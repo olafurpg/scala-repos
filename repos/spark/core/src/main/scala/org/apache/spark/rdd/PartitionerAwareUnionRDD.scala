@@ -55,7 +55,7 @@ private[spark] class PartitionerAwareUnionRDDPartition(
   * of the corresponding partitions of the parent RDDs. For example, location of partition 0
   * of the unified RDD will be where most of partition 0 of the parent RDDs are located.
   */
-private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
+private[spark] class PartitionerAwareUnionRDD[T: ClassTag](
     sc: SparkContext,
     var rdds: Seq[RDD[T]]
 )
@@ -71,9 +71,8 @@ private[spark] class PartitionerAwareUnionRDD[T : ClassTag](
   override def getPartitions: Array[Partition] = {
     val numPartitions = partitioner.get.numPartitions
     (0 until numPartitions)
-      .map(index =>
-            {
-          new PartitionerAwareUnionRDDPartition(rdds, index)
+      .map(index => {
+        new PartitionerAwareUnionRDDPartition(rdds, index)
       })
       .toArray
   }

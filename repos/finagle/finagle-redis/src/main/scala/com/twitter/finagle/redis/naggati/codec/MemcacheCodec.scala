@@ -23,8 +23,7 @@ import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 case class MemcacheRequest(
     line: List[String], data: Option[ByteBuffer], bytesRead: Int) {
   override def toString = {
-    "<Request: " + line.mkString("[", " ", "]") +
-    (data match {
+    "<Request: " + line.mkString("[", " ", "]") + (data match {
           case None => ""
           case Some(x) => " data=" + x.remaining
         }) + " read=" + bytesRead + ">"
@@ -37,8 +36,7 @@ case class MemcacheResponse(
 )
     extends Codec.Signalling {
   override def toString = {
-    "<Response: " + line +
-    (data match {
+    "<Response: " + line + (data match {
           case None => ""
           case Some(x) => " data=" + x.remaining
         }) + ">"

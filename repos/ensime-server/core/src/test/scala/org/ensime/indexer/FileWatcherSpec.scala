@@ -25,7 +25,9 @@ case class BaseRemoved(f: FileObject) extends FileWatcherMessage
   * true OS and FS support, which is lacking on all major platforms.
   */
 abstract class FileWatcherSpec
-    extends EnsimeSpec with ParallelTestExecution with IsolatedTestKitFixture
+    extends EnsimeSpec
+    with ParallelTestExecution
+    with IsolatedTestKitFixture
     with IsolatedEnsimeVFSFixture {
 
   // variant that watches a jar file

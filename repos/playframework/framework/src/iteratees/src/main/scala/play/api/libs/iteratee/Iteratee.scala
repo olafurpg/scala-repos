@@ -40,8 +40,8 @@ object Iteratee {
     * @param f a function folding the previous state and an input to a new state
     * $paramEcSingle
     */
-  def fold[E, A](state: A)(
-      f: (A, E) => A)(implicit ec: ExecutionContext): Iteratee[E, A] =
+  def fold[E, A](state: A)(f: (A, E) => A)(
+      implicit ec: ExecutionContext): Iteratee[E, A] =
     foldM(state)((a, e: E) => eagerFuture(f(a, e)))(ec)
 
   /**
@@ -241,13 +241,12 @@ object Iteratee {
     def apply[A, B](otherwise: => B)(eofValue: A): Iteratee[E, Either[B, A]] = {
       def cont: Iteratee[E, Either[B, A]] =
         Cont(
-            (in: Input[E]) =>
-              {
-            in match {
-              case Input.El(e) => Done(Left(otherwise), in)
-              case Input.EOF => Done(Right(eofValue), in)
-              case Input.Empty => cont
-            }
+            (in: Input[E]) => {
+          in match {
+            case Input.El(e) => Done(Left(otherwise), in)
+            case Input.EOF => Done(Right(eofValue), in)
+            case Input.Empty => cont
+          }
         })
       cont
     }
@@ -776,7 +775,8 @@ trait Iteratee[E, +A] { self =>
   * state is immediately available.
   */
 private sealed trait StepIteratee[E, A]
-    extends Iteratee[E, A] with Step[E, A] {
+    extends Iteratee[E, A]
+    with Step[E, A] {
 
   final override def it: Iteratee[E, A] = this
   final def immediateUnflatten: Step[E, A] = this
@@ -820,7 +820,8 @@ private sealed trait StepIteratee[E, A]
   * An iteratee in the "done" state.
   */
 private final class DoneIteratee[E, A](a: A, e: Input[E])
-    extends Step.Done[A, E](a, e) with StepIteratee[E, A] {
+    extends Step.Done[A, E](a, e)
+    with StepIteratee[E, A] {
 
   /**
     * Use an optimized implementation because this method is called by Play when running an
@@ -839,13 +840,15 @@ private final class DoneIteratee[E, A](a: A, e: Input[E])
   * An iteratee in the "cont" state.
   */
 private final class ContIteratee[E, A](k: Input[E] => Iteratee[E, A])
-    extends Step.Cont[E, A](k) with StepIteratee[E, A] {}
+    extends Step.Cont[E, A](k)
+    with StepIteratee[E, A] {}
 
 /**
   * An iteratee in the "error" state.
   */
 private final class ErrorIteratee[E](msg: String, e: Input[E])
-    extends Step.Error[E](msg, e) with StepIteratee[E, Nothing] {}
+    extends Step.Error[E](msg, e)
+    with StepIteratee[E, Nothing] {}
 
 /**
   * An iteratee whose state is provided in a Future, vs [[StepIteratee]].

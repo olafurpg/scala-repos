@@ -9,7 +9,9 @@ import akka.util.ByteString
 import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
 
 class TestTransportSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec
+    with DefaultTimeout
+    with ImplicitSender {
 
   val addressA: Address = Address("test", "testsytemA", "testhostA", 4321)
   val addressB: Address = Address("test", "testsytemB", "testhostB", 5432)

@@ -11,7 +11,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object PartialActionLaws {
-  def apply[G : Eq : Arbitrary, A : Eq : Arbitrary] =
+  def apply[G: Eq: Arbitrary, A: Eq: Arbitrary] =
     new PartialActionLaws[G, A] {
       val scalarLaws = PartialGroupLaws[G]
       def EquA = Eq[A]
@@ -57,8 +57,8 @@ trait PartialActionLaws[G, A] extends Laws {
     new ActionProperties(
         name = "semigroupAction",
         sl = _.semigroupoid(G0),
-        parents = Seq(
-              leftSemigroupoidPartialAction, rightSemigroupoidPartialAction)
+        parents =
+          Seq(leftSemigroupoidPartialAction, rightSemigroupoidPartialAction)
     )
 
   def groupoidPartialAction(implicit G: PartialAction[A, G], G0: Groupoid[G]) =

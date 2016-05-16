@@ -8,7 +8,10 @@ import mesosphere.marathon.{MarathonSpec, MarathonTestHelper}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskCountsTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Mockito
+    with Matchers {
   test("count no tasks") {
     When("getting counts for no tasks")
     val counts = TaskCounts(appTasks = Seq.empty, healthStatuses = Map.empty)
@@ -57,9 +60,9 @@ class TaskCountsTest
         MarathonTestHelper.runningTask("task1")
     )
     When("getting counts")
-    val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> aliveHealth))
+    val counts = TaskCounts(appTasks = oneRunningTask,
+                            healthStatuses =
+                              Map(Task.Id("task1") -> aliveHealth))
     Then("all counts are 0 except healthy")
     counts should be(TaskCounts.zero.copy(tasksRunning = 1, tasksHealthy = 1))
   }
@@ -70,9 +73,9 @@ class TaskCountsTest
         MarathonTestHelper.runningTask("task1")
     )
     When("getting counts")
-    val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> notAliveHealth))
+    val counts = TaskCounts(appTasks = oneRunningTask,
+                            healthStatuses =
+                              Map(Task.Id("task1") -> notAliveHealth))
     Then("all counts are 0 except tasksUnhealthy")
     counts should be(
         TaskCounts.zero.copy(tasksRunning = 1, tasksUnhealthy = 1))
@@ -84,9 +87,9 @@ class TaskCountsTest
         MarathonTestHelper.runningTask("task1")
     )
     When("getting counts")
-    val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> mixedHealth))
+    val counts = TaskCounts(appTasks = oneRunningTask,
+                            healthStatuses =
+                              Map(Task.Id("task1") -> mixedHealth))
     Then("all counts are 0 except tasksUnhealthy")
     counts should be(
         TaskCounts.zero.copy(tasksRunning = 1, tasksUnhealthy = 1))
@@ -98,9 +101,9 @@ class TaskCountsTest
         MarathonTestHelper.runningTask("task1")
     )
     When("getting counts")
-    val counts =
-      TaskCounts(appTasks = oneRunningTask,
-                 healthStatuses = Map(Task.Id("task1") -> noHealths))
+    val counts = TaskCounts(appTasks = oneRunningTask,
+                            healthStatuses =
+                              Map(Task.Id("task1") -> noHealths))
     Then("all counts are 0")
     counts should be(TaskCounts.zero.copy(tasksRunning = 1))
   }
@@ -117,9 +120,9 @@ class TaskCountsTest
     val counts = TaskCounts(
         appTasks = oneStagedTask,
         healthStatuses = Map(
-              Task.Id("task3") -> aliveHealth,
-              Task.Id("task4") -> notAliveHealth
-          )
+            Task.Id("task3") -> aliveHealth,
+            Task.Id("task4") -> notAliveHealth
+        )
     )
     Then("all counts are 0 except staged")
     counts should be(

@@ -28,8 +28,7 @@ class GraphConcatSpec extends TwoStreamsSetup {
       val probe = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           val concat1 = b add Concat[Int]()
           val concat2 = b add Concat[Int]()
 

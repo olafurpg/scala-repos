@@ -33,7 +33,8 @@ import org.joda.time._
 import org.joda.time.format._
 
 trait TimeComparisonSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -360,4 +361,5 @@ trait TimeComparisonSpecs[M[+ _]]
 }
 
 object TimeComparisonSpecs
-    extends TimeComparisonSpecs[test.YId] with test.YIdInstances
+    extends TimeComparisonSpecs[test.YId]
+    with test.YIdInstances

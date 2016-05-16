@@ -76,7 +76,8 @@ object ScrollPane {
 
 class ScrollPane(
     override val delegate: jfxsc.ScrollPane = new jfxsc.ScrollPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.ScrollPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ScrollPane] {
 
   /**
     * The node used as the content of this ScrollPane.

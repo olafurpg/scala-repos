@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
 object ActionLaws {
-  def apply[G : Eq : Arbitrary, A : Eq : Arbitrary] = new ActionLaws[G, A] {
+  def apply[G: Eq: Arbitrary, A: Eq: Arbitrary] = new ActionLaws[G, A] {
     val scalarLaws = GroupLaws[G]
     def EquA = Eq[A]
     def ArbA = implicitly[Arbitrary[A]]
@@ -119,7 +119,8 @@ trait ActionLaws[G, A] extends Laws {
       val parent: Option[AdditiveProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet with HasOneParent {
+      extends RuleSet
+      with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
   }
@@ -129,7 +130,8 @@ trait ActionLaws[G, A] extends Laws {
       val parent: Option[MultiplicativeProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet with HasOneParent {
+      extends RuleSet
+      with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
   }

@@ -155,8 +155,8 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "return result with 'Await.result'" in {
-      f((future,
-          result) => Await.result(future, defaultTimeout) mustBe (result))
+      f((future, result) =>
+            Await.result(future, defaultTimeout) mustBe (result))
     }
 
     "not timeout" in { f((future, _) => Await.ready(future, 0 millis)) }
@@ -237,7 +237,7 @@ class PromiseTests extends MinimalScalaTest {
     }
   }
 
-  def futureWithException[E <: Throwable : Manifest](
+  def futureWithException[E <: Throwable: Manifest](
       f: ((Future[Any], String) => Unit) => Unit) {
 
     "be completed" in {
@@ -245,10 +245,8 @@ class PromiseTests extends MinimalScalaTest {
     }
 
     "contain a value" in {
-      f(
-          (future, message) =>
-            {
-          future.value.get.failed.get.getMessage mustBe (message)
+      f((future, message) => {
+        future.value.get.failed.get.getMessage mustBe (message)
       })
     }
 

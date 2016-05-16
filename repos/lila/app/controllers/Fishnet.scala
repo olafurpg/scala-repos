@@ -47,10 +47,9 @@ object Fishnet extends LilaController {
       req.body
         .validate[A]
         .fold(
-            err =>
-              {
-                logger.warn(s"Malformed request: $err\n${req.body}")
-                BadRequest(jsonError(JsError toJson err)).fuccess
+            err => {
+              logger.warn(s"Malformed request: $err\n${req.body}")
+              BadRequest(jsonError(JsError toJson err)).fuccess
             },
             data =>
               api.authenticateClient(data, clientIp(req)) flatMap {

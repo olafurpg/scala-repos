@@ -103,7 +103,6 @@ trait PasswordTypedField extends TypedField[String] {
       name={funcName}
       value={valueBox openOr ""}
       tabindex={tabIndex.toString}/>
-  
   }
 
   def toForm: Box[NodeSeq] =
@@ -141,7 +140,8 @@ trait PasswordTypedField extends TypedField[String] {
 }
 
 class PasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with MandatoryTypedField[String]
+    extends Field[String, OwnerType]
+    with MandatoryTypedField[String]
     with PasswordTypedField {
 
   def this(rec: OwnerType, value: String) = {
@@ -161,7 +161,8 @@ class PasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalPasswordField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with OptionalTypedField[String]
+    extends Field[String, OwnerType]
+    with OptionalTypedField[String]
     with PasswordTypedField {
 
   def this(rec: OwnerType, value: Box[String]) = {

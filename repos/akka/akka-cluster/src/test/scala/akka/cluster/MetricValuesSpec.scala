@@ -12,7 +12,8 @@ import akka.cluster.StandardMetrics._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricValuesSpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with MetricsCollectorFactory {
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
 
@@ -25,7 +26,7 @@ class MetricValuesSpec
     (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
       nodes map { n ⇒
         n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
-                    n.metrics.collect {
+                  n.metrics.collect {
             case streaming if latest sameAs streaming ⇒ streaming :+ latest
         }))
       }

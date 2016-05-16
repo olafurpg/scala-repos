@@ -49,7 +49,7 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
 
 private[sql] object Dataset {
-  def apply[T : Encoder](
+  def apply[T: Encoder](
       sqlContext: SQLContext, logicalPlan: LogicalPlan): Dataset[T] = {
     new Dataset(sqlContext, logicalPlan, implicitly[Encoder[T]])
   }
@@ -155,7 +155,8 @@ class Dataset[T] private[sql](
     @transient override val sqlContext: SQLContext,
     @DeveloperApi @transient override val queryExecution: QueryExecution,
     encoder: Encoder[T])
-    extends Queryable with Serializable {
+    extends Queryable
+    with Serializable {
 
   queryExecution.assertAnalyzed()
 
@@ -297,7 +298,7 @@ class Dataset[T] private[sql](
     * @since 1.6.0
     */
   @Experimental
-  def as[U : Encoder]: Dataset[U] = Dataset[U](sqlContext, logicalPlan)
+  def as[U: Encoder]: Dataset[U] = Dataset[U](sqlContext, logicalPlan)
 
   /**
     * Converts this strongly typed collection of data to generic `DataFrame` with columns renamed.
@@ -912,8 +913,7 @@ class Dataset[T] private[sql](
     */
   @scala.annotation.varargs
   def selectExpr(exprs: String*): DataFrame = {
-    select(
-        exprs.map { expr =>
+    select(exprs.map { expr =>
       Column(sqlContext.sessionState.sqlParser.parseExpression(expr))
     }: _*)
   }
@@ -931,7 +931,7 @@ class Dataset[T] private[sql](
     * @since 1.6.0
     */
   @Experimental
-  def select[U1 : Encoder](c1: TypedColumn[T, U1]): Dataset[U1] = {
+  def select[U1: Encoder](c1: TypedColumn[T, U1]): Dataset[U1] = {
     new Dataset[U1](
         sqlContext,
         Project(
@@ -1203,7 +1203,7 @@ class Dataset[T] private[sql](
     * @since 2.0.0
     */
   @Experimental
-  def groupByKey[K : Encoder](func: T => K): KeyValueGroupedDataset[K, T] = {
+  def groupByKey[K: Encoder](func: T => K): KeyValueGroupedDataset[K, T] = {
     val inputPlan = logicalPlan
     val withGroupingKey = AppendColumns(func, inputPlan)
     val executed = sqlContext.executePlan(withGroupingKey)
@@ -1550,7 +1550,7 @@ class Dataset[T] private[sql](
     * @since 2.0.0
     */
   @Experimental
-  def explode[A <: Product : TypeTag](input: Column*)(
+  def explode[A <: Product: TypeTag](input: Column*)(
       f: Row => TraversableOnce[A]): DataFrame = {
     val schema = ScalaReflection.schemaFor[A].dataType.asInstanceOf[StructType]
 
@@ -1588,7 +1588,7 @@ class Dataset[T] private[sql](
     * @since 2.0.0
     */
   @Experimental
-  def explode[A, B : TypeTag](inputColumn: String, outputColumn: String)(
+  def explode[A, B: TypeTag](inputColumn: String, outputColumn: String)(
       f: A => TraversableOnce[B]): DataFrame = {
     val dataType = ScalaReflection.schemaFor[B].dataType
     val attributes = AttributeReference(outputColumn, dataType)() :: Nil
@@ -1825,8 +1825,8 @@ class Dataset[T] private[sql](
       if (outputCols.nonEmpty) {
         val aggExprs = statistics.flatMap {
           case (_, colToAgg) =>
-            outputCols.map(
-                c => Column(Cast(colToAgg(Column(c).expr), StringType)).as(c))
+            outputCols.map(c =>
+                  Column(Cast(colToAgg(Column(c).expr), StringType)).as(c))
         }
 
         val row = agg(aggExprs.head, aggExprs.tail: _*).head().toSeq
@@ -1921,7 +1921,7 @@ class Dataset[T] private[sql](
     * @since 1.6.0
     */
   @Experimental
-  def map[U : Encoder](func: T => U): Dataset[U] = mapPartitions(_.map(func))
+  def map[U: Encoder](func: T => U): Dataset[U] = mapPartitions(_.map(func))
 
   /**
     * :: Experimental ::
@@ -1944,8 +1944,7 @@ class Dataset[T] private[sql](
     * @since 1.6.0
     */
   @Experimental
-  def mapPartitions[U : Encoder](
-      func: Iterator[T] => Iterator[U]): Dataset[U] = {
+  def mapPartitions[U: Encoder](func: Iterator[T] => Iterator[U]): Dataset[U] = {
     new Dataset[U](sqlContext,
                    MapPartitions[T, U](func, logicalPlan),
                    implicitly[Encoder[U]])
@@ -1976,7 +1975,7 @@ class Dataset[T] private[sql](
     * @since 1.6.0
     */
   @Experimental
-  def flatMap[U : Encoder](func: T => TraversableOnce[U]): Dataset[U] =
+  def flatMap[U: Encoder](func: T => TraversableOnce[U]): Dataset[U] =
     mapPartitions(_.flatMap(func))
 
   /**

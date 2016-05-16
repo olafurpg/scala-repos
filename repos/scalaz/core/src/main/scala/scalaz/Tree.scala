@@ -17,7 +17,7 @@ sealed abstract class Tree[A] {
   def subForest: Stream[Tree[A]]
 
   /** Maps the elements of the Tree into a Monoid and folds the resulting Tree. */
-  def foldMap[B : Monoid](f: A => B): B =
+  def foldMap[B: Monoid](f: A => B): B =
     Monoid[B].append(f(rootLabel),
                      Foldable[Stream].foldMap[Tree[A], B](subForest)(
                          (_: Tree[A]).foldMap(f)))
@@ -61,8 +61,8 @@ sealed abstract class Tree[A] {
       s match {
         case ts if ts.isEmpty => done(Vector.empty[StringBuilder])
         case t #:: ts if ts.isEmpty =>
-          suspend(t.draw).map(
-              subtree => new StringBuilder("|") +: shift(stem, "   ", subtree))
+          suspend(t.draw).map(subtree =>
+                new StringBuilder("|") +: shift(stem, "   ", subtree))
         case t #:: ts =>
           for {
             subtree <- suspend(t.draw)
@@ -100,9 +100,8 @@ sealed abstract class Tree[A] {
 
   /** Breadth-first traversal. */
   def levels: Stream[Stream[A]] = {
-    val f = (s: Stream[Tree[A]]) =>
-      {
-        Foldable[Stream].foldMap(s)((_: Tree[A]).subForest)
+    val f = (s: Stream[Tree[A]]) => {
+      Foldable[Stream].foldMap(s)((_: Tree[A]).subForest)
     }
     Stream.iterate(Stream(this))(f) takeWhile (!_.isEmpty) map
     (_ map (_.rootLabel))

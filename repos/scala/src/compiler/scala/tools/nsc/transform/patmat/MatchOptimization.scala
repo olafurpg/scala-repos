@@ -24,7 +24,8 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
 
   ////
   trait CommonSubconditionElimination
-      extends OptimizedCodegen with MatchApproximator {
+      extends OptimizedCodegen
+      with MatchApproximator {
 
     /** a flow-sensitive, generalised, common sub-expression elimination
       * reuse knowledge from performed tests
@@ -70,7 +71,8 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
                 ((simplify(priorTest.prop) == nonTrivial) ||
                     // our conditions are implied by priorTest if it checks the same thing directly
                     (nonTrivial subsetOf deps) // or if it depends on a superset of our conditions
-                    ) && (deps subsetOf tested) // the conditions we've tested when we are here in the match satisfy the prior test, and hence what it tested
+                    ) &&
+                (deps subsetOf tested) // the conditions we've tested when we are here in the match satisfy the prior test, and hence what it tested
             } foreach {
               case (priorTest, _) =>
                 // if so, note the dependency in both tests
@@ -95,8 +97,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
       // replace each reference to a variable originally bound by a collapsed test by a reference to the hoisted variable
       val reused = new mutable.HashMap[TreeMaker, ReusedCondTreeMaker]
       var okToCall = false
-      val reusedOrOrig = (tm: TreeMaker) =>
-        { assert(okToCall); reused.getOrElse(tm, tm) }
+      val reusedOrOrig = (tm: TreeMaker) => {
+        assert(okToCall); reused.getOrElse(tm, tm)
+      }
 
       // maybe collapse: replace shared prefix of tree makers by a ReusingCondTreeMaker
       // once this has been computed, we'll know which tree makers are reused,
@@ -109,9 +112,11 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
           val (sharedPrefix, suffix) =
             tests span { test =>
               (test.prop == True) || (for (reusedTest <- test.reuses;
-              nextDeps <- dependencies.get(reusedTest);
-              diff <- (nextDeps -- currDeps).headOption;
-              _ <- Some(currDeps = nextDeps)) yield diff).nonEmpty
+                                           nextDeps <- dependencies.get(
+                                                          reusedTest);
+                                           diff <- (nextDeps -- currDeps).headOption;
+                                           _ <- Some(currDeps = nextDeps)) yield
+                diff).nonEmpty
             }
 
           val collapsedTreeMakers =
@@ -130,9 +135,9 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
               // and the last of such interesting shared conditions reuses another treemaker's test
               // replace the whole sharedPrefix by a ReusingCondTreeMaker
               for (lastShared <- sharedPrefix.reverse
-                .dropWhile(_.prop == True)
-                .headOption;
-              lastReused <- lastShared.reuses) yield
+                                  .dropWhile(_.prop == True)
+                                  .headOption;
+                   lastReused <- lastShared.reuses) yield
                 ReusingCondTreeMaker(sharedPrefix, reusedOrOrig) :: suffix.map(
                     _.treeMaker)
             }
@@ -409,7 +414,7 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
           if (unguardedComesLastOrAbsent /*(1)*/ &&
               impliesCurr.forall(caseEquals(currCase)) /*(2)*/ ) {
             collapsed +=
-            (if (impliesCurr.isEmpty && !isGuardedCase(currCase)) currCase
+              (if (impliesCurr.isEmpty && !isGuardedCase(currCase)) currCase
              else collapse(currCase :: impliesCurr, currIsDefault))
 
             remainingCases = others
@@ -705,7 +710,8 @@ trait MatchOptimization extends MatchTreeMaking with MatchAnalysis {
   }
 
   trait MatchOptimizer
-      extends OptimizedCodegen with SwitchEmission
+      extends OptimizedCodegen
+      with SwitchEmission
       with CommonSubconditionElimination {
     override def optimizeCases(
         prevBinder: Symbol,

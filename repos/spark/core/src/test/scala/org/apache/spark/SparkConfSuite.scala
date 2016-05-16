@@ -31,7 +31,9 @@ import org.apache.spark.serializer.{KryoRegistrator, KryoSerializer}
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkConfSuite
-    extends SparkFunSuite with LocalSparkContext with ResetSystemProperties {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with ResetSystemProperties {
   test("Test byteString conversion") {
     val conf = new SparkConf()
     // Simply exercise the API, we don't need a complete conversion test since that's handled in
@@ -162,7 +164,7 @@ class SparkConfSuite
 
     try {
       val t0 = System.currentTimeMillis()
-      while ( (System.currentTimeMillis() - t0) < 1000) {
+      while ((System.currentTimeMillis() - t0) < 1000) {
         val conf = Try(new SparkConf(loadDefaults = true))
         assert(conf.isSuccess === true)
       }
@@ -170,7 +172,7 @@ class SparkConfSuite
       executor.shutdownNow()
       val sysProps = System.getProperties
       for (key <- sysProps.stringPropertyNames().asScala
-                     if key.startsWith("spark.5425.")) sysProps.remove(key)
+           if key.startsWith("spark.5425.")) sysProps.remove(key)
     }
   }
 

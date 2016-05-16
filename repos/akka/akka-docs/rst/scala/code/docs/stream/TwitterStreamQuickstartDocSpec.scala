@@ -46,14 +46,15 @@ object TwitterStreamQuickstartDocSpec {
                                 "#akka !") :: Tweet(
             Author("drewhk"),
             System.currentTimeMillis,
-            "#akka !") :: Tweet(Author("ktosopl"),
-                                System.currentTimeMillis,
-                                "#akka on the rocks!") :: Tweet(
-            Author("mmartynas"),
+            "#akka !") :: Tweet(
+            Author("ktosopl"),
             System.currentTimeMillis,
-            "wow #akka !") :: Tweet(Author("akkateam"),
-                                    System.currentTimeMillis,
-                                    "#akka rocks!") :: Tweet(
+            "#akka on the rocks!") :: Tweet(Author("mmartynas"),
+                                            System.currentTimeMillis,
+                                            "wow #akka !") :: Tweet(
+            Author("akkateam"),
+            System.currentTimeMillis,
+            "#akka rocks!") :: Tweet(
             Author("bananaman"),
             System.currentTimeMillis,
             "#bananas rock!") :: Tweet(Author("appleman"),

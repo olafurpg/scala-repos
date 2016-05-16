@@ -29,8 +29,8 @@ class FlattenProjections extends Phase {
         logger.debug("Flattened projection to", res)
         res
       case p: PathElement =>
-        logger.debug("Analyzing " + p.pathString + " with symbols " +
-                     translations.keySet.mkString(", "),
+        logger.debug("Analyzing " + p.pathString +
+                     " with symbols " + translations.keySet.mkString(", "),
                      p)
         val p2 = splitPath(p, translations.keySet) match {
           case Some((base, rest, tsym)) =>

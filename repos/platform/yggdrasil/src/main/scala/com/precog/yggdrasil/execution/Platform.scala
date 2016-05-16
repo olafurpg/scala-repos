@@ -32,6 +32,7 @@ trait Execution[M[+ _], +A] {
 }
 
 trait Platform[M[+ _], Block, +A]
-    extends Execution[M, A] with SecureVFSModule[M, Block] {
+    extends Execution[M, A]
+    with SecureVFSModule[M, Block] {
   def vfs: SecureVFS
 }

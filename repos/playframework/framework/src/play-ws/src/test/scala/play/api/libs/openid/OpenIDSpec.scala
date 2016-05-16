@@ -62,8 +62,8 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axRequired = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axRequired =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)
@@ -85,8 +85,8 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axOptional = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axOptional =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)
@@ -108,10 +108,10 @@ object OpenIDSpec extends Specification with Mockito {
           openId.redirectURL(
               "http://example.com",
               "http://foo.bar.com/returnto",
-              axRequired = Seq(
-                    "first" -> "http://axschema.org/namePerson/first"),
-              axOptional = Seq(
-                    "email" -> "http://schema.openid.net/contact/email")),
+              axRequired =
+                Seq("first" -> "http://axschema.org/namePerson/first"),
+              axOptional =
+                Seq("email" -> "http://schema.openid.net/contact/email")),
           dur)
 
       val query = parseQueryString(redirectUrl)

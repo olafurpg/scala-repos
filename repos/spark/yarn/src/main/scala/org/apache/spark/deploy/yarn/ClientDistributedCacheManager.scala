@@ -79,15 +79,15 @@ private[spark] class ClientDistributedCacheManager() extends Logging {
       val pathURI = new URI(
           uri.getScheme(), uri.getAuthority(), uri.getPath(), null, link)
       if (resourceType == LocalResourceType.FILE) {
-        distCacheFiles(pathURI.toString()) = (
-            destStatus.getLen().toString(),
-            destStatus.getModificationTime().toString(),
-            visibility.name())
+        distCacheFiles(pathURI.toString()) =
+          (destStatus.getLen().toString(),
+           destStatus.getModificationTime().toString(),
+           visibility.name())
       } else {
-        distCacheArchives(pathURI.toString()) = (
-            destStatus.getLen().toString(),
-            destStatus.getModificationTime().toString(),
-            visibility.name())
+        distCacheArchives(pathURI.toString()) =
+          (destStatus.getLen().toString(),
+           destStatus.getModificationTime().toString(),
+           visibility.name())
       }
     }
   }
@@ -102,18 +102,18 @@ private[spark] class ClientDistributedCacheManager() extends Logging {
       env("SPARK_YARN_CACHE_FILES") = keys.reduceLeft[String] { (acc, n) =>
         acc + "," + n
       }
-      env("SPARK_YARN_CACHE_FILES_TIME_STAMPS") = timeStamps
-        .reduceLeft[String] { (acc, n) =>
-        acc + "," + n
-      }
+      env("SPARK_YARN_CACHE_FILES_TIME_STAMPS") =
+        timeStamps.reduceLeft[String] { (acc, n) =>
+          acc + "," + n
+        }
       env("SPARK_YARN_CACHE_FILES_FILE_SIZES") = sizes.reduceLeft[String] {
         (acc, n) =>
           acc + "," + n
       }
-      env("SPARK_YARN_CACHE_FILES_VISIBILITIES") = visibilities
-        .reduceLeft[String] { (acc, n) =>
-        acc + "," + n
-      }
+      env("SPARK_YARN_CACHE_FILES_VISIBILITIES") =
+        visibilities.reduceLeft[String] { (acc, n) =>
+          acc + "," + n
+        }
     }
   }
 
@@ -127,18 +127,18 @@ private[spark] class ClientDistributedCacheManager() extends Logging {
       env("SPARK_YARN_CACHE_ARCHIVES") = keys.reduceLeft[String] { (acc, n) =>
         acc + "," + n
       }
-      env("SPARK_YARN_CACHE_ARCHIVES_TIME_STAMPS") = timeStamps
-        .reduceLeft[String] { (acc, n) =>
-        acc + "," + n
-      }
+      env("SPARK_YARN_CACHE_ARCHIVES_TIME_STAMPS") =
+        timeStamps.reduceLeft[String] { (acc, n) =>
+          acc + "," + n
+        }
       env("SPARK_YARN_CACHE_ARCHIVES_FILE_SIZES") = sizes.reduceLeft[String] {
         (acc, n) =>
           acc + "," + n
       }
-      env("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") = visibilities
-        .reduceLeft[String] { (acc, n) =>
-        acc + "," + n
-      }
+      env("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") =
+        visibilities.reduceLeft[String] { (acc, n) =>
+          acc + "," + n
+        }
     }
   }
 

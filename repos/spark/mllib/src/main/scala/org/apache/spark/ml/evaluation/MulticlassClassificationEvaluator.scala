@@ -33,7 +33,9 @@ import org.apache.spark.sql.types.DoubleType
 @Experimental
 class MulticlassClassificationEvaluator @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
-    extends Evaluator with HasPredictionCol with HasLabelCol
+    extends Evaluator
+    with HasPredictionCol
+    with HasLabelCol
     with DefaultParamsWritable {
 
   @Since("1.5.0")

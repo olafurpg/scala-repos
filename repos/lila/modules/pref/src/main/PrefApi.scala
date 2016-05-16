@@ -51,8 +51,8 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
            challenge = r.getD("challenge", Pref.default.challenge),
            message = r.getD("message", Pref.default.message),
            coordColor = r.getD("coordColor", Pref.default.coordColor),
-           puzzleDifficulty = r.getD(
-                 "puzzleDifficulty", Pref.default.puzzleDifficulty),
+           puzzleDifficulty =
+             r.getD("puzzleDifficulty", Pref.default.puzzleDifficulty),
            submitMove = r.getD("submitMove", Pref.default.submitMove),
            confirmResign = r.getD("confirmResign", Pref.default.confirmResign),
            insightShare = r.getD("insightShare", Pref.default.insightShare),

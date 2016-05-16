@@ -38,7 +38,8 @@ class BacktrackingLineSearch(initfval: Double,
               shrinkStep
             } else if (enforceWolfeConditions && (fderiv < cWolfe * df0)) {
               growStep
-            } else if (enforceStrongWolfeConditions && (fderiv > -cWolfe * df0)) {
+            } else if (enforceStrongWolfeConditions &&
+                       (fderiv > -cWolfe * df0)) {
               shrinkStep
             } else {
               1.0

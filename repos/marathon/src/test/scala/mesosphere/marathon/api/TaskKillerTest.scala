@@ -17,7 +17,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TaskKillerTest
-    extends MarathonSpec with Matchers with BeforeAndAfterAll with MockitoSugar
+    extends MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with MockitoSugar
     with ScalaFutures {
 
   var tracker: TaskTracker = _

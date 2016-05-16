@@ -25,7 +25,8 @@ private[akka] object MessageSerializer {
       .deserialize(messageProtocol.getMessage.toByteArray,
                    messageProtocol.getSerializerId,
                    if (messageProtocol.hasMessageManifest)
-                     messageProtocol.getMessageManifest.toStringUtf8 else "")
+                     messageProtocol.getMessageManifest.toStringUtf8
+                   else "")
       .get
   }
 

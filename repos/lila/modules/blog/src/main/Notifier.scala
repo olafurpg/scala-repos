@@ -15,8 +15,9 @@ private[blog] final class Notifier(blogApi: BlogApi,
         _ ?? (_.results.headOption)
       } foreach {
         _ ?? { post =>
-          ThreadRepo.visibleByUserContainingExists(
-              user = lichessUserId, containing = post.id) foreach {
+          ThreadRepo.visibleByUserContainingExists(user = lichessUserId,
+                                                   containing =
+                                                     post.id) foreach {
             case true => funit
             case false =>
               UserRepo recentlySeenNotKidIds DateTime.now.minusWeeks(2) foreach {

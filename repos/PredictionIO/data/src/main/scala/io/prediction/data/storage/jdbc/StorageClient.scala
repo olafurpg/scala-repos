@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[BaseStorageClient]] */
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
   override val prefix = "JDBC"
 
   if (!config.properties.contains("URL")) {

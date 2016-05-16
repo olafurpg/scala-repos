@@ -45,8 +45,8 @@ class ScalaDocUnbalancedHeaderInspection extends LocalInspectionTool {
           var sibl = s.getNextSibling
           val firstSibl = sibl
           while (sibl != null &&
-          sibl.getNode.getElementType != DOC_COMMENT_END &&
-          sibl.getNode.getElementType != DOC_WHITESPACE) {
+                 sibl.getNode.getElementType != DOC_COMMENT_END &&
+                 sibl.getNode.getElementType != DOC_WHITESPACE) {
             val highlightedElement =
               if (s.getNextSibling != null) s.getNextSibling else s
             holder.registerProblem(

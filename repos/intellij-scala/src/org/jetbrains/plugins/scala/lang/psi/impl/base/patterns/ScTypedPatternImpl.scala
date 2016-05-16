@@ -22,7 +22,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, Type
   * Date: 28.02.2008
   */
 class ScTypedPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypedPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScTypedPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
@@ -105,14 +106,13 @@ class ScTypedPatternImpl(node: ASTNode)
                                       param.getExtendsListTypes
                                     if (listTypes.isEmpty) types.Any
                                     else
-                                      subst.subst(
-                                          Bounds
-                                            .glb(listTypes.toSeq
-                                                   .map(ScType
-                                                       .create(_,
-                                                               getProject,
-                                                               param.getResolveScope)),
-                                                 checkWeak = true))
+                                      subst.subst(Bounds.glb(
+                                              listTypes.toSeq.map(
+                                                  ScType.create(
+                                                      _,
+                                                      getProject,
+                                                      param.getResolveScope)),
+                                              checkWeak = true))
                                   } else arg.upper //todo: glb?
                                 ScSkolemizedType(
                                     arg.name, arg.args, lowerBound, upperBound)

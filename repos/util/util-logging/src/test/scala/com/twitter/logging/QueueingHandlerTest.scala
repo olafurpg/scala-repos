@@ -24,7 +24,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class QueueingHandlerTest
-    extends WordSpec with Eventually with IntegrationPatience {
+    extends WordSpec
+    with Eventually
+    with IntegrationPatience {
 
   class MockHandler extends Handler(BareFormatter, None) {
     def publish(record: javalog.LogRecord) = ()

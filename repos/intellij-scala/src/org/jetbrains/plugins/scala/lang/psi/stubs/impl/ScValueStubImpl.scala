@@ -22,7 +22,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScValue](parent, elemType) with ScValueStub {
+    extends StubBaseWrapper[ScValue](parent, elemType)
+    with ScValueStub {
   private var names: Array[StringRef] = _
   private var declaration: Boolean = false
   private var typeText: StringRef = _

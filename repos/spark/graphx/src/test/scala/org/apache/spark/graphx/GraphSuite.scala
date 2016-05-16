@@ -166,8 +166,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
           Iterator(
               (part.iterator.flatMap(e => Iterator(e.srcId, e.dstId))).toSet)
         }.collect
-      assert(verts.exists(
-              id => partitionSetsUnpartitioned.count(_.contains(id)) > bound))
+      assert(verts.exists(id =>
+                partitionSetsUnpartitioned.count(_.contains(id)) > bound))
 
       // Forming triplets view
       val g = Graph(sc.parallelize(List((0L, "a"), (1L, "b"), (2L, "c"))),
@@ -199,7 +199,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
 
   test("mapVertices changing type with same erased type") {
     withSpark { sc =>
-      val vertices = sc.parallelize(Array[(Long, Option[java.lang.Integer])](
+      val vertices = sc.parallelize(
+          Array[(Long, Option[java.lang.Integer])](
               (1L, Some(1)),
               (2L, Some(2)),
               (3L, Some(3))
@@ -215,8 +216,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       // Change type of replicated vertices, but preserve erased type
       val graph1 = graph0.mapVertices {
         case (vid, integerOpt) =>
-          integerOpt.map(
-              (x: java.lang.Integer) => x.toDouble: java.lang.Double)
+          integerOpt.map((x: java.lang.Integer) =>
+                x.toDouble: java.lang.Double)
       }
       // Access replicated vertices, exposing the erased type
       val graph2 = graph1.mapTriplets(t => t.srcAttr.get)
@@ -348,18 +349,14 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
   test("aggregateMessages") {
     withSpark { sc =>
       val n = 5
-      val agg = starGraph(sc, n).aggregateMessages[String](
-          ctx =>
-            {
-              if (ctx.dstAttr != null) {
-                throw new Exception(
-                    "expected ctx.dstAttr to be null due to TripletFields, but it was " +
-                    ctx.dstAttr)
-              }
-              ctx.sendToDst(ctx.srcAttr)
-          },
-          _ + _,
-          TripletFields.Src)
+      val agg = starGraph(sc, n).aggregateMessages[String](ctx => {
+        if (ctx.dstAttr != null) {
+          throw new Exception(
+              "expected ctx.dstAttr to be null due to TripletFields, but it was " +
+              ctx.dstAttr)
+        }
+        ctx.sendToDst(ctx.srcAttr)
+      }, _ + _, TripletFields.Src)
       assert(
           agg.collect().toSet === (1 to n).map(x => (x: VertexId, "v")).toSet)
     }
@@ -382,8 +379,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
             (a: Int, b: Int) => a + b)
         .collect()
         .toSet
-      assert(neighborDegreeSums === Set((0: VertexId, n)) ++ (1 to n).map(
-              x => (x: VertexId, 0)))
+      assert(neighborDegreeSums === Set((0: VertexId, n)) ++ (1 to n).map(x =>
+                (x: VertexId, 0)))
       // outerJoinVertices preserving type
       val messages = reverseStar.vertices.mapValues { (vid, attr) =>
         vid.toString

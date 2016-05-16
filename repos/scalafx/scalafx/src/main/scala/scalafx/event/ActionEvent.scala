@@ -67,7 +67,8 @@ object ActionEvent {
   */
 class ActionEvent(
     override val delegate: jfxe.ActionEvent = new jfxe.ActionEvent)
-    extends Event(delegate) with SFXDelegate[jfxe.ActionEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxe.ActionEvent] {
 
   /**
     * Construct a new ActionEvent with the specified event source and target.

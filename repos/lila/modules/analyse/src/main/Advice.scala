@@ -16,8 +16,7 @@ sealed trait Advice {
   def makeComment(withEval: Boolean, withBestMove: Boolean): String =
     withEval.??(evalComment ?? { c =>
       s"($c) "
-    }) +
-    (this match {
+    }) + (this match {
           case MateAdvice(seq, _, _, _) => seq.desc
           case CpAdvice(nag, _, _) => nag.toString
         }) + "." + {

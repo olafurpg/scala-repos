@@ -14,7 +14,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class StopOnFirstMatchingOfferMatcherTest
-    extends FunSuite with Mockito with GivenWhenThen with Matchers
+    extends FunSuite
+    with Mockito
+    with GivenWhenThen
+    with Matchers
     with ScalaFutures {
   test("returns first match if non-empty") {
     Given("a sequence of matchers, the first matching")
@@ -54,8 +57,9 @@ class StopOnFirstMatchingOfferMatcherTest
       override lazy val matchers: Seq[OfferMatcher] = Seq(
           offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
                   offer.getId, resendThisOffer = true)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = false))
+          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                           resendThisOffer =
+                                                             false))
       )
     }
 
@@ -73,8 +77,9 @@ class StopOnFirstMatchingOfferMatcherTest
       override lazy val matchers: Seq[OfferMatcher] = Seq(
           offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
                   offer.getId, resendThisOffer = false)),
-          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(
-                  offer.getId, resendThisOffer = true))
+          offerMatcher(OfferMatcher.MatchedTaskOps.noMatch(offer.getId,
+                                                           resendThisOffer =
+                                                             true))
       )
     }
 

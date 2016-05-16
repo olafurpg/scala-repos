@@ -35,11 +35,12 @@ trait Dependent {
     * The Cell notifies the Dependent of the dependency
     */
   def youDependOnMe(who: Cell[_]): Unit = synchronized {
-    _iDependOn = new WeakReference(who.asInstanceOf[Object]) :: _iDependOn
-      .filter(_.get match {
-      case null => false
-      case x => x ne who
-    })
+    _iDependOn =
+      new WeakReference(who.asInstanceOf[Object]) :: _iDependOn.filter(
+          _.get match {
+        case null => false
+        case x => x ne who
+      })
   }
 
   /**
@@ -131,8 +132,7 @@ trait Cell[T] extends Dependent {
     */
   def removeDependent[T <: Dependent](dep: T): T = {
     synchronized {
-      _dependentCells = _dependentCells.filter(
-          _.get match {
+      _dependentCells = _dependentCells.filter(_.get match {
         case null => false
         case x => x ne dep
       })
@@ -263,8 +263,8 @@ final case class SeqCell[T](cells: Cell[T]*) extends Cell[Seq[T]] {
     */
   def currentValue: (Seq[T], Long) = {
     val tcv = cells.map(_.currentValue)
-    tcv.map(_._1) -> tcv.foldLeft(0L)(
-        (max, c) => if (max > c._2) max else c._2)
+    tcv.map(_._1) -> tcv.foldLeft(0L)((max, c) =>
+          if (max > c._2) max else c._2)
   }
 
   /**

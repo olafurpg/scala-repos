@@ -39,7 +39,8 @@ object Camera {
 }
 
 abstract class Camera(override val delegate: jfxs.Camera)
-    extends Node(delegate) with SFXDelegate[jfxs.Camera] {
+    extends Node(delegate)
+    with SFXDelegate[jfxs.Camera] {
 
   /**
     * Specifies the far clipping plane of this `Camera` in the eye coordinate system of this node.

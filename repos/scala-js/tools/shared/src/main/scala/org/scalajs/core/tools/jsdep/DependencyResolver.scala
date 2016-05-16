@@ -7,8 +7,8 @@ import JSLibResolveException.Problem
 
 object DependencyResolver {
 
-  type DependencyFilter = Traversable[FlatJSDependency] => Traversable[
-      FlatJSDependency]
+  type DependencyFilter =
+    Traversable[FlatJSDependency] => Traversable[FlatJSDependency]
 
   /** Constructs an ordered list of JS libraries to include. Fails if:
     *  - Resource names do not identify a unique resource on the classpath

@@ -63,14 +63,12 @@ object Configuration {
       //   own properties and directConfig rather than system properties.
       val applicationConfig: Config = {
         def setting(key: String): Option[AnyRef] =
-          directSettings
-            .get(key)
-            .orElse(Option(properties.getProperty(key)))
+          directSettings.get(key).orElse(Option(properties.getProperty(key)))
 
-          {
-            setting("config.resource").map(resource =>
-                  ConfigFactory.parseResources(classLoader, resource.toString))
-          } orElse {
+        {
+          setting("config.resource").map(resource =>
+                ConfigFactory.parseResources(classLoader, resource.toString))
+        } orElse {
           setting("config.file").map(fileName =>
                 ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
         } getOrElse {
@@ -236,10 +234,10 @@ case class Configuration(underlying: Config) {
         case Some(values) if values.contains(value) => value
         case Some(values) if values.isEmpty => value
         case Some(values) =>
-          throw reportError(path,
-                            "Incorrect value, one of " +
-                            (values.reduceLeft(_ + ", " + _)) +
-                            " was expected.")
+          throw reportError(
+              path,
+              "Incorrect value, one of " + (values.reduceLeft(_ + ", " + _)) +
+              " was expected.")
         case None => value
       }
     }
@@ -999,9 +997,9 @@ private[play] class PlayConfig(val underlying: Config) {
     *
     * Each object in the sequence will fallback to the object loaded from prototype.$path.
     */
-  def getPrototypedSeq(
-      path: String,
-      prototypePath: String = "prototype.$path"): Seq[PlayConfig] = {
+  def getPrototypedSeq(path: String,
+                       prototypePath: String =
+                         "prototype.$path"): Seq[PlayConfig] = {
     val prototype = underlying.getConfig(prototypePath.replace("$path", path))
     get[Seq[Config]](path).map { config =>
       new PlayConfig(config.withFallback(prototype))
@@ -1013,9 +1011,9 @@ private[play] class PlayConfig(val underlying: Config) {
     *
     * Each value in the map will fallback to the object loaded from prototype.$path.
     */
-  def getPrototypedMap(
-      path: String,
-      prototypePath: String = "prototype.$path"): Map[String, PlayConfig] = {
+  def getPrototypedMap(path: String,
+                       prototypePath: String =
+                         "prototype.$path"): Map[String, PlayConfig] = {
     val prototype =
       if (prototypePath.isEmpty) {
         underlying
@@ -1035,7 +1033,7 @@ private[play] class PlayConfig(val underlying: Config) {
     *
     * Otherwise, the configuration from path will be looked up.
     */
-  def getDeprecated[A : ConfigLoader](
+  def getDeprecated[A: ConfigLoader](
       path: String, deprecatedPaths: String*): A = {
     deprecatedPaths.collectFirst {
       case deprecated if underlying.hasPath(deprecated) =>
@@ -1146,15 +1144,16 @@ private[play] object ConfigLoader {
         path =>
           if (!config.getIsNull(path))
             FiniteDuration(config.getDuration(path, TimeUnit.MILLISECONDS),
-                           TimeUnit.MILLISECONDS) else Duration.Inf)
+                           TimeUnit.MILLISECONDS)
+          else Duration.Inf)
 
   implicit val finiteDurationLoader: ConfigLoader[FiniteDuration] =
     ConfigLoader(config => config.getDuration(_, TimeUnit.MILLISECONDS))
       .map(millis => FiniteDuration(millis, TimeUnit.MILLISECONDS))
   implicit val seqFiniteDurationLoader: ConfigLoader[Seq[FiniteDuration]] =
     ConfigLoader(config => config.getDurationList(_, TimeUnit.MILLISECONDS))
-      .map(toScala(_).map(
-            millis => FiniteDuration(millis, TimeUnit.MILLISECONDS)))
+      .map(toScala(_).map(millis =>
+              FiniteDuration(millis, TimeUnit.MILLISECONDS)))
 
   implicit val doubleLoader = ConfigLoader(_.getDouble)
   implicit val seqDoubleLoader = ConfigLoader(_.getDoubleList).map(toScala)

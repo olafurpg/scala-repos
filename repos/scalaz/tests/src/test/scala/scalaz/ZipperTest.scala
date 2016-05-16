@@ -122,11 +122,11 @@ object ZipperTest extends SpecLite {
 
   def insertionTest(name: String,
                     insertion: (Zipper[Int], Int) => Zipper[Int],
-                    pred: (Zipper[Int], Zipper[Int],
-                    Int) => Prop) = name ! forAll { (z: Zipper[Int], e: Int) =>
-    val zi = insertion(z, e)
-    pred(zi, z, e)
-  }
+                    pred: (Zipper[Int], Zipper[Int], Int) => Prop) =
+    name ! forAll { (z: Zipper[Int], e: Int) =>
+      val zi = insertion(z, e)
+      pred(zi, z, e)
+    }
 
   val leftAndFocusChanged: (Zipper[Int], Zipper[Int], Int) => Prop = {
     (zNew, zOld, newFocus) =>
@@ -443,8 +443,8 @@ object ZipperTest extends SpecLite {
 
   "findBy should not blow the stack" ! prop { z: Zipper[Int] =>
     var limit = 10 * 1000
-    z.findBy(z => if (limit > 0) { limit -= 1; some(z.nextC) } else none)(
-        x => false)
+    z.findBy(z => if (limit > 0) { limit -= 1; some(z.nextC) } else none)(x =>
+          false)
     true
   }
 
@@ -453,9 +453,9 @@ object ZipperTest extends SpecLite {
       leftSize <- Gen.choose(0, size - 2)
       rightSize = size - 1 - leftSize
       lefts <- Gen.containerOfN[Stream, Int](
-          leftSize, implicitly[Arbitrary[Int]].arbitrary)
+                  leftSize, implicitly[Arbitrary[Int]].arbitrary)
       rights <- Gen.containerOfN[Stream, Int](
-          rightSize, implicitly[Arbitrary[Int]].arbitrary)
+                   rightSize, implicitly[Arbitrary[Int]].arbitrary)
       focus <- arbitrary[Int]
     } yield zipper(lefts, focus, rights)
 
@@ -533,7 +533,7 @@ object ZipperTest extends SpecLite {
   checkAll("Zipper", comonad.laws[Zipper])
 
   {
-    implicit def zipperEqual[A : Equal]: Equal[Zipper[A]] =
+    implicit def zipperEqual[A: Equal]: Equal[Zipper[A]] =
       new Equal[Zipper[A]] {
         import std.stream.streamEqual
         def streamEqualApprox =

@@ -65,7 +65,7 @@ object RejectionHandler {
       * Handles several Rejections of the same type at the same time.
       * The seq passed to the given function is guaranteed to be non-empty.
       */
-    def handleAll[T <: Rejection : ClassTag](
+    def handleAll[T <: Rejection: ClassTag](
         f: immutable.Seq[T] ⇒ Route): this.type = {
       val runtimeClass = implicitly[ClassTag[T]].runtimeClass
       cases += TypeHandler[T](runtimeClass, f)
@@ -89,7 +89,8 @@ object RejectionHandler {
       extends Handler
   private final case class TypeHandler[T <: Rejection](
       runtimeClass: Class[_], f: immutable.Seq[T] ⇒ Route)
-      extends Handler with PartialFunction[Rejection, T] {
+      extends Handler
+      with PartialFunction[Rejection, T] {
     def isDefinedAt(rejection: Rejection) = runtimeClass isInstance rejection
     def apply(rejection: Rejection) = rejection.asInstanceOf[T]
   }
@@ -155,8 +156,8 @@ object RejectionHandler {
       .handle {
         case MalformedQueryParamRejection(name, msg, _) ⇒
           complete((BadRequest,
-                    "The query parameter '" + name +
-                    "' was malformed:\n" + msg))
+                    "The query parameter '" + name + "' was malformed:\n" +
+                    msg))
       }
       .handle {
         case MalformedRequestContentRejection(msg, _) ⇒
@@ -235,9 +236,10 @@ object RejectionHandler {
       }
       .handleAll[UnacceptedResponseEncodingRejection] { rejections ⇒
         val supported = rejections.flatMap(_.supported)
-        complete((NotAcceptable,
-                  "Resource representation is only available with these Content-Encodings:\n" +
-                  supported.map(_.value).mkString("\n")))
+        complete(
+            (NotAcceptable,
+             "Resource representation is only available with these Content-Encodings:\n" +
+             supported.map(_.value).mkString("\n")))
       }
       .handleAll[UnsupportedRequestContentTypeRejection] { rejections ⇒
         val supported = rejections.flatMap(_.supported).mkString(" or ")
@@ -260,9 +262,10 @@ object RejectionHandler {
         val supported = rejections.map(_.supportedProtocol)
         complete(HttpResponse(
                 BadRequest,
-                entity = s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
-              .map("'" + _ + "'")
-              .mkString(",")}.",
+                entity =
+                  s"None of the websocket subprotocols offered in the request are supported. Supported are ${supported
+                .map("'" + _ + "'")
+                .mkString(",")}.",
                 headers = `Sec-WebSocket-Protocol`(supported) :: Nil))
       }
       .handle {

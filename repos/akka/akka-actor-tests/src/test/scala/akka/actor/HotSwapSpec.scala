@@ -84,9 +84,7 @@ class HotSwapSpec extends AkkaSpec with ImplicitSender {
     }
 
     "be able to revert hotswap its behavior with unbecome" in {
-      val a = system.actorOf(
-          Props(
-              new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case "init" ⇒ sender() ! "init"
           case "swap" ⇒

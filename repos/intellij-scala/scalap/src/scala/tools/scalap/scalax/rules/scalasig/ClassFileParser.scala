@@ -99,10 +99,9 @@ trait ByteCodeReader extends RulesWithState {
 
   val u1 =
     byte ^^
-    (b =>
-          {
-            if (b >= 0) b.toInt
-            else b.toInt + 256
+    (b => {
+          if (b >= 0) b.toInt
+          else b.toInt + 256
         })
   val u2 = bytes(2) ^^ (_.toInt)
   val u4 = bytes(4) ^^ (_.toInt) // should map to Long??
@@ -287,8 +286,8 @@ case class ClassFile(header: ClassFileHeader,
       .map(attr => ClassFileParser.parseAnnotations(attr.byteCode))
 
   def annotation(name: String) =
-    annotations.flatMap(
-        seq => seq.find(annot => constant(annot.typeIndex) == name))
+    annotations.flatMap(seq =>
+          seq.find(annot => constant(annot.typeIndex) == name))
 }
 
 case class Attribute(nameIndex: Int, byteCode: ByteCode)

@@ -162,13 +162,14 @@ trait IntroduceTypeAlias {
               scopeItem)
 
           val introduceRunnable: Computable[
-              (SmartPsiElementPointer[PsiElement], SmartPsiElementPointer[
-                  PsiElement])] = introduceTypeAlias(file,
-                                                     editor,
-                                                     typeElement,
-                                                     allOccurrences,
-                                                     suggestedNames(0),
-                                                     scopeItem)
+              (SmartPsiElementPointer[PsiElement],
+               SmartPsiElementPointer[PsiElement])] = introduceTypeAlias(
+              file,
+              editor,
+              typeElement,
+              allOccurrences,
+              suggestedNames(0),
+              scopeItem)
 
           CommandProcessor.getInstance.executeCommand(project, new Runnable {
             def run() {
@@ -270,7 +271,7 @@ trait IntroduceTypeAlias {
       typeName: String,
       occurrences: OccurrenceData,
       scope: ScopeItem): (SmartPsiElementPointer[PsiElement],
-  SmartPsiElementPointer[PsiElement]) = {
+                          SmartPsiElementPointer[PsiElement]) = {
     def addTypeAliasDefinition(
         typeName: String, typeElement: ScTypeElement, parent: PsiElement) = {
       def getAhchor(parent: PsiElement,
@@ -374,17 +375,17 @@ trait IntroduceTypeAlias {
     editor.getSelectionModel.removeSelection()
   }
 
-  protected def introduceTypeAlias(file: PsiFile,
-                                   editor: Editor,
-                                   typeElement: ScTypeElement,
-                                   occurrences_ : OccurrenceData,
-                                   typeName: String,
-                                   scope: ScopeItem)
-    : Computable[(SmartPsiElementPointer[PsiElement], SmartPsiElementPointer[
-            PsiElement])] = {
+  protected def introduceTypeAlias(
+      file: PsiFile,
+      editor: Editor,
+      typeElement: ScTypeElement,
+      occurrences_ : OccurrenceData,
+      typeName: String,
+      scope: ScopeItem): Computable[(SmartPsiElementPointer[PsiElement],
+                                     SmartPsiElementPointer[PsiElement])] = {
 
-    new Computable[(SmartPsiElementPointer[PsiElement], SmartPsiElementPointer[
-            PsiElement])]() {
+    new Computable[(SmartPsiElementPointer[PsiElement],
+                    SmartPsiElementPointer[PsiElement])]() {
       def compute() =
         runRefactoringForTypeInside(
             file, editor, typeElement, typeName, occurrences_, scope)

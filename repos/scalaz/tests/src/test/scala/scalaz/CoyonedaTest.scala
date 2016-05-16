@@ -36,7 +36,7 @@ object CoyonedaTest extends SpecLite {
 
   object instances {
     def functor[F[_]] = Functor[Coyoneda[F, ?]]
-    def contravariant[F[_]: Functor : Contravariant] =
+    def contravariant[F[_]: Functor: Contravariant] =
       Contravariant[Coyoneda[F, ?]]
     def foldable[F[_]: Foldable] = Foldable[Coyoneda[F, ?]]
     def foldable1[F[_]: Foldable1] = Foldable1[Coyoneda[F, ?]]
@@ -50,8 +50,8 @@ object CoyonedaTest extends SpecLite {
     def bindRec[F[_]: BindRec] = BindRec[Coyoneda[F, ?]]
     def monad[F[_]: Monad] = Monad[Coyoneda[F, ?]]
     def monadPlus[F[_]: MonadPlus] = MonadPlus[Coyoneda[F, ?]]
-    def plus[F[_]: Functor : Plus] = Plus[Coyoneda[F, ?]]
-    def plusEmpty[F[_]: Functor : PlusEmpty] = PlusEmpty[Coyoneda[F, ?]]
+    def plus[F[_]: Functor: Plus] = Plus[Coyoneda[F, ?]]
+    def plusEmpty[F[_]: Functor: PlusEmpty] = PlusEmpty[Coyoneda[F, ?]]
     def cobind[F[_]: Cobind] = Cobind[Coyoneda[F, ?]]
     def comonad[F[_]: Comonad] = Comonad[Coyoneda[F, ?]]
     def equal[F[_], A](implicit F: Functor[F], E: Equal[F[A]]) =
@@ -60,7 +60,7 @@ object CoyonedaTest extends SpecLite {
       Order[Coyoneda[F, A]]
 
     // checking absence of ambiguity
-    def functor[F[_]: MonadPlus : Comonad : Traverse1] =
+    def functor[F[_]: MonadPlus: Comonad: Traverse1] =
       Functor[Coyoneda[F, ?]]
     def foldable[F[_]: Foldable1] = Foldable[Coyoneda[F, ?]]
     def foldable[F[_]: Traverse1] = Foldable[Coyoneda[F, ?]]

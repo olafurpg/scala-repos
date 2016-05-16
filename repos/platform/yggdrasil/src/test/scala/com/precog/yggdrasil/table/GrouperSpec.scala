@@ -70,7 +70,9 @@ solve 'a, 'b
  */
 
 trait GrouperSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+    extends BlockStoreTestSupport[M]
+    with Specification
+    with ScalaCheck {
   self =>
   def tic_a = CPathField("tic_a")
   def tic_b = CPathField("tic_b")
@@ -453,25 +455,23 @@ trait GrouperSpec[M[+ _]]
     val table = fromJson(simpleMultiKeyData)
     val groupId = newGroupId
 
-    val spec =
-      GroupingSource(
-          table,
-          SourceKey.Single,
-          Some(TransSpec1.Id),
-          groupId,
-          GroupKeySpecAnd(
-              GroupKeySpecSource(CPathField("extra"),
-                                 Filter(
-                                     Map1(DerefObjectStatic(
-                                              SourceValue.Single,
+    val spec = GroupingSource(
+        table,
+        SourceKey.Single,
+        Some(TransSpec1.Id),
+        groupId,
+        GroupKeySpecAnd(
+            GroupKeySpecSource(
+                CPathField("extra"),
+                Filter(Map1(DerefObjectStatic(SourceValue.Single,
                                               CPathField("a")),
-                                          eq12F1),
-                                     Map1(DerefObjectStatic(SourceValue.Single,
-                                                            CPathField("a")),
-                                          eq12F1))),
-              GroupKeySpecSource(tic_b,
-                                 DerefObjectStatic(SourceValue.Single,
-                                                   CPathField("b")))))
+                            eq12F1),
+                       Map1(DerefObjectStatic(SourceValue.Single,
+                                              CPathField("a")),
+                            eq12F1))),
+            GroupKeySpecSource(tic_b,
+                               DerefObjectStatic(SourceValue.Single,
+                                                 CPathField("b")))))
 
     val result = Table.merge(spec) { (key, map) =>
       for {
@@ -739,7 +739,7 @@ trait GrouperSpec[M[+ _]]
             val JNum(v) = obj \ "value"
 
             v must_==
-            (grouped1ab(ka.toInt)(kb.toInt).size + grouped2(ka.toInt).size)
+              (grouped1ab(ka.toInt)(kb.toInt).size + grouped2(ka.toInt).size)
           }
       }
     }
@@ -1313,7 +1313,9 @@ trait GrouperSpec[M[+ _]]
 }
 
 object GrouperSpec
-    extends TableModuleSpec[YId] with GrouperSpec[YId] with YIdInstances {
+    extends TableModuleSpec[YId]
+    with GrouperSpec[YId]
+    with YIdInstances {
   type YggConfig = IdSourceConfig
   val yggConfig = new IdSourceConfig {
     val idSource = new FreshAtomicIdSource

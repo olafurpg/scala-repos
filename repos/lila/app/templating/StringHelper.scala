@@ -46,12 +46,9 @@ trait StringHelper { self: NumberHelper =>
 
   def markdownLinks(text: String) = Html {
     nl2br {
-      markdownLinkRegex.replaceAllIn(
-          escape(text),
-          m =>
-            {
-              s"""<a href="${m group 2}">${m group 1}</a>"""
-          })
+      markdownLinkRegex.replaceAllIn(escape(text), m => {
+        s"""<a href="${m group 2}">${m group 1}</a>"""
+      })
     }
   }
 
@@ -59,14 +56,11 @@ trait StringHelper { self: NumberHelper =>
     """(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s<>]+|\(([^\s<>]+|(\([^\s<>]+\)))*\))+(?:\(([^\s<>]+|(\([^\s<>]+\)))*\)|[^\s`!\[\]{};:'".,<>?«»“”‘’]))""".r
 
   def addLinks(text: String) =
-    urlRegex.replaceAllIn(
-        text,
-        m =>
-          {
-            val url = delocalize(quoteReplacement(m group 1))
-            val target = if (url contains netDomain) "" else " target='blank'"
-            s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
-        })
+    urlRegex.replaceAllIn(text, m => {
+      val url = delocalize(quoteReplacement(m group 1))
+      val target = if (url contains netDomain) "" else " target='blank'"
+      s"""<a$target rel="nofollow" href="${prependHttp(url)}">$url</a>"""
+    })
 
   private def prependHttp(url: String): String =
     url startsWith "http" fold (url, "http://" + url)

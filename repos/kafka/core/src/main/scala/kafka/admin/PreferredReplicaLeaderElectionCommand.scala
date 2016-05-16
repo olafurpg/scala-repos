@@ -125,8 +125,8 @@ object PreferredReplicaLeaderElectionCommand extends Logging {
       partitionsUndergoingPreferredReplicaElection: scala.collection.Set[
           TopicAndPartition]) {
     val zkPath = ZkUtils.PreferredReplicaLeaderElectionPath
-    val partitionsList = partitionsUndergoingPreferredReplicaElection.map(
-        e => Map("topic" -> e.topic, "partition" -> e.partition))
+    val partitionsList = partitionsUndergoingPreferredReplicaElection.map(e =>
+          Map("topic" -> e.topic, "partition" -> e.partition))
     val jsonData =
       Json.encode(Map("version" -> 1, "partitions" -> partitionsList))
     try {
@@ -151,8 +151,8 @@ class PreferredReplicaLeaderElectionCommand(
     extends Logging {
   def moveLeaderToPreferredReplica() = {
     try {
-      val validPartitions = partitions.filter(
-          p => validatePartition(zkUtils, p.topic, p.partition))
+      val validPartitions = partitions.filter(p =>
+            validatePartition(zkUtils, p.topic, p.partition))
       PreferredReplicaLeaderElectionCommand.writePreferredReplicaElectionData(
           zkUtils, validPartitions)
     } catch {

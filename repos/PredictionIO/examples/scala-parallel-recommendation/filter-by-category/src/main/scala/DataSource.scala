@@ -42,12 +42,13 @@ class DataSource(val dsp: DataSourceParams)
           }
       }
 
-    val rateEventsRDD: RDD[Event] = eventsDb.find(
-        appId = dsp.appId,
-        entityType = Some("user"),
-        eventNames = Some(List("rate", "buy")), // read "rate" and "buy" event
-        // targetEntityType is optional field of an event.
-        targetEntityType = Some(Some("item")))(sc)
+    val rateEventsRDD: RDD[Event] =
+      eventsDb.find(appId = dsp.appId,
+                    entityType = Some("user"),
+                    eventNames =
+                      Some(List("rate", "buy")), // read "rate" and "buy" event
+                    // targetEntityType is optional field of an event.
+                    targetEntityType = Some(Some("item")))(sc)
 
     val ratingsRDD: RDD[Rating] = rateEventsRDD.map { event =>
       val rating = try {

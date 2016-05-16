@@ -29,7 +29,10 @@ import java.io.File
 import scala.io.Source
 
 object ParserSpecs
-    extends Specification with ScalaCheck with StubPhases with Parser {
+    extends Specification
+    with ScalaCheck
+    with StubPhases
+    with Parser {
   import ast._
 
   val keywords = Set("new",

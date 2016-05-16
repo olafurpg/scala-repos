@@ -10,7 +10,10 @@ import mesosphere.marathon.test.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class WebJarServletTest
-    extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
 
   test("Get the / will send a redirect") {
     Given("A request response mock")

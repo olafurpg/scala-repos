@@ -68,7 +68,7 @@ trait StreamTest extends QueryTest with Timeouts {
     def toDF(): DataFrame =
       Dataset.newDataFrame(sqlContext, StreamingRelation(s))
 
-    def toDS[A : Encoder](): Dataset[A] =
+    def toDS[A: Encoder](): Dataset[A] =
       Dataset(sqlContext, StreamingRelation(s))
   }
 
@@ -116,7 +116,7 @@ trait StreamTest extends QueryTest with Timeouts {
     * This operation automatically blocks until all added data has been processed.
     */
   object CheckAnswer {
-    def apply[A : Encoder](data: A*): CheckAnswerRows = {
+    def apply[A: Encoder](data: A*): CheckAnswerRows = {
       val encoder = encoderFor[A]
       val toExternalRow = RowEncoder(encoder.schema)
       CheckAnswerRows(data.map(d => toExternalRow.fromRow(encoder.toRow(d))))
@@ -126,7 +126,8 @@ trait StreamTest extends QueryTest with Timeouts {
   }
 
   case class CheckAnswerRows(expectedAnswer: Seq[Row])
-      extends StreamAction with StreamMustBeRunning {
+      extends StreamAction
+      with StreamMustBeRunning {
     override def toString: String =
       s"CheckAnswer: ${expectedAnswer.mkString(",")}"
   }
@@ -140,7 +141,7 @@ trait StreamTest extends QueryTest with Timeouts {
   case object StartStream extends StreamAction
 
   /** Signals that a failure is expected and should not kill the test. */
-  case class ExpectFailure[T <: Throwable : ClassTag]() extends StreamAction {
+  case class ExpectFailure[T <: Throwable: ClassTag]() extends StreamAction {
     val causeClass: Class[T] =
       implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
     override def toString(): String =
@@ -223,7 +224,8 @@ trait StreamTest extends QueryTest with Timeouts {
 
     def threadState =
       if (currentStream != null && currentStream.microBatchThread.isAlive)
-        "alive" else "dead"
+        "alive"
+      else "dead"
 
     def testState =
       s"""

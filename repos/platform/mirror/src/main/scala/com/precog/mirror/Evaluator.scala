@@ -34,8 +34,12 @@ import scala.collection.mutable
 
 // TODO soup up all provenance sites with resolution of ParametricProvenance
 trait EvaluatorModule
-    extends ProvenanceChecker with Binder with GroupSolver with Compiler
-    with LineErrors with LibraryModule {
+    extends ProvenanceChecker
+    with Binder
+    with GroupSolver
+    with Compiler
+    with LineErrors
+    with LibraryModule {
 
   import ast._
 

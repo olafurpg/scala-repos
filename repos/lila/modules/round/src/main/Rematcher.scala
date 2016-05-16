@@ -55,12 +55,13 @@ private[round] final class Rematcher(messenger: Messenger,
     for {
       nextGame ← returnGame(pov) map (_.start)
       _ ← (GameRepo insertDenormalized nextGame) >> GameRepo.saveNext(
-          pov.game, nextGame.id) >>- messenger.system(
-          pov.game, _.rematchOfferAccepted) >>- {
-        isRematchCache.put(nextGame.id)
-        if (pov.game.variant == Chess960 && !rematch960Cache.get(pov.game.id))
-          rematch960Cache.put(nextGame.id)
-      }
+             pov.game, nextGame.id) >>- messenger.system(
+             pov.game, _.rematchOfferAccepted) >>- {
+           isRematchCache.put(nextGame.id)
+           if (pov.game.variant == Chess960 &&
+               !rematch960Cache.get(pov.game.id))
+             rematch960Cache.put(nextGame.id)
+         }
     } yield {
       onStart(nextGame.id)
       redirectEvents(nextGame)
@@ -90,15 +91,16 @@ private[round] final class Rematcher(messenger: Messenger,
     } yield
       Game.make(
           game = ChessGame(
-                board = Board(pieces, variant = pov.game.variant).withCastles {
+              board = Board(pieces, variant = pov.game.variant).withCastles {
                 situation.fold(Castles.init)(_.situation.board.history.castles)
               },
-                clock = pov.game.clock map (_.reset),
-                turns = situation ?? (_.turns),
-                startedAtTurn = situation ?? (_.turns)),
+              clock = pov.game.clock map (_.reset),
+              turns = situation ?? (_.turns),
+              startedAtTurn = situation ?? (_.turns)),
           whitePlayer = returnPlayer(pov.game, White, users),
           blackPlayer = returnPlayer(pov.game, Black, users),
-          mode = if (users.exists(_.lame)) chess.Mode.Casual
+          mode =
+            if (users.exists(_.lame)) chess.Mode.Casual
             else pov.game.mode,
           variant = pov.game.variant,
           source = pov.game.source | Source.Lobby,

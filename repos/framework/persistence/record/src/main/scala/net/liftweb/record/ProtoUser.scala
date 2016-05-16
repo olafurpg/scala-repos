@@ -182,7 +182,9 @@ trait ProtoUser[T <: ProtoUser[T]] extends Record[T] { self: T =>
   * get a bunch of user functionality including password reset, etc.
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
-    extends MetaRecord[ModelType] with GenProtoUser { self: ModelType =>
+    extends MetaRecord[ModelType]
+    with GenProtoUser {
+  self: ModelType =>
 
   type TheUserType = ModelType
 
@@ -340,11 +342,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * The list of fields presented to the user for editing
     */
   def editFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone)
+    List(firstName, lastName, email, locale, timezone)
 }
 
 /**

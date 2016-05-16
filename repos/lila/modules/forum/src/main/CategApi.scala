@@ -12,17 +12,16 @@ private[forum] final class CategApi(env: Env) {
   def list(teams: Set[String], troll: Boolean): Fu[List[CategView]] =
     for {
       categs ← CategRepo withTeams teams
-      views ←
-      (categs map { categ =>
-            env.postApi get (categ lastPostId troll) map { topicPost =>
-              CategView(categ, topicPost map {
-                _ match {
-                  case (topic, post) =>
-                    (topic, post, env.postApi lastPageOf topic)
-                }
-              }, troll)
-            }
-          }).sequenceFu
+      views ← (categs map { categ =>
+                   env.postApi get (categ lastPostId troll) map { topicPost =>
+                     CategView(categ, topicPost map {
+                       _ match {
+                         case (topic, post) =>
+                           (topic, post, env.postApi lastPageOf topic)
+                       }
+                     }, troll)
+                   }
+                 }).sequenceFu
     } yield views
 
   def teamNbPosts(slug: String): Fu[Int] = CategRepo nbPosts teamSlug(slug)
@@ -50,7 +49,8 @@ private[forum] final class CategApi(env: Env) {
           author = none,
           userId = "lichess".some,
           ip = none,
-          text = "Welcome to the %s forum!\nOnly members of the team can post here, but everybody can read." format name,
+          text =
+            "Welcome to the %s forum!\nOnly members of the team can post here, but everybody can read." format name,
           number = 1,
           troll = false,
           hidden = topic.hidden,
@@ -79,14 +79,14 @@ private[forum] final class CategApi(env: Env) {
       nbPostsTroll ← PostRepoTroll countByTopics topicIdsTroll
       lastPostTroll ← PostRepoTroll lastByTopics topicIdsTroll
       _ ← $update(
-          categ.copy(
-              nbTopics = topics.size,
-              nbPosts = nbPosts,
-              lastPostId = lastPost ?? (_.id),
-              nbTopicsTroll = topicsTroll.size,
-              nbPostsTroll = nbPostsTroll,
-              lastPostIdTroll = lastPostTroll ?? (_.id)
-          ))
+             categ.copy(
+                 nbTopics = topics.size,
+                 nbPosts = nbPosts,
+                 lastPostId = lastPost ?? (_.id),
+                 nbTopicsTroll = topicsTroll.size,
+                 nbPostsTroll = nbPostsTroll,
+                 lastPostIdTroll = lastPostTroll ?? (_.id)
+             ))
     } yield ()
 
   def denormalize: Funit =

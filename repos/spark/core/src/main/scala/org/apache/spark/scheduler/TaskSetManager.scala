@@ -53,7 +53,8 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
                                     val taskSet: TaskSet,
                                     val maxTaskFailures: Int,
                                     clock: Clock = new SystemClock())
-    extends Schedulable with Logging {
+    extends Schedulable
+    with Logging {
 
   val conf = sched.sc.conf
 
@@ -382,7 +383,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       execId: String, host: String, maxLocality: TaskLocality.Value)
     : Option[(Int, TaskLocality.Value, Boolean)] = {
     for (index <- dequeueTaskFromList(
-        execId, getPendingTasksForExecutor(execId))) {
+                     execId, getPendingTasksForExecutor(execId))) {
       return Some((index, TaskLocality.PROCESS_LOCAL, false))
     }
 
@@ -856,7 +857,7 @@ private[spark] class TaskSetManager(sched: TaskSchedulerImpl,
       }
     }
     for ((tid, info) <- taskInfos if info.running &&
-                       info.executorId == execId) {
+         info.executorId == execId) {
       val exitCausedByApp: Boolean = reason match {
         case exited: ExecutorExited => exited.exitCausedByApp
         case ExecutorKilled => false

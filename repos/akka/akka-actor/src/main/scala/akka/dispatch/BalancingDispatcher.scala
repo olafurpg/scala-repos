@@ -60,7 +60,8 @@ class BalancingDispatcher(
 
   private class SharingMailbox(
       val system: ActorSystemImpl, _messageQueue: MessageQueue)
-      extends Mailbox(_messageQueue) with DefaultSystemMessageQueue {
+      extends Mailbox(_messageQueue)
+      with DefaultSystemMessageQueue {
     override def cleanUp(): Unit = {
       val dlq = mailboxes.deadLetterMailbox
       //Don't call the original implementation of this since it scraps all messages, and we don't want to do that

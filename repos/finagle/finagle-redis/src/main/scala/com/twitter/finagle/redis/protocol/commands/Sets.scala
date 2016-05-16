@@ -35,7 +35,8 @@ object SMembers {
 }
 
 case class SIsMember(key: ChannelBuffer, value: ChannelBuffer)
-    extends StrictKeyCommand with StrictValueCommand {
+    extends StrictKeyCommand
+    with StrictValueCommand {
   val command = Commands.SISMEMBER
   override def toChannelBuffer =
     RedisCodec.toUnifiedFormat(Seq(CommandBytes.SISMEMBER, key, value))
@@ -92,8 +93,8 @@ case class SRandMember(key: ChannelBuffer, count: Option[Int] = None)
   val command = Commands.SRANDMEMBER
   override def toChannelBuffer = {
     val commands =
-      Seq(CommandBytes.SRANDMEMBER, key) ++ count.map(
-          c => StringToChannelBuffer(c.toString))
+      Seq(CommandBytes.SRANDMEMBER, key) ++ count.map(c =>
+            StringToChannelBuffer(c.toString))
     RedisCodec.toUnifiedFormat(commands)
   }
 }

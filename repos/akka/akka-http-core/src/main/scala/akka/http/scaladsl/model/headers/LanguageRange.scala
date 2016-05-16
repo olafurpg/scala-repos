@@ -11,7 +11,8 @@ import akka.http.javadsl.{model ⇒ jm}
 import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed trait LanguageRange
-    extends jm.headers.LanguageRange with ValueRenderable
+    extends jm.headers.LanguageRange
+    with ValueRenderable
     with WithQValue[LanguageRange] {
   def qValue: Float
   def primaryTag: String
@@ -36,7 +37,8 @@ object LanguageRange {
     def matches(lang: Language) = true
     def withQValue(qValue: Float) =
       if (qValue == 1.0f) `*`
-      else if (qValue != this.qValue) `*`(qValue.toFloat) else this
+      else if (qValue != this.qValue) `*`(qValue.toFloat)
+      else this
   }
   object `*` extends `*`(1.0f)
 
@@ -58,7 +60,8 @@ object LanguageRange {
 }
 
 final case class Language(primaryTag: String, subTags: immutable.Seq[String])
-    extends jm.headers.Language with ValueRenderable
+    extends jm.headers.Language
+    with ValueRenderable
     with WithQValue[LanguageRange] {
   def withQValue(qValue: Float) = LanguageRange(this, qValue.toFloat)
   def render[R <: Rendering](r: R): r.type = {

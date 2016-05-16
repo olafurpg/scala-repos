@@ -6,7 +6,8 @@ trait PullRequestComponent extends TemplateComponent { self: Profile =>
   lazy val PullRequests = TableQuery[PullRequests]
 
   class PullRequests(tag: Tag)
-      extends Table[PullRequest](tag, "PULL_REQUEST") with IssueTemplate {
+      extends Table[PullRequest](tag, "PULL_REQUEST")
+      with IssueTemplate {
     val branch = column[String]("BRANCH")
     val requestUserName = column[String]("REQUEST_USER_NAME")
     val requestRepositoryName = column[String]("REQUEST_REPOSITORY_NAME")

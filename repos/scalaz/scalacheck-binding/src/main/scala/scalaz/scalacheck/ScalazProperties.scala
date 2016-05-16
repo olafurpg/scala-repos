@@ -49,9 +49,8 @@ object ScalazProperties {
 
     import scala.math.{Ordering => SOrdering}
 
-    def scalaOrdering[A : Order : SOrdering : Arbitrary] =
-      forAll(
-          (a1: A, a2: A) =>
+    def scalaOrdering[A: Order: SOrdering: Arbitrary] =
+      forAll((a1: A, a2: A) =>
             Order[A].order(a1, a2) == Ordering.fromInt(
                 SOrdering[A].compare(a1, a2)))
 
@@ -246,8 +245,8 @@ object ScalazProperties {
         p.property("identity") = applicative.identity[F, Int]
         p.property("homomorphism") = applicative.homomorphism[F, Int, Int]
         p.property("interchange") = applicative.interchange[F, Int, Int]
-        p.property("map consistent with ap") = applicative
-          .mapApConsistency[F, Int, Int]
+        p.property("map consistent with ap") =
+          applicative.mapApConsistency[F, Int, Int]
       }
   }
 
@@ -274,8 +273,8 @@ object ScalazProperties {
         p.include(ScalazProperties.apply.laws[M])
 
         p.property("associativity") = bind.associativity[M, Int, Int, Int]
-        p.property("ap consistent with bind") = bind
-          .bindApConsistency[M, Int, Int]
+        p.property("ap consistent with bind") =
+          bind.bindApConsistency[M, Int, Int]
       }
   }
 
@@ -292,8 +291,8 @@ object ScalazProperties {
                    ag: Arbitrary[M[Int => Int]],
                    e: Equal[M[Int]]): Properties =
       newProperties("bindRec") { p =>
-        p.property("tailrecM is consistent with bind") = bindRec
-          .tailrecBindConsistency[M, Int]
+        p.property("tailrecM is consistent with bind") =
+          bindRec.tailrecBindConsistency[M, Int]
       }
   }
 
@@ -335,8 +334,8 @@ object ScalazProperties {
                    e: Equal[F[Int]]): Properties =
       newProperties("cobind") { p =>
         p.include(functor.laws[F])
-        p.property("cobind associative") = cobindAssociative[
-            F, Int, Int, Int, Int]
+        p.property("cobind associative") =
+          cobindAssociative[F, Int, Int, Int, Int]
       }
   }
 
@@ -419,8 +418,8 @@ object ScalazProperties {
         p.property("purity.option") = purity[F, Option, Int]
         p.property("purity.stream") = purity[F, Stream, Int]
 
-        p.property("sequential fusion") = resizeProp(
-            sequentialFusion[F, Option, List, Int, Int, Int], 3)
+        p.property("sequential fusion") =
+          resizeProp(sequentialFusion[F, Option, List, Int, Int, Int], 3)
       // TODO naturality, parallelFusion
       }
   }
@@ -606,12 +605,12 @@ object ScalazProperties {
         MN: Equal[M[N[F[C]]]]): Prop =
       forAll(F.traverse1Law.sequentialFusion1[N, M, A, B, C] _)
 
-    def naturality1[F[_], N[_], M[_], A](nat: (M ~> N))(
-        implicit fma: Arbitrary[F[M[A]]],
-        F: Traverse1[F],
-        N: Apply[N],
-        M: Apply[M],
-        NFA: Equal[N[F[A]]]): Prop =
+    def naturality1[F[_], N[_], M[_], A](
+        nat: (M ~> N))(implicit fma: Arbitrary[F[M[A]]],
+                       F: Traverse1[F],
+                       N: Apply[N],
+                       M: Apply[M],
+                       NFA: Equal[N[F[A]]]): Prop =
       forAll(F.traverse1Law.naturality1[N, M, A](nat) _)
 
     def parallelFusion1[F[_], N[_], M[_], A, B](
@@ -634,8 +633,8 @@ object ScalazProperties {
 
         import std.list._, std.option._
 
-        p.property("sequential fusion (1)") = resizeProp(
-            sequentialFusion1[F, Option, List, Int, Int, Int], 3)
+        p.property("sequential fusion (1)") =
+          resizeProp(sequentialFusion1[F, Option, List, Int, Int, Int], 3)
       // TODO naturality1, parallelFusion1
       }
   }
@@ -778,10 +777,10 @@ object ScalazProperties {
                         el: Equal[(Int =>: Int) =>: Int],
                         er: Equal[Int =>: (Int =>: Int)]): Properties =
       newProperties("associative") { p =>
-        p.property("left and then right reassociation is identity") = leftRight[
-            =>:, Int, Int, Int]
-        p.property("right and then left reassociation is identity") = rightLeft[
-            =>:, Int, Int, Int]
+        p.property("left and then right reassociation is identity") =
+          leftRight[=>:, Int, Int, Int]
+        p.property("right and then left reassociation is identity") =
+          rightLeft[=>:, Int, Int, Int]
       }
   }
 

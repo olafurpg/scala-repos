@@ -7,7 +7,7 @@ import Lexer.EOF
 
 abstract class LogReplay {
   def logreplay(event: String, x: => Boolean): Boolean
-  def logreplay[T : Pickler](event: String, x: => Option[T]): Option[T]
+  def logreplay[T: Pickler](event: String, x: => Option[T]): Option[T]
   def close()
   def flush()
 }
@@ -22,7 +22,7 @@ class Logger(wr0: Writer) extends LogReplay {
     if (xx) { insertComma(); pkl[Unit].labelled(event).pickle(wr, ()) }
     xx
   }
-  def logreplay[T : Pickler](event: String, x: => Option[T]) = {
+  def logreplay[T: Pickler](event: String, x: => Option[T]) = {
     val xx = x
     xx match {
       case Some(y) => insertComma(); pkl[T].labelled(event).pickle(wr, y)
@@ -36,7 +36,7 @@ class Logger(wr0: Writer) extends LogReplay {
 
 object NullLogger extends LogReplay {
   def logreplay(event: String, x: => Boolean) = x
-  def logreplay[T : Pickler](event: String, x: => Option[T]) = x
+  def logreplay[T: Pickler](event: String, x: => Option[T]) = x
   def close() {}
   def flush() {}
 }
@@ -58,7 +58,7 @@ class Replayer(raw: Reader) extends LogReplay {
       }
     }
 
-  def logreplay[T : Pickler](event: String, x: => Option[T]) =
+  def logreplay[T: Pickler](event: String, x: => Option[T]) =
     if (rd.token == EOF) NullLogger.logreplay(event, x)
     else {
       eatComma()

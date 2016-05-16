@@ -41,10 +41,10 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   def buildTableSchemaDescription(table: Table[_]): SchemaDescription =
     new DDL(Vector(table))
 
-  type QueryActionExtensionMethods[R, S <: NoStream] = QueryActionExtensionMethodsImpl[
-      R, S]
-  type StreamingQueryActionExtensionMethods[R, T] = StreamingQueryActionExtensionMethodsImpl[
-      R, T]
+  type QueryActionExtensionMethods[R, S <: NoStream] =
+    QueryActionExtensionMethodsImpl[R, S]
+  type StreamingQueryActionExtensionMethods[R, T] =
+    StreamingQueryActionExtensionMethodsImpl[R, T]
   type SchemaActionExtensionMethods = SchemaActionExtensionMethodsImpl
   type InsertActionExtensionMethods[T] = InsertActionExtensionMethodsImpl[T]
 
@@ -64,7 +64,7 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   lazy val MappedColumnType = new MappedColumnTypeFactory
 
   class MappedColumnTypeFactory extends super.MappedColumnTypeFactory {
-    def base[T : ClassTag, U : BaseColumnType](
+    def base[T: ClassTag, U: BaseColumnType](
         tmap: T => U, tcomap: U => T): BaseColumnType[T] = {
       assertNonNullType(implicitly[BaseColumnType[U]])
       new MappedColumnType(implicitly[BaseColumnType[U]], tmap, tcomap)
@@ -74,7 +74,8 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
   class MappedColumnType[T, U](
       val baseType: ColumnType[U], toBase: T => U, toMapped: U => T)(
       implicit val classTag: ClassTag[T])
-      extends ScalaType[T] with BaseTypedType[T] {
+      extends ScalaType[T]
+      with BaseTypedType[T] {
     def nullable: Boolean = baseType.nullable
     def ordered: Boolean = baseType.ordered
     def scalaOrderingFor(ord: Ordering): scala.math.Ordering[T] =
@@ -103,8 +104,8 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
           b ++= fromV.map(
               v =>
                 converter
-                  .asInstanceOf[
-                      ResultConverter[MemoryResultConverterDomain, _]]
+                  .asInstanceOf[ResultConverter[MemoryResultConverterDomain,
+                                                _]]
                   .read(v.asInstanceOf[QueryInterpreter.ProductValue]))
           b.result()
         case n => super.run(n)
@@ -140,10 +141,10 @@ trait MemoryProfile extends RelationalProfile with MemoryQueryingProfile {
       new DDL(tables ++ other.asInstanceOf[DDL].tables)
   }
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedBasicAction[
-      R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] = FixedBasicStreamingAction[
-      R, T, E]
+  type ProfileAction[+R, +S <: NoStream, -E <: Effect] =
+    FixedBasicAction[R, S, E]
+  type StreamingProfileAction[+R, +T, -E <: Effect] =
+    FixedBasicStreamingAction[R, T, E]
 
   protected[this] def dbAction[R, S <: NoStream, E <: Effect](
       f: Backend#Session => R): ProfileAction[R, S, E] =

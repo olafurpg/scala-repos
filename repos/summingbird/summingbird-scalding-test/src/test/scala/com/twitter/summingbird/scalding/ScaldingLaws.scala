@@ -60,7 +60,7 @@ class ScaldingLaws extends WordSpec {
 
   implicit def timeExtractor[T <: (Long, _)] = TestUtil.simpleTimeExtractor[T]
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   "The ScaldingPlatform" should {
 
@@ -465,11 +465,11 @@ class ScaldingLaws extends WordSpec {
                                                    Int,
                                                    Int,
                                                    Int,
-                                                   Int](
-          source1,
-          source2,
-          storeAndService,
-          finalStore)(tup => fnA(tup._2))(tup => fnB(tup._2))(postJoin)
+                                                   Int](source1,
+                                                        source2,
+                                                        storeAndService,
+                                                        finalStore)(tup =>
+            fnA(tup._2))(tup => fnB(tup._2))(postJoin)
 
       val scald = Scalding("scalaCheckleftJoinWithStoreJob")
       val ws = new LoopState(intr)
@@ -611,16 +611,16 @@ class ScaldingLaws extends WordSpec {
         TestSource(inWithTime,
                    Some(DateRange(RichDate(0), RichDate(endTimeOfLastBatch))))
 
-      val summer = TestGraphs.leftJoinWithDependentStoreJoinFanoutJob[Scalding,
-                                                                      (Long,
-                                                                      Int),
-                                                                      Int,
-                                                                      Int,
-                                                                      Int,
-                                                                      Int](
-          source,
-          storeAndService,
-          fmStore)(tup => fnA(tup._2))(valuesFlatMap)(flatMapFn)
+      val summer =
+        TestGraphs.leftJoinWithDependentStoreJoinFanoutJob[Scalding,
+                                                           (Long, Int),
+                                                           Int,
+                                                           Int,
+                                                           Int,
+                                                           Int](
+            source,
+            storeAndService,
+            fmStore)(tup => fnA(tup._2))(valuesFlatMap)(flatMapFn)
 
       val scald = Scalding("scalaCheckleftJoinWithDependentJob")
       val ws = new LoopState(intr)

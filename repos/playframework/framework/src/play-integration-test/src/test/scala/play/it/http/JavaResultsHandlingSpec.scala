@@ -20,12 +20,15 @@ import play.mvc.Results
 import play.mvc.Results.Chunks
 
 object NettyJavaResultsHandlingSpec
-    extends JavaResultsHandlingSpec with NettyIntegrationSpecification
+    extends JavaResultsHandlingSpec
+    with NettyIntegrationSpecification
 object AkkaHttpJavaResultsHandlingSpec
-    extends JavaResultsHandlingSpec with AkkaHttpIntegrationSpecification
+    extends JavaResultsHandlingSpec
+    with AkkaHttpIntegrationSpecification
 
 trait JavaResultsHandlingSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -43,8 +46,7 @@ trait JavaResultsHandlingSpec
       }
     }
 
-    "treat headers case insensitively" in makeRequest(
-        new MockController {
+    "treat headers case insensitively" in makeRequest(new MockController {
       def action = {
         response.setHeader("Server", "foo")
         response.setHeader("server", "bar")

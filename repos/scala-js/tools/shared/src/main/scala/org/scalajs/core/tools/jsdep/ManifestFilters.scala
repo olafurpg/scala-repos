@@ -3,8 +3,8 @@ package org.scalajs.core.tools.jsdep
 /** Holds useful JSDependencyManifest filters */
 object ManifestFilters {
 
-  type ManifestFilter = Traversable[JSDependencyManifest] => Traversable[
-      JSDependencyManifest]
+  type ManifestFilter =
+    Traversable[JSDependencyManifest] => Traversable[JSDependencyManifest]
 
   /** Creates a manifest filter that maps resource names of a certain
     *  origin as if they were written differently

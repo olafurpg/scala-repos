@@ -63,8 +63,8 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     * Writes `data` to a Parquet file, which is then passed to `f` and will be deleted after `f`
     * returns.
     */
-  protected def withParquetFile[T <: Product : ClassTag : TypeTag](
-      data: Seq[T])(f: String => Unit): Unit = {
+  protected def withParquetFile[T <: Product: ClassTag: TypeTag](data: Seq[T])(
+      f: String => Unit): Unit = {
     withTempPath { file =>
       sqlContext.createDataFrame(data).write.parquet(file.getCanonicalPath)
       f(file.getCanonicalPath)
@@ -75,11 +75,11 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     * Writes `data` to a Parquet file and reads it back as a [[DataFrame]],
     * which is then passed to `f`. The Parquet file will be deleted after `f` returns.
     */
-  protected def withParquetDataFrame[T <: Product : ClassTag : TypeTag](
+  protected def withParquetDataFrame[T <: Product: ClassTag: TypeTag](
       data: Seq[T], testVectorized: Boolean = true)(
       f: DataFrame => Unit): Unit = {
-    withParquetFile(data)(
-        path => readParquetFile(path.toString, testVectorized)(f))
+    withParquetFile(data)(path =>
+          readParquetFile(path.toString, testVectorized)(f))
   }
 
   /**
@@ -87,7 +87,7 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     * temporary table named `tableName`, then call `f`. The temporary table together with the
     * Parquet file will be dropped/deleted after `f` returns.
     */
-  protected def withParquetTable[T <: Product : ClassTag : TypeTag](
+  protected def withParquetTable[T <: Product: ClassTag: TypeTag](
       data: Seq[T], tableName: String, testVectorized: Boolean = true)(
       f: => Unit): Unit = {
     withParquetDataFrame(data, testVectorized) { df =>
@@ -96,7 +96,7 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     }
   }
 
-  protected def makeParquetFile[T <: Product : ClassTag : TypeTag](
+  protected def makeParquetFile[T <: Product: ClassTag: TypeTag](
       data: Seq[T], path: File): Unit = {
     sqlContext
       .createDataFrame(data)
@@ -105,7 +105,7 @@ private[sql] trait ParquetTest extends SQLTestUtils {
       .parquet(path.getCanonicalPath)
   }
 
-  protected def makeParquetFile[T <: Product : ClassTag : TypeTag](
+  protected def makeParquetFile[T <: Product: ClassTag: TypeTag](
       df: DataFrame, path: File): Unit = {
     df.write.mode(SaveMode.Overwrite).parquet(path.getCanonicalPath)
   }
@@ -147,11 +147,11 @@ private[sql] trait ParquetTest extends SQLTestUtils {
     * This is an overloaded version of `writeMetadata` above to allow writing customized
     * Parquet schema.
     */
-  protected def writeMetadata(
-      parquetSchema: MessageType,
-      path: Path,
-      configuration: Configuration,
-      extraMetadata: Map[String, String] = Map.empty[String, String]): Unit = {
+  protected def writeMetadata(parquetSchema: MessageType,
+                              path: Path,
+                              configuration: Configuration,
+                              extraMetadata: Map[String, String] =
+                                Map.empty[String, String]): Unit = {
     val extraMetadataAsJava = extraMetadata.asJava
     val createdBy = s"Apache Spark ${org.apache.spark.SPARK_VERSION}"
     val fileMetadata = new FileMetaData(

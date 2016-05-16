@@ -180,9 +180,9 @@ object TestUtils extends Logging {
     }
   }
 
-  def getBrokerListStrFromServers(
-      servers: Seq[KafkaServer],
-      protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT): String = {
+  def getBrokerListStrFromServers(servers: Seq[KafkaServer],
+                                  protocol: SecurityProtocol =
+                                    SecurityProtocol.PLAINTEXT): String = {
     servers
       .map(s => formatAddress(s.config.hostName, s.boundPort(protocol)))
       .mkString(",")
@@ -260,13 +260,14 @@ object TestUtils extends Logging {
     * Wait until the leader is elected and the metadata is propagated to all brokers.
     * Return the leader for each partition.
     */
-  def createTopic(zkUtils: ZkUtils,
-                  topic: String,
-                  numPartitions: Int = 1,
-                  replicationFactor: Int = 1,
-                  servers: Seq[KafkaServer],
-                  topicConfig: Properties = new Properties)
-    : scala.collection.immutable.Map[Int, Option[Int]] = {
+  def createTopic(
+      zkUtils: ZkUtils,
+      topic: String,
+      numPartitions: Int = 1,
+      replicationFactor: Int = 1,
+      servers: Seq[KafkaServer],
+      topicConfig: Properties =
+        new Properties): scala.collection.immutable.Map[Int, Option[Int]] = {
     // create topic
     AdminUtils.createTopic(
         zkUtils, topic, numPartitions, replicationFactor, topicConfig)
@@ -585,8 +586,8 @@ object TestUtils extends Logging {
       sessionTimeout: Int = 30000,
       securityProtocol: SecurityProtocol,
       trustStoreFile: Option[File] = None,
-      props: Option[Properties] = None)
-    : KafkaConsumer[Array[Byte], Array[Byte]] = {
+      props: Option[Properties] =
+        None): KafkaConsumer[Array[Byte], Array[Byte]] = {
     import org.apache.kafka.clients.consumer.ConsumerConfig
 
     val consumerProps = props.getOrElse(new Properties())
@@ -690,8 +691,8 @@ object TestUtils extends Logging {
   }
 
   def deleteBrokersInZk(zkUtils: ZkUtils, ids: Seq[Int]): Seq[Broker] = {
-    val brokers = ids.map(
-        id => new Broker(id, "localhost", 6667, SecurityProtocol.PLAINTEXT))
+    val brokers = ids.map(id =>
+          new Broker(id, "localhost", 6667, SecurityProtocol.PLAINTEXT))
     brokers.foreach(b => zkUtils.deletePath(ZkUtils.BrokerIdsPath + "/" + b))
     brokers
   }
@@ -734,10 +735,9 @@ object TestUtils extends Logging {
                              timeout: Int,
                              correlationId: Int = 0,
                              clientId: String): ProducerRequest = {
-    val data = topics.flatMap(
-        topic =>
-          partitions.map(
-              partition => (TopicAndPartition(topic, partition), message)))
+    val data = topics.flatMap(topic =>
+          partitions.map(partition =>
+                (TopicAndPartition(topic, partition), message)))
     new ProducerRequest(correlationId,
                         clientId,
                         acks.toShort,
@@ -804,7 +804,7 @@ object TestUtils extends Logging {
 
     var leader: Option[Int] = None
     while (!isLeaderElectedOrChanged &&
-    System.currentTimeMillis() < startTime + timeoutMs) {
+           System.currentTimeMillis() < startTime + timeoutMs) {
       // check if leader is elected
       leader = zkUtils.getLeaderForPartition(topic, partition)
       leader match {
@@ -931,7 +931,8 @@ object TestUtils extends Logging {
             partitionStateOpt match {
               case None => false
               case Some(partitionState) =>
-                leader = partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
+                leader =
+                  partitionState.leaderIsrAndControllerEpoch.leaderAndIsr.leader
                 result && Request.isValidBrokerId(leader)
             }
         },
@@ -991,30 +992,27 @@ object TestUtils extends Logging {
                                         assignedReplicas: Seq[Int],
                                         servers: Seq[KafkaServer]) {
     TestUtils.waitUntilTrue(
-        () =>
-          {
-            val inSyncReplicas = zkUtils.getInSyncReplicasForPartition(
-                topic, partitionToBeReassigned)
-            inSyncReplicas.size == assignedReplicas.size
+        () => {
+          val inSyncReplicas = zkUtils.getInSyncReplicasForPartition(
+              topic, partitionToBeReassigned)
+          inSyncReplicas.size == assignedReplicas.size
         },
         "Reassigned partition [%s,%d] is under replicated".format(
             topic, partitionToBeReassigned))
     var leader: Option[Int] = None
     TestUtils.waitUntilTrue(
-        () =>
-          {
-            leader = zkUtils.getLeaderForPartition(
-                topic, partitionToBeReassigned)
-            leader.isDefined
+        () => {
+          leader =
+            zkUtils.getLeaderForPartition(topic, partitionToBeReassigned)
+          leader.isDefined
         },
         "Reassigned partition [%s,%d] is unavailable".format(
             topic, partitionToBeReassigned))
     TestUtils.waitUntilTrue(
-        () =>
-          {
-            val leaderBroker =
-              servers.filter(s => s.config.brokerId == leader.get).head
-            leaderBroker.replicaManager.underReplicatedPartitionCount() == 0
+        () => {
+          val leaderBroker =
+            servers.filter(s => s.config.brokerId == leader.get).head
+          leaderBroker.replicaManager.underReplicatedPartitionCount() == 0
         },
         "Reassigned partition [%s,%d] is under-replicated as reported by the leader %d"
           .format(topic, partitionToBeReassigned, leader.get))
@@ -1038,11 +1036,11 @@ object TestUtils extends Logging {
   /**
     * Create new LogManager instance with default configuration for testing
     */
-  def createLogManager(
-      logDirs: Array[File] = Array.empty[File],
-      defaultConfig: LogConfig = LogConfig(),
-      cleanerConfig: CleanerConfig = CleanerConfig(enableCleaner = false),
-      time: MockTime = new MockTime()): LogManager = {
+  def createLogManager(logDirs: Array[File] = Array.empty[File],
+                       defaultConfig: LogConfig = LogConfig(),
+                       cleanerConfig: CleanerConfig = CleanerConfig(
+                           enableCleaner = false),
+                       time: MockTime = new MockTime()): LogManager = {
     new LogManager(logDirs = logDirs,
                    topicConfigs = Map(),
                    defaultConfig = defaultConfig,
@@ -1158,8 +1156,8 @@ object TestUtils extends Logging {
         val iterator = messageStream.iterator()
         try {
           var i = 0
-          while ( (shouldGetAllMessages && iterator.hasNext()) ||
-          (i < nMessagesPerThread)) {
+          while ((shouldGetAllMessages && iterator.hasNext()) ||
+                 (i < nMessagesPerThread)) {
             assertTrue(iterator.hasNext)
             val message =
               iterator.next.message // will throw a timeout exception if the message isn't there
@@ -1201,8 +1199,7 @@ object TestUtils extends Logging {
     // ensure that the topic-partition has been deleted from all brokers' replica managers
     TestUtils.waitUntilTrue(
         () =>
-          servers.forall(
-              server =>
+          servers.forall(server =>
                 topicAndPartitions.forall(tp =>
                       server.replicaManager.getPartition(
                           tp.topic, tp.partition) == None)),
@@ -1210,8 +1207,8 @@ object TestUtils extends Logging {
     // ensure that logs from all replicas are deleted if delete topic is marked successful in zookeeper
     assertTrue("Replica logs not deleted after delete topic is complete",
                servers.forall(server =>
-                     topicAndPartitions.forall(
-                         tp => server.getLogManager().getLog(tp).isEmpty)))
+                     topicAndPartitions.forall(tp =>
+                           server.getLogManager().getLog(tp).isEmpty)))
     // ensure that topic is removed from all cleaner offsets
     TestUtils.waitUntilTrue(
         () =>
@@ -1221,8 +1218,8 @@ object TestUtils extends Logging {
                 new OffsetCheckpoint(
                     new File(logDir, "cleaner-offset-checkpoint")).read()
               }
-              checkpoints.forall(
-                  checkpointsPerLogDir => !checkpointsPerLogDir.contains(tp))
+              checkpoints.forall(checkpointsPerLogDir =>
+                    !checkpointsPerLogDir.contains(tp))
           }),
         "Cleaner offset for deleted partition should have been removed")
   }
@@ -1233,9 +1230,9 @@ object TestUtils extends Logging {
     * @param buffer The buffer to translate
     * @param encoding The encoding to use in translating bytes to characters
     */
-  def readString(
-      buffer: ByteBuffer,
-      encoding: String = Charset.defaultCharset.toString): String = {
+  def readString(buffer: ByteBuffer,
+                 encoding: String =
+                   Charset.defaultCharset.toString): String = {
     val bytes = new Array[Byte](buffer.remaining)
     buffer.get(bytes)
     new String(bytes, encoding)

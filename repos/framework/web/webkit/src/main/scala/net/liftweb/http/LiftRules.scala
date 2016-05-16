@@ -146,8 +146,8 @@ object LiftRules extends LiftRulesMocker {
   /**
     * The pattern/PartialFunction for matching tags in Lift
     */
-  type TagProcessor = PartialFunction[
-      (String, Elem, LiftSession), DataAttributeProcessorAnswer]
+  type TagProcessor =
+    PartialFunction[(String, Elem, LiftSession), DataAttributeProcessorAnswer]
 
   /**
     * The test between the path of a request and whether that path
@@ -163,18 +163,18 @@ object LiftRules extends LiftRulesMocker {
 
   type RewritePF = PartialFunction[RewriteRequest, RewriteResponse]
   type SnippetPF = PartialFunction[List[String], NodeSeq => NodeSeq]
-  type LiftTagPF = PartialFunction[
-      (String, Elem, MetaData, NodeSeq, String), NodeSeq]
+  type LiftTagPF =
+    PartialFunction[(String, Elem, MetaData, NodeSeq, String), NodeSeq]
   type URINotFoundPF = PartialFunction[(Req, Box[Failure]), NotFound]
   type URLDecoratorPF = PartialFunction[String, String]
   type SnippetDispatchPF = PartialFunction[String, DispatchSnippet]
-  type ViewDispatchPF = PartialFunction[
-      List[String], Either[() => Box[NodeSeq], LiftView]]
+  type ViewDispatchPF =
+    PartialFunction[List[String], Either[() => Box[NodeSeq], LiftView]]
   type HttpAuthProtectedResourcePF = PartialFunction[Req, Box[Role]]
-  type ExceptionHandlerPF = PartialFunction[
-      (Props.RunModes.Value, Req, Throwable), LiftResponse]
-  type ResourceBundleFactoryPF = PartialFunction[
-      (String, Locale), ResourceBundle]
+  type ExceptionHandlerPF =
+    PartialFunction[(Props.RunModes.Value, Req, Throwable), LiftResponse]
+  type ResourceBundleFactoryPF =
+    PartialFunction[(String, Locale), ResourceBundle]
   type SplitSuffixPF = PartialFunction[List[String], (List[String], String)]
   type CometCreationPF = PartialFunction[CometCreationInfo, LiftCometActor]
 
@@ -293,8 +293,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed before sending the response to client. The functions'
     * result will be ignored.
     */
-  val beforeSend = RulesSeq[(BasicResponse, HTTPResponse, List[
-          (String, String)], Box[Req]) => Any]
+  val beforeSend = RulesSeq[(BasicResponse, HTTPResponse,
+                             List[(String, String)], Box[Req]) => Any]
 
   private[this] lazy val defaultSecurityRules = SecurityRules()
 
@@ -340,7 +340,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * application, <code>LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions</code>
     */
   def sessionCreatorForMigratorySessions: (HTTPSession,
-  String) => LiftSession = {
+                                           String) => LiftSession = {
     case (httpSession, contextPath) =>
       new LiftSession(contextPath, httpSession.sessionId, Full(httpSession))
       with MigratorySession
@@ -367,10 +367,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * from inside the &lt;lift:with-resource-id&gt; snippet
     *
     */
-  @volatile var attachResourceId: (String) => String = (name) =>
-    {
-      name + (if (name contains ("?")) "&" else "?") + instanceResourceId +
-      "=_"
+  @volatile var attachResourceId: (String) => String = (name) => {
+    name + (if (name contains ("?")) "&" else "?") + instanceResourceId + "=_"
   }
 
   /**
@@ -411,25 +409,24 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * existing comet requests based on the request, browser type, etc.
     */
   @volatile var makeCometBreakoutDecision: (LiftSession, Req) => Unit =
-    (session, req) =>
-      {
-        // get the open sessions to the host (this means that any DNS wildcarded
-        // Comet requests will not be counted), as well as all invalid/expired
-        // sessions
-        val (which, invalid) = session.cometForHost(req.hostAndPath)
+    (session, req) => {
+      // get the open sessions to the host (this means that any DNS wildcarded
+      // Comet requests will not be counted), as well as all invalid/expired
+      // sessions
+      val (which, invalid) = session.cometForHost(req.hostAndPath)
 
-        // get the maximum requests given the browser type
-        val max =
-          maxConcurrentRequests.vend(req) -
-          2 // this request and any open comet requests
+      // get the maximum requests given the browser type
+      val max =
+        maxConcurrentRequests.vend(req) -
+        2 // this request and any open comet requests
 
-        // dump the oldest requests
-        which.drop(max).foreach {
-          case (actor, req) => actor ! BreakOut()
-        }
-        invalid.foreach {
-          case (actor, req) => actor ! BreakOut()
-        }
+      // dump the oldest requests
+      which.drop(max).foreach {
+        case (actor, req) => actor ! BreakOut()
+      }
+      invalid.foreach {
+        case (actor, req) => actor ! BreakOut()
+      }
     }
 
   /**
@@ -464,8 +461,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   /**
     * A factory that will vend comet creators
     */
-  val cometCreationFactory: FactoryMaker[CometCreationInfo => Box[
-          LiftCometActor]] = new FactoryMaker(() => noComet _) {}
+  val cometCreationFactory: FactoryMaker[
+      CometCreationInfo => Box[LiftCometActor]] = new FactoryMaker(
+      () => noComet _) {}
 
   /**
     * Should codes that represent entities be converted to XML
@@ -492,8 +490,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * Holds user functions that are executed after the response is sent to client. The functions' result
     * will be ignored.
     */
-  val afterSend = RulesSeq[
-      (BasicResponse, HTTPResponse, List[(String, String)], Box[Req]) => Any]
+  val afterSend = RulesSeq[(BasicResponse, HTTPResponse,
+                            List[(String, String)], Box[Req]) => Any]
 
   /**
     * Calculate the Comet Server (by default, the server that
@@ -537,8 +535,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       url <- Box !! LiftRules.getClass.getResource("/" + cn + ".class")
       newUrl = new java.net.URL(
           url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
-      str <- tryo(new String(
-              readWholeStream(newUrl.openConnection.getInputStream), "UTF-8"))
+      str <- tryo(
+                new String(
+                    readWholeStream(newUrl.openConnection.getInputStream),
+                    "UTF-8"))
       ma <- """Implementation-Version: (.*)""".r.findFirstMatchIn(str)
     } yield ma.group(1)
 
@@ -551,8 +551,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       url <- Box !! LiftRules.getClass.getResource("/" + cn + ".class")
       newUrl = new java.net.URL(
           url.toExternalForm.split("!")(0) + "!" + "/META-INF/MANIFEST.MF")
-      str <- tryo(new String(
-              readWholeStream(newUrl.openConnection.getInputStream), "UTF-8"))
+      str <- tryo(
+                new String(
+                    readWholeStream(newUrl.openConnection.getInputStream),
+                    "UTF-8"))
       ma <- """Built-Time: (.*)""".r.findFirstMatchIn(str)
       asLong <- asLong(ma.group(1))
     } yield new Date(asLong)
@@ -606,11 +608,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * then we log a warning with the given parameter name and URI.
     */
   val handleUnmappedParameter = new FactoryMaker[(Req, String) => Unit](
-      () =>
-        { (req: Req, parameterName: String) =>
-          if (parameterName.startsWith("F"))
-            logger.warn("Unmapped Lift-like parameter seen in request [%s]: %s"
-                  .format(req.uri, parameterName))
+      () => { (req: Req, parameterName: String) =>
+        if (parameterName.startsWith("F"))
+          logger.warn("Unmapped Lift-like parameter seen in request [%s]: %s"
+                .format(req.uri, parameterName))
       }
   ) {}
 
@@ -735,42 +736,42 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     *
     * @see net.liftweb.builtin.snippet.Msgs
     */
-  @volatile var noticesToJsCmd: () => JsCmd = () =>
-    {
-      import builtin.snippet.{Msg, Msgs, MsgErrorMeta, MsgNoticeMeta, MsgWarningMeta}
+  @volatile var noticesToJsCmd: () => JsCmd = () => {
+    import builtin.snippet.{Msg, Msgs, MsgErrorMeta, MsgNoticeMeta, MsgWarningMeta}
 
-      // A "wrapper" that simply returns the javascript
-      val passJs = (in: JsCmd) => in
+    // A "wrapper" that simply returns the javascript
+    val passJs = (in: JsCmd) => in
 
-      // Delegate to Msgs for fadeout and effects
-      def noticesFadeOut(noticeType: NoticeType.Value): JsCmd =
-        Msgs.noticesFadeOut(noticeType, Noop, passJs)
+    // Delegate to Msgs for fadeout and effects
+    def noticesFadeOut(noticeType: NoticeType.Value): JsCmd =
+      Msgs.noticesFadeOut(noticeType, Noop, passJs)
 
-      def groupEffects(noticeType: NoticeType.Value): JsCmd =
-        Msgs.effects(Full(noticeType), noticeType.id, Noop, passJs)
+    def groupEffects(noticeType: NoticeType.Value): JsCmd =
+      Msgs.effects(Full(noticeType), noticeType.id, Noop, passJs)
 
-      def idEffects(id: String): JsCmd =
-        Msgs.effects(Empty, id, Noop, passJs)
+    def idEffects(id: String): JsCmd =
+      Msgs.effects(Empty, id, Noop, passJs)
 
-      // Compute the global notices first
-      val groupMessages = Msgs.renderNotices() match {
-        case NodeSeq.Empty => JsCmds.Noop
-        case xml =>
-          LiftRules.jsArtifacts.setHtml(LiftRules.noticesContainerId, xml) & noticesFadeOut(
-              NoticeType.Notice) & noticesFadeOut(NoticeType.Warning) & noticesFadeOut(
-              NoticeType.Error) & groupEffects(NoticeType.Notice) & groupEffects(
-              NoticeType.Warning) & groupEffects(NoticeType.Error)
-      }
+    // Compute the global notices first
+    val groupMessages = Msgs.renderNotices() match {
+      case NodeSeq.Empty => JsCmds.Noop
+      case xml =>
+        LiftRules.jsArtifacts.setHtml(LiftRules.noticesContainerId, xml) & noticesFadeOut(
+            NoticeType.Notice) & noticesFadeOut(NoticeType.Warning) & noticesFadeOut(
+            NoticeType.Error) & groupEffects(NoticeType.Notice) & groupEffects(
+            NoticeType.Warning) & groupEffects(NoticeType.Error)
+    }
 
-      // We need to determine the full set of IDs that need messages rendered.
-      val idSet = (S.idMessages((S.errors)) ++ S.idMessages((S.warnings)) ++ S
-            .idMessages((S.notices))).map(_._1).distinct
+    // We need to determine the full set of IDs that need messages rendered.
+    val idSet =
+      (S.idMessages((S.errors)) ++ S.idMessages((S.warnings)) ++ S.idMessages(
+              (S.notices))).map(_._1).distinct
 
-      // Merge each Id's messages and effects into the JsCmd chain
-      idSet.foldLeft(groupMessages) { (chain, id) =>
-        chain & LiftRules.jsArtifacts.setHtml(id, Msg.renderIdMsgs(id)) & idEffects(
-            id)
-      }
+    // Merge each Id's messages and effects into the JsCmd chain
+    idSet.foldLeft(groupMessages) { (chain, id) =>
+      chain & LiftRules.jsArtifacts.setHtml(id, Msg.renderIdMsgs(id)) & idEffects(
+          id)
+    }
   }
 
   /**
@@ -985,8 +986,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 
     case (_, _, Full(s))
-        if
-        (s.toLowerCase.startsWith("text/xml") ||
+        if (s.toLowerCase.startsWith("text/xml") ||
             s.toLowerCase.startsWith("text/xhtml") ||
             s.toLowerCase.startsWith("application/xml") ||
             s.toLowerCase.startsWith("application/xhtml+xml")) =>
@@ -1094,10 +1094,9 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * be used.  Also, keep in mind how FactoryMaker can be used... it can be global, per request, etc.
     */
   val externalTemplateResolver: FactoryMaker[() => PartialFunction[
-          (Locale, List[String]), Box[NodeSeq]]] = new FactoryMaker(
-      () =>
+          (Locale, List[String]), Box[NodeSeq]]] = new FactoryMaker(() =>
         (() =>
-          Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
+           Map.empty: PartialFunction[(Locale, List[String]), Box[NodeSeq]])) {}
 
   /**
     * There may be times when you want to entirely control the templating process.  You can insert a function
@@ -1108,13 +1107,12 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * in Scala a Map is PartialFunction and you can create Maps that have a default value using the withDefaultValue
     * method.
     */
-  val snippetWhiteList: FactoryMaker[() => PartialFunction[
-          (String, String), Box[NodeSeq => NodeSeq]]] =
-    new FactoryMaker(
-        () =>
+  val snippetWhiteList: FactoryMaker[
+      () => PartialFunction[(String, String), Box[NodeSeq => NodeSeq]]] =
+    new FactoryMaker(() =>
           (() =>
-            Map.empty: PartialFunction[
-                (String, String), Box[NodeSeq => NodeSeq]])) {}
+             Map.empty: PartialFunction[
+                 (String, String), Box[NodeSeq => NodeSeq]])) {}
 
   /**
     * This FactoryMaker can be used to disable the little used attributeSnippets
@@ -1182,8 +1180,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
           val sm = smf()
           _sitemap = Full(sm)
           for (menu <- sm.menus;
-          loc = menu.loc;
-          rewrite <- loc.rewritePF) LiftRules.statefulRewrite.append(
+               loc = menu.loc;
+               rewrite <- loc.rewritePF) LiftRules.statefulRewrite.append(
               PerRequestPF(rewrite))
 
           _sitemap
@@ -1238,12 +1236,10 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * what should we display?
     */
   val deferredSnippetFailure: FactoryMaker[Failure => NodeSeq] =
-    new FactoryMaker(
-        () =>
-          { failure: Failure =>
-        {
-          if (Props.devMode)
-            <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{failure.msg}{failure.exception match {
+    new FactoryMaker(() => { failure: Failure =>
+      {
+        if (Props.devMode)
+          <div style="border: red solid 2px">A lift:parallel snippet failed to render.Message:{failure.msg}{failure.exception match {
           case Full(e) =>
             <pre>{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
           case _ => NodeSeq.Empty
@@ -1253,18 +1249,16 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
         be displayed, but there will be errors in the output logs.
         </i>
         </div>
-          else NodeSeq.Empty
-        }
+        else NodeSeq.Empty
+      }
     }) {}
 
   /**
     * If a deferred snippet has a failure during render,
     * what should we display?
     */
-  val deferredSnippetTimeout: FactoryMaker[NodeSeq] = new FactoryMaker(
-      () =>
-        {
-      if (Props.devMode) <div style="border: red solid 2px">
+  val deferredSnippetTimeout: FactoryMaker[NodeSeq] = new FactoryMaker(() => {
+    if (Props.devMode) <div style="border: red solid 2px">
           A deferred snippet timed out during render.
 
           <i>note: this error is displayed in the browser because
@@ -1273,17 +1267,16 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
             be displayed, but there will be errors in the output logs.
           </i>
         </div>
-      else NodeSeq.Empty
+    else NodeSeq.Empty
   }) {}
 
   /**
     * Should comments be stripped from the served XHTML
     */
   val stripComments: FactoryMaker[Boolean] = new FactoryMaker(
-      () =>
-        {
-      if (Props.devMode) false
-      else true
+      () => {
+    if (Props.devMode) false
+    else true
   }) {}
 
   private[http] val reqCnt = new AtomicInteger(0)
@@ -1775,8 +1768,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
                                     prefix openOr (S.contextPath)) match {
                 case (Full(c), _) => CSSResponse(c)
                 case (x, input) => {
-                    logger.info("Fixing " + cssPath +
-                        " failed with result %s".format(x));
+                    logger.info("Fixing " +
+                        cssPath + " failed with result %s".format(x));
                     CSSResponse(input)
                   }
             })
@@ -1820,8 +1813,7 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     * include the JS settings.
     */
   val javaScriptSettings: FactoryMaker[() => Box[LiftSession => JsObj]] =
-    new FactoryMaker(
-        () =>
+    new FactoryMaker(() =>
           () =>
             (Full((session: LiftSession) => LiftJavaScript.settings): Box[
                 LiftSession => JsObj])) {}
@@ -1847,9 +1839,8 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val supplementalHeaders: FactoryMaker[List[(String, String)]] =
     new FactoryMaker(
-        () =>
-          {
-        ("X-Lift-Version", liftVersion) :: lockedSecurityRules.headers
+        () => {
+      ("X-Lift-Version", liftVersion) :: lockedSecurityRules.headers
     }) {}
 
   /**
@@ -1930,21 +1921,19 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   val cometUpdateExceptionHandler: FactoryMaker[Box[JsCmd]] =
     new FactoryMaker[Box[JsCmd]](
-        () =>
-          {
-        if (Props.devMode)
-          Full(JE.Call("lift.cometOnError", JE.JsVar("e")).cmd)
-        else Empty
+        () => {
+      if (Props.devMode)
+        Full(JE.Call("lift.cometOnError", JE.JsVar("e")).cmd)
+      else Empty
     }) {}
 
   /**
     * Holds the last update time of the Ajax request. Based on this server may return HTTP 304 status
     * indicating the client to used the cached information.
     */
-  @volatile var ajaxScriptUpdateTime: LiftSession => Long = session =>
-    {
-      object when extends SessionVar[Long](millis)
-      when.is
+  @volatile var ajaxScriptUpdateTime: LiftSession => Long = session => {
+    object when extends SessionVar[Long](millis)
+    when.is
   }
 
   /**
@@ -1999,10 +1988,12 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
     */
   @volatile
   var handleMimeFile: (String, String, String,
-  InputStream) => FileParamHolder = (fieldName, contentType, fileName,
-  inputStream) =>
-    new InMemFileParamHolder(
-        fieldName, contentType, fileName, Helpers.readWholeStream(inputStream))
+                       InputStream) => FileParamHolder =
+    (fieldName, contentType, fileName, inputStream) =>
+      new InMemFileParamHolder(fieldName,
+                               contentType,
+                               fileName,
+                               Helpers.readWholeStream(inputStream))
 
   private object _mimeHeaders
       extends TransientRequestVar[Box[Map[String, List[String]]]](Empty)
@@ -2072,14 +2063,13 @@ class LiftRules() extends Factory with FormVendor with LazyLoggable {
   }
 
   private def ctor() {
-    appendGlobalFormBuilder(FormBuilderLocator[String](
-            (value, setter) => SHtml.text(value, setter)))
-    appendGlobalFormBuilder(
-        FormBuilderLocator[Int]((value, setter) =>
+    appendGlobalFormBuilder(FormBuilderLocator[String]((value, setter) =>
+              SHtml.text(value, setter)))
+    appendGlobalFormBuilder(FormBuilderLocator[Int]((value, setter) =>
               SHtml.text(value.toString,
                          s => Helpers.asInt(s).foreach((setter)))))
-    appendGlobalFormBuilder(FormBuilderLocator[Boolean](
-            (value, setter) => SHtml.checkbox(value, s => setter(s))))
+    appendGlobalFormBuilder(FormBuilderLocator[Boolean]((value, setter) =>
+              SHtml.checkbox(value, s => setter(s))))
 
     import net.liftweb.builtin.snippet._
 

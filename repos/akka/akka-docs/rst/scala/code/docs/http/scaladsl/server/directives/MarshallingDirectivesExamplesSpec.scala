@@ -65,13 +65,12 @@ class MarshallingDirectivesExamplesSpec extends RoutingSpec {
   "example-completeWith-with-json" in {
     import PersonJsonSupport._
 
-    val findPerson = (f: Person => Unit) =>
-      {
+    val findPerson = (f: Person => Unit) => {
 
-        //... some processing logic...
+      //... some processing logic...
 
-        //complete the request
-        f(Person("Jane", 42))
+      //complete the request
+      f(Person("Jane", 42))
     }
 
     val route = get {
@@ -91,13 +90,12 @@ class MarshallingDirectivesExamplesSpec extends RoutingSpec {
   "example-handleWith-with-json" in {
     import PersonJsonSupport._
 
-    val updatePerson = (person: Person) =>
-      {
+    val updatePerson = (person: Person) => {
 
-        //... some processing logic...
+      //... some processing logic...
 
-        //return the person
-        person
+      //return the person
+      person
     }
 
     val route = post {

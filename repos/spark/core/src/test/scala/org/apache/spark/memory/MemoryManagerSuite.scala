@@ -38,7 +38,8 @@ import org.apache.spark.storage.memory.MemoryStore
   * Helper trait for sharing code among [[MemoryManager]] tests.
   */
 private[memory] trait MemoryManagerSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterEach {
 
   protected val evictedBlocks = new mutable.ArrayBuffer[(BlockId, BlockStatus)]
 
@@ -139,9 +140,9 @@ private[memory] trait MemoryManagerSuite
   /**
     * Create a MemoryManager with the specified execution memory limits and no storage memory.
     */
-  protected def createMemoryManager(
-      maxOnHeapExecutionMemory: Long,
-      maxOffHeapExecutionMemory: Long = 0L): MemoryManager
+  protected def createMemoryManager(maxOnHeapExecutionMemory: Long,
+                                    maxOffHeapExecutionMemory: Long =
+                                      0L): MemoryManager
 
   // -- Tests of sharing of execution memory between tasks ----------------------------------------
   // Prior to Spark 1.6, these tests were part of ShuffleMemoryManagerSuite.

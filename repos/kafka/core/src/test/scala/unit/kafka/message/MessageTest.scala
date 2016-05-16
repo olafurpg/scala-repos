@@ -49,7 +49,7 @@ class MessageTest extends JUnitSuite {
     val timestamps = Array(Message.NoTimestamp, 0L, 1L)
     val magicValues = Array(Message.MagicValue_V0, Message.MagicValue_V1)
     for (k <- keys; v <- vals; codec <- codecs; t <- timestamps;
-    mv <- magicValues) {
+         mv <- magicValues) {
       val timestamp = ensureValid(mv, t)
       messages += new MessageTestVal(
           k, v, codec, timestamp, mv, new Message(v, k, timestamp, codec, mv))

@@ -37,8 +37,8 @@ object ConstrBlock {
                 builder error ErrMsg("rbrace.expected")
                 builder.restoreNewlinesState
                 while (!builder.eof &&
-                !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
-                !builder.newlineBeforeCurrentToken) {
+                       !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
+                       !builder.newlineBeforeCurrentToken) {
                   builder.advanceLexer()
                 }
                 constrExprMarker.done(ScalaElementTypes.CONSTR_BLOCK)
@@ -48,8 +48,8 @@ object ConstrBlock {
                 builder error ErrMsg("rbrace.expected")
                 builder.restoreNewlinesState
                 while (!builder.eof &&
-                !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
-                !builder.newlineBeforeCurrentToken) {
+                       !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
+                       !builder.newlineBeforeCurrentToken) {
                   builder.advanceLexer()
                 }
                 constrExprMarker.done(ScalaElementTypes.CONSTR_BLOCK)

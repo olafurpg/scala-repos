@@ -15,7 +15,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types._
   * Date: 07.03.2008
   */
 class ScRefinementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScRefinement {
+    extends ScalaPsiElementImpl(node)
+    with ScRefinement {
   override def toString: String = "Refinement"
 
   override def processDeclarations(processor: PsiScopeProcessor,

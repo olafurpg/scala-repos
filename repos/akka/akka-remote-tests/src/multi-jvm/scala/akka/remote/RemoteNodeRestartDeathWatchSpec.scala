@@ -55,7 +55,8 @@ class RemoteNodeRestartDeathWatchMultiJvmNode2
 
 abstract class RemoteNodeRestartDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeRestartDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeRestartDeathWatchMultiJvmSpec._
 

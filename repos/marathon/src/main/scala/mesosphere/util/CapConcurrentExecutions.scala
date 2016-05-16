@@ -164,7 +164,8 @@ private[util] object RestrictParallelExecutionsActor {
   def props(metrics: CapConcurrentExecutionsMetrics,
             maxParallel: Int,
             maxQueued: Int): Props =
-    Props(new RestrictParallelExecutionsActor(
+    Props(
+        new RestrictParallelExecutionsActor(
             metrics, maxParallel = maxParallel, maxQueued = maxQueued))
 
   private val log = LoggerFactory.getLogger(getClass.getName)

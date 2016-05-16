@@ -174,9 +174,15 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
 
   /** ^~~~~~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 => f(b1, b2, b3, b4, b5, b6) } 
     */
-  def ^~~~~~~^[
-      B1, B2, B3, B4, B5, B6, B7, B >: A <% B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7, C](
-      f: (B1, B2, B3, B4, B5, B6, B7) => C) = map { a =>
+  def ^~~~~~~^[B1,
+               B2,
+               B3,
+               B4,
+               B5,
+               B6,
+               B7,
+               B >: A <% B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7,
+               C](f: (B1, B2, B3, B4, B5, B6, B7) => C) = map { a =>
     (a: B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7) match {
       case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 ~ b7 => f(b1, b2, b3, b4, b5, b6, b7)
     }

@@ -60,10 +60,13 @@ class SwaggerApiLookupSpec extends ScalatraSpec with JsonMatchers {
 }
 
 class ApiDocs(implicit val swagger: Swagger)
-    extends ScalatraServlet with JacksonSwaggerBase
+    extends ScalatraServlet
+    with JacksonSwaggerBase
 
 class ApiController1()(implicit val swagger: Swagger)
-    extends ScalatraServlet with JacksonJsonSupport with SwaggerSupport {
+    extends ScalatraServlet
+    with JacksonJsonSupport
+    with SwaggerSupport {
   override implicit protected def jsonFormats: Formats = DefaultFormats
 
   protected val applicationDescription: String = "The first API"
@@ -90,7 +93,9 @@ class ApiController1()(implicit val swagger: Swagger)
 }
 
 class ApiController2()(implicit val swagger: Swagger)
-    extends ScalatraServlet with JacksonJsonSupport with SwaggerSupport {
+    extends ScalatraServlet
+    with JacksonJsonSupport
+    with SwaggerSupport {
   override implicit protected def jsonFormats: Formats = DefaultFormats
 
   protected val applicationDescription: String = "The second API"

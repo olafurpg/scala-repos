@@ -28,8 +28,8 @@ final case class OptionT[F[_], A](run: F[Option[A]]) { self =>
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
     import std.option._
-    F.foldRight[Option[A], Z](run, z)(
-        (a, b) => Foldable[Option].foldRight[A, Z](a, b)(f))
+    F.foldRight[Option[A], Z](run, z)((a, b) =>
+          Foldable[Option].foldRight[A, Z](a, b)(f))
   }
 
   def traverse[G[_], B](f: A => G[B])(
@@ -212,7 +212,8 @@ private trait OptionTFunctor[F[_]] extends Functor[OptionT[F, ?]] {
 }
 
 private trait OptionTApply[F[_]]
-    extends Apply[OptionT[F, ?]] with OptionTFunctor[F] {
+    extends Apply[OptionT[F, ?]]
+    with OptionTFunctor[F] {
   implicit def F: Monad[F]
 
   override final def ap[A, B](fa: => OptionT[F, A])(
@@ -220,7 +221,8 @@ private trait OptionTApply[F[_]]
 }
 
 private trait OptionTBind[F[_]]
-    extends Bind[OptionT[F, ?]] with OptionTFunctor[F] {
+    extends Bind[OptionT[F, ?]]
+    with OptionTFunctor[F] {
   implicit def F: Monad[F]
 
   final def bind[A, B](fa: OptionT[F, A])(
@@ -228,7 +230,8 @@ private trait OptionTBind[F[_]]
 }
 
 private trait OptionTBindRec[F[_]]
-    extends BindRec[OptionT[F, ?]] with OptionTBind[F] {
+    extends BindRec[OptionT[F, ?]]
+    with OptionTBind[F] {
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
@@ -242,14 +245,16 @@ private trait OptionTBindRec[F[_]]
 }
 
 private trait OptionTMonad[F[_]]
-    extends Monad[OptionT[F, ?]] with OptionTBind[F] {
+    extends Monad[OptionT[F, ?]]
+    with OptionTBind[F] {
   implicit def F: Monad[F]
 
   def point[A](a: => A): OptionT[F, A] = OptionT[F, A](F.point(some(a)))
 }
 
 private trait OptionTMonadError[F[_], E]
-    extends MonadError[OptionT[F, ?], E] with OptionTMonad[F] {
+    extends MonadError[OptionT[F, ?], E]
+    with OptionTMonad[F] {
   override def F: MonadError[F, E]
 
   override def raiseError[A](e: E) =
@@ -267,7 +272,8 @@ private trait OptionTFoldable[F[_]] extends Foldable.FromFoldr[OptionT[F, ?]] {
 }
 
 private trait OptionTTraverse[F[_]]
-    extends Traverse[OptionT[F, ?]] with OptionTFoldable[F]
+    extends Traverse[OptionT[F, ?]]
+    with OptionTFoldable[F]
     with OptionTFunctor[F] {
   implicit def F: Traverse[F]
 
@@ -289,7 +295,8 @@ private trait OptionTHoist extends Hoist[OptionT] {
 }
 
 private trait OptionTMonadPlus[F[_]]
-    extends MonadPlus[OptionT[F, ?]] with OptionTMonad[F] {
+    extends MonadPlus[OptionT[F, ?]]
+    with OptionTMonad[F] {
   implicit def F: Monad[F]
 
   def empty[A]: OptionT[F, A] = OptionT(F point none[A])
@@ -298,7 +305,8 @@ private trait OptionTMonadPlus[F[_]]
 }
 
 private trait OptionTMonadTell[F[_], W]
-    extends MonadTell[OptionT[F, ?], W] with OptionTMonad[F]
+    extends MonadTell[OptionT[F, ?], W]
+    with OptionTMonad[F]
     with OptionTHoist {
   def MT: MonadTell[F, W]
 
@@ -309,7 +317,8 @@ private trait OptionTMonadTell[F[_], W]
 }
 
 private trait OptionTMonadListen[F[_], W]
-    extends MonadListen[OptionT[F, ?], W] with OptionTMonadTell[F, W] {
+    extends MonadListen[OptionT[F, ?], W]
+    with OptionTMonadTell[F, W] {
   def MT: MonadListen[F, W]
 
   def listen[A](ma: OptionT[F, A]): OptionT[F, (A, W)] = {

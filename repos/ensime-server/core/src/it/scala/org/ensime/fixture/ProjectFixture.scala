@@ -67,7 +67,8 @@ trait IsolatedProjectFixture extends ProjectFixture {
 }
 
 trait SharedProjectFixture
-    extends ProjectFixture with SharedEnsimeConfigFixture
+    extends ProjectFixture
+    with SharedEnsimeConfigFixture
     with SharedTestKitFixture {
 
   private var _project: TestActorRef[Project] = _

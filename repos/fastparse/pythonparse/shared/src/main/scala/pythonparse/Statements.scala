@@ -84,8 +84,9 @@ class Statements(indent: Int) {
           _ =>
             Ast.operator.Mult) | "/=".!.map(_ => Ast.operator.Div) | "%=".!.map(
           _ =>
-            Ast.operator.Mod) | "&=".!.map(_ => Ast.operator.BitAnd) | "|=".!
-        .map(_ => Ast.operator.BitOr) | "^=".!.map(_ => Ast.operator.BitXor) | "<<=".!
+            Ast.operator.Mod) | "&=".!.map(_ => Ast.operator.BitAnd) | "|=".!.map(
+          _ =>
+            Ast.operator.BitOr) | "^=".!.map(_ => Ast.operator.BitXor) | "<<=".!
         .map(_ => Ast.operator.LShift) | ">>=".!.map(_ => Ast.operator.RShift) | "**=".!
         .map(_ => Ast.operator.Pow) | "//=".!.map(_ => Ast.operator.FloorDiv)
   )

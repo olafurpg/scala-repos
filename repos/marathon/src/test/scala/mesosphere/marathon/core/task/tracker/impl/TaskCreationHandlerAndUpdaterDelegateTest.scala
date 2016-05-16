@@ -12,8 +12,12 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import org.scalatest.concurrent.ScalaFutures
 
 class TaskCreationHandlerAndUpdaterDelegateTest
-    extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with ScalaFutures with Matchers {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with ScalaFutures
+    with Matchers {
 
   test("Created succeeds") {
     val f = new Fixture

@@ -26,7 +26,7 @@ trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends AnyRef { self =>
   @annotation.unspecialized
   def curried: T1 => T2 => T3 => T4 => T5 => R = { (x1: T1) =>
     ((x2: T2, x3: T3, x4: T4, x5: T5) =>
-      self.apply(x1, x2, x3, x4, x5)).curried
+       self.apply(x1, x2, x3, x4, x5)).curried
   }
 
   /** Creates a tupled version of this function: instead of 5 arguments,

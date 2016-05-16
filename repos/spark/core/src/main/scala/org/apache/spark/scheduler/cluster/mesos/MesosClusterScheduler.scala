@@ -118,7 +118,8 @@ private[spark] class MesosDriverState(
   */
 private[spark] class MesosClusterScheduler(
     engineFactory: MesosClusterPersistenceEngineFactory, conf: SparkConf)
-    extends Scheduler with MesosSchedulerUtils {
+    extends Scheduler
+    with MesosSchedulerUtils {
   var frameworkUrl: String = _
   private val metricsSystem = MetricsSystem.createMetricsSystem(
       "mesos_cluster", conf, new SecurityManager(conf))
@@ -228,8 +229,8 @@ private[spark] class MesosClusterScheduler(
       } else if (launchedDrivers.contains(submissionId)) {
         s.success = true
         s.driverState = "RUNNING"
-        launchedDrivers(submissionId).mesosTaskStatus
-          .foreach(state => s.message = state.toString)
+        launchedDrivers(submissionId).mesosTaskStatus.foreach(state =>
+              s.message = state.toString)
       } else if (finishedDrivers.exists(
                      _.driverDescription.submissionId.equals(submissionId))) {
         s.success = true
@@ -682,7 +683,7 @@ private[spark] class MesosClusterScheduler(
 
           val newDriverDescription = state.driverDescription.copy(
               retryState = Some(new MesosClusterRetryState(
-                        status, retries, nextRetry, waitTimeSec)))
+                      status, retries, nextRetry, waitTimeSec)))
           pendingRetryDrivers += newDriverDescription
           pendingRetryDriversState.persist(taskId, newDriverDescription)
         } else if (TaskState.isFinished(TaskState.fromMesos(status.getState))) {

@@ -118,10 +118,10 @@ object WebSocketFlowHandler {
                 currentPartialMessage = null
                 message
               case MessageType.Continuation =>
-                currentPartialMessage = RawMessage(
-                    currentPartialMessage.messageType,
-                    currentPartialMessage.data ++ read.data,
-                    false)
+                currentPartialMessage =
+                  RawMessage(currentPartialMessage.messageType,
+                             currentPartialMessage.data ++ read.data,
+                             false)
                 null
               case _ if currentPartialMessage != null =>
                 serverInitiatedClose(CloseMessage(

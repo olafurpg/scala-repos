@@ -46,9 +46,10 @@ private[spark] class CartesianPartition(
     }
 }
 
-private[spark] class CartesianRDD[T : ClassTag, U : ClassTag](
+private[spark] class CartesianRDD[T: ClassTag, U: ClassTag](
     sc: SparkContext, var rdd1: RDD[T], var rdd2: RDD[U])
-    extends RDD[(T, U)](sc, Nil) with Serializable {
+    extends RDD[(T, U)](sc, Nil)
+    with Serializable {
 
   val numPartitionsInRdd2 = rdd2.partitions.length
 
@@ -73,7 +74,7 @@ private[spark] class CartesianRDD[T : ClassTag, U : ClassTag](
       split: Partition, context: TaskContext): Iterator[(T, U)] = {
     val currSplit = split.asInstanceOf[CartesianPartition]
     for (x <- rdd1.iterator(currSplit.s1, context);
-    y <- rdd2.iterator(currSplit.s2, context)) yield (x, y)
+         y <- rdd2.iterator(currSplit.s2, context)) yield (x, y)
   }
 
   override def getDependencies: Seq[Dependency[_]] = List(

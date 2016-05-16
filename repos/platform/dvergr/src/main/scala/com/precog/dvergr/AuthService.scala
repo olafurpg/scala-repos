@@ -53,7 +53,8 @@ trait AuthService[M[+ _]] { self =>
 case class WebAuthService(
     protocol: String, host: String, port: Int, path: String)(
     implicit executor: ExecutionContext)
-    extends WebClient(protocol, host, port, path) with AuthService[Response] {
+    extends WebClient(protocol, host, port, path)
+    with AuthService[Response] {
   import scalaz.syntax.monad._
   import scalaz.EitherT.eitherT
   implicit val M: Monad[Future] = new FutureMonad(executor)

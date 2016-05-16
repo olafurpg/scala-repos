@@ -30,7 +30,9 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark.ui.SparkUICssErrorHandler
 
 class UISeleniumSuite
-    extends HiveThriftJdbcTest with WebBrowser with Matchers
+    extends HiveThriftJdbcTest
+    with WebBrowser
+    with Matchers
     with BeforeAndAfterAll {
 
   implicit var webDriver: WebDriver = _

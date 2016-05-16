@@ -299,7 +299,9 @@ class IntervalReciprocalTest extends FunSuite {
 }
 
 class IntervalCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   property("x ⊆ x") {
     forAll { (x: Interval[Rational]) =>
@@ -524,7 +526,9 @@ class IntervalCheck
 }
 
 class IntervalIteratorCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>

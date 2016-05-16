@@ -113,8 +113,8 @@ object PartestUtil {
 
       val completion = Completions.strict(
           Set("<filename glob>",
-              "<regex> (for source, flags or checkfile contents)").map(
-              s => Completion.displayOnly(s)))
+              "<regex> (for source, flags or checkfile contents)").map(s =>
+                Completion.displayOnly(s)))
       val tokenCompletion = TokenCompletions.fixed((seen, level) => completion)
 
       val globOrPattern = StringBasic.map(expandGrep).flatMap {

@@ -31,7 +31,9 @@ import generic._
   *  Unlike iterables, sequences always have a defined order of elements.
   */
 trait GenSeqLike[+A, +Repr]
-    extends Any with GenIterableLike[A, Repr] with Equals
+    extends Any
+    with GenIterableLike[A, Repr]
+    with Equals
     with Parallelizable[A, parallel.ParSeq[A]] {
   def seq: Seq[A]
 

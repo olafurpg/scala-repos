@@ -56,8 +56,14 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   * are considered part of Spark's public api.
   */
 class HistoryServerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with MockitoSugar
-    with JsonTestUtils with Eventually with WebBrowser with LocalSparkContext
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
+    with MockitoSugar
+    with JsonTestUtils
+    with Eventually
+    with WebBrowser
+    with LocalSparkContext
     with ResetSystemProperties {
 
   private val logDir = new File("src/test/resources/spark-events")
@@ -303,8 +309,8 @@ class HistoryServerSuite
 
     def listDir(dir: Path): Seq[FileStatus] = {
       val statuses = fs.listStatus(dir)
-      statuses.flatMap(
-          stat => if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
+      statuses.flatMap(stat =>
+            if (stat.isDirectory) listDir(stat.getPath) else Seq(stat))
     }
 
     def dumpLogDir(msg: String = ""): Unit = {
@@ -396,15 +402,14 @@ class HistoryServerSuite
         case JNothing => Seq()
         case apps: JArray =>
           apps
-            .filter(app =>
-                  {
-                (app \ "attempts") match {
-                  case attempts: JArray =>
-                    val state = (attempts.children.head \ "completed")
-                      .asInstanceOf[JBool]
-                    state.value == completed
-                  case _ => false
-                }
+            .filter(app => {
+              (app \ "attempts") match {
+                case attempts: JArray =>
+                  val state =
+                    (attempts.children.head \ "completed").asInstanceOf[JBool]
+                  state.value == completed
+                case _ => false
+              }
             })
             .map(app => (app \ "id").asInstanceOf[JString].values)
         case _ => Seq()
@@ -480,9 +485,9 @@ class HistoryServerSuite
     logDir.deleteOnExit();
   }
 
-  def getContentAndCode(
-      path: String,
-      port: Int = port): (Int, Option[String], Option[String]) = {
+  def getContentAndCode(path: String,
+                        port: Int =
+                          port): (Int, Option[String], Option[String]) = {
     HistoryServerSuite.getContentAndCode(
         new URL(s"http://localhost:$port/api/v1/$path"))
   }

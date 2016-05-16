@@ -33,8 +33,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
   def createRpcEnv(name: String,
                    host: String = "localhost",
                    port: Int = 0,
-                   securityManager: SecurityManager = new SecurityManager(
-                         conf)): RpcEnv = {
+                   securityManager: SecurityManager =
+                     new SecurityManager(conf)): RpcEnv = {
     RpcEnv.create(name, host, port, conf, securityManager)
   }
 
@@ -168,7 +168,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
         10, 0, MapStatus(BlockManagerId("a", "hostA", 1000), Array(1000L)))
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
-    assert(slaveTracker.getMapSizesByExecutorId(10, 0) === Seq(
+    assert(
+        slaveTracker.getMapSizesByExecutorId(10, 0) === Seq(
             (BlockManagerId("a", "hostA", 1000),
              ArrayBuffer((ShuffleBlockId(10, 0, 0), size1000)))))
 

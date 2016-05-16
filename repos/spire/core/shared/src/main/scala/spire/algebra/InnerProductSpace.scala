@@ -2,7 +2,9 @@ package spire
 package algebra
 
 trait InnerProductSpace[V, @sp(Int, Long, Float, Double) F]
-    extends Any with VectorSpace[V, F] { self =>
+    extends Any
+    with VectorSpace[V, F] {
+  self =>
   def dot(v: V, w: V): F
 
   def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] =
@@ -18,7 +20,8 @@ object InnerProductSpace {
 }
 
 private[algebra] trait NormedInnerProductSpace[V, @sp(Float, Double) F]
-    extends Any with NormedVectorSpace[V, F] {
+    extends Any
+    with NormedVectorSpace[V, F] {
   def space: InnerProductSpace[V, F]
   def scalar: Field[F] = space.scalar
   def nroot: NRoot[F]

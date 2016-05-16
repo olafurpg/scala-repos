@@ -103,14 +103,14 @@ trait WithPlay { self: PackageObject =>
     def bind[A, B](fa: Fu[A])(f: A => Fu[B]) = fa flatMap f
   }
 
-  implicit def LilaFuMonoid[A : Monoid]: Monoid[Fu[A]] =
+  implicit def LilaFuMonoid[A: Monoid]: Monoid[Fu[A]] =
     Monoid.instance((x, y) =>
                       x zip y map {
                         case (a, b) => a ⊹ b
                     },
                     fuccess(∅[A]))
 
-  implicit def LilaFuZero[A : Zero]: Zero[Fu[A]] =
+  implicit def LilaFuZero[A: Zero]: Zero[Fu[A]] =
     Zero.instance(fuccess(zero[A]))
 
   implicit val LilaJsObjectZero: Zero[JsObject] =
@@ -224,7 +224,7 @@ trait WithPlay { self: PackageObject =>
     def mon(path: lila.mon.RecPath) = chronometer.mon(path).result
   }
 
-  implicit final class LilaPimpedFutureZero[A : Zero](fua: Fu[A]) {
+  implicit final class LilaPimpedFutureZero[A: Zero](fua: Fu[A]) {
 
     def nevermind: Fu[A] = fua recover {
       case e: lila.common.LilaException => zero[A]

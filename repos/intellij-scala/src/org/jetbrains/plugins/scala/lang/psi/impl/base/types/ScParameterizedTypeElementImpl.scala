@@ -25,7 +25,8 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScParameterizedTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParameterizedTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScParameterizedTypeElement {
   override def toString: String = "ParametrizedTypeElement: " + getText
 
   def typeArgList = findChildByClass(classOf[ScTypeArgs])
@@ -133,9 +134,10 @@ class ScParameterizedTypeElementImpl(node: ASTNode)
       forSomeBuilder.append(" forSome {")
       val typeElements = typeArgList.typeArgs.map {
         case w: ScWildcardTypeElement =>
-          forSomeBuilder.append("type _" + "$" + count +
-              w.lowerTypeElement.fold("")(te => s" >: ${te.getText}") +
-              w.upperTypeElement.fold("")(te => s" <: ${te.getText}"))
+          forSomeBuilder.append(
+              "type _" + "$" + count + w.lowerTypeElement.fold("")(te =>
+                    s" >: ${te.getText}") + w.upperTypeElement.fold("")(te =>
+                    s" <: ${te.getText}"))
           forSomeBuilder.append("; ")
           val res = s"_$$$count"
           count += 1

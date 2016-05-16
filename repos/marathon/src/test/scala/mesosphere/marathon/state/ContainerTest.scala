@@ -26,16 +26,19 @@ class ContainerTest extends MarathonSpec with Matchers {
         docker = Some(Container.Docker(image = "group/image"))
     )
 
-    lazy val container2 = Container(
-        `type` = mesos.ContainerInfo.Type.DOCKER,
-        volumes = Nil,
-        docker = Some(
-              Container.Docker(
+    lazy val container2 =
+      Container(
+          `type` = mesos.ContainerInfo.Type.DOCKER,
+          volumes =
+            Nil,
+          docker = Some(
+              Container
+                .Docker(
                   image = "group/image",
                   network = Some(
-                        mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
-                  portMappings = Some(
-                        Seq(
+                      mesos.ContainerInfo.DockerInfo.Network.BRIDGE),
+                  portMappings =
+                    Some(Seq(
                             Container.Docker.PortMapping(
                                 containerPort = 8080,
                                 hostPort = 32001,
@@ -51,51 +54,51 @@ class ContainerTest extends MarathonSpec with Matchers {
                         ))
               )
           )
-    )
+      )
 
     lazy val container3 = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
         volumes = Nil,
         docker = Some(
-              Container.Docker(
-                  image = "group/image",
-                  network = Some(mesos.ContainerInfo.DockerInfo.Network.NONE),
-                  privileged = true,
-                  parameters = Seq(
-                        Parameter("abc", "123"),
-                        Parameter("def", "456")
-                    )
-              )
-          )
+            Container.Docker(
+                image = "group/image",
+                network = Some(mesos.ContainerInfo.DockerInfo.Network.NONE),
+                privileged = true,
+                parameters = Seq(
+                    Parameter("abc", "123"),
+                    Parameter("def", "456")
+                )
+            )
+        )
     )
 
     lazy val container4 = Container(
         `type` = mesos.ContainerInfo.Type.DOCKER,
         volumes = Nil,
         docker = Some(
-              Container.Docker(
-                  image = "group/image",
-                  network = Some(mesos.ContainerInfo.DockerInfo.Network.NONE),
-                  privileged = true,
-                  parameters = Seq(
-                        Parameter("abc", "123"),
-                        Parameter("def", "456"),
-                        Parameter("def", "789")
-                    ),
-                  forcePullImage = true
-              )
-          )
+            Container.Docker(
+                image = "group/image",
+                network = Some(mesos.ContainerInfo.DockerInfo.Network.NONE),
+                privileged = true,
+                parameters = Seq(
+                    Parameter("abc", "123"),
+                    Parameter("def", "456"),
+                    Parameter("def", "789")
+                ),
+                forcePullImage = true
+            )
+        )
     )
 
     lazy val mesosContainerWithPersistentVolume = Container(
         `type` = mesos.ContainerInfo.Type.MESOS,
         volumes = Seq[Volume](
-              PersistentVolume(
-                  containerPath = "/local/container/",
-                  persistent = PersistentVolumeInfo(1024),
-                  mode = mesos.Volume.Mode.RW
-              )
-          ),
+            PersistentVolume(
+                containerPath = "/local/container/",
+                persistent = PersistentVolumeInfo(1024),
+                mode = mesos.Volume.Mode.RW
+            )
+        ),
         docker = None
     )
 
@@ -187,7 +190,7 @@ class ContainerTest extends MarathonSpec with Matchers {
           .setHostPort(32002)
           .setProtocol("udp")
           .build
-      )
+    )
 
     assert(
         expectedPortMappings == proto2.getDocker.getPortMappingsList.asScala)

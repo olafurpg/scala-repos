@@ -27,8 +27,13 @@ import typer._
 import emitter._
 
 object QuirrelCacheSpecs
-    extends Specification with Parser with Compiler with TreeShaker
-    with GroupSolver with LineErrors with RandomLibrarySpec {
+    extends Specification
+    with Parser
+    with Compiler
+    with TreeShaker
+    with GroupSolver
+    with LineErrors
+    with RandomLibrarySpec {
 
   import ast._
 

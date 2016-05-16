@@ -11,7 +11,8 @@ case class ArrayAccess(
 case class ClassCast(operand: IntermediateNode,
                      castType: IntermediateNode,
                      isPrimitive: Boolean)
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode
+    with TypedElement {
   def canSimplify: Boolean =
     isPrimitive &&
     List("Int", "Long", "Double", "Float", "Byte", "Char", "Short").contains(
@@ -32,7 +33,8 @@ case class ClassObjectAccess(expression: IntermediateNode)
     extends IntermediateNode
 case class InstanceOfConstruction(operand: IntermediateNode,
                                   mtype: IntermediateNode)
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode
+    with TypedElement {
   override def getType: TypeConstruction =
     mtype.asInstanceOf[TypedElement].getType
 }
@@ -80,7 +82,8 @@ object NewExpression {
 case class NewExpression(mtype: IntermediateNode,
                          arrayInitalizer: Seq[IntermediateNode],
                          arrayDimension: Seq[IntermediateNode])
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode
+    with TypedElement {
   override def getType: TypeConstruction =
     mtype.asInstanceOf[TypedElement].getType
 }

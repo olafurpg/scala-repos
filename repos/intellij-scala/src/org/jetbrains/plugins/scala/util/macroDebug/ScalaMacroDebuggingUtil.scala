@@ -187,11 +187,11 @@ object ScalaMacroDebuggingUtil {
 
     copyTextBetweenEditors(sourceEditor, macroEditor, project)
 
-    for (elt <- macrosToExpand.toList.sortWith(
-        (a, b) => a.getTextOffset > b.getTextOffset)) {
+    for (elt <- macrosToExpand.toList.sortWith((a, b) =>
+                     a.getTextOffset > b.getTextOffset)) {
       var macroCall = macrosheetFile.findElementAt(elt.getTextOffset)
       while (macroCall != null &&
-      !ScalaMacroDebuggingUtil.isMacroCall(macroCall)) {
+             !ScalaMacroDebuggingUtil.isMacroCall(macroCall)) {
         macroCall = macroCall.getParent
       }
       if (macroCall != null) {
@@ -210,9 +210,8 @@ object ScalaMacroDebuggingUtil {
                 s"{$macroExpansion}", PsiManager.getInstance(project))
             var statement = macroCall.getParent.addAfter(expansion, macroCall)
             macroCall.delete()
-            statement = CodeStyleManager
-              .getInstance(project)
-              .reformat(statement)
+            statement =
+              CodeStyleManager.getInstance(project).reformat(statement)
           }
         })
       }

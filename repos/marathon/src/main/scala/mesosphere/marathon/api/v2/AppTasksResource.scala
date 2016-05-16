@@ -127,8 +127,8 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
         deploymentResult(result(deploymentF))
       } else {
         reqToResponse(taskKiller.kill(pathId, findToKill)) { tasks =>
-          tasks.headOption.fold(unknownTask(id))(
-              task => ok(jsonObjString("task" -> task)))
+          tasks.headOption.fold(unknownTask(id))(task =>
+                ok(jsonObjString("task" -> task)))
         }
       }
   }

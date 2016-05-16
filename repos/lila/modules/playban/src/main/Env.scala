@@ -21,8 +21,8 @@ final class Env(config: Config, isRematch: String => Boolean, db: lila.db.Env) {
 object Env {
 
   lazy val current: Env =
-    "playban" boot new Env(
-        config = lila.common.PlayApp loadConfig "playban",
-        isRematch = lila.game.Env.current.cached.isRematch.get _,
-        db = lila.db.Env.current)
+    "playban" boot new Env(config = lila.common.PlayApp loadConfig "playban",
+                           isRematch =
+                             lila.game.Env.current.cached.isRematch.get _,
+                           db = lila.db.Env.current)
 }

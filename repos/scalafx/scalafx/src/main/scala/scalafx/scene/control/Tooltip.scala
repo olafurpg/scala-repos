@@ -118,7 +118,8 @@ object Tooltip {
   * @param delegate JavaFX Tooltip to be wrapped. It defaul value is a new JavaFX Tooltip with no text.
   */
 class Tooltip(override val delegate: jfxsc.Tooltip = new jfxsc.Tooltip)
-    extends PopupControl(delegate) with SFXDelegate[jfxsc.Tooltip] {
+    extends PopupControl(delegate)
+    with SFXDelegate[jfxsc.Tooltip] {
 
   /**
     * Creates a tooltip with the specified text.

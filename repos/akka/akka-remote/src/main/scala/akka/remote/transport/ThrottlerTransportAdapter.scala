@@ -116,8 +116,8 @@ object ThrottlerTransportAdapter {
       if (isAvailable(nanoTimeOfSend, tokens))
         (this.copy(
              nanoTimeOfLastSend = nanoTimeOfSend,
-             availableTokens = min(
-                   availableTokens - tokens + tokensGenerated(nanoTimeOfSend),
+             availableTokens =
+               min(availableTokens - tokens + tokensGenerated(nanoTimeOfSend),
                    capacity)),
          true)
       else (this, false)
@@ -419,8 +419,9 @@ private[transport] class ThrottledAssociation(
     val associationHandler: AssociationEventListener,
     val originalHandle: AssociationHandle,
     val inbound: Boolean)
-    extends Actor with LoggingFSM[ThrottledAssociation.ThrottlerState,
-                                  ThrottledAssociation.ThrottlerData]
+    extends Actor
+    with LoggingFSM[ThrottledAssociation.ThrottlerState,
+                    ThrottledAssociation.ThrottlerData]
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ThrottledAssociation._
   import context.dispatcher

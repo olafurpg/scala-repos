@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingCont
   * @author ilyas, Alexander Podkhalyuzin
   */
 class ScParenthesisedPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParenthesisedPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScParenthesisedPattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

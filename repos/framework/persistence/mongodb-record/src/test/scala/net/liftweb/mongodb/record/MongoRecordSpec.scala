@@ -300,7 +300,8 @@ class MongoRecordSpec extends Specification with MongoTestKit {
               ("name" -> "SubSubRecord1"),
               ("name" -> "SubSubRecord2")
           )) ~
-      ("when" -> ("$dt" -> srtr.meta.formats.dateFormat.format(sr1.when.value))) ~
+      ("when" -> ("$dt" -> srtr.meta.formats.dateFormat
+                .format(sr1.when.value))) ~
       ("slist" -> List("s1", "s2")) ~
       ("smap" -> (("a" -> "s1") ~ ("b" -> "s2"))) ~
       ("oid" -> ("$oid" -> sr1.oid.value.toString)) ~
@@ -312,7 +313,8 @@ class MongoRecordSpec extends Specification with MongoTestKit {
     val sr2Json =
       ("name" -> "SubRecord2") ~ ("subsub" -> ("name" -> "")) ~
       ("subsublist" -> JArray(Nil)) ~
-      ("when" -> ("$dt" -> srtr.meta.formats.dateFormat.format(sr2.when.value))) ~
+      ("when" -> ("$dt" -> srtr.meta.formats.dateFormat
+                .format(sr2.when.value))) ~
       ("slist" -> JArray(Nil)) ~ ("smap" -> JObject(Nil)) ~
       ("oid" -> ("$oid" -> sr2.oid.value.toString)) ~
       ("pattern" ->

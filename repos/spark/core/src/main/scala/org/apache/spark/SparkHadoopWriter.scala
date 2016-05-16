@@ -39,7 +39,8 @@ import org.apache.spark.util.SerializableJobConf
   * a filename to write to, etc, exactly like in a Hadoop MapReduce job.
   */
 private[spark] class SparkHadoopWriter(jobConf: JobConf)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   private val now = new Date()
   private val conf = new SerializableJobConf(jobConf)
@@ -120,9 +121,8 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
 
   private def getOutputFormat(): OutputFormat[AnyRef, AnyRef] = {
     if (format == null) {
-      format = conf.value
-        .getOutputFormat()
-        .asInstanceOf[OutputFormat[AnyRef, AnyRef]]
+      format =
+        conf.value.getOutputFormat().asInstanceOf[OutputFormat[AnyRef, AnyRef]]
     }
     format
   }

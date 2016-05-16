@@ -19,10 +19,10 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author ilyas
   */
-class ScalaControlFlowBuilder(
-    startInScope: ScalaPsiElement,
-    endInsScope: ScalaPsiElement,
-    policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy)
+class ScalaControlFlowBuilder(startInScope: ScalaPsiElement,
+                              endInsScope: ScalaPsiElement,
+                              policy: ScControlFlowPolicy =
+                                AllVariablesControlFlowPolicy)
     extends ScalaRecursiveElementVisitor {
   private val myInstructions = new ArrayBuffer[InstructionImpl]
   private val myPending = new ArrayBuffer[(InstructionImpl, ScalaPsiElement)]
@@ -123,7 +123,7 @@ class ScalaControlFlowBuilder(
       fromScope: ScalaPsiElement, toScope: ScalaPsiElement) {
     for {
       ((instr, scope), idx) <- myPending.zipWithIndex if scope != null &&
-                              PsiTreeUtil.isAncestor(fromScope, scope, false)
+      PsiTreeUtil.isAncestor(fromScope, scope, false)
     } {
       myPending.update(idx, (instr, toScope))
     }
@@ -363,8 +363,7 @@ class ScalaControlFlowBuilder(
 
   override def visitReturnStatement(ret: ScReturnStmt) {
     val isNodeNeeded =
-      myHead == null ||
-      (myHead.element match {
+      myHead == null || (myHead.element match {
             case Some(e) => e != ret
             case None => false
           })
@@ -462,8 +461,7 @@ class ScalaControlFlowBuilder(
 
   override def visitThrowExpression(throwStmt: ScThrowStmt) {
     val isNodeNeeded =
-      myHead == null ||
-      (myHead.element match {
+      myHead == null || (myHead.element match {
             case Some(e) => e != throwStmt
             case None => false
           })
@@ -558,10 +556,10 @@ class ScalaControlFlowBuilder(
       } else {
         startNode(Some(fBlock)) { finInstr =>
           for (p @ (instr, info) <- myTransitionInstructions;
-                                       if info.elem eq fBlock) {
-                addEdge(instr, finInstr)
-                myTransitionInstructions -= p
-              }
+               if info.elem eq fBlock) {
+            addEdge(instr, finInstr)
+            myTransitionInstructions -= p
+          }
           processCatch(finInstr)
           myHead = finInstr
           fBlock.accept(this)

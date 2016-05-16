@@ -57,8 +57,8 @@ class ConstantFoldingSuite extends PlanTest {
       .select(Literal(2) + Literal(3) + Literal(4) as Symbol("2+3+4"),
               Literal(2) * Literal(3) + Literal(4) as Symbol("2*3+4"),
               Literal(2) * (Literal(3) + Literal(4)) as Symbol("2*(3+4)"))
-      .where(Literal(1) === Literal(1) && Literal(2) > Literal(3) ||
-          Literal(3) > Literal(2))
+      .where(Literal(1) === Literal(1) &&
+          Literal(2) > Literal(3) || Literal(3) > Literal(2))
       .groupBy(
           Literal(2) * Literal(3) - Literal(6) / (Literal(4) - Literal(2))
       )(Literal(9) / Literal(3) as Symbol("9/3"))
@@ -100,12 +100,12 @@ class ConstantFoldingSuite extends PlanTest {
   test(
       "Constant folding test: expressions have attribute references and literals in " +
       "predicates") {
-    val originalQuery = testRelation.where(
+    val originalQuery = testRelation
+      .where(
         (('a > 1 && Literal(1) === Literal(1)) ||
-            ('a < 10 && Literal(1) === Literal(2)) ||
-            (Literal(1) === Literal(1) && 'b > 1) ||
-            (Literal(1) === Literal(2) && 'b < 10)) &&
-        (('a > 1 || Literal(1) === Literal(1)) &&
+            ('a < 10 && Literal(1) === Literal(2)) || (Literal(1) === Literal(
+                    1) && 'b > 1) || (Literal(1) === Literal(2) &&
+                'b < 10)) && (('a > 1 || Literal(1) === Literal(1)) &&
             ('a < 10 || Literal(1) === Literal(2)) &&
             (Literal(1) === Literal(1) || 'b > 1) &&
             (Literal(1) === Literal(2) || 'b < 10)))
@@ -141,8 +141,7 @@ class ConstantFoldingSuite extends PlanTest {
     val optimized = Optimize.execute(originalQuery.analyze)
 
     val correctAnswer = testRelation
-      .select(Rand(5L) + Literal(1.0) as Symbol("c1"),
-              sum('a) as Symbol("c2"))
+      .select(Rand(5L) + Literal(1.0) as Symbol("c1"), sum('a) as Symbol("c2"))
       .analyze
 
     comparePlans(optimized, correctAnswer)

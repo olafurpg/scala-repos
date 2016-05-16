@@ -38,7 +38,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.{ResetSystemProperties, Utils}
 
 class YarnSparkHadoopUtilSuite
-    extends SparkFunSuite with Matchers with Logging
+    extends SparkFunSuite
+    with Matchers
+    with Logging
     with ResetSystemProperties {
 
   val hasBash = try {

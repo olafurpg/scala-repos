@@ -117,7 +117,7 @@ trait Collections {
         } else {
           val b = if (mapped eq null) new ListBuffer[A] else mapped
           var xc = unchanged
-          while ( (xc ne pending0) && (xc ne pending1)) {
+          while ((xc ne pending0) && (xc ne pending1)) {
             b += xc.head
             xc = xc.tail
           }

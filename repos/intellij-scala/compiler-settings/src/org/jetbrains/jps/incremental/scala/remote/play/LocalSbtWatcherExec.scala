@@ -18,10 +18,11 @@ class LocalSbtWatcherExec extends SbtWatcherExec {
     val builder = new ProcessBuilder(args.tail: _*)
     builder.directory(new File(args.head))
 
-    descriptor = Option(builder.start()) map {
-      case p =>
-        createDescriptor(p, consumer).startListening()
-    }
+    descriptor =
+      Option(builder.start()) map {
+        case p =>
+          createDescriptor(p, consumer).startListening()
+      }
 
     if (isRunning) state = true
   }

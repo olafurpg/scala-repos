@@ -82,6 +82,6 @@ object DisjunctionTest extends SpecLite {
 
     3.right[String].validationNel must_=== 3.successNel[String]
     ("hello".left[Int].validationNel |@| "world".left[Int].validationNel).tupled must_===
-    ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
+      ("hello".failureNel[Int] |@| "world".failureNel[Int]).tupled
   }
 }

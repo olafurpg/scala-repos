@@ -11,8 +11,10 @@ import org.ensime.util.file._
   * Verifies common operations work correctly for unsaved files.
   */
 class UnsavedFileTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.TimingTestProject
 

@@ -409,7 +409,7 @@ class AssetsBuilder(errorHandler: HttpErrorHandler) extends Controller {
           ifModifiedSinceStr <- request.headers.get(IF_MODIFIED_SINCE)
           ifModifiedSince <- parseModifiedDate(ifModifiedSinceStr)
           lastModified <- assetInfo.parsedLastModified
-                             if !lastModified.after(ifModifiedSince)
+          if !lastModified.after(ifModifiedSince)
         } yield {
           NotModified
         }

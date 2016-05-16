@@ -211,7 +211,8 @@ object ActorMailboxSpec {
       classOf[UnboundedControlAwareMessageQueueSemantics])
 
   trait MCBoundedMessageQueueSemantics
-      extends MessageQueue with MultipleConsumerSemantics
+      extends MessageQueue
+      with MultipleConsumerSemantics
   final case class MCBoundedMailbox(
       val capacity: Int, val pushTimeOut: FiniteDuration)
       extends MailboxType
@@ -228,7 +229,9 @@ object ActorMailboxSpec {
 }
 
 class ActorMailboxSpec(conf: Config)
-    extends AkkaSpec(conf) with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec(conf)
+    with DefaultTimeout
+    with ImplicitSender {
 
   import ActorMailboxSpec._
 

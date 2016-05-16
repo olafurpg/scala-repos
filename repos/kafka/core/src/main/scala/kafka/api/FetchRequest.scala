@@ -45,18 +45,16 @@ object FetchRequest {
     val maxWait = buffer.getInt
     val minBytes = buffer.getInt
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            val offset = buffer.getLong
-            val fetchSize = buffer.getInt
-            (TopicAndPartition(topic, partitionId),
-             PartitionFetchInfo(offset, fetchSize))
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        val offset = buffer.getLong
+        val fetchSize = buffer.getInt
+        (TopicAndPartition(topic, partitionId),
+         PartitionFetchInfo(offset, fetchSize))
+      })
     })
     FetchRequest(versionId,
                  correlationId,
@@ -129,15 +127,14 @@ case class FetchRequest(
     4 + /* maxWait */
     4 + /* minBytes */
     4 + /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
-        val (topic, partitionFetchInfos) = currTopic
-        foldedTopics + shortStringLength(topic) + 4 + /* partition count */
-        partitionFetchInfos.size *
-        (4 + /* partition id */
-            8 + /* offset */
-            4 /* fetch size */
-            )
+    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) => {
+      val (topic, partitionFetchInfos) = currTopic
+      foldedTopics + shortStringLength(topic) + 4 + /* partition count */
+      partitionFetchInfos.size *
+      (4 + /* partition id */
+          8 + /* offset */
+          4 /* fetch size */
+          )
     })
   }
 

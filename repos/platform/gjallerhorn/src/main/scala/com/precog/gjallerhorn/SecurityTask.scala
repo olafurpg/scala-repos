@@ -26,7 +26,8 @@ import org.specs2.mutable._
 import specs2._
 
 class SecurityTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
   "security web service" should {
     "create derivative apikeys" in {
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
@@ -46,11 +47,9 @@ class SecurityTask(settings: Settings)
 """ format (rootPath, accountId))
 
       val result = Http(req OK as.String)
-      val json = JParser
-        .parseFromString(result())
-        .valueOr(throw _)
+      val json = JParser.parseFromString(result()).valueOr(throw _)
 
-        (json \ "name").deserialize[String] must_== "MH Test Write"
+      (json \ "name").deserialize[String] must_== "MH Test Write"
       (json \ "description").deserialize[String] must_== "Foo"
       (json \ "apiKey").deserialize[String] must_!= apiKey
       val perms =

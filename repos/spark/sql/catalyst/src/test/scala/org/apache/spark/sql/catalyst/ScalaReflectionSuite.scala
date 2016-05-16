@@ -83,15 +83,26 @@ class ScalaReflectionSuite extends SparkFunSuite {
     val schema = schemaFor[PrimitiveData]
     assert(
         schema === Schema(
-            StructType(
-                Seq(StructField("intField", IntegerType, nullable = false),
-                    StructField("longField", LongType, nullable = false),
-                    StructField("doubleField", DoubleType, nullable = false),
-                    StructField("floatField", FloatType, nullable = false),
-                    StructField("shortField", ShortType, nullable = false),
-                    StructField("byteField", ByteType, nullable = false),
-                    StructField(
-                        "booleanField", BooleanType, nullable = false))),
+            StructType(Seq(StructField(
+                               "intField",
+                               IntegerType,
+                               nullable =
+                                 false),
+                           StructField(
+                               "longField",
+                               LongType,
+                               nullable = false),
+                           StructField(
+                               "doubleField", DoubleType, nullable = false),
+                           StructField(
+                               "floatField", FloatType, nullable = false),
+                           StructField(
+                               "shortField", ShortType, nullable = false),
+                           StructField(
+                               "byteField", ByteType, nullable = false),
+                           StructField("booleanField",
+                                       BooleanType,
+                                       nullable = false))),
             nullable = true))
   }
 

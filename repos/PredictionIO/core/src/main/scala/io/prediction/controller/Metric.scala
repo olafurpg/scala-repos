@@ -96,7 +96,8 @@ private[prediction] trait StatsOptionMetricHelper[EI, Q, P, A] {
   * @group Evaluation
   */
 abstract class AverageMetric[EI, Q, P, A]
-    extends Metric[EI, Q, P, A, Double] with StatsMetricHelper[EI, Q, P, A]
+    extends Metric[EI, Q, P, A, Double]
+    with StatsMetricHelper[EI, Q, P, A]
     with QPAMetric[Q, P, A, Double] {
 
   /** Implement this method to return a score that will be used for averaging
@@ -149,7 +150,8 @@ abstract class OptionAverageMetric[EI, Q, P, A]
   * @group Evaluation
   */
 abstract class StdevMetric[EI, Q, P, A]
-    extends Metric[EI, Q, P, A, Double] with StatsMetricHelper[EI, Q, P, A]
+    extends Metric[EI, Q, P, A, Double]
+    with StatsMetricHelper[EI, Q, P, A]
     with QPAMetric[Q, P, A, Double] {
 
   /** Implement this method to return a score that will be used for calculating
@@ -203,8 +205,9 @@ abstract class OptionStdevMetric[EI, Q, P, A]
   *
   * @group Evaluation
   */
-abstract class SumMetric[EI, Q, P, A, R : ClassTag](implicit num: Numeric[R])
-    extends Metric[EI, Q, P, A, R]()(num) with QPAMetric[Q, P, A, R] {
+abstract class SumMetric[EI, Q, P, A, R: ClassTag](implicit num: Numeric[R])
+    extends Metric[EI, Q, P, A, R]()(num)
+    with QPAMetric[Q, P, A, R] {
 
   /** Implement this method to return a score that will be used for summing
     * across all QPA tuples.

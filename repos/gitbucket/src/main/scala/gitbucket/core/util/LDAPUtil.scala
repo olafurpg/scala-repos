@@ -46,8 +46,8 @@ object LDAPUtil {
                    password: String): Either[String, LDAPUserInfo] = {
     bind(
         host = ldapSettings.host,
-        port = ldapSettings.port.getOrElse(
-              SystemSettingsService.DefaultLdapPort),
+        port =
+          ldapSettings.port.getOrElse(SystemSettingsService.DefaultLdapPort),
         dn = ldapSettings.bindDN.getOrElse(""),
         password = ldapSettings.bindPassword.getOrElse(""),
         tls = ldapSettings.tls.getOrElse(false),
@@ -74,8 +74,8 @@ object LDAPUtil {
       password: String): Either[String, LDAPUserInfo] = {
     bind(
         host = ldapSettings.host,
-        port = ldapSettings.port.getOrElse(
-              SystemSettingsService.DefaultLdapPort),
+        port =
+          ldapSettings.port.getOrElse(SystemSettingsService.DefaultLdapPort),
         dn = userDN,
         password = password,
         tls = ldapSettings.tls.getOrElse(false),
@@ -103,17 +103,17 @@ object LDAPUtil {
                         ldapSettings.mailAttribute.get) match {
           case Some(mailAddress) =>
             Right(
-                LDAPUserInfo(
-                    userName = getUserNameFromMailAddress(userName),
-                    fullName = ldapSettings.fullNameAttribute.flatMap {
-                  fullNameAttribute =>
-                    findFullName(conn,
-                                 userDN,
-                                 ldapSettings.userNameAttribute,
-                                 userName,
-                                 fullNameAttribute)
-                }.getOrElse(userName),
-                    mailAddress = mailAddress))
+                LDAPUserInfo(userName = getUserNameFromMailAddress(userName),
+                             fullName =
+                               ldapSettings.fullNameAttribute.flatMap {
+                             fullNameAttribute =>
+                               findFullName(conn,
+                                            userDN,
+                                            ldapSettings.userNameAttribute,
+                                            userName,
+                                            fullNameAttribute)
+                           }.getOrElse(userName),
+                             mailAddress = mailAddress))
           case None => Left("Can't find mail address.")
         }
       }
@@ -214,11 +214,12 @@ object LDAPUtil {
       case x => "(&(" + x + ")(" + userNameAttribute + "=" + userName + "))"
     }
 
-    getEntries(conn.search(baseDN,
-                           LDAPConnection.SCOPE_SUB,
-                           filterCond,
-                           null,
-                           false)).collectFirst {
+    getEntries(
+        conn.search(baseDN,
+                    LDAPConnection.SCOPE_SUB,
+                    filterCond,
+                    null,
+                    false)).collectFirst {
       case x => x.getDN
     }
   }

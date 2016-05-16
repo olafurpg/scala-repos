@@ -28,8 +28,12 @@ import java.io.File
 import scala.io.Source
 
 object NullProvenanceSpecs
-    extends Specification with StubPhases with CompilerUtils with Compiler
-    with ProvenanceChecker with RandomLibrarySpec {
+    extends Specification
+    with StubPhases
+    with CompilerUtils
+    with Compiler
+    with ProvenanceChecker
+    with RandomLibrarySpec {
 
   import ast._
 

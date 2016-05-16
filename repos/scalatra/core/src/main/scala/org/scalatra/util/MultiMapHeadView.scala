@@ -10,8 +10,8 @@ object MultiMapHeadView {
     }
   }
 
-  def emptyIndifferent[
-      B]: MultiMapHeadView[String, B] with MapWithIndifferentAccess[B] = {
+  def emptyIndifferent[B]
+    : MultiMapHeadView[String, B] with MapWithIndifferentAccess[B] = {
     new MultiMapHeadView[String, B] with MapWithIndifferentAccess[B] {
       override protected val multiMap = Map.empty[String, Seq[B]]
     }

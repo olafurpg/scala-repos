@@ -273,7 +273,8 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
     */
   class ClusterResultAggregator(
       title: String, expectedResults: Int, settings: Settings)
-      extends Actor with ActorLogging {
+      extends Actor
+      with ActorLogging {
     import settings.reportMetricsInterval
     import settings.infolog
     private val cluster = Cluster(context.system)
@@ -638,7 +639,8 @@ private[cluster] object StressMultiJvmSpec extends MultiNodeConfig {
       case SimpleJob(id, payload) ⇒ sender() ! Ack(id)
       case TreeJob(id, payload, idx, levels, width) ⇒
         // create the actors when first TreeJob message is received
-        val totalActors = ((width * math.pow(width, levels) - 1) / (width - 1)).toInt
+        val totalActors =
+          ((width * math.pow(width, levels) - 1) / (width - 1)).toInt
         log.debug(
             "Creating [{}] actors in a tree structure of [{}] levels and each actor has [{}] children",
             totalActors,
@@ -775,8 +777,10 @@ class StressMultiJvmNode12 extends StressSpec
 class StressMultiJvmNode13 extends StressSpec
 
 abstract class StressSpec
-    extends MultiNodeSpec(StressMultiJvmSpec) with MultiNodeClusterSpec
-    with BeforeAndAfterEach with ImplicitSender {
+    extends MultiNodeSpec(StressMultiJvmSpec)
+    with MultiNodeClusterSpec
+    with BeforeAndAfterEach
+    with ImplicitSender {
 
   import StressMultiJvmSpec._
   import ClusterEvent._

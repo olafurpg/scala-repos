@@ -48,7 +48,8 @@ abstract class ScTypeDefinitionImpl protected (
     nodeType: IElementType,
     node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTypeDefinition with PsiClassFake {
+    with ScTypeDefinition
+    with PsiClassFake {
   override def hasTypeParameters: Boolean = typeParameters.nonEmpty
 
   override def add(element: PsiElement): PsiElement = {
@@ -123,9 +124,9 @@ abstract class ScTypeDefinitionImpl protected (
     }
   }
 
-  def getTypeWithProjections(
-      ctx: TypingContext,
-      thisProjections: Boolean = false): TypeResult[ScType] = {
+  def getTypeWithProjections(ctx: TypingContext,
+                             thisProjections: Boolean =
+                               false): TypeResult[ScType] = {
     def args: Seq[ScTypeParameterType] =
       typeParameters.map(new ScTypeParameterType(_, ScSubstitutor.empty))
     def innerType =
@@ -188,7 +189,7 @@ abstract class ScTypeDefinitionImpl protected (
       parentSourceMirror match {
         case td: ScTypeDefinitionImpl =>
           for (i <- td.typeDefinitions if name == i.name &&
-                   hasSameScalaKind(i)) return i
+               hasSameScalaKind(i)) return i
         case _ => this
       }
     }
@@ -297,13 +298,10 @@ abstract class ScTypeDefinitionImpl protected (
           _packageName(o, sep, k)
         case _: ScClass | _: ScTrait if trunced => k("")
         case t: ScTypeDefinition =>
-          _packageName(t,
-                       sep,
-                       (s) =>
-                         {
-                           val name = t.name
-                           k(s + transformName(encodeName, name) + sep)
-                       })
+          _packageName(t, sep, (s) => {
+            val name = t.name
+            k(s + transformName(encodeName, name) + sep)
+          })
         case p: ScPackaging =>
           _packageName(p, ".", (s) => k(s + p.getPackageName + "."))
         case f: ScalaFile =>
@@ -366,8 +364,8 @@ abstract class ScTypeDefinitionImpl protected (
         name, checkBases)
   }
 
-  override def getAllMethodsAndTheirSubstitutors: JList[IPair[
-          PsiMethod, PsiSubstitutor]] = {
+  override def getAllMethodsAndTheirSubstitutors: JList[
+      IPair[PsiMethod, PsiSubstitutor]] = {
     super [ScTypeDefinition].getAllMethodsAndTheirSubstitutors
   }
 
@@ -389,8 +387,10 @@ abstract class ScTypeDefinitionImpl protected (
   override def delete() {
     var toDelete: PsiElement = this
     var parent: PsiElement = getParent
-    while (parent.isInstanceOf[ScToplevelElement] &&
-    parent.asInstanceOf[ScToplevelElement].typeDefinitions.length == 1) {
+    while (parent.isInstanceOf[ScToplevelElement] && parent
+             .asInstanceOf[ScToplevelElement]
+             .typeDefinitions
+             .length == 1) {
       toDelete = parent
       parent = toDelete.getParent
     }
@@ -416,9 +416,10 @@ abstract class ScTypeDefinitionImpl protected (
 
   def signaturesByName(name: String): Seq[PhysicalSignature] = {
     (for ((s: PhysicalSignature, _) <- TypeDefinitionMembers
-      .getSignatures(this)
-      .forName(name)
-      ._1) yield s) ++ syntheticMethodsNoOverride
+                                        .getSignatures(this)
+                                        .forName(name)
+                                        ._1) yield
+      s) ++ syntheticMethodsNoOverride
       .filter(_.name == name)
       .map(new PhysicalSignature(_, ScSubstitutor.empty))
   }

@@ -24,7 +24,8 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                                     val authenticator: Authenticator,
                                     val authorizer: Authorizer,
                                     val config: MarathonConf)
-    extends AuthResource with Logging {
+    extends AuthResource
+    with Logging {
 
   @GET
   def running(@Context req: HttpServletRequest): Response =

@@ -20,7 +20,7 @@ object ForProps extends QuasiquoteProperties("for") {
 
   def genForEnums(size: Int): Gen[ForEnums] =
     for (first <- genForFrom;
-    rest <- listOfN(size, oneOf(genForFrom, genForFilter, genForEq))) yield
+         rest <- listOfN(size, oneOf(genForFrom, genForFilter, genForEq))) yield
       new ForEnums(first :: rest)
 
   implicit val arbForEnums: Arbitrary[ForEnums] = arbitrarySized(genForEnums)

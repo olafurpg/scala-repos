@@ -23,7 +23,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
   /* used in GenBCode: collects ClassDef symbols owning a main(Array[String]) method */
   private var entryPoints: List[Symbol] = Nil
   def getEntryPoints: List[Symbol] =
-    entryPoints sortBy ("" + _.fullName) // For predictably ordered error messages.
+    entryPoints sortBy ("" +
+        _.fullName) // For predictably ordered error messages.
 
   protected def newTransformer(unit: CompilationUnit): Transformer =
     new CleanUpTransformer(unit)
@@ -41,8 +42,8 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
       val Template(_, _, body) = tree
       clearStatics()
       val newBody = transformTrees(body)
-      val templ = deriveTemplate(tree)(
-          _ => transformTrees(newStaticMembers.toList) ::: newBody)
+      val templ = deriveTemplate(tree)(_ =>
+            transformTrees(newStaticMembers.toList) ::: newBody)
       try if (newStaticInits.isEmpty) templ
       else
         deriveTemplate(templ)(body =>
@@ -124,44 +125,42 @@ abstract class CleanUp extends Statics with Transform with ast.TreeDSL {
             in Java 8 interfaces, which don't support private static fields.
          */
 
-        addStaticMethodToClass(
-            (reflMethodSym, forReceiverSym) =>
-              {
-            val methodCache =
-              reflMethodSym.newVariable(mkTerm("methodCache"), ad.pos) setInfo StructuralCallSite.tpe
-            val methodSym =
-              reflMethodSym.newVariable(mkTerm("method"), ad.pos) setInfo MethodClass.tpe
+        addStaticMethodToClass((reflMethodSym, forReceiverSym) => {
+          val methodCache =
+            reflMethodSym.newVariable(mkTerm("methodCache"), ad.pos) setInfo StructuralCallSite.tpe
+          val methodSym =
+            reflMethodSym.newVariable(mkTerm("method"), ad.pos) setInfo MethodClass.tpe
 
-            val dummyMethodType =
-              MethodType(NoSymbol.newSyntheticValueParams(paramTypes), AnyTpe)
-            BLOCK(
-                ValDef(methodCache,
-                       ApplyDynamic(
-                           gen.mkAttributedIdent(StructuralCallSite_dummy),
-                           LIT(StructuralCallSite_bootstrap) :: LIT(
-                               dummyMethodType) :: Nil)
-                         .setType(StructuralCallSite.tpe)),
-                ValDef(methodSym,
-                       (REF(methodCache) DOT StructuralCallSite_find)(
-                           REF(forReceiverSym))),
-                IF(REF(methodSym) OBJ_NE NULL).THEN(Return(REF(methodSym))) ELSE {
-                  def methodSymRHS =
-                    ( (REF(forReceiverSym) DOT Class_getMethod)(
-                        LIT(method),
-                        (REF(methodCache) DOT StructuralCallSite_getParameterTypes)(
-                            )))
-                  def cacheAdd =
-                    ( (REF(methodCache) DOT StructuralCallSite_add)(
-                        REF(forReceiverSym), REF(methodSym)))
-                  BLOCK(
-                      REF(methodSym) ===
-                      (REF(currentRun.runDefinitions.ensureAccessibleMethod) APPLY
-                          (methodSymRHS)),
-                      cacheAdd,
-                      Return(REF(methodSym))
-                  )
-                }
-            )
+          val dummyMethodType =
+            MethodType(NoSymbol.newSyntheticValueParams(paramTypes), AnyTpe)
+          BLOCK(
+              ValDef(
+                  methodCache,
+                  ApplyDynamic(gen.mkAttributedIdent(StructuralCallSite_dummy),
+                               LIT(StructuralCallSite_bootstrap) :: LIT(
+                                   dummyMethodType) :: Nil)
+                    .setType(StructuralCallSite.tpe)),
+              ValDef(methodSym,
+                     (REF(methodCache) DOT StructuralCallSite_find)(
+                         REF(forReceiverSym))),
+              IF(REF(methodSym) OBJ_NE NULL).THEN(Return(REF(methodSym))) ELSE {
+                def methodSymRHS =
+                  ((REF(forReceiverSym) DOT Class_getMethod)(
+                      LIT(method),
+                      (REF(methodCache) DOT StructuralCallSite_getParameterTypes)(
+                          )))
+                def cacheAdd =
+                  ((REF(methodCache) DOT StructuralCallSite_add)(
+                      REF(forReceiverSym), REF(methodSym)))
+                BLOCK(
+                    REF(methodSym) ===
+                    (REF(currentRun.runDefinitions.ensureAccessibleMethod) APPLY
+                        (methodSymRHS)),
+                    cacheAdd,
+                    Return(REF(methodSym))
+                )
+              }
+          )
         })
       }
 

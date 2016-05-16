@@ -93,7 +93,8 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
 
     info("Settings after normalizing paths: " + newSettings)
     if (!command.files.isEmpty)
-      info("Input files after normalizing paths: " +
+      info(
+          "Input files after normalizing paths: " +
           (command.files mkString ","))
     printMemoryStats()
 

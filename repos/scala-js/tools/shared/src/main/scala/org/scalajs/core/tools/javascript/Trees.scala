@@ -243,7 +243,8 @@ object Trees {
       extends Literal
 
   case class StringLiteral(value: String)(implicit val pos: Position)
-      extends Literal with PropertyName {
+      extends Literal
+      with PropertyName {
     override def name = value
   }
 

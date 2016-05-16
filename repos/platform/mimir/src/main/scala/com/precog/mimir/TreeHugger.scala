@@ -76,7 +76,8 @@ class Code extends UsefulStuff {
     TRAITDEF("Genlib") withParents ("GenOpcode", "GenLibrary") := BLOCK(
         (DEF("_mathlib1") withFlags (Flags.OVERRIDE) :=
               REF("super._mathlib1") SEQ_++ (sym.Set UNAPPLY (ID(m1)))) ::
-        (DEF("_mathlib2") withFlags (Flags.OVERRIDE) := REF("super._mathlib2") SEQ_++
+        (DEF("_mathlib2") withFlags (Flags.OVERRIDE) :=
+              REF("super._mathlib2") SEQ_++
             (sym.Set UNAPPLY (ID(m2)))) :: methodsAll: _*
     )
   }

@@ -214,8 +214,8 @@ trait WebHookPullRequestService extends WebHookService {
             action = action,
             number = issue.issueId,
             repository = ApiRepository(repository, ApiUser(repoOwner)),
-            issue = ApiIssue(
-                  issue, RepositoryName(repository), ApiUser(issueUser)),
+            issue =
+              ApiIssue(issue, RepositoryName(repository), ApiUser(issueUser)),
             sender = ApiUser(sender))
       }
     }
@@ -231,7 +231,7 @@ trait WebHookPullRequestService extends WebHookService {
     callWebHookOf(repository.owner, repository.name, WebHook.PullRequest) {
       for {
         (issue, pullRequest) <- getPullRequest(
-            repository.owner, repository.name, issueId)
+                                   repository.owner, repository.name, issueId)
         users = getAccountsByUserNames(Set(repository.owner,
                                            pullRequest.requestUserName,
                                            issue.openedUserName),
@@ -239,8 +239,8 @@ trait WebHookPullRequestService extends WebHookService {
         baseOwner <- users.get(repository.owner)
         headOwner <- users.get(pullRequest.requestUserName)
         issueUser <- users.get(issue.openedUserName)
-        headRepo <- getRepository(
-            pullRequest.requestUserName, pullRequest.requestRepositoryName)
+        headRepo <- getRepository(pullRequest.requestUserName,
+                                  pullRequest.requestRepositoryName)
       } yield {
         WebHookPullRequestPayload(action = action,
                                   issue = issue,
@@ -263,17 +263,17 @@ trait WebHookPullRequestService extends WebHookService {
     (for {
       is <- Issues if is.closed === false.bind
       pr <- PullRequests
-               if pr.byPrimaryKey(is.userName, is.repositoryName, is.issueId)
-           if pr.requestUserName === userName.bind
-           if pr.requestRepositoryName === repositoryName.bind
-           if pr.requestBranch === branch.bind
+      if pr.byPrimaryKey(is.userName, is.repositoryName, is.issueId)
+      if pr.requestUserName === userName.bind
+      if pr.requestRepositoryName === repositoryName.bind
+      if pr.requestBranch === branch.bind
       bu <- Accounts if bu.userName === pr.userName
       ru <- Accounts if ru.userName === pr.requestUserName
       iu <- Accounts if iu.userName === is.openedUserName
       wh <- WebHooks if wh.byRepository(is.userName, is.repositoryName)
-      wht <- WebHookEvents if wht.event === WebHook.PullRequest
-              .asInstanceOf[WebHook.Event]
-              .bind && wht.byWebHook(wh)
+      wht <- WebHookEvents
+      if wht.event === WebHook.PullRequest.asInstanceOf[WebHook.Event].bind &&
+      wht.byWebHook(wh)
     } yield {
       ((is, iu, pr, bu, ru), wh)
     }).list.groupBy(_._1).mapValues(_.map(_._2))
@@ -288,9 +288,11 @@ trait WebHookPullRequestService extends WebHookService {
     import WebHookService._
     for {
       ((issue, issueUser, pullRequest, baseOwner, headOwner), webHooks) <- getPullRequestsByRequestForWebhook(
-          requestRepository.owner, requestRepository.name, requestBranch)
+                                                                              requestRepository.owner,
+                                                                              requestRepository.name,
+                                                                              requestBranch)
       baseRepo <- getRepository(
-          pullRequest.userName, pullRequest.repositoryName)
+                     pullRequest.userName, pullRequest.repositoryName)
     } yield {
       val payload = WebHookPullRequestPayload(
           action = action,
@@ -322,7 +324,7 @@ trait WebHookPullRequestReviewCommentService extends WebHookService {
         repository.owner, repository.name, WebHook.PullRequestReviewComment) {
       for {
         (issue, pullRequest) <- getPullRequest(
-            repository.owner, repository.name, issueId)
+                                   repository.owner, repository.name, issueId)
         users = getAccountsByUserNames(Set(repository.owner,
                                            pullRequest.requestUserName,
                                            issue.openedUserName),
@@ -330,8 +332,8 @@ trait WebHookPullRequestReviewCommentService extends WebHookService {
         baseOwner <- users.get(repository.owner)
         headOwner <- users.get(pullRequest.requestUserName)
         issueUser <- users.get(issue.openedUserName)
-        headRepo <- getRepository(
-            pullRequest.requestUserName, pullRequest.requestRepositoryName)
+        headRepo <- getRepository(pullRequest.requestUserName,
+                                  pullRequest.requestRepositoryName)
       } yield {
         WebHookPullRequestReviewCommentPayload(action = action,
                                                comment = comment,
@@ -359,8 +361,9 @@ trait WebHookIssueCommentService extends WebHookPullRequestService {
       implicit s: Session, context: JsonFormat.Context): Unit = {
     callWebHookOf(repository.owner, repository.name, WebHook.IssueComment) {
       for {
-        issueComment <- getComment(
-            repository.owner, repository.name, issueCommentId.toString())
+        issueComment <- getComment(repository.owner,
+                                   repository.name,
+                                   issueCommentId.toString())
         users = getAccountsByUserNames(Set(issue.openedUserName,
                                            repository.owner,
                                            issueComment.commentedUserName),
@@ -394,7 +397,8 @@ object WebHookService {
       commits: List[ApiCommit],
       repository: ApiRepository
   )
-      extends FieldSerializable with WebHookPayload {
+      extends FieldSerializable
+      with WebHookPayload {
     val compare = commits.size match {
       case 0 =>
         ApiPath(s"/${repository.full_name}") // maybe test hook on un-initalied repository
@@ -424,11 +428,12 @@ object WebHookService {
           before = ObjectId.toString(oldId),
           after = ObjectId.toString(newId),
           commits = commits.map { commit =>
-            ApiCommit.forPushPayload(
-                git, RepositoryName(repositoryInfo), commit)
+            ApiCommit.forPushPayload(git,
+                                     RepositoryName(repositoryInfo),
+                                     commit)
           },
           repository = ApiRepository.forPushPayload(
-                repositoryInfo, owner = ApiUser(repositoryOwner))
+              repositoryInfo, owner = ApiUser(repositoryOwner))
       )
   }
 
@@ -499,8 +504,8 @@ object WebHookService {
       WebHookIssueCommentPayload(
           action = "created",
           repository = ApiRepository(repository, repositoryUser),
-          issue = ApiIssue(
-                issue, RepositoryName(repository), ApiUser(issueUser)),
+          issue =
+            ApiIssue(issue, RepositoryName(repository), ApiUser(issueUser)),
           comment = ApiComment(comment,
                                RepositoryName(repository),
                                issue.issueId,

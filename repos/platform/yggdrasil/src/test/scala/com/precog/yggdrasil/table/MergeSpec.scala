@@ -40,7 +40,8 @@ import scalaz.syntax.comonad._
 import scalaz.syntax.monad._
 
 trait MergeSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
+    extends ColumnarTableModuleTestSupport[M]
+    with TableModuleSpec[M]
     with IndicesModule[M] {
 
   type GroupId = Int
@@ -128,13 +129,14 @@ trait MergeSpec[M[+ _]]
           GroupingSource(
               bar,
               DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
+              Some(
+                  InnerObjectConcat(
                       ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(DerefObjectStatic(DerefObjectStatic(Leaf(
-                                                                         Source),
-                                                                     valueField),
-                                                   cField),
-                                 "value"))),
+                      WrapObject(
+                          DerefObjectStatic(DerefObjectStatic(Leaf(Source),
+                                                              valueField),
+                                            cField),
+                          "value"))),
               0,
               GroupKeySpecOr(
                   GroupKeySpecSource(
@@ -156,17 +158,18 @@ trait MergeSpec[M[+ _]]
                       WrapObject(DerefObjectStatic(Leaf(Source), valueField),
                                  "value"))),
               3,
-              GroupKeySpecAnd(
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        aField)),
-                  GroupKeySpecSource(
-                      twoField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        bField)))
+              GroupKeySpecAnd(GroupKeySpecSource(oneField,
+                                                 DerefObjectStatic(
+                                                     DerefObjectStatic(
+                                                         Leaf(Source),
+                                                         valueField),
+                                                     aField)),
+                              GroupKeySpecSource(
+                                  twoField,
+                                  DerefObjectStatic(
+                                      DerefObjectStatic(Leaf(Source),
+                                                        valueField),
+                                      bField)))
           ),
           GroupingSpec.Intersection)
 
@@ -281,30 +284,30 @@ trait MergeSpec[M[+ _]]
           GroupingSource(
               medals,
               DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
+              Some(
+                  InnerObjectConcat(
                       ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(DerefObjectStatic(DerefObjectStatic(Leaf(
-                                                                         Source),
-                                                                     valueField),
-                                                   genderField),
-                                 "value"))),
+                      WrapObject(
+                          DerefObjectStatic(DerefObjectStatic(Leaf(Source),
+                                                              valueField),
+                                            genderField),
+                          "value"))),
               0,
               GroupKeySpecAnd(
                   GroupKeySpecSource(
                       extra0Field,
-                      Filter(
-                          EqualLiteral(
-                              DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                                  valueField),
-                                                genderField),
-                              CString("Men"),
-                              false),
-                          EqualLiteral(DerefObjectStatic(
-                                           DerefObjectStatic(
-                                               Leaf(Source), valueField),
-                                           genderField),
-                                       CString("Men"),
-                                       false))),
+                      Filter(EqualLiteral(DerefObjectStatic(DerefObjectStatic(
+                                                                Leaf(Source),
+                                                                valueField),
+                                                            genderField),
+                                          CString("Men"),
+                                          false),
+                             EqualLiteral(DerefObjectStatic(
+                                              DerefObjectStatic(Leaf(Source),
+                                                                valueField),
+                                              genderField),
+                                          CString("Men"),
+                                          false))),
                   GroupKeySpecSource(
                       oneField,
                       DerefObjectStatic(DerefObjectStatic(Leaf(Source),
@@ -314,35 +317,35 @@ trait MergeSpec[M[+ _]]
           GroupingSource(
               medals,
               DerefObjectStatic(Leaf(Source), keyField),
-              Some(InnerObjectConcat(
-                      ObjectDelete(Leaf(Source), Set(valueField)),
-                      WrapObject(
-                          DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                              valueField),
-                                            genderField),
-                          "value"))),
+              Some(InnerObjectConcat(ObjectDelete(Leaf(Source),
+                                                  Set(valueField)),
+                                     WrapObject(
+                                         DerefObjectStatic(
+                                             DerefObjectStatic(Leaf(Source),
+                                                               valueField),
+                                             genderField),
+                                         "value"))),
               2,
               GroupKeySpecAnd(
                   GroupKeySpecSource(
                       extra1Field,
-                      Filter(
-                          EqualLiteral(
-                              DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                                  valueField),
-                                                genderField),
-                              CString("Women"),
-                              false),
-                          EqualLiteral(DerefObjectStatic(
-                                           DerefObjectStatic(
-                                               Leaf(Source), valueField),
-                                           genderField),
-                                       CString("Women"),
-                                       false))),
-                  GroupKeySpecSource(
-                      oneField,
-                      DerefObjectStatic(DerefObjectStatic(Leaf(Source),
-                                                          valueField),
-                                        editionField)))
+                      Filter(EqualLiteral(DerefObjectStatic(
+                                              DerefObjectStatic(Leaf(Source),
+                                                                valueField),
+                                              genderField),
+                                          CString("Women"),
+                                          false),
+                             EqualLiteral(DerefObjectStatic(
+                                              DerefObjectStatic(Leaf(Source),
+                                                                valueField),
+                                              genderField),
+                                          CString("Women"),
+                                          false))),
+                  GroupKeySpecSource(oneField,
+                                     DerefObjectStatic(
+                                         DerefObjectStatic(Leaf(Source),
+                                                           valueField),
+                                         editionField)))
           ),
           GroupingSpec.Intersection)
 

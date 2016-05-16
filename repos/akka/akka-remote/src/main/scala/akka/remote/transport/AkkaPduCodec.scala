@@ -230,15 +230,19 @@ private[remote] object AkkaPduProtobufCodec extends AkkaPduCodec {
         val msgPdu = ackAndEnvelope.getEnvelope
         Some(
             Message(recipient = provider.resolveActorRefWithLocalAddress(
-                          msgPdu.getRecipient.getPath, localAddress),
+                        msgPdu.getRecipient.getPath,
+                        localAddress),
                     recipientAddress = AddressFromURIString(
-                          msgPdu.getRecipient.getPath),
-                    serializedMessage = msgPdu.getMessage,
-                    senderOption = if (msgPdu.hasSender)
+                        msgPdu.getRecipient.getPath),
+                    serializedMessage =
+                      msgPdu.getMessage,
+                    senderOption =
+                      if (msgPdu.hasSender)
                         Some(provider.resolveActorRefWithLocalAddress(
                                 msgPdu.getSender.getPath, localAddress))
                       else None,
-                    seqOption = if (msgPdu.hasSeq) Some(SeqNo(msgPdu.getSeq))
+                    seqOption =
+                      if (msgPdu.hasSeq) Some(SeqNo(msgPdu.getSeq))
                       else None))
       } else None
 

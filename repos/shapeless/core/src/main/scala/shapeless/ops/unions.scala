@@ -53,8 +53,8 @@ object union {
     def apply[C <: Coproduct, K](
         implicit selector: Selector[C, K]): Aux[C, K, selector.V] = selector
 
-    implicit def hdSelector[K, V0, T <: Coproduct]: Aux[
-        FieldType[K, V0] :+: T, K, V0] =
+    implicit def hdSelector[K, V0, T <: Coproduct]
+      : Aux[FieldType[K, V0] :+: T, K, V0] =
       new Selector[FieldType[K, V0] :+: T, K] {
         type V = V0
         def apply(u: FieldType[K, V] :+: T): Out = u match {

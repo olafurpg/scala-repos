@@ -42,7 +42,9 @@ object BeanIncludes extends BeanIncludes
   * their ScalaFX counterparts.
   */
 trait BeanIncludes
-    extends PropertyIncludes with BindingIncludes with LowerPriorityIncludes
+    extends PropertyIncludes
+    with BindingIncludes
+    with LowerPriorityIncludes
 
 /**
   * Contains implicit methods to convert from

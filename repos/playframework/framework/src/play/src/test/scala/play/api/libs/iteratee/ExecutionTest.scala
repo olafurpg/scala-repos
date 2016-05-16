@@ -56,7 +56,7 @@ class ExecutionTest {
   def mustExecute(expectedCount1: Int,
                   expectedCount2: Int,
                   c: BiConsumer[ExecutionContext, ExecutionContext]): Unit = {
-    _mustExecute(expectedCount1)(
-        ec1 => _mustExecute(expectedCount2)(ec2 => c.accept(ec1, ec2)))
+    _mustExecute(expectedCount1)(ec1 =>
+          _mustExecute(expectedCount2)(ec2 => c.accept(ec1, ec2)))
   }
 }

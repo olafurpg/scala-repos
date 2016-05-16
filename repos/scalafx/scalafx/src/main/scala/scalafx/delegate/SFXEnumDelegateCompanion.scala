@@ -35,8 +35,7 @@ import scala.language.implicitConversions
   * @tparam E Original JavaFX `enum`
   * @tparam S `SFXEnumDelegate` that wrappers `E`
   */
-trait SFXEnumDelegateCompanion[
-    E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] {
+trait SFXEnumDelegateCompanion[E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] {
 
   /**
     *  Converts a `SFXEnumDelegate` to its respective JavaFX `Enum`.

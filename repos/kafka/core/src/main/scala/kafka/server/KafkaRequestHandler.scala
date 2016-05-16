@@ -32,9 +32,10 @@ class KafkaRequestHandler(id: Int,
                           val totalHandlerThreads: Int,
                           val requestChannel: RequestChannel,
                           apis: KafkaApis)
-    extends Runnable with Logging {
-  this.logIdent = "[Kafka Request Handler " + id + " on Broker " + brokerId +
-  "], "
+    extends Runnable
+    with Logging {
+  this.logIdent =
+    "[Kafka Request Handler " + id + " on Broker " + brokerId + "], "
 
   def run() {
     while (true) {
@@ -75,7 +76,8 @@ class KafkaRequestHandlerPool(val brokerId: Int,
                               val requestChannel: RequestChannel,
                               val apis: KafkaApis,
                               numThreads: Int)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   /* a meter to track the average free capacity of the request handlers */
   private val aggregateIdleMeter = newMeter(

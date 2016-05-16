@@ -47,7 +47,8 @@ object ReadOnlyBooleanWrapper {
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyBooleanWrapper.html javafx.beans.property.ReadOnlyBooleanWrapper]] */
 class ReadOnlyBooleanWrapper(
-    override val delegate: jfxbp.ReadOnlyBooleanWrapper = new jfxbp.ReadOnlyBooleanWrapper(
+    override val delegate: jfxbp.ReadOnlyBooleanWrapper =
+      new jfxbp.ReadOnlyBooleanWrapper(
           ))
     extends BooleanProperty(delegate)
     with SFXDelegate[jfxbp.ReadOnlyBooleanWrapper] {

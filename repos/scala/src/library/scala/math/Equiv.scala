@@ -54,8 +54,8 @@ object Equiv extends LowPriorityEquiv {
   def fromFunction[T](cmp: (T, T) => Boolean): Equiv[T] = new Equiv[T] {
     def equiv(x: T, y: T) = cmp(x, y)
   }
-  def by[T, S : Equiv](f: T => S): Equiv[T] =
+  def by[T, S: Equiv](f: T => S): Equiv[T] =
     fromFunction((x, y) => implicitly[Equiv[S]].equiv(f(x), f(y)))
 
-  def apply[T : Equiv]: Equiv[T] = implicitly[Equiv[T]]
+  def apply[T: Equiv]: Equiv[T] = implicitly[Equiv[T]]
 }

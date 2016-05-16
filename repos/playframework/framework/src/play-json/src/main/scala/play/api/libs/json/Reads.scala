@@ -221,8 +221,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
     Json.obj(
         "__VAL__" -> knownValue,
         "__ERR__" -> key,
-        "__ARGS__" -> args.foldLeft(JsArray())(
-            (acc: JsArray, arg: JsValue) => acc :+ arg)
+        "__ARGS__" -> args.foldLeft(JsArray())((acc: JsArray, arg: JsValue) =>
+              acc :+ arg)
     )
   }
 
@@ -293,8 +293,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   /**
     * Deserializer for BigDecimal
     */
-  implicit val bigDecReads = Reads[BigDecimal](
-      js =>
+  implicit val bigDecReads = Reads[BigDecimal](js =>
         js match {
       case JsString(s) =>
         scala.util.control.Exception
@@ -327,9 +326,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def dateReads(
-      pattern: String,
-      corrector: String => String = identity): Reads[java.util.Date] =
+  def dateReads(pattern: String,
+                corrector: String => String =
+                  identity): Reads[java.util.Date] =
     new Reads[java.util.Date] {
 
       def reads(json: JsValue): JsResult[java.util.Date] = json match {
@@ -735,9 +734,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def jodaDateReads(
-      pattern: String,
-      corrector: String => String = identity): Reads[org.joda.time.DateTime] =
+  def jodaDateReads(pattern: String,
+                    corrector: String => String =
+                      identity): Reads[org.joda.time.DateTime] =
     new Reads[org.joda.time.DateTime] {
       import org.joda.time.DateTime
 
@@ -773,9 +772,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `org.joda.time.format.DateTimeFormat`.
     * @param corrector string transformation function (See jodaDateReads)
     */
-  def jodaLocalDateReads(
-      pattern: String,
-      corrector: String => String = identity): Reads[org.joda.time.LocalDate] =
+  def jodaLocalDateReads(pattern: String,
+                         corrector: String => String =
+                           identity): Reads[org.joda.time.LocalDate] =
     new Reads[org.joda.time.LocalDate] {
 
       import org.joda.time.LocalDate
@@ -814,9 +813,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `org.joda.time.format.DateTimeFormat`.
     * @param corrector string transformation function (See jodaTimeReads)
     */
-  def jodaLocalTimeReads(
-      pattern: String,
-      corrector: String => String = identity): Reads[org.joda.time.LocalTime] =
+  def jodaLocalTimeReads(pattern: String,
+                         corrector: String => String =
+                           identity): Reads[org.joda.time.LocalTime] =
     new Reads[org.joda.time.LocalTime] {
 
       import org.joda.time.LocalTime
@@ -856,9 +855,9 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param pattern a date pattern, as specified in `java.text.SimpleDateFormat`.
     * @param corrector a simple string transformation function that can be used to transform input String before parsing. Useful when standards are not exactly respected and require a few tweaks
     */
-  def sqlDateReads(
-      pattern: String,
-      corrector: String => String = identity): Reads[java.sql.Date] =
+  def sqlDateReads(pattern: String,
+                   corrector: String => String =
+                     identity): Reads[java.sql.Date] =
     dateReads(pattern, corrector).map(d => new java.sql.Date(d.getTime))
 
   /**
@@ -1039,7 +1038,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   /**
     * Deserializer for Array[T] types.
     */
-  implicit def ArrayReads[T : Reads : ClassTag]: Reads[Array[T]] =
+  implicit def ArrayReads[T: Reads: ClassTag]: Reads[Array[T]] =
     new Reads[Array[T]] {
       def reads(json: JsValue) = json.validate[List[T]].map(_.toArray)
     }

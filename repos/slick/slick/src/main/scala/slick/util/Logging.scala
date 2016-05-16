@@ -73,8 +73,8 @@ final class SlickLogger(val slf4jLogger: Slf4jLogger) {
 }
 
 object SlickLogger {
-  private val treePrinter = new TreePrinter(prefix = DumpInfo.highlight(
-            if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
+  private val treePrinter = new TreePrinter(prefix =
+        DumpInfo.highlight(if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
 
   def apply[T](implicit ct: ClassTag[T]): SlickLogger =
     new SlickLogger(LoggerFactory.getLogger(ct.runtimeClass))

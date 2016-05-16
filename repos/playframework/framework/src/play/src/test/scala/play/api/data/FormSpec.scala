@@ -441,7 +441,7 @@ object ScalaForms {
                    s => (s.headOption map { _ == '3' }) getOrElse false)
         .transform[Int](Integer.parseInt _, _.toString)
         .verifying("number.42", _ < 42)
-    )
+  )
 
   val emailForm = Form(
       tuple(

@@ -47,7 +47,8 @@ private[hive] class SparkExecuteStatementOperation(
     runInBackground: Boolean = true)(
     hiveContext: HiveContext, sessionToActivePool: SMap[SessionHandle, String])
     extends ExecuteStatementOperation(
-        parentSession, statement, confOverlay, runInBackground) with Logging {
+        parentSession, statement, confOverlay, runInBackground)
+    with Logging {
 
   private var result: DataFrame = _
   private var iter: Iterator[SparkRow] = _

@@ -12,9 +12,13 @@ import slick.sql.SqlProfile
 
 /** Abstract profile for accessing SQL databases via JDBC. */
 trait JdbcProfile
-    extends SqlProfile with JdbcActionComponent with JdbcInvokerComponent
-    with JdbcTypesComponent with JdbcModelComponent
-    /* internal: */ with JdbcStatementBuilderComponent
+    extends SqlProfile
+    with JdbcActionComponent
+    with JdbcInvokerComponent
+    with JdbcTypesComponent
+    with JdbcModelComponent
+    /* internal: */
+    with JdbcStatementBuilderComponent
     with JdbcMappingCompilerComponent {
 
   @deprecated(

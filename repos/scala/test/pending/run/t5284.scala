@@ -6,8 +6,8 @@ object Test {
 }
 
 object Blarg {
-  def apply[T : Manifest](a: Array[T]) = new Blarg(a)
+  def apply[T: Manifest](a: Array[T]) = new Blarg(a)
 }
-class Blarg[@specialized T : Manifest](val a: Array[T]) {
+class Blarg[@specialized T: Manifest](val a: Array[T]) {
   def m[@specialized W >: T, @specialized S](f: W => S) = f(a(0))
 }

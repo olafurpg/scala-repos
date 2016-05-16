@@ -80,7 +80,8 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
 @Experimental
 class NaiveBayes @Since("1.5.0")(@Since("1.5.0") override val uid: String)
     extends ProbabilisticClassifier[Vector, NaiveBayes, NaiveBayesModel]
-    with NaiveBayesParams with DefaultParamsWritable {
+    with NaiveBayesParams
+    with DefaultParamsWritable {
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("nb"))
@@ -134,7 +135,8 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
                                   @Since("1.5.0") val pi: Vector,
                                   @Since("1.5.0") val theta: Matrix)
     extends ProbabilisticClassificationModel[Vector, NaiveBayesModel]
-    with NaiveBayesParams with MLWritable {
+    with NaiveBayesParams
+    with MLWritable {
 
   import OldNaiveBayes.{Bernoulli, Multinomial}
 

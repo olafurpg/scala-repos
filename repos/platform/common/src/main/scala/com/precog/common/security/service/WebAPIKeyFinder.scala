@@ -93,7 +93,8 @@ class RealWebAPIKeyFinder(protocol: String,
                           path: String,
                           val rootAPIKey: APIKey)(
     implicit val executor: ExecutionContext)
-    extends WebClient(protocol, host, port, path) with WebAPIKeyFinder {
+    extends WebClient(protocol, host, port, path)
+    with WebAPIKeyFinder {
   implicit val M = new FutureMonad(executor)
 }
 

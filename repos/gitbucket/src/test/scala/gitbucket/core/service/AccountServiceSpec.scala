@@ -10,8 +10,7 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
 
   test("getAllUsers") {
     withTestDB { implicit session =>
-      assert(
-          AccountService.getAllUsers() match {
+      assert(AccountService.getAllUsers() match {
         case List(
             Account("root",
                     "root",

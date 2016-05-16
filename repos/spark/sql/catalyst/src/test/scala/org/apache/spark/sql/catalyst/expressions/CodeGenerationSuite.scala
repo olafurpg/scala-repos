@@ -73,7 +73,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
         .map(c =>
               EqualTo(BoundReference(0, StringType, false), Literal(s"$c:$n")))
         .reduceLeft[Expression]((l, r) => Or(l, r))
-        (condition, Literal(n))
+      (condition, Literal(n))
     }
 
     val expression = CaseWhen((1 to cases).map(generateCase(_)))
@@ -101,8 +101,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
                         true),
             StructField(
                 "d",
-                new StructType(
-                    Array(
+                new StructType(Array(
                         StructField("a",
                                     new StructType(Array(
                                             StructField("b", StringType, true),

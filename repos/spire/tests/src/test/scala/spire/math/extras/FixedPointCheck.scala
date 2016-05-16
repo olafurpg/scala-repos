@@ -13,7 +13,9 @@ import spire.math.Rational
 import scala.util.Try
 
 class FixedPointCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] = Arbitrary(
       arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))

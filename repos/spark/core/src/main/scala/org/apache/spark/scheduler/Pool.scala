@@ -32,7 +32,8 @@ private[spark] class Pool(val poolName: String,
                           val schedulingMode: SchedulingMode,
                           initMinShare: Int,
                           initWeight: Int)
-    extends Schedulable with Logging {
+    extends Schedulable
+    with Logging {
 
   val schedulableQueue = new ConcurrentLinkedQueue[Schedulable]
   val schedulableNameToSchedulable = new ConcurrentHashMap[String, Schedulable]

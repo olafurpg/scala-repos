@@ -87,11 +87,11 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
                      deployment.get.config,
                      ClusterRouterGroup(
                          RoundRobinGroup(List("/user/myservice")),
-                         ClusterRouterGroupSettings(
-                             totalInstances = 20,
-                             routeesPaths = List("/user/myservice"),
-                             allowLocalRoutees = false,
-                             useRole = None)),
+                         ClusterRouterGroupSettings(totalInstances = 20,
+                                                    routeesPaths =
+                                                      List("/user/myservice"),
+                                                    allowLocalRoutees = false,
+                                                    useRole = None)),
                      ClusterScope,
                      "mydispatcher",
                      "mymailbox")))

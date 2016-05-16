@@ -42,7 +42,8 @@ object ColumnConstraints {
 }
 
 class ColumnConstraints(
-    override val delegate: jfxsl.ColumnConstraints = new jfxsl.ColumnConstraints)
+    override val delegate: jfxsl.ColumnConstraints =
+      new jfxsl.ColumnConstraints)
     extends ConstraintsBase(delegate)
     with SFXDelegate[jfxsl.ColumnConstraints] {
 

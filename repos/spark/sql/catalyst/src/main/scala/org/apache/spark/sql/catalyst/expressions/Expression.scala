@@ -323,12 +323,9 @@ abstract class UnaryExpression extends Expression {
     */
   protected def defineCodeGen(
       ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        s"${ev.value} = ${f(eval)};"
-                    })
+    nullSafeCodeGen(ctx, ev, eval => {
+      s"${ev.value} = ${f(eval)};"
+    })
   }
 
   /**
@@ -414,12 +411,9 @@ abstract class BinaryExpression extends Expression {
   protected def defineCodeGen(ctx: CodegenContext,
                               ev: ExprCode,
                               f: (String, String) => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2) =>
-                      {
-                        s"${ev.value} = ${f(eval1, eval2)};"
-                    })
+    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+      s"${ev.value} = ${f(eval1, eval2)};"
+    })
   }
 
   /**
@@ -557,13 +551,10 @@ abstract class TernaryExpression extends Expression {
   protected def defineCodeGen(ctx: CodegenContext,
                               ev: ExprCode,
                               f: (String, String,
-                              String) => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2, eval3) =>
-                      {
-                        s"${ev.value} = ${f(eval1, eval2, eval3)};"
-                    })
+                                  String) => String): String = {
+    nullSafeCodeGen(ctx, ev, (eval1, eval2, eval3) => {
+      s"${ev.value} = ${f(eval1, eval2, eval3)};"
+    })
   }
 
   /**
@@ -577,7 +568,7 @@ abstract class TernaryExpression extends Expression {
   protected def nullSafeCodeGen(ctx: CodegenContext,
                                 ev: ExprCode,
                                 f: (String, String,
-                                String) => String): String = {
+                                    String) => String): String = {
     val leftGen = children(0).gen(ctx)
     val midGen = children(1).gen(ctx)
     val rightGen = children(2).gen(ctx)

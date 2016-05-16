@@ -352,15 +352,18 @@ final class Eval(optionsNoncp: Seq[String],
                                         val extraSemi: String)
   private[this] def definitionErrorStrings = new ParseErrorStrings(
       base = "Error parsing definition.",
-      extraBlank = "  Ensure that there are no blank lines within a definition.",
+      extraBlank =
+        "  Ensure that there are no blank lines within a definition.",
       missingBlank = "  Ensure that definitions are separated by blank lines.",
-      extraSemi = "  A trailing semicolon is not permitted for standalone definitions."
+      extraSemi =
+        "  A trailing semicolon is not permitted for standalone definitions."
   )
   private[this] def settingErrorStrings = new ParseErrorStrings(
       base = "Error parsing expression.",
       extraBlank = "  Ensure that there are no blank lines within a setting.",
       missingBlank = "  Ensure that settings are separated by blank lines.",
-      extraSemi = "  Note that settings are expressions and do not end with semicolons.  (Semicolons are fine within {} blocks, however.)"
+      extraSemi =
+        "  Note that settings are expressions and do not end with semicolons.  (Semicolons are fine within {} blocks, however.)"
   )
 
   /**

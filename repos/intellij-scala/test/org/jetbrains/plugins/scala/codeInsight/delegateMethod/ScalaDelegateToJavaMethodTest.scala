@@ -30,11 +30,13 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
       myFixture.configureByText("ScalaDummy.scala", clean(scalaText))
     val oldSpecifyType =
       ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = specifyRetType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      specifyRetType
     new ScalaGenerateDelegateHandler()
       .invoke(myFixture.getProject, myFixture.getEditor, scalaFile)
     assertEquals(clean(expectedText), clean(scalaFile.getText))
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      oldSpecifyType
   }
 
   def testJavaFieldTarget() {

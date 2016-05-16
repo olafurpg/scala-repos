@@ -188,7 +188,9 @@ object FileSource {
   * This is a base class for File-based sources
   */
 abstract class FileSource
-    extends SchemedSource with LocalSourceOverride with HfsTapProvider {
+    extends SchemedSource
+    with LocalSourceOverride
+    with HfsTapProvider {
 
   /**
     * Determines if a path is 'valid' for this source. In strict mode all paths must be valid.
@@ -488,7 +490,8 @@ case class Tsv(p: String,
                override val skipHeader: Boolean = false,
                override val writeHeader: Boolean = false,
                override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends FixedPathSource(p) with DelimitedScheme
+    extends FixedPathSource(p)
+    with DelimitedScheme
 
 /**
   * Allows the use of multiple Tsv input paths. The Tsv files will
@@ -501,7 +504,8 @@ case class MultipleTsvFiles(p: Seq[String],
                             override val fields: Fields = Fields.ALL,
                             override val skipHeader: Boolean = false,
                             override val writeHeader: Boolean = false)
-    extends FixedPathSource(p: _*) with DelimitedScheme
+    extends FixedPathSource(p: _*)
+    with DelimitedScheme
 
 /**
   * Csv value source
@@ -514,7 +518,8 @@ case class Csv(p: String,
                override val writeHeader: Boolean = false,
                override val quote: String = "\"",
                override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends FixedPathSource(p) with DelimitedScheme
+    extends FixedPathSource(p)
+    with DelimitedScheme
 
 /**
   * One separated value (commonly used by Pig)
@@ -522,7 +527,8 @@ case class Csv(p: String,
 case class Osv(p: String,
                f: Fields = Fields.ALL,
                override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends FixedPathSource(p) with DelimitedScheme {
+    extends FixedPathSource(p)
+    with DelimitedScheme {
   override val fields = f
   override val separator = "\u0001"
 }
@@ -541,7 +547,8 @@ object TextLine {
 class TextLine(p: String,
                override val sinkMode: SinkMode,
                override val textEncoding: String)
-    extends FixedPathSource(p) with TextLineScheme {
+    extends FixedPathSource(p)
+    with TextLineScheme {
   // For some Java interop
   def this(p: String) =
     this(p, TextLine.defaultSinkMode, TextLine.defaultTextEncoding)
@@ -553,7 +560,8 @@ class TextLine(p: String,
 class OffsetTextLine(filepath: String,
                      override val sinkMode: SinkMode,
                      override val textEncoding: String)
-    extends FixedPathSource(filepath) with Mappable[(Long, String)]
+    extends FixedPathSource(filepath)
+    with Mappable[(Long, String)]
     with TextSourceScheme {
 
   override def converter[U >: (Long, String)] =
@@ -578,15 +586,20 @@ object OffsetTextLine {
 case class SequenceFile(p: String,
                         f: Fields = Fields.ALL,
                         override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends FixedPathSource(p) with SequenceFileScheme with LocalTapSource {
+    extends FixedPathSource(p)
+    with SequenceFileScheme
+    with LocalTapSource {
   override val fields = f
 }
 
 case class MultipleSequenceFiles(p: String*)
-    extends FixedPathSource(p: _*) with SequenceFileScheme with LocalTapSource
+    extends FixedPathSource(p: _*)
+    with SequenceFileScheme
+    with LocalTapSource
 
 case class MultipleTextLineFiles(p: String*)
-    extends FixedPathSource(p: _*) with TextLineScheme
+    extends FixedPathSource(p: _*)
+    with TextLineScheme
 
 /**
   * Delimited files source
@@ -598,6 +611,7 @@ case class MultipleDelimitedFiles(f: Fields,
                                   override val skipHeader: Boolean,
                                   override val writeHeader: Boolean,
                                   p: String*)
-    extends FixedPathSource(p: _*) with DelimitedScheme {
+    extends FixedPathSource(p: _*)
+    with DelimitedScheme {
   override val fields = f
 }

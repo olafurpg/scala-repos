@@ -517,7 +517,8 @@ private[columnar] object COMPACT_DECIMAL {
 
 private[columnar] sealed abstract class ByteArrayColumnType[JvmType](
     val defaultSize: Int)
-    extends ColumnType[JvmType] with DirectCopyColumnType[JvmType] {
+    extends ColumnType[JvmType]
+    with DirectCopyColumnType[JvmType] {
 
   def serialize(value: JvmType): Array[Byte]
   def deserialize(bytes: Array[Byte]): JvmType
@@ -591,7 +592,8 @@ private[columnar] object LARGE_DECIMAL {
 }
 
 private[columnar] case class STRUCT(dataType: StructType)
-    extends ColumnType[UnsafeRow] with DirectCopyColumnType[UnsafeRow] {
+    extends ColumnType[UnsafeRow]
+    with DirectCopyColumnType[UnsafeRow] {
 
   private val numOfFields: Int = dataType.fields.length
 

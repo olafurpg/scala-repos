@@ -76,7 +76,8 @@ object Timeline extends AnimationStatics {
   * @define DV Default value:
   */
 class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
-    extends Animation(delegate) with SFXDelegate[jfxa.Timeline] {
+    extends Animation(delegate)
+    with SFXDelegate[jfxa.Timeline] {
 
   // CONSTRUCTORS
 

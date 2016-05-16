@@ -25,7 +25,8 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.{BaseProcessor, Comple
   * Date: 13.03.2008
   */
 class ScTypeProjectionImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypeProjection {
+    extends ScalaPsiElementImpl(node)
+    with ScTypeProjection {
 
   override def toString: String = "TypeProjection: " + getText
 

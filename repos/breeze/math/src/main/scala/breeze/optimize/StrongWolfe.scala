@@ -3,7 +3,8 @@ package breeze.optimize
 import breeze.util.SerializableLogging
 
 abstract class CubicLineSearch
-    extends SerializableLogging with MinimizingLineSearch {
+    extends SerializableLogging
+    with MinimizingLineSearch {
   import scala.math._
 
   case class Bracket(

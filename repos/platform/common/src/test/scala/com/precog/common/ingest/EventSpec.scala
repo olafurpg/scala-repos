@@ -35,7 +35,9 @@ import blueeyes.json.serialization.Extractor._
 import scalaz._
 
 class EventSpec
-    extends Specification with ArbitraryEventMessage with ScalaCheck {
+    extends Specification
+    with ArbitraryEventMessage
+    with ScalaCheck {
   implicit val arbEvent = Arbitrary(genRandomIngest)
   "serialization of an event" should {
     "read back the data that was written" in check { in: Ingest =>

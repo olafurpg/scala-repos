@@ -60,7 +60,8 @@ trait TimeZoneTypedField extends StringTypedField {
 }
 
 class TimeZoneField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends StringField(rec, 32) with TimeZoneTypedField {
+    extends StringField(rec, 32)
+    with TimeZoneTypedField {
 
   override def defaultValue = TimeZone.getDefault.getID
 
@@ -71,4 +72,5 @@ class TimeZoneField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalTimeZoneField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends OptionalStringField(rec, 32) with TimeZoneTypedField
+    extends OptionalStringField(rec, 32)
+    with TimeZoneTypedField

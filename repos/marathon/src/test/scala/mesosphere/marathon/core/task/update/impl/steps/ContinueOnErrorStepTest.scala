@@ -12,7 +12,10 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 class ContinueOnErrorStepTest
-    extends FunSuite with Matchers with GivenWhenThen with Mockito {
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with Mockito {
   test("name uses nested name") {
     object nested extends TaskStatusUpdateStep {
       override def name: String = "nested"
@@ -61,9 +64,9 @@ class ContinueOnErrorStepTest
       step.processUpdate(timestamp,
                          task = dummyTask,
                          mesosStatus = TaskStatus
-                             .newBuilder()
-                             .setTaskId(TaskID.newBuilder().setValue("task"))
-                             .buildPartial())
+                           .newBuilder()
+                           .setTaskId(TaskID.newBuilder().setValue("task"))
+                           .buildPartial())
     }
 
     Given("a nested step that is always successful")

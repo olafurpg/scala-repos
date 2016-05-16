@@ -235,7 +235,9 @@ trait TreeAndTypeAnalysis extends Debugging {
 }
 
 trait MatchApproximation
-    extends TreeAndTypeAnalysis with ScalaLogic with MatchTreeMaking {
+    extends TreeAndTypeAnalysis
+    with ScalaLogic
+    with MatchTreeMaking {
   import global._
   import global.definitions._
 
@@ -351,9 +353,9 @@ trait MatchApproximation
 
           val okSubst =
             Substitution(unboundFrom, unboundTo map (normalize(_))) // it's important substitution does not duplicate trees here -- it helps to keep hash consing simple, anyway
-          pointsToBound ++=
-          ((okSubst.from, okSubst.to).zipped filter { (f, t) =>
-                pointsToBound exists (sym => t.exists(_.symbol == sym))
+          pointsToBound ++= ((okSubst.from, okSubst.to).zipped filter {
+                (f, t) =>
+                  pointsToBound exists (sym => t.exists(_.symbol == sym))
               })._1
           // debug.patmat("pointsToBound: "+ pointsToBound)
 
@@ -449,11 +451,12 @@ trait MatchApproximation
         def handleUnknown(tm: TreeMaker) = False
       }
 
-      final def approximateMatch(
-          cases: List[List[TreeMaker]],
-          treeMakerToProp: TreeMakerToProp = conservative) = {
+      final def approximateMatch(cases: List[List[TreeMaker]],
+                                 treeMakerToProp: TreeMakerToProp =
+                                   conservative) = {
         val testss = cases.map { _ map (tm => Test(treeMakerToProp(tm), tm)) }
-        substitutionComputed = true // a second call to approximateMatch should not re-compute the substitution (would be wrong)
+        substitutionComputed =
+          true // a second call to approximateMatch should not re-compute the substitution (would be wrong)
         testss
       }
     }
@@ -539,7 +542,8 @@ trait MatchAnalysis extends MatchApproximation {
         var reachable = true
         var caseIndex = 0
 
-        debug.patmat("reachability, vars:\n" +
+        debug.patmat(
+            "reachability, vars:\n" +
             ((propsCasesFail flatMap gatherVariables).distinct map (_.describe) mkString
                 ("\n")))
         debug.patmat(s"equality axioms:\n$eqAxiomsOk")
@@ -666,7 +670,7 @@ trait MatchAnalysis extends MatchApproximation {
         //         with Nil and List().
         val result = mutable.Buffer[CounterExample]()
         for (example <- examples
-                           if (!result.exists(example coveredBy _))) result += example
+             if (!result.exists(example coveredBy _))) result += example
         result.toList
       }
     }
@@ -710,8 +714,8 @@ trait MatchAnalysis extends MatchApproximation {
       override def coveredBy(other: CounterExample): Boolean =
         other match {
           case other @ ListExample(_) =>
-            this == other ||
-            ((elems.length == other.elems.length) && (elems zip other.elems).forall {
+            this == other || ((elems.length == other.elems.length) &&
+                (elems zip other.elems).forall {
                   case (a, b) => a coveredBy b
                 })
           case _ => super.coveredBy(other)
@@ -726,8 +730,8 @@ trait MatchAnalysis extends MatchApproximation {
       override def coveredBy(other: CounterExample): Boolean =
         other match {
           case TupleExample(otherArgs) =>
-            this == other ||
-            ((ctorArgs.length == otherArgs.length) && (ctorArgs zip otherArgs).forall {
+            this == other || ((ctorArgs.length == otherArgs.length) &&
+                (ctorArgs zip otherArgs).forall {
                   case (a, b) => a coveredBy b
                 })
           case _ => super.coveredBy(other)
@@ -736,8 +740,8 @@ trait MatchAnalysis extends MatchApproximation {
     case class ConstructorExample(cls: Symbol, ctorArgs: List[CounterExample])
         extends CounterExample {
       override def toString =
-        cls.decodedName +
-        (if (cls.isModuleClass) "" else ctorArgs.mkString("(", ", ", ")"))
+        cls.decodedName + (if (cls.isModuleClass) ""
+                           else ctorArgs.mkString("(", ", ", ")"))
     }
 
     case object WildcardExample extends CounterExample {
@@ -981,13 +985,12 @@ trait MatchAnalysis extends MatchApproximation {
           if (!allFieldAssignmentsLegal) Some(NoExample)
           else {
             debug.patmat(
-                "describing " +
-                ((variable,
-                  equalTo,
-                  notEqualTo,
-                  fields,
-                  cls,
-                  allFieldAssignmentsLegal)))
+                "describing " + ((variable,
+                                  equalTo,
+                                  notEqualTo,
+                                  fields,
+                                  cls,
+                                  allFieldAssignmentsLegal)))
             val res = prunedEqualTo match {
               // a definite assignment to a value
               case List(eq: ValueConst) if fields.isEmpty =>
@@ -998,9 +1001,8 @@ trait MatchAnalysis extends MatchApproximation {
               //  --> typical example is when the scrutinee is a tuple and all the cases first unwrap that tuple and only then test something interesting
               case _
                   if cls != NoSymbol && !isPrimitiveValueClass(cls) &&
-                  (uniqueEqualTo.nonEmpty ||
-                      (fields.nonEmpty && prunedEqualTo.isEmpty &&
-                          notEqualTo.isEmpty)) =>
+                  (uniqueEqualTo.nonEmpty || (fields.nonEmpty &&
+                          prunedEqualTo.isEmpty && notEqualTo.isEmpty)) =>
                 def args(brevity: Boolean = beBrief) = {
                   // figure out the constructor arguments from the field assignment
                   val argLen = (caseFieldAccs.length min ctorParams.length)

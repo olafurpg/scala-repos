@@ -178,8 +178,8 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
     val cmd =
       if (permissionType == Allow) AllowHostCommand else DenyHostCommand
 
-    Users.foldLeft(cmd)(
-        (cmd, user) => cmd ++ Array(principalCmd, user.toString))
+    Users.foldLeft(cmd)((cmd, user) =>
+          cmd ++ Array(principalCmd, user.toString))
   }
 
   def withAuthorizer(props: Properties)(f: Authorizer => Unit) {

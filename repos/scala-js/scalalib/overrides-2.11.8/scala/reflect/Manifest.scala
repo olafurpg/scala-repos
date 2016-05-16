@@ -69,7 +69,8 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
 // @deprecated("Use type tags and manually check the corresponding class or type instead", "2.10.0")
 @SerialVersionUID(1L)
 abstract class AnyValManifest[T <: AnyVal](override val toString: String)
-    extends Manifest[T] with Equals {
+    extends Manifest[T]
+    with Equals {
   override def <:<(that: ClassManifest[_]): Boolean =
     (that eq this) || (that eq Manifest.Any) || (that eq Manifest.AnyVal)
   override def canEqual(other: Any) = other match {

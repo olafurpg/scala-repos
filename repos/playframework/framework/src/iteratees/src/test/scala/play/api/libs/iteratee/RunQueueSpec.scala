@@ -79,8 +79,8 @@ object RunQueueSpec extends Specification with ExecutionSpecification {
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(
-            runSize, new NaiveQueueTester())
+        errorPercentage =
+          percentageOfRunsWithOrderingErrors(runSize, new NaiveQueueTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 

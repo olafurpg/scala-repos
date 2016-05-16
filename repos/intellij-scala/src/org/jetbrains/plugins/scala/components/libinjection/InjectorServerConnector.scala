@@ -57,8 +57,9 @@ class InjectorServerConnector(module: Module,
     var result: Either[Array[(File, String)], Seq[String]] = Right(
         Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors)
-      else Left(classfiles(outputDir))
+      result =
+        if (errors.nonEmpty) Right(errors)
+        else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

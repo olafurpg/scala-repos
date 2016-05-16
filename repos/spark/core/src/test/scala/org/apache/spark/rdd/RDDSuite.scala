@@ -183,17 +183,16 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
     val emptyMap = new StringMap {
       override def default(key: String): Int = 0
     }
-    val mergeElement: (StringMap, (String, Int)) => StringMap = (map, pair) =>
-      {
-        map(pair._1) += pair._2
-        map
+    val mergeElement: (StringMap, (String, Int)) => StringMap = (map,
+                                                                 pair) => {
+      map(pair._1) += pair._2
+      map
     }
-    val mergeMaps: (StringMap, StringMap) => StringMap = (map1, map2) =>
-      {
-        for ((key, value) <- map2) {
-          map1(key) += value
-        }
-        map1
+    val mergeMaps: (StringMap, StringMap) => StringMap = (map1, map2) => {
+      for ((key, value) <- map2) {
+        map1(key) += value
+      }
+      map1
     }
     val result = pairs.aggregate(emptyMap)(mergeElement, mergeMaps)
     assert(result.toSet === Set(("a", 6), ("b", 2), ("c", 5)))
@@ -730,10 +729,9 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
                             "Karen|Williams|60",
                             "Thomas|Williams|30")
 
-    val parse = (s: String) =>
-      {
-        val split = s.split("\\|")
-        Person(split(0), split(1), split(2).toInt)
+    val parse = (s: String) => {
+      val split = s.split("\\|")
+      Person(split(0), split(1), split(2).toInt)
     }
 
     import scala.reflect.classTag
@@ -967,7 +965,7 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
   }
 
   /** A contrived RDD that allows the manual addition of dependencies after creation. */
-  private class CyclicalDependencyRDD[T : ClassTag] extends RDD[T](sc, Nil) {
+  private class CyclicalDependencyRDD[T: ClassTag] extends RDD[T](sc, Nil) {
     private val mutableDependencies: ArrayBuffer[Dependency[_]] =
       ArrayBuffer.empty
     override def compute(p: Partition, c: TaskContext): Iterator[T] =
@@ -981,7 +979,7 @@ class RDDSuite extends SparkFunSuite with SharedSparkContext {
 
   test(
       "RDD.partitions() fails fast when partitions indicies are incorrect (SPARK-13021)") {
-    class BadRDD[T : ClassTag](prev: RDD[T]) extends RDD[T](prev) {
+    class BadRDD[T: ClassTag](prev: RDD[T]) extends RDD[T](prev) {
 
       override def compute(
           part: Partition, context: TaskContext): Iterator[T] = {

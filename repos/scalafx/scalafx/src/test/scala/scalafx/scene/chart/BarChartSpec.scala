@@ -44,7 +44,8 @@ class BarChartSpec
     extends SimpleSFXDelegateSpec[
         jfxsc.BarChart[String, Number], BarChart[String, Number]](
         classOf[jfxsc.BarChart[String, Number]],
-        classOf[BarChart[String, Number]]) with RunOnApplicationThread {
+        classOf[BarChart[String, Number]])
+    with RunOnApplicationThread {
 
   override def getScalaClassInstance =
     new BarChart[String, Number](getJavaClassInstance)

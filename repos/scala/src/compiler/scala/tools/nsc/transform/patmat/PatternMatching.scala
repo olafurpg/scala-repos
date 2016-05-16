@@ -35,10 +35,20 @@ import scala.reflect.internal.util.Position
   *  - recover exhaustivity/unreachability of user-defined extractors by partitioning the types they match on using an HList or similar type-level structure
   */
 trait PatternMatching
-    extends Transform with TypingTransformers with Debugging with Interface
-    with MatchTranslation with MatchTreeMaking with MatchCodeGen with MatchCps
-    with ScalaLogic with Solving with MatchAnalysis with MatchOptimization
-    with MatchWarnings with ScalacPatternExpanders {
+    extends Transform
+    with TypingTransformers
+    with Debugging
+    with Interface
+    with MatchTranslation
+    with MatchTreeMaking
+    with MatchCodeGen
+    with MatchCps
+    with ScalaLogic
+    with Solving
+    with MatchAnalysis
+    with MatchOptimization
+    with MatchWarnings
+    with ScalacPatternExpanders {
   import global._
 
   val phaseName: String = "patmat"
@@ -87,7 +97,8 @@ trait PatternMatching
   }
 
   class PureMatchTranslator(val typer: analyzer.Typer, val matchStrategy: Tree)
-      extends MatchTranslator with PureCodegen {
+      extends MatchTranslator
+      with PureCodegen {
     def optimizeCases(
         prevBinder: Symbol, cases: List[List[TreeMaker]], pt: Type) =
       (cases, Nil)
@@ -98,7 +109,9 @@ trait PatternMatching
   }
 
   class OptimizingMatchTranslator(val typer: analyzer.Typer)
-      extends MatchTranslator with MatchOptimizer with MatchAnalyzer
+      extends MatchTranslator
+      with MatchOptimizer
+      with MatchAnalyzer
       with Solver
 }
 

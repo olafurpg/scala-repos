@@ -96,18 +96,18 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   /**
     * Apply a function to 4 results, nondeterminstically ordering their effects 
     */
-  def nmap4[A, B, C, D, R](
-      a: F[A], b: F[B], c: F[C], d: F[D])(f: (A, B, C, D) => R): F[R] =
-    nmap2(nmap2(a, b)((_, _)), nmap2(c, d)((_, _)))(
-        (ab, cd) => f(ab._1, ab._2, cd._1, cd._2))
+  def nmap4[A, B, C, D, R](a: F[A], b: F[B], c: F[C], d: F[D])(
+      f: (A, B, C, D) => R): F[R] =
+    nmap2(nmap2(a, b)((_, _)), nmap2(c, d)((_, _)))((ab, cd) =>
+          f(ab._1, ab._2, cd._1, cd._2))
 
   /**
     * Apply a function to 5 results, nondeterminstically ordering their effects 
     */
   def nmap5[A, B, C, D, E, R](a: F[A], b: F[B], c: F[C], d: F[D], e: F[E])(
       f: (A, B, C, D, E) => R): F[R] =
-    nmap2(nmap2(a, b)((_, _)), nmap3(c, d, e)((_, _, _)))(
-        (ab, cde) => f(ab._1, ab._2, cde._1, cde._2, cde._3))
+    nmap2(nmap2(a, b)((_, _)), nmap3(c, d, e)((_, _, _)))((ab, cde) =>
+          f(ab._1, ab._2, cde._1, cde._2, cde._3))
 
   /**
     * Apply a function to 6 results, nondeterminstically ordering their effects 
@@ -115,8 +115,8 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def nmap6[A, B, C, D, E, FF, R](
       a: F[A], b: F[B], c: F[C], d: F[D], e: F[E], ff: F[FF])(
       f: (A, B, C, D, E, FF) => R): F[R] =
-    nmap2(nmap3(a, b, c)((_, _, _)), nmap3(d, e, ff)((_, _, _)))(
-        (abc, deff) => f(abc._1, abc._2, abc._3, deff._1, deff._2, deff._3))
+    nmap2(nmap3(a, b, c)((_, _, _)), nmap3(d, e, ff)((_, _, _)))((abc, deff) =>
+          f(abc._1, abc._2, abc._3, deff._1, deff._2, deff._3))
 
   /**
     * Obtain results from both `a` and `b`, nondeterministically ordering
@@ -138,8 +138,8 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     val R = implicitly[Reducer[A, List[A]]]
     bind(chooseAny(fs.head, fs.tail.toList)) {
       case (a, residuals) =>
-        map(reduceUnordered(residuals)(R))(
-            list => NonEmptyList.nels(a, list: _*))
+        map(reduceUnordered(residuals)(R))(list =>
+              NonEmptyList.nels(a, list: _*))
     }
   }
 
@@ -180,22 +180,22 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   /**
     * Nondeterministically sequence `fs`, collecting the results using a `Monoid`.
     */
-  def aggregate[A : Monoid](fs: Seq[F[A]]): F[A] =
-    map(gather(fs))(_.foldLeft(implicitly[Monoid[A]].zero)(
-            (a, b) => implicitly[Monoid[A]].append(a, b)))
+  def aggregate[A: Monoid](fs: Seq[F[A]]): F[A] =
+    map(gather(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a, b) =>
+              implicitly[Monoid[A]].append(a, b)))
 
-  def aggregate1[A : Semigroup](fs: NonEmptyList[F[A]]): F[A] =
+  def aggregate1[A: Semigroup](fs: NonEmptyList[F[A]]): F[A] =
     map(gather1(fs))(Foldable1[NonEmptyList].suml1(_))
 
   /**
     * Nondeterministically sequence `fs`, collecting the results using
     * a commutative `Monoid`.
     */
-  def aggregateCommutative[A : Monoid](fs: Seq[F[A]]): F[A] =
-    map(gatherUnordered(fs))(_.foldLeft(implicitly[Monoid[A]].zero)(
-            (a, b) => implicitly[Monoid[A]].append(a, b)))
+  def aggregateCommutative[A: Monoid](fs: Seq[F[A]]): F[A] =
+    map(gatherUnordered(fs))(_.foldLeft(implicitly[Monoid[A]].zero)((a, b) =>
+              implicitly[Monoid[A]].append(a, b)))
 
-  def aggregateCommutative1[A : Semigroup](fs: NonEmptyList[F[A]]): F[A] =
+  def aggregateCommutative1[A: Semigroup](fs: NonEmptyList[F[A]]): F[A] =
     map(gatherUnordered1(fs))(Foldable1[NonEmptyList].suml1(_))
 
   def parallel: Applicative[λ[α => F[α] @@ Parallel]] =

@@ -131,7 +131,8 @@ private[akka] class Shard(typeName: String,
                           extractEntityId: ShardRegion.ExtractEntityId,
                           extractShardId: ShardRegion.ExtractShardId,
                           handOffStopMessage: Any)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   import ShardRegion.{handOffStopperProps, EntityId, Msg, Passivate, ShardInitialized}
   import ShardCoordinator.Internal.{HandOff, ShardStopped}
@@ -204,10 +205,11 @@ private[akka] class Shard(typeName: String,
 
       if (state.entities.nonEmpty) {
         handOffStopper = Some(
-            context
-              .watch(context
-                  .actorOf(
-                    handOffStopperProps(shardId, replyTo, idByRef.keySet, handOffStopMessage))))
+            context.watch(
+                context.actorOf(handOffStopperProps(shardId,
+                                                    replyTo,
+                                                    idByRef.keySet,
+                                                    handOffStopMessage))))
 
         //During hand off we only care about watching for termination of the hand off stopper
         context become {
@@ -348,7 +350,9 @@ private[akka] class PersistentShard(
                   settings,
                   extractEntityId,
                   extractShardId,
-                  handOffStopMessage) with PersistentActor with ActorLogging {
+                  handOffStopMessage)
+    with PersistentActor
+    with ActorLogging {
 
   import ShardRegion.{EntityId, Msg}
   import Shard.{State, RestartEntity, EntityStopped, EntityStarted}

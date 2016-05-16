@@ -32,21 +32,27 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
       val on2 = on.replace({
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
-          else if (sym == rightGen) Ref(rgen2) else r
+          else if (sym == rightGen) Ref(rgen2)
+          else r
       }, true)
       convert(
           Union(Join(leftGen, rightGen, left, right, JoinType.Inner, on),
-                Bind(bgen,
-                     Filter(
-                         lgen2,
-                         assignFreshSymbols(left),
-                         Library.Not.typed(on.nodeType,
-                                           Library.Exists
-                                             .typed(
-                                               on.nodeType, Filter(rgen2, assignFreshSymbols(right), on2)))
-          ),
-          Pure(ProductNode(ConstArray(Ref(bgen), nullStructFor(right.nodeType.structural.asCollectionType.elementType))))
-        ), true).infer())
+                Bind(
+                    bgen,
+                    Filter(
+                        lgen2,
+                        assignFreshSymbols(left),
+                        Library.Not.typed(on.nodeType,
+                                          Library.Exists
+                                            .typed(on.nodeType,
+                                                   Filter(
+                                                       rgen2, assignFreshSymbols(right), on2)))
+                    ),
+                    Pure(ProductNode(ConstArray(
+                                Ref(bgen),
+                                nullStructFor(
+                                    right.nodeType.structural.asCollectionType.elementType))))),
+                true).infer())
     case Join(leftGen, rightGen, left, right, JoinType.Right, on)
         if !useRightJoin =>
       // as rightJoin bs on e => bs leftJoin as on { (b, a) => e(a, b) } map { case (b, a) => (a, b) }
@@ -63,18 +69,21 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
       val on2 = on.replace({
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
-          else if (sym == rightGen) Ref(rgen2) else r
+          else if (sym == rightGen) Ref(rgen2)
+          else r
       }, true)
       convert(
           Union(Join(leftGen, rightGen, left, right, JoinType.Left, on),
-                Bind(
-                    bgen,
-                    Filter(rgen2,
-                           assignFreshSymbols(right),
-                           Library.Not.typed(on.nodeType,
-                                             Library.Exists
-                                               .typed(on.nodeType,
-                                                      Filter(lgen2,
+                Bind(bgen,
+                     Filter(
+                         rgen2,
+                         assignFreshSymbols(right),
+                         Library.Not.typed(
+                             on.nodeType,
+                             Library.Exists.typed(
+                                 on.nodeType,
+                                 Filter(
+                                     lgen2,
                                                              assignFreshSymbols(
                                                                  left),
                                                              on2)))),

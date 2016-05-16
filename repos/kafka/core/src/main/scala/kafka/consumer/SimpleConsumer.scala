@@ -201,8 +201,9 @@ class SimpleConsumer(val host: String,
                              earliestOrLatest: Long,
                              consumerId: Int): Long = {
     val request = OffsetRequest(
-        requestInfo = Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                  earliestOrLatest, 1)),
+        requestInfo =
+          Map(topicAndPartition -> PartitionOffsetRequestInfo(earliestOrLatest,
+                                                              1)),
         clientId = clientId,
         replicaId = consumerId)
     val partitionErrorAndOffset =

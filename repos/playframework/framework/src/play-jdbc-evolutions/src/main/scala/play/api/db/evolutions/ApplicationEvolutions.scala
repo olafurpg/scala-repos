@@ -303,10 +303,10 @@ class DefaultEvolutionsConfigParser @Inject()(configuration: Configuration)
 
     // Since the evolutions config was completely inverted and has changed massively, we have our own deprecated
     // implementation that reads deprecated keys from the root config, otherwise reads from the passed in config
-    def getDeprecated[A : ConfigLoader](config: PlayConfig,
-                                        baseKey: => String,
-                                        path: String,
-                                        deprecated: String): A = {
+    def getDeprecated[A: ConfigLoader](config: PlayConfig,
+                                       baseKey: => String,
+                                       path: String,
+                                       deprecated: String): A = {
       if (rootConfig.underlying.hasPath(deprecated)) {
         rootConfig.reportDeprecation(s"$baseKey.$path", deprecated)
         rootConfig.get[A](deprecated)

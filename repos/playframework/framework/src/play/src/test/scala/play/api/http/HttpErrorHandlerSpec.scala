@@ -81,8 +81,8 @@ object HttpErrorHandlerSpec extends Specification {
       .injectorFromBindings(
           HttpErrorHandler.bindingsFromConfiguration(env, config) ++ Seq(
               BindingKey(classOf[Router]).to(Router.empty),
-              BindingKey(classOf[OptionalSourceMapper]).to(
-                  new OptionalSourceMapper(None)),
+              BindingKey(classOf[OptionalSourceMapper])
+                .to(new OptionalSourceMapper(None)),
               BindingKey(classOf[Configuration]).to(config),
               BindingKey(classOf[Environment]).to(env)
           ))

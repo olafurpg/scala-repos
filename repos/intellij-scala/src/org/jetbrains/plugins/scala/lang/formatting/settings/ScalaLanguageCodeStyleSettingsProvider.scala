@@ -332,7 +332,8 @@ class ScalaLanguageCodeStyleSettingsProvider
     indentOptions.INDENT_SIZE = 2
     indentOptions.TAB_SIZE = 2
     indentOptions.CONTINUATION_INDENT_SIZE = 2
-    commonCodeStyleSettings.KEEP_FIRST_COLUMN_COMMENT = false //added here to comply with prior default behavior
+    commonCodeStyleSettings.KEEP_FIRST_COLUMN_COMMENT =
+      false //added here to comply with prior default behavior
     commonCodeStyleSettings
   }
 

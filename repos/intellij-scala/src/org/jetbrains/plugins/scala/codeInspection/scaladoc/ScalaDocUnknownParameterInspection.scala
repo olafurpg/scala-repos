@@ -53,7 +53,7 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
 
         def collectDocParams() {
           for (tagParam <- s.findTagsByName(
-              Set("@param", "@tparam").contains(_))) {
+                              Set("@param", "@tparam").contains(_))) {
             if (tagParam.getValueElement != null) {
               tagParam.name match {
                 case "@param" =>
@@ -144,7 +144,7 @@ class ScalaDocUnknownParameterInspection extends LocalInspectionTool {
             for (tag <- s.findTagsByName(
                            Set(MyScaladocParsing.PARAM_TAG,
                                MyScaladocParsing.TYPE_PARAM_TAG).contains _)
-                           if tag.isInstanceOf[ScDocTag]) {
+                 if tag.isInstanceOf[ScDocTag]) {
               holder.registerProblem(
                   holder.getManager.createProblemDescriptor(
                       tag.getFirstChild,

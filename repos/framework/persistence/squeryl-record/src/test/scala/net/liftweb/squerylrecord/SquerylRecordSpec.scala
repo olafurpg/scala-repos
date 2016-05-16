@@ -53,7 +53,7 @@ class SquerylRecordSpec extends Specification with AroundExample {
     }
   }
 
-  protected def around[T : AsResult](t: => T) = {
+  protected def around[T: AsResult](t: => T) = {
     S.initIfUninitted(session) {
       DBHelper.initSquerylRecordWithInMemoryDB()
       DBHelper.createSchema()
@@ -98,8 +98,8 @@ class SquerylRecordSpec extends Specification with AroundExample {
 
     "support normal joins" in {
       transaction {
-        val companiesWithEmployees = from(companies, employees)((c,
-            e) => where(c.id === e.companyId.get) select ((c.id, e.id))).toList
+        val companiesWithEmployees = from(companies, employees)((c, e) =>
+              where(c.id === e.companyId.get) select ((c.id, e.id))).toList
         companiesWithEmployees must haveSize(td.allEmployees.size)
         companiesWithEmployees must containAllOf(td.allEmployees map { e =>
           (e.companyId.get, e.id)
@@ -110,8 +110,9 @@ class SquerylRecordSpec extends Specification with AroundExample {
     "support left outer joins" in {
       transaction {
         S.initIfUninitted(session) {
-          val companiesWithEmployees = join(companies, employees.leftOuter)((c,
-              e) => select(c, e) on (c.id === e.map(_.companyId)))
+          val companiesWithEmployees =
+            join(companies, employees.leftOuter)((c, e) =>
+                  select(c, e) on (c.id === e.map(_.companyId)))
 
           companiesWithEmployees must haveSize(4)
           // One company doesn't have an employee, two have
@@ -129,16 +130,16 @@ class SquerylRecordSpec extends Specification with AroundExample {
               2)
 
           val employeesWithSameAdminSetting =
-            join(employees, employees.leftOuter)((e1,
-                e2) => select(e1, e2) on (e1.admin === e2.map(_.admin)))
+            join(employees, employees.leftOuter)((e1, e2) =>
+                  select(e1, e2) on (e1.admin === e2.map(_.admin)))
 
           employeesWithSameAdminSetting.foreach { ee =>
             ee._2 must not(beEmpty)
           }
 
           val companiesWithSameCreationDate =
-            join(companies, companies.leftOuter)((c1,
-                c2) => select(c1, c2) on (c1.created === c2.map(_.created)))
+            join(companies, companies.leftOuter)((c1, c2) =>
+                  select(c1, c2) on (c1.created === c2.map(_.created)))
           companiesWithSameCreationDate must not(beEmpty)
 
           val employeesWithSameDepartmentNumber =
@@ -147,8 +148,9 @@ class SquerylRecordSpec extends Specification with AroundExample {
                   (e1.departmentNumber === e2.map(_.departmentNumber)))
           employeesWithSameDepartmentNumber must not(beEmpty)
 
-          val employeesWithSameRoles = join(employees, employees.leftOuter)(
-              (e1, e2) => select(e1, e2) on (e1.role === e2.map(_.role)))
+          val employeesWithSameRoles =
+            join(employees, employees.leftOuter)((e1, e2) =>
+                  select(e1, e2) on (e1.role === e2.map(_.role)))
           employeesWithSameRoles must not(beEmpty)
         }
       }
@@ -219,12 +221,12 @@ class SquerylRecordSpec extends Specification with AroundExample {
       transaction {
         S.initIfUninitted(session) {
           val company = companies.lookup(td.c2.id).head
-          val employee = from(employees)(
-              e => where(e.companyId === company.idField) select (e)).head
+          val employee = from(employees)(e =>
+                where(e.companyId === company.idField) select (e)).head
           employee.id must_== td.e2.id
 
-          val loadedCompanies = from(companies)(
-              c => where(c.created === company.created) select (c))
+          val loadedCompanies = from(companies)(c =>
+                where(c.created === company.created) select (c))
           loadedCompanies.size must beGreaterThanOrEqualTo(1)
         }
       }
@@ -238,12 +240,12 @@ class SquerylRecordSpec extends Specification with AroundExample {
 
     "support date/time queries" >> {
       transaction {
-        val c1 = from(companies)(
-            c => where(c.created <= Calendar.getInstance) select (c))
+        val c1 = from(companies)(c =>
+              where(c.created <= Calendar.getInstance) select (c))
         c1.size must beGreaterThan(1)
 
-        val c2 = from(companies)(
-            c => where(c.created <= Calendar.getInstance.getTime) select (c))
+        val c2 = from(companies)(c =>
+              where(c.created <= Calendar.getInstance.getTime) select (c))
         c2.size must beGreaterThan(1)
       }
     }
@@ -254,8 +256,8 @@ class SquerylRecordSpec extends Specification with AroundExample {
       transaction {
         // Should work with the ID function (returns a long):
         val companyId: Long = from(companies)(c =>
-              where(c.id in from(companies)(
-                      c2 => where(c2.id === td.c1.id) select (c2.id))) select
+              where(c.id in from(companies)(c2 =>
+                        where(c2.id === td.c1.id) select (c2.id))) select
               (c.id)).single
         companyId must_== td.c1.id
 
@@ -303,8 +305,8 @@ class SquerylRecordSpec extends Specification with AroundExample {
 
         // Enum fields:
         val empRoleQuery = from(employees)(e =>
-              where(e.role in from(employees)(
-                      e2 => where(e2.id === td.e2.id) select (e2.role))) select
+              where(e.role in from(employees)(e2 =>
+                        where(e2.id === td.e2.id) select (e2.role))) select
               (e.role.get))
         val empRole = empRoleQuery.single
         empRole must_== td.e2.role.get
@@ -327,9 +329,8 @@ class SquerylRecordSpec extends Specification with AroundExample {
         bridge.save
         val company2 = Company.findForParam(id.toString)
         company2.isDefined must_== true
-        company2.foreach(c2 =>
-              {
-            c2.postCode.get must_== "10001"
+        company2.foreach(c2 => {
+          c2.postCode.get must_== "10001"
         })
         val allCompanies = Company.findForList(0, 1000)
         allCompanies.size must be_>(0)

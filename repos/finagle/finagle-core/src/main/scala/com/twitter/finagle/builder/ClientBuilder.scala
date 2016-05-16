@@ -31,10 +31,10 @@ import scala.annotation.{implicitNotFound, varargs}
 object ClientBuilder {
   type Complete[Req, Rep] = ClientBuilder[
       Req, Rep, ClientConfig.Yes, ClientConfig.Yes, ClientConfig.Yes]
-  type NoCluster[Req, Rep] = ClientBuilder[
-      Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]
-  type NoCodec = ClientBuilder[
-      _, _, ClientConfig.Yes, Nothing, ClientConfig.Yes]
+  type NoCluster[Req, Rep] =
+    ClientBuilder[Req, Rep, Nothing, ClientConfig.Yes, ClientConfig.Yes]
+  type NoCodec =
+    ClientBuilder[_, _, ClientConfig.Yes, Nothing, ClientConfig.Yes]
 
   def apply() = new ClientBuilder()
 
@@ -102,10 +102,9 @@ object ClientConfig {
       newClient(dest, label).toService
 
     def newClient(dest: Name, label: String): ServiceFactory[Req, Rep] =
-      ServiceFactory(
-          () =>
-            Future.value(Service.mk[Req, Rep](
-                    _ => Future.exception(new Exception("unimplemented")))))
+      ServiceFactory(() =>
+            Future.value(Service.mk[Req, Rep](_ =>
+                      Future.exception(new Exception("unimplemented")))))
   }
 
   def nilClient[Req, Rep]: StackBasedClient[Req, Rep] = NilClient[Req, Rep]()
@@ -261,8 +260,7 @@ private[builder] final class ClientConfig[
   * @see The [[http://twitter.github.io/finagle/guide/Configuration.html user guide]]
   *      for information on the preferred `with`-style APIs insead.
   */
-class ClientBuilder[
-    Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] private[finagle](
+class ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit] private[finagle](
     client: StackBasedClient[Req, Rep]
 ) {
   import ClientConfig._
@@ -270,10 +268,10 @@ class ClientBuilder[
 
   // Convenient aliases.
   type FullySpecifiedConfig = FullySpecified[Req, Rep]
-  type ThisConfig = ClientConfig[
-      Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit]
-  type This = ClientBuilder[
-      Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit]
+  type ThisConfig =
+    ClientConfig[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit]
+  type This =
+    ClientBuilder[Req, Rep, HasCluster, HasCodec, HasHostConnectionLimit]
 
   private[builder] def this() = this(ClientConfig.nilClient)
 
@@ -288,7 +286,7 @@ class ClientBuilder[
     new ClientBuilder(client)
 
   private def configured[
-      P : Stack.Param, HasCluster1, HasCodec1, HasHostConnectionLimit1](
+      P: Stack.Param, HasCluster1, HasCodec1, HasHostConnectionLimit1](
       param: P
   ): ClientBuilder[Req, Rep, HasCluster1, HasCodec1, HasHostConnectionLimit1] =
     copy(client.configured(param))

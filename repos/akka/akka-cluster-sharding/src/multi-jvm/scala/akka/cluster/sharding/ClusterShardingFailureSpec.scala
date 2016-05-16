@@ -106,7 +106,9 @@ class DDataClusterShardingFailureMultiJvmNode3
 
 abstract class ClusterShardingFailureSpec(
     config: ClusterShardingFailureSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config)
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterShardingFailureSpec._
   import config._
 
@@ -115,20 +117,20 @@ abstract class ClusterShardingFailureSpec(
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+          new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(controller) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(controller) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 

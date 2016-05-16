@@ -37,7 +37,8 @@ class MemberWeaklyUpMultiJvmNode4 extends MemberWeaklyUpSpec
 class MemberWeaklyUpMultiJvmNode5 extends MemberWeaklyUpSpec
 
 abstract class MemberWeaklyUpSpec
-    extends MultiNodeSpec(MemberWeaklyUpSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(MemberWeaklyUpSpec)
+    with MultiNodeClusterSpec {
 
   import MemberWeaklyUpSpec._
 

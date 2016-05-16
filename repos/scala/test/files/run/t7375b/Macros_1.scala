@@ -11,7 +11,7 @@ object Macros {
   def foo = macro impl
   def impl(c: Context) = {
     import c.universe._
-    def test[T : c.TypeTag] =
+    def test[T: c.TypeTag] =
       reify(
           println(c
                 .Expr[String](Literal(

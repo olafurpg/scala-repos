@@ -46,9 +46,15 @@ import org.apache.spark.storage.StorageLevel
   * Params for linear regression.
   */
 private[regression] trait LinearRegressionParams
-    extends PredictorParams with HasRegParam with HasElasticNetParam
-    with HasMaxIter with HasTol with HasFitIntercept with HasStandardization
-    with HasWeightCol with HasSolver
+    extends PredictorParams
+    with HasRegParam
+    with HasElasticNetParam
+    with HasMaxIter
+    with HasTol
+    with HasFitIntercept
+    with HasStandardization
+    with HasWeightCol
+    with HasSolver
 
 /**
   * :: Experimental ::
@@ -69,7 +75,9 @@ private[regression] trait LinearRegressionParams
 class LinearRegression @Since("1.3.0")(
     @Since("1.3.0") override val uid: String)
     extends Regressor[Vector, LinearRegression, LinearRegressionModel]
-    with LinearRegressionParams with DefaultParamsWritable with Logging {
+    with LinearRegressionParams
+    with DefaultParamsWritable
+    with Logging {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("linReg"))
@@ -220,15 +228,16 @@ class LinearRegression @Since("1.3.0")(
     if (handlePersistence) instances.persist(StorageLevel.MEMORY_AND_DISK)
 
     val (featuresSummarizer, ySummarizer) = {
-      val seqOp = (c: (MultivariateOnlineSummarizer,
-      MultivariateOnlineSummarizer), instance: Instance) =>
-        (c._1.add(instance.features, instance.weight),
-         c._2.add(Vectors.dense(instance.label), instance.weight))
+      val seqOp =
+        (c: (MultivariateOnlineSummarizer, MultivariateOnlineSummarizer),
+         instance: Instance) =>
+          (c._1.add(instance.features, instance.weight),
+           c._2.add(Vectors.dense(instance.label), instance.weight))
 
-      val combOp = (c1: (MultivariateOnlineSummarizer,
-      MultivariateOnlineSummarizer), c2: (MultivariateOnlineSummarizer,
-      MultivariateOnlineSummarizer)) =>
-        (c1._1.merge(c2._1), c1._2.merge(c2._2))
+      val combOp =
+        (c1: (MultivariateOnlineSummarizer, MultivariateOnlineSummarizer),
+         c2: (MultivariateOnlineSummarizer, MultivariateOnlineSummarizer)) =>
+          (c1._1.merge(c2._1), c1._2.merge(c2._2))
 
       instances.treeAggregate(new MultivariateOnlineSummarizer,
                               new MultivariateOnlineSummarizer)(seqOp, combOp)
@@ -306,19 +315,19 @@ class LinearRegression @Since("1.3.0")(
       } else {
         val standardizationParam = $(standardization)
         def effectiveL1RegFun =
-          (index: Int) =>
-            {
-              if (standardizationParam) {
-                effectiveL1RegParam
-              } else {
-                // If `standardization` is false, we still standardize the data
-                // to improve the rate of convergence; as a result, we have to
-                // perform this reverse standardization by penalizing each component
-                // differently to get effectively the same objective function when
-                // the training dataset is not standardized.
-                if (featuresStd(index) != 0.0)
-                  effectiveL1RegParam / featuresStd(index) else 0.0
-              }
+          (index: Int) => {
+            if (standardizationParam) {
+              effectiveL1RegParam
+            } else {
+              // If `standardization` is false, we still standardize the data
+              // to improve the rate of convergence; as a result, we have to
+              // perform this reverse standardization by penalizing each component
+              // differently to get effectively the same objective function when
+              // the training dataset is not standardized.
+              if (featuresStd(index) != 0.0)
+                effectiveL1RegParam / featuresStd(index)
+              else 0.0
+            }
           }
         new BreezeOWLQN[Int, BDV[Double]](
             $(maxIter), 10, effectiveL1RegFun, $(tol))
@@ -418,7 +427,8 @@ class LinearRegressionModel private[ml](override val uid: String,
                                         val coefficients: Vector,
                                         val intercept: Double)
     extends RegressionModel[Vector, LinearRegressionModel]
-    with LinearRegressionParams with MLWritable {
+    with LinearRegressionParams
+    with MLWritable {
 
   private var trainingSummary: Option[LinearRegressionTrainingSummary] = None
 
@@ -518,7 +528,8 @@ object LinearRegressionModel extends MLReadable[LinearRegressionModel] {
   /** [[MLWriter]] instance for [[LinearRegressionModel]] */
   private[LinearRegressionModel] class LinearRegressionModelWriter(
       instance: LinearRegressionModel)
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(intercept: Double, coefficients: Vector)
 

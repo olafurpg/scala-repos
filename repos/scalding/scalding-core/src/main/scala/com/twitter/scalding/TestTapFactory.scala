@@ -70,8 +70,8 @@ class TestTapFactory(src: Source, sinkMode: SinkMode) extends Serializable {
     hdfsScheme.map { _.getSinkFields }
       .getOrElse(sys.error("No sinkFields defined"))
 
-  def hdfsScheme: Option[Scheme[
-          JobConf, RecordReader[_, _], OutputCollector[_, _], _, _]] = None
+  def hdfsScheme: Option[
+      Scheme[JobConf, RecordReader[_, _], OutputCollector[_, _], _, _]] = None
 
   def createTap(readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] = {
     mode match {

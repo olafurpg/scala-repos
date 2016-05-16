@@ -39,11 +39,9 @@ object VerifyClass {
     val urls = args.map(Path.apply).map(_.toFile.toURI.toURL).toArray
     println("As urls: " + urls.mkString(","))
     val cl = URLClassLoader.newInstance(urls, null)
-    val results = args
-      .flatMap(n => checkClasses(n, cl))
-      .toMap
-      (for { (name, result) <- results } yield
-        (name, result.getOrElse(null))).asJava
+    val results = args.flatMap(n => checkClasses(n, cl)).toMap
+    (for { (name, result) <- results } yield
+      (name, result.getOrElse(null))).asJava
   }
 
   def main(args: Array[String]): Unit = {

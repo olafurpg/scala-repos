@@ -37,7 +37,8 @@ class ReplicatorChaosSpecMultiJvmNode4 extends ReplicatorChaosSpec
 class ReplicatorChaosSpecMultiJvmNode5 extends ReplicatorChaosSpec
 
 class ReplicatorChaosSpec
-    extends MultiNodeSpec(ReplicatorChaosSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ReplicatorChaosSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ReplicatorChaosSpec._
   import Replicator._

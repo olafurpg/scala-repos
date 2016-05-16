@@ -37,9 +37,9 @@ object StreamConverters {
     * @param in a function which creates the InputStream to read from
     * @param chunkSize the size of each read operation, defaults to 8192
     */
-  def fromInputStream(
-      in: () ⇒ InputStream,
-      chunkSize: Int = 8192): Source[ByteString, Future[IOResult]] =
+  def fromInputStream(in: () ⇒ InputStream,
+                      chunkSize: Int =
+                        8192): Source[ByteString, Future[IOResult]] =
     new Source(
         new InputStreamSource(in,
                               chunkSize,
@@ -60,8 +60,9 @@ object StreamConverters {
     *
     * @param writeTimeout the max time the write operation on the materialized OutputStream should block, defaults to 5 seconds
     */
-  def asOutputStream(writeTimeout: FiniteDuration = 5.seconds)
-    : Source[ByteString, OutputStream] =
+  def asOutputStream(
+      writeTimeout: FiniteDuration =
+        5.seconds): Source[ByteString, OutputStream] =
     Source.fromGraph(new OutputStreamSourceStage(writeTimeout))
 
   /**
@@ -77,9 +78,9 @@ object StreamConverters {
     * The [[OutputStream]] will be closed when the stream flowing into this [[Sink]] is completed. The [[Sink]]
     * will cancel the stream when the [[OutputStream]] is no longer writable.
     */
-  def fromOutputStream(
-      out: () ⇒ OutputStream,
-      autoFlush: Boolean = false): Sink[ByteString, Future[IOResult]] =
+  def fromOutputStream(out: () ⇒ OutputStream,
+                       autoFlush: Boolean =
+                         false): Sink[ByteString, Future[IOResult]] =
     new Sink(
         new OutputStreamSink(out,
                              DefaultAttributes.outputStreamSink,

@@ -42,46 +42,43 @@ object RawCompileLike {
   def cached(cache: File, doCompile: Gen): Gen =
     cached(cache, Seq(), doCompile)
   def cached(cache: File, fileInputOpts: Seq[String], doCompile: Gen): Gen =
-    (sources, classpath, outputDirectory, options, maxErrors, log) =>
-      {
-        type Inputs = FilesInfo[HashFileInfo] :+: FilesInfo[ModifiedFileInfo] :+: Seq[
-            File] :+: File :+: Seq[String] :+: Int :+: HNil
-        val inputs: Inputs =
-          hash(sources.toSet ++ optionFiles(options, fileInputOpts)) :+: lastModified(
-              classpath.toSet) :+: classpath :+: outputDirectory :+: options :+: maxErrors :+: HNil
-        implicit val stringEquiv: Equiv[String] = defaultEquiv
-        implicit val fileEquiv: Equiv[File] = defaultEquiv
-        implicit val intEquiv: Equiv[Int] = defaultEquiv
-        val cachedComp = inputChanged(cache / "inputs") {
-          (inChanged, in: Inputs) =>
-            outputChanged(cache / "output") {
-              (outChanged, outputs: FilesInfo[PlainFileInfo]) =>
-                if (inChanged || outChanged)
-                  doCompile(sources,
-                            classpath,
-                            outputDirectory,
-                            options,
-                            maxErrors,
-                            log)
-                else log.debug("Uptodate: " + outputDirectory.getAbsolutePath)
-            }
-        }
-        cachedComp(inputs)(() => exists(outputDirectory.allPaths.get.toSet))
+    (sources, classpath, outputDirectory, options, maxErrors, log) => {
+      type Inputs = FilesInfo[HashFileInfo] :+: FilesInfo[ModifiedFileInfo] :+: Seq[
+          File] :+: File :+: Seq[String] :+: Int :+: HNil
+      val inputs: Inputs =
+        hash(sources.toSet ++ optionFiles(options, fileInputOpts)) :+: lastModified(
+            classpath.toSet) :+: classpath :+: outputDirectory :+: options :+: maxErrors :+: HNil
+      implicit val stringEquiv: Equiv[String] = defaultEquiv
+      implicit val fileEquiv: Equiv[File] = defaultEquiv
+      implicit val intEquiv: Equiv[Int] = defaultEquiv
+      val cachedComp = inputChanged(cache / "inputs") {
+        (inChanged, in: Inputs) =>
+          outputChanged(cache / "output") {
+            (outChanged, outputs: FilesInfo[PlainFileInfo]) =>
+              if (inChanged || outChanged)
+                doCompile(sources,
+                          classpath,
+                          outputDirectory,
+                          options,
+                          maxErrors,
+                          log)
+              else log.debug("Uptodate: " + outputDirectory.getAbsolutePath)
+          }
+      }
+      cachedComp(inputs)(() => exists(outputDirectory.allPaths.get.toSet))
     }
   def prepare(description: String, doCompile: Gen): Gen =
-    (sources, classpath, outputDirectory, options, maxErrors, log) =>
-      {
-        if (sources.isEmpty)
-          log.info("No sources available, skipping " + description + "...")
-        else {
-          log.info(description.capitalize + " to " +
-              outputDirectory.absolutePath + "...")
-          IO.delete(outputDirectory)
-          IO.createDirectory(outputDirectory)
-          doCompile(
-              sources, classpath, outputDirectory, options, maxErrors, log)
-          log.info(description.capitalize + " successful.")
-        }
+    (sources, classpath, outputDirectory, options, maxErrors, log) => {
+      if (sources.isEmpty)
+        log.info("No sources available, skipping " + description + "...")
+      else {
+        log.info(description.capitalize + " to " +
+            outputDirectory.absolutePath + "...")
+        IO.delete(outputDirectory)
+        IO.createDirectory(outputDirectory)
+        doCompile(sources, classpath, outputDirectory, options, maxErrors, log)
+        log.info(description.capitalize + " successful.")
+      }
     }
   def filterSources(f: File => Boolean, doCompile: Gen): Gen =
     (sources, classpath, outputDirectory, options, maxErrors, log) =>
@@ -93,10 +90,9 @@ object RawCompileLike {
                 log)
 
   def rawCompile(instance: ScalaInstance, cpOptions: ClasspathOptions): Gen =
-    (sources, classpath, outputDirectory, options, maxErrors, log) =>
-      {
-        val compiler = new RawCompiler(instance, cpOptions, log)
-        compiler(sources, classpath, outputDirectory, options)
+    (sources, classpath, outputDirectory, options, maxErrors, log) => {
+      val compiler = new RawCompiler(instance, cpOptions, log)
+      compiler(sources, classpath, outputDirectory, options)
     }
   def compile(label: String,
               cache: File,
@@ -105,5 +101,5 @@ object RawCompileLike {
     cached(cache, prepare(label + " sources", rawCompile(instance, cpOptions)))
 
   val nop: Gen = (sources, classpath, outputDirectory, options, maxErrors,
-  log) => ()
+                  log) => ()
 }

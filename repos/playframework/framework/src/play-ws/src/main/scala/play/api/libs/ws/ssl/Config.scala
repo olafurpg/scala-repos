@@ -178,11 +178,11 @@ case class SSLConfig(
     checkRevocation: Option[Boolean] = None,
     revocationLists: Option[Seq[URL]] = None,
     enabledCipherSuites: Option[Seq[String]] = None,
-    enabledProtocols: Option[Seq[String]] = Some(
-          Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
+    enabledProtocols: Option[Seq[String]] =
+      Some(Seq("TLSv1.2", "TLSv1.1", "TLSv1")),
     disabledSignatureAlgorithms: Seq[String] = Seq("MD2", "MD4", "MD5"),
-    disabledKeyAlgorithms: Seq[String] = Seq(
-          "RSA keySize < 2048", "DSA keySize < 2048", "EC keySize < 224"),
+    disabledKeyAlgorithms: Seq[String] =
+      Seq("RSA keySize < 2048", "DSA keySize < 2048", "EC keySize < 224"),
     keyManagerConfig: KeyManagerConfig = KeyManagerConfig(),
     trustManagerConfig: TrustManagerConfig = TrustManagerConfig(),
     secureRandom: Option[SecureRandom] = None,

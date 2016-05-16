@@ -58,7 +58,7 @@ object arbitrary extends ArbitraryInstances0 {
       implicit F: Arbitrary[F[Option[A]]]): Arbitrary[OptionT[F, A]] =
     Arbitrary(F.arbitrary.map(OptionT.apply))
 
-  implicit def evalArbitrary[A : Arbitrary]: Arbitrary[Eval[A]] =
+  implicit def evalArbitrary[A: Arbitrary]: Arbitrary[Eval[A]] =
     Arbitrary(
         Gen.oneOf(getArbitrary[A].map(Eval.now(_)),
                   getArbitrary[A].map(Eval.later(_)),
@@ -67,9 +67,8 @@ object arbitrary extends ArbitraryInstances0 {
   implicit def prodArbitrary[F[_], G[_], A](
       implicit F: Arbitrary[F[A]],
       G: Arbitrary[G[A]]): Arbitrary[Prod[F, G, A]] =
-    Arbitrary(
-        F.arbitrary.flatMap(
-            fa => G.arbitrary.map(ga => Prod[F, G, A](fa, ga))))
+    Arbitrary(F.arbitrary.flatMap(fa =>
+              G.arbitrary.map(ga => Prod[F, G, A](fa, ga))))
 
   implicit def funcArbitrary[F[_], A, B](
       implicit F: Arbitrary[F[B]]): Arbitrary[Func[F, A, B]] =
@@ -80,8 +79,8 @@ object arbitrary extends ArbitraryInstances0 {
       FF: Applicative[F]): Arbitrary[AppFunc[F, A, B]] =
     Arbitrary(F.arbitrary.map(fb => Func.appFunc[F, A, B](_ => fb)))
 
-  implicit def writerArbitrary[L : Arbitrary, V : Arbitrary]: Arbitrary[Writer[
-          L, V]] =
+  implicit def writerArbitrary[L: Arbitrary, V: Arbitrary]
+    : Arbitrary[Writer[L, V]] =
     writerTArbitrary[Id, L, V]
 
   // until this is provided by scalacheck
@@ -97,10 +96,10 @@ object arbitrary extends ArbitraryInstances0 {
         Gen.oneOf(F.arbitrary.map(Coproduct.leftc[F, G, A]),
                   G.arbitrary.map(Coproduct.rightc[F, G, A])))
 
-  implicit def showArbitrary[A : Arbitrary]: Arbitrary[Show[A]] =
+  implicit def showArbitrary[A: Arbitrary]: Arbitrary[Show[A]] =
     Arbitrary(Show.fromToString[A])
 
-  implicit def function0Arbitrary[A : Arbitrary]: Arbitrary[() => A] =
+  implicit def function0Arbitrary[A: Arbitrary]: Arbitrary[() => A] =
     Arbitrary(getArbitrary[A].map(() => _))
 }
 

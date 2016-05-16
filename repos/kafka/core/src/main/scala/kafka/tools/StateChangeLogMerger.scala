@@ -137,11 +137,8 @@ object StateChangeLogMerger extends Logging {
       topic = options.valueOf(topicOpt)
     }
     if (options.has(partitionsOpt)) {
-      partitions = options
-        .valueOf(partitionsOpt)
-        .split(",")
-        .toList
-        .map(_.toInt)
+      partitions =
+        options.valueOf(partitionsOpt).split(",").toList.map(_.toInt)
       val duplicatePartitions = CoreUtils.duplicates(partitions)
       if (duplicatePartitions.nonEmpty) {
         System.err.println(
@@ -150,10 +147,10 @@ object StateChangeLogMerger extends Logging {
         System.exit(1)
       }
     }
-    startDate = dateFormat.parse(
-        options.valueOf(startTimeOpt).replace('\"', ' ').trim)
-    endDate = dateFormat.parse(
-        options.valueOf(endTimeOpt).replace('\"', ' ').trim)
+    startDate =
+      dateFormat.parse(options.valueOf(startTimeOpt).replace('\"', ' ').trim)
+    endDate =
+      dateFormat.parse(options.valueOf(endTimeOpt).replace('\"', ' ').trim)
 
     /**
       * n-way merge from m input files:

@@ -19,7 +19,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MemcachedTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
   test("Memcached.Client has expected stack and params") {
     val markDeadFor = Backoff.const(1.second)
@@ -41,8 +43,7 @@ class MemcachedTest
     val FailureAccrualFactory.Param.Configured(policy) =
       params[FailureAccrualFactory.Param]
     assert(policy() == failureAccrualPolicy)
-    assert(
-        markDeadFor.take(10).force.toSeq ===
+    assert(markDeadFor.take(10).force.toSeq ===
         (0 until 10 map { _ =>
           1.second
         }))

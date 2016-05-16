@@ -174,7 +174,8 @@ object MyParams extends MLReadable[MyParams] {
 }
 
 class DefaultReadWriteSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("default read/write") {

@@ -318,9 +318,8 @@ object Enumerator {
             result.success(r)
         }
 
-        def iteratee[EE <: E2](
-            f: ((Boolean, Boolean)) => (Boolean,
-            Boolean)): Iteratee[EE, Unit] = {
+        def iteratee[EE <: E2](f: ((Boolean, Boolean)) => (Boolean, Boolean))
+          : Iteratee[EE, Unit] = {
           def step(in: Input[EE]): Iteratee[EE, Unit] = {
 
             val p = Promise[Iteratee[E2, A]]()
@@ -411,8 +410,8 @@ object Enumerator {
     *          the next input, or none if the value is completely unfolded.
     * $paramEcSingle
     */
-  def unfold[S, E](s: S)(f: S => Option[(S, E)])(
-      implicit ec: ExecutionContext): Enumerator[E] =
+  def unfold[S, E](s: S)(
+      f: S => Option[(S, E)])(implicit ec: ExecutionContext): Enumerator[E] =
     checkContinue1(s)(new TreatCont1[E, S] {
       private val pec = ec.prepare()
 
@@ -530,11 +529,11 @@ object Enumerator {
     * @param onError Called when an error occurs in the iteratee
     * $paramEcMultiple
     */
-  def fromCallback1[E](
-      retriever: Boolean => Future[Option[E]],
-      onComplete: () => Unit = () => (),
-      onError: (String, Input[E]) => Unit = (_: String, _: Input[E]) =>
-          ())(implicit ec: ExecutionContext) = new Enumerator[E] {
+  def fromCallback1[E](retriever: Boolean => Future[Option[E]],
+                       onComplete: () => Unit = () => (),
+                       onError: (String, Input[E]) => Unit =
+                         (_: String, _: Input[E]) => ())(
+      implicit ec: ExecutionContext) = new Enumerator[E] {
     private val pec = ec.prepare()
     def apply[A](it: Iteratee[E, A]): Future[Iteratee[E, A]] = {
 
@@ -732,10 +731,9 @@ object Enumerator {
     def apply[A](i: Iteratee[E, A]) = Future.successful(i)
   }
 
-  private def enumerateSeq[E, A]: (Seq[E],
-  Iteratee[E, A]) => Future[Iteratee[E, A]] = { (l, i) =>
-    l.foldLeft(Future.successful(i))(
-        (i, e) =>
+  private def enumerateSeq[E, A]
+    : (Seq[E], Iteratee[E, A]) => Future[Iteratee[E, A]] = { (l, i) =>
+    l.foldLeft(Future.successful(i))((i, e) =>
           i.flatMap(it =>
                 it.pureFold {
           case Step.Cont(k) => k(Input.El(e))
@@ -755,7 +753,7 @@ object Enumerator {
   private[iteratee] def enumerateSeq2[E](s: Seq[Input[E]]): Enumerator[E] =
     checkContinue1(s)(new TreatCont1[E, Seq[Input[E]]] {
       def apply[A](loop: (Iteratee[E, A],
-                   Seq[Input[E]]) => Future[Iteratee[E, A]],
+                          Seq[Input[E]]) => Future[Iteratee[E, A]],
                    s: Seq[Input[E]],
                    k: Input[E] => Iteratee[E, A]): Future[Iteratee[E, A]] =
         if (!s.isEmpty) loop(k(s.head), s.tail)

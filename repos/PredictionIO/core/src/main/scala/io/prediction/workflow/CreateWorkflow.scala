@@ -36,25 +36,25 @@ import scala.language.existentials
 
 object CreateWorkflow extends Logging {
 
-  case class WorkflowConfig(
-      deployMode: String = "",
-      batch: String = "",
-      engineId: String = "",
-      engineVersion: String = "",
-      engineVariant: String = "",
-      engineFactory: String = "",
-      engineParamsKey: String = "",
-      evaluationClass: Option[String] = None,
-      engineParamsGeneratorClass: Option[String] = None,
-      env: Option[String] = None,
-      skipSanityCheck: Boolean = false,
-      stopAfterRead: Boolean = false,
-      stopAfterPrepare: Boolean = false,
-      verbosity: Int = 0,
-      verbose: Boolean = false,
-      debug: Boolean = false,
-      logFile: Option[String] = None,
-      jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
+  case class WorkflowConfig(deployMode: String = "",
+                            batch: String = "",
+                            engineId: String = "",
+                            engineVersion: String = "",
+                            engineVariant: String = "",
+                            engineFactory: String = "",
+                            engineParamsKey: String = "",
+                            evaluationClass: Option[String] = None,
+                            engineParamsGeneratorClass: Option[String] = None,
+                            env: Option[String] = None,
+                            skipSanityCheck: Boolean = false,
+                            stopAfterRead: Boolean = false,
+                            stopAfterPrepare: Boolean = false,
+                            verbosity: Int = 0,
+                            verbose: Boolean = false,
+                            debug: Boolean = false,
+                            logFile: Option[String] = None,
+                            jsonExtractor: JsonExtractorOption =
+                              JsonExtractorOption.Both)
 
   case class AlgorithmParams(name: String, params: JValue)
 
@@ -164,8 +164,7 @@ object CreateWorkflow extends Logging {
     }
 
     val pioEnvVars = wfc.env
-      .map(
-          e =>
+      .map(e =>
             e.split(',')
               .flatMap(p =>
                     p.split('=') match {
@@ -230,11 +229,14 @@ object CreateWorkflow extends Logging {
         }
 
       val engineInstance = EngineInstance(
-          id = "",
-          status = "INIT",
+          id =
+            "",
+          status =
+            "INIT",
           startTime = DateTime.now,
           endTime = DateTime.now,
-          engineId = wfc.engineId,
+          engineId =
+            wfc.engineId,
           engineVersion = wfc.engineVersion,
           engineVariant = variantId,
           engineFactory = engineFactory,
@@ -242,23 +244,23 @@ object CreateWorkflow extends Logging {
           env = pioEnvVars,
           sparkConf = workflowParams.sparkEnv,
           dataSourceParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.dataSourceParams),
+              wfc.jsonExtractor, engineParams.dataSourceParams),
           preparatorParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.preparatorParams),
+              wfc.jsonExtractor, engineParams.preparatorParams),
           algorithmsParams = JsonExtractor.paramsToJson(
-                wfc.jsonExtractor, engineParams.algorithmParamsList),
+              wfc.jsonExtractor, engineParams.algorithmParamsList),
           servingParams = JsonExtractor.paramToJson(
-                wfc.jsonExtractor, engineParams.servingParams))
+              wfc.jsonExtractor, engineParams.servingParams))
 
       val engineInstanceId =
         Storage.getMetaDataEngineInstances.insert(engineInstance)
 
-      CoreWorkflow.runTrain(
-          env = pioEnvVars,
-          params = workflowParams,
-          engine = trainableEngine,
-          engineParams = engineParams,
-          engineInstance = engineInstance.copy(id = engineInstanceId))
+      CoreWorkflow.runTrain(env = pioEnvVars,
+                            params = workflowParams,
+                            engine = trainableEngine,
+                            engineParams = engineParams,
+                            engineInstance =
+                              engineInstance.copy(id = engineInstanceId))
     } else {
       val workflowParams = WorkflowParams(
           verbose = wfc.verbosity,

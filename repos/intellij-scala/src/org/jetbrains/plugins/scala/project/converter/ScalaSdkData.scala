@@ -160,8 +160,8 @@ private object ScalaSdkData {
     val candidates = {
       val suffixes =
         Iterator.single("") ++ Iterator.from(2).map("_" + _.toString)
-      suffixes.map(
-          suffix => new File(new File(base, "libraries"), s"$name$suffix.xml"))
+      suffixes.map(suffix =>
+            new File(new File(base, "libraries"), s"$name$suffix.xml"))
     }
 
     candidates

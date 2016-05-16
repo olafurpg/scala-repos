@@ -25,29 +25,9 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
                           Seq(6) -> Seq(6, 6, 6))
       TestConfig.RandomTestRange foreach
       (_ ⇒
-            runScript(script, settings)(_.statefulMapConcat(() ⇒
-                      {
-                var prev: Option[Int] = None
-                x ⇒
-                  prev match {
-                    case Some(e) ⇒
-                      prev = Some(x)
-                      (1 to e) map (_ ⇒ x)
-                    case None ⇒
-                      prev = Some(x)
-                      List.empty[Int]
-                  }
-            })))
-    }
-
-    "be able to restart" in {
-      Source(List(2, 1, 3, 4, 1))
-        .statefulMapConcat(() ⇒
-              {
-            var prev: Option[Int] = None
-            x ⇒
-              {
-                if (x % 3 == 0) throw ex
+            runScript(script, settings)(_.statefulMapConcat(() ⇒ {
+              var prev: Option[Int] = None
+              x ⇒
                 prev match {
                   case Some(e) ⇒
                     prev = Some(x)
@@ -56,7 +36,25 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
                     prev = Some(x)
                     List.empty[Int]
                 }
+            })))
+    }
+
+    "be able to restart" in {
+      Source(List(2, 1, 3, 4, 1))
+        .statefulMapConcat(() ⇒ {
+          var prev: Option[Int] = None
+          x ⇒
+            {
+              if (x % 3 == 0) throw ex
+              prev match {
+                case Some(e) ⇒
+                  prev = Some(x)
+                  (1 to e) map (_ ⇒ x)
+                case None ⇒
+                  prev = Some(x)
+                  List.empty[Int]
               }
+            }
         })
         .withAttributes(ActorAttributes.supervisionStrategy(
                 Supervision.restartingDecider))
@@ -70,21 +68,20 @@ class FlowStatefulMapConcatSpec extends AkkaSpec with ScriptedTest {
 
     "be able to resume" in {
       Source(List(2, 1, 3, 4, 1))
-        .statefulMapConcat(() ⇒
-              {
-            var prev: Option[Int] = None
-            x ⇒
-              {
-                if (x % 3 == 0) throw ex
-                prev match {
-                  case Some(e) ⇒
-                    prev = Some(x)
-                    (1 to e) map (_ ⇒ x)
-                  case None ⇒
-                    prev = Some(x)
-                    List.empty[Int]
-                }
+        .statefulMapConcat(() ⇒ {
+          var prev: Option[Int] = None
+          x ⇒
+            {
+              if (x % 3 == 0) throw ex
+              prev match {
+                case Some(e) ⇒
+                  prev = Some(x)
+                  (1 to e) map (_ ⇒ x)
+                case None ⇒
+                  prev = Some(x)
+                  List.empty[Int]
               }
+            }
         })
         .withAttributes(ActorAttributes.supervisionStrategy(
                 Supervision.resumingDecider))

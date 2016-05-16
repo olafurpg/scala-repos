@@ -36,12 +36,12 @@ class SbtAutoImportListener(project: Project) extends VirtualFileAdapter {
               new ImportSpecBuilder(project, SbtProjectSystem.Id)
                 .forceWhenUptodate()
                 .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-            )
+          )
       })
     }
   }
 
   private def isBuildFile(file: VirtualFile): Boolean =
-    Option(file.getCanonicalPath)
-      .fold(false)(path => Sbt.isProjectDefinitionFile(project, path.toFile))
+    Option(file.getCanonicalPath).fold(false)(path =>
+          Sbt.isProjectDefinitionFile(project, path.toFile))
 }

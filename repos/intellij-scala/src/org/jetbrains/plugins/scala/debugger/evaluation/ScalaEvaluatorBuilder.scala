@@ -75,7 +75,8 @@ private[evaluation] class NeedCompilationException(message: String)
 
 private[evaluation] class ScalaEvaluatorBuilder(
     val codeFragment: ScalaCodeFragment, val position: SourcePosition)
-    extends ScalaEvaluatorBuilderUtil with SyntheticVariablesHelper {
+    extends ScalaEvaluatorBuilderUtil
+    with SyntheticVariablesHelper {
 
   import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil._
 

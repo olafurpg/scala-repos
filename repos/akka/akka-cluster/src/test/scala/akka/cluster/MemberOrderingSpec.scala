@@ -98,10 +98,10 @@ class MemberOrderingSpec extends WordSpec with Matchers {
 
       (SortedSet(m(address1, Joining)) - m(address1, Up)) should ===(
           SortedSet.empty[Member])
-      (SortedSet(m(address1, Exiting)) -
-          m(address1, Removed)) should ===(SortedSet.empty[Member])
-      (SortedSet(m(address1, Up)) -
-          m(address1, Exiting)) should ===(SortedSet.empty[Member])
+      (SortedSet(m(address1, Exiting)) - m(address1, Removed)) should ===(
+          SortedSet.empty[Member])
+      (SortedSet(m(address1, Up)) - m(address1, Exiting)) should ===(
+          SortedSet.empty[Member])
       (SortedSet(m(address2, Up), m(address3, Joining), m(address1, Exiting)) -
           m(address1, Removed)) should ===(
           SortedSet(m(address2, Up), m(address3, Joining)))

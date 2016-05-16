@@ -123,7 +123,8 @@ object RemotingSpec {
   """)
 
   def muteSystem(system: ActorSystem) {
-    system.eventStream.publish(TestEvent.Mute(
+    system.eventStream.publish(
+        TestEvent.Mute(
             EventFilter.error(start = "AssociationError"),
             EventFilter.warning(start = "AssociationError"),
             EventFilter.warning(pattern = "received dead letter.*")))
@@ -132,7 +133,8 @@ object RemotingSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemotingSpec
-    extends AkkaSpec(RemotingSpec.cfg) with ImplicitSender
+    extends AkkaSpec(RemotingSpec.cfg)
+    with ImplicitSender
     with DefaultTimeout {
 
   import RemotingSpec._
@@ -148,8 +150,9 @@ class RemotingSpec
     .resolve()
   val remoteSystem = ActorSystem("remote-sys", conf)
 
-  for ((name, proto) ← Seq(
-      "/gonk" -> "tcp", "/zagzag" -> "udp", "/roghtaar" -> "ssl.tcp")) deploy(
+  for ((name, proto) ← Seq("/gonk" -> "tcp",
+                           "/zagzag" -> "udp",
+                           "/roghtaar" -> "ssl.tcp")) deploy(
       system, Deploy(name, scope = RemoteScope(addr(remoteSystem, proto))))
 
   def addr(sys: ActorSystem, proto: String) =
@@ -213,8 +216,8 @@ class RemotingSpec
         TestEvent.Mute(
             EventFilter[EndpointException](),
             EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate|HandleListener)")))
+            EventFilter.warning(pattern =
+                  "received dead letter.*(InboundPayload|Disassociate|HandleListener)")))
   }
 
   private def byteStringOfSize(size: Int) =
@@ -733,11 +736,11 @@ class RemotingSpec
 
         registry.registerTransport(
             remoteTransport,
-            associationEventListenerFuture = Future.successful(
-                  new Transport.AssociationEventListener {
-              override def notify(ev: Transport.AssociationEvent): Unit =
-                remoteTransportProbe.ref ! ev
-            }))
+            associationEventListenerFuture =
+              Future.successful(new Transport.AssociationEventListener {
+                override def notify(ev: Transport.AssociationEvent): Unit =
+                  remoteTransportProbe.ref ! ev
+              }))
 
         val outboundHandle = new TestAssociationHandle(rawLocalAddress,
                                                        rawRemoteAddress,
@@ -829,11 +832,11 @@ class RemotingSpec
 
         registry.registerTransport(
             remoteTransport,
-            associationEventListenerFuture = Future.successful(
-                  new Transport.AssociationEventListener {
-              override def notify(ev: Transport.AssociationEvent): Unit =
-                remoteTransportProbe.ref ! ev
-            }))
+            associationEventListenerFuture =
+              Future.successful(new Transport.AssociationEventListener {
+                override def notify(ev: Transport.AssociationEvent): Unit =
+                  remoteTransportProbe.ref ! ev
+              }))
 
         val outboundHandle = new TestAssociationHandle(rawLocalAddress,
                                                        rawRemoteAddress,

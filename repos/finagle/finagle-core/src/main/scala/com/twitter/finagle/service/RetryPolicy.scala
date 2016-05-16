@@ -92,7 +92,8 @@ abstract class RetryPolicy[-A]
   * the two abstract methods `shouldRetry` and `backoffAt` and you're good to go!
   */
 abstract class SimpleRetryPolicy[A](i: Int)
-    extends RetryPolicy[A] with (A => Option[(Duration, RetryPolicy[A])]) {
+    extends RetryPolicy[A]
+    with (A => Option[(Duration, RetryPolicy[A])]) {
   def this() = this(0)
 
   final def apply(e: A) = {
@@ -184,9 +185,8 @@ object RetryPolicy extends JavaSingleton {
       policy: RetryPolicy[Try[Nothing]]
   ): RetryPolicy[(Req, Try[Rep])] =
     new RetryPolicy[(Req, Try[Rep])] {
-      def apply(
-          input: (Req,
-          Try[Rep])): Option[(Duration, RetryPolicy[(Req, Try[Rep])])] =
+      def apply(input: (Req, Try[Rep]))
+        : Option[(Duration, RetryPolicy[(Req, Try[Rep])])] =
         input match {
           case (_, t @ Throw(_)) =>
             policy(t.asInstanceOf[Throw[Nothing]]) match {

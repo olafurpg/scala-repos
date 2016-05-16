@@ -30,7 +30,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     val EmptyPackageClass: ClassSymbol
     val EmptyPackage: ModuleSymbol
 
-    def symbolOf[T : universe.WeakTypeTag]: universe.TypeSymbol =
+    def symbolOf[T: universe.WeakTypeTag]: universe.TypeSymbol =
       universe.weakTypeTag[T].in(this).tpe.typeSymbolDirect.asType
 
     def findMemberFromRoot(fullName: Name): Symbol = {
@@ -112,7 +112,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     def getRequiredClass(fullname: String): ClassSymbol =
       getClassByName(newTypeNameCached(fullname))
 
-    def requiredClass[T : ClassTag]: ClassSymbol =
+    def requiredClass[T: ClassTag]: ClassSymbol =
       getRequiredClass(erasureName[T])
 
     def getClassIfDefined(fullname: String): Symbol =
@@ -156,7 +156,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     // removing the trailing $, but I think that classTag should have
     // a method which returns a usable name, one which doesn't expose this
     // detail of the backend.
-    def requiredModule[T : ClassTag]: ModuleSymbol =
+    def requiredModule[T: ClassTag]: ModuleSymbol =
       getRequiredModule(erasureName[T] stripSuffix "$")
 
     def getModuleIfDefined(fullname: String): Symbol =
@@ -221,7 +221,7 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
       }
 
     /************************ helpers ************************/
-    def erasureName[T : ClassTag]: String = {
+    def erasureName[T: ClassTag]: String = {
       /* We'd like the String representation to be a valid
        * scala type, so we have to decode the jvm's secret language.
        */
@@ -276,15 +276,14 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
         // because Definitions.scala, which initializes and enters them, only affects rootMirror
         // therefore we need to enter them manually for non-root mirrors
         definitions.syntheticCoreClasses foreach
-        (theirSym =>
-              {
-                val theirOwner = theirSym.owner
-                assert(theirOwner.isPackageClass,
-                       s"theirSym = $theirSym, theirOwner = $theirOwner")
-                val ourOwner = staticPackage(theirOwner.fullName).moduleClass
-                val ourSym =
-                  theirSym // just copy the symbol into our branch of the symbol table
-                ourOwner.info.decls enterIfNew ourSym
+        (theirSym => {
+              val theirOwner = theirSym.owner
+              assert(theirOwner.isPackageClass,
+                     s"theirSym = $theirSym, theirOwner = $theirOwner")
+              val ourOwner = staticPackage(theirOwner.fullName).moduleClass
+              val ourSym =
+                theirSym // just copy the symbol into our branch of the symbol table
+              ourOwner.info.decls enterIfNew ourSym
             })
       }
 
@@ -307,7 +306,8 @@ trait Mirrors extends api.Mirrors { thisUniverse: SymbolTable =>
     // Features common to RootClass and RootPackage, the roots of all
     // type and term symbols respectively.
     sealed trait RootSymbol
-        extends WellKnownSymbol with thisUniverse.RootSymbol {
+        extends WellKnownSymbol
+        with thisUniverse.RootSymbol {
       final override def isRootSymbol = true
       override def owner = rootOwner
       override def typeOfThis = thisSym.tpe

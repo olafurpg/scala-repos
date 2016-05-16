@@ -70,12 +70,12 @@ object Memcache {
         .str
   }
 
-  def store[K : Codec, V : Codec](keyPrefix: String): Store[K, V] = {
+  def store[K: Codec, V: Codec](keyPrefix: String): Store[K, V] = {
     implicit val valueToBuf = Injection.connect[V, Array[Byte], ChannelBuffer]
     MemcacheStore(client).convert(keyEncoder[K](keyPrefix))
   }
 
-  def mergeable[K : Codec, V : Codec : Monoid](
+  def mergeable[K: Codec, V: Codec: Monoid](
       keyPrefix: String): MergeableStore[K, V] =
     MergeableStore.fromStore(store[K, V](keyPrefix))
 }

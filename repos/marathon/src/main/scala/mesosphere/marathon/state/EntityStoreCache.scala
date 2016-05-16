@@ -21,7 +21,9 @@ import scala.concurrent.Future
   *    - clear everything
   */
 class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
-    extends EntityStore[T] with LeadershipCallback with VersionedEntry {
+    extends EntityStore[T]
+    with LeadershipCallback
+    with VersionedEntry {
 
   @volatile
   private[state] var cacheOpt: Option[TrieMap[String, Option[T]]] = None

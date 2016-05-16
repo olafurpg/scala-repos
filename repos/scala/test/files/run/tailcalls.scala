@@ -225,7 +225,8 @@ class FancyTailCalls {
     if ({
       def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
       loop(x)
-    } == v) true else false
+    } == v) true
+    else false
   }
   def tcInPatternGuard(x: Int, v: Int): Boolean =
     v match {

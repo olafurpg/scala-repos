@@ -80,8 +80,8 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
       val additionalFiles =
         packageObjectsData.invalidatedPackageObjects(sources).filter(_.exists)
       if (additionalFiles.nonEmpty) {
-        (sources ++ additionalFiles).foreach(
-            f => FSOperations.markDirty(context, CompilationRound.NEXT, f))
+        (sources ++ additionalFiles).foreach(f =>
+              FSOperations.markDirty(context, CompilationRound.NEXT, f))
         return ExitCode.ADDITIONAL_PASS_REQUIRED
       }
     }
@@ -183,8 +183,8 @@ class IdeaIncrementalBuilder(category: BuilderCategory)
     for {
       target <- chunk.getTargets.asScala
       tempRoot <- project.getBuildRootIndex
-        .getTempTargetRoots(target, context)
-        .asScala
+                   .getTempTargetRoots(target, context)
+                   .asScala
     } {
       FileUtil.processFilesRecursively(
           tempRoot.getRootFile, new Processor[File] {

@@ -103,7 +103,7 @@ private[sbt] object SettingCompletions {
         val s = first
           .take(QuietLimit - 1)
           .mkString("", ", ", " and " + last.size + " others.")
-          (s, true)
+        (s, true)
       }
     }
     if (redefined.isEmpty) "No settings or tasks were redefined."
@@ -140,7 +140,7 @@ private[sbt] object SettingCompletions {
       defineKey <- scopedKeyParser(keyMap, settings, context)
       a <- assign(defineKey)
       deps <- valueParser(
-          defineKey, a, inputScopedKey(keyFilter(defineKey.key)))
+                 defineKey, a, inputScopedKey(keyFilter(defineKey.key)))
     } yield
       () // parser is currently only for completion and the parsed data structures are not used
 
@@ -323,8 +323,8 @@ private[sbt] object SettingCompletions {
       prominentOnly.isEmpty
     val showKeys = if (showAll) applicable else prominentOnly
     val showDescriptions = (level >= 2) || (showKeys.size <= detailLimit)
-    completeDescribed(seen, showDescriptions, showKeys)(
-        s => description(s).toList.mkString)
+    completeDescribed(seen, showDescriptions, showKeys)(s =>
+          description(s).toList.mkString)
   }
   def completeDescribed[T](
       seen: String, showDescriptions: Boolean, in: Seq[(String, T)])(

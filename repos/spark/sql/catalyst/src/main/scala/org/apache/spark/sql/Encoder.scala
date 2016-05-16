@@ -191,7 +191,7 @@ object Encoders {
     *
     * @since 1.6.0
     */
-  def kryo[T : ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
+  def kryo[T: ClassTag]: Encoder[T] = genericSerializer(useKryo = true)
 
   /**
     * Creates an encoder that serializes objects of type T using Kryo.
@@ -213,7 +213,7 @@ object Encoders {
     *
     * @since 1.6.0
     */
-  def javaSerialization[T : ClassTag]: Encoder[T] =
+  def javaSerialization[T: ClassTag]: Encoder[T] =
     genericSerializer(useKryo = false)
 
   /**
@@ -230,7 +230,7 @@ object Encoders {
     javaSerialization(ClassTag[T](clazz))
 
   /** Throws an exception if T is not a public class. */
-  private def validatePublicClass[T : ClassTag](): Unit = {
+  private def validatePublicClass[T: ClassTag](): Unit = {
     if (!Modifier.isPublic(classTag[T].runtimeClass.getModifiers)) {
       throw new UnsupportedOperationException(
           s"${classTag[T].runtimeClass.getName} is not a public class. " +
@@ -239,7 +239,7 @@ object Encoders {
   }
 
   /** A way to construct encoders using generic serializers. */
-  private def genericSerializer[T : ClassTag](useKryo: Boolean): Encoder[T] = {
+  private def genericSerializer[T: ClassTag](useKryo: Boolean): Encoder[T] = {
     if (classTag[T].runtimeClass.isPrimitive) {
       throw new UnsupportedOperationException(
           "Primitive types are not supported.")
@@ -251,14 +251,14 @@ object Encoders {
         schema = new StructType().add("value", BinaryType),
         flat = true,
         toRowExpressions = Seq(
-              EncodeUsingSerializer(BoundReference(0,
-                                                   ObjectType(classOf[AnyRef]),
-                                                   nullable = true),
-                                    kryo = useKryo)),
+            EncodeUsingSerializer(BoundReference(0,
+                                                 ObjectType(classOf[AnyRef]),
+                                                 nullable = true),
+                                  kryo = useKryo)),
         fromRowExpression = DecodeUsingSerializer[T](
-              BoundReference(0, BinaryType, nullable = true),
-              classTag[T],
-              kryo = useKryo),
+            BoundReference(0, BinaryType, nullable = true),
+            classTag[T],
+            kryo = useKryo),
         clsTag = classTag[T]
     )
   }

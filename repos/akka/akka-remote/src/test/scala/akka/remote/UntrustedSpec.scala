@@ -65,7 +65,8 @@ akka.remote.untrusted-mode = on
 akka.remote.trusted-selection-paths = ["/user/receptionist", ]    
 akka.remote.netty.tcp.port = 0
 akka.loglevel = DEBUG
-""") with ImplicitSender {
+""")
+    with ImplicitSender {
 
   import UntrustedSpec._
 

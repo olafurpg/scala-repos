@@ -655,7 +655,9 @@ abstract class HiveThriftJdbcTest extends HiveThriftServer2Test {
 }
 
 abstract class HiveThriftServer2Test
-    extends SparkFunSuite with BeforeAndAfterAll with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Logging {
   def mode: ServerMode.Value
 
   private val CLASS_NAME =

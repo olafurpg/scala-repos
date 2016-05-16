@@ -585,7 +585,8 @@ object Collections {
   }
 
   private trait WrappedCollection[E, Coll <: Collection[E]]
-      extends Collection[E] with Serializable {
+      extends Collection[E]
+      with Serializable {
 
     protected def inner: Coll
 
@@ -633,10 +634,13 @@ object Collections {
   }
 
   private trait WrappedSet[E, Coll <: Set[E]]
-      extends WrappedEquals with WrappedCollection[E, Coll] with Set[E]
+      extends WrappedEquals
+      with WrappedCollection[E, Coll]
+      with Set[E]
 
   private trait WrappedSortedSet[E]
-      extends WrappedSet[E, SortedSet[E]] with SortedSet[E] {
+      extends WrappedSet[E, SortedSet[E]]
+      with SortedSet[E] {
 
     def comparator(): Comparator[_ >: E] =
       inner.comparator()
@@ -658,7 +662,9 @@ object Collections {
   }
 
   private trait WrappedList[E]
-      extends WrappedEquals with WrappedCollection[E, List[E]] with List[E] {
+      extends WrappedEquals
+      with WrappedCollection[E, List[E]]
+      with List[E] {
 
     def addAll(index: Int, c: Collection[_ <: E]): Boolean =
       inner.addAll(index, c)
@@ -692,7 +698,8 @@ object Collections {
   }
 
   private trait WrappedMap[K, V, M <: Map[K, V]]
-      extends WrappedEquals with Map[K, V] {
+      extends WrappedEquals
+      with Map[K, V] {
 
     protected def inner: M
 
@@ -737,7 +744,8 @@ object Collections {
   }
 
   private trait WrappedSortedMap[K, V]
-      extends WrappedMap[K, V, SortedMap[K, V]] with SortedMap[K, V] {
+      extends WrappedMap[K, V, SortedMap[K, V]]
+      with SortedMap[K, V] {
     def comparator(): Comparator[_ >: K] =
       inner.comparator
 
@@ -771,7 +779,8 @@ object Collections {
   }
 
   private trait WrappedListIterator[E]
-      extends WrappedIterator[E, ListIterator[E]] with ListIterator[E] {
+      extends WrappedIterator[E, ListIterator[E]]
+      with ListIterator[E] {
     def hasPrevious(): Boolean =
       inner.hasPrevious
 
@@ -843,7 +852,8 @@ object Collections {
   }
 
   private class UnmodifiableSet[E, Coll <: Set[E]](inner: Coll)
-      extends UnmodifiableCollection[E, Coll](inner) with WrappedSet[E, Coll]
+      extends UnmodifiableCollection[E, Coll](inner)
+      with WrappedSet[E, Coll]
 
   private class ImmutableSet[E](inner: Set[E])
       extends UnmodifiableSet[E, Set[E]](inner) {
@@ -851,10 +861,12 @@ object Collections {
   }
 
   private class UnmodifiableSortedSet[E](inner: SortedSet[E])
-      extends UnmodifiableSet[E, SortedSet[E]](inner) with WrappedSortedSet[E]
+      extends UnmodifiableSet[E, SortedSet[E]](inner)
+      with WrappedSortedSet[E]
 
   private class UnmodifiableList[E](inner: List[E])
-      extends UnmodifiableCollection[E, List[E]](inner) with WrappedList[E] {
+      extends UnmodifiableCollection[E, List[E]](inner)
+      with WrappedList[E] {
 
     override def addAll(index: Int, c: Collection[_ <: E]): Boolean =
       if (eagerThrow || c.nonEmpty) throw new UnsupportedOperationException
@@ -1120,7 +1132,8 @@ object Collections {
   }
 
   private class EmptyListIterator
-      extends EmptyIterator with ListIterator[Any] {
+      extends EmptyIterator
+      with ListIterator[Any] {
     def hasPrevious(): Boolean = false
 
     def previous(): Any =

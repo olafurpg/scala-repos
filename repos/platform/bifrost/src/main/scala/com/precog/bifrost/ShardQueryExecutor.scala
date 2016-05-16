@@ -59,7 +59,9 @@ import scalaz.syntax.traverse._
 trait Blah {}
 
 trait ShardQueryExecutorConfig
-    extends BaseConfig with ColumnarTableModuleConfig with EvaluatorConfig
+    extends BaseConfig
+    with ColumnarTableModuleConfig
+    with EvaluatorConfig
     with IdSourceConfig {
   def clock: Clock
   val queryId = new java.util.concurrent.atomic.AtomicLong()
@@ -89,12 +91,13 @@ object Fault {
 }
 
 trait ShardQueryExecutorPlatform[M[+ _]]
-    extends ParseEvalStack[M] with XLightWebHttpClientModule[M] {
+    extends ParseEvalStack[M]
+    with XLightWebHttpClientModule[M] {
   case class StackException(error: StackError)
       extends Exception(error.toString)
 
-  abstract class ShardQueryExecutor[N[+ _]](
-      N0: Monad[N])(implicit mn: M ~> N, nm: N ~> M)
+  abstract class ShardQueryExecutor[N[+ _]](N0: Monad[N])(
+      implicit mn: M ~> N, nm: N ~> M)
       extends Evaluator[N](N0)
       with QueryExecutor[N, (Set[Fault], StreamT[N, Slice])] {
 
@@ -141,7 +144,7 @@ trait ShardQueryExecutorPlatform[M[+ _]]
 
           val resultVN: N[EvaluationError \/ Table] = {
             bytecode map { instrs =>
-              ((systemError _) <-:(StackException(_)) <-: decorate(instrs).disjunction) traverse {
+              ((systemError _) <-: (StackException(_)) <-: decorate(instrs).disjunction) traverse {
                 dag =>
                   applyQueryOptions(opts) {
                     logger.debug("[QID:%d] Evaluating query".format(qid))

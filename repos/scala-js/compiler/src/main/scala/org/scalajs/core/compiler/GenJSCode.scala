@@ -28,8 +28,12 @@ import ScopedVar.withScopedVars
   *  @author Sébastien Doeraene
   */
 abstract class GenJSCode
-    extends plugins.PluginComponent with TypeKinds with JSEncoding
-    with GenJSExports with GenJSFiles with PluginComponent210Compat {
+    extends plugins.PluginComponent
+    with TypeKinds
+    with JSEncoding
+    with GenJSExports
+    with GenJSFiles
+    with PluginComponent210Compat {
 
   val jsAddons: JSGlobalAddons {
     val global: GenJSCode.this.global.type
@@ -145,7 +149,8 @@ abstract class GenJSCode
 
     val tryingToGenMethodAsJSFunction = new ScopedVar[Boolean](false)
     class CancelGenMethodAsJSFunction(message: String)
-        extends Throwable(message) with scala.util.control.ControlThrowable
+        extends Throwable(message)
+        with scala.util.control.ControlThrowable
 
     // Rewriting of anonymous function classes ---------------------------------
 
@@ -581,7 +586,7 @@ abstract class GenJSCode
         parent <- sym.info.parents
         typeSym = parent.typeSymbol
         _ = assert(typeSym != NoSymbol, "parent needs symbol")
-            if typeSym.isTraitOrInterface
+        if typeSym.isTraitOrInterface
       } yield {
         encodeClassFullNameIdent(typeSym)
       }
@@ -1588,8 +1593,8 @@ abstract class GenJSCode
               }
             case _ =>
               mutatedLocalVars += sym
-              js.Assign(js.VarRef(encodeLocalSym(sym))(toIRType(sym.tpe)),
-                        genRhs)
+              js.Assign(
+                  js.VarRef(encodeLocalSym(sym))(toIRType(sym.tpe)), genRhs)
           }
 
         /** Array constructor */
@@ -1707,8 +1712,8 @@ abstract class GenJSCode
             }
 
           withScopedVars(
-              enclosingLabelDefParams := enclosingLabelDefParams.get +
-              (tree.symbol -> labelParamSyms)
+              enclosingLabelDefParams :=
+                enclosingLabelDefParams.get + (tree.symbol -> labelParamSyms)
           ) {
             val bodyType = toIRType(tree.tpe)
             val labelIdent = encodeLabelSym(tree.symbol)
@@ -2660,7 +2665,8 @@ abstract class GenJSCode
       else if (jsPrimitives.isJavaScriptPrimitive(code))
         genJSPrimitive(tree, receiver, args, code)
       else
-        abort("Unknown primitive operation: " + sym.fullName + "(" +
+        abort(
+            "Unknown primitive operation: " + sym.fullName + "(" +
             fun.symbol.simpleName + ") " + " at: " + (tree.pos))
     }
 
@@ -3154,8 +3160,8 @@ abstract class GenJSCode
       def matchingSymIn(clazz: Symbol) = clazz.tpe.member(sym.name).suchThat {
         s =>
           val sParams = s.tpe.params
-          !s.isBridge &&
-          params.size == sParams.size && (params zip sParams).forall {
+          !s.isBridge && params.size == sParams.size &&
+          (params zip sParams).forall {
             case (s1, s2) =>
               s1.tpe =:= s2.tpe
           }
@@ -3229,13 +3235,16 @@ abstract class GenJSCode
 
         for {
           (rtClass, reflBoxClass) <- Seq(
-              (StringClass, StringClass),
-              (BoxedDoubleClass, NumberReflectiveCallClass),
-              (BoxedBooleanClass, BooleanReflectiveCallClass),
-              (BoxedLongClass, LongReflectiveCallClass)
-          )
+                                        (StringClass, StringClass),
+                                        (BoxedDoubleClass,
+                                         NumberReflectiveCallClass),
+                                        (BoxedBooleanClass,
+                                         BooleanReflectiveCallClass),
+                                        (BoxedLongClass,
+                                         LongReflectiveCallClass)
+                                    )
           implMethodSym = matchingSymIn(reflBoxClass)
-              if implMethodSym != NoSymbol && implMethodSym.isPublic
+          if implMethodSym != NoSymbol && implMethodSym.isPublic
         } {
           callStatement = js.If(genIsInstanceOf(callTrg, rtClass.tpe), {
             if (implMethodSym.owner == ObjectClass) {
@@ -3874,7 +3883,7 @@ abstract class GenJSCode
       // Filter members of target module for matching member
       val compMembers = for {
         mem <- RuntimeStringModule.tpe.members
-                  if mem.name == jsnme.newString && ctor.tpe.matches(mem.tpe)
+        if mem.name == jsnme.newString && ctor.tpe.matches(mem.tpe)
       } yield mem
 
       if (compMembers.isEmpty) {
@@ -4038,7 +4047,8 @@ abstract class GenJSCode
       for ((arg, paramSym) <- args zip sym.tpe.params) {
         val wasRepeated = wereRepeated.getOrElse(paramSym.name, false)
         if (wasRepeated) {
-          reversedArgs = genPrimitiveJSRepeatedParam(arg) reverse_::: reversedArgs
+          reversedArgs =
+            genPrimitiveJSRepeatedParam(arg) reverse_::: reversedArgs
         } else {
           val unboxedArg = genExpr(arg)
           val boxedArg = unboxedArg match {
@@ -4060,10 +4070,11 @@ abstract class GenJSCode
 
       // Find remaining js.UndefinedParam and replace by js.Undefined. This can
       // happen with named arguments or when multiple argument lists are present
-      reversedArgs = reversedArgs map {
-        case js.UndefinedParam() => js.Undefined()
-        case arg => arg
-      }
+      reversedArgs =
+        reversedArgs map {
+          case js.UndefinedParam() => js.Undefined()
+          case arg => arg
+        }
 
       reversedArgs.reverse
     }
@@ -4544,11 +4555,11 @@ abstract class GenJSCode
       JSFunctionToScala(closure, params.size)
     }
 
-    private def patchFunBodyWithBoxes(
-        methodSym: Symbol,
-        params: List[js.ParamDef],
-        body: js.Tree,
-        useParamsBeforeLambdaLift: Boolean = false)(
+    private def patchFunBodyWithBoxes(methodSym: Symbol,
+                                      params: List[js.ParamDef],
+                                      body: js.Tree,
+                                      useParamsBeforeLambdaLift: Boolean =
+                                        false)(
         implicit pos: Position): (List[js.ParamDef], js.Tree) = {
       val methodType =
         enteringPhase(currentRun.posterasurePhase)(methodSym.tpe)

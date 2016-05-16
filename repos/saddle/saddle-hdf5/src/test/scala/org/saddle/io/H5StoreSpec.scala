@@ -56,7 +56,7 @@ class H5StoreSpec extends Specification {
     fn
   }
 
-  def hdfTest[T : AsResult](test: String)(logic: => T): Fragment = {
+  def hdfTest[T: AsResult](test: String)(logic: => T): Fragment = {
     allCatch either {
       java.lang.Runtime.getRuntime.loadLibrary("jhdf5")
     } match {

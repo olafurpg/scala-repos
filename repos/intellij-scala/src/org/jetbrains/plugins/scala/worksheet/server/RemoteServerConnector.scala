@@ -78,14 +78,12 @@ class RemoteServerConnector(
               }
           }
 
-          new NonServerRunner(project, Some(errorHandler)).buildProcess(
-              encodedArgs,
-              (text: String) =>
-                {
-                  val event = Event.fromBytes(
-                      Base64Converter.decode(text.getBytes("UTF-8")))
-                  eventClient.process(event)
-              })
+          new NonServerRunner(project, Some(errorHandler))
+            .buildProcess(encodedArgs, (text: String) => {
+            val event =
+              Event.fromBytes(Base64Converter.decode(text.getBytes("UTF-8")))
+            eventClient.process(event)
+          })
       }
 
       if (worksheetProcess == null) return ExitCode.ABORT
@@ -152,7 +150,8 @@ object RemoteServerConnector {
         else {
           val buffer = new StringBuilder
 
-          for (j <- 0 until (linesLength - 2)) buffer append lines(j) append "\n"
+          for (j <- 0 until (linesLength -
+                       2)) buffer append lines(j) append "\n"
 
           val lines1 = lines(linesLength - 1)
 

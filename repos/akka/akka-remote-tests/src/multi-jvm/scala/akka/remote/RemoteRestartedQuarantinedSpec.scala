@@ -57,7 +57,8 @@ class RemoteRestartedQuarantinedSpecMultiJvmNode2
     extends RemoteRestartedQuarantinedSpec
 
 abstract class RemoteRestartedQuarantinedSpec
-    extends MultiNodeSpec(RemoteRestartedQuarantinedSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteRestartedQuarantinedSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteRestartedQuarantinedSpec._
@@ -117,9 +118,9 @@ abstract class RemoteRestartedQuarantinedSpec
         within(10.seconds) {
           awaitAssert {
             EventFilter
-              .warning(
-                  pattern = "The remote system has quarantined this system",
-                  occurrences = 1)
+              .warning(pattern =
+                         "The remote system has quarantined this system",
+                       occurrences = 1)
               .intercept {
                 ref ! "boo!"
               }

@@ -62,7 +62,8 @@ private[http] object ExtractionMap {
   * INTERNAL API
   */
 private[http] object RouteImplementation
-    extends Directives with server.RouteConcatenation {
+    extends Directives
+    with server.RouteConcatenation {
   def apply(route: Route): ScalaRoute = {
     def directiveFor(route: DirectiveRoute): Directive0 = route match {
       case RouteAlternatives() ⇒ ScalaDirective.Empty
@@ -221,9 +222,9 @@ private[http] object RouteImplementation
 
       case o: OpaqueRoute ⇒
         (ctx ⇒
-          o.handle(new RequestContextImpl(ctx))
-            .asInstanceOf[RouteResultImpl]
-            .underlying)
+           o.handle(new RequestContextImpl(ctx))
+             .asInstanceOf[RouteResultImpl]
+             .underlying)
       case p: Product ⇒
         extractExecutionContext { implicit ec ⇒
           complete((500, s"Not implemented: ${p.productPrefix}"))
@@ -233,7 +234,7 @@ private[http] object RouteImplementation
   def pathMatcherDirective[T](
       matchers: immutable.Seq[PathMatcher[_]],
       directive: PathMatcher1[T] ⇒ Directive1[T] // this type is too specific and only a placeholder for a proper polymorphic function
-      ): Directive0 = {
+  ): Directive0 = {
     // Concatenating PathMatchers is a bit complicated as we don't want to build up a tuple
     // but something which we can later split all the separate values and add them to the
     // ExtractionMap.
@@ -268,9 +269,9 @@ private[http] object RouteImplementation
 
   def transformExtractionMap(f: ExtractionMap ⇒ ExtractionMap): Directive0 = {
     @tailrec
-    def updateExtractionMap(
-        headers: immutable.Seq[HttpHeader],
-        prefix: Vector[HttpHeader] = Vector.empty): immutable.Seq[HttpHeader] =
+    def updateExtractionMap(headers: immutable.Seq[HttpHeader],
+                            prefix: Vector[HttpHeader] =
+                              Vector.empty): immutable.Seq[HttpHeader] =
       headers match {
         case (m: ExtractionMap) +: rest ⇒ f(m) +: (prefix ++ rest)
         case other +: rest ⇒ updateExtractionMap(rest, prefix :+ other)

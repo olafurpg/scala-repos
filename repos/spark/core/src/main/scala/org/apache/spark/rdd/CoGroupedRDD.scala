@@ -59,7 +59,8 @@ private[spark] case class NarrowCoGroupSplitDep(
   */
 private[spark] class CoGroupPartition(
     idx: Int, val narrowDeps: Array[Option[NarrowCoGroupSplitDep]])
-    extends Partition with Serializable {
+    extends Partition
+    with Serializable {
   override val index: Int = idx
   override def hashCode(): Int = idx
 }
@@ -76,7 +77,7 @@ private[spark] class CoGroupPartition(
   * @param part partitioner used to partition the shuffle output
   */
 @DeveloperApi
-class CoGroupedRDD[K : ClassTag](
+class CoGroupedRDD[K: ClassTag](
     @transient var rdds: Seq[RDD[_ <: Product2[K, _]]], part: Partitioner)
     extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil) {
 
@@ -169,28 +170,25 @@ class CoGroupedRDD[K : ClassTag](
   private def createExternalMap(numRdds: Int)
     : ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner] = {
 
-    val createCombiner: (CoGroupValue => CoGroupCombiner) = value =>
-      {
-        val newCombiner = Array.fill(numRdds)(new CoGroup)
-        newCombiner(value._2) += value._1
-        newCombiner
+    val createCombiner: (CoGroupValue => CoGroupCombiner) = value => {
+      val newCombiner = Array.fill(numRdds)(new CoGroup)
+      newCombiner(value._2) += value._1
+      newCombiner
     }
     val mergeValue: (CoGroupCombiner,
-    CoGroupValue) => CoGroupCombiner = (combiner, value) =>
-      {
-        combiner(value._2) += value._1
-        combiner
+                     CoGroupValue) => CoGroupCombiner = (combiner, value) => {
+      combiner(value._2) += value._1
+      combiner
     }
-    val mergeCombiners: (CoGroupCombiner,
-    CoGroupCombiner) => CoGroupCombiner = (combiner1, combiner2) =>
-      {
+    val mergeCombiners: (CoGroupCombiner, CoGroupCombiner) => CoGroupCombiner =
+      (combiner1, combiner2) => {
         var depNum = 0
         while (depNum < numRdds) {
           combiner1(depNum) ++= combiner2(depNum)
           depNum += 1
         }
         combiner1
-    }
+      }
     new ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner](
         createCombiner, mergeValue, mergeCombiners)
   }

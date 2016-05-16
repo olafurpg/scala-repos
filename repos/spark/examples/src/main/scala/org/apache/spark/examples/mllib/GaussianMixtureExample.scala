@@ -50,8 +50,7 @@ object GaussianMixtureExample {
 
     // output parameters of max-likelihood model
     for (i <- 0 until gmm.k) {
-      println(
-          "weight=%f\nmu=%s\nsigma=\n%s\n" format
+      println("weight=%f\nmu=%s\nsigma=\n%s\n" format
           (gmm.weights(i), gmm.gaussians(i).mu, gmm.gaussians(i).sigma))
     }
     // $example off$

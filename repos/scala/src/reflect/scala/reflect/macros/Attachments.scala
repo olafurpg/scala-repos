@@ -34,26 +34,25 @@ abstract class Attachments { self =>
   /** The underlying payload with the guarantee that no two elements have the same type. */
   def all: Set[Any] = Set.empty
 
-  private def matchesTag[T : ClassTag](datum: Any) =
+  private def matchesTag[T: ClassTag](datum: Any) =
     classTag[T].runtimeClass.isInstance(datum)
 
   /** An underlying payload of the given class type `T`. */
-  def get[T : ClassTag]: Option[T] =
+  def get[T: ClassTag]: Option[T] =
     (all find matchesTag[T]).asInstanceOf[Option[T]]
 
   /** Check underlying payload contains an instance of type `T`. */
-  def contains[T : ClassTag]: Boolean =
+  def contains[T: ClassTag]: Boolean =
     !isEmpty && (all exists matchesTag[T])
 
   /** Creates a copy of this attachment with the payload slot of T added/updated with the provided value.
     *  Replaces an existing payload of the same type, if exists.
     */
-  def update[T : ClassTag](
-      attachment: T): Attachments { type Pos = self.Pos } =
+  def update[T: ClassTag](attachment: T): Attachments { type Pos = self.Pos } =
     new NonemptyAttachments[Pos](this.pos, remove[T].all + attachment)
 
   /** Creates a copy of this attachment with the payload of the given class type `T` removed. */
-  def remove[T : ClassTag]: Attachments { type Pos = self.Pos } = {
+  def remove[T: ClassTag]: Attachments { type Pos = self.Pos } = {
     val newAll = all filterNot matchesTag[T]
     if (newAll.isEmpty) pos.asInstanceOf[Attachments { type Pos = self.Pos }]
     else new NonemptyAttachments[Pos](this.pos, newAll)

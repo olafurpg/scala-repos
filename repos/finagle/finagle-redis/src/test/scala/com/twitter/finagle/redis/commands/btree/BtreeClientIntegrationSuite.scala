@@ -14,7 +14,8 @@ import scala.collection.mutable
 @Ignore
 @RunWith(classOf[JUnitRunner])
 final class BtreeClientIntegrationSuite
-    extends FunSuite with BeforeAndAfterAll {
+    extends FunSuite
+    with BeforeAndAfterAll {
   var client: Client = _
   var dict: mutable.HashMap[String, mutable.HashMap[String, String]] = _
 

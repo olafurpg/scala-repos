@@ -17,7 +17,8 @@ case class TypeClass(name: String,
     "[[" + fqn + "]]" +
     (if (extendsList.nonEmpty)
        " extends " +
-       extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
+       extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ")
+     else "")
 }
 
 object TypeClass {
@@ -289,8 +290,7 @@ object GenTypeClass {
     }
     def extendsToSyntaxListText = kind match {
       case Kind.*->* | Kind.*^*->* =>
-        "extends To" + typeClassName + "Ops0" +
-        (extendsList match {
+        "extends To" + typeClassName + "Ops0" + (extendsList match {
               case Seq() => ""
               case es =>
                 es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")

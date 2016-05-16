@@ -37,7 +37,8 @@ class ScNewTemplateDefinitionImpl private (
     nodeType: IElementType,
     node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScNewTemplateDefinition with PsiClassFake {
+    with ScNewTemplateDefinition
+    with PsiClassFake {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScTemplateDefinitionStub) = {
     this(stub, ScalaElementTypes.NEW_TEMPLATE, null)
@@ -58,12 +59,12 @@ class ScNewTemplateDefinitionImpl private (
         case None => Seq.empty
       }
 
-    val (holders, aliases): (Seq[ScDeclaredElementsHolder],
-    Seq[ScTypeAlias]) = extendsBlock.templateBody match {
-      case Some(b: ScTemplateBody) =>
-        (b.holders.toSeq ++ earlyHolders, b.aliases.toSeq)
-      case None => (earlyHolders, Seq.empty)
-    }
+    val (holders, aliases): (Seq[ScDeclaredElementsHolder], Seq[ScTypeAlias]) =
+      extendsBlock.templateBody match {
+        case Some(b: ScTemplateBody) =>
+          (b.holders.toSeq ++ earlyHolders, b.aliases.toSeq)
+        case None => (earlyHolders, Seq.empty)
+      }
 
     val superTypes = extendsBlock.superTypes.filter {
       case ScDesignatorType(clazz: PsiClass) =>
@@ -191,8 +192,8 @@ class ScNewTemplateDefinitionImpl private (
         name, checkBases)
   }
 
-  override def getAllMethodsAndTheirSubstitutors: JList[IPair[
-          PsiMethod, PsiSubstitutor]] = {
+  override def getAllMethodsAndTheirSubstitutors: JList[
+      IPair[PsiMethod, PsiSubstitutor]] = {
     super [ScNewTemplateDefinition].getAllMethodsAndTheirSubstitutors
   }
 

@@ -24,7 +24,8 @@ import akka.actor._
   * The Java API for generating UDP commands is available at [[UdpConnectedMessage]].
   */
 object UdpConnected
-    extends ExtensionId[UdpConnectedExt] with ExtensionIdProvider {
+    extends ExtensionId[UdpConnectedExt]
+    with ExtensionIdProvider {
 
   override def lookup = UdpConnected
 
@@ -152,9 +153,10 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
       system.settings.config.getConfig("akka.io.udp-connected"))
 
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[UdpConnectedManager], this)
-                             .withDeploy(Deploy.local),
-                         name = "IO-UDP-CONN")
+    system.systemActorOf(
+        props =
+          Props(classOf[UdpConnectedManager], this).withDeploy(Deploy.local),
+        name = "IO-UDP-CONN")
   }
 
   /**

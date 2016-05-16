@@ -11,8 +11,7 @@ import org.scalacheck.Prop.forAll
 trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F] {
   def laws: ApplicativeErrorLaws[F, E]
 
-  def applicativeError[
-      A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
+  def applicativeError[A: Arbitrary: Eq, B: Arbitrary: Eq, C: Arbitrary: Eq](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],

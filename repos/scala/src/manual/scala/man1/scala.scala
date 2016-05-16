@@ -46,8 +46,8 @@ object scala extends Command {
                   ".jar") & " file " & "will be used if it is newer than the script file."),
           Definition(CmdOption("nocompdaemon"),
                      "Do not use the " & MBold("fsc") & " offline compiler."),
-          Definition(
-              CmdOption("nc"), "Same as " & Mono("-nocompdaemon") & "."),
+          Definition(CmdOption("nc"),
+                     "Same as " & Mono("-nocompdaemon") & "."),
           Definition(
               CmdOptionBound("D", "property=value"),
               "Set a Java system property.  If no value is specified, " & "then the property is set to the empty string."),

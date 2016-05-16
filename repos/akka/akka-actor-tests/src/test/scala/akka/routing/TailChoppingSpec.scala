@@ -29,7 +29,9 @@ object TailChoppingSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TailChoppingSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec
+    with DefaultTimeout
+    with ImplicitSender {
   import TailChoppingSpec._
 
   def oneOfShouldEqual(what: Any, default: Any, ref: ActorRef*)(
@@ -90,8 +92,8 @@ class TailChoppingSpec
       probe.send(routedActor, "")
       probe.expectMsg("ack")
 
-      oneOfShouldEqual(1, 1, actor1, actor2)(
-          ref ⇒ Await.result(ref ? "times", timeout.duration))
+      oneOfShouldEqual(1, 1, actor1, actor2)(ref ⇒
+            Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }
@@ -111,8 +113,8 @@ class TailChoppingSpec
         case Failure(timeoutEx: AskTimeoutException) ⇒
       }
 
-      allShouldEqual(1, actor1, actor2)(
-          ref ⇒ Await.result(ref ? "times", timeout.duration))
+      allShouldEqual(1, actor1, actor2)(ref ⇒
+            Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
     }

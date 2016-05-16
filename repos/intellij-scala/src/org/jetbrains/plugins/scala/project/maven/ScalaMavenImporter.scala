@@ -73,8 +73,8 @@ class ScalaMavenImporter
       val compilerOptions = {
         val plugins =
           configuration.plugins.map(id => mavenProject.localPathTo(id).getPath)
-        configuration.compilerOptions ++ plugins.map(
-            path => "-Xplugin:" + path)
+        configuration.compilerOptions ++ plugins.map(path =>
+              "-Xplugin:" + path)
       }
 
       module.configureScalaCompilerSettingsFrom("Maven", compilerOptions)

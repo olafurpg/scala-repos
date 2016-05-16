@@ -13,21 +13,21 @@ object Compat {
     def pt: A = t._1
   }
 
-  def PickleMacros_pickleTo[T : c.WeakTypeTag, S](c: Context)(
+  def PickleMacros_pickleTo[T: c.WeakTypeTag, S](c: Context)(
       output: c.Expr[S])(format: c.Expr[PickleFormat]): c.Expr[Unit] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with PickleMacros
     c.Expr[Unit](bundle.pickleTo[T](output.tree)(format.tree))
   }
 
-  def FastTypeTagMacros_impl[T : c.WeakTypeTag](
+  def FastTypeTagMacros_impl[T: c.WeakTypeTag](
       c: Context): c.Expr[FastTypeTag[T]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with FastTypeTagMacros
     c.Expr[FastTypeTag[T]](bundle.impl[T])
   }
 
-  def FastTypeTagMacros_implClassTag[T : c.WeakTypeTag](
+  def FastTypeTagMacros_implClassTag[T: c.WeakTypeTag](
       c: Context): c.Expr[FastTypeTag[T]] = {
     val c0: c.type = c
     val bundle = new { val c: c0.type = c0 } with FastTypeTagMacros

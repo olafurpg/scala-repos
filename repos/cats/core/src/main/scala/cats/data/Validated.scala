@@ -111,8 +111,8 @@ sealed abstract class Validated[+E, +A] extends Product with Serializable {
     * From Apply:
     * if both the function and this value are Valid, apply the function
     */
-  def ap[EE >: E, B](
-      f: Validated[EE, A => B])(implicit EE: Semigroup[EE]): Validated[EE, B] =
+  def ap[EE >: E, B](f: Validated[EE, A => B])(
+      implicit EE: Semigroup[EE]): Validated[EE, B] =
     (this, f) match {
       case (Valid(a), Valid(f)) => Valid(f(a))
       case (Invalid(e1), Invalid(e2)) => Invalid(EE.combine(e2, e1))
@@ -225,7 +225,7 @@ private[data] sealed abstract class ValidatedInstances
         x combine y
     }
 
-  implicit def validatedOrder[A : Order, B : Order]: Order[Validated[A, B]] =
+  implicit def validatedOrder[A: Order, B: Order]: Order[Validated[A, B]] =
     new Order[Validated[A, B]] {
       def compare(x: Validated[A, B], y: Validated[A, B]): Int = x compare y
       override def partialCompare(
@@ -276,8 +276,8 @@ private[data] sealed abstract class ValidatedInstances
           fa: Validated[E, A], fb: Validated[E, B]): Validated[E, (A, B)] =
         fa.product(fb)(E)
 
-      def handleErrorWith[A](fa: Validated[E, A])(
-          f: E => Validated[E, A]): Validated[E, A] =
+      def handleErrorWith[A](
+          fa: Validated[E, A])(f: E => Validated[E, A]): Validated[E, A] =
         fa match {
           case Validated.Invalid(e) => f(e)
           case v @ Validated.Valid(_) => v
@@ -296,8 +296,8 @@ private[data] sealed abstract class ValidatedInstances1
         x combine y
     }
 
-  implicit def validatedPartialOrder[
-      A : PartialOrder, B : PartialOrder]: PartialOrder[Validated[A, B]] =
+  implicit def validatedPartialOrder[A: PartialOrder, B: PartialOrder]
+    : PartialOrder[Validated[A, B]] =
     new PartialOrder[Validated[A, B]] {
       def partialCompare(x: Validated[A, B], y: Validated[A, B]): Double =
         x partialCompare y
@@ -307,7 +307,7 @@ private[data] sealed abstract class ValidatedInstances1
 }
 
 private[data] sealed abstract class ValidatedInstances2 {
-  implicit def validatedEq[A : Eq, B : Eq]: Eq[Validated[A, B]] =
+  implicit def validatedEq[A: Eq, B: Eq]: Eq[Validated[A, B]] =
     new Eq[Validated[A, B]] {
       def eqv(x: Validated[A, B], y: Validated[A, B]): Boolean = x === y
     }
@@ -335,8 +335,8 @@ trait ValidatedFunctions {
     new CatchOnlyPartiallyApplied[T]
 
   final class CatchOnlyPartiallyApplied[T] private[ValidatedFunctions] {
-    def apply[A](
-        f: => A)(implicit T: ClassTag[T], NT: NotNull[T]): Validated[T, A] =
+    def apply[A](f: => A)(
+        implicit T: ClassTag[T], NT: NotNull[T]): Validated[T, A] =
       try {
         valid(f)
       } catch {

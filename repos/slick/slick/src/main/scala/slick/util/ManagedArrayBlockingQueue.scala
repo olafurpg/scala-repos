@@ -10,7 +10,9 @@ import java.util._
   * `java.util.concurrent.ArrayBlockingQueue` for documentation. */
 abstract class ManagedArrayBlockingQueue[E >: Null <: AnyRef](
     capacity: Int, fair: Boolean = false)
-    extends AbstractQueue[E] with BlockingQueue[E] { self =>
+    extends AbstractQueue[E]
+    with BlockingQueue[E] {
+  self =>
 
   /** Determine if the item should be accepted at the current time. */
   protected[this] def accept(item: E, size: Int): Boolean

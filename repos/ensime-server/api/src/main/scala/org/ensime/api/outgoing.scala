@@ -166,7 +166,8 @@ case class RefactorEffect(
     changes: List[FileEdit],
     status: scala.Symbol = 'success // redundant field
 )
-    extends RpcResponse with RefactorProcedure
+    extends RpcResponse
+    with RefactorProcedure
 
 case class RefactorResult(
     procedureId: Int,
@@ -174,14 +175,16 @@ case class RefactorResult(
     touchedFiles: Seq[File],
     status: scala.Symbol = 'success // redundant field
 )
-    extends RpcResponse with RefactorProcedure
+    extends RpcResponse
+    with RefactorProcedure
 
 case class RefactorDiffEffect(
     procedureId: Int,
     refactorType: RefactorType,
     diff: File
 )
-    extends RpcResponse with RefactorProcedure
+    extends RpcResponse
+    with RefactorProcedure
 
 sealed abstract class RefactorDesc(val refactorType: RefactorType)
 

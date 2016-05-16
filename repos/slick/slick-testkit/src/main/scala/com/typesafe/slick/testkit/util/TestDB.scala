@@ -192,17 +192,15 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
       for {
         tables <- localTables
         sequences <- localSequences
-        _ <- DBIO.seq(
-            (tables.map(t =>
-                      sqlu"""drop table if exists #${profile.quoteIdentifier(t)} cascade""") ++ sequences
-                  .map(t =>
-                      sqlu"""drop sequence if exists #${profile
-                .quoteIdentifier(t)} cascade""")): _*)
+        _ <- DBIO.seq((tables.map(t =>
+                          sqlu"""drop table if exists #${profile
+                    .quoteIdentifier(t)} cascade""") ++ sequences.map(t =>
+                          sqlu"""drop sequence if exists #${profile
+                    .quoteIdentifier(t)} cascade""")): _*)
       } yield ()
     }
   def assertTablesExist(tables: String*) =
-    DBIO.seq(
-        tables.map(t =>
+    DBIO.seq(tables.map(t =>
               sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
                 .as[Int]): _*)
   def assertNotTablesExist(tables: String*) =
@@ -211,9 +209,10 @@ abstract class JdbcTestDB(val confName: String) extends SqlTestDB {
               sql"""select 1 from #${profile.quoteIdentifier(t)} where 1 < 0"""
                 .as[Int]
                 .failed): _*)
-  def createSingleSessionDatabase(implicit session: profile.Backend#Session,
-                                  executor: AsyncExecutor = AsyncExecutor
-                                      .default()): profile.Backend#Database = {
+  def createSingleSessionDatabase(
+      implicit session: profile.Backend#Session,
+      executor: AsyncExecutor =
+        AsyncExecutor.default()): profile.Backend#Database = {
     val wrappedConn = new DelegateConnection(session.conn) {
       override def close(): Unit = ()
     }
@@ -264,8 +263,8 @@ abstract class ExternalJdbcTestDB(confName: String)
 
   override def isEnabled = super.isEnabled && config.getBoolean("enabled")
 
-  override lazy val testClasses: Seq[Class[
-          _ <: GenericTest[_ >: Null <: TestDB]]] = TestkitConfig
+  override lazy val testClasses: Seq[
+      Class[_ <: GenericTest[_ >: Null <: TestDB]]] = TestkitConfig
     .getStrings(config, "testClasses")
     .map(_.map(n =>
               Class
@@ -286,7 +285,7 @@ abstract class ExternalJdbcTestDB(confName: String)
               DBIO
                 .seq((drop ++ create).map(s => sqlu"#$s"): _*)
                 .withPinnedSession
-            ))
+          ))
     }
     if (!postCreate.isEmpty) {
       await(

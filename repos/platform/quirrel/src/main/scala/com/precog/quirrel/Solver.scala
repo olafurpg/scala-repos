@@ -95,8 +95,7 @@ trait Solver extends parser.AST with typer.Binder {
         Set(Div(loc2, Sub(loc, x, Mul(loc, z, y)), y))
     }, {
       case Sub(loc, Div(loc2, w, x), Div(loc3, y, z)) =>
-        Set(
-            Div(loc2,
+        Set(Div(loc2,
                 Sub(loc, Mul(loc2, w, z), Mul(loc3, y, x)),
                 Mul(loc2, x, z)))
     }, {
@@ -114,19 +113,23 @@ trait Solver extends parser.AST with typer.Binder {
     }, { case Neg(_, Neg(_, x)) => Set(x) }, {
       case Add(loc, left, right) =>
         for (left2 <- possibilities(left) + left;
-        right2 <- possibilities(right) + right) yield Add(loc, left2, right2)
+             right2 <- possibilities(right) + right) yield
+          Add(loc, left2, right2)
     }, {
       case Sub(loc, left, right) =>
         for (left2 <- possibilities(left) + left;
-        right2 <- possibilities(right) + right) yield Sub(loc, left2, right2)
+             right2 <- possibilities(right) + right) yield
+          Sub(loc, left2, right2)
     }, {
       case Mul(loc, left, right) =>
         for (left2 <- possibilities(left) + left;
-        right2 <- possibilities(right) + right) yield Mul(loc, left2, right2)
+             right2 <- possibilities(right) + right) yield
+          Mul(loc, left2, right2)
     }, {
       case Div(loc, left, right) =>
         for (left2 <- possibilities(left) + left;
-        right2 <- possibilities(right) + right) yield Div(loc, left2, right2)
+             right2 <- possibilities(right) + right) yield
+          Div(loc, left2, right2)
     }, { case Neg(loc, child) => possibilities(child) map neg(loc) }, {
       case Paren(_, child) => Set(child)
     }, {
@@ -341,8 +344,7 @@ trait Solver extends parser.AST with typer.Binder {
   private def printTrace(trace: List[Expr]) {
     if (enableTrace) {
       println("*** Solution Point!")
-      println(
-          trace.reverse map { e =>
+      println(trace.reverse map { e =>
         printSExp(e)
       } mkString "\n\n")
     }

@@ -17,7 +17,8 @@ import scala.util.control.NoStackTrace
 
 @SerialVersionUID(1L)
 final case class FailureInjectorException(msg: String)
-    extends AkkaException(msg) with NoStackTrace
+    extends AkkaException(msg)
+    with NoStackTrace
 
 class FailureInjectorProvider extends TransportAdapterProvider {
 
@@ -58,7 +59,8 @@ private[remote] object FailureInjectorTransportAdapter {
 private[remote] class FailureInjectorTransportAdapter(
     wrappedTransport: Transport, val extendedSystem: ExtendedActorSystem)
     extends AbstractTransportAdapter(wrappedTransport)(
-        extendedSystem.dispatcher) with AssociationEventListener {
+        extendedSystem.dispatcher)
+    with AssociationEventListener {
 
   private def rng = ThreadLocalRandom.current()
   private val log = Logging(extendedSystem, getClass.getName)

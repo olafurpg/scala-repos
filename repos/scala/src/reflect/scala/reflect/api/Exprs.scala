@@ -138,13 +138,13 @@ trait Exprs { self: Universe =>
     *  @group Expressions
     */
   object Expr {
-    def apply[T : WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
-                               treec: TreeCreator): Expr[T] =
+    def apply[T: WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
+                              treec: TreeCreator): Expr[T] =
       new ExprImpl[T](mirror.asInstanceOf[Mirror], treec)
     def unapply[T](expr: Expr[T]): Option[Tree] = Some(expr.tree)
   }
 
-  private class ExprImpl[+T : WeakTypeTag](
+  private class ExprImpl[+T: WeakTypeTag](
       val mirror: Mirror, val treec: TreeCreator)
       extends Expr[T] {
     def in[U <: Universe with Singleton](

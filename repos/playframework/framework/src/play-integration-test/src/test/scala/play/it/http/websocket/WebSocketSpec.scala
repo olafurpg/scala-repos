@@ -24,12 +24,15 @@ import java.util.concurrent.atomic.AtomicReference
 import java.util.function.{Consumer, Function}
 
 object NettyWebSocketSpec
-    extends WebSocketSpec with NettyIntegrationSpecification
+    extends WebSocketSpec
+    with NettyIntegrationSpecification
 object AkkaHttpWebSocketSpec
-    extends WebSocketSpec with AkkaHttpIntegrationSpecification
+    extends WebSocketSpec
+    with AkkaHttpIntegrationSpecification
 
 trait WebSocketSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential

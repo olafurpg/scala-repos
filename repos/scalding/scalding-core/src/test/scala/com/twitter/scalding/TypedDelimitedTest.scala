@@ -65,7 +65,8 @@ object DailySuffixTypedTsvJob {
 }
 
 class DailySuffixTypedTsvJob(args: Args)
-    extends Job(args) with UtcDateRangeJob {
+    extends Job(args)
+    with UtcDateRangeJob {
   try {
     DailySuffixTypedTsvJob
       .source("input0")

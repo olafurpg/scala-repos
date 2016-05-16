@@ -40,7 +40,7 @@ object Probes {
       name: String,
       publisher: Publisher[T],
       messageLogger: T => String = (t: T) =>
-          t.toString): Publisher[T] = new Publisher[T] with Probe {
+        t.toString): Publisher[T] = new Publisher[T] with Probe {
     val probeName = name
     val startTime = System.nanoTime()
 
@@ -85,7 +85,7 @@ object Probes {
                               processor: Processor[In, Out],
                               inLogger: In => String = (in: In) => in.toString,
                               outLogger: Out => String = (out: Out) =>
-                                  out.toString): Processor[In, Out] = {
+                                out.toString): Processor[In, Out] = {
     val subscriber = subscriberProbe(name + "-in", processor, inLogger)
     val publisher = publisherProbe(name + "-out", processor, outLogger)
     new Processor[In, Out] {
@@ -101,7 +101,7 @@ object Probes {
 
   def flowProbe[T](name: String,
                    messageLogger: T => String = (t: T) =>
-                       t.toString): Flow[T, T, _] = {
+                     t.toString): Flow[T, T, _] = {
     Flow[T].transform(() =>
           new PushPullStage[T, T] with Probe {
         override def startTime: Long = System.nanoTime()

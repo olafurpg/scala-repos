@@ -53,7 +53,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
             val tpText = ScalaPsiUtil.typeParamString(clazzTypeParam)
             val tpAdditional =
               if (clazzTypeParam.typeParameters.nonEmpty)
-                Some(s"Lifted$tpName") else None
+                Some(s"Lifted$tpName")
+              else None
             val additionalWithComma = tpAdditional.map(", " + _).getOrElse("")
             val additionalWithBracket =
               tpAdditional.map("[" + _ + "]").getOrElse("")
@@ -136,8 +137,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                         def clauseText(p: ScParameterClause): String = {
                           p.parameters
                             .map(paramText)
-                            .mkString("(" +
-                                      (if (p.isImplicit) "implicit " else ""),
+                            .mkString("(" + (if (p.isImplicit) "implicit "
+                                             else ""),
                                       ", ",
                                       ")")
                         }

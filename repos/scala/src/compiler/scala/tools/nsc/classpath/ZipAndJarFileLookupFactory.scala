@@ -48,7 +48,8 @@ sealed trait ZipAndJarFileLookupFactory {
 object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
 
   private case class ZipArchiveFlatClassPath(zipFile: File)
-      extends ZipArchiveFileLookup[ClassFileEntryImpl] with NoSourcePaths {
+      extends ZipArchiveFileLookup[ClassFileEntryImpl]
+      with NoSourcePaths {
 
     override def findClassFile(className: String): Option[AbstractFile] = {
       val (pkg, simpleClassName) =
@@ -74,7 +75,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
     * Name: scala/Function2$mcFJD$sp.class
     */
   private case class ManifestResourcesFlatClassPath(file: ManifestResources)
-      extends FlatClassPath with NoSourcePaths {
+      extends FlatClassPath
+      with NoSourcePaths {
 
     override def findClassFile(className: String): Option[AbstractFile] = {
       val (pkg, simpleClassName) =
@@ -142,8 +144,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
         case None => Seq.empty
         case Some(PackageFileInfo(_, subpackages)) =>
           val prefix = PackageNameUtils.packagePrefix(inPackage)
-          subpackages.map(
-              packageFile => PackageEntryImpl(prefix + packageFile.name))
+          subpackages.map(packageFile =>
+                PackageEntryImpl(prefix + packageFile.name))
       }
 
     override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] =
@@ -188,7 +190,8 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
 object ZipAndJarFlatSourcePathFactory extends ZipAndJarFileLookupFactory {
 
   private case class ZipArchiveFlatSourcePath(zipFile: File)
-      extends ZipArchiveFileLookup[SourceFileEntryImpl] with NoClassPaths {
+      extends ZipArchiveFileLookup[SourceFileEntryImpl]
+      with NoClassPaths {
 
     override def asSourcePathString: String = asClassPathString
 

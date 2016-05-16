@@ -16,7 +16,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class FailFastFactoryTest
-    extends FunSuite with MockitoSugar with Conductors
+    extends FunSuite
+    with MockitoSugar
+    with Conductors
     with IntegrationPatience {
 
   def newCtx() = new {

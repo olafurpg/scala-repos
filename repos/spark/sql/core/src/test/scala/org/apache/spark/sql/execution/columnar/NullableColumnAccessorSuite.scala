@@ -26,7 +26,8 @@ import org.apache.spark.sql.types._
 
 class TestNullableColumnAccessor[JvmType](
     buffer: ByteBuffer, columnType: ColumnType[JvmType])
-    extends BasicColumnAccessor(buffer, columnType) with NullableColumnAccessor
+    extends BasicColumnAccessor(buffer, columnType)
+    with NullableColumnAccessor
 
 object TestNullableColumnAccessor {
   def apply[JvmType](

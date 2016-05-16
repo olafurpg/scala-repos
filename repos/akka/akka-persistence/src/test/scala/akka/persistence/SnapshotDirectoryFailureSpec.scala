@@ -12,7 +12,8 @@ object SnapshotDirectoryFailureSpec {
   val inUseSnapshotPath = "target/inUseSnapshotPath"
 
   class TestPersistentActor(name: String, probe: ActorRef)
-      extends PersistentActor with TurnOffRecoverOnStart {
+      extends PersistentActor
+      with TurnOffRecoverOnStart {
 
     override def persistenceId: String = name
 
@@ -32,7 +33,8 @@ class SnapshotDirectoryFailureSpec
     extends AkkaSpec(PersistenceSpec.config(
             "leveldb", "SnapshotDirectoryFailureSpec", extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
 
   import SnapshotDirectoryFailureSpec._
 

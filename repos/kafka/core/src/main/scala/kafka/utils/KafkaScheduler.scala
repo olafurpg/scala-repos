@@ -71,7 +71,8 @@ trait Scheduler {
 class KafkaScheduler(val threads: Int,
                      val threadNamePrefix: String = "kafka-scheduler-",
                      daemon: Boolean = true)
-    extends Scheduler with Logging {
+    extends Scheduler
+    with Logging {
   private var executor: ScheduledThreadPoolExecutor = null
   private val schedulerThreadId = new AtomicInteger(0)
 
@@ -87,10 +88,10 @@ class KafkaScheduler(val threads: Int,
       executor.setThreadFactory(
           new ThreadFactory() {
         def newThread(runnable: Runnable): Thread =
-          Utils.newThread(
-              threadNamePrefix + schedulerThreadId.getAndIncrement(),
-              runnable,
-              daemon)
+          Utils.newThread(threadNamePrefix +
+                          schedulerThreadId.getAndIncrement(),
+                          runnable,
+                          daemon)
       })
     }
   }

@@ -204,7 +204,7 @@ trait Crudify {
       for {
         pointer <- fieldsForDisplay
         field <- computeFieldFromPointer(entry, pointer).toList
-                    if field.shouldDisplay_?
+        if field.shouldDisplay_?
       } yield {
         ".name *" #> field.displayHtml & ".value *" #> field.asHtml
       }
@@ -356,7 +356,7 @@ trait Crudify {
       for {
         pointer <- fieldsForDisplay
         field <- computeFieldFromPointer(item, pointer).toList
-                    if field.shouldDisplay_?
+        if field.shouldDisplay_?
       } yield {
         ".name *" #> field.displayHtml & ".value *" #> field.asHtml
       }
@@ -772,7 +772,7 @@ trait Crudify {
         for {
           pointer <- fieldsForEditing
           field <- computeFieldFromPointer(item, pointer).toList
-                      if field.show_?
+          if field.show_?
           form <- field.toForm.toList
           bindNode = ".name *" #> {
             wrapNameInRequired(field.displayHtml, field.required_?) ++ error(

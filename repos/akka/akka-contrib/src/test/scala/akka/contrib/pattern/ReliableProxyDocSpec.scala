@@ -41,10 +41,12 @@ object ReliableProxyDocSpec {
   //#demo-transition
 
   class WatchingProxyParent(targetPath: ActorPath) extends Actor {
-    val proxy = context.watch(
-        context
-          .actorOf(
-            ReliableProxy.props(targetPath, 100.millis, reconnectAfter = 500.millis, maxReconnects = 3)))
+    val proxy = context.watch(context.actorOf(ReliableProxy.props(targetPath,
+                                                                  100.millis,
+                                                                  reconnectAfter =
+                                                                    500.millis,
+                                                                  maxReconnects =
+                                                                    3)))
 
     var client: Option[ActorRef] = None
 

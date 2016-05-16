@@ -88,10 +88,11 @@ trait PatternTypers { self: Analyzer =>
       val member = unapplyMember(fun.tpe)
       def resultType = (fun.tpe memberType member).finalResultType
       def isEmptyType = resultOfMatchingMethod(resultType, nme.isEmpty)()
-      def isOkay = (resultType.isErroneous || (resultType <:< BooleanTpe) ||
-          (isEmptyType <:< BooleanTpe) || member.isMacro ||
-          member.isOverloaded // the whole overloading situation is over the rails
-          )
+      def isOkay =
+        (resultType.isErroneous || (resultType <:< BooleanTpe) ||
+            (isEmptyType <:< BooleanTpe) || member.isMacro ||
+            member.isOverloaded // the whole overloading situation is over the rails
+            )
 
       // Dueling test cases: pos/overloaded-unapply.scala, run/case-class-23.scala, pos/t5022.scala
       // A case class with 23+ params has no unapply method.
@@ -186,9 +187,9 @@ trait PatternTypers { self: Analyzer =>
 
       // !!! FIXME - skipping this when variance.isInvariant allows unsoundness, see SI-5189
       // Test case which presently requires the exclusion is run/gadts.scala.
-      def eligible(tparam: Symbol) = (tparam.isTypeParameterOrSkolem &&
-          tparam.owner.isTerm &&
-          (settings.strictInference || !variance.isInvariant))
+      def eligible(tparam: Symbol) =
+        (tparam.isTypeParameterOrSkolem && tparam.owner.isTerm &&
+            (settings.strictInference || !variance.isInvariant))
 
       def skolems = try skolemBuffer.toList finally skolemBuffer.clear()
       def apply(tp: Type): Type = mapOver(tp) match {
@@ -240,8 +241,7 @@ trait PatternTypers { self: Analyzer =>
       // TODO SI-7886 / SI-5900 This is well intentioned but doesn't quite hit the nail on the head.
       //      For now, I've put it completely behind -Xstrict-inference.
       val untrustworthyPt =
-        settings.strictInference &&
-        (ptIn =:= AnyTpe || ptIn =:= NothingTpe ||
+        settings.strictInference && (ptIn =:= AnyTpe || ptIn =:= NothingTpe ||
             ptIn.typeSymbol != caseClass)
       val variantToSkolem = new VariantToSkolemMap
       val caseClassType = tree.tpe.prefix memberType caseClass

@@ -29,7 +29,9 @@ import org.apache.spark.streaming.util.{FileBasedWriteAheadLogSegment, FileBased
 import org.apache.spark.util.Utils
 
 class WriteAheadLogBackedBlockRDDSuite
-    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with BeforeAndAfterEach {
 
   val conf = new SparkConf()
     .setMaster("local[2]")
@@ -194,11 +196,11 @@ class WriteAheadLogBackedBlockRDDSuite
     )
 
     // Create the RDD and verify whether the returned data is correct
-    val rdd = new WriteAheadLogBackedBlockRDD[String](
-        sparkContext,
-        blockIds.toArray,
-        recordHandles.toArray,
-        storeInBlockManager = false)
+    val rdd = new WriteAheadLogBackedBlockRDD[String](sparkContext,
+                                                      blockIds.toArray,
+                                                      recordHandles.toArray,
+                                                      storeInBlockManager =
+                                                        false)
     assert(rdd.collect() === data.flatten)
 
     // Verify that the block fetching is skipped when isBlockValid is set to false.

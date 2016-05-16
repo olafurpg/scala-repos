@@ -227,7 +227,8 @@ sealed trait TailProducer[P <: Platform[P], +T] extends Producer[P, T] {
 
 class AlsoTailProducer[P <: Platform[P], +T, +R](
     ensure: TailProducer[P, T], result: TailProducer[P, R])
-    extends AlsoProducer[P, T, R](ensure, result) with TailProducer[P, R]
+    extends AlsoProducer[P, T, R](ensure, result)
+    with TailProducer[P, R]
 
 /**
   * This is a special node that ensures that the first argument is planned, but produces values
@@ -243,7 +244,8 @@ case class NamedProducer[P <: Platform[P], +T](
 
 class TPNamedProducer[P <: Platform[P], +T](
     producer: Producer[P, T], id: String)
-    extends NamedProducer[P, T](producer, id) with TailProducer[P, T]
+    extends NamedProducer[P, T](producer, id)
+    with TailProducer[P, T]
 
 /**
   * Represents filters and maps which may be optimized differently

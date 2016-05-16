@@ -64,9 +64,9 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
     new AuthenticationService[A, HttpResponse[JValue]](
         accountManager, service)({
       case NotProvided =>
-        HttpResponse(
-            Unauthorized,
-            headers = HttpHeaders(List(("WWW-Authenticate", "Basic"))))
+        HttpResponse(Unauthorized,
+                     headers =
+                       HttpHeaders(List(("WWW-Authenticate", "Basic"))))
       case AuthMismatch(message) =>
         HttpResponse(Unauthorized, content = Some(message.serialize))
     })
@@ -83,27 +83,25 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
       extends DelegatingService[A, Future[B], A, Account => Future[B]]
       with Logging {
     private implicit val M = new FutureMonad(executor)
-    val service = (request: HttpRequest[A]) =>
-      {
-        logger.info("Got authentication request " + request)
-        delegate.service(request) map { (f: Account => Future[B]) =>
-          request.headers.header[Authorization] flatMap {
-            _.basic map {
-              case BasicAuthCredentials(email, password) =>
-                accountManager.authAccount(email, password) flatMap {
-                  case Success(account) => f(account)
-                  case Failure(error) =>
-                    logger.warn(
-                        "Authentication failure from %s for %s: %s".format(
-                            NetUtils.remoteIpFrom(request), email, error))
-                    Future(err(AuthMismatch(
-                                "Credentials provided were formatted correctly, but did not match a known account.")))
-                }
-            }
-          } getOrElse {
-            Future(err(NotProvided))
+    val service = (request: HttpRequest[A]) => {
+      logger.info("Got authentication request " + request)
+      delegate.service(request) map { (f: Account => Future[B]) =>
+        request.headers.header[Authorization] flatMap {
+          _.basic map {
+            case BasicAuthCredentials(email, password) =>
+              accountManager.authAccount(email, password) flatMap {
+                case Success(account) => f(account)
+                case Failure(error) =>
+                  logger.warn("Authentication failure from %s for %s: %s"
+                        .format(NetUtils.remoteIpFrom(request), email, error))
+                  Future(err(AuthMismatch(
+                              "Credentials provided were formatted correctly, but did not match a known account.")))
+              }
           }
+        } getOrElse {
+          Future(err(NotProvided))
         }
+      }
     }
 
     val metadata = DescriptionMetadata(
@@ -112,7 +110,8 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
 }
 
 trait AccountService
-    extends BlueEyesServiceBuilder with AuthenticationCombinators
+    extends BlueEyesServiceBuilder
+    with AuthenticationCombinators
     with Logging {
   self =>
   case class State(handlers: AccountServiceHandlers, stop: Stoppable)

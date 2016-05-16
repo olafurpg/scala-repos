@@ -92,11 +92,11 @@ object InjectTest extends SpecLite {
   }
 
   "prj" in {
-    def distr[F[_], A](
-        t: Free[F, A])(implicit F: Functor[F],
-                       I0: Test1Algebra :<: F,
-                       I1: Test2Algebra :<: F,
-                       I2: Test3Algebra :<: F): Option[Free[F, A]] =
+    def distr[F[_], A](t: Free[F, A])(
+        implicit F: Functor[F],
+        I0: Test1Algebra :<: F,
+        I1: Test2Algebra :<: F,
+        I2: Test3Algebra :<: F): Option[Free[F, A]] =
       for {
         Test1(x, h) <- match_[F, Test1Algebra, A](t)
         Test2(y, k) <- match_[F, Test2Algebra, A](h(x.length))

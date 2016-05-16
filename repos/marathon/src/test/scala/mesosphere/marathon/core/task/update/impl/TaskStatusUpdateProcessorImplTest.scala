@@ -27,7 +27,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TaskStatusUpdateProcessorImplTest
-    extends MarathonSpec with Mockito with ScalaFutures with GivenWhenThen
+    extends MarathonSpec
+    with Mockito
+    with ScalaFutures
+    with GivenWhenThen
     with Matchers {
   test(
       "process update for unknown task that's not lost will result in a kill and ack") {

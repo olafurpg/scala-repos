@@ -165,11 +165,11 @@ object ReflectiveAccess {
       case e: Exception => Left(e)
     }
 
-  def createInstance[T](
-      fqn: String,
-      params: Array[Class[_]],
-      args: Array[AnyRef],
-      classloader: ClassLoader = loader): Either[Exception, T] =
+  def createInstance[T](fqn: String,
+                        params: Array[Class[_]],
+                        args: Array[AnyRef],
+                        classloader: ClassLoader =
+                          loader): Either[Exception, T] =
     try {
       assert(params ne null)
       assert(args ne null)
@@ -205,9 +205,9 @@ object ReflectiveAccess {
         Left(e)
     }
 
-  def getClassFor[T](
-      fqn: String,
-      classloader: ClassLoader = loader): Either[Exception, Class[T]] =
+  def getClassFor[T](fqn: String,
+                     classloader: ClassLoader =
+                       loader): Either[Exception, Class[T]] =
     try {
       assert(fqn ne null)
 

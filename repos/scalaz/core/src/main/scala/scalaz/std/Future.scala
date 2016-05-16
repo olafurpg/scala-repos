@@ -18,8 +18,10 @@ trait FutureInstances1 {
 }
 
 private class FutureInstance(implicit ec: ExecutionContext)
-    extends Nondeterminism[Future] with Cobind[Future]
-    with MonadError[Future, Throwable] with Catchable[Future] {
+    extends Nondeterminism[Future]
+    with Cobind[Future]
+    with MonadError[Future, Throwable]
+    with Catchable[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f

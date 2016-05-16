@@ -23,17 +23,17 @@ class ArrayBuilderTest {
   def erase(x: Any): Any = x
 
   @inline
-  def makeNoInline[T : ClassTag](): ArrayBuilder[T] = {
+  def makeNoInline[T: ClassTag](): ArrayBuilder[T] = {
     @noinline def ct = implicitly[ClassTag[T]]
     ArrayBuilder.make[T]()(ct)
   }
 
   @inline
-  def zerosInline[T : ClassTag](length: Int): Array[T] =
+  def zerosInline[T: ClassTag](length: Int): Array[T] =
     Array.fill(length)(null.asInstanceOf[T])
 
   @noinline
-  def zerosNoInline[T : ClassTag](length: Int): Array[T] =
+  def zerosNoInline[T: ClassTag](length: Int): Array[T] =
     Array.fill(length)(null.asInstanceOf[T])
 
   @noinline def someInt: Int = 53

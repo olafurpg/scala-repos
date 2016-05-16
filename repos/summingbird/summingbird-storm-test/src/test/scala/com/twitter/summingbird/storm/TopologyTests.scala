@@ -62,7 +62,7 @@ class TopologyTests extends WordSpec {
 
   implicit val storm = Storm.local()
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   /**
     * Perform a single run of TestGraphs.singleStepJob using the
@@ -70,7 +70,8 @@ class TopologyTests extends WordSpec {
     */
   def funcToPlan(
       mkJob: (Producer[Storm, Int],
-      Storm#Store[Int, Int]) => TailProducer[Storm, Any]): StormTopology = {
+              Storm#Store[Int, Int]) => TailProducer[Storm, Any])
+    : StormTopology = {
     val original = sample[List[Int]]
 
     val job = mkJob(

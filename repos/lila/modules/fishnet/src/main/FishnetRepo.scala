@@ -67,7 +67,8 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
   def updateOrGiveUpAnalysis(ana: Work.Analysis) =
     if (ana.isOutOfTries) giveUpAnalysis(ana) else updateAnalysis(ana)
   def countAnalysis(acquired: Boolean) =
-    analysisColl.count(BSONDocument(
+    analysisColl.count(
+        BSONDocument(
             "acquired" -> BSONDocument("$exists" -> acquired)
         ).some)
 

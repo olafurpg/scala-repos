@@ -60,15 +60,14 @@ case class HttpBasicAuthentication(realmName: String)(
     func: PartialFunction[(String, String, Req), Boolean])
     extends HttpAuthentication {
   def credentials(r: Req): Box[(String, String)] = {
-    header(r).flatMap(auth =>
-          {
-        val decoded = new String(Base64.decodeBase64(
-                auth.substring(6, auth.length).getBytes)).split(":").toList
-        decoded match {
-          case userName :: password :: _ => Full((userName, password))
-          case userName :: Nil => Full((userName, ""))
-          case _ => Empty
-        }
+    header(r).flatMap(auth => {
+      val decoded = new String(Base64.decodeBase64(
+              auth.substring(6, auth.length).getBytes)).split(":").toList
+      decoded match {
+        case userName :: password :: _ => Full((userName, password))
+        case userName :: Nil => Full((userName, ""))
+        case _ => Empty
+      }
     })
   }
 
@@ -87,7 +86,8 @@ case class HttpBasicAuthentication(realmName: String)(
 
 case class HttpDigestAuthentication(realmName: String)(
     func: PartialFunction[(String, Req, (String) => Boolean), Boolean])
-    extends HttpAuthentication with Loggable {
+    extends HttpAuthentication
+    with Loggable {
   private val nonceMap = new HashMap[String, Long]
 
   private object CheckAndPurge
@@ -100,12 +100,11 @@ case class HttpDigestAuthentication(realmName: String)(
       case CheckAndPurge =>
         if (keepPinging) doPing()
         nonceMap.foreach(
-            (entry) =>
-              {
-            val ts = System.currentTimeMillis
-            if ((ts - entry._2) > nonceValidityPeriod) {
-              nonceMap -= entry._1
-            }
+            (entry) => {
+          val ts = System.currentTimeMillis
+          if ((ts - entry._2) > nonceValidityPeriod) {
+            nonceMap -= entry._1
+          }
         })
 
       case ShutDown => keepPinging = false
@@ -126,21 +125,20 @@ case class HttpDigestAuthentication(realmName: String)(
   override def shutDown = NonceWatcher ! ShutDown
 
   def getInfo(req: Req): Box[DigestAuthentication] =
-    header(req).map(auth =>
-          {
+    header(req).map(auth => {
 
-        val info = auth.substring(7, auth.length)
-        val pairs = splitNameValuePairs(info)
-        DigestAuthentication(req.request.method.toUpperCase,
-                             pairs("username"),
-                             pairs("realm"),
-                             pairs("nonce"),
-                             pairs("uri"),
-                             pairs("qop"),
-                             pairs("nc"),
-                             pairs("cnonce"),
-                             pairs("response"),
-                             pairs("opaque"))
+      val info = auth.substring(7, auth.length)
+      val pairs = splitNameValuePairs(info)
+      DigestAuthentication(req.request.method.toUpperCase,
+                           pairs("username"),
+                           pairs("realm"),
+                           pairs("nonce"),
+                           pairs("uri"),
+                           pairs("qop"),
+                           pairs("nc"),
+                           pairs("cnonce"),
+                           pairs("response"),
+                           pairs("opaque"))
     })
 
   /**

@@ -257,14 +257,13 @@ object TopicCommand extends Logging {
                       !reportUnavailablePartitions) ||
                   (reportUnderReplicatedPartitions &&
                       inSyncReplicas.size < assignedReplicas.size) ||
-                  (reportUnavailablePartitions &&
-                      (!leader.isDefined ||
+                  (reportUnavailablePartitions && (!leader.isDefined ||
                           !liveBrokers.contains(leader.get)))) {
                 print("\tTopic: " + topic)
                 print("\tPartition: " + partitionId)
                 print(
-                    "\tLeader: " +
-                    (if (leader.isDefined) leader.get else "none"))
+                    "\tLeader: " + (if (leader.isDefined) leader.get
+                                    else "none"))
                 print("\tReplicas: " + assignedReplicas.mkString(","))
                 println("\tIsr: " + inSyncReplicas.mkString(","))
               }
@@ -283,8 +282,8 @@ object TopicCommand extends Logging {
         configsToBeAdded.forall(config => config.length == 2),
         "Invalid topic config: all configs to be added must be in the format \"key=val\".")
     val props = new Properties
-    configsToBeAdded.foreach(
-        pair => props.setProperty(pair(0).trim, pair(1).trim))
+    configsToBeAdded.foreach(pair =>
+          props.setProperty(pair(0).trim, pair(1).trim))
     LogConfig.validate(props)
     if (props.containsKey(LogConfig.MessageFormatVersionProp)) {
       println(

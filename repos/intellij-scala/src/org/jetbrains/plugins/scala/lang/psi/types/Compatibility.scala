@@ -62,13 +62,13 @@ object Compatibility {
             (Success(typez, None), Set.empty)
           val functionType = ScFunctionType(expected, Seq(typez))(
               place.getProject, place.getResolveScope)
-          val results =
-            new ImplicitCollector(place,
-                                  functionType,
-                                  functionType,
-                                  None,
-                                  isImplicitConversion = true,
-                                  isExtensionConversion = false).collect()
+          val results = new ImplicitCollector(place,
+                                              functionType,
+                                              functionType,
+                                              None,
+                                              isImplicitConversion = true,
+                                              isExtensionConversion =
+                                                false).collect()
           if (results.length == 1) {
             val res = results.head
             val paramType = InferUtil.extractImplicitParameterType(res)
@@ -174,8 +174,9 @@ object Compatibility {
   }
 
   def clashedAssignmentsIn(exprs: Seq[Expression]): Seq[ScAssignStmt] = {
-    val pairs = for (Expression(assignment @ NamedAssignStmt(name)) <- exprs) yield
-      (name, assignment)
+    val pairs =
+      for (Expression(assignment @ NamedAssignStmt(name)) <- exprs) yield
+        (name, assignment)
     val names = pairs.unzip._1
     val clashedNames = names.diff(names.distinct)
     pairs.filter(p => clashedNames.contains(p._1)).map(_._2)
@@ -291,9 +292,11 @@ object Compatibility {
                 ScType.designator(seqClass), Seq(param.expectedType))
 
             for (exprType <- expr
-              .getTypeAfterImplicitConversion(
-                  checkWithImplicits, isShapesResolve, Some(expectedType))
-              .tr) yield {
+                              .getTypeAfterImplicitConversion(
+                                  checkWithImplicits,
+                                  isShapesResolve,
+                                  Some(expectedType))
+                              .tr) yield {
               val conforms =
                 Conformance.conforms(tp, exprType, checkWeak = true)
               if (!conforms) {
@@ -341,9 +344,11 @@ object Compatibility {
                 val paramType = param.paramType
                 val expectedType = param.expectedType
                 for (exprType <- expr
-                  .getTypeAfterImplicitConversion(
-                      checkWithImplicits, isShapesResolve, Some(expectedType))
-                  .tr) {
+                                  .getTypeAfterImplicitConversion(
+                                      checkWithImplicits,
+                                      isShapesResolve,
+                                      Some(expectedType))
+                                  .tr) {
                   val conforms =
                     Conformance.conforms(paramType, exprType, checkWeak = true)
                   if (!conforms) {
@@ -397,9 +402,10 @@ object Compatibility {
       val expectedType: ScType = parameters.last.expectedType
       while (k < exprs.length) {
         for (exprType <- exprs(k)
-          .getTypeAfterImplicitConversion(
-              checkWithImplicits, isShapesResolve, Some(expectedType))
-          ._1) {
+                          .getTypeAfterImplicitConversion(checkWithImplicits,
+                                                          isShapesResolve,
+                                                          Some(expectedType))
+                          ._1) {
           val conforms =
             Conformance.conforms(paramType, exprType, checkWeak = true)
           if (!conforms) {
@@ -426,8 +432,7 @@ object Compatibility {
             Seq.empty, undefSubst, defaultParameterUsed, matched, matchedTypes)
 
       val missed = for ((parameter: Parameter, b) <- parameters.zip(used)
-                                                        if !b &&
-                                                    !parameter.isDefault) yield
+                        if !b && !parameter.isDefault) yield
         MissedValueParameter(parameter)
       defaultParameterUsed = parameters.zip(used).exists {
         case (param, bool) => !bool && param.isDefault

@@ -15,8 +15,10 @@ import org.apache.commons.io.FileUtils
 import org.scalatra.i18n.Messages
 
 class SystemSettingsController
-    extends SystemSettingsControllerBase with AccountService
-    with RepositoryService with AdminAuthenticator
+    extends SystemSettingsControllerBase
+    with AccountService
+    with RepositoryService
+    with AdminAuthenticator
 
 trait SystemSettingsControllerBase extends AccountManagementControllerBase {
   self: AccountService with RepositoryService with AdminAuthenticator =>
@@ -63,9 +65,9 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                                                    optional(text()))),
                                          "baseDN" -> trim(
                                              label("Base DN", text(required))),
-                                         "userNameAttribute" -> trim(label(
-                                                 "User name attribute",
-                                                 text(required))),
+                                         "userNameAttribute" -> trim(
+                                             label("User name attribute",
+                                                   text(required))),
                                          "additionalFilterCondition" -> trim(
                                              label(
                                                  "Additional filter condition",
@@ -82,9 +84,10 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                                          "ssl" -> trim(
                                              label("Enable SSL",
                                                    optional(boolean()))),
-                                         "keystore" -> trim(label("Keystore",
-                                                                  optional(text(
-                                                                          ))))
+                                         "keystore" -> trim(
+                                             label("Keystore",
+                                                   optional(text(
+                                                           ))))
                                      )(Ldap.apply))
   )(SystemSettings.apply).verifying { settings =>
     Vector(
@@ -255,13 +258,14 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         removeUserRelatedData(userName)
       }
 
-      updateAccount(account.copy(
-              password = form.password.map(sha1).getOrElse(account.password),
-              fullName = form.fullName,
-              mailAddress = form.mailAddress,
-              isAdmin = form.isAdmin,
-              url = form.url,
-              isRemoved = form.isRemoved))
+      updateAccount(
+          account.copy(password =
+                         form.password.map(sha1).getOrElse(account.password),
+                       fullName = form.fullName,
+                       mailAddress = form.mailAddress,
+                       isAdmin = form.isAdmin,
+                       url = form.url,
+                       isRemoved = form.isRemoved))
 
       updateImage(userName, form.fileId, form.clearImage)
       redirect("/admin/users")
@@ -356,7 +360,8 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
               _.split(":") match {
                 case Array(userName, isManager) => isManager.toBoolean
               }
-            }) None else Some("Must select one manager at least.")
+            }) None
+      else Some("Must select one manager at least.")
     }
   }
 

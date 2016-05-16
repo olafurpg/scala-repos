@@ -47,7 +47,8 @@ import scalafx.testutil.RunOnApplicationThread
   */
 @RunWith(classOf[JUnitRunner])
 class PackageCollectionFillerSpec
-    extends FlatSpec with RunOnApplicationThread {
+    extends FlatSpec
+    with RunOnApplicationThread {
 
   private case class Analyzer[T](originalList: jfxc.ObservableList[T]) {
     val originalElements = originalList.toList

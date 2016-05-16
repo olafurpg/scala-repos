@@ -122,7 +122,8 @@ class ScalaLanguageInjector(myInjectionConfiguration: Configuration)
           else ""
         val suffix =
           if (i == literals.size - 1)
-            annotation.flatMap(readAttribute(_, "suffix")).mkString else ""
+            annotation.flatMap(readAttribute(_, "suffix")).mkString
+          else ""
 
         if (!literal.isMultiLineString) {
           registrar.addPlace(prefix,
@@ -364,9 +365,10 @@ object ScalaLanguageInjector {
 
       if (wsPrefixLength != lineLength) {
         rangesCollected +=
-        (new TextRange(if (partOfMlLine.trim startsWith margin)
-                         count + 1 + wsPrefixLength else count,
-                       count + lineLength) shiftRight range.getStartOffset)
+          (new TextRange(if (partOfMlLine.trim startsWith margin)
+                           count + 1 + wsPrefixLength
+                         else count,
+                         count + lineLength) shiftRight range.getStartOffset)
       }
 
       count += lineLength + 1

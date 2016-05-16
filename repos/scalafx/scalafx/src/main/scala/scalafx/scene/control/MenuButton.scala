@@ -61,7 +61,8 @@ object MenuButton {
   */
 class MenuButton(
     override val delegate: jfxsc.MenuButton = new jfxsc.MenuButton)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.MenuButton] {
+    extends ButtonBase(delegate)
+    with SFXDelegate[jfxsc.MenuButton] {
 
   /** Creates a toggle button with the specified text as its label. */
   def this(text: String) = this(new jfxsc.MenuButton(text))

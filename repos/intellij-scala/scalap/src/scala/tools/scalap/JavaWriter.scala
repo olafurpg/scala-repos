@@ -22,8 +22,9 @@ class JavaWriter(classfile: Classfile, writer: Writer)
     if ((flags & 0x0004) != 0) x = buffer.append("protected ")
     if ((flags & 0x0010) != 0) x = buffer.append("final ")
     if ((flags & 0x0400) != 0)
-      x = if (clazz) buffer.append("abstract ")
-      else buffer.append("/*deferred*/ ")
+      x =
+        if (clazz) buffer.append("abstract ")
+        else buffer.append("/*deferred*/ ")
     buffer.toString()
   }
 
@@ -157,8 +158,8 @@ class JavaWriter(classfile: Classfile, writer: Writer)
         val n = ((data(0) & 0xff) << 8) + (data(1) & 0xff)
         indent.print("throws ")
         for (i <- Iterator.range(0, n) map { x =>
-          2 * (x + 1)
-        }) {
+                   2 * (x + 1)
+                 }) {
           val inx = ((data(i) & 0xff) << 8) + (data(i + 1) & 0xff)
           if (i > 2) print(", ")
           print(getClassName(inx).trim())

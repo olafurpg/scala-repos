@@ -16,7 +16,8 @@ import org.testng.annotations.AfterClass
 abstract class AkkaIdentityProcessorVerification[T](
     env: TestEnvironment, publisherShutdownTimeout: Long)
     extends IdentityProcessorVerification[T](env, publisherShutdownTimeout)
-    with TestNGSuiteLike with ActorSystemLifecycle {
+    with TestNGSuiteLike
+    with ActorSystemLifecycle {
 
   def this(printlnDebug: Boolean) =
     this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),

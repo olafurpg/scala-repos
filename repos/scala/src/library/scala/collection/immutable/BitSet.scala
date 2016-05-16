@@ -24,8 +24,11 @@ import mutable.Builder
   */
 @SerialVersionUID(1611436763290191562L)
 abstract class BitSet
-    extends scala.collection.AbstractSet[Int] with SortedSet[Int]
-    with scala.collection.BitSet with BitSetLike[BitSet] with Serializable {
+    extends scala.collection.AbstractSet[Int]
+    with SortedSet[Int]
+    with scala.collection.BitSet
+    with BitSetLike[BitSet]
+    with Serializable {
   override def empty = BitSet.empty
 
   protected def fromBitMaskNoCopy(elems: Array[Long]): BitSet =

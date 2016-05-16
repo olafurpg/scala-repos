@@ -81,11 +81,12 @@ trait DestructureTypes {
     def list(nodes: List[Node]): Node = wrapSequence(nodes)
     def product(tp: Type, nodes: Node*): Node =
       product(typeTypeName(tp), nodes: _*)
-    def product(typeName: String, nodes: Node*): Node = (nodes.toList filterNot
-    (_ == wrapEmpty) match {
-      case Nil => wrapEmpty
-      case xs => withType(wrapProduct(xs), typeName)
-    })
+    def product(typeName: String, nodes: Node*): Node =
+      (nodes.toList filterNot
+      (_ == wrapEmpty) match {
+        case Nil => wrapEmpty
+        case xs => withType(wrapProduct(xs), typeName)
+      })
 
     def atom[U](label: String, value: U): Node = node(label, wrapAtom(value))
     def constant(label: String, const: Constant): Node = atom(label, const)
@@ -114,7 +115,8 @@ trait DestructureTypes {
     def typeBounds(lo0: Type, hi0: Type): Node = {
       val lo =
         if ((lo0 eq WildcardType) || (lo0.typeSymbol eq NothingClass))
-          wrapEmpty else this("lo", lo0)
+          wrapEmpty
+        else this("lo", lo0)
       val hi =
         if ((hi0 eq WildcardType) || (hi0.typeSymbol eq AnyClass)) wrapEmpty
         else this("hi", hi0)
@@ -165,13 +167,14 @@ trait DestructureTypes {
       )
     }
 
-    def symbolType(sym: Symbol) = (if (sym.isRefinementClass) "Refinement"
-                                   else if (sym.isAliasType) "Alias"
-                                   else if (sym.isTypeSkolem) "TypeSkolem"
-                                   else if (sym.isTypeParameter) "TypeParam"
-                                   else if (sym.isAbstractType) "AbstractType"
-                                   else if (sym.isType) "TypeSymbol"
-                                   else "TermSymbol")
+    def symbolType(sym: Symbol) =
+      (if (sym.isRefinementClass) "Refinement"
+       else if (sym.isAliasType) "Alias"
+       else if (sym.isTypeSkolem) "TypeSkolem"
+       else if (sym.isTypeParameter) "TypeParam"
+       else if (sym.isAbstractType) "AbstractType"
+       else if (sym.isType) "TypeSymbol"
+       else "TermSymbol")
     def typeRefType(sym: Symbol) =
       (if (sym.isRefinementClass) "RefinementTypeRef"
        else if (sym.isAliasType) "AliasTypeRef"

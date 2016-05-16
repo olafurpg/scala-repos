@@ -242,8 +242,8 @@ object State {
     def handleError(t: Throwable): State = handleException(t, s, log)
     def fail = {
       import BasicCommandStrings.Compat.{FailureWall => CompatFailureWall}
-      val remaining = s.remainingCommands.dropWhile(
-          c => c != FailureWall && c != CompatFailureWall)
+      val remaining = s.remainingCommands.dropWhile(c =>
+            c != FailureWall && c != CompatFailureWall)
       if (remaining.isEmpty) applyOnFailure(s, Nil, exit(ok = false))
       else applyOnFailure(s, remaining, s.copy(remainingCommands = remaining))
     }

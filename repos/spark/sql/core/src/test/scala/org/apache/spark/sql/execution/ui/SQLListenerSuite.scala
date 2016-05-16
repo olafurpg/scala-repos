@@ -75,8 +75,7 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
   private def createTaskMetrics(
       accumulatorUpdates: Map[Long, Long]): TaskMetrics = {
     val metrics = mock(classOf[TaskMetrics])
-    when(metrics.accumulatorUpdates()).thenReturn(
-        accumulatorUpdates.map {
+    when(metrics.accumulatorUpdates()).thenReturn(accumulatorUpdates.map {
       case (id, update) =>
         new AccumulableInfo(id,
                             Some(""),
@@ -122,9 +121,9 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
         SparkListenerJobStart(jobId = 0,
                               time = System.currentTimeMillis(),
                               stageInfos = Seq(
-                                    createStageInfo(0, 0),
-                                    createStageInfo(1, 0)
-                                ),
+                                  createStageInfo(0, 0),
+                                  createStageInfo(1, 0)
+                              ),
                               createProperties(executionId)))
     listener.onStageSubmitted(
         SparkListenerStageSubmitted(createStageInfo(0, 0)))

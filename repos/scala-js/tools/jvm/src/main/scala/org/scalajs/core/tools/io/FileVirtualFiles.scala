@@ -52,7 +52,8 @@ object FileVirtualFile extends (File => FileVirtualFile) {
 
 /** A [[VirtualTextFile]] implemented by an actual file on the file system. */
 class FileVirtualTextFile(f: File)
-    extends FileVirtualFile(f) with VirtualTextFile {
+    extends FileVirtualFile(f)
+    with VirtualTextFile {
   import FileVirtualTextFile._
 
   override def content: String = readFileToString(file)
@@ -71,7 +72,8 @@ object FileVirtualTextFile extends (File => FileVirtualTextFile) {
 }
 
 trait WritableFileVirtualTextFile
-    extends FileVirtualTextFile with WritableVirtualTextFile {
+    extends FileVirtualTextFile
+    with WritableVirtualTextFile {
   override def contentWriter: Writer = {
     new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))
@@ -85,7 +87,8 @@ object WritableFileVirtualTextFile {
 
 /** A [[VirtualBinaryFile]] implemented by an actual file on the file system. */
 class FileVirtualBinaryFile(f: File)
-    extends FileVirtualFile(f) with VirtualBinaryFile {
+    extends FileVirtualFile(f)
+    with VirtualBinaryFile {
   import FileVirtualBinaryFile._
 
   override def inputStream: InputStream =
@@ -107,7 +110,8 @@ object FileVirtualBinaryFile extends (File => FileVirtualBinaryFile) {
 }
 
 trait WritableFileVirtualBinaryFile
-    extends FileVirtualBinaryFile with WritableVirtualBinaryFile {
+    extends FileVirtualBinaryFile
+    with WritableVirtualBinaryFile {
   override def outputStream: OutputStream =
     new BufferedOutputStream(new FileOutputStream(file))
 }
@@ -118,7 +122,8 @@ object WritableFileVirtualBinaryFile {
 }
 
 class FileVirtualJSFile(f: File)
-    extends FileVirtualTextFile(f) with VirtualJSFile {
+    extends FileVirtualTextFile(f)
+    with VirtualJSFile {
   import FileVirtualFile._
   import FileVirtualTextFile._
 
@@ -143,7 +148,8 @@ object FileVirtualJSFile extends (File => FileVirtualJSFile) {
 }
 
 trait WritableFileVirtualJSFile
-    extends FileVirtualJSFile with WritableFileVirtualTextFile
+    extends FileVirtualJSFile
+    with WritableFileVirtualTextFile
     with WritableVirtualJSFile {
 
   override def sourceMapWriter: Writer = {
@@ -158,7 +164,8 @@ object WritableFileVirtualJSFile {
 }
 
 class FileVirtualScalaJSIRFile(f: File)
-    extends FileVirtualBinaryFile(f) with VirtualSerializedScalaJSIRFile
+    extends FileVirtualBinaryFile(f)
+    with VirtualSerializedScalaJSIRFile
 
 object FileVirtualScalaJSIRFile extends (File => FileVirtualScalaJSIRFile) {
   import FileVirtualFile._

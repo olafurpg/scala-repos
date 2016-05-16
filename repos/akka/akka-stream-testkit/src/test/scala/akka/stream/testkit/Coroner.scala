@@ -233,8 +233,7 @@ object Coroner {
         }
 
         for (mi ← ti.getLockedMonitors
-                     if mi.getLockedStackDepth == i) appendMsg(
-            "\t-  locked ", mi)
+             if mi.getLockedStackDepth == i) appendMsg("\t-  locked ", mi)
       }
 
       val locks = ti.getLockedSynchronizers

@@ -68,7 +68,8 @@ object FilterConfig {
             variant = r intsD "v" flatMap { chess.variant.Variant(_) },
             mode = r intsD "m" flatMap { Mode(_) },
             speed = r intsD "s" flatMap { Speed(_) },
-            ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
+            ratingRange =
+              r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default)
 
       def writes(w: BSON.Writer, o: FilterConfig) =
         BSONDocument("v" -> o.variant.map(_.id),

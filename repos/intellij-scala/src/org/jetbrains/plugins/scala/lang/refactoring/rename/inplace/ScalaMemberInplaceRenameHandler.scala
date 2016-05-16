@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
   * 6/20/13
   */
 class ScalaMemberInplaceRenameHandler
-    extends MemberInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends MemberInplaceRenameHandler
+    with ScalaInplaceRenameHandler {
 
   override def isAvailable(
       element: PsiElement, editor: Editor, file: PsiFile): Boolean = {

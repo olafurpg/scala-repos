@@ -9,7 +9,8 @@ import java.util.{AbstractQueue, Queue, Collection, Iterator}
 
 class BoundedBlockingQueue[E <: AnyRef](
     val maxCapacity: Int, private val backing: Queue[E])
-    extends AbstractQueue[E] with BlockingQueue[E] {
+    extends AbstractQueue[E]
+    with BlockingQueue[E] {
 
   backing match {
     case null =>

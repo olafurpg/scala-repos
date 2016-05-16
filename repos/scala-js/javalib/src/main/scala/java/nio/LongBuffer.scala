@@ -16,7 +16,8 @@ object LongBuffer {
 abstract class LongBuffer private[nio](_capacity: Int,
                                        private[nio] val _array: Array[Long],
                                        private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[LongBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[LongBuffer] {
 
   private[nio] type ElementType = Long
   private[nio] type BufferType = LongBuffer

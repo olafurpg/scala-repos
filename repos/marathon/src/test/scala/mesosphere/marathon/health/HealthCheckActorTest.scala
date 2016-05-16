@@ -19,13 +19,15 @@ import scala.collection.immutable.Set
 import scala.concurrent.Future
 
 class HealthCheckActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
     with BeforeAndAfterAll {
 
   override lazy implicit val system: ActorSystem = ActorSystem(
       name = "system",
-      defaultExecutionContext = Some(
-            CallerThreadExecutionContext.callerThreadExecutionContext)
+      defaultExecutionContext =
+        Some(CallerThreadExecutionContext.callerThreadExecutionContext)
   )
 
   // regression test for #934

@@ -45,11 +45,9 @@ class SbtCompiler(javac: JavaCompiler,
 
     val outputToAnalysisMap = compilationData.outputToCacheMap.map {
       case (output, cache) =>
-        val analysis = fileToStore(cache)
-          .get()
-          .map(_._1)
-          .getOrElse(Analysis.Empty)
-          (output, analysis)
+        val analysis =
+          fileToStore(cache).get().map(_._1).getOrElse(Analysis.Empty)
+        (output, analysis)
     }
 
     val incOptions = compilationData.sbtIncOptions match {

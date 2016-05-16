@@ -23,7 +23,8 @@ private[http] class FormFieldImpl[T, U](receptacle: NameReceptacle[T])(
     implicit fu: FromStrictFormFieldUnmarshaller[T],
     tTag: ClassTag[U],
     conv: T ⇒ U)
-    extends StandaloneExtractionImpl[U] with FormField[U] {
+    extends StandaloneExtractionImpl[U]
+    with FormField[U] {
   import Directives._
 
   def directive: Directive1[U] =

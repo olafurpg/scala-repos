@@ -37,7 +37,8 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
                           forName: Option[String] = None,
                           postProcess: ScalaResolveResult => Unit = r => {},
                           val includePrefixImports: Boolean = true)
-    extends BaseProcessor(kinds) with PrecedenceHelper[QualifiedName] {
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[QualifiedName] {
   protected val precedence: mutable.HashMap[QualifiedName, Int] =
     new mutable.HashMap[QualifiedName, Int]()
 
@@ -144,14 +145,14 @@ class CompletionProcessor(override val kinds: Set[ResolveTargets.Value],
         return true //do not add constructor
       case td: ScTypeDefinition =>
         if (kindMatches(td)) {
-          val result = new ScalaResolveResult(
-              td,
-              substitutor,
-              nameShadow = isRenamed,
-              implicitFunction = implFunction,
-              fromType = fromType,
-              importsUsed = importsUsed,
-              prefixCompletion = prefixCompletion)
+          val result = new ScalaResolveResult(td,
+                                              substitutor,
+                                              nameShadow = isRenamed,
+                                              implicitFunction = implFunction,
+                                              fromType = fromType,
+                                              importsUsed = importsUsed,
+                                              prefixCompletion =
+                                                prefixCompletion)
           _addResult(result)
         }
         ScalaPsiUtil.getCompanionModule(td) match {

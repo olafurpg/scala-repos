@@ -39,7 +39,7 @@ final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
   * 
   * @author Miles Sabin
   */
-class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
+class SizedOps[A0, Repr: AdditiveCollection, L <: Nat](
     s: Sized[Repr, L], itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
   import nat._
   import ops.nat._
@@ -164,11 +164,11 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
     * Append the argument collection to this collection. The resulting collection will be statically known to have
     * ''m+n'' elements.
     */
-  def ++[B >: A0, That, M <: Nat](
-      that: Sized[That, M])(implicit sum: Sum[L, M],
-                            cbf: CanBuildFrom[Repr, B, That],
-                            convThat: That => GenTraversableLike[B, That],
-                            ev: AdditiveCollection[That]) =
+  def ++[B >: A0, That, M <: Nat](that: Sized[That, M])(
+      implicit sum: Sum[L, M],
+      cbf: CanBuildFrom[Repr, B, That],
+      convThat: That => GenTraversableLike[B, That],
+      ev: AdditiveCollection[That]) =
     wrap[That, sum.Out](s.unsized ++ that.unsized)
 
   /**
@@ -227,8 +227,8 @@ object AdditiveCollection {
   import scala.collection.immutable.Queue
   import scala.collection.LinearSeq
 
-  implicit def linearSeqAdditiveCollection[
-      T]: AdditiveCollection[LinearSeq[T]] =
+  implicit def linearSeqAdditiveCollection[T]
+    : AdditiveCollection[LinearSeq[T]] =
     new AdditiveCollection[LinearSeq[T]] {}
 
   implicit def vectorAdditiveCollection[T]: AdditiveCollection[Vector[T]] =
@@ -249,11 +249,11 @@ object AdditiveCollection {
   implicit def queueAdditiveCollection[T]: AdditiveCollection[Queue[T]] =
     new AdditiveCollection[Queue[T]] {}
 
-  implicit def indexedSeqAdditiveCollection[T]: AdditiveCollection[
-      IndexedSeq[T]] =
+  implicit def indexedSeqAdditiveCollection[T]
+    : AdditiveCollection[IndexedSeq[T]] =
     new AdditiveCollection[IndexedSeq[T]] {}
 
-  implicit def defaultAdditiveCollection[T]: AdditiveCollection[
-      collection.immutable.IndexedSeq[T]] =
+  implicit def defaultAdditiveCollection[T]
+    : AdditiveCollection[collection.immutable.IndexedSeq[T]] =
     new AdditiveCollection[collection.immutable.IndexedSeq[T]] {}
 }

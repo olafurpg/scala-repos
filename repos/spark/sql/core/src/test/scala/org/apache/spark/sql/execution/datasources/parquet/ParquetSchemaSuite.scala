@@ -32,7 +32,7 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
   /**
     * Checks whether the reflected Parquet message type for product type `T` conforms `messageType`.
     */
-  protected def testSchemaInference[T <: Product : ClassTag : TypeTag](
+  protected def testSchemaInference[T <: Product: ClassTag: TypeTag](
       testName: String,
       messageType: String,
       binaryAsString: Boolean,
@@ -493,10 +493,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with nullable element type - 2",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = true),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = true),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group element {
@@ -511,10 +510,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type - 1 - standard",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = false),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = false),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group list {
@@ -529,10 +527,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type - 2",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = false),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = false),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group element {
@@ -547,10 +544,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type - 3",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = false),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = false),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated int32 element;
@@ -589,12 +585,13 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type - 5 - parquet-avro style",
       StructType(
-          Seq(StructField("f1",
-                          ArrayType(StructType(Seq(StructField("str",
-                                                               StringType,
-                                                               nullable = false))),
-                                    containsNull = false),
-                          nullable = true))),
+          Seq(StructField(
+                  "f1",
+                  ArrayType(StructType(Seq(StructField("str",
+                                                       StringType,
+                                                       nullable = false))),
+                            containsNull = false),
+                  nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group array {
@@ -610,12 +607,13 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type - 6 - parquet-thrift style",
       StructType(
-          Seq(StructField("f1",
-                          ArrayType(StructType(Seq(StructField("str",
-                                                               StringType,
-                                                               nullable = false))),
-                                    containsNull = false),
-                          nullable = true))),
+          Seq(StructField(
+                  "f1",
+                  ArrayType(StructType(Seq(StructField("str",
+                                                       StringType,
+                                                       nullable = false))),
+                            containsNull = false),
+                  nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group f1_tuple {
@@ -687,10 +685,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testCatalystToParquet(
       "Backwards-compatibility: LIST with nullable element type - 2 - prior to 1.4.x",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = true),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = true),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group bag {
@@ -705,10 +702,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testCatalystToParquet(
       "Backwards-compatibility: LIST with non-nullable element type - 1 - standard",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = false),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = false),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated group list {
@@ -723,10 +719,9 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testCatalystToParquet(
       "Backwards-compatibility: LIST with non-nullable element type - 2 - prior to 1.4.x",
-      StructType(
-          Seq(StructField("f1",
-                          ArrayType(IntegerType, containsNull = false),
-                          nullable = true))),
+      StructType(Seq(StructField("f1",
+                                 ArrayType(IntegerType, containsNull = false),
+                                 nullable = true))),
       """message root {
       |  optional group f1 (LIST) {
       |    repeated int32 array;
@@ -1373,21 +1368,22 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
                      catalystSchema = new StructType(),
                      expectedSchema = "message root {}")
 
-  testSchemaClipping("disjoint field sets",
-                     parquetSchema = """message root {
+  testSchemaClipping(
+      "disjoint field sets",
+      parquetSchema = """message root {
         |  required group f0 {
         |    required int32 f00;
         |    required int64 f01;
         |  }
         |}
       """.stripMargin,
-                     catalystSchema = new StructType().add(
-                           "f0",
-                           new StructType()
-                             .add("f02", FloatType, nullable = true)
-                             .add("f03", DoubleType, nullable = true),
-                           nullable = true),
-                     expectedSchema = """message root {
+      catalystSchema =
+        new StructType().add("f0",
+                             new StructType()
+                               .add("f02", FloatType, nullable = true)
+                               .add("f03", DoubleType, nullable = true),
+                             nullable = true),
+      expectedSchema = """message root {
         |  required group f0 {
         |    optional float f02;
         |    optional double f03;

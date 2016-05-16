@@ -111,7 +111,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   }
 
   private[this] def hyperLogLogMap[
-      T <% Array[Byte]: TupleConverter, U : TupleSetter](
+      T <% Array[Byte]: TupleConverter, U: TupleSetter](
       f: (Fields, Fields), errPercent: Double = 1.0)(fn: HLL => U) = {
     //bits = log(m) == 2 *log(104/errPercent) = 2log(104) - 2*log(errPercent)
     def log2(x: Double) = scala.math.log(x) / scala.math.log(2.0)
@@ -126,7 +126,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * This is count with a predicate: only counts the tuples for which
     * `fn(tuple)` is true
     */
-  def count[T : TupleConverter](fieldDef: (Fields, Fields))(
+  def count[T: TupleConverter](fieldDef: (Fields, Fields))(
       fn: T => Boolean): Self = {
     mapPlusMap(fieldDef) { (arg: T) =>
       if (fn(arg)) 1L else 0L
@@ -202,7 +202,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   /*
    * check if a predicate is satisfied for all in the values for this key
    */
-  def forall[T : TupleConverter](fieldDef: (Fields, Fields))(
+  def forall[T: TupleConverter](fieldDef: (Fields, Fields))(
       fn: (T) => Boolean): Self = {
     mapReduceMap(fieldDef)(fn)({ (x: Boolean, y: Boolean) =>
       x && y
@@ -469,7 +469,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     *
     * topClicks will be a List[(Long,Long)]
     */
-  def sortWithTake[T : TupleConverter](f: (Fields, Fields), k: Int)(
+  def sortWithTake[T: TupleConverter](f: (Fields, Fields), k: Int)(
       lt: (T, T) => Boolean): Self = {
     val ord = Ordering.fromLessThan(lt);
     sortedTake(f, k)(implicitly[TupleConverter[T]], ord)

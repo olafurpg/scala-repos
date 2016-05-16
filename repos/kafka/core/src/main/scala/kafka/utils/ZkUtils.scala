@@ -407,10 +407,10 @@ class ZkUtils(val zkClient: ZkClient,
   /**
     * Create an ephemeral node with the given path and data. Create parents if necessary.
     */
-  private def createEphemeralPath(
-      path: String,
-      data: String,
-      acls: java.util.List[ACL] = DefaultAcls): Unit = {
+  private def createEphemeralPath(path: String,
+                                  data: String,
+                                  acls: java.util.List[ACL] =
+                                    DefaultAcls): Unit = {
     try {
       ZkPath.createEphemeral(zkClient, path, data, acls)
     } catch {
@@ -425,10 +425,10 @@ class ZkUtils(val zkClient: ZkClient,
     * Create an ephemeral node with the given path and data.
     * Throw NodeExistException if node already exists.
     */
-  def createEphemeralPathExpectConflict(
-      path: String,
-      data: String,
-      acls: java.util.List[ACL] = DefaultAcls): Unit = {
+  def createEphemeralPathExpectConflict(path: String,
+                                        data: String,
+                                        acls: java.util.List[ACL] =
+                                          DefaultAcls): Unit = {
     try {
       createEphemeralPath(path, data, acls)
     } catch {
@@ -515,8 +515,8 @@ class ZkUtils(val zkClient: ZkClient,
       path: String,
       data: String,
       expectVersion: Int,
-      optionalChecker: Option[(ZkUtils, String, String) => (Boolean, Int)] = None)
-    : (Boolean, Int) = {
+      optionalChecker: Option[(ZkUtils, String, String) => (Boolean, Int)] =
+        None): (Boolean, Int) = {
     try {
       val stat = zkClient.writeDataReturnStat(path, data, expectVersion)
       debug(
@@ -759,8 +759,8 @@ class ZkUtils(val zkClient: ZkClient,
       case Some(jsonPartitionMap) =>
         val reassignedPartitions = parsePartitionReassignmentData(
             jsonPartitionMap)
-        reassignedPartitions.map(
-            p => (p._1 -> new ReassignedPartitionsContext(p._2)))
+        reassignedPartitions.map(p =>
+              (p._1 -> new ReassignedPartitionsContext(p._2)))
       case None => Map.empty[TopicAndPartition, ReassignedPartitionsContext]
     }
   }
@@ -774,13 +774,11 @@ class ZkUtils(val zkClient: ZkClient,
           case Some(partitionsSeq) =>
             partitionsSeq
               .asInstanceOf[Seq[Map[String, Any]]]
-              .map(p =>
-                    {
-                  val topic = p.get("topic").get.asInstanceOf[String]
-                  val partition = p.get("partition").get.asInstanceOf[Int]
-                  val newReplicas =
-                    p.get("replicas").get.asInstanceOf[Seq[Int]]
-                  TopicAndPartition(topic, partition) -> newReplicas
+              .map(p => {
+                val topic = p.get("topic").get.asInstanceOf[String]
+                val partition = p.get("partition").get.asInstanceOf[Int]
+                val newReplicas = p.get("replicas").get.asInstanceOf[Seq[Int]]
+                TopicAndPartition(topic, partition) -> newReplicas
               })
           case None =>
             Seq.empty
@@ -804,10 +802,9 @@ class ZkUtils(val zkClient: ZkClient,
             val mapPartitionSeq =
               partitionsSeq.asInstanceOf[Seq[Map[String, Any]]]
             mapPartitionSeq.foreach(
-                p =>
-                  {
-                val topic = p.get("topic").get.asInstanceOf[String]
-                topics ++= List(topic)
+                p => {
+              val topic = p.get("topic").get.asInstanceOf[String]
+              topics ++= List(topic)
             })
           case None =>
         }

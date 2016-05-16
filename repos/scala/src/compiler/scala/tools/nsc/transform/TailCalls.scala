@@ -324,10 +324,10 @@ abstract class TailCalls extends Transform {
                */
               if (newCtx.isMandatory) {
                 for (t @ Apply(fn, _) <- newRHS;
-                                            if fn.symbol == newCtx.method) {
-                      failPositions(newCtx) = t.pos
-                      tailrecFailure(newCtx)
-                    }
+                     if fn.symbol == newCtx.method) {
+                  failPositions(newCtx) = t.pos
+                  tailrecFailure(newCtx)
+                }
               }
               val newThis = newCtx.newThis(tree.pos)
               val vpSyms = vparamss0.flatten map (_.symbol)

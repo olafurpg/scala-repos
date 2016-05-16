@@ -14,7 +14,10 @@ import scala.concurrent.Future
 import MarathonTestHelper.Implicits._
 
 class UpdateTaskTrackerStepImplTest
-    extends FunSuite with Matchers with ScalaFutures with Mockito
+    extends FunSuite
+    with Matchers
+    with ScalaFutures
+    with Mockito
     with GivenWhenThen {
   test("name") {
     new Fixture().step.name should equal("updateTaskTracker")

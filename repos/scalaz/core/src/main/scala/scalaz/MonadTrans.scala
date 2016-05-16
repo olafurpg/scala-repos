@@ -71,8 +71,8 @@ sealed abstract class MonadPartialOrderFunctions
       def promote[A](m: M[A]) = m
     }
 
-  implicit def transformer[
-      M[_]: Monad, F[_ [_], _]: MonadTrans]: MonadPartialOrder[F[M, ?], M] =
+  implicit def transformer[M[_]: Monad, F[_ [_], _]: MonadTrans]
+    : MonadPartialOrder[F[M, ?], M] =
     id[M].transform[F]
 }
 

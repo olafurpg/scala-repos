@@ -146,7 +146,8 @@ object ReplayLogProducer extends Logging {
 
   class ZKConsumerThread(
       config: Config, stream: KafkaStream[Array[Byte], Array[Byte]])
-      extends Thread with Logging {
+      extends Thread
+      with Logging {
     val shutdownLatch = new CountDownLatch(1)
     val producer =
       new KafkaProducer[Array[Byte], Array[Byte]](config.producerProps)

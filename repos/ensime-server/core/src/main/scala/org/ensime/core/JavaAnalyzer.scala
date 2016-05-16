@@ -17,7 +17,9 @@ class JavaAnalyzer(
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
 )
-    extends Actor with Stash with ActorLogging {
+    extends Actor
+    with Stash
+    with ActorLogging {
 
   protected var javaCompiler: JavaCompiler = _
 

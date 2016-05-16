@@ -24,7 +24,9 @@ import akka.http.scaladsl.model.HttpMethods._
 import akka.http.impl.util._
 
 abstract class CoderSpec
-    extends WordSpec with CodecSpecSupport with Inspectors {
+    extends WordSpec
+    with CodecSpecSupport
+    with Inspectors {
   protected def Coder: Coder with StreamDecoder
   protected def newDecodedInputStream(underlying: InputStream): InputStream
   protected def newEncodedOutputStream(underlying: OutputStream): OutputStream

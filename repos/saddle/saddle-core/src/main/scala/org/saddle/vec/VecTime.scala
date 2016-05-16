@@ -67,43 +67,43 @@ class VecTime(
 
   def unary_-() = sys.error("Cannot negate VecTime")
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: (DateTime) => B) =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: (DateTime) => B) =
     times.map(v => f(l2t(v)))
 
-  def flatMap[@spec(Boolean, Int, Long, Double) B : ST](
+  def flatMap[@spec(Boolean, Int, Long, Double) B: ST](
       f: DateTime => Vec[B]): Vec[B] =
     VecImpl.flatMap(this)(f)
 
-  def foldLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def foldLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, DateTime) => B) =
     times.foldLeft(init)((a, b) => f(a, l2t(b)))
 
-  def scanLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def scanLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, DateTime) => B) =
     times.scanLeft(init)((a, b) => f(a, l2t(b)))
 
-  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: (DateTime) => Boolean)(init: B)(f: (B, DateTime) => B) =
     times.filterFoldLeft(l2t _ andThen pred)(init)((a, b) => f(a, l2t(b)))
 
-  def filterScanLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterScanLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: (DateTime) => Boolean)(init: B)(f: (B, DateTime) => B) =
     times.filterScanLeft(l2t _ andThen pred)(init)((a, b) => f(a, l2t(b)))
 
-  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B : ST](
+  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B: ST](
       init: B)(f: (B, DateTime) => B)(cond: (B, DateTime) => Boolean) =
-    times.foldLeftWhile(init)((a, b) => f(a, l2t(b)))(
-        (a, b) => cond(a, l2t(b)))
+    times.foldLeftWhile(init)((a, b) => f(a, l2t(b)))((a, b) =>
+          cond(a, l2t(b)))
 
-  def zipMap[@spec(Boolean, Int, Long, Double) B : ST,
-             @spec(Boolean, Int, Long, Double) C : ST](other: Vec[B])(
+  def zipMap[@spec(Boolean, Int, Long, Double) B: ST,
+             @spec(Boolean, Int, Long, Double) C: ST](other: Vec[B])(
       f: (DateTime, B) => C) = times.zipMap(other)((a, b) => f(l2t(a), b))
 
   def dropNA = vl2vt(times.dropNA)
 
   def hasNA = times.hasNA
 
-  def rolling[@spec(Boolean, Int, Long, Double) B : ST](
+  def rolling[@spec(Boolean, Int, Long, Double) B: ST](
       winSz: Int, f: (Vec[DateTime]) => B) =
     times.rolling(winSz, vl2vt _ andThen f)
 

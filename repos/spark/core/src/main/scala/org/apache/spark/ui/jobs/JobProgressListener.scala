@@ -179,7 +179,8 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
   override def onJobStart(jobStart: SparkListenerJobStart): Unit =
     synchronized {
       val jobGroup = for (props <- Option(jobStart.properties);
-      group <- Option(props.getProperty(SparkContext.SPARK_JOB_GROUP_ID))) yield
+                          group <- Option(props.getProperty(
+                                          SparkContext.SPARK_JOB_GROUP_ID))) yield
         group
       val jobData: JobUIData =
         new JobUIData(jobId = jobStart.jobId,
@@ -286,9 +287,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     }
 
     for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-        stage.stageId);
-    jobId <- activeJobsDependentOnStage;
-    jobData <- jobIdToData.get(jobId)) {
+                                          stage.stageId);
+         jobId <- activeJobsDependentOnStage;
+         jobData <- jobIdToData.get(jobId)) {
       jobData.numActiveStages -= 1
       if (stage.failureReason.isEmpty) {
         if (!stage.submissionTime.isEmpty) {
@@ -324,9 +325,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
     stages(stage.stageId) = stage
 
     for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-        stage.stageId);
-    jobId <- activeJobsDependentOnStage;
-    jobData <- jobIdToData.get(jobId)) {
+                                          stage.stageId);
+         jobId <- activeJobsDependentOnStage;
+         jobData <- jobIdToData.get(jobId)) {
       jobData.numActiveStages += 1
 
       // If a stage retries again, it should be removed from completedStageIndices set
@@ -349,9 +350,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
             taskInfo.taskId, new TaskUIData(taskInfo, Some(metrics)))
       }
       for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-          taskStart.stageId);
-      jobId <- activeJobsDependentOnStage;
-      jobData <- jobIdToData.get(jobId)) {
+                                            taskStart.stageId);
+           jobId <- activeJobsDependentOnStage;
+           jobData <- jobIdToData.get(jobId)) {
         jobData.numActiveTasks += 1
       }
     }
@@ -391,20 +392,20 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       execSummary.taskTime += info.duration
       stageData.numActiveTasks -= 1
 
-      val (errorMessage, accums): (Option[String],
-      Seq[AccumulableInfo]) = taskEnd.reason match {
-        case org.apache.spark.Success =>
-          stageData.completedIndices.add(info.index)
-          stageData.numCompleteTasks += 1
-          (None, taskEnd.taskMetrics.accumulatorUpdates())
-        case e: ExceptionFailure =>
-          // Handle ExceptionFailure because we might have accumUpdates
-          stageData.numFailedTasks += 1
-          (Some(e.toErrorString), e.accumUpdates)
-        case e: TaskFailedReason => // All other failure cases
-          stageData.numFailedTasks += 1
-          (Some(e.toErrorString), Seq.empty[AccumulableInfo])
-      }
+      val (errorMessage, accums): (Option[String], Seq[AccumulableInfo]) =
+        taskEnd.reason match {
+          case org.apache.spark.Success =>
+            stageData.completedIndices.add(info.index)
+            stageData.numCompleteTasks += 1
+            (None, taskEnd.taskMetrics.accumulatorUpdates())
+          case e: ExceptionFailure =>
+            // Handle ExceptionFailure because we might have accumUpdates
+            stageData.numFailedTasks += 1
+            (Some(e.toErrorString), e.accumUpdates)
+          case e: TaskFailedReason => // All other failure cases
+            stageData.numFailedTasks += 1
+            (Some(e.toErrorString), Seq.empty[AccumulableInfo])
+        }
 
       val taskMetrics =
         if (accums.nonEmpty) {
@@ -425,9 +426,9 @@ class JobProgressListener(conf: SparkConf) extends SparkListener with Logging {
       taskData.errorMessage = errorMessage
 
       for (activeJobsDependentOnStage <- stageIdToActiveJobIds.get(
-          taskEnd.stageId);
-      jobId <- activeJobsDependentOnStage;
-      jobData <- jobIdToData.get(jobId)) {
+                                            taskEnd.stageId);
+           jobId <- activeJobsDependentOnStage;
+           jobData <- jobIdToData.get(jobId)) {
         jobData.numActiveTasks -= 1
         taskEnd.reason match {
           case Success =>

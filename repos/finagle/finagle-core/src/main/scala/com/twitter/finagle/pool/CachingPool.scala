@@ -13,12 +13,12 @@ import scala.annotation.tailrec
   * @see The [[https://twitter.github.io/finagle/guide/Clients.html#caching-pool user guide]]
   *      for more details.
   */
-private[finagle] class CachingPool[Req, Rep](
-    factory: ServiceFactory[Req, Rep],
-    cacheSize: Int,
-    ttl: Duration,
-    timer: Timer,
-    statsReceiver: StatsReceiver = NullStatsReceiver)
+private[finagle] class CachingPool[Req, Rep](factory: ServiceFactory[Req, Rep],
+                                             cacheSize: Int,
+                                             ttl: Duration,
+                                             timer: Timer,
+                                             statsReceiver: StatsReceiver =
+                                               NullStatsReceiver)
     extends ServiceFactory[Req, Rep] {
   private[this] val cache =
     new Cache[Service[Req, Rep]](cacheSize, ttl, timer, Some(_.close()))

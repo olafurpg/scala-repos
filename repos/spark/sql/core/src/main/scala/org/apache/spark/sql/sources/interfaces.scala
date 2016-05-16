@@ -404,12 +404,12 @@ case class HadoopFsRelation(sqlContext: SQLContext,
                             bucketSpec: Option[BucketSpec],
                             fileFormat: FileFormat,
                             options: Map[String, String])
-    extends BaseRelation with FileRelation {
+    extends BaseRelation
+    with FileRelation {
 
   val schema: StructType = {
     val dataSchemaColumnNames = dataSchema.map(_.name.toLowerCase).toSet
-    StructType(
-        dataSchema ++ partitionSchema.filterNot { column =>
+    StructType(dataSchema ++ partitionSchema.filterNot { column =>
       dataSchemaColumnNames.contains(column.name.toLowerCase)
     })
   }
@@ -535,7 +535,8 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
                       val parameters: Map[String, String],
                       val paths: Seq[Path],
                       val partitionSchema: Option[StructType])
-    extends FileCatalog with Logging {
+    extends FileCatalog
+    with Logging {
 
   private val hadoopConf = new Configuration(
       sqlContext.sparkContext.hadoopConfiguration)
@@ -668,8 +669,8 @@ class HDFSFileCatalog(val sqlContext: SQLContext,
         PartitioningUtils.parsePartitions(
             leafDirs,
             PartitioningUtils.DEFAULT_PARTITION_NAME,
-            typeInference = sqlContext.conf
-                .partitionColumnTypeInferenceEnabled(),
+            typeInference =
+              sqlContext.conf.partitionColumnTypeInferenceEnabled(),
             basePaths = basePaths)
     }
   }

@@ -248,8 +248,8 @@ class ScalaPatternParameterInfoHandler
                 if (ref != null) {
                   val name = ref.refName
                   val variants: Array[ResolveResult] = ref.multiResolve(false)
-                  for (variant <- variants if variant
-                                   .isInstanceOf[ScalaResolveResult]) {
+                  for (variant <- variants
+                       if variant.isInstanceOf[ScalaResolveResult]) {
                     val r = variant.asInstanceOf[ScalaResolveResult]
                     r.element match {
                       case fun: ScFunction if fun.parameters.nonEmpty =>
@@ -257,15 +257,14 @@ class ScalaPatternParameterInfoHandler
                         val subst =
                           if (fun.typeParameters.length == 0) substitutor
                           else {
-                            val undefSubst = fun.typeParameters.foldLeft(
-                                ScSubstitutor.empty)((s,
-                                p) =>
-                                  s.bindT((
-                                              p.name,
-                                              ScalaPsiUtil.getPsiElementId(p)),
-                                          ScUndefinedType(
-                                              new ScTypeParameterType(
-                                                  p, substitutor))))
+                            val undefSubst =
+                              fun.typeParameters.foldLeft(ScSubstitutor.empty)(
+                                  (s, p) =>
+                                    s.bindT((p.name,
+                                             ScalaPsiUtil.getPsiElementId(p)),
+                                            ScUndefinedType(
+                                                new ScTypeParameterType(
+                                                    p, substitutor))))
                             val emptySubst: ScSubstitutor =
                               fun.typeParameters.foldLeft(ScSubstitutor.empty)(
                                   (s, p) =>

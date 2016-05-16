@@ -144,12 +144,12 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
     )
 
     // reserved resources should not be matched by selector with reserved = false
-    ResourceMatcher.matchResources(
-        offer,
-        app,
-        runningTasks = Set(),
-        ResourceSelector(Set("*", "marathon"), reserved = false)) should be(
-        None)
+    ResourceMatcher.matchResources(offer,
+                                   app,
+                                   runningTasks = Set(),
+                                   ResourceSelector(Set("*", "marathon"),
+                                                    reserved =
+                                                      false)) should be(None)
   }
 
   test("match resources should not consider resources with disk infos") {
@@ -238,13 +238,13 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         mem = 128.0,
         disk = 0.0,
         constraints = Set(
-              Constraint.newBuilder
-                .setField("hostname")
-                .setOperator(Operator.LIKE)
-                .setValue("host1")
-                .build()
-            )
-      )
+            Constraint.newBuilder
+              .setField("hostname")
+              .setOperator(Operator.LIKE)
+              .setValue("host1")
+              .build()
+        )
+    )
 
     val resOpt = ResourceMatcher.matchResources(
         offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)
@@ -263,13 +263,13 @@ class ResourceMatcherTest extends MarathonSpec with Matchers {
         mem = 128.0,
         disk = 0.0,
         constraints = Set(
-              Constraint.newBuilder
-                .setField("hostname")
-                .setOperator(Operator.LIKE)
-                .setValue("host2")
-                .build()
-            )
-      )
+            Constraint.newBuilder
+              .setField("hostname")
+              .setOperator(Operator.LIKE)
+              .setValue("host2")
+              .build()
+        )
+    )
 
     val resOpt = ResourceMatcher.matchResources(
         offer, app, runningTasks = Iterable.empty, ResourceSelector.wildcard)

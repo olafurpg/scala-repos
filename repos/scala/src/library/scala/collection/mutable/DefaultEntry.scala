@@ -14,7 +14,8 @@ package mutable
   *  @since 2.3
   */
 final class DefaultEntry[A, B](val key: A, var value: B)
-    extends HashEntry[A, DefaultEntry[A, B]] with Serializable {
+    extends HashEntry[A, DefaultEntry[A, B]]
+    with Serializable {
   override def toString = chainString
 
   def chainString = {

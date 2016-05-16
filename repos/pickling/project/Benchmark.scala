@@ -76,10 +76,10 @@ object Benchmark {
         // PAPER
         travIntPick := benchTask(
             "TraversableIntBench", 100000 to 1000000 by 100000).evaluated,
-        travIntJava := benchTask(
-            "TraversableJavaIntBench", 100000 to 1000000 by 100000).evaluated,
-        travIntKryo := benchTask(
-            "TraversableKryoIntBench", 100000 to 1000000 by 100000).evaluated,
+        travIntJava := benchTask("TraversableJavaIntBench",
+                                 100000 to 1000000 by 100000).evaluated,
+        travIntKryo := benchTask("TraversableKryoIntBench",
+                                 100000 to 1000000 by 100000).evaluated,
         travIntPickFreeMem := benchTask("TraversableIntBenchFreeMem",
                                         100000 to 1000000 by 100000).evaluated,
         travIntJavaFreeMem := benchTask("TraversableJavaIntBenchFreeMem",

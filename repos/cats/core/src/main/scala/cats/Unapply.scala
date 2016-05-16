@@ -153,19 +153,20 @@ private[cats] sealed abstract class Unapply3Instances {
   // the type we will instantiate when we find a type class instance
   // for a type in the shape of a Monad Transformer with 3 type params
   // F[_[_],_,_] when we fix the middle type
-  type Aux3MTLeft[TC[_ [_]], MA, F[_ [_], _, _], AA[_], B, C] = Unapply[TC, MA] {
-    type M[X] = F[AA, X, C]
-    type A = B
-  }
+  type Aux3MTLeft[TC[_ [_]], MA, F[_ [_], _, _], AA[_], B, C] =
+    Unapply[TC, MA] {
+      type M[X] = F[AA, X, C]
+      type A = B
+    }
 
   // the type we will instantiate when we find a type class instance
   // for a type in the shape of a Monad Transformer with 3 type params
   // F[_[_],_,_] when we fix the right type
-  type Aux3MTRight[TC[_ [_]], MA, F[_ [_], _, _], AA[_], B, C] = Unapply[
-      TC, MA] {
-    type M[X] = F[AA, B, X]
-    type A = C
-  }
+  type Aux3MTRight[TC[_ [_]], MA, F[_ [_], _, _], AA[_], B, C] =
+    Unapply[TC, MA] {
+      type M[X] = F[AA, B, X]
+      type A = C
+    }
 
   implicit def unapply3MTLeft[TC[_ [_]], F[_ [_], _, _], AA[_], B, C](
       implicit tc: TC[F[AA, ?, C]]): Aux3MTLeft[TC, F[AA, B, C], F, AA, B, C] =

@@ -74,8 +74,9 @@ final class Well44497a protected[random](state: Array[Int], i0: Int)
     val z2: Int = mat0neg(-10, state(vm2(i))) ^ mat3neg(-26, state(vm3(i)))
 
     state(i) = z1 ^ z2
-    state(vrm1(i)) = mat1(z0) ^ mat0pos(20, z1) ^ mat5(
-        9, 0xb729fcec, 0xfbffffff, 0x00020000, z2) ^ mat1(state(i))
+    state(vrm1(i)) =
+      mat1(z0) ^ mat0pos(20, z1) ^ mat5(
+          9, 0xb729fcec, 0xfbffffff, 0x00020000, z2) ^ mat1(state(i))
     i = vrm1(i)
 
     state(i)

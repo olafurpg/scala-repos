@@ -197,10 +197,8 @@ class SerializeSpec extends AkkaSpec(SerializationTests.serializeConf) {
           new ObjectInputStream(new ByteArrayInputStream(outbuf.toByteArray))
         JavaSerializer.currentSystem
           .withValue(a.asInstanceOf[ActorSystemImpl]) {
-          val deadLetters = in
-            .readObject()
-            .asInstanceOf[DeadLetterActorRef]
-            (deadLetters eq a.deadLetters) should ===(true)
+          val deadLetters = in.readObject().asInstanceOf[DeadLetterActorRef]
+          (deadLetters eq a.deadLetters) should ===(true)
         }
       } finally {
         shutdown(a)
@@ -505,6 +503,7 @@ protected[akka] class TestSerializer extends Serializer {
 
 @SerialVersionUID(1)
 protected[akka] final case class FakeThrowable(msg: String)
-    extends Throwable(msg) with Serializable {
+    extends Throwable(msg)
+    with Serializable {
   override def fillInStackTrace = null
 }

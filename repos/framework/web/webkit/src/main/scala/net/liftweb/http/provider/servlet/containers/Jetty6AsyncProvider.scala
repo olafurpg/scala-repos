@@ -63,8 +63,8 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
     * return a function that vends the ServletAsyncProvider
     */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
-    Full(req => new Jetty6AsyncProvider(req))
-      .filter(i => suspendResumeSupport_?)
+    Full(req => new Jetty6AsyncProvider(req)).filter(i =>
+          suspendResumeSupport_?)
 }
 
 /**
@@ -74,7 +74,8 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   *
   */
 class Jetty6AsyncProvider(req: HTTPRequest)
-    extends ServletAsyncProvider with Loggable {
+    extends ServletAsyncProvider
+    with Loggable {
 
   import Jetty6AsyncProvider._
 

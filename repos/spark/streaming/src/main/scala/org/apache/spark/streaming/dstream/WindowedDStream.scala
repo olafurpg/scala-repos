@@ -24,7 +24,7 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.Duration
 
-private[streaming] class WindowedDStream[T : ClassTag](
+private[streaming] class WindowedDStream[T: ClassTag](
     parent: DStream[T],
     _windowDuration: Duration,
     _slideDuration: Duration)

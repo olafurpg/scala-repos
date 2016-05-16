@@ -413,7 +413,9 @@ object BigDecimal {
   *  @version 1.1
   */
 final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
-    extends ScalaNumber with ScalaNumericConversions with Serializable
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable
     with Ordered[BigDecimal] {
   def this(bigDecimal: BigDec) =
     this(bigDecimal, BigDecimal.defaultMathContext)
@@ -434,14 +436,16 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
   // Note--not lazy val because we can't afford the extra space.
   private final var computedHashCode: Int = BigDecimal.hashCodeNotComputed
   private final def computeHashCode(): Unit = {
-    computedHashCode = if (isWhole && (precision - scale) < BigDecimal.maximumHashScale)
-      toBigInt.hashCode
-    else if (isDecimalDouble) doubleValue.##
-    else {
-      val temp = bigDecimal.stripTrailingZeros
-      scala.util.hashing.MurmurHash3.mixLast(
-          temp.scaleByPowerOfTen(temp.scale).toBigInteger.hashCode, temp.scale)
-    }
+    computedHashCode =
+      if (isWhole && (precision - scale) < BigDecimal.maximumHashScale)
+        toBigInt.hashCode
+      else if (isDecimalDouble) doubleValue.##
+      else {
+        val temp = bigDecimal.stripTrailingZeros
+        scala.util.hashing.MurmurHash3.mixLast(
+            temp.scaleByPowerOfTen(temp.scale).toBigInteger.hashCode,
+            temp.scale)
+      }
   }
 
   /** Returns the hash code for this BigDecimal.

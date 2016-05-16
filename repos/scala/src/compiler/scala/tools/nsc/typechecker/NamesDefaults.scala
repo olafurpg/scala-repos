@@ -54,14 +54,14 @@ trait NamesDefaults { self: Analyzer =>
   }
 
   /** @param pos maps indices from old to new */
-  def reorderArgs[T : ClassTag](args: List[T], pos: Int => Int): List[T] = {
+  def reorderArgs[T: ClassTag](args: List[T], pos: Int => Int): List[T] = {
     val res = new Array[T](args.length)
     foreachWithIndex(args)((arg, index) => res(pos(index)) = arg)
     res.toList
   }
 
   /** @param pos maps indices from new to old (!) */
-  private def reorderArgsInv[T : ClassTag](
+  private def reorderArgsInv[T: ClassTag](
       args: List[T], pos: Int => Int): List[T] = {
     val argsArray = args.toArray
     (argsArray.indices map (i => argsArray(pos(i)))).toList
@@ -483,28 +483,28 @@ trait NamesDefaults { self: Analyzer =>
       if (missing forall (_.hasDefault)) {
         val defaultArgs =
           missing flatMap
-          (p =>
-                {
-                  val defGetter = defaultGetter(p, context)
-                  // TODO #3649 can create spurious errors when companion object is gone (because it becomes unlinked from scope)
-                  if (defGetter == NoSymbol)
-                    None // prevent crash in erroneous trees, #3649
-                  else {
-                    var default1: Tree = qual match {
-                      case Some(q) =>
-                        gen.mkAttributedSelect(q.duplicate, defGetter)
-                      case None => gen.mkAttributedRef(defGetter)
-                    }
-                    default1 = if (targs.isEmpty) default1
-                    else TypeApply(default1, targs.map(_.duplicate))
-                    val default2 = (default1 /: previousArgss)(
-                        (tree, args) => Apply(tree, args.map(_.duplicate)))
-                    Some(
-                        atPos(pos) {
-                      if (positional) default2
-                      else AssignOrNamedArg(Ident(p.name), default2)
-                    })
+          (p => {
+                val defGetter = defaultGetter(p, context)
+                // TODO #3649 can create spurious errors when companion object is gone (because it becomes unlinked from scope)
+                if (defGetter == NoSymbol)
+                  None // prevent crash in erroneous trees, #3649
+                else {
+                  var default1: Tree = qual match {
+                    case Some(q) =>
+                      gen.mkAttributedSelect(q.duplicate, defGetter)
+                    case None => gen.mkAttributedRef(defGetter)
                   }
+                  default1 =
+                    if (targs.isEmpty) default1
+                    else TypeApply(default1, targs.map(_.duplicate))
+                  val default2 = (default1 /: previousArgss)((tree, args) =>
+                        Apply(tree, args.map(_.duplicate)))
+                  Some(
+                      atPos(pos) {
+                    if (positional) default2
+                    else AssignOrNamedArg(Ident(p.name), default2)
+                  })
+                }
               })
         (givenArgs ::: defaultArgs, Nil)
       } else (givenArgs, missing filterNot (_.hasDefault))
@@ -664,7 +664,8 @@ trait NamesDefaults { self: Analyzer =>
               if isAmbiguousAssignment(typer, params(paramPos), arg) =>
             AmbiguousReferenceInNamesDefaultError(arg, name)
           case paramPos if paramPos != argIndex =>
-            positionalAllowed = false // named arg is not in original parameter order: require names after this
+            positionalAllowed =
+              false // named arg is not in original parameter order: require names after this
             argPos(argIndex) = paramPos // fix up the arg position
             rhs
           case _ => rhs

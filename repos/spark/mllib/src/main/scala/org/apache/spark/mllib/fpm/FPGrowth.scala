@@ -48,9 +48,10 @@ import org.apache.spark.storage.StorageLevel
   * @tparam Item item type
   */
 @Since("1.3.0")
-class FPGrowthModel[Item : ClassTag] @Since("1.3.0")(
+class FPGrowthModel[Item: ClassTag] @Since("1.3.0")(
     @Since("1.3.0") val freqItemsets: RDD[FreqItemset[Item]])
-    extends Saveable with Serializable {
+    extends Saveable
+    with Serializable {
 
   /**
     * Generates association rules for the [[Item]]s in [[freqItemsets]].
@@ -103,8 +104,7 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       val sc = model.freqItemsets.sparkContext
       val sqlContext = SQLContext.getOrCreate(sc)
 
-      val metadata = compact(
-          render(
+      val metadata = compact(render(
               ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
@@ -142,7 +142,7 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       loadImpl(freqItemsets, sample)
     }
 
-    def loadImpl[Item : ClassTag](
+    def loadImpl[Item: ClassTag](
         freqItemsets: DataFrame, sample: Item): FPGrowthModel[Item] = {
       val freqItemsetsRDD = freqItemsets.select("items", "freq").rdd.map { x =>
         val items = x.getAs[Seq[Item]](0).toArray
@@ -173,7 +173,8 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
 @Since("1.3.0")
 class FPGrowth private (
     private var minSupport: Double, private var numPartitions: Int)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   /**
     * Constructs a default instance with default parameters {minSupport: `0.3`, numPartitions: same
@@ -210,7 +211,7 @@ class FPGrowth private (
     *
     */
   @Since("1.3.0")
-  def run[Item : ClassTag](data: RDD[Array[Item]]): FPGrowthModel[Item] = {
+  def run[Item: ClassTag](data: RDD[Array[Item]]): FPGrowthModel[Item] = {
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning("Input data is not cached.")
     }
@@ -238,7 +239,7 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute items
     * @return array of frequent pattern ordered by their frequencies
     */
-  private def genFreqItems[Item : ClassTag](
+  private def genFreqItems[Item: ClassTag](
       data: RDD[Array[Item]],
       minCount: Long,
       partitioner: Partitioner): Array[Item] = {
@@ -265,7 +266,7 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute transactions
     * @return an RDD of (frequent itemset, count)
     */
-  private def genFreqItemsets[Item : ClassTag](
+  private def genFreqItemsets[Item: ClassTag](
       data: RDD[Array[Item]],
       minCount: Long,
       freqItems: Array[Item],
@@ -293,7 +294,7 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute transactions
     * @return a map of (target partition, conditional transaction)
     */
-  private def genCondTransactions[Item : ClassTag](
+  private def genCondTransactions[Item: ClassTag](
       transaction: Array[Item],
       itemToRank: Map[Item, Int],
       partitioner: Partitioner): mutable.Map[Int, Array[Int]] = {

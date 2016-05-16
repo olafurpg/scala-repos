@@ -113,4 +113,5 @@ object AnchorPane {
 
 class AnchorPane(
     override val delegate: jfxsl.AnchorPane = new jfxsl.AnchorPane)
-    extends Pane(delegate) with SFXDelegate[jfxsl.AnchorPane] {}
+    extends Pane(delegate)
+    with SFXDelegate[jfxsl.AnchorPane] {}

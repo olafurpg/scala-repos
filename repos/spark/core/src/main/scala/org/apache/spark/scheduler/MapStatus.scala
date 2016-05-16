@@ -93,7 +93,8 @@ private[spark] object MapStatus {
 private[spark] class CompressedMapStatus(
     private[this] var loc: BlockManagerId,
     private[this] var compressedSizes: Array[Byte])
-    extends MapStatus with Externalizable {
+    extends MapStatus
+    with Externalizable {
 
   protected def this() =
     this(null, null.asInstanceOf[Array[Byte]]) // For deserialization only
@@ -137,7 +138,8 @@ private[spark] class HighlyCompressedMapStatus private (
     private[this] var numNonEmptyBlocks: Int,
     private[this] var emptyBlocks: RoaringBitmap,
     private[this] var avgSize: Long)
-    extends MapStatus with Externalizable {
+    extends MapStatus
+    with Externalizable {
 
   // loc could be null when the default constructor is called during deserialization
   require(

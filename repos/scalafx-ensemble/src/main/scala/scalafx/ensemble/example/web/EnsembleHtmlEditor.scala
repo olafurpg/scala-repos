@@ -65,8 +65,8 @@ class EnsembleHtmlEditor extends EnsembleExample {
           htmlEditor,
           new Button {
             text = "Display Html below"
-            onAction = (ae: ActionEvent) =>
-              htmlLabel.text = htmlEditor.htmlText
+            onAction =
+              (ae: ActionEvent) => htmlLabel.text = htmlEditor.htmlText
           },
           new ScrollPane {
             prefHeight = 200

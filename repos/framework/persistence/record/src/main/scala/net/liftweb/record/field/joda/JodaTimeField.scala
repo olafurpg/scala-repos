@@ -77,7 +77,8 @@ trait JodaTimeTypedField extends TypedField[DateTime] with JodaHelpers {
 }
 
 class JodaTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[DateTime, OwnerType] with MandatoryTypedField[DateTime]
+    extends Field[DateTime, OwnerType]
+    with MandatoryTypedField[DateTime]
     with JodaTimeTypedField {
 
   def owner = rec
@@ -91,7 +92,8 @@ class JodaTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalJodaTimeField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[DateTime, OwnerType] with OptionalTypedField[DateTime]
+    extends Field[DateTime, OwnerType]
+    with OptionalTypedField[DateTime]
     with JodaTimeTypedField {
 
   def owner = rec

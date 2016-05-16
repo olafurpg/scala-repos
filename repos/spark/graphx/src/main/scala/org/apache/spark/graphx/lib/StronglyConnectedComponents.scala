@@ -35,7 +35,7 @@ object StronglyConnectedComponents {
     *
     * @return a graph with vertex attributes containing the smallest vertex id in each SCC
     */
-  def run[VD : ClassTag, ED : ClassTag](
+  def run[VD: ClassTag, ED: ClassTag](
       graph: Graph[VD, ED], numIter: Int): Graph[VertexId, ED] = {
     require(numIter > 0,
             s"Number of iterations must be greater than 0," +
@@ -77,9 +77,8 @@ object StronglyConnectedComponents {
             opt.getOrElse(scc)
         }
         // only keep vertices that are not final
-        sccWorkGraph = sccWorkGraph
-          .subgraph(vpred = (vid, data) => !data._2)
-          .cache()
+        sccWorkGraph =
+          sccWorkGraph.subgraph(vpred = (vid, data) => !data._2).cache()
       } while (sccWorkGraph.numVertices < numVertices)
 
       sccWorkGraph = sccWorkGraph.mapVertices {
@@ -91,14 +90,13 @@ object StronglyConnectedComponents {
       sccWorkGraph = Pregel[(VertexId, Boolean), ED, VertexId](
           sccWorkGraph, Long.MaxValue, activeDirection = EdgeDirection.Out)(
           (vid, myScc,
-          neighborScc) => (math.min(myScc._1, neighborScc), myScc._2),
-          e =>
-            {
-              if (e.srcAttr._1 < e.dstAttr._1) {
-                Iterator((e.dstId, e.srcAttr._1))
-              } else {
-                Iterator()
-              }
+           neighborScc) => (math.min(myScc._1, neighborScc), myScc._2),
+          e => {
+            if (e.srcAttr._1 < e.dstAttr._1) {
+              Iterator((e.dstId, e.srcAttr._1))
+            } else {
+              Iterator()
+            }
           },
           (vid1, vid2) => math.min(vid1, vid2))
 
@@ -108,22 +106,19 @@ object StronglyConnectedComponents {
           sccWorkGraph, false, activeDirection = EdgeDirection.In)(
           // vertex is final if it is the root of a color
           // or it has the same color as a neighbor that is final
-          (vid, myScc, existsSameColorFinalNeighbor) =>
-            {
-              val isColorRoot = vid == myScc._1
-              (myScc._1,
-               myScc._2 || isColorRoot || existsSameColorFinalNeighbor)
+          (vid, myScc, existsSameColorFinalNeighbor) => {
+            val isColorRoot = vid == myScc._1
+            (myScc._1, myScc._2 || isColorRoot || existsSameColorFinalNeighbor)
           },
           // activate neighbor if they are not final, you are, and you have the same color
-          e =>
-            {
-              val sameColor = e.dstAttr._1 == e.srcAttr._1
-              val onlyDstIsFinal = e.dstAttr._2 && !e.srcAttr._2
-              if (sameColor && onlyDstIsFinal) {
-                Iterator((e.srcId, e.dstAttr._2))
-              } else {
-                Iterator()
-              }
+          e => {
+            val sameColor = e.dstAttr._1 == e.srcAttr._1
+            val onlyDstIsFinal = e.dstAttr._2 && !e.srcAttr._2
+            if (sameColor && onlyDstIsFinal) {
+              Iterator((e.srcId, e.dstAttr._2))
+            } else {
+              Iterator()
+            }
           },
           (final1, final2) => final1 || final2)
     }

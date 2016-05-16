@@ -7,6 +7,9 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.fileStructureView._
   * @since 21.04.2015.
   */
 class Scalatest2_10_1_9_2_StructureViewTest
-    extends Scalatest2_10_1_9_2_Base with FeatureSpecFileStructureViewTest
-    with FlatSpecFileStructureViewTest with FreeSpecFileStructureViewTest
-    with FunSuiteFileStructureViewTest with PropSpecFileStructureViewTest {}
+    extends Scalatest2_10_1_9_2_Base
+    with FeatureSpecFileStructureViewTest
+    with FlatSpecFileStructureViewTest
+    with FreeSpecFileStructureViewTest
+    with FunSuiteFileStructureViewTest
+    with PropSpecFileStructureViewTest {}

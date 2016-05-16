@@ -125,8 +125,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
       case _: ScTemplateBody =>
         x match {
           case mem: ScMember
-              if mem.getModifierList.accessModifier
-                .exists(_.isUnqualifiedPrivateOrThis) =>
+              if mem.getModifierList.accessModifier.exists(
+                  _.isUnqualifiedPrivateOrThis) =>
             processLocalDeclaredElementHolder(x, state)
           case _ => // ignore.
         }

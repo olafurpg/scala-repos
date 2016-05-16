@@ -38,9 +38,8 @@ class DefaultOSGiLogger extends DefaultLogger {
       */
     def setLogService(logService: LogService) {
       messagesToLog.foreach(
-          x ⇒
-            {
-          logMessage(logService, x)
+          x ⇒ {
+        logMessage(logService, x)
       })
       context.become(initialisedReceive(logService))
     }

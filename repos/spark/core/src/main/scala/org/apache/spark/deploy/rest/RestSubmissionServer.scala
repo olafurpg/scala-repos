@@ -94,10 +94,8 @@ private[spark] abstract class RestSubmissionServer(
     }
     server.setHandler(mainHandler)
     server.start()
-    val boundPort = server
-      .getConnectors()(0)
-      .getLocalPort
-      (server, boundPort)
+    val boundPort = server.getConnectors()(0).getLocalPort
+    (server, boundPort)
   }
 
   def stop(): Unit = {

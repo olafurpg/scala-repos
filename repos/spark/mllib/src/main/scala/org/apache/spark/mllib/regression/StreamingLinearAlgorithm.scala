@@ -146,7 +146,7 @@ abstract class StreamingLinearAlgorithm[
     *
     */
   @Since("1.1.0")
-  def predictOnValues[K : ClassTag](
+  def predictOnValues[K: ClassTag](
       data: DStream[(K, Vector)]): DStream[(K, Double)] = {
     if (model.isEmpty) {
       throw new IllegalArgumentException(

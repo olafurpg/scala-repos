@@ -33,9 +33,9 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
       kind: String, maxWait: FiniteDuration = 30.seconds): CallbackEvent =
     waitForEventWith(kind, _ => true, maxWait)
 
-  def waitForDeploymentId(
-      deploymentId: String,
-      maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
+  def waitForDeploymentId(deploymentId: String,
+                          maxWait: FiniteDuration =
+                            30.seconds): CallbackEvent = {
     waitForEventWith("deployment_success",
                      _.info.getOrElse("id", "") == deploymentId,
                      maxWait)
@@ -74,8 +74,9 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
   /**
     * Wait for the events of the given kinds (=types).
     */
-  def waitForEvents(kinds: String*)(maxWait: FiniteDuration = 30.seconds)
-    : Map[String, Seq[CallbackEvent]] = {
+  def waitForEvents(
+      kinds: String*)(maxWait: FiniteDuration =
+                        30.seconds): Map[String, Seq[CallbackEvent]] = {
 
     val deadline = maxWait.fromNow
 

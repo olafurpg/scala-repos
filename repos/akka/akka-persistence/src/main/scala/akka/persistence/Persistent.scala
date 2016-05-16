@@ -36,7 +36,8 @@ object AtomicWrite {
 }
 
 final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
-    extends PersistentEnvelope with Message {
+    extends PersistentEnvelope
+    with Message {
   require(payload.nonEmpty, "payload of AtomicWrite must not be empty!")
 
   // only check that all persistenceIds are equal when there's more than one in the Seq
@@ -176,7 +177,8 @@ private[persistence] final case class PersistentImpl(
     override val deleted: Boolean,
     override val sender: ActorRef,
     override val writerUuid: String)
-    extends PersistentRepr with NoSerializationVerificationNeeded {
+    extends PersistentRepr
+    with NoSerializationVerificationNeeded {
 
   def withPayload(payload: Any): PersistentRepr =
     copy(payload = payload)

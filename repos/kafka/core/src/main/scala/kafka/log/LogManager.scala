@@ -104,7 +104,8 @@ class LogManager(val logDirs: Array[File],
     dirs.map { dir =>
       val lock = new FileLock(new File(dir, LockFile))
       if (!lock.tryLock())
-        throw new KafkaException("Failed to acquire lock on file .lock in " +
+        throw new KafkaException(
+            "Failed to acquire lock on file .lock in " +
             lock.file.getParentFile.getAbsolutePath +
             ". A Kafka instance in another process or thread is using this directory.")
       lock

@@ -79,7 +79,8 @@ private[jobs] object KillOverdueTasksActor {
 }
 
 private class KillOverdueTasksActor(support: KillOverdueTasksActor.Support)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var checkTicker: Cancellable = _
 
   override def preStart(): Unit = {

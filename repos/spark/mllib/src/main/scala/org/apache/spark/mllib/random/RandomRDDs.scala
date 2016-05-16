@@ -377,11 +377,11 @@ object RandomRDDs {
     */
   @DeveloperApi
   @Since("1.1.0")
-  def randomRDD[T : ClassTag](sc: SparkContext,
-                              generator: RandomDataGenerator[T],
-                              size: Long,
-                              numPartitions: Int = 0,
-                              seed: Long = Utils.random.nextLong()): RDD[T] = {
+  def randomRDD[T: ClassTag](sc: SparkContext,
+                             generator: RandomDataGenerator[T],
+                             size: Long,
+                             numPartitions: Int = 0,
+                             seed: Long = Utils.random.nextLong()): RDD[T] = {
     new RandomRDD[T](
         sc, size, numPartitionsOrDefault(sc, numPartitions), generator, seed)
   }

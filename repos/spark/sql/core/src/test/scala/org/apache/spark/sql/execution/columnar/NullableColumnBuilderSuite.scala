@@ -27,9 +27,9 @@ class TestNullableColumnBuilder[JvmType](columnType: ColumnType[JvmType])
     with NullableColumnBuilder
 
 object TestNullableColumnBuilder {
-  def apply[JvmType](
-      columnType: ColumnType[JvmType],
-      initialSize: Int = 0): TestNullableColumnBuilder[JvmType] = {
+  def apply[JvmType](columnType: ColumnType[JvmType],
+                     initialSize: Int =
+                       0): TestNullableColumnBuilder[JvmType] = {
     val builder = new TestNullableColumnBuilder(columnType)
     builder.initialize(initialSize)
     builder

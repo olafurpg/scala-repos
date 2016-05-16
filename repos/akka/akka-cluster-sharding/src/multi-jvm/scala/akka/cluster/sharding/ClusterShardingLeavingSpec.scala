@@ -112,7 +112,9 @@ class DDataClusterShardingLeavingMultiJvmNode4
 
 abstract class ClusterShardingLeavingSpec(
     config: ClusterShardingLeavingSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config)
+    with STMultiNodeSpec
+    with ImplicitSender {
   import ClusterShardingLeavingSpec._
   import config._
 
@@ -121,20 +123,20 @@ abstract class ClusterShardingLeavingSpec(
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
          "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+         "akka.persistence.snapshot-store.local.dir").map(s ⇒
+          new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 
   override protected def afterTermination() {
     runOn(first) {
-      storageLocations.foreach(
-          dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+      storageLocations.foreach(dir ⇒
+            if (dir.exists) FileUtils.deleteDirectory(dir))
     }
   }
 

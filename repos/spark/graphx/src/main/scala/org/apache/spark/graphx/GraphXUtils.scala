@@ -50,12 +50,12 @@ object GraphXUtils {
     * A proxy method to map the obsolete API to the new one.
     */
   private[graphx] def mapReduceTriplets[
-      VD : ClassTag, ED : ClassTag, A : ClassTag](
+      VD: ClassTag, ED: ClassTag, A: ClassTag](
       g: Graph[VD, ED],
       mapFunc: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
       reduceFunc: (A, A) => A,
-      activeSetOpt: Option[(VertexRDD[_], EdgeDirection)] = None)
-    : VertexRDD[A] = {
+      activeSetOpt: Option[(VertexRDD[_], EdgeDirection)] =
+        None): VertexRDD[A] = {
     def sendMsg(ctx: EdgeContext[VD, ED, A]) {
       mapFunc(ctx.toEdgeTriplet).foreach { kv =>
         val id = kv._1

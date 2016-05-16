@@ -101,7 +101,8 @@ case class TemplatedTsv(override val basePath: String,
                         override val writeHeader: Boolean = false,
                         override val sinkMode: SinkMode = SinkMode.REPLACE,
                         override val fields: Fields = Fields.ALL)
-    extends TemplateSource with DelimitedScheme
+    extends TemplateSource
+    with DelimitedScheme
 
 /**
   * An implementation of SequenceFile output, split over a template tap.
@@ -112,13 +113,14 @@ case class TemplatedTsv(override val basePath: String,
   * @param pathFields The set of fields to apply to the path.
   * @param sinkMode How to handle conflicts with existing output.
   */
-case class TemplatedSequenceFile(
-    override val basePath: String,
-    override val template: String,
-    val sequenceFields: Fields = Fields.ALL,
-    override val pathFields: Fields = Fields.ALL,
-    override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends TemplateSource with SequenceFileScheme {
+case class TemplatedSequenceFile(override val basePath: String,
+                                 override val template: String,
+                                 val sequenceFields: Fields = Fields.ALL,
+                                 override val pathFields: Fields = Fields.ALL,
+                                 override val sinkMode: SinkMode =
+                                   SinkMode.REPLACE)
+    extends TemplateSource
+    with SequenceFileScheme {
 
   override val fields = sequenceFields
 }

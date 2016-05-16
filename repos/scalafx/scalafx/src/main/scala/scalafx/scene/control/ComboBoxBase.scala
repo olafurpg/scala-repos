@@ -41,7 +41,8 @@ object ComboBoxBase {
 }
 
 abstract class ComboBoxBase[T](override val delegate: jfxsc.ComboBoxBase[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.ComboBoxBase[T]] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.ComboBoxBase[T]] {
 
   /**
     * Arms the ComboBox.

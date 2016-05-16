@@ -226,10 +226,9 @@ class InputStreamsSuite extends TestSuiteBase with BeforeAndAfter {
       // Let the data from the receiver be received
       val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
       val startTime = System.currentTimeMillis()
-      while (
-      (!MultiThreadTestReceiver.haveAllThreadsFinished ||
-          output.sum < numTotalRecords) &&
-      System.currentTimeMillis() - startTime < 5000) {
+      while ((!MultiThreadTestReceiver.haveAllThreadsFinished ||
+                 output.sum < numTotalRecords) &&
+             System.currentTimeMillis() - startTime < 5000) {
         Thread.sleep(100)
         clock.advance(batchDuration.milliseconds)
       }
@@ -532,24 +531,24 @@ class TestServer(portToBind: Int = 0) extends Logging {
 
 /** This is a receiver to test multiple threads inserting data using block generator */
 class MultiThreadTestReceiver(numThreads: Int, numRecordsPerThread: Int)
-    extends Receiver[Int](StorageLevel.MEMORY_ONLY_SER) with Logging {
+    extends Receiver[Int](StorageLevel.MEMORY_ONLY_SER)
+    with Logging {
   lazy val executorPool = Executors.newFixedThreadPool(numThreads)
   lazy val finishCount = new AtomicInteger(0)
 
   def onStart() {
-    (1 to numThreads).map(threadId =>
-          {
-        val runnable = new Runnable {
-          def run() {
-            (1 to numRecordsPerThread)
-              .foreach(i => store(threadId * numRecordsPerThread + i))
-            if (finishCount.incrementAndGet == numThreads) {
-              MultiThreadTestReceiver.haveAllThreadsFinished = true
-            }
-            logInfo("Finished thread " + threadId)
+    (1 to numThreads).map(threadId => {
+      val runnable = new Runnable {
+        def run() {
+          (1 to numRecordsPerThread).foreach(i =>
+                store(threadId * numRecordsPerThread + i))
+          if (finishCount.incrementAndGet == numThreads) {
+            MultiThreadTestReceiver.haveAllThreadsFinished = true
           }
+          logInfo("Finished thread " + threadId)
         }
-        executorPool.submit(runnable)
+      }
+      executorPool.submit(runnable)
     })
   }
 

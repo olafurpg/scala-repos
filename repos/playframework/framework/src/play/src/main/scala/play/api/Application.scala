@@ -38,8 +38,8 @@ import scala.reflect.ClassTag
   * This will create an application using the current classloader.
   *
   */
-@implicitNotFound(
-    msg = "You do not have an implicit Application in scope. If you want to bring the current running Application into context, please use dependency injection.")
+@implicitNotFound(msg =
+      "You do not have an implicit Application in scope. If you want to bring the current running Application into context, please use dependency injection.")
 trait Application {
 
   /**
@@ -217,7 +217,7 @@ object Application {
     * will still be cleaned even if the ReferenceQueue is never
     * activated.
     */
-  def instanceCache[T : ClassTag]: Application => T =
+  def instanceCache[T: ClassTag]: Application => T =
     new InlineCache((app: Application) => app.injector.instanceOf[T])
 }
 

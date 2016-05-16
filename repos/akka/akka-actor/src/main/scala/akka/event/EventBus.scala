@@ -540,7 +540,8 @@ trait ActorClassification {
           else true
         } else {
           if (!mappings.replace(monitored, v, removed))
-            dissociate(monitored, monitor) else true
+            dissociate(monitored, monitor)
+          else true
         }
     }
   }

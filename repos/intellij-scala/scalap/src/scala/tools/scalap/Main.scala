@@ -295,9 +295,9 @@ object Main {
     } else Console.println("class/object " + classname + " not found.")
   }
 
-  def fromPathString(
-      path: String,
-      context: JavaContext = DefaultJavaContext): JavaClassPath = {
+  def fromPathString(path: String,
+                     context: JavaContext =
+                       DefaultJavaContext): JavaClassPath = {
     val s = new Settings()
     s.classpath.value = path
     new PathResolver(s, context).result

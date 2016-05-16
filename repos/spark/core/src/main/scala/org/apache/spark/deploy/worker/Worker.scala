@@ -49,7 +49,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
                              workDirPath: String = null,
                              val conf: SparkConf,
                              val securityMgr: SecurityManager)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   private val host = rpcEnv.address.host
   private val port = rpcEnv.address.port
@@ -459,8 +460,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
           masterRef.address.toSparkURL)
       changeMaster(masterRef, masterWebUiUrl)
 
-      val execs = executors.values.map(
-          e => new ExecutorDescription(e.appId, e.execId, e.cores, e.state))
+      val execs = executors.values.map(e =>
+            new ExecutorDescription(e.appId, e.execId, e.cores, e.state))
       masterRef.send(WorkerSchedulerStateResponse(
               workerId, execs.toList, drivers.keys.toSeq))
 
@@ -502,8 +503,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
           val manager = new ExecutorRunner(
               appId,
               execId,
-              appDesc.copy(command = Worker.maybeUpdateSSLSettings(
-                        appDesc.command, conf)),
+              appDesc.copy(command =
+                    Worker.maybeUpdateSSLSettings(appDesc.command, conf)),
               cores_,
               memory_,
               self,
@@ -568,8 +569,8 @@ private[deploy] class Worker(override val rpcEnv: RpcEnv,
             driverId,
             workDir,
             sparkHome,
-            driverDesc.copy(command = Worker.maybeUpdateSSLSettings(
-                      driverDesc.command, conf)),
+            driverDesc.copy(command =
+                  Worker.maybeUpdateSSLSettings(driverDesc.command, conf)),
             self,
             workerUri,
             securityMgr)

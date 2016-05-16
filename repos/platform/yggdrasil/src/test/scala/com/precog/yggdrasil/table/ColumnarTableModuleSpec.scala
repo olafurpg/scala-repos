@@ -95,15 +95,23 @@ trait TestColumnarTableModule[M[+ _]]
 }
 
 trait ColumnarTableModuleSpec[M[+ _]]
-    extends TestColumnarTableModule[M] with TableModuleSpec[M]
-    with CogroupSpec[M] with CrossSpec[M] with TransformSpec[M]
-    with CompactSpec[M] with TakeRangeSpec[M] with CanonicalizeSpec[M]
-    with PartitionMergeSpec[M] with ToArraySpec[M] with ConcatSpec[M]
+    extends TestColumnarTableModule[M]
+    with TableModuleSpec[M]
+    with CogroupSpec[M]
+    with CrossSpec[M]
+    with TransformSpec[M]
+    with CompactSpec[M]
+    with TakeRangeSpec[M]
+    with CanonicalizeSpec[M]
+    with PartitionMergeSpec[M]
+    with ToArraySpec[M]
+    with ConcatSpec[M]
     with SampleSpec[M]
     //with UnionAllSpec[M]
     //with CrossAllSpec[M]
     //with GroupingGraphSpec[M]
-    with DistinctSpec[M] with SchemasSpec[M] {
+    with DistinctSpec[M]
+    with SchemasSpec[M] {
   spec =>
 
   import trans._
@@ -303,23 +311,24 @@ trait ColumnarTableModuleSpec[M[+ _]]
         val sample: List[JValue] = List(
             JObject(
                 JField("key", JArray(JNum(-1L) :: JNum(0L) :: Nil)) :: JField(
-                    "value", JNull) :: Nil
+                    "value",
+                    JNull) :: Nil
             ),
             JObject(
-                JField(
-                    "key",
-                    JArray(JNum(-3090012080927607325l) :: JNum(
-                            2875286661755661474l) :: Nil)) :: JField(
+                JField("key",
+                       JArray(JNum(-3090012080927607325l) :: JNum(
+                               2875286661755661474l) :: Nil)) :: JField(
                     "value",
                     JObject(List(
                             JField("q8b",
-                                   JArray(List(JNum(6.615224799778253E307d),
-                                               JArray(List(
-                                                       JBool(false),
-                                                       JNull,
-                                                       JNum(-8.988465674311579E307d))),
-                                               JNum(
-                                                   -3.536399224770604E307d)))),
+                                   JArray(List(
+                                           JNum(6.615224799778253E307d),
+                                           JArray(List(
+                                                   JBool(false),
+                                                   JNull,
+                                                   JNum(
+                                                       -8.988465674311579E307d))),
+                                           JNum(-3.536399224770604E307d)))),
                             JField("lwu", JNum(-5.121099465699862E307d))))) :: Nil
             ),
             JObject(
@@ -557,8 +566,7 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
   "logging" should {
     "run" in {
-      testSimpleCogroup(
-          t =>
+      testSimpleCogroup(t =>
             t.logged(xlogger, "test-logging", "start stream", "end stream") {
           slice =>
             "size: " + slice.size

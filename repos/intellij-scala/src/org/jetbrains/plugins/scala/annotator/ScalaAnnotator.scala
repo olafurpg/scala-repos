@@ -58,11 +58,19 @@ import scala.collection.{Seq, Set, mutable}
   * Date: 23.06.2008
   */
 class ScalaAnnotator
-    extends Annotator with FunctionAnnotator with ScopeAnnotator
-    with ParametersAnnotator with ApplicationAnnotator with AssignmentAnnotator
-    with VariableDefinitionAnnotator with TypedStatementAnnotator
-    with PatternDefinitionAnnotator with PatternAnnotator
-    with ConstructorAnnotator with OverridingAnnotator with ValueClassAnnotator
+    extends Annotator
+    with FunctionAnnotator
+    with ScopeAnnotator
+    with ParametersAnnotator
+    with ApplicationAnnotator
+    with AssignmentAnnotator
+    with VariableDefinitionAnnotator
+    with TypedStatementAnnotator
+    with PatternDefinitionAnnotator
+    with PatternAnnotator
+    with ConstructorAnnotator
+    with OverridingAnnotator
+    with ValueClassAnnotator
     with DumbAware {
 
   override def annotate(element: PsiElement, holder: AnnotationHolder) {
@@ -646,8 +654,8 @@ class ScalaAnnotator
       val holder = ScalaRefCountHolder.getInstance(file)
       holder.registerValueUsed(value)
       // For use of unapply method, see SCL-3463
-      resolveResult.parentElement.foreach(
-          parent => holder.registerValueUsed(ReadValueUsed(parent)))
+      resolveResult.parentElement.foreach(parent =>
+            holder.registerValueUsed(ReadValueUsed(parent)))
     }
   }
 
@@ -921,7 +929,7 @@ class ScalaAnnotator
     var resolve: Array[ResolveResult] = null
     resolve = refElement.multiResolve(false)
     for (result <- resolve if result.isInstanceOf[ScalaResolveResult];
-    scalaResult = result.asInstanceOf[ScalaResolveResult]) {
+         scalaResult = result.asInstanceOf[ScalaResolveResult]) {
       registerUsedImports(refElement, scalaResult)
       registerUsedElement(refElement, scalaResult, checkWrite = true)
     }

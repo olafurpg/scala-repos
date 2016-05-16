@@ -65,7 +65,8 @@ object DefaultOptions {
   }
   def pluginResolvers(plugin: Boolean, snapshot: Boolean): Seq[Resolver] = {
     if (plugin && snapshot)
-      Seq(Classpaths.typesafeSnapshots, Classpaths.sbtPluginSnapshots) else Nil
+      Seq(Classpaths.typesafeSnapshots, Classpaths.sbtPluginSnapshots)
+    else Nil
   }
   def addResolvers: Setting[_] =
     Keys.resolvers <++= Keys.isSnapshot apply resolvers

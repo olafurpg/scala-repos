@@ -117,7 +117,8 @@ class AvatarImageProviderSpec extends FunSpec with MockitoSugar {
     * Adapter to test AvatarImageProviderImpl.
     */
   class AvatarImageProviderImpl(account: Option[Account])
-      extends AvatarImageProvider with RequestCache {
+      extends AvatarImageProvider
+      with RequestCache {
 
     def toHtml(userName: String,
                size: Int,

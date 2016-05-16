@@ -18,7 +18,8 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
   * @author Alexander Podkhalyuzin
   */
 class ScTryStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTryStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScTryStmt {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

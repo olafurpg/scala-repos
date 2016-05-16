@@ -210,7 +210,7 @@ abstract class GenTraversableFactory[
     *  @param end   the end value of the $coll (the first value NOT contained)
     *  @return  a $coll with values `start, start + 1, ..., end - 1`
     */
-  def range[T : Integral](start: T, end: T): CC[T] =
+  def range[T: Integral](start: T, end: T): CC[T] =
     range(start, end, implicitly[Integral[T]].one)
 
   /** Produces a $coll containing equally spaced values in some integer interval.
@@ -219,7 +219,7 @@ abstract class GenTraversableFactory[
     *  @param step  the difference between successive elements of the $coll (must be positive or negative)
     *  @return      a $coll with values `start, start + step, ...` up to, but excluding `end`
     */
-  def range[T : Integral](start: T, end: T, step: T): CC[T] = {
+  def range[T: Integral](start: T, end: T, step: T): CC[T] = {
     val num = implicitly[Integral[T]]
     import num._
 

@@ -77,7 +77,8 @@ object LineChart {
 }
 
 class LineChart[X, Y](override val delegate: jfxsc.LineChart[X, Y])
-    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.LineChart[X, Y]] {
+    extends XYChart[X, Y](delegate)
+    with SFXDelegate[jfxsc.LineChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.LineChart[X, Y](xAxis, yAxis))

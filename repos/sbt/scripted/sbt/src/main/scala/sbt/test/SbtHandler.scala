@@ -101,5 +101,6 @@ final class SbtHandler(directory: File,
     if (argument.contains(" "))
       "\"" +
       argument.replaceAll(q("""\"""), """\\""").replaceAll(q("\""), "\\\"") +
-      "\"" else argument
+      "\""
+    else argument
 }

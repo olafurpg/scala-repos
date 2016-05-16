@@ -55,4 +55,6 @@ trait OptimizeTestBaseTrait {
 }
 
 class OptimizeTestBase
-    extends FunSuite with Checkers with OptimizeTestBaseTrait
+    extends FunSuite
+    with Checkers
+    with OptimizeTestBaseTrait

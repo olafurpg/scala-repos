@@ -125,8 +125,8 @@ class RouteDirectivesSpec extends FreeSpec with GenericRoutingSpec {
         response shouldEqual HttpResponse(
             status = 302,
             entity = HttpEntity(
-                  ContentTypes.`text/html(UTF-8)`,
-                  "The requested resource temporarily resides under <a href=\"/foo\">this URI</a>."),
+                ContentTypes.`text/html(UTF-8)`,
+                "The requested resource temporarily resides under <a href=\"/foo\">this URI</a>."),
             headers = Location("/foo") :: Nil)
       }
     }

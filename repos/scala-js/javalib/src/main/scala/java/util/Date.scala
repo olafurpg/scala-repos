@@ -7,7 +7,10 @@ package java.util
 import scalajs.js
 
 class Date private (private val date: js.Date)
-    extends Object with Serializable with Cloneable with Comparable[Date] {
+    extends Object
+    with Serializable
+    with Cloneable
+    with Comparable[Date] {
 
   import Date._
 

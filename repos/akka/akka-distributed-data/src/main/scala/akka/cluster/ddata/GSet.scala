@@ -29,7 +29,9 @@ object GSet {
   */
 @SerialVersionUID(1L)
 final case class GSet[A](elements: Set[A])
-    extends ReplicatedData with ReplicatedDataSerialization with FastMerge {
+    extends ReplicatedData
+    with ReplicatedDataSerialization
+    with FastMerge {
 
   type T = GSet[A]
 
@@ -72,4 +74,5 @@ object GSetKey {
 
 @SerialVersionUID(1L)
 final case class GSetKey[A](_id: String)
-    extends Key[GSet[A]](_id) with ReplicatedDataSerialization
+    extends Key[GSet[A]](_id)
+    with ReplicatedDataSerialization

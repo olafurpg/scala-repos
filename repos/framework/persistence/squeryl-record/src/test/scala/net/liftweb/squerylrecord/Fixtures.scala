@@ -69,7 +69,9 @@ object DBHelper {
   * Test Record: Company. It has many different field types for test purposes.
   */
 class Company private ()
-    extends Record[Company] with KeyedRecord[Long] with Optimistic {
+    extends Record[Company]
+    with KeyedRecord[Long]
+    with Optimistic {
 
   override def meta = Company
 
@@ -87,7 +89,9 @@ class Company private ()
   lazy val employees = MySchema.companyToEmployees.left(this)
 }
 object Company
-    extends Company with MetaRecord[Company] with CRUDify[Long, Company] {
+    extends Company
+    with MetaRecord[Company]
+    with CRUDify[Long, Company] {
 
   def table = MySchema.companies
 
@@ -107,8 +111,10 @@ object EmployeeRole extends Enumeration {
   * TypedField are also supported.
   */
 class SpecialField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with TypedField[String]
-    with SquerylRecordField with MandatoryTypedField[String] {
+    extends Field[String, OwnerType]
+    with TypedField[String]
+    with SquerylRecordField
+    with MandatoryTypedField[String] {
 
   override def owner = rec
   override def classOfPersistentField = classOf[String]

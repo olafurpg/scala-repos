@@ -45,7 +45,7 @@ abstract class JavaToScalaConversionTestBase
     var elem: PsiElement = javaFile.findElementAt(startOffset)
     assert(elem.getTextRange.getStartOffset == startOffset)
     while (elem.getParent != null && !elem.getParent.isInstanceOf[PsiFile] &&
-    elem.getParent.getTextRange.getStartOffset == startOffset) {
+           elem.getParent.getTextRange.getStartOffset == startOffset) {
       elem = elem.getParent
     }
     val buf = new ArrayBuffer[PsiElement]

@@ -128,8 +128,8 @@ trait SdkDescriptorCompanion {
       requiredBinaryArtifacts -- existingBinaryArtifacts
 
     if (missingBinaryArtifacts.isEmpty) {
-      val compilerBinaries = binaryComponents.filter(
-          it => requiredBinaryArtifacts.contains(it.artifact))
+      val compilerBinaries = binaryComponents.filter(it =>
+            requiredBinaryArtifacts.contains(it.artifact))
 
       val libraryBinaries =
         binaryComponents.filter(it => libraryArtifacts.contains(it.artifact))

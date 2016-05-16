@@ -20,7 +20,9 @@ class TCPConnectionActor(
     project: ActorRef,
     broadcaster: ActorRef
 )
-    extends Actor with Stash with ActorLogging {
+    extends Actor
+    with Stash
+    with ActorLogging {
 
   case object Ack extends Tcp.Event
 

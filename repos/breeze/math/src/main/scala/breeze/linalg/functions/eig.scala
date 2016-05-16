@@ -139,7 +139,8 @@ object eigSym extends UFunc {
     val info = new intW(0)
     lapack.dsyev(
         if (rightEigenvectors)
-          "V" else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
+          "V"
+        else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
         "L" /* lower triangular */,
         N /* number of rows */,
         A.data,

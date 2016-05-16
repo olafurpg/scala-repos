@@ -263,10 +263,10 @@ package scalaguide.http.scalaactionscomposition {
       }
     }
 
-    def assertAction[A, T : AsResult](action: EssentialAction,
-                                      request: => Request[A] = FakeRequest(),
-                                      expectedResponse: Int = OK)(
-        assertions: Future[Result] => T) = {
+    def assertAction[A, T: AsResult](
+        action: EssentialAction,
+        request: => Request[A] = FakeRequest(),
+        expectedResponse: Int = OK)(assertions: Future[Result] => T) = {
       running() { app =>
         implicit val mat = ActorMaterializer()(app.actorSystem)
         val result = action(request).run()

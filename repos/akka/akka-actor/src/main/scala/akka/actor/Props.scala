@@ -60,7 +60,7 @@ object Props extends AbstractProps {
     * Scala API: Returns a Props that has default values except for "creator" which will be a function that creates an instance
     * of the supplied type using the default constructor.
     */
-  def apply[T <: Actor : ClassTag](): Props =
+  def apply[T <: Actor: ClassTag](): Props =
     apply(defaultDeploy, implicitly[ClassTag[T]].runtimeClass, List.empty)
 
   /**
@@ -76,7 +76,7 @@ object Props extends AbstractProps {
     * Instead you must create a named class that mixin the trait,
     * e.g. `class MyActor extends Actor with Stash`.
     */
-  def apply[T <: Actor : ClassTag](creator: ⇒ T): Props =
+  def apply[T <: Actor: ClassTag](creator: ⇒ T): Props =
     mkProps(implicitly[ClassTag[T]].runtimeClass, () ⇒ creator)
 
   private def mkProps(classOfActor: Class[_], ctor: () ⇒ Actor): Props =

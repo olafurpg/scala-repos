@@ -86,8 +86,7 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
             .trim() == "case") {
         chooseXmlTask(withAttr = false)
       }
-    } else if (c == '{' &&
-               (element.getParent match {
+    } else if (c == '{' && (element.getParent match {
                      case l: ScInterpolatedStringLiteral =>
                        !l.isMultiLineString; case _ => false
                    })) {
@@ -423,15 +422,15 @@ class ScalaTypedHandler extends TypedHandlerDelegate {
         _.parent.flatMap(_.parent).exists(_.isInstanceOf[ScValue]))
   }
 
-  private def indentElement(
-      file: PsiFile)(document: Document,
-                     project: Project,
-                     element: PsiElement,
-                     offset: Int,
-                     prevCondition: PsiElement => Boolean,
-                     condition: PsiElement => Boolean = element =>
-                         element.isInstanceOf[PsiWhiteSpace] ||
-                         ScalaPsiUtil.isLineTerminator(element)) {
+  private def indentElement(file: PsiFile)(
+      document: Document,
+      project: Project,
+      element: PsiElement,
+      offset: Int,
+      prevCondition: PsiElement => Boolean,
+      condition: PsiElement => Boolean = element =>
+        element.isInstanceOf[PsiWhiteSpace] ||
+        ScalaPsiUtil.isLineTerminator(element)) {
     if (condition(element)) {
       val anotherElement = file.findElementAt(offset - 2)
       if (prevCondition(anotherElement)) {

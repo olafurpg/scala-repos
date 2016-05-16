@@ -15,7 +15,7 @@ import scala.collection.mutable
   * Nikolay.Tropin
   * 2014-03-25
   */
-class ScalaMemberChooser[T <: ClassMember : scala.reflect.ClassTag](
+class ScalaMemberChooser[T <: ClassMember: scala.reflect.ClassTag](
     elements: Array[T],
     allowEmptySelection: Boolean,
     allowMultiSelection: Boolean,
@@ -46,8 +46,10 @@ class ScalaMemberChooser[T <: ClassMember : scala.reflect.ClassTag](
   addOverrideModifierChb.setVisible(needAddOverrideChb)
 
   override def doOKAction(): Unit = {
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = specifyRetTypeChb.isSelected
-    ScalaApplicationSettings.getInstance.ADD_OVERRIDE_TO_IMPLEMENTED = addOverrideModifierChb.isSelected
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      specifyRetTypeChb.isSelected
+    ScalaApplicationSettings.getInstance.ADD_OVERRIDE_TO_IMPLEMENTED =
+      addOverrideModifierChb.isSelected
     super.doOKAction()
   }
 }

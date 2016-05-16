@@ -47,43 +47,52 @@ case class CreateDatabase(databaseName: String,
                           path: Option[String],
                           comment: Option[String],
                           props: Map[String, String])(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class CreateFunction(functionName: String,
                           alias: String,
                           resources: Seq[(String, String)],
                           isTemp: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableRename(
     oldName: TableIdentifier, newName: TableIdentifier)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSetProperties(
     tableName: TableIdentifier, properties: Map[String, String])(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableUnsetProperties(tableName: TableIdentifier,
                                      properties: Map[String, String],
                                      ifExists: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSerDeProperties(
     tableName: TableIdentifier,
     serdeClassName: Option[String],
     serdeProperties: Option[Map[String, String]],
     partition: Option[Map[String, String]])(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableStorageProperties(
     tableName: TableIdentifier, buckets: BucketSpec)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableNotClustered(tableName: TableIdentifier)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableNotSorted(tableName: TableIdentifier)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSkewed(tableName: TableIdentifier,
                             // e.g. (dt, country)
@@ -91,7 +100,8 @@ case class AlterTableSkewed(tableName: TableIdentifier,
                             // e.g. ('2008-08-08', 'us), ('2009-09-09', 'uk')
                             skewedValues: Seq[Seq[String]],
                             storedAsDirs: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging {
+    extends NativeDDLCommand(sql)
+    with Logging {
 
   require(
       skewedValues.forall(_.size == skewedCols.size),
@@ -99,71 +109,85 @@ case class AlterTableSkewed(tableName: TableIdentifier,
 }
 
 case class AlterTableNotSkewed(tableName: TableIdentifier)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableNotStoredAsDirs(tableName: TableIdentifier)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSkewedLocation(
     tableName: TableIdentifier, skewedMap: Map[String, String])(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableAddPartition(
     tableName: TableIdentifier,
     partitionSpecsAndLocs: Seq[(TablePartitionSpec, Option[String])],
     ifNotExists: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableRenamePartition(tableName: TableIdentifier,
                                      oldPartition: TablePartitionSpec,
                                      newPartition: TablePartitionSpec)(
     sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableExchangePartition(fromTableName: TableIdentifier,
                                        toTableName: TableIdentifier,
                                        spec: TablePartitionSpec)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableDropPartition(tableName: TableIdentifier,
                                    specs: Seq[TablePartitionSpec],
                                    ifExists: Boolean,
                                    purge: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableArchivePartition(
     tableName: TableIdentifier, spec: TablePartitionSpec)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableUnarchivePartition(
     tableName: TableIdentifier, spec: TablePartitionSpec)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSetFileFormat(tableName: TableIdentifier,
                                    partitionSpec: Option[TablePartitionSpec],
                                    fileFormat: Seq[String],
                                    genericFormat: Option[String])(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableSetLocation(tableName: TableIdentifier,
                                  partitionSpec: Option[TablePartitionSpec],
                                  location: String)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableTouch(
     tableName: TableIdentifier, partitionSpec: Option[TablePartitionSpec])(
     sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableCompact(tableName: TableIdentifier,
                              partitionSpec: Option[TablePartitionSpec],
                              compactType: String)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableMerge(
     tableName: TableIdentifier, partitionSpec: Option[TablePartitionSpec])(
     sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableChangeCol(tableName: TableIdentifier,
                                partitionSpec: Option[TablePartitionSpec],
@@ -174,18 +198,21 @@ case class AlterTableChangeCol(tableName: TableIdentifier,
                                afterColName: Option[String],
                                restrict: Boolean,
                                cascade: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableAddCol(tableName: TableIdentifier,
                             partitionSpec: Option[TablePartitionSpec],
                             columns: StructType,
                             restrict: Boolean,
                             cascade: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging
 
 case class AlterTableReplaceCol(tableName: TableIdentifier,
                                 partitionSpec: Option[TablePartitionSpec],
                                 columns: StructType,
                                 restrict: Boolean,
                                 cascade: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging
+    extends NativeDDLCommand(sql)
+    with Logging

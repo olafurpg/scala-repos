@@ -48,7 +48,7 @@ object Sessions {
       }
     }))
 
-  def runSession[S, D : Session[S]#HasDual](p: S, dp: D) =
+  def runSession[S, D: Session[S]#HasDual](p: S, dp: D) =
     implicitly[Session[S]#HasDual[D]].run(p, dp)
 
   // def runSession[S, D](p: S, dp: D)(implicit s: Session[S]#HasDual[D]) =

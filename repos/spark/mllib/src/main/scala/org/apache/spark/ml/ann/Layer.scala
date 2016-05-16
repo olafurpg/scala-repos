@@ -566,11 +566,12 @@ private[ml] object FeedForwardTopology {
     val layers = new Array[Layer]((layerSizes.length - 1) * 2)
     for (i <- 0 until layerSizes.length - 1) {
       layers(i * 2) = new AffineLayer(layerSizes(i), layerSizes(i + 1))
-      layers(i * 2 + 1) = if (softmax && i == layerSizes.length - 2) {
-        new FunctionalLayer(new SoftmaxFunction())
-      } else {
-        new FunctionalLayer(new SigmoidFunction())
-      }
+      layers(i * 2 + 1) =
+        if (softmax && i == layerSizes.length - 2) {
+          new FunctionalLayer(new SoftmaxFunction())
+        } else {
+          new FunctionalLayer(new SigmoidFunction())
+        }
     }
     FeedForwardTopology(layers)
   }

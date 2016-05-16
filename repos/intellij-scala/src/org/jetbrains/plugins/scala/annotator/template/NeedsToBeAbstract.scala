@@ -29,7 +29,7 @@ object NeedsToBeAbstract extends AnnotatorPart[ScTemplateDefinition] {
 
     val undefined = for {
       member <- getMembersToImplement(definition, withOwn = true)
-                   if !member.isInstanceOf[ScAliasMember] // See SCL-2887
+      if !member.isInstanceOf[ScAliasMember] // See SCL-2887
     } yield (member.getText, member.getParentNodeDelegate.getText)
 
     if (undefined.nonEmpty) {

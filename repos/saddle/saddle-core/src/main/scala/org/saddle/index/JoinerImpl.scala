@@ -23,7 +23,7 @@ import locator.Locator
   * Concrete implementation of Joiner instance which is specialized on basic
   * types.
   */
-class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
+class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
     extends Joiner[T] {
   private implicit def wrapArray(arr: Array[Int]): Option[Array[Int]] =
     Some(arr)
@@ -498,9 +498,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
               var ldups = 0
               var rdups = 0
               while (lc + ldups < nleft &&
-              lval == left.raw(lc + ldups)) ldups += 1
+                     lval == left.raw(lc + ldups)) ldups += 1
               while (rc + rdups < nright &&
-              rval == right.raw(rc + rdups)) rdups += 1
+                     rval == right.raw(rc + rdups)) rdups += 1
               var m = 0
               while (m < ldups) {
                 var n = 0
@@ -673,7 +673,7 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
 }
 
 private[saddle] object JoinerImpl {
-  def join[@spec(Boolean, Int, Long, Double) T : ST : ORD](
+  def join[@spec(Boolean, Int, Long, Double) T: ST: ORD](
       left: Index[T], right: Index[T], how: JoinType) =
     (new JoinerImpl[T]).join(left, right, how)
 }

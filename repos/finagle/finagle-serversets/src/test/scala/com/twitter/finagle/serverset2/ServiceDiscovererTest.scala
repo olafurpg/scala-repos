@@ -23,7 +23,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 @RunWith(classOf[JUnitRunner])
 class ServiceDiscovererTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
 
   class ServiceDiscovererWithExposedCache(
@@ -227,9 +229,9 @@ class ServiceDiscovererTest
           Watched(Some(Data.Stat(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)), ewwatchv))
 
       val gw @ GetChildrenWatch("/foo/bar") = watchedZk.value.opq(1)
-      gw.res() = Return(
-          Watched(Node.Children(Seq("member_1", "member_2"), null),
-                  Var.value(WatchState.Pending)))
+      gw.res() =
+        Return(Watched(Node.Children(Seq("member_1", "member_2"), null),
+                       Var.value(WatchState.Pending)))
 
       val gd @ GetData("/foo/bar/member_1") = watchedZk.value.opq(2)
       gd.res() = Throw(new Exception)

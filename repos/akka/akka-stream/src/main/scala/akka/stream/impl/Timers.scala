@@ -51,7 +51,8 @@ private[stream] object Timers {
 
         final override protected def onTimer(key: Any): Unit =
           if (!initialHasPassed)
-            failStage(new TimeoutException(
+            failStage(
+                new TimeoutException(
                     s"The first element has not yet passed through in $timeout."))
 
         override def preStart(): Unit = scheduleOnce("InitialTimeout", timeout)

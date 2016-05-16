@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   * Date: 9/5/12
   */
 class ScalaCollectionRendererTest
-    extends ScalaDebuggerTestCase with ScalaVersion_2_11 {
+    extends ScalaDebuggerTestCase
+    with ScalaVersion_2_11 {
   private val COMMON_FILE_NAME = "dummy.scala"
   private val UNIQUE_ID = "uniqueID"
 

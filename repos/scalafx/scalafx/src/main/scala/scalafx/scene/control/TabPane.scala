@@ -89,7 +89,8 @@ object TabPane {
 }
 
 class TabPane(override val delegate: jfxsc.TabPane = new jfxsc.TabPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.TabPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TabPane] {
 
   /**
     * The rotatedGraphic state of the tabs in the TabPane.

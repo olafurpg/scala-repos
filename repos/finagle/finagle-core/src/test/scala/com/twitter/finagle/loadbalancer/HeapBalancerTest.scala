@@ -12,7 +12,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class HeapBalancerTest
-    extends FunSuite with MockitoSugar with AssertionsForJUnit {
+    extends FunSuite
+    with MockitoSugar
+    with AssertionsForJUnit {
   class LoadedFactory(which: String)
       extends ServiceFactory[Unit, LoadedFactory] {
     var load = 0

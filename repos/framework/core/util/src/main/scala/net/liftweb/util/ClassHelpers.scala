@@ -55,15 +55,15 @@ trait ClassHelpers { self: ControlHelpers =>
                              modifiers: List[Function1[String, String]],
                              targetType: Class[C]): Box[Class[C]] =
     (for (place <- where.view;
-    mod <- modifiers.view;
-    fullName = place + "." + mod(name);
-    ignore = List(classOf[ClassNotFoundException],
-                  classOf[ClassCastException],
-                  classOf[NoClassDefFoundError]);
-    klass <- tryo(ignore)(Class
-          .forName(fullName)
-          .asSubclass(targetType)
-          .asInstanceOf[Class[C]])) yield klass).headOption
+          mod <- modifiers.view;
+          fullName = place + "." + mod(name);
+          ignore = List(classOf[ClassNotFoundException],
+                        classOf[ClassCastException],
+                        classOf[NoClassDefFoundError]);
+          klass <- tryo(ignore)(Class
+                        .forName(fullName)
+                        .asSubclass(targetType)
+                        .asInstanceOf[Class[C]])) yield klass).headOption
 
   /**
     * General method to in find a class according to its type, its name, a list of possible
@@ -150,7 +150,7 @@ trait ClassHelpers { self: ControlHelpers =>
   def findType[C <: AnyRef](where: List[(String, List[String])])(
       implicit m: Manifest[C]): Box[Class[C]] =
     (for ((name, packages) <- where;
-    klass <- findType[C](name, packages)) yield klass).headOption
+          klass <- findType[C](name, packages)) yield klass).headOption
 
   /**
     * Find a class given a list of possible names and corresponding packages, turning underscored
@@ -396,13 +396,12 @@ trait ClassHelpers { self: ControlHelpers =>
             case Nil => Empty
             case x :: xs =>
               Full(
-                  () =>
-                    {
-                  try {
-                    Full(x.invoke(instance))
-                  } catch {
-                    case e: InvocationTargetException => throw e.getCause
-                  }
+                  () => {
+                try {
+                  Full(x.invoke(instance))
+                } catch {
+                  case e: InvocationTargetException => throw e.getCause
+                }
               })
           }
         }

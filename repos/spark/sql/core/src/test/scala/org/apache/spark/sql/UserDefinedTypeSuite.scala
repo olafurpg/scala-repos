@@ -67,7 +67,9 @@ private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 }
 
 class UserDefinedTypeSuite
-    extends QueryTest with SharedSQLContext with ParquetTest {
+    extends QueryTest
+    with SharedSQLContext
+    with ParquetTest {
   import testImplicits._
 
   private lazy val pointsRDD =

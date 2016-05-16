@@ -23,7 +23,8 @@ import cascading.tuple.Fields
   * in each operation.
   */
 trait FoldOperations[+Self <: FoldOperations[Self]]
-    extends ReduceOperations[Self] with Sortable[Self] {
+    extends ReduceOperations[Self]
+    with Sortable[Self] {
   /*
    *  prefer reduce or mapReduceMap. foldLeft will force all work to be
    *  done on the reducers.  If your function is not associative and

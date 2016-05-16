@@ -13,9 +13,12 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class ThriftRichClientTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite
+    with MockitoSugar
+    with OneInstancePerTest {
   object ThriftRichClientMock
-      extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient {
+      extends Client[ThriftClientRequest, Array[Byte]]
+      with ThriftRichClient {
     override val protocolFactory: TProtocolFactory = Protocols.binaryFactory()
     override val defaultClientName = "mock_client"
 

@@ -1125,7 +1125,7 @@ object Keys {
   type TaskStreams = std.TaskStreams[ScopedKey[_]]
 
   @deprecated("Implementation detail.", "0.13.1")
-  def dummy[T : Manifest](
+  def dummy[T: Manifest](
       name: String, description: String): (TaskKey[T], Task[T]) =
     Def.dummy(name, description)
   @deprecated("Implementation detail.", "0.13.1")

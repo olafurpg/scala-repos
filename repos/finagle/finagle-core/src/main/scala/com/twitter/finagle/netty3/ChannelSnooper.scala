@@ -8,7 +8,8 @@ import org.jboss.netty.buffer.ChannelBuffer
 
 /** Log events on channels */
 trait ChannelSnooper
-    extends ChannelDownstreamHandler with ChannelUpstreamHandler {
+    extends ChannelDownstreamHandler
+    with ChannelUpstreamHandler {
   val name: String
 
   private[this] lazy val printStream = new PrintStream(

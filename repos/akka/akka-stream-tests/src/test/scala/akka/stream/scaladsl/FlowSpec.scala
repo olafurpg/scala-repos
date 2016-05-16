@@ -107,8 +107,8 @@ class FlowSpec
           Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
     })
 
-  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] = (f,
-  m) ⇒ f.runWith(Sink.asPublisher(false))(m)
+  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] =
+    (f, m) ⇒ f.runWith(Sink.asPublisher(false))(m)
 
   def toFanoutPublisher[In, Out](
       elasticity: Int): (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out] =
@@ -125,7 +125,7 @@ class FlowSpec
   "A Flow" must {
 
     for ((name, op) ← List("identity" -> identity, "identity2" -> identity2);
-    n ← List(1, 2, 4)) {
+         n ← List(1, 2, 4)) {
       s"request initial elements from upstream ($name, $n)" in {
         new ChainSetup(op,
                        settings.withInputBuffer(initialSize = n, maxSize = n),

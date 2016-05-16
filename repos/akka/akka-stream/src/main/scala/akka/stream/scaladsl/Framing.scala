@@ -30,8 +30,8 @@ object Framing {
     */
   def delimiter(delimiter: ByteString,
                 maximumFrameLength: Int,
-                allowTruncation: Boolean = false)
-    : Flow[ByteString, ByteString, NotUsed] =
+                allowTruncation: Boolean =
+                  false): Flow[ByteString, ByteString, NotUsed] =
     Flow[ByteString]
       .transform(() ⇒
             new DelimiterFramingStage(
@@ -52,11 +52,12 @@ object Framing {
     *                           the length of the size field)
     * @param byteOrder The ''ByteOrder'' to be used when decoding the field
     */
-  def lengthField(fieldLength: Int,
-                  fieldOffset: Int = 0,
-                  maximumFrameLength: Int,
-                  byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN)
-    : Flow[ByteString, ByteString, NotUsed] = {
+  def lengthField(
+      fieldLength: Int,
+      fieldOffset: Int = 0,
+      maximumFrameLength: Int,
+      byteOrder: ByteOrder =
+        ByteOrder.LITTLE_ENDIAN): Flow[ByteString, ByteString, NotUsed] = {
     require(fieldLength >= 1 && fieldLength <= 4,
             "Length field length must be 1, 2, 3 or 4.")
     Flow[ByteString]
@@ -125,31 +126,29 @@ object Framing {
   class FramingException(msg: String) extends RuntimeException(msg)
 
   private final val bigEndianDecoder: (ByteIterator, Int) ⇒ Int = (bs,
-  length) ⇒
-    {
-      var count = length
-      var decoded = 0
-      while (count > 0) {
-        decoded <<= 8
-        decoded |= bs.next().toInt & 0xFF
-        count -= 1
-      }
-      decoded
+                                                                   length) ⇒ {
+    var count = length
+    var decoded = 0
+    while (count > 0) {
+      decoded <<= 8
+      decoded |= bs.next().toInt & 0xFF
+      count -= 1
+    }
+    decoded
   }
 
-  private final val littleEndianDecoder: (ByteIterator, Int) ⇒ Int = (bs,
-  length) ⇒
-    {
-      val highestOctet = (length - 1) << 3
-      val Mask = ((1L << (length << 3)) - 1).toInt
-      var count = length
-      var decoded = 0
-      while (count > 0) {
-        decoded >>>= 8
-        decoded += (bs.next().toInt & 0xFF) << highestOctet
-        count -= 1
-      }
-      decoded & Mask
+  private final val littleEndianDecoder: (ByteIterator,
+                                          Int) ⇒ Int = (bs, length) ⇒ {
+    val highestOctet = (length - 1) << 3
+    val Mask = ((1L << (length << 3)) - 1).toInt
+    var count = length
+    var decoded = 0
+    while (count > 0) {
+      decoded >>>= 8
+      decoded += (bs.next().toInt & 0xFF) << highestOctet
+      count -= 1
+    }
+    decoded & Mask
   }
 
   private class DelimiterFramingStage(val separatorBytes: ByteString,

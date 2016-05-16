@@ -35,8 +35,12 @@ import org.apache.spark.sql.types._
   * Params for [[Word2Vec]] and [[Word2VecModel]].
   */
 private[feature] trait Word2VecBase
-    extends Params with HasInputCol with HasOutputCol with HasMaxIter
-    with HasStepSize with HasSeed {
+    extends Params
+    with HasInputCol
+    with HasOutputCol
+    with HasMaxIter
+    with HasStepSize
+    with HasSeed {
 
   /**
     * The dimension of the code that you want to transform from words.
@@ -113,7 +117,8 @@ private[feature] trait Word2VecBase
   */
 @Experimental
 final class Word2Vec(override val uid: String)
-    extends Estimator[Word2VecModel] with Word2VecBase
+    extends Estimator[Word2VecModel]
+    with Word2VecBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("w2v"))
@@ -182,7 +187,9 @@ object Word2Vec extends DefaultParamsReadable[Word2Vec] {
 class Word2VecModel private[ml](
     override val uid: String,
     @transient private val wordVectors: feature.Word2VecModel)
-    extends Model[Word2VecModel] with Word2VecBase with MLWritable {
+    extends Model[Word2VecModel]
+    with Word2VecBase
+    with MLWritable {
 
   import Word2VecModel._
 
@@ -194,8 +201,8 @@ class Word2VecModel private[ml](
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
-    val wordVec = wordVectors.getVectors.mapValues(
-        vec => Vectors.dense(vec.map(_.toDouble)))
+    val wordVec = wordVectors.getVectors.mapValues(vec =>
+          Vectors.dense(vec.map(_.toDouble)))
     sc.parallelize(wordVec.toSeq).toDF("word", "vector")
   }
 

@@ -84,8 +84,11 @@ trait UTestPackageTest extends UTestTestCase {
                     checkPackageConfigAndSettings(
                         _, generatedName = "ScalaTests in 'src'"),
                     root =>
-                      checkResultTreeHasExactNamedPath(
-                          root, "[root]", "Test1", "tests", "test1") &&
+                      checkResultTreeHasExactNamedPath(root,
+                                                       "[root]",
+                                                       "Test1",
+                                                       "tests",
+                                                       "test1") &&
                       checkResultTreeHasExactNamedPath(root,
                                                        "[root]",
                                                        "Test1",

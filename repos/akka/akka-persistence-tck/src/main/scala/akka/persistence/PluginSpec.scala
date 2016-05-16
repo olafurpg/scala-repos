@@ -12,7 +12,10 @@ import org.scalatest._
 import java.util.UUID
 
 abstract class PluginSpec(val config: Config)
-    extends TestKitBase with WordSpecLike with Matchers with BeforeAndAfterAll
+    extends TestKitBase
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
     with BeforeAndAfterEach {
   private val counter = new AtomicInteger(0)
 
@@ -41,7 +44,7 @@ abstract class PluginSpec(val config: Config)
 
   def writerUuid: String = _writerUuid
 
-  def subscribe[T : ClassTag](subscriber: ActorRef) =
+  def subscribe[T: ClassTag](subscriber: ActorRef) =
     system.eventStream.subscribe(
         subscriber, implicitly[ClassTag[T]].runtimeClass)
 }

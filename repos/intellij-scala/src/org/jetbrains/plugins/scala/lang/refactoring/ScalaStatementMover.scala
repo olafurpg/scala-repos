@@ -30,8 +30,8 @@ class ScalaStatementMover extends LineMover {
 
     def aim(sourceClass: ElementClass,
             predicate: PsiElement => Boolean,
-            canUseLineAsTarget: Boolean = true)
-      : Option[(PsiElement, LineRange)] = {
+            canUseLineAsTarget: Boolean =
+              true): Option[(PsiElement, LineRange)] = {
       findSourceOf(sourceClass).map { source =>
         val targetRange = findTargetRangeFor(source, predicate).getOrElse {
           if (canUseLineAsTarget) nextLineRangeFor(source) else null
@@ -62,7 +62,8 @@ class ScalaStatementMover extends LineMover {
         val maxLine =
           editor.offsetToLogicalPosition(editor.getDocument.getTextLength).line
         if (range.endLine < maxLine)
-          new LineRange(range.endLine, range.endLine + 1) else null
+          new LineRange(range.endLine, range.endLine + 1)
+        else null
       } else {
         new LineRange(range.startLine - 1, range.startLine)
       }
@@ -142,6 +143,6 @@ class ScalaStatementMover extends LineMover {
         .map(_.getPsi)
         .headOption
 
-      (firstLeafOf(span), firstLeafOf(span.reverse))
+    (firstLeafOf(span), firstLeafOf(span.reverse))
   }
 }

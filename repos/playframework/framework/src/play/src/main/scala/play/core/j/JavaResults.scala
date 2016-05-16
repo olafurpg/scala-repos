@@ -28,7 +28,9 @@ import java.util.function.Consumer
   * Java compatible Results
   */
 object JavaResults
-    extends Results with DefaultWriteables with DefaultContentTypeOfs {
+    extends Results
+    with DefaultWriteables
+    with DefaultContentTypeOfs {
   def writeContent(
       mimeType: String)(implicit codec: Codec): Writeable[Content] =
     Writeable((content: Content) => codec.encode(contentBody(content)),
@@ -115,7 +117,7 @@ object JavaResultExtractor {
                 .fromSetCookieHeader(
                     responseHeader.headers.get(HeaderNames.SET_COOKIE))
                 .get(Session.COOKIE_NAME)
-            )
+          )
           .data
           .asJava)
 
@@ -127,7 +129,7 @@ object JavaResultExtractor {
                 .fromSetCookieHeader(
                     responseHeader.headers.get(HeaderNames.SET_COOKIE))
                 .get(Flash.COOKIE_NAME)
-            )
+          )
           .data
           .asJava)
 

@@ -27,8 +27,8 @@ object quickSelect extends UFunc {
   }
 
   @expand
-  implicit def inPlaceImpl2[
-      @expand.args(Int, Long, Double, Float) T]: InPlaceImpl2[Array[T], Int] = {
+  implicit def inPlaceImpl2[@expand.args(Int, Long, Double, Float) T]
+    : InPlaceImpl2[Array[T], Int] = {
 
     new InPlaceImpl2[Array[T], Int] {
 
@@ -169,8 +169,8 @@ object quickSelect extends UFunc {
 object quickSelectImpl extends UFunc {
 
   @expand
-  implicit def impl[@expand.args(Int, Long, Double, Float) T]: Impl2[
-      Array[T], Int, T] =
+  implicit def impl[@expand.args(Int, Long, Double, Float) T]
+    : Impl2[Array[T], Int, T] =
     new Impl2[Array[T], Int, T] {
 
       def apply(x: Array[T], position: Int): T = {

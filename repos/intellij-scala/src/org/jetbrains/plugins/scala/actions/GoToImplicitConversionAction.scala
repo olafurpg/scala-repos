@@ -193,13 +193,12 @@ class GoToImplicitConversionAction
                 (ScUnderScoreSectionUtil.isUnderscoreFunction(expr) && expr
                       .getImplicitConversions(fromUnder = true)
                       ._2
-                      .isDefined) ||
-                (expr.getAdditionalExpression.isDefined &&
+                      .isDefined) || (expr.getAdditionalExpression.isDefined &&
                     expr.getAdditionalExpression.get._1
                       .getImplicitConversions(
                           fromUnder = false,
-                          expectedOption = Some(
-                                expr.getAdditionalExpression.get._2))
+                          expectedOption =
+                            Some(expr.getAdditionalExpression.get._2))
                       ._2
                       .isDefined) =>
               res += expr
@@ -228,9 +227,8 @@ class GoToImplicitConversionAction
             expressions,
             (elem: ScExpression) => chooseExpression(elem),
             "Expressions",
-            (expr: ScExpression) =>
-              {
-                ScalaRefactoringUtil.getShortText(expr)
+            (expr: ScExpression) => {
+              ScalaRefactoringUtil.getShortText(expr)
             })
       }
     }

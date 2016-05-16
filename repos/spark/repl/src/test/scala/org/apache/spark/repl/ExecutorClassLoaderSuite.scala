@@ -45,7 +45,9 @@ import org.apache.spark.rpc.RpcEnv
 import org.apache.spark.util.Utils
 
 class ExecutorClassLoaderSuite
-    extends SparkFunSuite with BeforeAndAfterAll with MockitoSugar
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with MockitoSugar
     with Logging {
 
   val childClassNames = List("ReplFakeClass1", "ReplFakeClass2")

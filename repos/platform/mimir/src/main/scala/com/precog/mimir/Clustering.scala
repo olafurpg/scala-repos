@@ -465,8 +465,9 @@ trait KMediansCoreSetClustering {
 
         var i = 0
         while (i < scaledPoint.length) {
-          scaledPoint(i) = center(i) +
-          math.floor(scaledPoint(i)) * sideLength + (sideLength / 2)
+          scaledPoint(i) =
+            center(i) + math.floor(scaledPoint(i)) * sideLength +
+            (sideLength / 2)
           i += 1
         }
         new GridPoint(scaledPoint)
@@ -560,7 +561,8 @@ trait KMediansCoreSetClustering {
 }
 
 trait ClusteringLibModule[M[+ _]]
-    extends ColumnarTableModule[M] with AssignClusterModule[M] {
+    extends ColumnarTableModule[M]
+    with AssignClusterModule[M] {
   trait ClusteringLib extends ColumnarTableLib with AssignClusterSupport {
     import trans._
     import TransSpecModule._
@@ -707,7 +709,8 @@ trait ClusteringLibModule[M[+ _]]
 
       def morph1Apply(ks: List[Int]): Morph1Apply = new Morph1Apply {
         def apply(table0: Table, ctx: MorphContext): M[Table] = {
-          val table = table0.transform(DerefObjectStatic(
+          val table = table0.transform(
+              DerefObjectStatic(
                   trans.DeepMap1(TransSpec1.Id, cf.util.CoerceToDouble),
                   paths.Value))
 

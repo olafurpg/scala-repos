@@ -6,7 +6,8 @@ trait IssueLabelComponent extends TemplateComponent { self: Profile =>
   lazy val IssueLabels = TableQuery[IssueLabels]
 
   class IssueLabels(tag: Tag)
-      extends Table[IssueLabel](tag, "ISSUE_LABEL") with IssueTemplate
+      extends Table[IssueLabel](tag, "ISSUE_LABEL")
+      with IssueTemplate
       with LabelTemplate {
     def * =
       (userName, repositoryName, issueId, labelId) <>

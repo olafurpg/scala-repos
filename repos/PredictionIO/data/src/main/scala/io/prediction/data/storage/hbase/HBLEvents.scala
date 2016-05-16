@@ -32,7 +32,8 @@ import scala.concurrent.Future
 
 class HBLEvents(
     val client: HBClient, config: StorageClientConfig, val namespace: String)
-    extends LEvents with Logging {
+    extends LEvents
+    with Logging {
 
   // implicit val formats = DefaultFormats + new EventJson4sSupport.DBSerializer
 

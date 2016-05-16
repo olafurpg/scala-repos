@@ -13,7 +13,8 @@ object A3 {
 
 class A4 {
   def f(l: List[String]): List[String] = {
-    l map (_ + "1"): @noinline // inlining adds a reference to the nested class scala/collection/generic/GenTraversableFactory$GenericCanBuildFrom
+    l map (_ +
+        "1"): @noinline // inlining adds a reference to the nested class scala/collection/generic/GenTraversableFactory$GenericCanBuildFrom
   }
 }
 
@@ -125,14 +126,13 @@ val x = { ((x: String) => x + "1")
 }
 }
 
-class A20 { (s: String) =>
-  {
-    { (s: String) =>
-      ()
-    }
-    { (s: String) => (s: String) =>
-      1
-    }
+class A20 { (s: String) => {
+  { (s: String) =>
+    ()
+  }
+  { (s: String) => (s: String) =>
+    1
+  }
 }
 }
 
@@ -192,18 +192,16 @@ trait A24 extends A24Base {
 
 class SI_9105 {
   //      outerClass       enclMeth
-  val fun = (s: String) =>
-    {
-      class A //        SI_9105           null
-      def m: Object = { class B; new B } //        SI_9105            m$1
-      val f: Object = { class C; new C } //        SI_9105           null
+  val fun = (s: String) => {
+    class A //        SI_9105           null
+    def m: Object = { class B; new B } //        SI_9105            m$1
+    val f: Object = { class C; new C } //        SI_9105           null
   }
   def met =
-    (s: String) =>
-      {
-        class D //        SI_9105            met
-        def m: Object = { class E; new E } //        SI_9105            m$1
-        val f: Object = { class F; new F } //        SI_9105            met
+    (s: String) => {
+      class D //        SI_9105            met
+      def m: Object = { class E; new E } //        SI_9105            m$1
+      val f: Object = { class F; new F } //        SI_9105            met
     }
 
   def byName(op: => Any) = 0

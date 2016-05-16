@@ -69,7 +69,8 @@ object NettyFutureBridge {
 
 @SerialVersionUID(1L)
 class NettyTransportException(msg: String, cause: Throwable)
-    extends RuntimeException(msg, cause) with OnlyCauseStackTrace {
+    extends RuntimeException(msg, cause)
+    with OnlyCauseStackTrace {
   def this(msg: String) = this(msg, null)
 }
 
@@ -225,7 +226,8 @@ private[netty] abstract class ServerHandler(
     protected final val transport: NettyTransport,
     private final val associationListenerFuture: Future[
         AssociationEventListener])
-    extends NettyServerHelpers with CommonHandlers {
+    extends NettyServerHelpers
+    with CommonHandlers {
 
   import transport.executionContext
 
@@ -255,7 +257,8 @@ private[netty] abstract class ServerHandler(
   */
 private[netty] abstract class ClientHandler(
     protected final val transport: NettyTransport, remoteAddress: Address)
-    extends NettyClientHelpers with CommonHandlers {
+    extends NettyClientHelpers
+    with CommonHandlers {
   final protected val statusPromise = Promise[AssociationHandle]()
   def statusFuture = statusPromise.future
 
@@ -461,14 +464,14 @@ class NettyTransport(
       bootstrap.setOption(
           "receiveBufferSizePredictorFactory",
           new FixedReceiveBufferSizePredictorFactory(ReceiveBufferSize.get))
-    settings.ReceiveBufferSize.foreach(
-        sz ⇒ bootstrap.setOption("receiveBufferSize", sz))
-    settings.SendBufferSize.foreach(
-        sz ⇒ bootstrap.setOption("sendBufferSize", sz))
-    settings.WriteBufferHighWaterMark.foreach(
-        sz ⇒ bootstrap.setOption("writeBufferHighWaterMark", sz))
-    settings.WriteBufferLowWaterMark.foreach(
-        sz ⇒ bootstrap.setOption("writeBufferLowWaterMark", sz))
+    settings.ReceiveBufferSize.foreach(sz ⇒
+          bootstrap.setOption("receiveBufferSize", sz))
+    settings.SendBufferSize.foreach(sz ⇒
+          bootstrap.setOption("sendBufferSize", sz))
+    settings.WriteBufferHighWaterMark.foreach(sz ⇒
+          bootstrap.setOption("writeBufferHighWaterMark", sz))
+    settings.WriteBufferLowWaterMark.foreach(sz ⇒
+          bootstrap.setOption("writeBufferLowWaterMark", sz))
     bootstrap
   }
 
@@ -488,14 +491,14 @@ class NettyTransport(
         "connectTimeoutMillis", settings.ConnectionTimeout.toMillis)
     bootstrap.setOption("tcpNoDelay", settings.TcpNodelay)
     bootstrap.setOption("keepAlive", settings.TcpKeepalive)
-    settings.ReceiveBufferSize.foreach(
-        sz ⇒ bootstrap.setOption("receiveBufferSize", sz))
-    settings.SendBufferSize.foreach(
-        sz ⇒ bootstrap.setOption("sendBufferSize", sz))
-    settings.WriteBufferHighWaterMark.foreach(
-        sz ⇒ bootstrap.setOption("writeBufferHighWaterMark", sz))
-    settings.WriteBufferLowWaterMark.foreach(
-        sz ⇒ bootstrap.setOption("writeBufferLowWaterMark", sz))
+    settings.ReceiveBufferSize.foreach(sz ⇒
+          bootstrap.setOption("receiveBufferSize", sz))
+    settings.SendBufferSize.foreach(sz ⇒
+          bootstrap.setOption("sendBufferSize", sz))
+    settings.WriteBufferHighWaterMark.foreach(sz ⇒
+          bootstrap.setOption("writeBufferHighWaterMark", sz))
+    settings.WriteBufferLowWaterMark.foreach(sz ⇒
+          bootstrap.setOption("writeBufferLowWaterMark", sz))
     bootstrap
   }
 
@@ -517,7 +520,10 @@ class NettyTransport(
   override def listen: Future[(Address, Promise[AssociationEventListener])] = {
     for {
       address ← addressToSocketAddress(
-          Address("", "", settings.BindHostname, settings.BindPortSelector))
+                   Address("",
+                           "",
+                           settings.BindHostname,
+                           settings.BindPortSelector))
     } yield {
       try {
         val newServerChannel = inboundBootstrap match {
@@ -580,17 +586,17 @@ class NettyTransport(
       (for {
         socketAddress ← addressToSocketAddress(remoteAddress)
         readyChannel ← NettyFutureBridge(bootstrap.connect(socketAddress)) map {
-          channel ⇒
-            if (EnableSsl)
-              blocking {
-                channel.getPipeline
-                  .get(classOf[SslHandler])
-                  .handshake()
-                  .awaitUninterruptibly()
-              }
-            if (!isDatagram) channel.setReadable(false)
-            channel
-        }
+                        channel ⇒
+                          if (EnableSsl)
+                            blocking {
+                              channel.getPipeline
+                                .get(classOf[SslHandler])
+                                .handshake()
+                                .awaitUninterruptibly()
+                            }
+                          if (!isDatagram) channel.setReadable(false)
+                          channel
+                      }
         handle ← if (isDatagram)
                   Future {
                     readyChannel.getRemoteAddress match {

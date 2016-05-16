@@ -71,7 +71,7 @@ package object math {
   def fib(n: Long): BigInt = {
     if (n < 0) throw new IllegalArgumentException(n.toString)
     var i = 63
-    while ( ((n >>> i) & 1) == 0 && i >= 0) i -= 1
+    while (((n >>> i) & 1) == 0 && i >= 0) i -= 1
     @tailrec def loop(a: BigInt, b: BigInt, i: Int): BigInt = {
       val c = a + b
       if (i < 0) b

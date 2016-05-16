@@ -63,7 +63,8 @@ private[changeSignature] object ScalaNamedElementUsageInfo {
 }
 
 private[changeSignature] case class FunUsageInfo(namedElement: ScFunction)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] case class PrimaryConstructorUsageInfo(
     pc: ScPrimaryConstructor)
@@ -73,11 +74,13 @@ private[changeSignature] case class PrimaryConstructorUsageInfo(
 
 private[changeSignature] case class OverriderValUsageInfo(
     namedElement: ScBindingPattern)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] case class OverriderClassParamUsageInfo(
     namedElement: ScClassParameter)
-    extends UsageInfo(namedElement) with ScalaNamedElementUsageInfo
+    extends UsageInfo(namedElement)
+    with ScalaNamedElementUsageInfo
 
 private[changeSignature] trait MethodUsageInfo {
   def expr: ScExpression
@@ -92,7 +95,8 @@ private[changeSignature] trait MethodUsageInfo {
 
 private[changeSignature] case class MethodCallUsageInfo(
     ref: ScReferenceExpression, call: ScMethodCall)
-    extends UsageInfo(call) with MethodUsageInfo {
+    extends UsageInfo(call)
+    with MethodUsageInfo {
 
   private val resolveResult = Option(ref).flatMap(_.bind())
   val substitutor = resolveResult.map(_.substitutor)
@@ -109,14 +113,16 @@ private[changeSignature] case class MethodCallUsageInfo(
 
 private[changeSignature] case class RefExpressionUsage(
     refExpr: ScReferenceExpression)
-    extends UsageInfo(refExpr: PsiReference) with MethodUsageInfo {
+    extends UsageInfo(refExpr: PsiReference)
+    with MethodUsageInfo {
   val expr = refExpr
   val ref = refExpr
   val argsInfo = OldArgsInfo(Seq.empty, method)
 }
 
 private[changeSignature] case class InfixExprUsageInfo(infix: ScInfixExpr)
-    extends UsageInfo(infix) with MethodUsageInfo {
+    extends UsageInfo(infix)
+    with MethodUsageInfo {
   val expr = infix
   val ref = infix.operation
   val argsInfo = OldArgsInfo(infix.argumentExpressions, method)
@@ -124,7 +130,8 @@ private[changeSignature] case class InfixExprUsageInfo(infix: ScInfixExpr)
 
 private[changeSignature] case class PostfixExprUsageInfo(
     postfix: ScPostfixExpr)
-    extends UsageInfo(postfix) with MethodUsageInfo {
+    extends UsageInfo(postfix)
+    with MethodUsageInfo {
   val expr = postfix
   val ref = postfix.operation
   val argsInfo = OldArgsInfo(postfix.argumentExpressions, method)
@@ -132,7 +139,8 @@ private[changeSignature] case class PostfixExprUsageInfo(
 
 private[changeSignature] case class ConstructorUsageInfo(
     ref: ScReferenceElement, constr: ScConstructor)
-    extends UsageInfo(constr) with MethodUsageInfo {
+    extends UsageInfo(constr)
+    with MethodUsageInfo {
 
   private val resolveResult = Option(ref).flatMap(_.bind())
   val substitutor = resolveResult.map(_.substitutor)
@@ -178,11 +186,13 @@ private[changeSignature] trait PatternUsageInfo {
 
 private[changeSignature] case class ConstructorPatternUsageInfo(
     pattern: ScConstructorPattern)
-    extends UsageInfo(pattern) with PatternUsageInfo
+    extends UsageInfo(pattern)
+    with PatternUsageInfo
 
 private[changeSignature] case class InfixPatternUsageInfo(
     pattern: ScInfixPattern)
-    extends UsageInfo(pattern) with PatternUsageInfo
+    extends UsageInfo(pattern)
+    with PatternUsageInfo
 
 private[changeSignature] object UsageUtil {
 

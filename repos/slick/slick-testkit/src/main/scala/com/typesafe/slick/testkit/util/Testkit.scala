@@ -114,7 +114,8 @@ case class TestMethod(name: String,
         if (r == classOf[Future[_]])
           await(method.invoke(testObject).asInstanceOf[Future[Any]])
         else if (r == classOf[DBIOAction[_, _, _]])
-          await(testObject.db
+          await(
+              testObject.db
                 .run(method.invoke(testObject).asInstanceOf[DBIO[Any]]))
         else
           throw new RuntimeException(
@@ -287,11 +288,13 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
   def ifCap[E <: Effect, R](caps: Capability*)(
       f: => DBIOAction[R, NoStream, E]): DBIOAction[Unit, NoStream, E] =
     if (caps.forall(c => tdb.capabilities.contains(c)))
-      f.andThen(DBIO.successful(())) else DBIO.successful(())
+      f.andThen(DBIO.successful(()))
+    else DBIO.successful(())
   def ifNotCap[E <: Effect, R](caps: Capability*)(
       f: => DBIOAction[R, NoStream, E]): DBIOAction[Unit, NoStream, E] =
     if (!caps.forall(c => tdb.capabilities.contains(c)))
-      f.andThen(DBIO.successful(())) else DBIO.successful(())
+      f.andThen(DBIO.successful(()))
+    else DBIO.successful(())
 
   def ifCapF[R](caps: Capability*)(f: => Future[R]): Future[Unit] =
     if (caps.forall(c => tdb.capabilities.contains(c))) f.map(_ => ())
@@ -343,8 +346,8 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
   def materializeAsync[T, R](
       p: Publisher[T],
       tr: T => Future[R],
-      delay: Duration = Duration(100L, TimeUnit.MILLISECONDS))
-    : Future[Vector[R]] = {
+      delay: Duration =
+        Duration(100L, TimeUnit.MILLISECONDS)): Future[Vector[R]] = {
     val exe = new ThreadPoolExecutor(
         1, 1, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue[Runnable]())
     val ec = ExecutionContext.fromExecutor(exe)
@@ -418,8 +421,7 @@ abstract class AsyncTest[TDB >: Null <: TestDB](
     }
   }
 
-  implicit class CollectionAssertionExtensionMethods[
-      T](v: TraversableOnce[T]) {
+  implicit class CollectionAssertionExtensionMethods[T](v: TraversableOnce[T]) {
     private[this] val cln = getClass.getName
     private[this] def fixStack(f: => Unit): Unit = try f catch {
       case ex: AssertionError =>

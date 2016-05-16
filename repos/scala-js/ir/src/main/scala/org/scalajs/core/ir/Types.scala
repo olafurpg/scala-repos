@@ -116,7 +116,8 @@ object Types {
 
   /** Array type. */
   final case class ArrayType(baseClassName: String, dimensions: Int)
-      extends Type with ReferenceType
+      extends Type
+      with ReferenceType
 
   object ArrayType {
     def apply(innerType: ReferenceType): ArrayType = innerType match {
@@ -170,8 +171,7 @@ object Types {
     import Definitions._
 
     (lhs != NoType && rhs != NoType) && {
-      (lhs == rhs) ||
-      ((lhs, rhs) match {
+      (lhs == rhs) || ((lhs, rhs) match {
             case (_, AnyType) => true
             case (NothingType, _) => true
 

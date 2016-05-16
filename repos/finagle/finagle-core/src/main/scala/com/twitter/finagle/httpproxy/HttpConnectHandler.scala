@@ -124,7 +124,8 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
     }
 
     // proxy cancellations again.
-    connectFuture.get.addListener(new ChannelFutureListener {
+    connectFuture.get.addListener(
+        new ChannelFutureListener {
       def operationComplete(f: ChannelFuture) {
         if (f.isSuccess) HttpConnectHandler. super.channelConnected(ctx, e)
         else if (f.isCancelled)

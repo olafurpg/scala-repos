@@ -542,7 +542,8 @@ abstract class TreeBrowsers {
         (str + " annotations: " + s.annotations.mkString("", " ", "") +
             (if (s.isTypeSkolem)
                "\ndeSkolemized annotations: " +
-               s.deSkolemize.annotations.mkString("", " ", "") else ""))
+               s.deSkolemize.annotations.mkString("", " ", "")
+             else ""))
       } else ""
     }
   }

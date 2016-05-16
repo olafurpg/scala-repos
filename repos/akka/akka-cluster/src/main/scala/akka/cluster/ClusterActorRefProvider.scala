@@ -42,11 +42,12 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
     import remoteSettings._
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
-        ClusterRemoteWatcher.props(
-            failureDetector,
-            heartbeatInterval = WatchHeartBeatInterval,
-            unreachableReaperInterval = WatchUnreachableReaperInterval,
-            heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter),
+        ClusterRemoteWatcher.props(failureDetector,
+                                   heartbeatInterval = WatchHeartBeatInterval,
+                                   unreachableReaperInterval =
+                                     WatchUnreachableReaperInterval,
+                                   heartbeatExpectedResponseAfter =
+                                     WatchHeartbeatExpectedResponseAfter),
         "remote-watcher")
   }
 
@@ -98,17 +99,17 @@ private[akka] class ClusterDeployer(
           deploy.routerConfig match {
             case r: Pool ⇒
               Some(
-                  deploy.copy(routerConfig = ClusterRouterPool(
-                                    r,
-                                    ClusterRouterPoolSettings.fromConfig(
-                                        deploy.config)),
-                              scope = ClusterScope))
+                  deploy.copy(
+                      routerConfig = ClusterRouterPool(
+                          r,
+                          ClusterRouterPoolSettings.fromConfig(deploy.config)),
+                      scope = ClusterScope))
             case r: Group ⇒
               Some(
                   deploy.copy(routerConfig = ClusterRouterGroup(
-                                    r,
-                                    ClusterRouterGroupSettings.fromConfig(
-                                        deploy.config)),
+                                  r,
+                                  ClusterRouterGroupSettings.fromConfig(
+                                      deploy.config)),
                               scope = ClusterScope))
             case other ⇒
               throw new IllegalArgumentException(

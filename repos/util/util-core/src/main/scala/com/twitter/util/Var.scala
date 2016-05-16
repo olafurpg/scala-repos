@@ -65,25 +65,21 @@ trait Var[+T] { self =>
   def flatMap[U](f: T => Var[U]): Var[U] = new Var[U] {
     def observe(depth: Int, obs: Observer[U]) = {
       val inner = new AtomicReference(Closable.nop)
-      val outer = self.observe(
-          depth,
-          Observer(
-              t =>
-                {
-              // TODO: Right now we rely on synchronous propagation; and
-              // thus also synchronous closes. We should instead perform
-              // asynchronous propagation so that it is is safe &
-              // predictable to have asynchronously closing Vars, for
-              // example. Currently the only source of potentially
-              // asynchronous closing is Var.async; here we have modified
-              // the external process to close asynchronously with the Var
-              // itself. Thus we know the code path here is synchronous:
-              // we control all Var implementations, and also all Closable
-              // combinators have been modified to evaluate their respective
-              // Futures eagerly.
-              val done = inner.getAndSet(f(t).observe(depth + 1, obs)).close()
-              assert(done.isDone)
-          }))
+      val outer = self.observe(depth, Observer(t => {
+        // TODO: Right now we rely on synchronous propagation; and
+        // thus also synchronous closes. We should instead perform
+        // asynchronous propagation so that it is is safe &
+        // predictable to have asynchronously closing Vars, for
+        // example. Currently the only source of potentially
+        // asynchronous closing is Var.async; here we have modified
+        // the external process to close asynchronously with the Var
+        // itself. Thus we know the code path here is synchronous:
+        // we control all Var implementations, and also all Closable
+        // combinators have been modified to evaluate their respective
+        // Futures eagerly.
+        val done = inner.getAndSet(f(t).observe(depth + 1, obs)).close()
+        assert(done.isDone)
+      }))
 
       Closable.sequence(outer, Closable.ref(inner))
     }
@@ -235,7 +231,7 @@ object Var {
   /**
     * Collect a collection of Vars into a Var of collection.
     */
-  def collect[T : ClassTag, CC[X] <: Traversable[X]](vars: CC[Var[T]])(
+  def collect[T: ClassTag, CC[X] <: Traversable[X]](vars: CC[Var[T]])(
       implicit newBuilder: CanBuildFrom[CC[T], T, CC[T]]): Var[CC[T]] = {
     val vs = vars.toArray
 
@@ -365,7 +361,9 @@ private object UpdatableVar {
 }
 
 private[util] class UpdatableVar[T](init: T)
-    extends Var[T] with Updatable[T] with Extractable[T] {
+    extends Var[T]
+    with Updatable[T]
+    with Extractable[T] {
   import UpdatableVar._
   import Var.Observer
 

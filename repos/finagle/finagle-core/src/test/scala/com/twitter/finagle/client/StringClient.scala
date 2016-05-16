@@ -44,7 +44,8 @@ private[finagle] trait StringClient {
   case class Client(
       stack: Stack[ServiceFactory[String, String]] = StackClient.newStack,
       params: Stack.Params = Stack.Params.empty)
-      extends StdStackClient[String, String, Client] with StringRichClient {
+      extends StdStackClient[String, String, Client]
+      with StringRichClient {
     protected def copy1(
         stack: Stack[ServiceFactory[String, String]] = this.stack,
         params: Stack.Params = this.params

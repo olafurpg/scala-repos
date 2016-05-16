@@ -172,8 +172,8 @@ class HoconPsiParser extends PsiParser {
           pass(Comma)
         } else {
           tokenError(
-              "expected object field" +
-              (if (insideObject) ", include or '}'" else " or include"))
+              "expected object field" + (if (insideObject) ", include or '}'"
+                                         else " or include"))
         }
       }
 
@@ -214,8 +214,7 @@ class HoconPsiParser extends PsiParser {
               parseStringLiteral(IncludeTarget)
             } catch {
               case e: MalformedURLException =>
-                tokenError(
-                    if (e.getMessage != null) e.getMessage
+                tokenError(if (e.getMessage != null) e.getMessage
                     else "malformed URL")
             }
           } else {
@@ -369,8 +368,8 @@ class HoconPsiParser extends PsiParser {
       def tryParseNull =
         tryParse(passKeyword("null") && matches(endingMatcher), Null)
       def tryParseBoolean =
-        tryParse((passKeyword("true") ||
-                     passKeyword("false")) && matches(endingMatcher),
+        tryParse((passKeyword("true") || passKeyword("false")) &&
+                 matches(endingMatcher),
                  Boolean)
       def tryParseNumber =
         tryParse(passNumber() && matches(endingMatcher), Number)

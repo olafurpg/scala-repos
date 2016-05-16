@@ -12,8 +12,8 @@ object MonadCatchIO extends MonadCatchIOFunctions {
 }
 
 sealed abstract class MonadCatchIOFunctions {
-  def except[M[_], A](ma: M[A])(handler: Throwable => M[A])(
-      implicit M: MonadCatchIO[M]): M[A] =
+  def except[M[_], A](ma: M[A])(
+      handler: Throwable => M[A])(implicit M: MonadCatchIO[M]): M[A] =
     M.except(ma)(handler)
 
   import scalaz.syntax.monad._
@@ -22,8 +22,8 @@ sealed abstract class MonadCatchIOFunctions {
     * Executes the handler for exceptions that are raised and match the given predicate.
     * Other exceptions are rethrown.
     */
-  def catchSome[M[_]: MonadCatchIO, A, B](ma: M[A])(
-      p: Throwable => Option[B], handler: B => M[A]): M[A] =
+  def catchSome[M[_]: MonadCatchIO, A, B](
+      ma: M[A])(p: Throwable => Option[B], handler: B => M[A]): M[A] =
     except(ma)(
         e =>
           p(e) match {
@@ -36,8 +36,8 @@ sealed abstract class MonadCatchIOFunctions {
     * exception was raised.
     */
   def catchLeft[M[_]: MonadCatchIO, A](ma: M[A]): M[Throwable \/ A] =
-    except(ma.map(\/.right[Throwable, A]))(
-        t => \/.left[Throwable, A](t).point[M])
+    except(ma.map(\/.right[Throwable, A]))(t =>
+          \/.left[Throwable, A](t).point[M])
 
   /** Like "catchLeft" but takes a predicate to select which exceptions are caught. */
   def catchSomeLeft[M[_]: MonadCatchIO, A, B](ma: M[A])(
@@ -53,8 +53,8 @@ sealed abstract class MonadCatchIOFunctions {
         a <- (throw e): M[A]
       } yield a)
 
-  def bracket[M[_]: MonadCatchIO, A, B, C](before: M[A])(
-      after: A => M[B])(during: A => M[C]): M[C] =
+  def bracket[M[_]: MonadCatchIO, A, B, C](before: M[A])(after: A => M[B])(
+      during: A => M[C]): M[C] =
     for {
       a <- before
       r <- onException(during(a), after(a))
@@ -82,8 +82,8 @@ sealed abstract class MonadCatchIOFunctions {
     } yield r
 
   /** An automatic resource management. */
-  def using[M[_], A, B](ma: M[A])(f: A => M[B])(
-      implicit M: MonadCatchIO[M], resource: Resource[A]) =
+  def using[M[_], A, B](ma: M[A])(
+      f: A => M[B])(implicit M: MonadCatchIO[M], resource: Resource[A]) =
     bracket(ma)(resource.close(_).liftIO[M])(f)
 
   implicit def KleisliMonadCatchIO[F[_], R](

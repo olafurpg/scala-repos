@@ -50,10 +50,10 @@ object MutablizingAdaptor {
     else InnerProductSpaceAdaptor(vs)
   }
 
-  def ensureMutable[V, S](
-      vs: VectorField[V, S])(implicit canIterate: CanTraverseValues[V, S],
-                             canMap: CanMapValues[V, S, S, V],
-                             canZipMap: CanZipMapValues[V, S, S, V])
+  def ensureMutable[V, S](vs: VectorField[V, S])(
+      implicit canIterate: CanTraverseValues[V, S],
+      canMap: CanMapValues[V, S, S, V],
+      canZipMap: CanZipMapValues[V, S, S, V])
     : MutablizingAdaptor[VectorField, MutableVectorField, V, S] = {
     if (vs.isInstanceOf[MutableVectorField[_, _]])
       IdentityWrapper[MutableVectorField, V, S](
@@ -61,10 +61,10 @@ object MutablizingAdaptor {
     else VectorFieldAdaptor(vs)
   }
 
-  def ensureMutable[V, S](
-      vs: VectorRing[V, S])(implicit canIterate: CanTraverseValues[V, S],
-                            canMap: CanMapValues[V, S, S, V],
-                            canZipMap: CanZipMapValues[V, S, S, V])
+  def ensureMutable[V, S](vs: VectorRing[V, S])(
+      implicit canIterate: CanTraverseValues[V, S],
+      canMap: CanMapValues[V, S, S, V],
+      canZipMap: CanZipMapValues[V, S, S, V])
     : MutablizingAdaptor[VectorRing, MutableVectorRing, V, S] = {
     if (vs.isInstanceOf[MutableVectorRing[_, _]])
       IdentityWrapper[MutableVectorRing, V, S](
@@ -72,10 +72,10 @@ object MutablizingAdaptor {
     else VectorRingAdaptor(vs)
   }
 
-  def ensureMutable[V, S](
-      vs: CoordinateField[V, S])(implicit canIterate: CanTraverseValues[V, S],
-                                 canMap: CanMapValues[V, S, S, V],
-                                 canZipMap: CanZipMapValues[V, S, S, V])
+  def ensureMutable[V, S](vs: CoordinateField[V, S])(
+      implicit canIterate: CanTraverseValues[V, S],
+      canMap: CanMapValues[V, S, S, V],
+      canZipMap: CanZipMapValues[V, S, S, V])
     : MutablizingAdaptor[CoordinateField, MutableCoordinateField, V, S] = {
     if (vs.isInstanceOf[MutableCoordinateField[_, _]])
       IdentityWrapper[MutableCoordinateField, V, S](

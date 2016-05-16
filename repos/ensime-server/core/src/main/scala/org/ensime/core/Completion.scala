@@ -203,7 +203,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
                       c1.name.length < c2.name.length)
                 })
                 .take(maxResults)
-            )
+          )
         case _ => CompletionInfoList("", Nil)
       }
     }
@@ -293,8 +293,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
           case m @ ScopeMember(sym, tpe, accessible, viaView) =>
             val p = sym.pos
             val inSymbol =
-              p.isRange &&
-              (context.offset >= p.startOrCursor &&
+              p.isRange && (context.offset >= p.startOrCursor &&
                   context.offset <= p.endOrCursor)
             if (!sym.isConstructor && !inSymbol) {
               buff ++= toCompletionInfo(
@@ -394,7 +393,8 @@ trait Completion { self: RichPresentationCompiler =>
                                CompletionSignature(List.empty, "", false),
                                isCallable = false,
                                50,
-                               None)) else None
+                               None))
+          else None
         }.toList.sortBy(ci => (ci.relevance, ci.name))
       case _ => List.empty
     }

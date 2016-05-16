@@ -37,7 +37,9 @@ import org.scalacheck.{Shrink, Arbitrary, Gen, Pretty}
 import scala.annotation.tailrec
 
 class RowFormatSpec
-    extends Specification with ScalaCheck with CValueGenerators {
+    extends Specification
+    with ScalaCheck
+    with CValueGenerators {
   import Arbitrary._
   import ByteBufferPool._
 

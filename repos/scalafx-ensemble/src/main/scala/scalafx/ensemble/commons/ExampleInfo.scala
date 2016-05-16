@@ -79,8 +79,9 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
   /** Collection of resources used by this example */
   lazy val resources: Set[String] = {
     def extract(pattern: Regex): Seq[String] = {
-      val resources = for (pattern(resourcePath) <- pattern findAllIn sourceCode) yield
-        resourcePath
+      val resources =
+        for (pattern(resourcePath) <- pattern findAllIn sourceCode) yield
+          resourcePath
       resources
         .map(r => if (r.startsWith("/")) r else "/" + packagePath + "/" + r)
         .toSeq
@@ -108,8 +109,9 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
 
   private def extractStageProperties(sourceRaw: String): Seq[String] = {
     val pattern = """@stage-property\s*(.*)""".r
-    val properties = for (pattern(property) <- pattern findAllIn sourceRaw) yield
-      property.trim
+    val properties =
+      for (pattern(property) <- pattern findAllIn sourceRaw) yield
+        property.trim
     properties.toSeq
   }
 
@@ -135,11 +137,13 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
     source = source.replaceAll("""\s*//\s*@stage-property\s*(.*)""", "")
 
     // Append copyright, package, and required imports
-    source = "" + "/*\n" + " * Copyright 2013 ScalaFX Project\n" +
-    " * All right reserved.\n" + " */\n" +
-    (if (!originalPackageName.isEmpty) "package " + originalPackageName + "\n"
-     else "") + "\n" + "import scalafx.application.JFXApp\n" +
-    "import scalafx.scene.Scene\n" + source
+    source =
+      "" + "/*\n" + " * Copyright 2013 ScalaFX Project\n" +
+      " * All right reserved.\n" + " */\n" +
+      (if (!originalPackageName.isEmpty)
+         "package " + originalPackageName + "\n"
+       else "") + "\n" + "import scalafx.application.JFXApp\n" +
+      "import scalafx.scene.Scene\n" + source
 
     // Remove local imports
     source = source.replaceAll("""import scalafx.ensemble.\S*\s*""", "")
@@ -154,9 +158,9 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
     val stageHeader =
       "" + "\n\n" + "  stage = new JFXApp.PrimaryStage {\n" +
       "    title = \"" + formatAddSpaces(extractSampleName(sourceRaw)) +
-      " Example\"\n" +
-      (if (stageProperties.isEmpty) ""
-       else stageProperties.mkString("    ", "\n    ", "\n")) +
+      " Example\"\n" + (if (stageProperties.isEmpty) ""
+                        else
+                          stageProperties.mkString("    ", "\n    ", "\n")) +
       "    scene = new Scene {\n" + "      root ="
     source = source.replaceFirst("""\s*def\s*getContent\s*=""", stageHeader)
 

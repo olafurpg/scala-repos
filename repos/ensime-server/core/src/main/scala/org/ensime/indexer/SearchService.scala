@@ -30,7 +30,9 @@ class SearchService(
     implicit actorSystem: ActorSystem,
     vfs: EnsimeVFS
 )
-    extends ClassfileIndexer with FileChangeListener with SLF4JLogging {
+    extends ClassfileIndexer
+    with FileChangeListener
+    with SLF4JLogging {
 
   private val QUERY_TIMEOUT = 30 seconds
 
@@ -309,7 +311,8 @@ class SearchService(
 case class IndexFile(f: FileObject)
 
 class IndexingQueueActor(searchService: SearchService)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import context.system
 
   import scala.concurrent.duration._

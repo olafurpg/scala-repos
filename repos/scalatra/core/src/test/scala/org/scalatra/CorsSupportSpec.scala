@@ -26,7 +26,8 @@ class CorsSupportSpec extends ScalatraSpec {
   object context {
     def validSimpleRequest = {
       get("/",
-          headers = Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
+          headers =
+            Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
         response.getHeader(CorsSupport.AccessControlAllowOriginHeader) must_== "http://www.example.com"
       }
     }
@@ -37,11 +38,11 @@ class CorsSupportSpec extends ScalatraSpec {
     }
 
     def validPreflightRequest = {
-      options(
-          "/",
-          headers = Map(CorsSupport.OriginHeader -> "http://www.example.com",
-                        CorsSupport.AccessControlRequestMethodHeader -> "GET",
-                        "Content-Type" -> "application/json")) {
+      options("/",
+              headers =
+                Map(CorsSupport.OriginHeader -> "http://www.example.com",
+                    CorsSupport.AccessControlRequestMethodHeader -> "GET",
+                    "Content-Type" -> "application/json")) {
         response.getHeader(CorsSupport.AccessControlAllowOriginHeader) must_== "http://www.example.com"
       }
     }
@@ -85,7 +86,8 @@ class DisabledCorsSupportSpec extends ScalatraSpec {
   object context {
     def simpleRequestToDisabledCors = {
       get("/disabled/",
-          headers = Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
+          headers =
+            Map(CorsSupport.OriginHeader -> "http://www.example.com")) {
         response.getHeader(CorsSupport.AccessControlAllowOriginHeader) must_== null
       }
     }

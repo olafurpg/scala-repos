@@ -71,7 +71,9 @@ object MarathonSchedulerServiceTest {
 }
 
 class MarathonSchedulerServiceTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
     with Matchers {
   import MarathonSchedulerServiceTest._
 

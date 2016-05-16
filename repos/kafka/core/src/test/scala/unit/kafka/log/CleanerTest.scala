@@ -170,8 +170,7 @@ class CleanerTest extends JUnitSuite {
 
   /* extract all the keys from a log */
   def keysInLog(log: Log): Iterable[Int] =
-    log.logSegments.flatMap(
-        s =>
+    log.logSegments.flatMap(s =>
           s.log
             .filter(!_.message.isNull)
             .filter(_.message.hasKey)
@@ -425,7 +424,7 @@ class CleanerTest extends JUnitSuite {
     //    On recovery, clean operation is aborted. All messages should be present in the log
     log.logSegments.head.changeFileSuffixes("", Log.CleanedFileSuffix)
     for (file <- dir.listFiles
-                    if file.getName.endsWith(Log.DeletedFileSuffix)) {
+         if file.getName.endsWith(Log.DeletedFileSuffix)) {
       Utils.atomicMoveWithFallback(
           file.toPath,
           Paths.get(CoreUtils.replaceSuffix(
@@ -441,7 +440,7 @@ class CleanerTest extends JUnitSuite {
     //    renamed to .deleted. Clean operation is resumed during recovery. 
     log.logSegments.head.changeFileSuffixes("", Log.SwapFileSuffix)
     for (file <- dir.listFiles
-                    if file.getName.endsWith(Log.DeletedFileSuffix)) {
+         if file.getName.endsWith(Log.DeletedFileSuffix)) {
       Utils.atomicMoveWithFallback(
           file.toPath,
           Paths.get(CoreUtils.replaceSuffix(

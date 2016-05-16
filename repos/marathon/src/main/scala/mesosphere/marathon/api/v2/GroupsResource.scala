@@ -208,7 +208,7 @@ class GroupsResource @Inject()(groupManager: GroupManager,
                     "steps" -> DeploymentPlan(originalGroup, updatedGroup).steps
                 )
                 .toString()
-            )
+          )
         } else {
           val (deployment, _) =
             updateOrCreate(id.toRootPath, groupUpdate, force)

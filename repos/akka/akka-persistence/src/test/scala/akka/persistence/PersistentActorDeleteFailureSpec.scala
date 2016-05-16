@@ -17,9 +17,11 @@ object PersistentActorDeleteFailureSpec {
 
   case class DeleteTo(n: Long)
   class SimulatedException(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
   class SimulatedSerializationException(msg: String)
-      extends RuntimeException(msg) with NoStackTrace
+      extends RuntimeException(msg)
+      with NoStackTrace
 
   class DeleteFailingInmemJournal extends InmemJournal {
     override def asyncDeleteMessagesTo(
@@ -52,9 +54,11 @@ class PersistentActorDeleteFailureSpec
         PersistenceSpec.config(
             "inmem",
             "SnapshotFailureRobustnessSpec",
-            extraConfig = Some("""
+            extraConfig =
+              Some("""
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorDeleteFailureSpec$DeleteFailingInmemJournal"
-  """))) with ImplicitSender {
+  """)))
+    with ImplicitSender {
   import PersistentActorDeleteFailureSpec._
 
   system.eventStream.publish(

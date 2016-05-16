@@ -31,7 +31,8 @@ import akka.http.impl.util.JavaMapping.Implicits._
   *    Like binary MediaTypes `WithFixedCharset` types can be implicitly converted to a [[ContentType]].
   */
 sealed abstract class MediaType
-    extends jm.MediaType with LazyValueBytesRenderable
+    extends jm.MediaType
+    with LazyValueBytesRenderable
     with WithQValue[MediaRange] {
   import MediaType.Compressibility
 
@@ -270,7 +271,8 @@ object MediaType {
                                val subType: String,
                                val comp: Compressibility,
                                val fileExtensions: List[String])
-      extends MediaType with jm.MediaType.Binary {
+      extends MediaType
+      with jm.MediaType.Binary {
     def binary = true
     def params: Map[String, String] = Map.empty
     def withParams(params: Map[String, String]): Binary with MediaType =
@@ -285,7 +287,8 @@ object MediaType {
   }
 
   sealed abstract class NonBinary
-      extends MediaType with jm.MediaType.NonBinary {
+      extends MediaType
+      with jm.MediaType.NonBinary {
     def binary = false
     def comp = Compressible
     def withComp(comp: Compressibility): Binary with MediaType =
@@ -297,7 +300,8 @@ object MediaType {
                                          val subType: String,
                                          val charset: HttpCharset,
                                          val fileExtensions: List[String])
-      extends NonBinary with jm.MediaType.WithFixedCharset {
+      extends NonBinary
+      with jm.MediaType.WithFixedCharset {
     def params: Map[String, String] = Map.empty
     def withParams(
         params: Map[String, String]): WithFixedCharset with MediaType =
@@ -311,7 +315,8 @@ object MediaType {
   }
 
   sealed abstract class WithOpenCharset
-      extends NonBinary with jm.MediaType.WithOpenCharset {
+      extends NonBinary
+      with jm.MediaType.WithOpenCharset {
     def withCharset(charset: HttpCharset): ContentType.WithCharset =
       ContentType(this, charset)
 
@@ -335,7 +340,8 @@ object MediaType {
   }
 
   final class Multipart(val subType: String, val params: Map[String, String])
-      extends WithOpenCharset with jm.MediaType.Multipart {
+      extends WithOpenCharset
+      with jm.MediaType.Multipart {
     val value = renderValue(mainType, subType, params)
     override def mainType = "multipart"
     override def isMultipart = true
@@ -343,8 +349,7 @@ object MediaType {
     def withParams(params: Map[String, String]): MediaType.Multipart =
       new MediaType.Multipart(subType, params)
     def withBoundary(boundary: String): MediaType.Multipart =
-      withParams(
-          if (boundary.isEmpty) params - "boundary"
+      withParams(if (boundary.isEmpty) params - "boundary"
           else params.updated("boundary", boundary))
   }
 

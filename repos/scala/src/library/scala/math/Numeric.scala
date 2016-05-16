@@ -43,7 +43,8 @@ object Numeric {
     def toDouble(x: BigInt): Double = x.doubleValue
   }
   implicit object BigIntIsIntegral
-      extends BigIntIsIntegral with Ordering.BigIntOrdering
+      extends BigIntIsIntegral
+      with Ordering.BigIntOrdering
 
   trait IntIsIntegral extends Integral[Int] {
     def plus(x: Int, y: Int): Int = x + y
@@ -74,7 +75,8 @@ object Numeric {
     def toDouble(x: Short): Double = x.toDouble
   }
   implicit object ShortIsIntegral
-      extends ShortIsIntegral with Ordering.ShortOrdering
+      extends ShortIsIntegral
+      with Ordering.ShortOrdering
 
   trait ByteIsIntegral extends Integral[Byte] {
     def plus(x: Byte, y: Byte): Byte = (x + y).toByte
@@ -90,7 +92,8 @@ object Numeric {
     def toDouble(x: Byte): Double = x.toDouble
   }
   implicit object ByteIsIntegral
-      extends ByteIsIntegral with Ordering.ByteOrdering
+      extends ByteIsIntegral
+      with Ordering.ByteOrdering
 
   trait CharIsIntegral extends Integral[Char] {
     def plus(x: Char, y: Char): Char = (x + y).toChar
@@ -106,7 +109,8 @@ object Numeric {
     def toDouble(x: Char): Double = x.toDouble
   }
   implicit object CharIsIntegral
-      extends CharIsIntegral with Ordering.CharOrdering
+      extends CharIsIntegral
+      with Ordering.CharOrdering
 
   trait LongIsIntegral extends Integral[Long] {
     def plus(x: Long, y: Long): Long = x + y
@@ -122,7 +126,8 @@ object Numeric {
     def toDouble(x: Long): Double = x.toDouble
   }
   implicit object LongIsIntegral
-      extends LongIsIntegral with Ordering.LongOrdering
+      extends LongIsIntegral
+      with Ordering.LongOrdering
 
   trait FloatIsConflicted extends Numeric[Float] {
     def plus(x: Float, y: Float): Float = x + y
@@ -147,9 +152,11 @@ object Numeric {
       (BigDecimal(x) remainder BigDecimal(y)).floatValue
   }
   implicit object FloatIsFractional
-      extends FloatIsFractional with Ordering.FloatOrdering
+      extends FloatIsFractional
+      with Ordering.FloatOrdering
   object FloatAsIfIntegral
-      extends FloatAsIfIntegral with Ordering.FloatOrdering {}
+      extends FloatAsIfIntegral
+      with Ordering.FloatOrdering {}
 
   trait DoubleIsConflicted extends Numeric[Double] {
     def plus(x: Double, y: Double): Double = x + y
@@ -187,11 +194,13 @@ object Numeric {
   }
 
   trait BigDecimalIsFractional
-      extends BigDecimalIsConflicted with Fractional[BigDecimal] {
+      extends BigDecimalIsConflicted
+      with Fractional[BigDecimal] {
     def div(x: BigDecimal, y: BigDecimal): BigDecimal = x / y
   }
   trait BigDecimalAsIfIntegral
-      extends BigDecimalIsConflicted with Integral[BigDecimal] {
+      extends BigDecimalIsConflicted
+      with Integral[BigDecimal] {
     def quot(x: BigDecimal, y: BigDecimal): BigDecimal = x quot y
     def rem(x: BigDecimal, y: BigDecimal): BigDecimal = x remainder y
   }
@@ -199,14 +208,18 @@ object Numeric {
   // For Double and BigDecimal we offer implicit Fractional objects, but also one
   // which acts like an Integral type, which is useful in NumericRange.
   implicit object BigDecimalIsFractional
-      extends BigDecimalIsFractional with Ordering.BigDecimalOrdering
+      extends BigDecimalIsFractional
+      with Ordering.BigDecimalOrdering
   object BigDecimalAsIfIntegral
-      extends BigDecimalAsIfIntegral with Ordering.BigDecimalOrdering
+      extends BigDecimalAsIfIntegral
+      with Ordering.BigDecimalOrdering
 
   implicit object DoubleIsFractional
-      extends DoubleIsFractional with Ordering.DoubleOrdering
+      extends DoubleIsFractional
+      with Ordering.DoubleOrdering
   object DoubleAsIfIntegral
-      extends DoubleAsIfIntegral with Ordering.DoubleOrdering
+      extends DoubleAsIfIntegral
+      with Ordering.DoubleOrdering
 }
 
 trait Numeric[T] extends Ordering[T] {

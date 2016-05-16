@@ -64,7 +64,8 @@ class StubVFSMetadata[M[+ _]](
             PathMetadata(
                 Path(key.components(path.length)),
                 if (key.length == path.length + 1)
-                  DataOnly(FileContent.XQuirrelData) else PathOnly
+                  DataOnly(FileContent.XQuirrelData)
+                else PathOnly
             )
         }
       }
@@ -83,17 +84,18 @@ class StubVFSMetadata[M[+ _]](
       version: Version): EitherT[M, ResourceError, PathStructure] = {
     for {
       types <- getPathMeta(path) map {
-        _ collect {
-          case (ColumnRef(`property`, ctype), count) => (ctype, count)
-        }
-      }
+                _ collect {
+                  case (ColumnRef(`property`, ctype), count) => (ctype, count)
+                }
+              }
 
       children <- getPathMeta(path) map {
-        _ flatMap {
-          case t @ (ColumnRef(s, ctype), count) =>
-            if (s.hasPrefix(property)) s.take(property.length + 1) else None
-        }
-      }
+                   _ flatMap {
+                     case t @ (ColumnRef(s, ctype), count) =>
+                       if (s.hasPrefix(property)) s.take(property.length + 1)
+                       else None
+                   }
+                 }
     } yield PathStructure(types, children.toSet)
   }
 

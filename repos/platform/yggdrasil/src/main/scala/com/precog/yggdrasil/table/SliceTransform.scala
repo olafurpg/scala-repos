@@ -61,8 +61,11 @@ import scalaz.syntax.std.boolean._
 import scalaz.syntax.bifunctor._
 
 trait SliceTransforms[M[+ _]]
-    extends TableModule[M] with ColumnarTableTypes[M] with ObjectConcatHelpers
-    with ArrayConcatHelpers with MapUtils {
+    extends TableModule[M]
+    with ColumnarTableTypes[M]
+    with ObjectConcatHelpers
+    with ArrayConcatHelpers
+    with MapUtils {
 
   import TableModule._
   import trans._
@@ -123,11 +126,13 @@ trait SliceTransforms[M[+ _]]
               val columns: Map[ColumnRef, Column] = {
                 val resultColumns = for {
                   cl <- sl.columns collect {
-                    case (ref, col) if ref.selector == CPath.Identity => col
-                  }
+                         case (ref, col) if ref.selector == CPath.Identity =>
+                           col
+                       }
                   cr <- sr.columns collect {
-                    case (ref, col) if ref.selector == CPath.Identity => col
-                  }
+                         case (ref, col) if ref.selector == CPath.Identity =>
+                           col
+                       }
                   result <- f(cl, cr)
                 } yield result
 
@@ -820,8 +825,8 @@ trait SliceTransforms[M[+ _]]
     }
 
     def zip2[B, C](t: SliceTransform1[B], t2: SliceTransform1[C])(
-        combine: (Slice, Slice,
-        Slice) => Slice): SliceTransform1[(A, B, C)] = {
+        combine: (Slice,
+                  Slice, Slice) => Slice): SliceTransform1[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.
@@ -1099,21 +1104,21 @@ trait SliceTransforms[M[+ _]]
 
         case (sta, stb) =>
           SliceTransform2[(A, B)]((sta.initial, stb.initial), {
-                                    case ((a0, b0), sl0, sr0) =>
-                                      for (ares <- sta.f(a0, sl0, sr0);
-                                      bres <- stb.f(b0, sl0, sr0)) yield {
-                                        val (a, sa) = ares
-                                        val (b, sb) = bres
-                                        assert(sa.size == sb.size)
-                                        ((a, b), combine(sa, sb))
-                                      }
-                                  })
+            case ((a0, b0), sl0, sr0) =>
+              for (ares <- sta.f(a0, sl0, sr0);
+                   bres <- stb.f(b0, sl0, sr0)) yield {
+                val (a, sa) = ares
+                val (b, sb) = bres
+                assert(sa.size == sb.size)
+                ((a, b), combine(sa, sb))
+              }
+          })
       }
     }
 
     def zip2[B, C](t: SliceTransform2[B], t2: SliceTransform2[C])(
-        combine: (Slice, Slice,
-        Slice) => Slice): SliceTransform2[(A, B, C)] = {
+        combine: (Slice,
+                  Slice, Slice) => Slice): SliceTransform2[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.

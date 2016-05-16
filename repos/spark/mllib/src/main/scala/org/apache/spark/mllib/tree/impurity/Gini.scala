@@ -82,7 +82,8 @@ object Gini extends Impurity {
   * @param numClasses  Number of classes for label.
   */
 private[tree] class GiniAggregator(numClasses: Int)
-    extends ImpurityAggregator(numClasses) with Serializable {
+    extends ImpurityAggregator(numClasses)
+    with Serializable {
 
   /**
     * Update stats for one (node, feature, bin) with the given label.

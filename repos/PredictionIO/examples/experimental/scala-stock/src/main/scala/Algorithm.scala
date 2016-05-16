@@ -14,7 +14,7 @@ import scala.reflect.runtime.universe._
 
 import scala.collection.immutable.HashMap
 
-abstract class StockStrategy[M : ClassTag]
+abstract class StockStrategy[M: ClassTag]
     extends LAlgorithm[TrainingData, (TrainingData, M), QueryDate, Prediction] {
   def train(trainingData: TrainingData): (TrainingData, M) = {
     (trainingData, createModel(trainingData.view))

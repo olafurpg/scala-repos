@@ -16,16 +16,16 @@ final class Foldable1Ops[F[_], A] private[syntax](val self: F[A])(
   final def foldLeft1(f: (A, A) => A): A = F.foldLeft1(self)(f)
   final def foldr1(f: A => (=> A) => A): A = F.foldr1(self)(f)
   final def foldl1(f: A => A => A): A = F.foldl1(self)(f)
-  final def foldMap1[B : Semigroup](f: A => B = (a: A) => a): B =
+  final def foldMap1[B: Semigroup](f: A => B = (a: A) => a): B =
     F.foldMap1(self)(f)
   final def sumr1(implicit A: Semigroup[A]): A = F.sumr1(self)
   final def suml1(implicit A: Semigroup[A]): A = F.suml1(self)
   final def maximum1(implicit A: Order[A]): A = F.maximum1(self)
-  final def maximumOf1[B : Order](f: A => B): B = F.maximumOf1(self)(f)
-  final def maximumBy1[B : Order](f: A => B): A = F.maximumBy1(self)(f)
+  final def maximumOf1[B: Order](f: A => B): B = F.maximumOf1(self)(f)
+  final def maximumBy1[B: Order](f: A => B): A = F.maximumBy1(self)(f)
   final def minimum1(implicit A: Order[A]): A = F.minimum1(self)
-  final def minimumOf1[B : Order](f: A => B): B = F.minimumOf1(self)(f)
-  final def minimumBy1[B : Order](f: A => B): A = F.minimumBy1(self)(f)
+  final def minimumOf1[B: Order](f: A => B): B = F.minimumOf1(self)(f)
+  final def minimumBy1[B: Order](f: A => B): A = F.minimumBy1(self)(f)
   final def distinct1(implicit A: Order[A]): NonEmptyList[A] =
     F.distinct1(self)
   final def distinctE1(implicit A: Equal[A]): NonEmptyList[A] =

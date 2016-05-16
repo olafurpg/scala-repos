@@ -48,7 +48,8 @@ trait PartitionLeaderSelector {
   */
 class OfflinePartitionLeaderSelector(
     controllerContext: ControllerContext, config: KafkaConfig)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[OfflinePartitionLeaderSelector]: "
 
   def selectLeader(
@@ -56,10 +57,10 @@ class OfflinePartitionLeaderSelector(
       currentLeaderAndIsr: LeaderAndIsr): (LeaderAndIsr, Seq[Int]) = {
     controllerContext.partitionReplicaAssignment.get(topicAndPartition) match {
       case Some(assignedReplicas) =>
-        val liveAssignedReplicas = assignedReplicas.filter(
-            r => controllerContext.liveBrokerIds.contains(r))
-        val liveBrokersInIsr = currentLeaderAndIsr.isr.filter(
-            r => controllerContext.liveBrokerIds.contains(r))
+        val liveAssignedReplicas = assignedReplicas.filter(r =>
+              controllerContext.liveBrokerIds.contains(r))
+        val liveBrokersInIsr = currentLeaderAndIsr.isr.filter(r =>
+              controllerContext.liveBrokerIds.contains(r))
         val currentLeaderEpoch = currentLeaderAndIsr.leaderEpoch
         val currentLeaderIsrZkPathVersion = currentLeaderAndIsr.zkVersion
         val newLeaderAndIsr = liveBrokersInIsr.isEmpty match {
@@ -138,7 +139,8 @@ class OfflinePartitionLeaderSelector(
   * Replicas to receive LeaderAndIsr request = reassigned replicas
   */
 class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[ReassignedPartitionLeaderSelector]: "
 
   /**
@@ -152,8 +154,7 @@ class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
       .newReplicas
     val currentLeaderEpoch = currentLeaderAndIsr.leaderEpoch
     val currentLeaderIsrZkPathVersion = currentLeaderAndIsr.zkVersion
-    val aliveReassignedInSyncReplicas = reassignedInSyncReplicas.filter(
-        r =>
+    val aliveReassignedInSyncReplicas = reassignedInSyncReplicas.filter(r =>
           controllerContext.liveBrokerIds.contains(r) &&
           currentLeaderAndIsr.isr.contains(r))
     val newLeaderOpt = aliveReassignedInSyncReplicas.headOption
@@ -188,7 +189,8 @@ class ReassignedPartitionLeaderSelector(controllerContext: ControllerContext)
   */
 class PreferredReplicaPartitionLeaderSelector(
     controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
   this.logIdent = "[PreferredReplicaPartitionLeaderSelector]: "
 
   def selectLeader(
@@ -235,7 +237,8 @@ class PreferredReplicaPartitionLeaderSelector(
   * Replicas to receive LeaderAndIsr request = live assigned replicas
   */
 class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
 
   this.logIdent = "[ControlledShutdownLeaderSelector]: "
 
@@ -282,7 +285,8 @@ class ControlledShutdownLeaderSelector(controllerContext: ControllerContext)
   * set of replicas assigned to a given topic/partition.
   */
 class NoOpLeaderSelector(controllerContext: ControllerContext)
-    extends PartitionLeaderSelector with Logging {
+    extends PartitionLeaderSelector
+    with Logging {
 
   this.logIdent = "[NoOpLeaderSelector]: "
 

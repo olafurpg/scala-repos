@@ -76,9 +76,9 @@ package scalaguide.akka {
           app.injector.instanceOf(bind[ActorRef].qualifiedWith("parent-actor"))
         val futureConfig = for {
           child <- (actor ? actors.ParentActor.GetChild("my.config"))
-            .mapTo[ActorRef]
+                    .mapTo[ActorRef]
           config <- (child ? actors.ConfiguredChildActor.GetConfig)
-            .mapTo[String]
+                     .mapTo[String]
         } yield config
         await(futureConfig) must_== "foo"
       }
@@ -271,7 +271,8 @@ package scalaguide.akka {
     class ParentActor @Inject()(
         childFactory: ConfiguredChildActor.Factory
     )
-        extends Actor with InjectedActorSupport {
+        extends Actor
+        with InjectedActorSupport {
       import ParentActor._
 
       def receive = {

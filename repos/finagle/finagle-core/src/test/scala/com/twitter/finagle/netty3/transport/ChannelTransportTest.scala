@@ -16,7 +16,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite
+    with MockitoSugar
+    with OneInstancePerTest {
 
   // For some reason, the scala compiler has a difficult time with
   // mockito's vararg-v-singlearg 'thenReturns'. We force the

@@ -649,8 +649,8 @@ private[scala] abstract class LowPriorityImplicits {
   implicit def unwrapString(ws: WrappedString): String =
     if (ws ne null) ws.self else null
 
-  implicit def fallbackStringCanBuildFrom[T]: CanBuildFrom[
-      String, T, immutable.IndexedSeq[T]] =
+  implicit def fallbackStringCanBuildFrom[T]
+    : CanBuildFrom[String, T, immutable.IndexedSeq[T]] =
     new CanBuildFrom[String, T, immutable.IndexedSeq[T]] {
       def apply(from: String) = immutable.IndexedSeq.newBuilder[T]
       def apply() = immutable.IndexedSeq.newBuilder[T]

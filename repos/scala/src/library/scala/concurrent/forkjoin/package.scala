@@ -19,7 +19,8 @@ package object forkjoin {
       "Use java.util.concurrent.ForkJoinPool directly, instead of this alias.",
       "2.12.0")
   object ForkJoinPool {
-    type ForkJoinWorkerThreadFactory = juc.ForkJoinPool.ForkJoinWorkerThreadFactory
+    type ForkJoinWorkerThreadFactory =
+      juc.ForkJoinPool.ForkJoinWorkerThreadFactory
     type ManagedBlocker = juc.ForkJoinPool.ManagedBlocker
 
     val defaultForkJoinWorkerThreadFactory: ForkJoinWorkerThreadFactory =

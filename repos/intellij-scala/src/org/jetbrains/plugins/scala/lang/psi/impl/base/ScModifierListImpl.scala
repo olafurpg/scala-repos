@@ -113,7 +113,7 @@ class ScModifierListImpl private (
         val buf = new ArrayBuffer[ASTNode]()
         var nextSibling = getNextSibling
         while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
-            nextSibling.getNode.getElementType)) {
+                   nextSibling.getNode.getElementType)) {
           buf += nextSibling.getNode
           nextSibling = nextSibling.getNextSibling
         }
@@ -146,7 +146,7 @@ class ScModifierListImpl private (
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                       child.asInstanceOf[ScAccessModifier].isPrivate) {
+               child.asInstanceOf[ScAccessModifier].isPrivate) {
             getNode.removeChild(child.getNode)
             return
           }
@@ -158,7 +158,7 @@ class ScModifierListImpl private (
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                       child.asInstanceOf[ScAccessModifier].isProtected) {
+               child.asInstanceOf[ScAccessModifier].isProtected) {
             getNode.removeChild(child.getNode)
             return
           }

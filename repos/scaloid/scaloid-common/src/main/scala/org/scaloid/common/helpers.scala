@@ -349,8 +349,11 @@ object WidgetHelpers extends WidgetHelpers
   * Aggregate trait for helpers.
   */
 trait Helpers
-    extends AppHelpers with ContentHelpers with MediaHelpers
-    with PreferenceHelpers with WidgetHelpers
+    extends AppHelpers
+    with ContentHelpers
+    with MediaHelpers
+    with PreferenceHelpers
+    with WidgetHelpers
 
 /**
   * Aggregate object for helpers.

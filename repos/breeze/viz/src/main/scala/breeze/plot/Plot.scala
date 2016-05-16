@@ -110,8 +110,9 @@ class Plot() {
     if (value != logScaleX) {
       // TODO this is such a pain. There has to be a better way.
       val oldAxis = _xaxis
-      _xaxis = if (value) new LogarithmicAxis(xlabel)
-      else new NumberAxis(xlabel)
+      _xaxis =
+        if (value) new LogarithmicAxis(xlabel)
+        else new NumberAxis(xlabel)
       plot.setDomainAxis(_xaxis)
       xlim = oldAxis.getLowerBound -> oldAxis.getUpperBound
       _xaxis.setStandardTickUnits(oldAxis.getStandardTickUnits)
@@ -123,8 +124,9 @@ class Plot() {
     if (value != logScaleY) {
       // TODO this is such a pain. There has to be a better way.
       val oldAxis = _yaxis
-      _yaxis = if (value) new LogarithmicAxis(ylabel)
-      else new NumberAxis(ylabel)
+      _yaxis =
+        if (value) new LogarithmicAxis(ylabel)
+        else new NumberAxis(ylabel)
       plot.setRangeAxis(_yaxis)
       ylim = oldAxis.getLowerBound -> oldAxis.getUpperBound
       _yaxis.setStandardTickUnits(oldAxis.getStandardTickUnits)
@@ -157,10 +159,9 @@ class Plot() {
 
   // set integer tick units by default
   Array(xaxis, yaxis) foreach
-  (axis =>
-        {
-          axis.setAutoRangeIncludesZero(false)
-          axis.setStandardTickUnits(Plot.integerTickUnits)
+  (axis => {
+        axis.setAutoRangeIncludesZero(false)
+        axis.setStandardTickUnits(Plot.integerTickUnits)
       })
 
   /** The JFreeChart plot object. */

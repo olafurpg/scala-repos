@@ -39,9 +39,8 @@ private final class LeaderboardIndexer(
   private def saveEntries(entries: Seq[Entry]) =
     entries.nonEmpty ?? leaderboardColl
       .bulkInsert(
-          documents = entries
-              .map(BSONHandlers.leaderboardEntryHandler.write)
-              .toStream,
+          documents =
+            entries.map(BSONHandlers.leaderboardEntryHandler.write).toStream,
           ordered = false
       )
       .void
@@ -64,7 +63,8 @@ private final class LeaderboardIndexer(
                   score = player.score,
                   rank = rank,
                   rankRatio = Ratio(if (tour.nbPlayers > 0)
-                          rank.toDouble / tour.nbPlayers else 0),
+                        rank.toDouble / tour.nbPlayers
+                      else 0),
                   freq = tour.schedule.map(_.freq),
                   speed = tour.schedule.map(_.speed),
                   perf = perfType,

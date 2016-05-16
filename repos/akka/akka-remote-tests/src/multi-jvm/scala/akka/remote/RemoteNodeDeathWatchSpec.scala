@@ -81,7 +81,8 @@ abstract class RemoteNodeDeathWatchSlowSpec extends RemoteNodeDeathWatchSpec {
 
 abstract class RemoteNodeDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec
+    with ImplicitSender {
 
   import RemoteNodeDeathWatchMultiJvmSpec._
   import RemoteWatcher._

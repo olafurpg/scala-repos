@@ -66,8 +66,10 @@ private[ml] trait CrossValidatorParams extends ValidatorParams with HasSeed {
 @Since("1.2.0")
 @Experimental
 class CrossValidator @Since("1.2.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[CrossValidatorModel] with CrossValidatorParams
-    with MLWritable with Logging {
+    extends Estimator[CrossValidatorModel]
+    with CrossValidatorParams
+    with MLWritable
+    with Logging {
 
   @Since("1.2.0")
   def this() = this(Identifiable.randomUID("cv"))
@@ -266,11 +268,11 @@ object CrossValidator extends MLReadable[CrossValidator] {
       }
     }
 
-    private[tuning] def saveImpl(
-        path: String,
-        instance: CrossValidatorParams,
-        sc: SparkContext,
-        extraMetadata: Option[JObject] = None): Unit = {
+    private[tuning] def saveImpl(path: String,
+                                 instance: CrossValidatorParams,
+                                 sc: SparkContext,
+                                 extraMetadata: Option[JObject] =
+                                   None): Unit = {
       import org.json4s.JsonDSL._
 
       val estimatorParamMapsJson = compact(
@@ -333,7 +335,7 @@ object CrossValidator extends MLReadable[CrossValidator] {
             ParamMap(paramPairs: _*)
           }
           .toArray
-        (metadata, estimator, evaluator, estimatorParamMaps, numFolds)
+      (metadata, estimator, evaluator, estimatorParamMaps, numFolds)
     }
   }
 }
@@ -352,7 +354,8 @@ class CrossValidatorModel private[ml](
     @Since("1.4.0") override val uid: String,
     @Since("1.2.0") val bestModel: Model[_],
     @Since("1.5.0") val avgMetrics: Array[Double])
-    extends Model[CrossValidatorModel] with CrossValidatorParams
+    extends Model[CrossValidatorModel]
+    with CrossValidatorParams
     with MLWritable {
 
   @Since("1.4.0")

@@ -25,7 +25,8 @@ import org.apache.spark.rpc.{RpcAddress, RpcCallContext}
 
 private[netty] abstract class NettyRpcCallContext(
     override val senderAddress: RpcAddress)
-    extends RpcCallContext with Logging {
+    extends RpcCallContext
+    with Logging {
 
   protected def send(message: Any): Unit
 

@@ -21,7 +21,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   */
 class ScFieldIdImpl private (
     stub: StubElement[ScFieldId], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScFieldId
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScFieldId
     with ScImportableDeclarationsOwner {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScFieldIdStub) = {

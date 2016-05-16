@@ -8,7 +8,8 @@ package akka
   */
 @SerialVersionUID(1L)
 class AkkaException(message: String, cause: Throwable)
-    extends RuntimeException(message, cause) with Serializable {
+    extends RuntimeException(message, cause)
+    with Serializable {
   def this(msg: String) = this(msg, null)
 }
 

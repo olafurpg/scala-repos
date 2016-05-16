@@ -11,7 +11,8 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.ssl.SslHandler
 
 class ChannelTransport[In, Out](ch: Channel)
-    extends Transport[In, Out] with ChannelUpstreamHandler {
+    extends Transport[In, Out]
+    with ChannelUpstreamHandler {
   private[this] var nneed = 0
   private[this] def need(n: Int): Unit = synchronized {
     nneed += n

@@ -38,7 +38,9 @@ case class OrcParDataWithKey(
 
 // TODO This test suite duplicates ParquetPartitionDiscoverySuite a lot
 class OrcPartitionDiscoverySuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest
+    with TestHiveSingleton
+    with BeforeAndAfterAll {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -49,12 +51,12 @@ class OrcPartitionDiscoverySuite
     try f(dir) finally Utils.deleteRecursively(dir)
   }
 
-  def makeOrcFile[T <: Product : ClassTag : TypeTag](
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](
       data: Seq[T], path: File): Unit = {
     data.toDF().write.mode("overwrite").orc(path.getCanonicalPath)
   }
 
-  def makeOrcFile[T <: Product : ClassTag : TypeTag](
+  def makeOrcFile[T <: Product: ClassTag: TypeTag](
       df: DataFrame, path: File): Unit = {
     df.write.mode("overwrite").orc(path.getCanonicalPath)
   }

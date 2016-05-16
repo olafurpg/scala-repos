@@ -38,7 +38,8 @@ case class TungstenAggregate(
     initialInputBufferOffset: Int,
     resultExpressions: Seq[NamedExpression],
     child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   private[this] val aggregateBufferAttributes = {
     aggregateExpressions.flatMap(_.aggregateFunction.aggBufferAttributes)
@@ -522,8 +523,8 @@ case class TungstenAggregate(
     ctx.currentVars = input
     val keyCode = GenerateUnsafeProjection.createCode(
         ctx,
-        groupingExpressions.map(
-            e => BindReferences.bindReference[Expression](e, child.output)))
+        groupingExpressions.map(e =>
+              BindReferences.bindReference[Expression](e, child.output)))
     val key = keyCode.value
     val buffer = ctx.freshName("aggBuffer")
 
@@ -548,7 +549,8 @@ case class TungstenAggregate(
       BindReferences.bindReference(hashExpr, child.output).gen(ctx)
 
     val inputAttr = aggregateBufferAttributes ++ child.output
-    ctx.currentVars = new Array[ExprCode](aggregateBufferAttributes.length) ++ input
+    ctx.currentVars =
+      new Array[ExprCode](aggregateBufferAttributes.length) ++ input
     ctx.INPUT_ROW = buffer
     // TODO: support subexpression elimination
     val evals =

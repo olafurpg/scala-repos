@@ -217,9 +217,9 @@ class JetTest extends FunSuite with Matchers {
     (a / b) should equal(Jet(a.real / b.real, a.infinitesimal :/ b.real))
   }
   test("Evaluation and differentiation of arithmetic operations") {
-    def a[@sp(Double) T : Field : Trig](x: T): T =
+    def a[@sp(Double) T: Field: Trig](x: T): T =
       2.0 * x + spire.math.cos[T](x)
-    def b[@sp(Double) T : Field : Trig](x: T): T =
+    def b[@sp(Double) T: Field: Trig](x: T): T =
       spire.math.sin(x) - spire.math.log[T](x) + 7.3
     def da(x: Double) = 2.0 - scala.math.sin(x)
     def db(x: Double) = scala.math.cos(x) - 1 / x
@@ -227,20 +227,20 @@ class JetTest extends FunSuite with Matchers {
     val x = 894.3287562
     val jx = x + Jet.h[Double](0)
 
-    def a_plus_b[@sp(Double) T : Field : Trig](x: T): T = a(x) + b(x)
+    def a_plus_b[@sp(Double) T: Field: Trig](x: T): T = a(x) + b(x)
     a_plus_b(jx).real should be(a(x) + b(x))
     a_plus_b(jx).infinitesimal(0) should be(da(x) + db(x) +- maxError)
 
-    def a_minus_b[@sp(Double) T : Field : Trig](x: T): T = a(x) - b(x)
+    def a_minus_b[@sp(Double) T: Field: Trig](x: T): T = a(x) - b(x)
     a_minus_b(jx).real should be(a(x) - b(x))
     a_minus_b(jx).infinitesimal(0) should be(da(x) - db(x) +- maxError)
 
-    def a_times_b[@sp(Double) T : Field : Trig](x: T): T = a(x) * b(x)
+    def a_times_b[@sp(Double) T: Field: Trig](x: T): T = a(x) * b(x)
     a_times_b(jx).real should be(a(x) * b(x))
     a_times_b(jx).infinitesimal(0) should be(
         da(x) * b(x) + a(x) * db(x) +- maxError)
 
-    def a_div_b[@sp(Double) T : Field : Trig](x: T): T = a(x) / b(x)
+    def a_div_b[@sp(Double) T: Field: Trig](x: T): T = a(x) / b(x)
     a_div_b(jx).real should be(a(x) / b(x))
     a_div_b(jx).infinitesimal(0) should be(
         (da(x) * b(x) - a(x) * db(x)) / (b(x) * b(x)) +- maxError)
@@ -336,14 +336,14 @@ class JetTest extends FunSuite with Matchers {
         1.0 - scala.math.tanh(x) * scala.math.tanh(x) +- maxError)
   }
   test("Chain-rule differentiation") {
-    def a[@sp(Double) T : Field : Trig](x: T): T =
+    def a[@sp(Double) T: Field: Trig](x: T): T =
       2.0 * x * x - 3.14 * x + 2.71
-    def b[@sp(Double) T : Field : Trig](x: T): T =
+    def b[@sp(Double) T: Field: Trig](x: T): T =
       3.14 * x * x - spire.math.tan(x)
-    def c[@sp(Double) T : Field : Trig](x: T): T =
+    def c[@sp(Double) T: Field: Trig](x: T): T =
       spire.math.acos(x) * spire.math.sin(x) + x
 
-    def abc[@sp(Double) T : Field : Trig](x: T): T = a(b(c(x)))
+    def abc[@sp(Double) T: Field: Trig](x: T): T = a(b(c(x)))
 
     def da(x: Double) = 4.0 * x - 3.14
     def db(x: Double) =
@@ -362,7 +362,7 @@ class JetTest extends FunSuite with Matchers {
     abc(jx).real should be(abc(x))
   }
   test("Evaluation and differentiation of a generic function") {
-    def func[@sp(Double) T : Field : Trig](x: T): T =
+    def func[@sp(Double) T: Field: Trig](x: T): T =
       3.14 * x * x - spire.math.tan(x)
     def dfunc(x: Double) =
       3.14 * 2.0 * x - (1.0 + scala.math.tan(x) * scala.math.tan(x))
@@ -373,7 +373,7 @@ class JetTest extends FunSuite with Matchers {
     jfunc.infinitesimal(0) should be(dfunc(x) +- maxError)
   }
   test("Evaluation and differentiation of a generic function of two variables") {
-    def func[@sp(Double) T : Field : Trig](x: T, y: T): T =
+    def func[@sp(Double) T: Field: Trig](x: T, y: T): T =
       3.14 * x * y - spire.math.tan(x - y)
     def dfuncX(x: Double, y: Double) =
       3.14 * y - (1.0 + scala.math.tan(x - y) * scala.math.tan(x - y))

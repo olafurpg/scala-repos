@@ -27,7 +27,8 @@ import scala.collection.Seq
   * Date: 22.02.2008
   */
 class ScSelfInvocationImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScSelfInvocation {
+    extends ScalaPsiElementImpl(node)
+    with ScSelfInvocation {
   override def toString: String = "SelfInvocation"
 
   def bind: Option[PsiElement] = bindInternal(shapeResolve = false)
@@ -60,7 +61,7 @@ class ScSelfInvocationImpl(node: ASTNode)
                                           enableTupling = true,
                                           selfConstructorResolve = true)
     for (constr <- clazz.secondaryConstructors.filter(_ != method)
-                      if constr != method) {
+         if constr != method) {
       proc.execute(constr, ResolveState.initial)
     }
     clazz.constructor match {
@@ -78,7 +79,7 @@ class ScSelfInvocationImpl(node: ASTNode)
           .nested(c.methodType, i)
           .getOrElse(
               return Failure("Not enough parameter sections", Some(this)))
-          (methodType, c.containingClass)
+        (methodType, c.containingClass)
       case _ =>
         return Failure("Cannot shape resolve self invocation", Some(this))
     }
@@ -97,13 +98,13 @@ class ScSelfInvocationImpl(node: ASTNode)
   }
 
   def shapeMultiType(i: Int): Seq[TypeResult[ScType]] = {
-    bindMultiInternal(shapeResolve = true)
-      .map(pe => workWithBindInternal(Some(pe), i))
+    bindMultiInternal(shapeResolve = true).map(pe =>
+          workWithBindInternal(Some(pe), i))
   }
 
   def multiType(i: Int): Seq[TypeResult[ScType]] = {
-    bindMultiInternal(shapeResolve = false)
-      .map(pe => workWithBindInternal(Some(pe), i))
+    bindMultiInternal(shapeResolve = false).map(pe =>
+          workWithBindInternal(Some(pe), i))
   }
 
   override def accept(visitor: ScalaElementVisitor) {

@@ -65,14 +65,16 @@ object Challenge extends LilaController {
       isForMe(c) ?? env.api.accept(c, ctx.me).flatMap {
         case Some(pov) =>
           negotiate(
-              html = Redirect(routes.Round.watcher(pov.game.id, "white")).fuccess,
+              html =
+                Redirect(routes.Round.watcher(pov.game.id, "white")).fuccess,
               api = apiVersion =>
-                  Env.api.roundApi.player(pov, apiVersion) map { Ok(_) }
+                Env.api.roundApi.player(pov, apiVersion) map { Ok(_) }
           ) flatMap withChallengeAnonCookie(ctx.isAnon, c, false)
         case None =>
-          negotiate(
-              html = Redirect(routes.Round.watcher(c.id, "white")).fuccess,
-              api = _ => notFoundJson("Someone else accepted the challenge"))
+          negotiate(html =
+                      Redirect(routes.Round.watcher(c.id, "white")).fuccess,
+                    api =
+                      _ => notFoundJson("Someone else accepted the challenge"))
       }
     }
   }
@@ -143,8 +145,8 @@ object Challenge extends LilaController {
                                              user,
                                              pref.challenge,
                                              follow,
-                                             fromCheat = me.engine &&
-                                               !user.engine)
+                                             fromCheat =
+                                               me.engine && !user.engine)
           }
       }
   }

@@ -22,7 +22,7 @@ trait Injector {
   /**
     * Get an instance of the given class from the injector.
     */
-  def instanceOf[T : ClassTag]: T
+  def instanceOf[T: ClassTag]: T
 
   /**
     * Get an instance of the given class from the injector.

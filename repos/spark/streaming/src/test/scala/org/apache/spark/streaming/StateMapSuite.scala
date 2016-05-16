@@ -297,14 +297,14 @@ class StateMapSuite extends SparkFunSuite {
               "Final state map does not match reference map")
   }
 
-  private def testSerialization[T : ClassTag](
+  private def testSerialization[T: ClassTag](
       map: OpenHashMapBasedStateMap[T, T],
       msg: String): OpenHashMapBasedStateMap[T, T] = {
     testSerialization(new JavaSerializer(conf), map, msg)
     testSerialization(new KryoSerializer(conf), map, msg)
   }
 
-  private def testSerialization[T : ClassTag](
+  private def testSerialization[T: ClassTag](
       serializer: Serializer,
       map: OpenHashMapBasedStateMap[T, T],
       msg: String): OpenHashMapBasedStateMap[T, T] = {
@@ -397,7 +397,7 @@ class StateMapSuite extends SparkFunSuite {
     assert(record.mappedData === deserRecord.mappedData)
   }
 
-  private def serializeAndDeserialize[T : ClassTag](
+  private def serializeAndDeserialize[T: ClassTag](
       serializer: Serializer, t: T): T = {
     val serializerInstance = serializer.newInstance()
     serializerInstance.deserialize[T](

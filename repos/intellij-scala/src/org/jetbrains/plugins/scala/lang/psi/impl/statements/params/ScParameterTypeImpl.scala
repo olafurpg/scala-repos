@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
   * Date: 22.02.2008
   */
 class ScParameterTypeImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParameterType {
+    extends ScalaPsiElementImpl(node)
+    with ScParameterType {
 
   override def toString: String = "ParameterType"
 

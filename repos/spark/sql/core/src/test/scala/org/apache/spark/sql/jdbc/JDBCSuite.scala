@@ -36,7 +36,9 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.Utils
 
 class JDBCSuite
-    extends SparkFunSuite with BeforeAndAfter with PrivateMethodTester
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with PrivateMethodTester
     with SharedSQLContext {
   import testImplicits._
 
@@ -681,8 +683,7 @@ class JDBCSuite
     assert(
         doCompileFilter(Or(EqualTo("col0", 2), EqualTo("col1", "ghi"))) === "(col0 = 2) OR (col1 = 'ghi')")
     assert(doCompileFilter(LessThan("col0", 5)) === "col0 < 5")
-    assert(
-        doCompileFilter(LessThan(
+    assert(doCompileFilter(LessThan(
                 "col3",
                 Timestamp.valueOf("1995-11-21 00:00:00.0"))) === "col3 < '1995-11-21 00:00:00.0'")
     assert(
@@ -696,8 +697,8 @@ class JDBCSuite
     assert(doCompileFilter(IsNull("col1")) === "col1 IS NULL")
     assert(doCompileFilter(IsNotNull("col1")) === "col1 IS NOT NULL")
     assert(
-        doCompileFilter(And(
-                EqualNullSafe("col0", "abc"),
+        doCompileFilter(
+            And(EqualNullSafe("col0", "abc"),
                 EqualTo("col1", "def"))) === "((NOT (col0 != 'abc' OR col0 IS NULL OR 'abc' IS NULL) " +
         "OR (col0 IS NULL AND 'abc' IS NULL))) AND (col1 = 'def')")
   }

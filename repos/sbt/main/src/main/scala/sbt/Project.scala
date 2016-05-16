@@ -357,8 +357,8 @@ object Project extends ProjectExtra {
   /** This is a variation of def apply that mixes in GeneratedRootProject. */
   private[sbt] def mkGeneratedRoot(
       id: String, base: File, aggregate: => Seq[ProjectReference]): Project = {
-    validProjectID(id).foreach(
-        errMsg => sys.error("Invalid project ID: " + errMsg))
+    validProjectID(id).foreach(errMsg =>
+          sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,
@@ -447,8 +447,8 @@ object Project extends ProjectExtra {
                          auto: AddSettings,
                          plugins: Plugins,
                          autoPlugins: Seq[AutoPlugin]): Project = {
-    validProjectID(id).foreach(
-        errMsg => sys.error("Invalid project ID: " + errMsg))
+    validProjectID(id).foreach(errMsg =>
+          sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
                                      base,
                                      aggregate,
@@ -772,7 +772,7 @@ object Project extends ProjectExtra {
   def reverseDependencies(cMap: Map[ScopedKey[_], Flattened],
                           scoped: ScopedKey[_]): Iterable[ScopedKey[_]] =
     for ((key, compiled) <- cMap; dep <- compiled.dependencies
-                                            if dep == scoped) yield key
+         if dep == scoped) yield key
 
   //@deprecated("Use SettingCompletions.setAll when available.", "0.13.0")
   def setAll(
@@ -889,8 +889,7 @@ object Project extends ProjectExtra {
                            value)(f))
       }
     def keepAs(key: TaskKey[S]): Def.Initialize[Task[S]] =
-      (i, Keys.resolvedScoped)(
-          (t, scoped) =>
+      (i, Keys.resolvedScoped)((t, scoped) =>
             tx(t,
                (state, value) =>
                  set(resolveContext(key, scoped.scope, state), state, value)))

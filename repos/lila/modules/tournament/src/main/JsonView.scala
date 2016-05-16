@@ -29,13 +29,13 @@ final class JsonView(getLightUser: String => Option[LightUser],
       data <- cachableData(tour.id)
       myInfo <- me ?? { PlayerRepo.playerInfo(tour.id, _) }
       stand <- (myInfo, page) match {
-        case (_, Some(p)) => standing(tour, p)
-        case (Some(i), _) => standing(tour, i.page)
-        case _ => standing(tour, 1)
-      }
+                case (_, Some(p)) => standing(tour, p)
+                case (Some(i), _) => standing(tour, i.page)
+                case _ => standing(tour, 1)
+              }
       playerInfoJson <- playerInfoExt ?? { pie =>
-        playerInfo(pie).map(_.some)
-      }
+                         playerInfo(pie).map(_.some)
+                       }
     } yield
       Json
         .obj(
@@ -87,7 +87,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
     for {
       ranking <- cached ranking info.tour
       pairings <- PairingRepo.finishedByPlayerChronological(
-          info.tour.id, info.user.id)
+                     info.tour.id, info.user.id)
       sheet = info.tour.system.scoringSystem
         .sheet(info.tour, info.user.id, pairings)
       tpr <- performance(info.tour, info.player, pairings)
@@ -161,15 +161,16 @@ final class JsonView(getLightUser: String => Option[LightUser],
   private def computeStanding(tour: Tournament, page: Int): Fu[JsObject] =
     for {
       rankedPlayers <- PlayerRepo.bestByTourWithRankByPage(
-          tour.id, 10, page max 1)
+                          tour.id, 10, page max 1)
       sheets <- rankedPlayers.map { p =>
-        PairingRepo.finishedByPlayerChronological(tour.id, p.player.userId) map {
-          pairings =>
-            p.player.userId -> tour.system.scoringSystem.sheet(tour,
-                                                               p.player.userId,
-                                                               pairings)
-        }
-      }.sequenceFu.map(_.toMap)
+                 PairingRepo.finishedByPlayerChronological(
+                     tour.id, p.player.userId) map { pairings =>
+                   p.player.userId -> tour.system.scoringSystem.sheet(
+                       tour,
+                       p.player.userId,
+                       pairings)
+                 }
+               }.sequenceFu.map(_.toMap)
     } yield
       Json.obj(
           "page" -> page,
@@ -281,7 +282,7 @@ final class JsonView(getLightUser: String => Option[LightUser],
             case rp @ RankedPlayer(_, player) =>
               for {
                 pairings <- PairingRepo.finishedByPlayerChronological(
-                    tour.id, player.userId)
+                               tour.id, player.userId)
                 sheet = tour.system.scoringSystem.sheet(tour,
                                                         player.userId,
                                                         pairings)

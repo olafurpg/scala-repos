@@ -23,21 +23,24 @@ abstract class AbstractSourceCodeGenerator(model: m.Model)
     (if (tables.exists(_.PlainSqlMapper.enabled)) {
        "// NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.\n" +
        "import slick.jdbc.{GetResult => GR}\n"
-     } else "") +
-    (if (ddlEnabled) {
-       "\n/** DDL for all tables. Call .create to execute. */" +
-       (if (tables.length > 5)
-          "\nlazy val schema: profile.SchemaDescription = Array(" +
-          tables.map(_.TableValue.name + ".schema").mkString(", ") +
-          ").reduceLeft(_ ++ _)"
-        else if (tables.nonEmpty)
-          "\nlazy val schema: profile.SchemaDescription = " +
-          tables.map(_.TableValue.name + ".schema").mkString(" ++ ")
-        else
-          "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
-       "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
-       "\ndef ddl = schema" + "\n\n"
-     } else "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
+     } else "") + (if (ddlEnabled) {
+                     "\n/** DDL for all tables. Call .create to execute. */" +
+                     (if (tables.length > 5)
+                        "\nlazy val schema: profile.SchemaDescription = Array(" +
+                        tables
+                          .map(_.TableValue.name + ".schema")
+                          .mkString(", ") + ").reduceLeft(_ ++ _)"
+                      else if (tables.nonEmpty)
+                        "\nlazy val schema: profile.SchemaDescription = " +
+                        tables
+                          .map(_.TableValue.name + ".schema")
+                          .mkString(" ++ ")
+                      else
+                        "\nlazy val schema: profile.SchemaDescription = profile.DDL(Nil, Nil)") +
+                     "\n@deprecated(\"Use .schema instead of .ddl\", \"3.0\")" +
+                     "\ndef ddl = schema" + "\n\n"
+                   } else
+                     "") + tables.map(_.code.mkString("\n")).mkString("\n\n")
   }
 
   protected def tuple(i: Int) = termName(s"_${i + 1}")
@@ -107,8 +110,8 @@ def $name($args): $name = {
           .zipWithIndex
           .map { case (t, i) => s"""e$i: GR[$t]""" }
           .mkString(", ")
-        val rearranged = compoundValue(desiredColumnOrder.map(
-                i => if (hlistEnabled) s"r($i)" else tuple(i)))
+        val rearranged = compoundValue(desiredColumnOrder.map(i =>
+                  if (hlistEnabled) s"r($i)" else tuple(i)))
         def result(args: String) =
           if (mappingEnabled) s"$factory($args)" else args
         val body =

@@ -8,13 +8,16 @@ trait LzoTypedTsv1[A] extends LzoTypedTsv[Tuple1[A]] with Mappable1[A]
 trait LzoTypedTsv2[A, B] extends LzoTypedTsv[Tuple2[A, B]] with Mappable2[A, B]
 
 trait LzoTypedTsv3[A, B, C]
-    extends LzoTypedTsv[Tuple3[A, B, C]] with Mappable3[A, B, C]
+    extends LzoTypedTsv[Tuple3[A, B, C]]
+    with Mappable3[A, B, C]
 
 trait LzoTypedTsv4[A, B, C, D]
-    extends LzoTypedTsv[Tuple4[A, B, C, D]] with Mappable4[A, B, C, D]
+    extends LzoTypedTsv[Tuple4[A, B, C, D]]
+    with Mappable4[A, B, C, D]
 
 trait LzoTypedTsv5[A, B, C, D, E]
-    extends LzoTypedTsv[Tuple5[A, B, C, D, E]] with Mappable5[A, B, C, D, E]
+    extends LzoTypedTsv[Tuple5[A, B, C, D, E]]
+    with Mappable5[A, B, C, D, E]
 
 trait LzoTypedTsv6[A, B, C, D, E, F]
     extends LzoTypedTsv[Tuple6[A, B, C, D, E, F]]
@@ -83,8 +86,8 @@ trait LzoTypedTsv20[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T]
 
 trait LzoTypedTsv21[
     A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
-    extends LzoTypedTsv[Tuple21[
-            A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]]
+    extends LzoTypedTsv[
+        Tuple21[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]]
     with Mappable21[
         A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U]
 

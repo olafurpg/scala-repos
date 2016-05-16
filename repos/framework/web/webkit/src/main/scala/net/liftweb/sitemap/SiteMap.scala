@@ -144,27 +144,25 @@ sealed class SiteMapSingleton {
     */
   def sitemapMutator(pf: PartialFunction[Menu, List[Menu]])(
       or: SiteMap => SiteMap): SiteMap => SiteMap =
-    (sm: SiteMap) =>
-      {
-        var fired = false
+    (sm: SiteMap) => {
+      var fired = false
 
-        def theFunc: Menu => List[Menu] =
-          (menu: Menu) =>
-            {
-              if (fired) {
-                List(menu)
-              } else if (pf.isDefinedAt(menu)) {
-                fired = true
-                pf(menu)
-              } else List(menu.rebuild(doAMenuItem _))
-          }
+      def theFunc: Menu => List[Menu] =
+        (menu: Menu) => {
+          if (fired) {
+            List(menu)
+          } else if (pf.isDefinedAt(menu)) {
+            fired = true
+            pf(menu)
+          } else List(menu.rebuild(doAMenuItem _))
+        }
 
-        def doAMenuItem(in: List[Menu]): List[Menu] =
-          in.flatMap(theFunc)
+      def doAMenuItem(in: List[Menu]): List[Menu] =
+        in.flatMap(theFunc)
 
-        val ret = sm.rebuild(_.flatMap(theFunc))
+      val ret = sm.rebuild(_.flatMap(theFunc))
 
-        if (fired) ret else or(sm)
+      if (fired) ret else or(sm)
     }
 
   /**

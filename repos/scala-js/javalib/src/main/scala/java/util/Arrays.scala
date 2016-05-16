@@ -82,7 +82,7 @@ object Arrays {
   }
 
   @inline
-  private def sortRangeImpl[@specialized T : ClassTag](
+  private def sortRangeImpl[@specialized T: ClassTag](
       a: Array[T], fromIndex: Int, toIndex: Int)(
       implicit ord: Ordering[T]): Unit = {
     checkIndicesForCopyOfRange(a.length, fromIndex, toIndex)
@@ -98,8 +98,7 @@ object Arrays {
   }
 
   @inline
-  private def sortImpl[@specialized T : ClassTag : Ordering](
-      a: Array[T]): Unit =
+  private def sortImpl[@specialized T: ClassTag: Ordering](a: Array[T]): Unit =
     quickSort[T](a, 0, a.length)
 
   @inline
@@ -544,8 +543,7 @@ object Arrays {
 
   @inline
   private def equalsImpl[T](a: Array[T], b: Array[T]): Boolean = {
-    (a eq b) ||
-    (a != null && b != null && a.length == b.length &&
+    (a eq b) || (a != null && b != null && a.length == b.length &&
         a.indices.forall(i => a(i) == b(i)))
   }
 
@@ -671,7 +669,7 @@ object Arrays {
     copyOfImpl(original, newLength)
 
   @inline
-  private def copyOfImpl[U, T : ClassTag](
+  private def copyOfImpl[U, T: ClassTag](
       original: Array[U], newLength: Int): Array[T] = {
     checkArrayLength(newLength)
     val copyLength = Math.min(newLength, original.length)
@@ -732,7 +730,7 @@ object Arrays {
     copyOfRangeImpl(original, start, end)
 
   @inline
-  private def copyOfRangeImpl[T : ClassTag](
+  private def copyOfRangeImpl[T: ClassTag](
       original: Array[T], start: Int, end: Int): Array[T] = {
     checkIndicesForCopyOfRange(original.length, start, end)
     val retLength = end - start
@@ -798,11 +796,11 @@ object Arrays {
   @inline
   private def hashCodeImpl[T](a: Array[T],
                               elementHashCode: T => Int = (x: T) =>
-                                  x.asInstanceOf[AnyRef].hashCode): Int = {
+                                x.asInstanceOf[AnyRef].hashCode): Int = {
     if (a == null) 0
     else
-      a.foldLeft(1)(
-          (acc, x) => 31 * acc + (if (x == null) 0 else elementHashCode(x)))
+      a.foldLeft(1)((acc, x) =>
+            31 * acc + (if (x == null) 0 else elementHashCode(x)))
   }
 
   @noinline def deepHashCode(a: Array[AnyRef]): Int = {

@@ -58,7 +58,8 @@ private[serverset2] trait StatsClient extends ZooKeeperClient {
 }
 
 private[serverset2] trait StatsReader
-    extends StatsClient with ZooKeeperReader {
+    extends StatsClient
+    with ZooKeeperReader {
   protected val underlying: ZooKeeperReader
 
   def exists(path: String): Future[Option[Data.Stat]] =
@@ -80,7 +81,8 @@ private[serverset2] trait StatsReader
 }
 
 private[serverset2] trait StatsWriter
-    extends StatsClient with ZooKeeperWriter {
+    extends StatsClient
+    with ZooKeeperWriter {
   protected val underlying: ZooKeeperWriter
 
   def create(
@@ -118,12 +120,16 @@ private[serverset2] trait StatsMulti extends StatsClient with ZooKeeperMulti {
 }
 
 private[serverset2] trait StatsRW
-    extends ZooKeeperRW with StatsReader with StatsWriter {
+    extends ZooKeeperRW
+    with StatsReader
+    with StatsWriter {
   protected val underlying: ZooKeeperRW
 }
 
 private[serverset2] trait StatsRWMulti
-    extends ZooKeeperRWMulti with StatsReader with StatsWriter
+    extends ZooKeeperRWMulti
+    with StatsReader
+    with StatsWriter
     with StatsMulti {
   protected val underlying: ZooKeeperRWMulti
 }

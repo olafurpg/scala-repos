@@ -133,7 +133,7 @@ final class LiteralDoubleOrderOps(val lhs: Double) extends AnyVal {
     ev.max(c.fromDouble(lhs), rhs)
 }
 
-final class SignedOps[A : Signed](lhs: A) {
+final class SignedOps[A: Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
@@ -178,8 +178,7 @@ final class GroupOps[A](lhs: A)(implicit ev: Group[A]) {
   def |-|(rhs: A): A = macro Ops.binop[A, A]
 }
 
-final class AdditiveSemigroupOps[
-    A](lhs: A)(implicit ev: AdditiveSemigroup[A]) {
+final class AdditiveSemigroupOps[A](lhs: A)(implicit ev: AdditiveSemigroup[A]) {
   def +(rhs: A): A = macro Ops.binop[A, A]
   def +(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops
     .binopWithLift[Int, Ring[A], A]
@@ -399,7 +398,7 @@ final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
     f.div(ev.log(lhs), ev.log(f.fromInt(base)))
 }
 
-final class MeetOps[A : MeetSemilattice](lhs: A) {
+final class MeetOps[A: MeetSemilattice](lhs: A) {
   def meet(rhs: A): A = macro Ops.binop[A, A]
   def ∧(rhs: A): A = macro Ops.binop[A, A]
 
@@ -409,7 +408,7 @@ final class MeetOps[A : MeetSemilattice](lhs: A) {
     .binopWithLift[Int, Ring[A], A]
 }
 
-final class JoinOps[A : JoinSemilattice](lhs: A) {
+final class JoinOps[A: JoinSemilattice](lhs: A) {
   def join(rhs: A): A = macro Ops.binop[A, A]
   def ∨(rhs: A): A = macro Ops.binop[A, A]
 
@@ -419,7 +418,7 @@ final class JoinOps[A : JoinSemilattice](lhs: A) {
     .binopWithLift[Int, Ring[A], A]
 }
 
-final class HeytingOps[A : Heyting](lhs: A) {
+final class HeytingOps[A: Heyting](lhs: A) {
   def unary_~(): A = macro Ops.unop[A]
   def imp(rhs: A): A = macro Ops.binop[A, A]
 
@@ -432,7 +431,7 @@ final class HeytingOps[A : Heyting](lhs: A) {
     .binopWithLift[Int, Ring[A], A]
 }
 
-final class BoolOps[A : Bool](lhs: A) {
+final class BoolOps[A: Bool](lhs: A) {
   def ^(rhs: A): A = macro Ops.binop[A, A]
   def nand(rhs: A): A = macro Ops.binop[A, A]
   def nor(rhs: A): A = macro Ops.binop[A, A]

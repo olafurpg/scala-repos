@@ -72,8 +72,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
     lazy val updateInsert = compile(updateInsertCompiler)
 
     /** Build a list of columns and a matching `ResultConverter` for retrieving keys of inserted rows. */
-    def buildReturnColumns(node: Node): (ConstArray[String],
-    ResultConverter[JdbcResultConverterDomain, _], Boolean) = {
+    def buildReturnColumns(
+        node: Node): (ConstArray[String],
+                      ResultConverter[JdbcResultConverterDomain, _],
+                      Boolean) = {
       if (!capabilities.contains(JdbcCapabilities.returnInsertKey))
         throw new SlickException(
             "This DBMS does not allow returning columns from INSERT statements")
@@ -311,10 +313,10 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
         expr(n, true)
     }
 
-    protected def buildFrom(
-        n: Node,
-        alias: Option[TermSymbol],
-        skipParens: Boolean = false): Unit = building(FromPart) {
+    protected def buildFrom(n: Node,
+                            alias: Option[TermSymbol],
+                            skipParens: Boolean =
+                              false): Unit = building(FromPart) {
       def addAlias = alias foreach { s =>
         b += ' ' += symbolName(s)
       }
@@ -545,8 +547,7 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
                   case Select(Ref(struct), _) if struct == sym => true;
                   case _ => false
                 } =>
-              (
-                  sym, from, where, ch.map {
+              (sym, from, where, ch.map {
                 case Select(Ref(_), field) => field
               })
             case _ =>
@@ -561,7 +562,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
       }
 
       val qtn = quoteTableName(from)
-      symbolName(gen) = qtn // Alias table to itself because UPDATE does not support aliases
+      symbolName(gen) =
+        qtn // Alias table to itself because UPDATE does not support aliases
       b"update $qtn set "
       b.sep(select, ", ")(field => b += symbolName(field) += " = ?")
       if (!where.isEmpty) {
@@ -598,7 +600,8 @@ trait JdbcStatementBuilderComponent { self: JdbcProfile =>
               " -- A single SQL comprehension is required")
       }
       val qtn = quoteTableName(from)
-      symbolName(gen) = qtn // Alias table to itself because DELETE does not support aliases
+      symbolName(gen) =
+        qtn // Alias table to itself because DELETE does not support aliases
       b"delete from $qtn"
       if (!where.isEmpty) {
         b" where "

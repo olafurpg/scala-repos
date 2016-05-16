@@ -66,7 +66,8 @@ class LogCleaner(val config: CleanerConfig,
                  val logDirs: Array[File],
                  val logs: Pool[TopicAndPartition, Log],
                  time: Time = SystemTime)
-    extends Logging with KafkaMetricsGroup {
+    extends Logging
+    with KafkaMetricsGroup {
 
   /* for managing the state of partitions being cleaned. package-private to allow access in tests */
   private[log] val cleanerManager = new LogCleanerManager(logDirs, logs)
@@ -201,12 +202,11 @@ class LogCleaner(val config: CleanerConfig,
 
     val cleaner = new Cleaner(
         id = threadId,
-        offsetMap = new SkimpyOffsetMap(
-              memory = math
-                  .min(config.dedupeBufferSize / config.numThreads,
-                       Int.MaxValue)
-                  .toInt,
-              hashAlgorithm = config.hashAlgorithm),
+        offsetMap = new SkimpyOffsetMap(memory = math
+                                          .min(config.dedupeBufferSize / config.numThreads,
+                                               Int.MaxValue)
+                                          .toInt,
+                                        hashAlgorithm = config.hashAlgorithm),
         ioBufferSize = config.ioBufferSize / config.numThreads / 2,
         maxIoBufferSize = config.maxMessageSize,
         dupBufferLoadFactor = config.dedupeBufferLoadFactor,
@@ -286,18 +286,20 @@ class LogCleaner(val config: CleanerConfig,
                   100 * stats.elapsedIndexSecs / stats.elapsedSecs) +
         "\tBuffer utilization: %.1f%%%n".format(100 * stats.bufferUtilization) +
         "\tCleaned %,.1f MB in %.1f seconds (%,.1f Mb/sec, %.1f%% of total time)%n"
-          .format(
-            mb(stats.bytesRead),
-            stats.elapsedSecs - stats.elapsedIndexSecs,
-            mb(stats.bytesRead) / (stats.elapsedSecs - stats.elapsedIndexSecs),
-            100 * (stats.elapsedSecs - stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
+          .format(mb(stats.bytesRead),
+                  stats.elapsedSecs - stats.elapsedIndexSecs,
+                  mb(stats.bytesRead) / (stats.elapsedSecs -
+                      stats.elapsedIndexSecs),
+                  100 * (stats.elapsedSecs -
+                      stats.elapsedIndexSecs).toDouble / stats.elapsedSecs) +
         "\tStart size: %,.1f MB (%,d messages)%n".format(mb(stats.bytesRead),
                                                          stats.messagesRead) +
-        "\tEnd size: %,.1f MB (%,d messages)%n".format(
-            mb(stats.bytesWritten), stats.messagesWritten) +
+        "\tEnd size: %,.1f MB (%,d messages)%n".format(mb(stats.bytesWritten),
+                                                       stats.messagesWritten) +
         "\t%.1f%% size reduction (%.1f%% fewer messages)%n".format(
             100.0 * (1.0 - stats.bytesWritten.toDouble / stats.bytesRead),
-            100.0 * (1.0 - stats.messagesWritten.toDouble / stats.messagesRead))
+            100.0 * (1.0 -
+                stats.messagesWritten.toDouble / stats.messagesRead))
       info(message)
       if (stats.invalidMessagesRead > 0) {
         warn(
@@ -670,9 +672,9 @@ private[log] class Cleaner(val id: Int,
       var indexSize = segs.head.index.sizeInBytes
       segs = segs.tail
       while (!segs.isEmpty && logSize + segs.head.size <= maxSize &&
-      indexSize + segs.head.index.sizeInBytes <= maxIndexSize &&
-      segs.head.index.lastOffset -
-      group.last.index.baseOffset <= Int.MaxValue) {
+             indexSize + segs.head.index.sizeInBytes <= maxIndexSize &&
+             segs.head.index.lastOffset -
+             group.last.index.baseOffset <= Int.MaxValue) {
         group = segs.head :: group
         logSize += segs.head.size
         indexSize += segs.head.index.sizeInBytes

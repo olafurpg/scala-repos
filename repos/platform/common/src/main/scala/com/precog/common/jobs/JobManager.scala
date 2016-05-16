@@ -196,10 +196,10 @@ trait JobManager[M[+ _]] { self =>
                 startedAt: DateTime = new DateTime): N[Either[String, Job]] =
         t(self.start(job, startedAt))
 
-      def cancel(
-          job: JobId,
-          reason: String,
-          cancelledAt: DateTime = new DateTime): N[Either[String, Job]] =
+      def cancel(job: JobId,
+                 reason: String,
+                 cancelledAt: DateTime =
+                   new DateTime): N[Either[String, Job]] =
         t(self.cancel(job, reason, cancelledAt))
 
       def abort(job: JobId,

@@ -17,7 +17,7 @@ import java.util.Arrays
   * hash, i.e. make sure it is different for different nodes.
   *
   */
-class ConsistentHash[T : ClassTag] private (
+class ConsistentHash[T: ClassTag] private (
     nodes: immutable.SortedMap[Int, T], val virtualNodesFactor: Int) {
 
   import ConsistentHash._
@@ -119,7 +119,7 @@ class ConsistentHash[T : ClassTag] private (
 }
 
 object ConsistentHash {
-  def apply[T : ClassTag](
+  def apply[T: ClassTag](
       nodes: Iterable[T], virtualNodesFactor: Int): ConsistentHash[T] = {
     new ConsistentHash(
         immutable.SortedMap.empty[Int, T] ++

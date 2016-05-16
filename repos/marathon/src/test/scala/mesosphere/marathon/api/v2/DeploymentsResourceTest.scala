@@ -12,7 +12,10 @@ import scala.concurrent.Future
 import scala.collection.immutable.Seq
 
 class DeploymentsResourceTest
-    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers
+    with Mockito {
 
   test("access without authentication is denied") {
     Given("An unauthenticated request")

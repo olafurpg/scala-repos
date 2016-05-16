@@ -29,10 +29,10 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
   private def defaultName[T](node: T): String =
     node.getClass.getName.replaceFirst("com.twitter.summingbird.", "")
 
-  def getName[T](
-      curLookupTable: BaseLookupTable[T],
-      node: T,
-      requestedName: Option[String] = None): (BaseLookupTable[T], String) = {
+  def getName[T](curLookupTable: BaseLookupTable[T],
+                 node: T,
+                 requestedName: Option[String] =
+                   None): (BaseLookupTable[T], String) = {
     val nodeLookupTable = curLookupTable._1
     val nameLookupTable = curLookupTable._2
     val preferredName = requestedName.getOrElse(defaultName(node))

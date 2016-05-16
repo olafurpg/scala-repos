@@ -59,7 +59,7 @@ class WrappedDictionaryTest {
   // Some arbitrary methods to test the builders
 
   @Test def map(): Unit = {
-    def ct[A : ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
+    def ct[A: ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
     val dict = js.Dictionary[Int]()
     dict ++= Seq("one" -> 1, "two" -> 2, "three" -> 3)
 

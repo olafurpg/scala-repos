@@ -16,8 +16,7 @@ class CaseClassParamInspection
       for {
         paramClause <- c.allClauses.take(1)
         classParam @ (__ : ScClassParameter) <- paramClause.parameters
-                                                   if classParam.isVal &&
-                                               classParam.isCaseClassVal
+        if classParam.isVal && classParam.isCaseClassVal
       } {
         holder.registerProblem(
             classParam,

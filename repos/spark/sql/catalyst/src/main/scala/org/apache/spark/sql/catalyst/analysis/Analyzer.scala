@@ -54,7 +54,8 @@ class Analyzer(catalog: Catalog,
                registry: FunctionRegistry,
                conf: CatalystConf,
                maxIterations: Int = 100)
-    extends RuleExecutor[LogicalPlan] with CheckAnalysis {
+    extends RuleExecutor[LogicalPlan]
+    with CheckAnalysis {
 
   def resolver: Resolver = {
     if (conf.caseSensitiveAnalysis) {
@@ -508,8 +509,8 @@ class Analyzer(catalog: Catalog,
           case a @ Alias(f @ UnresolvedFunction(_, args, _), name)
               if containsStar(args) =>
             val newChildren = expandStarExpressions(args, child)
-            Alias(child = f.copy(children = newChildren), name)(
-                isGenerated = a.isGenerated) :: Nil
+            Alias(child = f.copy(children = newChildren), name)(isGenerated =
+                  a.isGenerated) :: Nil
           case UnresolvedAlias(c @ CreateArray(args), _)
               if containsStar(args) =>
             val expandedArgs = args.flatMap {
@@ -551,8 +552,8 @@ class Analyzer(catalog: Catalog,
       // we still have chance to resolve it based on its descendants
       case s @ Sort(ordering, global, child)
           if child.resolved && !s.resolved =>
-        val newOrdering = ordering.map(
-            order => resolveExpression(order, child).asInstanceOf[SortOrder])
+        val newOrdering = ordering.map(order =>
+              resolveExpression(order, child).asInstanceOf[SortOrder])
         Sort(newOrdering, global, child)
 
       // A special case for Generate, because the output of Generate should not be resolved by
@@ -915,8 +916,8 @@ class Analyzer(catalog: Catalog,
         try {
           val unresolvedSortOrders =
             sortOrder.filter(s => !s.resolved || containsAggregate(s))
-          val aliasedOrdering = unresolvedSortOrders.map(
-              o => Alias(o.child, "aggOrder")(isGenerated = true))
+          val aliasedOrdering = unresolvedSortOrders.map(o =>
+                Alias(o.child, "aggOrder")(isGenerated = true))
           val aggregatedOrdering =
             aggregate.copy(aggregateExpressions = aliasedOrdering)
           val resolvedAggregate: Aggregate =
@@ -965,13 +966,11 @@ class Analyzer(catalog: Catalog,
           if (sortOrder == finalSortOrders) {
             sort
           } else {
-            Project(
-                aggregate.output,
-                Sort(
-                    finalSortOrders,
-                    global,
-                    aggregate.copy(
-                        aggregateExpressions = originalAggExprs ++ needsPushDown)))
+            Project(aggregate.output,
+                    Sort(finalSortOrders,
+                         global,
+                         aggregate.copy(aggregateExpressions =
+                               originalAggExprs ++ needsPushDown)))
           }
         } catch {
           // Attempting to resolve in the aggregate can result in ambiguity.  When this happens,
@@ -1007,8 +1006,8 @@ class Analyzer(catalog: Catalog,
             "Cannot explode *, explode can only be applied on a specific column.")
       case p: Generate if !p.child.resolved || !p.generator.resolved => p
       case g: Generate if !g.resolved =>
-        g.copy(generatorOutput = makeGeneratorOutput(
-                  g.generator, g.generatorOutput.map(_.name)))
+        g.copy(generatorOutput =
+              makeGeneratorOutput(g.generator, g.generatorOutput.map(_.name)))
 
       case p @ Project(projectList, child) =>
         // Holds the resolved generator, if one exists in the project list.
@@ -1025,7 +1024,8 @@ class Analyzer(catalog: Catalog,
 
             resolvedGenerator = Generate(
                 generator,
-                join = projectList.size > 1, // Only join if there are other expressions in SELECT.
+                join =
+                  projectList.size > 1, // Only join if there are other expressions in SELECT.
                 outer = false,
                 qualifier = None,
                 generatorOutput = makeGeneratorOutput(generator, names),
@@ -1438,9 +1438,9 @@ class Analyzer(catalog: Catalog,
     def apply(plan: LogicalPlan): LogicalPlan = plan transform {
       case logical: LogicalPlan =>
         logical transformExpressions {
-          case WindowExpression(
-              wf: WindowFunction,
-              WindowSpecDefinition(_, _, f: SpecifiedWindowFrame))
+          case WindowExpression(wf: WindowFunction,
+                                WindowSpecDefinition(
+                                _, _, f: SpecifiedWindowFrame))
               if wf.frame != UnspecifiedFrame && wf.frame != f =>
             failAnalysis(
                 s"Window Frame $f must match the required frame ${wf.frame}")
@@ -1609,8 +1609,8 @@ object CleanupAliases extends Rule[LogicalPlan] {
       Aggregate(grouping.map(trimAliases), cleanedAggs, child)
 
     case w @ Window(windowExprs, partitionSpec, orderSpec, child) =>
-      val cleanedWindowExprs = windowExprs.map(
-          e => trimNonTopLevelAliases(e).asInstanceOf[NamedExpression])
+      val cleanedWindowExprs = windowExprs.map(e =>
+            trimNonTopLevelAliases(e).asInstanceOf[NamedExpression])
       Window(cleanedWindowExprs,
              partitionSpec.map(trimAliases),
              orderSpec.map(trimAliases(_).asInstanceOf[SortOrder]),

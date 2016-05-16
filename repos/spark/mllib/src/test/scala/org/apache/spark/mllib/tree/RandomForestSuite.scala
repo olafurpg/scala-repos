@@ -60,12 +60,12 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("Binary classification with continuous features:" +
       " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val categoricalFeaturesInfo = Map.empty[Int, Int]
-    val strategy =
-      new Strategy(algo = Classification,
-                   impurity = Gini,
-                   maxDepth = 2,
-                   numClasses = 2,
-                   categoricalFeaturesInfo = categoricalFeaturesInfo)
+    val strategy = new Strategy(algo = Classification,
+                                impurity = Gini,
+                                maxDepth = 2,
+                                numClasses = 2,
+                                categoricalFeaturesInfo =
+                                  categoricalFeaturesInfo)
     binaryClassificationTestWithContinuousFeatures(strategy)
   }
 
@@ -108,13 +108,13 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("Regression with continuous features:" +
       " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
     val categoricalFeaturesInfo = Map.empty[Int, Int]
-    val strategy =
-      new Strategy(algo = Regression,
-                   impurity = Variance,
-                   maxDepth = 2,
-                   maxBins = 10,
-                   numClasses = 2,
-                   categoricalFeaturesInfo = categoricalFeaturesInfo)
+    val strategy = new Strategy(algo = Regression,
+                                impurity = Variance,
+                                maxDepth = 2,
+                                maxBins = 10,
+                                numClasses = 2,
+                                categoricalFeaturesInfo =
+                                  categoricalFeaturesInfo)
     regressionTestWithContinuousFeatures(strategy)
   }
 
@@ -204,12 +204,12 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("Binary classification with continuous features: subsampling features") {
     val categoricalFeaturesInfo = Map.empty[Int, Int]
-    val strategy =
-      new Strategy(algo = Classification,
-                   impurity = Gini,
-                   maxDepth = 2,
-                   numClasses = 2,
-                   categoricalFeaturesInfo = categoricalFeaturesInfo)
+    val strategy = new Strategy(algo = Classification,
+                                impurity = Gini,
+                                maxDepth = 2,
+                                numClasses = 2,
+                                categoricalFeaturesInfo =
+                                  categoricalFeaturesInfo)
     binaryClassificationTestWithContinuousFeaturesAndSubsampledFeatures(
         strategy)
   }
@@ -238,12 +238,12 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val categoricalFeaturesInfo = Map(0 -> 3, 2 -> 2, 4 -> 4)
     val input = sc.parallelize(arr)
 
-    val strategy =
-      new Strategy(algo = Classification,
-                   impurity = Gini,
-                   maxDepth = 5,
-                   numClasses = 3,
-                   categoricalFeaturesInfo = categoricalFeaturesInfo)
+    val strategy = new Strategy(algo = Classification,
+                                impurity = Gini,
+                                maxDepth = 5,
+                                numClasses = 3,
+                                categoricalFeaturesInfo =
+                                  categoricalFeaturesInfo)
     val model = RandomForest.trainClassifier(input,
                                              strategy,
                                              numTrees = 2,

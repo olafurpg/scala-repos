@@ -72,11 +72,10 @@ class InlineInfoTest extends ClearAfterClass {
             .inlineInfo)
 
     val fromAttrs = classes.map(
-        c =>
-          {
-        assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
-               c.attrs)
-        compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
+        c => {
+      assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
+             c.attrs)
+      compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
     })
 
     assert(fromSyms == fromAttrs)

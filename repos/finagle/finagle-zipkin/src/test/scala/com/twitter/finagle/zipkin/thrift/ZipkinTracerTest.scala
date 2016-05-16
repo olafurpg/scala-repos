@@ -14,7 +14,9 @@ import java.net.InetSocketAddress
 
 @RunWith(classOf[JUnitRunner])
 class ZipkinTracerTest
-    extends FunSuite with MockitoSugar with GeneratorDrivenPropertyChecks {
+    extends FunSuite
+    with MockitoSugar
+    with GeneratorDrivenPropertyChecks {
   import ZipkinTracerTest._
 
   test("ZipkinTracer should handle sampling") {

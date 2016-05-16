@@ -78,8 +78,8 @@ class AkkaHttpServer(config: ServerConfig,
     Await.result(bindingFuture, bindTimeout)
   }
 
-  private val httpServerBinding = config.port.map(
-      port => createServerBinding(port, ConnectionContext.noEncryption()))
+  private val httpServerBinding = config.port.map(port =>
+        createServerBinding(port, ConnectionContext.noEncryption()))
 
   private val httpsServerBinding = config.sslPort.map { port =>
     val connectionContext = try {

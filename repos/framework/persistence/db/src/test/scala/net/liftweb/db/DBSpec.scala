@@ -184,8 +184,7 @@ class DBSpec extends Specification with Mockito {
       DB.defineConnectionManager(DefaultConnectionIdentifier,
                                  dBVendor(activeConnection))
 
-      tryo(
-          DB.use(DefaultConnectionIdentifier) { c =>
+      tryo(DB.use(DefaultConnectionIdentifier) { c =>
         DB.appendPostTransaction(DefaultConnectionIdentifier, m.f _)
         DB.rollback(DefaultConnectionIdentifier)
         42

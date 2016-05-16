@@ -108,7 +108,8 @@ class OptionalEnumNameField[
     rec: OwnerType, protected val enum: EnumType)(
     implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
-    with OptionalTypedField[EnumType#Value] with EnumNameTypedField[EnumType] {
+    with OptionalTypedField[EnumType#Value]
+    with EnumNameTypedField[EnumType] {
   def this(rec: OwnerType, enum: EnumType, value: Box[EnumType#Value])(
       implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)

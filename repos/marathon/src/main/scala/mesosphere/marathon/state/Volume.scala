@@ -35,7 +35,8 @@ object Volume {
   def apply(proto: Protos.Volume): Volume = {
     val persistent: Option[PersistentVolumeInfo] =
       if (proto.hasPersistent)
-        Some(PersistentVolumeInfo(proto.getPersistent.getSize)) else None
+        Some(PersistentVolumeInfo(proto.getPersistent.getSize))
+      else None
 
     persistent match {
       case Some(persistentVolumeInfo) =>
@@ -60,9 +61,10 @@ object Volume {
         mode = proto.getMode
     )
 
-  def unapply(volume: Volume)
-    : Option[(String, Option[String], Mesos.Volume.Mode, Option[
-            PersistentVolumeInfo])] =
+  def unapply(volume: Volume): Option[(String,
+                                       Option[String],
+                                       Mesos.Volume.Mode,
+                                       Option[PersistentVolumeInfo])] =
     volume match {
       case persistentVolume: PersistentVolume =>
         Some(

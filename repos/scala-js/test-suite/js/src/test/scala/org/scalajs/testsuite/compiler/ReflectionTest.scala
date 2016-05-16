@@ -28,7 +28,7 @@ import org.scalajs.testsuite.utils.Platform._
 class ReflectionTest {
   import ReflectionTest._
 
-  def implicitClassTagTest[A : ClassTag](x: Any): Boolean = x match {
+  def implicitClassTagTest[A: ClassTag](x: Any): Boolean = x match {
     case x: A => true
     case _ => false
   }

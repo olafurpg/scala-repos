@@ -55,7 +55,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
   lazy val session = new LiftSession("", randomString(20), Empty)
 
   // One of these is for specs2 2.x, the other for specs2 1.x
-  protected def around[T : AsResult](t: => T) = S.initIfUninitted(session) {
+  protected def around[T: AsResult](t: => T) = S.initIfUninitted(session) {
     AsResult(t)
   }
   protected def around[T <% org.specs2.execute.Result](t: => T) =
@@ -221,12 +221,11 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           formXml foreach { fprime =>
             val f = ("* [name]" #> ".*" & "select *" #>
                 (((ns: NodeSeq) =>
-                      ns.filter {
-                        case e: Elem =>
-                          e.attribute("selected").map(_.text) == Some(
-                              "selected")
-                        case _ => false
-                      }) andThen "* [value]" #> ".*"))(fprime)
+                    ns.filter {
+                      case e: Elem =>
+                        e.attribute("selected").map(_.text) == Some("selected")
+                      case _ => false
+                    }) andThen "* [value]" #> ".*"))(fprime)
             val ret: Boolean = Helpers.compareXml(f, fp)
 
             ret must_== true
@@ -346,14 +345,14 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
     }
 
     "require at least 3 character password" in {
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("ab")
       rec.validate must_==
-      (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
+        (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
     }
   }
 
@@ -405,8 +404,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           lst,
           rec.objectIdRefListField,
           JsArray(Str(oid1.toString), Str(oid2.toString), Str(oid3.toString)),
-          JArray(
-              List(
+          JArray(List(
                   JObject(List(JField("$oid", JString(oid1.toString)))),
                   JObject(List(JField("$oid", JString(oid2.toString)))),
                   JObject(List(JField("$oid", JString(oid3.toString))))
@@ -565,8 +563,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           map,
           rec.mandatoryStringMapField,
           JsObj(("a", Str("abc")), ("b", Str("def")), ("c", Str("ghi"))),
-          JObject(
-              List(
+          JObject(List(
                   JField("a", JString("abc")),
                   JField("b", JString("def")),
                   JField("c", JString("ghi"))
@@ -586,8 +583,7 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           map,
           rec.mandatoryIntMapField,
           JsObj(("a", Num(4)), ("b", Num(5)), ("c", Num(6))),
-          JObject(
-              List(
+          JObject(List(
                   JField("a", JInt(4)),
                   JField("b", JInt(5)),
                   JField("c", JInt(6))

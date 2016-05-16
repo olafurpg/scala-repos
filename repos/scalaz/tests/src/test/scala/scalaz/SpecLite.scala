@@ -39,7 +39,8 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
 
     def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
-      property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
+      property(context + ":" + s) =
+        Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
   }
 
   implicit def enrichString(s: String) = new StringOps(s)

@@ -32,7 +32,10 @@ import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Success, Try}
 
 class TightRequestTimeoutSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures {
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]

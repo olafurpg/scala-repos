@@ -12,7 +12,8 @@ import scala.collection.mutable.Map
   * ServletContext) to a mutable map.
   */
 trait AttributesMap
-    extends Map[String, Any] with MutableMapWithIndifferentAccess[Any] {
+    extends Map[String, Any]
+    with MutableMapWithIndifferentAccess[Any] {
 
   protected def attributes: Attributes
 

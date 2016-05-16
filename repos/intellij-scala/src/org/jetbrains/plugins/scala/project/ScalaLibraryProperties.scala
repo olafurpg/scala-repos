@@ -18,8 +18,8 @@ class ScalaLibraryProperties
 
   def loadState(state: ScalaLibraryPropertiesState) {
     languageLevel = ScalaLanguageLevel.from(state.languageLevel)
-    compilerClasspath = state.compilerClasspath.map(
-        path => new File(urlToPath(path)))
+    compilerClasspath =
+      state.compilerClasspath.map(path => new File(urlToPath(path)))
   }
 
   def getState = {

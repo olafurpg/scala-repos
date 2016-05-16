@@ -23,7 +23,9 @@ import org.scalatest.{Matchers, WordSpec}
 import scala.language.experimental.macros
 
 class ScroogeMacrosUnitTests
-    extends WordSpec with Matchers with PropertyChecks {
+    extends WordSpec
+    with Matchers
+    with PropertyChecks {
   import ScroogeGenerators._
   import TestHelper._
   import Macros._

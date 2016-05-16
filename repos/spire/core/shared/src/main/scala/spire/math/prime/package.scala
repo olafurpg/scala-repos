@@ -158,7 +158,8 @@ package object prime {
         }
 
         if (g == 1) fastRho(y, q, r * 2, m)
-        else if (g == n) slowRho(x, ys) else g
+        else if (g == n) slowRho(x, ys)
+        else g
       }
 
       @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {

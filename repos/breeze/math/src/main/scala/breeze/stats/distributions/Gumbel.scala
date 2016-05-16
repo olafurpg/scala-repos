@@ -10,7 +10,9 @@ import breeze.numerics.{exp, log}
   **/
 case class Gumbel(location: Double, scale: Double)(
     implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   def mean: Double = location + scale * γ
 
   def mode: Double = location

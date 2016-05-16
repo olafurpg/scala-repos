@@ -43,4 +43,5 @@ private[finagle] class WriteCompletionTimeoutHandler(
 
 // raised on timeout task after write completes
 private[channel] object TimeoutCancelled
-    extends Exception("timeout cancelled") with NoStacktrace
+    extends Exception("timeout cancelled")
+    with NoStacktrace

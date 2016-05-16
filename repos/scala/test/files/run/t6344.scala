@@ -87,7 +87,7 @@ class C7 extends C6[Int] {
 }
 
 object Test {
-  def show[A : ClassTag] = {
+  def show[A: ClassTag] = {
     println(classTag[A].runtimeClass.getName)
     classTag[A].runtimeClass.getDeclaredMethods.toList
       .sortBy(_.toString)

@@ -32,7 +32,8 @@ import org.apache.spark.sql.hive.{HiveContext, HiveMetastoreTypes}
 
 private[hive] class SparkSQLDriver(
     val context: HiveContext = SparkSQLEnv.hiveContext)
-    extends Driver with Logging {
+    extends Driver
+    with Logging {
 
   private[hive] var tableSchema: Schema = _
   private[hive] var hiveResponse: Seq[String] = _

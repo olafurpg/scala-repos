@@ -94,8 +94,7 @@ sealed abstract class Future[+A] {
     this.stepInterruptibly(cancel) match {
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
-        onFinish(
-            a =>
+        onFinish(a =>
               if (!cancel.get) cb(a)
               else Trampoline.done(()))
       case BindAsync(onFinish, g) if !cancel.get =>
@@ -275,8 +274,8 @@ sealed abstract class Future[+A] {
     }
 
   def unsafePerformTimed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout.toMillis)
 
   @deprecated("use unsafePerformTimed", "7.2")
@@ -286,8 +285,8 @@ sealed abstract class Future[+A] {
 
   @deprecated("use unsafePerformTimed", "7.2")
   def timed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout)
 
   /**
@@ -383,8 +382,8 @@ object Future {
 
       // implementation runs all threads, dumping to a shared queue
       // last thread to finish invokes the callback with the results
-      override def reduceUnordered[A, M](
-          fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+      override def reduceUnordered[A, M](fs: Seq[Future[A]])(
+          implicit R: Reducer[A, M]): Future[M] =
         fs match {
           case Seq() => Future.now(R.zero)
           case Seq(f) => f.map(R.unit)
@@ -402,8 +401,8 @@ object Future {
 
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
-                    cb(results.toList.foldLeft(R.zero)((a,
-                            b) => R.append(a, b)))
+                    cb(results.toList.foldLeft(R.zero)((a, b) =>
+                              R.append(a, b)))
                   else Trampoline.done(())
                 }
               }
@@ -439,9 +438,8 @@ object Future {
     * the given `ExecutorService`. Note that this forking is only described
     * by the returned `Future`--nothing occurs until the `Future` is run.
     */
-  def fork[A](a: => Future[A])(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Future[A] =
+  def fork[A](a: => Future[A])(implicit pool: ExecutorService =
+                                 Strategy.DefaultExecutorService): Future[A] =
     Future(a).join
 
   /**
@@ -459,23 +457,22 @@ object Future {
     * exceptions.
     */
   def async[A](listen: (A => Unit) => Unit): Future[A] =
-    Async(
-        (cb: A => Trampoline[Unit]) =>
+    Async((cb: A => Trampoline[Unit]) =>
           listen { a =>
         cb(a).run
     })
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
-  def apply[A](a: => A)(
-      implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Future[A] = Async { cb =>
-    pool.submit { new Callable[Unit] { def call = cb(a).run } }
+  def apply[A](a: => A)(implicit pool: ExecutorService =
+                          Strategy.DefaultExecutorService): Future[A] = Async {
+    cb =>
+      pool.submit { new Callable[Unit] { def call = cb(a).run } }
   }
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(
-      implicit pool: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[A] =
+      implicit pool: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[A] =
     Async { cb =>
       pool.schedule(new Callable[Unit] {
         def call = cb(a).run

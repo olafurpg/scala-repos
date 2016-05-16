@@ -59,7 +59,9 @@ case class WindowData(month: Int, area: String, product: Int)
   * valid, but Hive currently cannot execute it.
   */
 class SQLQuerySuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -699,7 +701,7 @@ class SQLQuerySuite
     sql("SELECT * FROM src WHERE key % 2 = 0")
       .sample(withReplacement = false, fraction = 0.3)
       .registerTempTable("sampled")
-      (1 to 10).foreach { i =>
+    (1 to 10).foreach { i =>
       checkAnswer(sql("SELECT * FROM sampled WHERE key % 2 = 1"),
                   Seq.empty[Row])
     }
@@ -715,9 +717,9 @@ class SQLQuerySuite
     val schema = StructType(
         StructField(
             "s",
-            StructType(StructField("innerStruct",
-                                   StructType(StructField(
-                                           "s1",
+            StructType(StructField(
+                    "innerStruct",
+                    StructType(StructField("s1",
                                            StringType,
                                            true) :: Nil)) :: StructField(
                     "innerArray", ArrayType(IntegerType), true) :: StructField(
@@ -1529,15 +1531,14 @@ class SQLQuerySuite
 
   test("run sql directly on files") {
     val df = sqlContext.range(100).toDF()
-    withTempPath(f =>
-          {
-        df.write.parquet(f.getCanonicalPath)
-        checkAnswer(sql(s"select id from parquet.`${f.getCanonicalPath}`"), df)
-        checkAnswer(
-            sql(s"select id from `org.apache.spark.sql.parquet`.`${f.getCanonicalPath}`"),
-            df)
-        checkAnswer(
-            sql(s"select a.id from parquet.`${f.getCanonicalPath}` as a"), df)
+    withTempPath(f => {
+      df.write.parquet(f.getCanonicalPath)
+      checkAnswer(sql(s"select id from parquet.`${f.getCanonicalPath}`"), df)
+      checkAnswer(
+          sql(s"select id from `org.apache.spark.sql.parquet`.`${f.getCanonicalPath}`"),
+          df)
+      checkAnswer(
+          sql(s"select a.id from parquet.`${f.getCanonicalPath}` as a"), df)
     })
   }
 

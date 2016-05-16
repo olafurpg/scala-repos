@@ -24,8 +24,10 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
   */
 abstract class ScFunctionImpl protected (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScMember
-    with ScFunction with ScTypeParametersOwner {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScMember
+    with ScFunction
+    with ScTypeParametersOwner {
   override def isStable = false
 
   def nameId: PsiElement = {

@@ -233,11 +233,11 @@ object DevServerStart {
             address = httpAddress,
             mode = Mode.Dev,
             properties = process.properties,
-            configuration = Configuration.load(
-                  classLoader,
-                  System.getProperties,
-                  dirAndDevSettings,
-                  allowMissingApplicationConf = true)
+            configuration = Configuration.load(classLoader,
+                                               System.getProperties,
+                                               dirAndDevSettings,
+                                               allowMissingApplicationConf =
+                                                 true)
         )
 
         // We *must* use a different Akka configuration in dev mode, since loading two actor systems from the same
@@ -253,11 +253,10 @@ object DevServerStart {
             appProvider,
             actorSystem,
             ActorMaterializer()(actorSystem),
-            () =>
-              {
-                actorSystem.terminate()
-                Await.result(actorSystem.whenTerminated, Duration.Inf)
-                Future.successful(())
+            () => {
+              actorSystem.terminate()
+              Await.result(actorSystem.whenTerminated, Duration.Inf)
+              Future.successful(())
             })
         val serverProvider = ServerProvider.fromConfiguration(
             classLoader, serverConfig.configuration)

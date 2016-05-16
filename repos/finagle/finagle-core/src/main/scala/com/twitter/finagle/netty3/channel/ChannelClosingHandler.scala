@@ -9,7 +9,8 @@ import org.jboss.netty.channel.{SimpleChannelHandler, LifeCycleAwareChannelHandl
 import com.twitter.finagle.netty3.LatentChannelFuture
 
 private[finagle] class ChannelClosingHandler
-    extends SimpleChannelHandler with LifeCycleAwareChannelHandler {
+    extends SimpleChannelHandler
+    with LifeCycleAwareChannelHandler {
   private[this] val channelCloseFuture = new LatentChannelFuture
   private[this] var channel: Channel = null
   private[this] var awaitingClose = false

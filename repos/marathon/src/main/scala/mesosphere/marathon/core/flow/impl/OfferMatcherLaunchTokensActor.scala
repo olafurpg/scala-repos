@@ -31,7 +31,8 @@ private class OfferMatcherLaunchTokensActor(
     conf: LaunchTokenConfig,
     taskStatusObservables: TaskStatusObservables,
     offerMatcherManager: OfferMatcherManager)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var taskStatusUpdateSubscription: Subscription = _
   var periodicSetToken: Cancellable = _
 

@@ -5,8 +5,11 @@ import spire.algebra.{EuclideanRing, IsReal}
 import spire.std._
 
 trait Integral[@sp(Int, Long) A]
-    extends Any with EuclideanRing[A] with ConvertableFrom[A]
-    with ConvertableTo[A] with IsReal[A]
+    extends Any
+    with EuclideanRing[A]
+    with ConvertableFrom[A]
+    with ConvertableTo[A]
+    with IsReal[A]
 
 object Integral {
   implicit final val IntIsIntegral = new IntIsIntegral
@@ -35,8 +38,12 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
 
 @SerialVersionUID(0L)
 private[math] class IntIsIntegral
-    extends Integral[Int] with IntIsEuclideanRing with ConvertableFromInt
-    with ConvertableToInt with IntIsReal with Serializable {
+    extends Integral[Int]
+    with IntIsEuclideanRing
+    with ConvertableFromInt
+    with ConvertableToInt
+    with IntIsReal
+    with Serializable {
   override def fromInt(n: Int): Int = n
   override def toDouble(n: Int): Double = n.toDouble
   override def toRational(n: Int): Rational = super [IntIsReal].toRational(n)
@@ -48,8 +55,12 @@ private[math] class IntIsIntegral
 
 @SerialVersionUID(0L)
 private[math] class LongIsIntegral
-    extends Integral[Long] with LongIsEuclideanRing with ConvertableFromLong
-    with ConvertableToLong with LongIsReal with Serializable {
+    extends Integral[Long]
+    with LongIsEuclideanRing
+    with ConvertableFromLong
+    with ConvertableToLong
+    with LongIsReal
+    with Serializable {
   override def fromInt(n: Int): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
   override def toRational(n: Long): Rational = super [LongIsReal].toRational(n)
@@ -61,8 +72,11 @@ private[math] class LongIsIntegral
 
 @SerialVersionUID(0L)
 private[math] class BigIntIsIntegral
-    extends Integral[BigInt] with BigIntIsEuclideanRing
-    with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal
+    extends Integral[BigInt]
+    with BigIntIsEuclideanRing
+    with ConvertableFromBigInt
+    with ConvertableToBigInt
+    with BigIntIsReal
     with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def toDouble(n: BigInt): Double = n.toDouble
@@ -76,8 +90,11 @@ private[math] class BigIntIsIntegral
 
 @SerialVersionUID(0L)
 private[math] class SafeLongIsIntegral
-    extends Integral[SafeLong] with SafeLongIsEuclideanRing
-    with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal
+    extends Integral[SafeLong]
+    with SafeLongIsEuclideanRing
+    with ConvertableFromSafeLong
+    with ConvertableToSafeLong
+    with SafeLongIsReal
     with Serializable {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
   override def toDouble(n: SafeLong): Double = n.toDouble

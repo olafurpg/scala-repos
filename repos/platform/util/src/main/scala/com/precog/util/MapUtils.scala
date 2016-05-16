@@ -45,8 +45,7 @@ class MapPimp[A, B, CC[B] <: GenTraversable[B]](left: GenMap[A, CC[B]]) {
     left foreach {
       case (key, leftValues) => {
           right get key map { rightValues =>
-            resultBuilder +=
-            (key -> Either3
+            resultBuilder += (key -> Either3
                   .middle3[B, (CC[B], CC2[C]), C]((leftValues, rightValues)))
           } getOrElse {
             leftValues foreach { b =>
@@ -60,8 +59,7 @@ class MapPimp[A, B, CC[B] <: GenTraversable[B]](left: GenMap[A, CC[B]]) {
       case (key, rightValues) => {
           if (!(left get key isDefined)) {
             rightValues foreach { c =>
-              resultBuilder +=
-              (key -> Either3.right3[B, (CC[B], CC2[C]), C](c))
+              resultBuilder += (key -> Either3.right3[B, (CC[B], CC2[C]), C](c))
             }
           }
         }

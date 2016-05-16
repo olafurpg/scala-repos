@@ -129,11 +129,11 @@ class StateTTests extends CatsSuite {
 }
 
 object StateTTests extends StateTTestsInstances {
-  implicit def stateEq[S : Eq : Arbitrary, A : Eq]: Eq[State[S, A]] =
+  implicit def stateEq[S: Eq: Arbitrary, A: Eq]: Eq[State[S, A]] =
     stateTEq[Eval, S, A]
 
-  implicit def stateArbitrary[S : Arbitrary, A : Arbitrary]: Arbitrary[State[
-          S, A]] =
+  implicit def stateArbitrary[S: Arbitrary, A: Arbitrary]
+    : Arbitrary[State[S, A]] =
     stateTArbitrary[Eval, S, A]
 
   val add1: State[Int, Int] = State(n => (n + 1, n))

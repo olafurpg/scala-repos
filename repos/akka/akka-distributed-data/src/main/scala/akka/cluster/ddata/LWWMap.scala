@@ -40,7 +40,8 @@ object LWWMap {
 @SerialVersionUID(1L)
 final class LWWMap[A] private[akka](
     private[akka] val underlying: ORMap[LWWRegister[A]])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
   import LWWRegister.{Clock, defaultClock}
 
@@ -172,4 +173,5 @@ object LWWMapKey {
 
 @SerialVersionUID(1L)
 final case class LWWMapKey[A](_id: String)
-    extends Key[LWWMap[A]](_id) with ReplicatedDataSerialization
+    extends Key[LWWMap[A]](_id)
+    with ReplicatedDataSerialization

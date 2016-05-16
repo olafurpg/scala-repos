@@ -29,11 +29,10 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
       val testActor = TestProbe()
 
       val measureBetweenEvery = 5
-      val printInfo = (interval: Duration) ⇒
-        {
-          testActor.ref ! interval
-          info(
-              s"Measured interval between $measureBetweenEvery elements was: $interval")
+      val printInfo = (interval: Duration) ⇒ {
+        testActor.ref ! interval
+        info(
+            s"Measured interval between $measureBetweenEvery elements was: $interval")
       }
 
       val n = 20
@@ -53,7 +52,8 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
           })
 
       val expectedNrOfOnIntervalCalls =
-        testRuns.size * ((n / measureBetweenEvery) - 1) // first time has no value to compare to, so skips calling onInterval
+        testRuns.size * ((n / measureBetweenEvery) -
+            1) // first time has no value to compare to, so skips calling onInterval
       1 to expectedNrOfOnIntervalCalls foreach { _ ⇒
         testActor.expectMsgType[Duration]
       }
@@ -63,10 +63,9 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
       val testActor = TestProbe()
 
       val n = 50
-      val printInfo = (d: FiniteDuration) ⇒
-        {
-          testActor.ref ! d
-          info(s"Processing $n elements took $d")
+      val printInfo = (d: FiniteDuration) ⇒ {
+        testActor.ref ! d
+        info(s"Processing $n elements took $d")
       }
 
       val testRuns = 1 to 3

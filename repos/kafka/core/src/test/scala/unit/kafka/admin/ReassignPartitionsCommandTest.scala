@@ -21,7 +21,9 @@ import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 
 class ReassignPartitionsCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness
+    with Logging
+    with RackAwareTest {
 
   @Test
   def testRackAwareReassign() {

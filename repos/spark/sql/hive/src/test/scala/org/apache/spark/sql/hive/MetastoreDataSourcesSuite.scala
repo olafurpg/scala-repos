@@ -38,7 +38,9 @@ import org.apache.spark.util.Utils
   * Tests for persisting tables created though the data sources API into the metastore.
   */
 class MetastoreDataSourcesSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import hiveContext.implicits._
 
@@ -706,13 +708,14 @@ class MetastoreDataSourcesSuite
           tableType = CatalogTableType.MANAGED_TABLE,
           schema = Seq.empty,
           storage = CatalogStorageFormat(
-                locationUri = None,
-                inputFormat = None,
-                outputFormat = None,
-                serde = None,
-                serdeProperties = Map("path" -> sessionState.catalog
-                        .hiveDefaultTableFilePath(TableIdentifier(tableName)))
-            ),
+              locationUri = None,
+              inputFormat = None,
+              outputFormat = None,
+              serde = None,
+              serdeProperties =
+                Map("path" -> sessionState.catalog.hiveDefaultTableFilePath(
+                        TableIdentifier(tableName)))
+          ),
           properties = Map("spark.sql.sources.provider" -> "json",
                            "spark.sql.sources.schema" -> schema.json,
                            "EXTERNAL" -> "FALSE"))
@@ -906,8 +909,8 @@ class MetastoreDataSourcesSuite
         partitionColumns = Array.empty[String],
         bucketSpec = None,
         provider = "parquet",
-        options = Map("path" -> "just a dummy path",
-                      "skipHiveMetadata" -> "false"),
+        options =
+          Map("path" -> "just a dummy path", "skipHiveMetadata" -> "false"),
         isExternal = false)
 
     // As a proxy for verifying that the table was stored in Hive compatible format, we verify that
@@ -925,8 +928,8 @@ class MetastoreDataSourcesSuite
         partitionColumns = Array.empty[String],
         bucketSpec = None,
         provider = "parquet",
-        options = Map("path" -> "just a dummy path",
-                      "skipHiveMetadata" -> "true"),
+        options =
+          Map("path" -> "just a dummy path", "skipHiveMetadata" -> "true"),
         isExternal = false)
 
     // As a proxy for verifying that the table was stored in SparkSQL format, we verify that

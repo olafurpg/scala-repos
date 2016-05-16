@@ -13,29 +13,29 @@ import lila.db.ByteArray
 import lila.rating.PerfType
 import lila.user.User
 
-case class Game(
-    id: String,
-    whitePlayer: Player,
-    blackPlayer: Player,
-    binaryPieces: ByteArray,
-    binaryPgn: ByteArray,
-    status: Status,
-    turns: Int, // = ply
-    startedAtTurn: Int,
-    clock: Option[Clock],
-    castleLastMoveTime: CastleLastMoveTime,
-    daysPerTurn: Option[Int],
-    positionHashes: PositionHash = Array(),
-    checkCount: CheckCount = CheckCount(0, 0),
-    binaryMoveTimes: ByteArray = ByteArray.empty, // tenths of seconds
-    mode: Mode = Mode.default,
-    variant: Variant = Variant.default,
-    crazyData: Option[Crazyhouse.Data] = None,
-    next: Option[String] = None,
-    bookmarks: Int = 0,
-    createdAt: DateTime = DateTime.now,
-    updatedAt: Option[DateTime] = None,
-    metadata: Metadata) {
+case class Game(id: String,
+                whitePlayer: Player,
+                blackPlayer: Player,
+                binaryPieces: ByteArray,
+                binaryPgn: ByteArray,
+                status: Status,
+                turns: Int, // = ply
+                startedAtTurn: Int,
+                clock: Option[Clock],
+                castleLastMoveTime: CastleLastMoveTime,
+                daysPerTurn: Option[Int],
+                positionHashes: PositionHash = Array(),
+                checkCount: CheckCount = CheckCount(0, 0),
+                binaryMoveTimes: ByteArray =
+                  ByteArray.empty, // tenths of seconds
+                mode: Mode = Mode.default,
+                variant: Variant = Variant.default,
+                crazyData: Option[Crazyhouse.Data] = None,
+                next: Option[String] = None,
+                bookmarks: Int = 0,
+                createdAt: DateTime = DateTime.now,
+                updatedAt: Option[DateTime] = None,
+                metadata: Metadata) {
 
   val players = List(whitePlayer, blackPlayer)
 
@@ -147,9 +147,10 @@ case class Game(
   }
 
   lazy val toChessHistory = ChessHistory(
-      lastMove = castleLastMoveTime.lastMove map {
-        case (orig, dest) => Uci.Move(orig, dest)
-      },
+      lastMove =
+        castleLastMoveTime.lastMove map {
+          case (orig, dest) => Uci.Move(orig, dest)
+        },
       castles = castleLastMoveTime.castles,
       positionHashes = positionHashes,
       checkCount = checkCount)
@@ -161,36 +162,38 @@ case class Game(
     val (history, situation) = (game.board.history, game.situation)
 
     def copyPlayer(player: Player) = player.copy(
-        blurs = math.min(playerMoves(player.color),
-                         player.blurs +
-                         (blur &&
-                             moveOrDrop.fold(_.color, _.color) == player.color)
-                           .fold(1, 0))
+        blurs = math.min(
+            playerMoves(player.color),
+            player.blurs + (blur &&
+                moveOrDrop.fold(_.color, _.color) == player.color).fold(1, 0))
     )
 
     val updated = copy(
-        whitePlayer = copyPlayer(whitePlayer),
+        whitePlayer =
+          copyPlayer(whitePlayer),
         blackPlayer = copyPlayer(blackPlayer),
         binaryPieces = BinaryFormat.piece write game.board.pieces,
-        binaryPgn = BinaryFormat.pgn write game.pgnMoves,
-        turns = game.turns,
+        binaryPgn =
+          BinaryFormat.pgn write game.pgnMoves,
+        turns =
+          game.turns,
         positionHashes = history.positionHashes,
         checkCount = history.checkCount,
         crazyData = situation.board.crazyData,
         castleLastMoveTime = CastleLastMoveTime(
-              castles = history.castles,
-              lastMove = history.lastMove.map(_.origDest),
-              lastMoveTime = Some(
-                    ((nowMillis - createdAt.getMillis) / 100).toInt),
-              check = situation.kingPos ifTrue situation.check),
+            castles = history.castles,
+            lastMove = history.lastMove.map(_.origDest),
+            lastMoveTime =
+              Some(((nowMillis - createdAt.getMillis) / 100).toInt),
+            check = situation.kingPos ifTrue situation.check),
         binaryMoveTimes = isPgnImport.fold(
-              ByteArray.empty,
-              BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
+            ByteArray.empty,
+            BinaryFormat.moveTime write lastMoveTime.fold(Vector(0)) { lmt =>
               moveTimes :+ {
                 (nowTenths - lmt - (lag.??(_.toMillis) / 100)).toInt max 0
               }
             }
-          ),
+        ),
         status = situation.status | status,
         clock = game.clock)
 
@@ -533,15 +536,16 @@ object Game {
     Game(id = IdGenerator.game,
          whitePlayer = whitePlayer,
          blackPlayer = blackPlayer,
-         binaryPieces = if (game.isStandardInit) BinaryFormat.piece.standard
+         binaryPieces =
+           if (game.isStandardInit) BinaryFormat.piece.standard
            else BinaryFormat.piece write game.board.pieces,
          binaryPgn = ByteArray.empty,
          status = Status.Created,
          turns = game.turns,
          startedAtTurn = game.startedAtTurn,
          clock = game.clock,
-         castleLastMoveTime = CastleLastMoveTime.init.copy(
-               castles = game.board.history.castles),
+         castleLastMoveTime =
+           CastleLastMoveTime.init.copy(castles = game.board.history.castles),
          daysPerTurn = daysPerTurn,
          mode = mode,
          variant = variant,

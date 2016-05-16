@@ -52,7 +52,8 @@ class DenseVector[@spec(Double, Int, Float, Long) V](val data: Array[V],
                                                      val offset: Int,
                                                      val stride: Int,
                                                      val length: Int)
-    extends StorageVector[V] with VectorLike[V, DenseVector[V]]
+    extends StorageVector[V]
+    with VectorLike[V, DenseVector[V]]
     with Serializable {
   def this(data: Array[V]) = this(data, 0, 1, data.length)
   def this(data: Array[V], offset: Int) = this(data, offset, 1, data.length)
@@ -257,11 +258,13 @@ class DenseVector[@spec(Double, Int, Float, Long) V](val data: Array[V],
 }
 
 object DenseVector
-    extends VectorConstructors[DenseVector] with DenseVector_GenericOps
-    with DenseVectorOps with DenseVector_OrderingOps
+    extends VectorConstructors[DenseVector]
+    with DenseVector_GenericOps
+    with DenseVectorOps
+    with DenseVector_OrderingOps
     with DenseVector_SpecialOps {
 
-  def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
+  def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](
       size: Int): DenseVector[V] = {
     val data = new Array[V](size)
     if (size != 0 && data(0) != implicitly[Zero[V]].zero)
@@ -315,10 +318,10 @@ object DenseVector
     }
   }
 
-  def ones[@spec(Double, Int, Float, Long) V : ClassTag : Semiring](
+  def ones[@spec(Double, Int, Float, Long) V: ClassTag: Semiring](
       size: Int): DenseVector[V] = fill[V](size, implicitly[Semiring[V]].one)
 
-  def fill[@spec(Double, Int, Float, Long) V : ClassTag : Semiring](
+  def fill[@spec(Double, Int, Float, Long) V: ClassTag: Semiring](
       size: Int, v: V): DenseVector[V] = {
     val r = apply(new Array[V](size))
     assert(r.stride == 1)
@@ -331,7 +334,7 @@ object DenseVector
     * Horizontal concatenation of two or more vectors into one matrix.
     * @throws IllegalArgumentException if vectors have different sizes
     */
-  def horzcat[V : ClassTag : Zero](vectors: DenseVector[V]*): DenseMatrix[V] = {
+  def horzcat[V: ClassTag: Zero](vectors: DenseVector[V]*): DenseMatrix[V] = {
     val size = vectors.head.size
     if (!(vectors forall (_.size == size)))
       throw new IllegalArgumentException(
@@ -360,15 +363,15 @@ object DenseVector
 
   // capabilities
 
-  implicit def canCreateZerosLike[V : ClassTag : Zero]: CanCreateZerosLike[
-      DenseVector[V], DenseVector[V]] =
+  implicit def canCreateZerosLike[V: ClassTag: Zero]
+    : CanCreateZerosLike[DenseVector[V], DenseVector[V]] =
     new CanCreateZerosLike[DenseVector[V], DenseVector[V]] {
       def apply(v1: DenseVector[V]): DenseVector[V] = {
         zeros[V](v1.length)
       }
     }
 
-  implicit def canCopyDenseVector[V : ClassTag]: CanCopy[DenseVector[V]] = {
+  implicit def canCopyDenseVector[V: ClassTag]: CanCopy[DenseVector[V]] = {
     new CanCopy[DenseVector[V]] {
       def apply(v1: DenseVector[V]): DenseVector[V] = {
         v1.copy
@@ -451,8 +454,8 @@ object DenseVector
       }
     }
 
-  implicit def canTraverseZipValues[V, W]: CanZipAndTraverseValues[
-      DenseVector[V], DenseVector[W], V, W] =
+  implicit def canTraverseZipValues[V, W]
+    : CanZipAndTraverseValues[DenseVector[V], DenseVector[W], V, W] =
     new CanZipAndTraverseValues[DenseVector[V], DenseVector[W], V, W] {
 
       /** Iterates all key-value pairs from the given collection. */
@@ -463,15 +466,14 @@ object DenseVector
           throw new IllegalArgumentException(
               "Vectors to be zipped must have same size")
         }
-        cfor(0)(i => i < from1.size, i => i + 1)(i =>
-              {
-            fn.visit(from1(i), from2(i))
+        cfor(0)(i => i < from1.size, i => i + 1)(i => {
+          fn.visit(from1(i), from2(i))
         })
       }
     }
 
-  implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
-      DenseVector[V], Int, V] =
+  implicit def canTraverseKeyValuePairs[V]
+    : CanTraverseKeyValuePairs[DenseVector[V], Int, V] =
     new CanTraverseKeyValuePairs[DenseVector[V], Int, V] {
       def isTraversableAgain(from: DenseVector[V]): Boolean = true
 
@@ -488,9 +490,8 @@ object DenseVector
       }
     }
 
-  implicit def canTransformValues[
-      @specialized(Int, Float, Double) V]: CanTransformValues[
-      DenseVector[V], V] =
+  implicit def canTransformValues[@specialized(Int, Float, Double) V]
+    : CanTransformValues[DenseVector[V], V] =
     new CanTransformValues[DenseVector[V], V] {
       def transform(from: DenseVector[V], fn: (V) => V) {
         val data = from.data
@@ -586,7 +587,7 @@ object DenseVector
   }
 
   class CanZipMapValuesDenseVector[
-      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV : ClassTag]
+      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV: ClassTag]
       extends CanZipMapValues[DenseVector[V], V, RV, DenseVector[RV]] {
     def create(length: Int) = DenseVector(new Array[RV](length))
 
@@ -605,7 +606,7 @@ object DenseVector
     }
   }
 
-  implicit def zipMap[V, R : ClassTag]: CanZipMapValuesDenseVector[V, R] =
+  implicit def zipMap[V, R: ClassTag]: CanZipMapValuesDenseVector[V, R] =
     new CanZipMapValuesDenseVector[V, R]
   implicit val zipMap_d: CanZipMapValuesDenseVector[Double, Double] =
     new CanZipMapValuesDenseVector[Double, Double]
@@ -615,7 +616,7 @@ object DenseVector
     new CanZipMapValuesDenseVector[Int, Int]
 
   class CanZipMapKeyValuesDenseVector[
-      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV : ClassTag]
+      @spec(Double, Int, Float, Long) V, @spec(Int, Double) RV: ClassTag]
       extends CanZipMapKeyValues[DenseVector[V], Int, V, RV, DenseVector[RV]] {
     def create(length: Int) = DenseVector(new Array[RV](length))
 
@@ -640,7 +641,7 @@ object DenseVector
     }
   }
 
-  implicit def zipMapKV[V, R : ClassTag]: CanZipMapKeyValuesDenseVector[V, R] =
+  implicit def zipMapKV[V, R: ClassTag]: CanZipMapKeyValuesDenseVector[V, R] =
     new CanZipMapKeyValuesDenseVector[V, R]
 
   implicit val canAddIntoD: OpAdd.InPlaceImpl2[
@@ -649,14 +650,16 @@ object DenseVector
       def apply(a: DenseVector[Double], b: DenseVector[Double]) = {
         canDaxpy(a, 1.0, b)
       }
-      implicitly[BinaryUpdateRegistry[
-              Vector[Double], Vector[Double], OpAdd.type]].register(this)
+      implicitly[
+          BinaryUpdateRegistry[Vector[Double], Vector[Double], OpAdd.type]]
+        .register(this)
     }
   }
 
   implicit object canDaxpy
       extends scaleAdd.InPlaceImpl3[
-          DenseVector[Double], Double, DenseVector[Double]] with Serializable {
+          DenseVector[Double], Double, DenseVector[Double]]
+      with Serializable {
     def apply(y: DenseVector[Double], a: Double, x: DenseVector[Double]) {
       require(x.length == y.length, s"Vectors must have same length")
       // using blas here is always a bad idea.
@@ -691,8 +694,9 @@ object DenseVector
       def apply(a: DenseVector[Double], b: DenseVector[Double]) = {
         canDaxpy(a, -1.0, b)
       }
-      implicitly[BinaryUpdateRegistry[
-              Vector[Double], Vector[Double], OpSub.type]].register(this)
+      implicitly[
+          BinaryUpdateRegistry[Vector[Double], Vector[Double], OpSub.type]]
+        .register(this)
     }
   }
   implicit val canSubD: OpSub.Impl2[
@@ -746,9 +750,8 @@ object DenseVector
    */
   @expand
   @expand.valify
-  implicit def canNorm[
-      @expand.args(Int, Float, Long, BigInt, Complex) T]: norm.Impl2[
-      DenseVector[T], Double, Double] = {
+  implicit def canNorm[@expand.args(Int, Float, Long, BigInt, Complex) T]
+    : norm.Impl2[DenseVector[T], Double, Double] = {
 
     new norm.Impl2[DenseVector[T], Double, Double] {
       def apply(v: DenseVector[T], n: Double): Double = {

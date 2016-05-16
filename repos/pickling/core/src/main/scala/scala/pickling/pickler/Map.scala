@@ -26,7 +26,7 @@ object MapPicklerHelper {
 }
 
 trait MapPicklers {
-  implicit def mapPickler[K : FastTypeTag, V : FastTypeTag](
+  implicit def mapPickler[K: FastTypeTag, V: FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
       pairTag: FastTypeTag[(K, V)],
@@ -57,7 +57,7 @@ trait MapPicklers {
 }
 
 trait ImmutableSortedMapPicklers {
-  implicit def immutableSortedMapPickler[K : FastTypeTag, V : FastTypeTag](
+  implicit def immutableSortedMapPickler[K: FastTypeTag, V: FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
       pairTag: FastTypeTag[(K, V)],
@@ -72,7 +72,7 @@ trait ImmutableSortedMapPicklers {
 }
 
 trait MutableMapPicklers {
-  implicit def mutableMapPickler[K : FastTypeTag, V : FastTypeTag](
+  implicit def mutableMapPickler[K: FastTypeTag, V: FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
       pairTag: FastTypeTag[(K, V)],

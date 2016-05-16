@@ -52,7 +52,9 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
                              webUiPort: Int,
                              val securityMgr: SecurityManager,
                              val conf: SparkConf)
-    extends ThreadSafeRpcEndpoint with Logging with LeaderElectable {
+    extends ThreadSafeRpcEndpoint
+    with Logging
+    with LeaderElectable {
 
   private val forwardMessageThread =
     ThreadUtils.newDaemonSingleThreadScheduledExecutor(
@@ -151,12 +153,12 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
     webUi = new MasterWebUI(this, webUiPort)
     webUi.bind()
     masterWebUiUrl = "http://" + masterPublicAddress + ":" + webUi.boundPort
-    checkForWorkerTimeOutTask = forwardMessageThread.scheduleAtFixedRate(
-        new Runnable {
-      override def run(): Unit = Utils.tryLogNonFatalError {
-        self.send(CheckForWorkerTimeOut)
-      }
-    }, 0, WORKER_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+    checkForWorkerTimeOutTask =
+      forwardMessageThread.scheduleAtFixedRate(new Runnable {
+        override def run(): Unit = Utils.tryLogNonFatalError {
+          self.send(CheckForWorkerTimeOut)
+        }
+      }, 0, WORKER_TIMEOUT_MS, TimeUnit.MILLISECONDS)
 
     if (restServerEnabled) {
       val port = conf.getInt("spark.master.rest.port", 6066)
@@ -191,8 +193,8 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
           .getConstructor(classOf[SparkConf], classOf[Serializer])
           .newInstance(conf, serializer)
           .asInstanceOf[StandaloneRecoveryModeFactory]
-          (factory.createPersistenceEngine(),
-           factory.createLeaderElectionAgent(this))
+        (factory.createPersistenceEngine(),
+         factory.createLeaderElectionAgent(this))
       case _ =>
         (new BlackHolePersistenceEngine(), new MonarchyLeaderAgent(this))
     }
@@ -232,12 +234,13 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
     case ElectedLeader => {
         val (storedApps, storedDrivers, storedWorkers) =
           persistenceEngine.readPersistedData(rpcEnv)
-        state = if (storedApps.isEmpty && storedDrivers.isEmpty &&
-                    storedWorkers.isEmpty) {
-          RecoveryState.ALIVE
-        } else {
-          RecoveryState.RECOVERING
-        }
+        state =
+          if (storedApps.isEmpty && storedDrivers.isEmpty &&
+              storedWorkers.isEmpty) {
+            RecoveryState.ALIVE
+          } else {
+            RecoveryState.RECOVERING
+          }
         logInfo("I have been elected leader! New state: " + state)
         if (state == RecoveryState.RECOVERING) {
           beginRecovery(storedApps, storedDrivers, storedWorkers)
@@ -964,12 +967,11 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
         val toRemove = math.max(RETAINED_APPLICATIONS / 10, 1)
         completedApps
           .take(toRemove)
-          .foreach(a =>
-                {
-              Option(appIdToUI.remove(a.id)).foreach { ui =>
-                webUi.detachSparkUI(ui)
-              }
-              applicationMetricsSystem.removeSource(a.appSource)
+          .foreach(a => {
+            Option(appIdToUI.remove(a.id)).foreach { ui =>
+              webUi.detachSparkUI(ui)
+            }
+            applicationMetricsSystem.removeSource(a.appSource)
           })
         completedApps.trimStart(toRemove)
       }
@@ -1108,11 +1110,12 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
       return Future.successful(None)
     }
     val futureUI = Future {
-      val eventLogFilePrefix = EventLoggingListener.getLogPath(
-          eventLogDir,
-          app.id,
-          appAttemptId = None,
-          compressionCodecName = app.desc.eventLogCodec)
+      val eventLogFilePrefix =
+        EventLoggingListener.getLogPath(eventLogDir,
+                                        app.id,
+                                        appAttemptId = None,
+                                        compressionCodecName =
+                                          app.desc.eventLogCodec)
       val fs = Utils.getHadoopFileSystem(eventLogDir, hadoopConf)
       val inProgressExists = fs.exists(
           new Path(eventLogFilePrefix + EventLoggingListener.IN_PROGRESS))
@@ -1168,8 +1171,8 @@ private[deploy] class Master(override val rpcEnv: RpcEnv,
         logWarning(msg)
         msg += " Did you specify the correct logging directory?"
         msg = URLEncoder.encode(msg, "UTF-8")
-        app.appUIUrlAtHistoryServer = Some(
-            notFoundBasePath + s"?msg=$msg&title=$title")
+        app.appUIUrlAtHistoryServer =
+          Some(notFoundBasePath + s"?msg=$msg&title=$title")
 
       case e: Exception =>
         // Relay exception message to application UI page

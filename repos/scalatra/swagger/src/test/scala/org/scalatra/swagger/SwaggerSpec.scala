@@ -21,7 +21,8 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
     sequential ^ "Swagger integration should" ^ "list resources" ! listResources ^ "list pet operations" ! listPetOperations ^ "list store operations" ! listStoreOperations ^ "list user operations" ! listUserOperations ^ "list model elements in order" ! checkModelOrder ^ end
   val apiInfo = ApiInfo(
       title = "Swagger Sample App",
-      description = "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
+      description =
+        "This is a sample server Petstore server.  You can find out more about Swagger \n    at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger.",
       termsOfServiceUrl = "http://helloreverb.com/terms/",
       contact = "apiteam@wordnik.com",
       license = "Apache 2.0",
@@ -322,8 +323,8 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
                                     "required",
                                     "paramAccess")
               mm setMessage
-              (mm.message + " in parameter " + (v \ "name").extractOrElse(
-                      "N/A"))
+              (mm.message + " in parameter " +
+                  (v \ "name").extractOrElse("N/A"))
             }
 
           if (r.nonEmpty) r reduce (_ and _) else 1.must_==(1)
@@ -331,9 +332,8 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
           val m = act \ fn must_== exp \ fn
           m setMessage
           (JsonMethods.compact(JsonMethods.render(act \ fn)) +
-              " does not match\n" +
-              JsonMethods.compact(JsonMethods.render(exp \ fn)) +
-              " for field " + fn)
+              " does not match\n" + JsonMethods.compact(
+                  JsonMethods.render(exp \ fn)) + " for field " + fn)
       }
     }
 
@@ -352,7 +352,9 @@ class SwaggerSpec extends ScalatraSpec with JsonMatchers {
 }
 
 class SwaggerTestServlet(protected val swagger: Swagger)
-    extends ScalatraServlet with NativeJsonSupport with SwaggerSupport {
+    extends ScalatraServlet
+    with NativeJsonSupport
+    with SwaggerSupport {
 
   protected val applicationDescription = "Operations about pets"
   override protected val applicationName = Some("pet")
@@ -446,7 +448,9 @@ class SwaggerTestServlet(protected val swagger: Swagger)
 }
 
 class StoreApi(val swagger: Swagger)
-    extends ScalatraServlet with NativeJsonSupport with SwaggerSupport {
+    extends ScalatraServlet
+    with NativeJsonSupport
+    with SwaggerSupport {
   protected val applicationDescription = "Operations about store"
   override protected val applicationName = Some("store")
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -489,7 +493,9 @@ class StoreApi(val swagger: Swagger)
 }
 
 class UserApi(val swagger: Swagger)
-    extends ScalatraServlet with NativeJsonSupport with SwaggerSupport {
+    extends ScalatraServlet
+    with NativeJsonSupport
+    with SwaggerSupport {
   protected val applicationDescription = "Operations about user"
   override protected val applicationName = Some("user")
   protected implicit val jsonFormats: Formats = DefaultFormats
@@ -503,7 +509,8 @@ class UserApi(val swagger: Swagger)
 }
 
 class SwaggerResourcesServlet(val swagger: Swagger)
-    extends ScalatraServlet with NativeSwaggerBase
+    extends ScalatraServlet
+    with NativeSwaggerBase
 
 case class Order(
     @ApiModelProperty(position = 1) id: Long,
@@ -527,10 +534,10 @@ case class Pet(@ApiModelProperty(position = 3) id: Long,
                @ApiModelProperty(position = 2) name: String,
                @ApiModelProperty(position = 6) photoUrls: List[String],
                @ApiModelProperty(position = 4) tags: List[Tag],
-               @ApiModelProperty(
-                   position = 5,
-                   description = "pet status in the store",
-                   allowableValues = "available,pending,sold") status: String)
+               @ApiModelProperty(position = 5,
+                                 description = "pet status in the store",
+                                 allowableValues =
+                                   "available,pending,sold") status: String)
 
 case class Tag(id: Long, name: String)
 case class Category(id: Long, name: String)

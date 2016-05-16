@@ -191,17 +191,17 @@ class ScalaInplaceVariableIntroducer(project: Project,
           def setGreedyToRightToFalse(): Unit = {
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
-            for (highlighter <- highlighters; if checkRange(
-                                   highlighter.getStartOffset,
-                                   highlighter.getEndOffset)) greedyToRight +=
-            (highlighter -> highlighter.isGreedyToRight)
+            for (highlighter <- highlighters;
+                 if checkRange(highlighter.getStartOffset,
+                               highlighter.getEndOffset)) greedyToRight +=
+              (highlighter -> highlighter.isGreedyToRight)
           }
           def resetGreedyToRightBack(): Unit = {
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
-            for (highlighter <- highlighters; if checkRange(
-                                   highlighter.getStartOffset,
-                                   highlighter.getEndOffset)) highlighter
+            for (highlighter <- highlighters;
+                 if checkRange(highlighter.getStartOffset,
+                               highlighter.getEndOffset)) highlighter
               .setGreedyToRight(greedyToRight(highlighter))
           }
           def checkRange(start: Int, end: Int): Boolean = {
@@ -390,9 +390,11 @@ class ScalaInplaceVariableIntroducer(project: Project,
     myEditor.getDocument.removeDocumentListener(myCheckIdentifierListener)
 
     if (myVarCheckbox != null)
-      ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_IS_VAR = myVarCheckbox.isSelected
+      ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_IS_VAR =
+        myVarCheckbox.isSelected
     if (mySpecifyTypeChb != null && !isEnumerator)
-      ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_EXPLICIT_TYPE = mySpecifyTypeChb.isSelected
+      ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_EXPLICIT_TYPE =
+        mySpecifyTypeChb.isSelected
 
     try {
       val named = namedElement(getDeclaration).orNull

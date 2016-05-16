@@ -199,7 +199,7 @@ object BuiltinCommands {
     val instance = e
       .getOpt(Keys.scalaInstance.task)
       .flatMap(_ => quiet(e.runTask(Keys.scalaInstance, s)._2))
-      (scalaVersion, scalaHome, instance) match {
+    (scalaVersion, scalaHome, instance) match {
       case (sv, Some(home), Some(si)) =>
         "local Scala version " + selectScalaVersion(sv, si) + " at " +
         home.getAbsolutePath
@@ -423,13 +423,11 @@ object BuiltinCommands {
   }
 
   def setParser =
-    (s: State) =>
-      {
-        val extracted = Project.extract(s)
-        import extracted._
-        token(Space ~> flag("every" ~ Space)) ~ SettingCompletions
-          .settingParser(
-            structure.data, structure.index.keyMap, currentProject)
+    (s: State) => {
+      val extracted = Project.extract(s)
+      import extracted._
+      token(Space ~> flag("every" ~ Space)) ~ SettingCompletions.settingParser(
+          structure.data, structure.index.keyMap, currentProject)
     }
 
   @deprecated("Use Inspect.parser", "0.13.0")
@@ -469,14 +467,13 @@ object BuiltinCommands {
       f <- if (lastOnly_keys._1) success(() => s)
           else Aggregation.evaluatingParser(s, structure, show)(kvs)
     } yield
-      () =>
-        {
-          def export0(s: State): State = lastImpl(s, kvs, Some(ExportStream))
-          val newS = try f() catch {
-            case e: Exception =>
-              try export0(s) finally { throw e }
-          }
-          export0(newS)
+      () => {
+        def export0(s: State): State = lastImpl(s, kvs, Some(ExportStream))
+        val newS = try f() catch {
+          case e: Exception =>
+            try export0(s) finally { throw e }
+        }
+        export0(newS)
       }
   }
 
@@ -494,8 +491,8 @@ object BuiltinCommands {
         keepLastLog(s)
     }
   def export =
-    Command(ExportCommand, exportBrief, exportDetailed)(exportParser)(
-        (s, f) => f())
+    Command(ExportCommand, exportBrief, exportDetailed)(exportParser)((s, f) =>
+          f())
 
   private[this] def lastImpl(
       s: State, sks: AnyKeys, sid: Option[String]): State = {
@@ -560,10 +557,9 @@ object BuiltinCommands {
       System.out.println(helpString)
       s
     }
-  val pluginParser: State => Parser[AutoPlugin] = s =>
-    {
-      val autoPlugins: Map[String, AutoPlugin] = PluginsDebug.autoPluginMap(s)
-      token(Space) ~> Act.knownPluginParser(autoPlugins, "plugin")
+  val pluginParser: State => Parser[AutoPlugin] = s => {
+    val autoPlugins: Map[String, AutoPlugin] = PluginsDebug.autoPluginMap(s)
+    token(Space) ~> Act.knownPluginParser(autoPlugins, "plugin")
   }
   def plugin = Command(PluginCommand)(pluginParser) { (s, plugin) =>
     val helpString = PluginsDebug.help(plugin, s)
@@ -640,7 +636,8 @@ object BuiltinCommands {
   }
 
   def loadProjectCommands(arg: String) =
-    StashOnFailure :: (OnFailure + " " + loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
+    StashOnFailure :: (OnFailure + " " +
+        loadProjectCommand(LoadFailed, arg)) :: loadProjectCommand(
         LoadProjectImpl, arg) :: PopOnFailure :: State.FailureWall :: Nil
   def loadProject =
     Command(LoadProject, LoadProjectBrief, LoadProjectDetailed)(

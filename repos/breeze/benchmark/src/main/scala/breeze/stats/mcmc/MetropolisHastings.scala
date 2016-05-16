@@ -27,23 +27,19 @@ class MetropolisHastingsBenchmark extends BreezeBenchmark {
 
   def pullAllSamples(m: Rand[Double]) = {
     var result = 0.0
-    cfor(0)(i => i < numSamples, i => i + 1)(i =>
-          {
-        result = m.draw()
+    cfor(0)(i => i < numSamples, i => i + 1)(i => {
+      result = m.draw()
     })
     result
   }
 
   def pullAllSamplesWithWork(m: Rand[Double]) = {
     var result = 0.0
-    cfor(0)(i => i < numSamples / 4, i => i + 1)(
-        i =>
-          {
-        val x = m.draw()
-        cfor(0)(j => j < 400, j => j + 1)(j =>
-              {
-            result += math.log(math.exp(x)) / (1 + x * x)
-        })
+    cfor(0)(i => i < numSamples / 4, i => i + 1)(i => {
+      val x = m.draw()
+      cfor(0)(j => j < 400, j => j + 1)(j => {
+        result += math.log(math.exp(x)) / (1 + x * x)
+      })
     })
     result
   }

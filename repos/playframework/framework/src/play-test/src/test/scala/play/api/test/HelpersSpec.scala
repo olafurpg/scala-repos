@@ -88,8 +88,8 @@ class HelpersSpec extends Specification {
   "contentAsJson" should {
 
     "extract the content from Result as Json" in {
-      val jsonResult = Ok("""{"play":["java","scala"]}""").as(
-          "application/json")
+      val jsonResult =
+        Ok("""{"play":["java","scala"]}""").as("application/json")
       (contentAsJson(Future.successful(jsonResult)) \ "play").as[List[String]] must_==
         List("java", "scala")
     }

@@ -187,12 +187,8 @@ class IteratorTest {
     val s1 = mkIterator.toStream
     val s2 = mkInfinite.toStream
     // back and forth without slipping into nontermination.
-    results += (Stream from 1).toIterator
-      .drop(10)
-      .toStream
-      .drop(10)
-      .toIterator
-      .next()
+    results +=
+      (Stream from 1).toIterator.drop(10).toStream.drop(10).toIterator.next()
     assertSameElements(List(1, 1, 21), results)
   }
   // SI-8552

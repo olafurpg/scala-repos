@@ -304,13 +304,10 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
       </div>
 
       val sel =
-        ".question" #> elements.map(
-            value =>
-              {
-            ".question [id]" #> ("question-" + value) & ".question [class]" #>
-            ("question-" +
-                value) & ".L" #> anchor("L", value) & ".U" #> anchor(
-                "U", value) & ".D" #> anchor("D", value)
+        ".question" #> elements.map(value => {
+          ".question [id]" #> ("question-" + value) & ".question [class]" #>
+          ("question-" + value) & ".L" #> anchor("L", value) & ".U" #> anchor(
+              "U", value) & ".D" #> anchor("D", value)
         })
 
       val res = sel(xml)
@@ -612,9 +609,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     "other Andreas test" in {
       def renderBlogEntrySummary = {
         ".blogEntry" #>
-        ((ns: NodeSeq) =>
-              {
-                ("*" #> "Horse").apply(ns)
+        ((ns: NodeSeq) => {
+              ("*" #> "Horse").apply(ns)
             })
       }
 
@@ -670,13 +666,13 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     "substitute multiple Strings with a List by id" in {
       ("#foo" #> "hello" & "#baz" #> List("bye", "bye"))(
           <b><div id="baz">Hello</div><span id="foo"/></b>) must_==
-      (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{Text("hello")}</b>)
+        (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{Text("hello")}</b>)
     }
 
     "substitute multiple Strings with a List by id" in {
       (("#foo" replaceWith "hello") & ("#baz" replaceWith List("bye", "bye")))(
           <b><div id="baz">Hello</div><span id="foo"/></b>) must_==
-      (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{Text("hello")}</b>)
+        (NodeSeq fromSeq <b>{Text("bye")}{Text("bye")}{Text("hello")}</b>)
     }
 
     "substitute multiple Strings with a List of XML by id" in {
@@ -772,9 +768,8 @@ object CssBindHelpersSpec extends Specification with XmlMatchers {
     "maintain unique id attributes provided by transform" in {
       val func =
         ".thinglist *" #>
-        (".thing" #> List("xx1", "xx2", "xx2", "xx2", "xx4").map(t =>
-                  {
-                ".thing [id]" #> t
+        (".thing" #> List("xx1", "xx2", "xx2", "xx2", "xx4").map(t => {
+              ".thing [id]" #> t
             }))
       val answer =
         func(<ul class="thinglist"><li id="other" class="thing" /></ul>)

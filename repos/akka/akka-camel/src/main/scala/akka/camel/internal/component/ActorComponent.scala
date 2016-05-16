@@ -56,7 +56,8 @@ private[camel] class ActorEndpoint(uri: String,
                                    comp: ActorComponent,
                                    val path: ActorEndpointPath,
                                    val camel: Camel)
-    extends DefaultEndpoint(uri, comp) with ActorEndpointConfig {
+    extends DefaultEndpoint(uri, comp)
+    with ActorEndpointConfig {
 
   /**
     * The ActorEndpoint only supports receiving messages from Camel.
@@ -103,7 +104,8 @@ private[camel] trait ActorEndpointConfig {
   * @see akka.camel.internal.component.ActorEndpoint
   */
 private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
-    extends DefaultProducer(endpoint) with AsyncProcessor {
+    extends DefaultProducer(endpoint)
+    with AsyncProcessor {
 
   /**
     * Processes the exchange.
@@ -161,7 +163,8 @@ private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
           case Success(msg) ⇒
             exchange.setResponse(CamelMessage.canonicalize(msg))
           case Failure(e: TimeoutException) ⇒
-            exchange.setFailure(FailureResult(new TimeoutException(
+            exchange.setFailure(
+                FailureResult(new TimeoutException(
                         "Failed to get response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
                         (endpoint.path, endpoint.replyTimeout, endpoint))))
           case Failure(throwable) ⇒
@@ -170,11 +173,13 @@ private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
           case Success(Ack) ⇒ () /* no response message to set */
           case Success(failure: FailureResult) ⇒ exchange.setFailure(failure)
           case Success(msg) ⇒
-            exchange.setFailure(FailureResult(new IllegalArgumentException(
+            exchange.setFailure(
+                FailureResult(new IllegalArgumentException(
                         "Expected Ack or Failure message, but got: [%s] from actor [%s]" format
                         (msg, endpoint.path))))
           case Failure(e: TimeoutException) ⇒
-            exchange.setFailure(FailureResult(new TimeoutException(
+            exchange.setFailure(
+                FailureResult(new TimeoutException(
                         "Failed to get Ack or Failure response from the actor [%s] within timeout [%s]. Check replyTimeout and blocking settings [%s]" format
                         (endpoint.path, endpoint.replyTimeout, endpoint))))
           case Failure(throwable) ⇒
@@ -188,8 +193,7 @@ private[camel] class ActorProducer(val endpoint: ActorEndpoint, camel: Camel)
       }
       implicit val ec =
         camel.system.dispatcher // FIXME which ExecutionContext should be used here?
-      async.onComplete(
-          action andThen { _ ⇒
+      async.onComplete(action andThen { _ ⇒
         callback.done(false)
       })
       false

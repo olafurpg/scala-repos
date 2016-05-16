@@ -89,26 +89,25 @@ class ScalaResolveResult(
 
   def isRenamed: Option[String] = nameShadow
 
-  def copy(
-      subst: ScSubstitutor = substitutor,
-      problems: Seq[ApplicabilityProblem] = problems,
-      defaultParameterUsed: Boolean = defaultParameterUsed,
-      innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
-      tuplingUsed: Boolean = tuplingUsed,
-      isSetterFunction: Boolean = isSetterFunction,
-      isAssignment: Boolean = isAssignment,
-      notCheckedResolveResult: Boolean = notCheckedResolveResult,
-      isAccessible: Boolean = isAccessible,
-      resultUndef: Option[ScUndefinedSubstitutor] = None,
-      isDynamic: Boolean = isDynamic,
-      isForwardReference: Boolean = isForwardReference,
-      implicitParameterType: Option[ScType] = implicitParameterType,
-      importsUsed: collection.Set[ImportUsed] = importsUsed,
-      implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
-      implicitReason: ImplicitResult = implicitReason,
-      implicitSearchState: Option[ImplicitState] = implicitSearchState,
-      unresolvedTypeParameters: Option[Seq[TypeParameter]] = unresolvedTypeParameters)
-    : ScalaResolveResult =
+  def copy(subst: ScSubstitutor = substitutor,
+           problems: Seq[ApplicabilityProblem] = problems,
+           defaultParameterUsed: Boolean = defaultParameterUsed,
+           innerResolveResult: Option[ScalaResolveResult] = innerResolveResult,
+           tuplingUsed: Boolean = tuplingUsed,
+           isSetterFunction: Boolean = isSetterFunction,
+           isAssignment: Boolean = isAssignment,
+           notCheckedResolveResult: Boolean = notCheckedResolveResult,
+           isAccessible: Boolean = isAccessible,
+           resultUndef: Option[ScUndefinedSubstitutor] = None,
+           isDynamic: Boolean = isDynamic,
+           isForwardReference: Boolean = isForwardReference,
+           implicitParameterType: Option[ScType] = implicitParameterType,
+           importsUsed: collection.Set[ImportUsed] = importsUsed,
+           implicitParameters: Seq[ScalaResolveResult] = implicitParameters,
+           implicitReason: ImplicitResult = implicitReason,
+           implicitSearchState: Option[ImplicitState] = implicitSearchState,
+           unresolvedTypeParameters: Option[Seq[TypeParameter]] =
+             unresolvedTypeParameters): ScalaResolveResult =
     new ScalaResolveResult(element,
                            subst,
                            importsUsed,

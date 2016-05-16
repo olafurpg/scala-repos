@@ -58,7 +58,8 @@ object SwingNode {
   * @since 8.0
   */
 class SwingNode(override val delegate: jfxes.SwingNode = new jfxes.SwingNode)
-    extends Node(delegate) with SFXDelegate[jfxes.SwingNode] {
+    extends Node(delegate)
+    with SFXDelegate[jfxes.SwingNode] {
 
   /**
     * the JComponent instance attached to this SwingNode.

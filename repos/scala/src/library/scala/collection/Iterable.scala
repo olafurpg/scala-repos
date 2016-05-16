@@ -16,7 +16,8 @@ import mutable.Builder
   *  $iterableInfo
   */
 trait Iterable[+A]
-    extends Traversable[A] with GenIterable[A]
+    extends Traversable[A]
+    with GenIterable[A]
     with GenericTraversableTemplate[A, Iterable]
     with IterableLike[A, Iterable[A]] {
   override def companion: GenericCompanion[Iterable] = Iterable
@@ -50,4 +51,5 @@ object Iterable extends TraversableFactory[Iterable] {
 
 /** Explicit instantiation of the `Iterable` trait to reduce class file size in subclasses. */
 abstract class AbstractIterable[+A]
-    extends AbstractTraversable[A] with Iterable[A]
+    extends AbstractTraversable[A]
+    with Iterable[A]

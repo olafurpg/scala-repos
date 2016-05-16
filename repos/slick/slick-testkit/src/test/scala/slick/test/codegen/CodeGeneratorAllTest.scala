@@ -41,37 +41,35 @@ class CodeGeneratorAllTest(val tdb: JdbcTestDB) extends DBTest {
     // fetch data model
     val modelA = tdb.profile.createModel()
     // customize code generator
-    val codegenA =
-      modelA.map(
-          m =>
-            new SourceCodeGenerator(m) {
-          // override mapped table and class name
-          override def entityName =
-            dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase
-          override def tableName =
-            dbTableName => dbTableName.toLowerCase.toCamelCase
+    val codegenA = modelA.map(m =>
+          new SourceCodeGenerator(m) {
+        // override mapped table and class name
+        override def entityName =
+          dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase
+        override def tableName =
+          dbTableName => dbTableName.toLowerCase.toCamelCase
 
-          // add some custom import
-          override def code =
-            "import foo.{MyCustomType,MyCustomTypeMapper}" + "\n" + super.code
+        // add some custom import
+        override def code =
+          "import foo.{MyCustomType,MyCustomTypeMapper}" + "\n" + super.code
 
-          // override table generator
-          override def Table =
-            new Table(_) {
-              // disable entity class generation and mapping
-              override def EntityType = new EntityType {
-                override def classEnabled = false
-              }
-
-              // override contained column generator
-              override def Column = new Column(_) {
-                // use the data model member of this column to change the Scala type, e.g. to a custom enum or anything else
-                override def rawType =
-                  if (model.name == "SOME_SPECIAL_COLUMN_NAME") "MyCustomType"
-                  else super.rawType
-              }
+        // override table generator
+        override def Table =
+          new Table(_) {
+            // disable entity class generation and mapping
+            override def EntityType = new EntityType {
+              override def classEnabled = false
             }
-      })
+
+            // override contained column generator
+            override def Column = new Column(_) {
+              // use the data model member of this column to change the Scala type, e.g. to a custom enum or anything else
+              override def rawType =
+                if (model.name == "SOME_SPECIAL_COLUMN_NAME") "MyCustomType"
+                else super.rawType
+            }
+          }
+    })
     val profileName =
       tdb.profile.getClass.toString.dropRight(1).split("[\\. ]").last
 

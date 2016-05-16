@@ -62,8 +62,11 @@ class TransformationSampleSpecMultiJvmNode4 extends TransformationSampleSpec
 class TransformationSampleSpecMultiJvmNode5 extends TransformationSampleSpec
 
 abstract class TransformationSampleSpec
-    extends MultiNodeSpec(TransformationSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(TransformationSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import TransformationSampleSpecConfig._
 

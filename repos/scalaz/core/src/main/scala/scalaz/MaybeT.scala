@@ -20,8 +20,8 @@ final case class MaybeT[F[_], A](run: F[Maybe[A]]) { self =>
     )
 
   def foldRight[Z](z: => Z)(f: (A, => Z) => Z)(implicit F: Foldable[F]): Z = {
-    F.foldRight[Maybe[A], Z](run, z)(
-        (a, b) => Foldable[Maybe].foldRight[A, Z](a, b)(f))
+    F.foldRight[Maybe[A], Z](run, z)((a, b) =>
+          Foldable[Maybe].foldRight[A, Z](a, b)(f))
   }
 
   def traverse[G[_], B](f: A => G[B])(
@@ -193,7 +193,8 @@ private trait MaybeTMonad[F[_]] extends Monad[MaybeT[F, ?]] {
 }
 
 private trait MaybeTBindRec[F[_]]
-    extends BindRec[MaybeT[F, ?]] with MaybeTMonad[F] {
+    extends BindRec[MaybeT[F, ?]]
+    with MaybeTMonad[F] {
   implicit def B: BindRec[F]
 
   final def tailrecM[A, B](f: A => MaybeT[F, A \/ B])(a: A): MaybeT[F, B] =
@@ -213,7 +214,8 @@ private trait MaybeTFoldable[F[_]] extends Foldable.FromFoldr[MaybeT[F, ?]] {
 }
 
 private trait MaybeTTraverse[F[_]]
-    extends Traverse[MaybeT[F, ?]] with MaybeTFoldable[F]
+    extends Traverse[MaybeT[F, ?]]
+    with MaybeTFoldable[F]
     with MaybeTFunctor[F] {
   implicit def F: Traverse[F]
 
@@ -235,7 +237,8 @@ private trait MaybeTHoist extends Hoist[MaybeT] {
 }
 
 private trait MaybeTMonadPlus[F[_]]
-    extends MonadPlus[MaybeT[F, ?]] with MaybeTMonad[F] {
+    extends MonadPlus[MaybeT[F, ?]]
+    with MaybeTMonad[F] {
   implicit def F: Monad[F]
 
   def empty[A]: MaybeT[F, A] = MaybeT(F point Maybe.empty)
@@ -243,7 +246,8 @@ private trait MaybeTMonadPlus[F[_]]
 }
 
 private trait MaybeTMonadError[F[_], E]
-    extends MonadError[MaybeT[F, ?], E] with MaybeTMonad[F] {
+    extends MonadError[MaybeT[F, ?], E]
+    with MaybeTMonad[F] {
   override def F: MonadError[F, E]
 
   override def raiseError[A](e: E) =
@@ -254,7 +258,9 @@ private trait MaybeTMonadError[F[_], E]
 }
 
 private trait MaybeTMonadTell[F[_], W]
-    extends MonadTell[MaybeT[F, ?], W] with MaybeTMonad[F] with MaybeTHoist {
+    extends MonadTell[MaybeT[F, ?], W]
+    with MaybeTMonad[F]
+    with MaybeTHoist {
   def MT: MonadTell[F, W]
 
   implicit def F = MT
@@ -264,7 +270,8 @@ private trait MaybeTMonadTell[F[_], W]
 }
 
 private trait MaybeTMonadListen[F[_], W]
-    extends MonadListen[MaybeT[F, ?], W] with MaybeTMonadTell[F, W] {
+    extends MonadListen[MaybeT[F, ?], W]
+    with MaybeTMonadTell[F, W] {
   def MT: MonadListen[F, W]
 
   def listen[A](ma: MaybeT[F, A]): MaybeT[F, (A, W)] = {

@@ -30,7 +30,8 @@ import scala.{Range => ScalaRange}
   * which includes some map-side reductions.
   */
 class GroupBuilder(val groupFields: Fields)
-    extends FoldOperations[GroupBuilder] with StreamOperations[GroupBuilder] {
+    extends FoldOperations[GroupBuilder]
+    with StreamOperations[GroupBuilder] {
   // We need the implicit conversions from symbols to Fields
   import Dsl._
 
@@ -414,8 +415,7 @@ class GroupBuilder(val groupFields: Fields)
           outFields,
           conv,
           setter)
-      every(
-          pipe =>
+      every(pipe =>
             new Every(pipe, inFields, b, defaultMode(inFields, outFields)))
     }
   }
@@ -426,7 +426,8 @@ class GroupBuilder(val groupFields: Fields)
   * The Scala 2.9 implementation creates an off-by-one bug with the unused fields in the Fields API
   */
 class ScanLeftIterator[T, U](it: Iterator[T], init: U, fn: (U, T) => U)
-    extends Iterator[U] with java.io.Serializable {
+    extends Iterator[U]
+    with java.io.Serializable {
   protected var prev: Option[U] = None
   def hasNext: Boolean = { prev.isEmpty || it.hasNext }
   // Don't use pattern matching in a performance-critical section

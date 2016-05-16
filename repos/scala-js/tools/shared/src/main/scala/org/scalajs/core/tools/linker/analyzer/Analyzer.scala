@@ -155,7 +155,7 @@ private final class Analyzer(semantics: Semantics,
     for {
       getSuperclassMethodInfo <- classClassInfo.flatMap(_.methodInfos.get(
                                         "getSuperclass__jl_Class"))
-                                    if getSuperclassMethodInfo.isReachable
+      if getSuperclassMethodInfo.isReachable
     } {
       // calledFrom should always be nonEmpty if isReachable, but let's be robust
       implicit val from =
@@ -219,11 +219,12 @@ private final class Analyzer(semantics: Semantics,
 
       val parents = data.superClass ++: data.interfaces
 
-      ancestors = this +: parents.flatMap { parent =>
-        val cls = lookupClass(parent)
-        cls.linkClasses()
-        cls.ancestors
-      }.distinct
+      ancestors =
+        this +: parents.flatMap { parent =>
+          val cls = lookupClass(parent)
+          cls.linkClasses()
+          cls.ancestors
+        }.distinct
 
       for (ancestor <- ancestors) ancestor.descendants += this
     }
@@ -280,8 +281,8 @@ private final class Analyzer(semantics: Semantics,
           } else {
             val syntheticInfo =
               Infos.MethodInfo(encodedName = ctorName,
-                               methodsCalledStatically = Map(
-                                     superClass.encodedName -> List(ctorName)))
+                               methodsCalledStatically =
+                                 Map(superClass.encodedName -> List(ctorName)))
             val m = new MethodInfo(this, syntheticInfo)
             m.syntheticKind = MethodSyntheticKind.InheritedConstructor
             methodInfos += ctorName -> m
@@ -364,7 +365,7 @@ private final class Analyzer(semantics: Semantics,
       val candidates = for {
         intf <- ancestors if intf.isInterface
         m <- intf.methodInfos.get(methodName) if !m.isAbstract &&
-            !m.isDefaultBridge
+        !m.isDefaultBridge
       } yield m
 
       val notShadowed =
@@ -398,11 +399,11 @@ private final class Analyzer(semantics: Semantics,
 
       val syntheticInfo = Infos.MethodInfo(
           encodedName = methodName,
-          methodsCalledStatically = Map(
-                targetOwner.encodedName -> List(methodName)))
+          methodsCalledStatically =
+            Map(targetOwner.encodedName -> List(methodName)))
       val m = new MethodInfo(this, syntheticInfo)
-      m.syntheticKind = MethodSyntheticKind.DefaultBridge(
-          targetOwner.encodedName)
+      m.syntheticKind =
+        MethodSyntheticKind.DefaultBridge(targetOwner.encodedName)
       methodInfos += methodName -> m
       m
     }
@@ -525,12 +526,13 @@ private final class Analyzer(semantics: Semantics,
       val syntheticInfo = Infos.MethodInfo(
           encodedName = proxyName,
           methodsCalled = Map(this.encodedName -> List(targetName)),
-          methodsCalledStatically = (if (returnsChar)
-                                       Map(BoxedCharacterClass -> List(
-                                               "init___C"))
-                                     else Map.empty),
-          instantiatedClasses = (if (returnsChar) List(BoxedCharacterClass)
-                                 else Nil))
+          methodsCalledStatically =
+            (if (returnsChar)
+               Map(BoxedCharacterClass -> List("init___C"))
+             else Map.empty),
+          instantiatedClasses =
+            (if (returnsChar) List(BoxedCharacterClass)
+             else Nil))
       val m = new MethodInfo(this, syntheticInfo)
       m.syntheticKind = MethodSyntheticKind.ReflectiveProxy(targetName)
       methodInfos += proxyName -> m

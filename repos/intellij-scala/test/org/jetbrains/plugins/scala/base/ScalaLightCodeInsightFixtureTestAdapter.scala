@@ -93,8 +93,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val caretIndex = text.indexOf(CARET_MARKER)
     val highlights: mutable.Buffer[HighlightInfo] = for {
       info <- myFixture.doHighlighting() if info.getDescription == annotation
-             if caretIndex == -1 || new TextRange(
-                 info.getStartOffset, info.getEndOffset).contains(caretIndex)
+      if caretIndex == -1 || new TextRange(
+          info.getStartOffset, info.getEndOffset).contains(caretIndex)
     } yield info
     val ranges = highlights.map(info => (info.startOffset, info.endOffset))
     assert(highlights.isEmpty,
@@ -179,8 +179,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     assert(withRightDescription.nonEmpty,
            "No highlightings with such description: " + annotation)
 
-    val ranges = withRightDescription.map(
-        info => (info.getStartOffset, info.getEndOffset))
+    val ranges = withRightDescription.map(info =>
+          (info.getStartOffset, info.getEndOffset))
     val message =
       "Highlights with this description are at " + ranges.mkString(" ") +
       ", but has to be at " + (selectionStart, selectionEnd)
@@ -220,7 +220,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
             if (info != null && info.quickFixActionRanges != null &&
                 checkCaret(info.getStartOffset, info.getEndOffset))
               actions ++=
-              (for (pair <- info.quickFixActionRanges if pair != null) yield
+                (for (pair <- info.quickFixActionRanges if pair != null) yield
                     pair.getFirst.getAction))
 
     assert(actions.nonEmpty, "There is no available fixes.")

@@ -61,7 +61,8 @@ class CompiledFunction[F, PT, PU, R <: Rep[_], RU](
     val tuple: F => PT => R,
     val pshape: Shape[ColumnsShapeLevel, PU, PU, PT],
     val profile: BasicProfile)
-    extends Compiled[F] with CompilersMixin {
+    extends Compiled[F]
+    with CompilersMixin {
 
   /** Create an applied `Compiled` value for this compiled function. All applied
     * values share their compilation state with the original compiled function. */
@@ -102,7 +103,8 @@ class AppliedCompiledFunction[PU, R <: Rep[_], RU](
 
 abstract class CompiledExecutable[R, RU](
     val extract: R, val profile: BasicProfile)
-    extends RunnableCompiled[R, RU] with CompilersMixin {
+    extends RunnableCompiled[R, RU]
+    with CompilersMixin {
   def param = ()
   def toNode: Node
 }
@@ -123,8 +125,7 @@ trait Executable[T, TU] {
 object Executable {
   @inline implicit def queryIsExecutable[B, BU, C[_]] =
     StreamingExecutable[Query[B, BU, C], C[BU], BU]
-  @inline implicit def tableQueryIsExecutable[
-      B <: AbstractTable[_], BU, C[_]] =
+  @inline implicit def tableQueryIsExecutable[B <: AbstractTable[_], BU, C[_]] =
     StreamingExecutable[Query[B, BU, C] with TableQuery[B], C[BU], BU]
   @inline implicit def baseJoinQueryIsExecutable[
       B1, B2, BU1, BU2, C[_], Ba1, Ba2] =

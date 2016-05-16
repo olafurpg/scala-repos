@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Bounds, Nothing, ScType}
   * Date: 06.03.2008
   */
 class ScMatchStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScMatchStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScMatchStmt {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)

@@ -55,7 +55,8 @@ import scala.collection.JavaConverters._
 import scalaz.{EitherT, Monad}
 
 object DesktopIngestShardServer
-    extends StandaloneShardServer with StandaloneIngestServer
+    extends StandaloneShardServer
+    with StandaloneIngestServer
     with NIHDBQueryExecutorComponent {
   val caveatMessage = None
 

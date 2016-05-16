@@ -109,15 +109,15 @@ trait ModelFactoryImplicitSupport {
         .map(_.hideImplicitConversions)
         .getOrElse(Nil)
 
-      conversions = conversions filterNot { conv: ImplicitConversionImpl =>
-        hiddenConversions.contains(conv.conversionShortName) ||
-        hiddenConversions.contains(conv.conversionQualifiedName)
-      }
+      conversions =
+        conversions filterNot { conv: ImplicitConversionImpl =>
+          hiddenConversions.contains(conv.conversionShortName) ||
+          hiddenConversions.contains(conv.conversionQualifiedName)
+        }
 
       // Filter out non-sensical conversions from value types
       if (isPrimitiveValueType(sym.tpe_*))
-        conversions = conversions.filter(
-            (ic: ImplicitConversionImpl) =>
+        conversions = conversions.filter((ic: ImplicitConversionImpl) =>
               hardcoded.valueClassFilter(
                   sym.nameString, ic.conversionQualifiedName))
 
@@ -231,83 +231,82 @@ trait ModelFactoryImplicitSupport {
                               sym: Symbol,
                               context: Context,
                               inTpl: DocTemplateImpl): List[Constraint] =
-    types.flatMap((tpe: Type) =>
-          {
-        // TODO: Before creating constraints, map typeVarToOriginOrWildcard on the implicitTypes
-        val implType = typeVarToOriginOrWildcard(tpe)
-        val qualifiedName = makeQualifiedName(implType.typeSymbol)
+    types.flatMap((tpe: Type) => {
+      // TODO: Before creating constraints, map typeVarToOriginOrWildcard on the implicitTypes
+      val implType = typeVarToOriginOrWildcard(tpe)
+      val qualifiedName = makeQualifiedName(implType.typeSymbol)
 
-        var available: Option[Boolean] = None
+      var available: Option[Boolean] = None
 
-        // see: https://groups.google.com/forum/?hl=en&fromgroups#!topic/scala-internals/gm_fr0RKzC4
-        //
-        // println(implType + " => " + implType.isTrivial)
-        // var tpes: List[Type] = List(implType)
-        // while (!tpes.isEmpty) {
-        //   val tpe = tpes.head
-        //   tpes = tpes.tail
-        //   tpe match {
-        //     case TypeRef(pre, sym, args) =>
-        //       tpes = pre :: args ::: tpes
-        //       println(tpe + " => " + tpe.isTrivial)
-        //     case _ =>
-        //       println(tpe + " (of type" + tpe.getClass + ") => " + tpe.isTrivial)
-        //   }
-        // }
-        // println("\n")
+      // see: https://groups.google.com/forum/?hl=en&fromgroups#!topic/scala-internals/gm_fr0RKzC4
+      //
+      // println(implType + " => " + implType.isTrivial)
+      // var tpes: List[Type] = List(implType)
+      // while (!tpes.isEmpty) {
+      //   val tpe = tpes.head
+      //   tpes = tpes.tail
+      //   tpe match {
+      //     case TypeRef(pre, sym, args) =>
+      //       tpes = pre :: args ::: tpes
+      //       println(tpe + " => " + tpe.isTrivial)
+      //     case _ =>
+      //       println(tpe + " (of type" + tpe.getClass + ") => " + tpe.isTrivial)
+      //   }
+      // }
+      // println("\n")
 
-        // look for type variables in the type. If there are none, we can decide if the implicit is there or not
-        if (implType.isTrivial) {
-          try {
-            // TODO: Not sure if `owner = sym.owner` is the right thing to do -- seems similar to what scalac should be doing
-            val silentContext = context
-              .make(owner = sym.owner)
-              .makeSilent(reportAmbiguousErrors = false)
-            val search =
-              inferImplicit(EmptyTree, tpe, false, false, silentContext, false)
-            available = Some(search.tree != EmptyTree)
-          } catch {
-            case _: TypeError =>
+      // look for type variables in the type. If there are none, we can decide if the implicit is there or not
+      if (implType.isTrivial) {
+        try {
+          // TODO: Not sure if `owner = sym.owner` is the right thing to do -- seems similar to what scalac should be doing
+          val silentContext = context
+            .make(owner = sym.owner)
+            .makeSilent(reportAmbiguousErrors = false)
+          val search =
+            inferImplicit(EmptyTree, tpe, false, false, silentContext, false)
+          available = Some(search.tree != EmptyTree)
+        } catch {
+          case _: TypeError =>
+        }
+      }
+
+      available match {
+        case Some(true) =>
+          Nil
+        case Some(false) if !settings.docImplicitsShowAll =>
+          // if -implicits-show-all is not set, we get rid of impossible conversions (such as Numeric[String])
+          throw new ImplicitNotFound(implType)
+        case _ =>
+          val typeParamNames = sym.typeParams.map(_.name)
+
+          // TODO: This is maybe the worst hack I ever did - it's as dirty as hell, but it seems to work, so until I
+          // learn more about symbols, it'll have to do.
+          implType match {
+            case TypeRef(pre, sym, List(TypeRef(NoPrefix, targ, Nil)))
+                if (typeParamNames contains targ.name) =>
+              hardcoded.knownTypeClasses.get(qualifiedName) match {
+                case Some(explanation) =>
+                  List(new KnownTypeClassConstraint {
+                    val typeParamName = targ.nameString
+                    lazy val typeExplanation = explanation
+                    lazy val typeClassEntity = makeTemplate(sym)
+                    lazy val implicitType: TypeEntity =
+                      makeType(implType, inTpl)
+                  })
+                case None =>
+                  List(new TypeClassConstraint {
+                    val typeParamName = targ.nameString
+                    lazy val typeClassEntity = makeTemplate(sym)
+                    lazy val implicitType: TypeEntity =
+                      makeType(implType, inTpl)
+                  })
+              }
+            case _ =>
+              List(new ImplicitInScopeConstraint {
+                lazy val implicitType: TypeEntity = makeType(implType, inTpl)
+              })
           }
-        }
-
-        available match {
-          case Some(true) =>
-            Nil
-          case Some(false) if !settings.docImplicitsShowAll =>
-            // if -implicits-show-all is not set, we get rid of impossible conversions (such as Numeric[String])
-            throw new ImplicitNotFound(implType)
-          case _ =>
-            val typeParamNames = sym.typeParams.map(_.name)
-
-            // TODO: This is maybe the worst hack I ever did - it's as dirty as hell, but it seems to work, so until I
-            // learn more about symbols, it'll have to do.
-            implType match {
-              case TypeRef(pre, sym, List(TypeRef(NoPrefix, targ, Nil)))
-                  if (typeParamNames contains targ.name) =>
-                hardcoded.knownTypeClasses.get(qualifiedName) match {
-                  case Some(explanation) =>
-                    List(new KnownTypeClassConstraint {
-                      val typeParamName = targ.nameString
-                      lazy val typeExplanation = explanation
-                      lazy val typeClassEntity = makeTemplate(sym)
-                      lazy val implicitType: TypeEntity =
-                        makeType(implType, inTpl)
-                    })
-                  case None =>
-                    List(new TypeClassConstraint {
-                      val typeParamName = targ.nameString
-                      lazy val typeClassEntity = makeTemplate(sym)
-                      lazy val implicitType: TypeEntity =
-                        makeType(implType, inTpl)
-                    })
-                }
-              case _ =>
-                List(new ImplicitInScopeConstraint {
-                  lazy val implicitType: TypeEntity = makeType(implType, inTpl)
-                })
-            }
-        }
+      }
     })
 
   def makeSubstitutionConstraints(
@@ -530,8 +529,7 @@ trait ModelFactoryImplicitSupport {
     */
   def uniteConstraints(constr: TypeConstraint): (List[Type], List[Type]) =
     try {
-      (List(
-           wildcardToNothing(
+      (List(wildcardToNothing(
                lub(constr.loBounds map typeVarToOriginOrWildcard))),
        List(
            wildcardToNothing(

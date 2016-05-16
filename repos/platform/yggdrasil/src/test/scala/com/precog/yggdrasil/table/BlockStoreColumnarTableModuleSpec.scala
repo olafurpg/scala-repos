@@ -52,8 +52,10 @@ import TableModule._
 import TableModule.paths._
 
 trait BlockStoreColumnarTableModuleSpec[M[+ _]]
-    extends TableModuleSpec[M] with BlockLoadSpec[M]
-    with BlockSortSpec[M] with BlockAlignSpec[M] {
+    extends TableModuleSpec[M]
+    with BlockLoadSpec[M]
+    with BlockSortSpec[M]
+    with BlockAlignSpec[M] {
   self =>
 
   type MemoId = Int

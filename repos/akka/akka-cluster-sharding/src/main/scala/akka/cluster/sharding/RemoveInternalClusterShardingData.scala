@@ -127,7 +127,8 @@ object RemoveInternalClusterShardingData {
     def props(journalPluginId: String,
               persistenceId: String,
               replyTo: ActorRef): Props =
-      Props(new RemoveOnePersistenceId(
+      Props(
+          new RemoveOnePersistenceId(
               journalPluginId, persistenceId: String, replyTo))
 
     case class Result(removals: Try[Removals])
@@ -202,7 +203,8 @@ class RemoveInternalClusterShardingData(journalPluginId: String,
                                         typeNames: Set[String],
                                         completion: Promise[Unit],
                                         remove2dot3Data: Boolean)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import RemoveInternalClusterShardingData._
   import RemoveOnePersistenceId.Result
 

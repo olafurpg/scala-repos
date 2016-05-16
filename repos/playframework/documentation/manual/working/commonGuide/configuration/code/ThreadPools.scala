@@ -211,8 +211,7 @@ object ThreadPoolsSpec extends PlaySpecification {
     }
   }
 
-  def runningWithConfig[T : AsResult](config: String)(
-      block: Application => T) = {
+  def runningWithConfig[T: AsResult](config: String)(block: Application => T) = {
     val parsed: java.util.Map[String, Object] =
       ConfigFactory.parseString(config).root.unwrapped
     running(_.configure(Configuration(ConfigFactory.parseString(config))))(

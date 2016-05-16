@@ -99,19 +99,18 @@ class SendSelectionToConsoleAction extends AnAction {
 
       text
         .split('\n')
-        .foreach(line =>
-              {
-            if (line != "") {
-              val outputStream: OutputStream = processHandler.getProcessInput
-              try {
-                val bytes: Array[Byte] = (line + "\n").getBytes
-                outputStream.write(bytes)
-                outputStream.flush()
-              } catch {
-                case e: IOException => //ignore
-              }
+        .foreach(line => {
+          if (line != "") {
+            val outputStream: OutputStream = processHandler.getProcessInput
+            try {
+              val bytes: Array[Byte] = (line + "\n").getBytes
+              outputStream.write(bytes)
+              outputStream.flush()
+            } catch {
+              case e: IOException => //ignore
             }
-            console.textSent(line + "\n")
+          }
+          console.textSent(line + "\n")
         })
     }
   }

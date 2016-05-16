@@ -27,7 +27,8 @@ import scala.reflect.ClassTag
     "2.11.0")
 trait TraversableProxyLike[
     +A, +Repr <: TraversableLike[A, Repr] with Traversable[A]]
-    extends TraversableLike[A, Repr] with Proxy {
+    extends TraversableLike[A, Repr]
+    with Proxy {
   def self: Repr
 
   override def foreach[U](f: A => U): Unit = self.foreach(f)
@@ -61,11 +62,11 @@ trait TraversableProxyLike[
   override def reduceRight[B >: A](op: (A, B) => B): B = self.reduceRight(op)
   override def reduceRightOption[B >: A](op: (A, B) => B): Option[B] =
     self.reduceRightOption(op)
-  override def scanLeft[B, That](z: B)(
-      op: (B, A) => B)(implicit bf: CanBuildFrom[Repr, B, That]): That =
+  override def scanLeft[B, That](z: B)(op: (B, A) => B)(
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     self.scanLeft(z)(op)(bf)
-  override def scanRight[B, That](z: B)(
-      op: (A, B) => B)(implicit bf: CanBuildFrom[Repr, B, That]): That =
+  override def scanRight[B, That](z: B)(op: (A, B) => B)(
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     self.scanRight(z)(op)(bf)
   override def sum[B >: A](implicit num: Numeric[B]): B = self.sum(num)
   override def product[B >: A](implicit num: Numeric[B]): B = self.product(num)
@@ -90,7 +91,7 @@ trait TraversableProxyLike[
   override def copyToArray[B >: A](xs: Array[B], start: Int) =
     self.copyToArray(xs, start)
   override def copyToArray[B >: A](xs: Array[B]) = self.copyToArray(xs)
-  override def toArray[B >: A : ClassTag]: Array[B] = self.toArray
+  override def toArray[B >: A: ClassTag]: Array[B] = self.toArray
   override def toList: List[A] = self.toList
   override def toIterable: Iterable[A] = self.toIterable
   override def toSeq: Seq[A] = self.toSeq

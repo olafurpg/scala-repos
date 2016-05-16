@@ -247,8 +247,9 @@ object ColumnarTableModule extends Logging {
       val arr = new Array[String](rows)
       var row = 0
       while (row < rows) {
-        arr(row) = if (col.isDefinedAt(row)) quoteIfNeeded(col.strValue(row))
-        else ""
+        arr(row) =
+          if (col.isDefinedAt(row)) quoteIfNeeded(col.strValue(row))
+          else ""
         row += 1
       }
       arr
@@ -391,10 +392,13 @@ object ColumnarTableModule extends Logging {
 }
 
 trait ColumnarTableModule[M[+ _]]
-    extends TableModule[M] with ColumnarTableTypes[M]
+    extends TableModule[M]
+    with ColumnarTableTypes[M]
     with IdSourceScannerModule
-    with SliceTransforms[M] with SamplableColumnarTableModule[M]
-    with IndicesModule[M] with YggConfigComponent {
+    with SliceTransforms[M]
+    with SamplableColumnarTableModule[M]
+    with IndicesModule[M]
+    with YggConfigComponent {
 
   import TableModule._
   import trans._
@@ -776,7 +780,9 @@ trait ColumnarTableModule[M[+ _]]
   }
 
   abstract class ColumnarTable(slices0: StreamT[M, Slice], val size: TableSize)
-      extends TableLike with SamplableColumnarTable { self: Table =>
+      extends TableLike
+      with SamplableColumnarTable {
+    self: Table =>
     import SliceTransform._
 
     private final val readStarts =
@@ -791,7 +797,7 @@ trait ColumnarTableModule[M[+ _]]
             slices0.map(s => { blockReads.getAndIncrement; s })
           })
           .point[M]
-      )
+    )
 
     /**
       * Folds over the table to produce a single value (stored in a singleton table).
@@ -1125,7 +1131,7 @@ trait ColumnarTableModule[M[+ _]]
                     rightStart0: Option[SlicePosition[RK]],
                     rightEnd0: Option[SlicePosition[RK]])(
               ibufs: IndexBuffers = new IndexBuffers(
-                    leftPosition.key.size, rightPosition.key.size))
+                  leftPosition.key.size, rightPosition.key.size))
             : M[Option[(Slice, CogroupState)]] = {
 
             val SlicePosition(lSliceId, lpos0, lkstate, lkey, lhead, ltail) =
@@ -1923,17 +1929,16 @@ trait ColumnarTableModule[M[+ _]]
       def stepPartition(head: Slice,
                         spanStart: Int,
                         tail: StreamT[M, Slice]): StreamT[M, Slice] = {
-        val comparatorGen = (s: Slice) =>
-          {
-            val rowComparator = Slice.rowComparatorFor(head, s) { s0 =>
-              s0.columns.keys collect {
-                case ColumnRef(path @ CPath(CPathField("0"), _ @_ *), _) =>
-                  path
-              }
+        val comparatorGen = (s: Slice) => {
+          val rowComparator = Slice.rowComparatorFor(head, s) { s0 =>
+            s0.columns.keys collect {
+              case ColumnRef(path @ CPath(CPathField("0"), _ @_ *), _) =>
+                path
             }
+          }
 
-            (i: Int) =>
-              rowComparator.compare(spanStart, i)
+          (i: Int) =>
+            rowComparator.compare(spanStart, i)
         }
 
         val groupTable = subTable(comparatorGen, head.drop(spanStart) :: tail)
@@ -2075,7 +2080,8 @@ trait ColumnarTableModule[M[+ _]]
 
               build0(row + 1,
                      if (!contains(masks, mask) && !isZero(mask))
-                       copyOf(mask, mask.length) :: masks else masks)
+                       copyOf(mask, mask.length) :: masks
+                     else masks)
             } else masks
           }
 

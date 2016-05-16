@@ -17,14 +17,14 @@ import scala.collection.mutable
   * User: Alefas
   * Date: 12.10.11
   */
-case class ScalaMethodEvaluator(
-    objectEvaluator: Evaluator,
-    _methodName: String,
-    signature: JVMName,
-    argumentEvaluators: Seq[Evaluator],
-    traitImplementation: Option[JVMName] = None,
-    methodPosition: Set[SourcePosition] = Set.empty,
-    localMethodIndex: Int = -1)
+case class ScalaMethodEvaluator(objectEvaluator: Evaluator,
+                                _methodName: String,
+                                signature: JVMName,
+                                argumentEvaluators: Seq[Evaluator],
+                                traitImplementation: Option[JVMName] = None,
+                                methodPosition: Set[SourcePosition] =
+                                  Set.empty,
+                                localMethodIndex: Int = -1)
     extends Evaluator {
   def getModifier: Modifier = null
 
@@ -91,7 +91,8 @@ case class ScalaMethodEvaluator(
       }
       val sign: String =
         if (signature != null && args.size == argumentEvaluators.size)
-          signature.getName(debugProcess) else null
+          signature.getName(debugProcess)
+        else null
       var mName: String =
         DebuggerUtilsEx.methodName(referenceType.name, methodName, sign)
       def findMethod(referenceType: ReferenceType): Method = {
@@ -147,26 +148,24 @@ case class ScalaMethodEvaluator(
             else if (filtered.length == 1) jdiMethod = filtered.head
             else {
               val newFiltered =
-                filtered.filter(
-                    m =>
-                      {
-                    var result = true
-                    ApplicationManager.getApplication.runReadAction(
-                        new Runnable {
-                      def run() {
-                        try {
-                          val lines = methodPosition.map(_.getLine)
-                          result = m
-                            .allLineLocations()
-                            .exists(l =>
-                                  lines.contains(ScalaPositionManager
-                                        .checkedLineNumber(l)))
-                        } catch {
-                          case e: Exception => //ignore
-                        }
+                filtered.filter(m => {
+                  var result = true
+                  ApplicationManager.getApplication.runReadAction(
+                      new Runnable {
+                    def run() {
+                      try {
+                        val lines = methodPosition.map(_.getLine)
+                        result = m
+                          .allLineLocations()
+                          .exists(l =>
+                                lines.contains(
+                                    ScalaPositionManager.checkedLineNumber(l)))
+                      } catch {
+                        case e: Exception => //ignore
                       }
-                    })
-                    result
+                    }
+                  })
+                  result
                 })
               if (newFiltered.isEmpty) jdiMethod = filtered.head
               else jdiMethod = newFiltered.head

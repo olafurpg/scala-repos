@@ -11,7 +11,8 @@ import org.ensime.util.file._
 import scala.util.{Properties, Try}
 
 class ServerStartupSpec
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
     with IsolatedTestKitFixture {
 
   val original = EnsimeConfigFixture.EmptyTestProject

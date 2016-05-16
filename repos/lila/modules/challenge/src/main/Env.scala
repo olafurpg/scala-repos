@@ -64,12 +64,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "challenge" boot new Env(
-        config = lila.common.PlayApp loadConfig "challenge",
-        system = lila.common.PlayApp.system,
-        onStart = lila.game.Env.current.onStart,
-        hub = lila.hub.Env.current,
-        lightUser = lila.user.Env.current.lightUser,
-        db = lila.db.Env.current,
-        scheduler = lila.common.PlayApp.scheduler)
+    "challenge" boot new Env(config =
+                               lila.common.PlayApp loadConfig "challenge",
+                             system = lila.common.PlayApp.system,
+                             onStart = lila.game.Env.current.onStart,
+                             hub = lila.hub.Env.current,
+                             lightUser = lila.user.Env.current.lightUser,
+                             db = lila.db.Env.current,
+                             scheduler = lila.common.PlayApp.scheduler)
 }

@@ -30,8 +30,12 @@ import java.io.File
 import scala.io.Source
 
 object BinderSpecs
-    extends Specification with ScalaCheck with Parser with StubPhases
-    with Binder with StaticLibrarySpec {
+    extends Specification
+    with ScalaCheck
+    with Parser
+    with StubPhases
+    with Binder
+    with StaticLibrarySpec {
 
   import ast._
   import library._

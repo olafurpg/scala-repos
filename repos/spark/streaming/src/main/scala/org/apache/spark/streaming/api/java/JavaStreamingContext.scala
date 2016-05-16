@@ -475,10 +475,9 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
   ): JavaDStream[T] = {
     implicit val cmt: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
-    val scalaTransformFunc = (rdds: Seq[RDD[_]], time: Time) =>
-      {
-        val jrdds = rdds.map(JavaRDD.fromRDD(_)).asJava
-        transformFunc.call(jrdds, time).rdd
+    val scalaTransformFunc = (rdds: Seq[RDD[_]], time: Time) => {
+      val jrdds = rdds.map(JavaRDD.fromRDD(_)).asJava
+      transformFunc.call(jrdds, time).rdd
     }
     ssc.transform(dstreams.asScala.map(_.dstream).toSeq, scalaTransformFunc)
   }
@@ -500,10 +499,9 @@ class JavaStreamingContext(val ssc: StreamingContext) extends Closeable {
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[K]]
     implicit val cmv: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
-    val scalaTransformFunc = (rdds: Seq[RDD[_]], time: Time) =>
-      {
-        val jrdds = rdds.map(JavaRDD.fromRDD(_)).asJava
-        transformFunc.call(jrdds, time).rdd
+    val scalaTransformFunc = (rdds: Seq[RDD[_]], time: Time) => {
+      val jrdds = rdds.map(JavaRDD.fromRDD(_)).asJava
+      transformFunc.call(jrdds, time).rdd
     }
     ssc.transform(dstreams.asScala.map(_.dstream).toSeq, scalaTransformFunc)
   }
@@ -628,11 +626,9 @@ object JavaStreamingContext {
       checkpointPath: String,
       creatingFunc: JFunction0[JavaStreamingContext]
   ): JavaStreamingContext = {
-    val ssc = StreamingContext.getOrCreate(checkpointPath,
-                                           () =>
-                                             {
-                                               creatingFunc.call().ssc
-                                           })
+    val ssc = StreamingContext.getOrCreate(checkpointPath, () => {
+      creatingFunc.call().ssc
+    })
     new JavaStreamingContext(ssc)
   }
 
@@ -652,12 +648,9 @@ object JavaStreamingContext {
       creatingFunc: JFunction0[JavaStreamingContext],
       hadoopConf: Configuration
   ): JavaStreamingContext = {
-    val ssc = StreamingContext.getOrCreate(checkpointPath,
-                                           () =>
-                                             {
-                                               creatingFunc.call().ssc
-                                           },
-                                           hadoopConf)
+    val ssc = StreamingContext.getOrCreate(checkpointPath, () => {
+      creatingFunc.call().ssc
+    }, hadoopConf)
     new JavaStreamingContext(ssc)
   }
 
@@ -680,13 +673,9 @@ object JavaStreamingContext {
       hadoopConf: Configuration,
       createOnError: Boolean
   ): JavaStreamingContext = {
-    val ssc = StreamingContext.getOrCreate(checkpointPath,
-                                           () =>
-                                             {
-                                               creatingFunc.call().ssc
-                                           },
-                                           hadoopConf,
-                                           createOnError)
+    val ssc = StreamingContext.getOrCreate(checkpointPath, () => {
+      creatingFunc.call().ssc
+    }, hadoopConf, createOnError)
     new JavaStreamingContext(ssc)
   }
 

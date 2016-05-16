@@ -101,8 +101,10 @@ object ActorCreationPerfSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorCreationPerfSpec
-    extends AkkaSpec("akka.actor.serialize-messages = off") with ImplicitSender
-    with MetricsKit with BeforeAndAfterAll {
+    extends AkkaSpec("akka.actor.serialize-messages = off")
+    with ImplicitSender
+    with MetricsKit
+    with BeforeAndAfterAll {
 
   import ActorCreationPerfSpec._
 
@@ -232,14 +234,16 @@ class ActorCreationPerfSpec
     val props2 = Props(new EmptyActor)
     registerTests("Props(new EmptyActor) same", () ⇒ { props2 })
 
-    registerTests("Props(classOf[EmptyArgsActor], ...) new",
-                  () ⇒ { Props(classOf[EmptyArgsActor], 4711, 1729) })
+    registerTests("Props(classOf[EmptyArgsActor], ...) new", () ⇒ {
+      Props(classOf[EmptyArgsActor], 4711, 1729)
+    })
 
     val props3 = Props(classOf[EmptyArgsActor], 4711, 1729)
     registerTests("Props(classOf[EmptyArgsActor], ...) same", () ⇒ { props3 })
 
-    registerTests("Props(new EmptyArgsActor(...)) new",
-                  () ⇒ { Props(new EmptyArgsActor(4711, 1729)) })
+    registerTests("Props(new EmptyArgsActor(...)) new", () ⇒ {
+      Props(new EmptyArgsActor(4711, 1729))
+    })
 
     val props4 = Props(new EmptyArgsActor(4711, 1729))
     registerTests("Props(new EmptyArgsActor(...)) same", () ⇒ { props4 })

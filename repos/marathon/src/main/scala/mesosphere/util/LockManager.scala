@@ -26,8 +26,8 @@ object LockManager {
 
   def create(): LockManager = new LockManager {
     val locks = loadingCache[String]()
-    override def executeSequentially[T](key: String)(future: => Future[T])(
-        implicit ec: ExecutionContext): Future[T] = {
+    override def executeSequentially[T](key: String)(
+        future: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
       val lock = locks.get(key)
       scala.concurrent.blocking {
         lock.acquire()

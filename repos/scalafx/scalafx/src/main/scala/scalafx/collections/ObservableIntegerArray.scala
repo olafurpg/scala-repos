@@ -69,8 +69,8 @@ object ObservableIntegerArray
   * @define ARY `Array`
   */
 class ObservableIntegerArray(
-    delegate: jfxc.ObservableIntegerArray = jfxc.FXCollections
-        .observableIntegerArray())
+    delegate: jfxc.ObservableIntegerArray =
+      jfxc.FXCollections.observableIntegerArray())
     extends ObservableArray[
         Int, ObservableIntegerArray, jfxc.ObservableIntegerArray](delegate) {
 

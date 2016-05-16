@@ -131,7 +131,8 @@ object PopupWindow {
 }
 
 abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
-    extends Window(delegate) with SFXDelegate[jfxs.PopupWindow] {
+    extends Window(delegate)
+    with SFXDelegate[jfxs.PopupWindow] {
 
   /** Specifies the popup anchor point which is used in popup positioning. */
   def anchorLocation: ObjectProperty[jfxs.PopupWindow.AnchorLocation] =

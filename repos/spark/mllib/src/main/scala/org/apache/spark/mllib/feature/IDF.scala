@@ -178,8 +178,8 @@ class IDFModel private[spark](@Since("1.1.0") val idf: Vector)
   @Since("1.1.0")
   def transform(dataset: RDD[Vector]): RDD[Vector] = {
     val bcIdf = dataset.context.broadcast(idf)
-    dataset.mapPartitions(
-        iter => iter.map(v => IDFModel.transform(bcIdf.value, v)))
+    dataset.mapPartitions(iter =>
+          iter.map(v => IDFModel.transform(bcIdf.value, v)))
   }
 
   /**

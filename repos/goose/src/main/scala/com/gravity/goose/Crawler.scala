@@ -92,8 +92,8 @@ class Crawler(config: Configuration) {
             }
             article.topNode = extractor.postExtractionCleanup(article.topNode)
 
-            article.cleanedArticleText = outputFormatter.getFormattedText(
-                article.topNode)
+            article.cleanedArticleText =
+              outputFormatter.getFormattedText(article.topNode)
           }
         case _ => trace("NO ARTICLE FOUND")
       }
@@ -157,14 +157,13 @@ class Crawler(config: Configuration) {
     val dir: File = new File(config.localStoragePath)
 
     dir.list.foreach(
-        filename =>
-          {
-        if (filename.startsWith(article.linkhash)) {
-          val f: File = new File(dir.getAbsolutePath + "/" + filename)
-          if (!f.delete) {
-            warn("Unable to remove temp file: " + filename)
-          }
+        filename => {
+      if (filename.startsWith(article.linkhash)) {
+        val f: File = new File(dir.getAbsolutePath + "/" + filename)
+        if (!f.delete) {
+          warn("Unable to remove temp file: " + filename)
         }
+      }
     })
   }
 }

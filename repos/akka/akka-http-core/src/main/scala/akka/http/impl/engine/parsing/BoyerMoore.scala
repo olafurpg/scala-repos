@@ -41,7 +41,8 @@ private class BoyerMoore(needle: Array[Byte]) {
 
     @tailrec def suffixLength(i: Int, j: Int, result: Int): Int =
       if (i >= 0 && needle(i) == needle(j))
-        suffixLength(i - 1, j - 1, result + 1) else result
+        suffixLength(i - 1, j - 1, result + 1)
+      else result
     @tailrec def loop2(i: Int): Unit =
       if (i < nl1) {
         val sl = suffixLength(i, nl1, 0)

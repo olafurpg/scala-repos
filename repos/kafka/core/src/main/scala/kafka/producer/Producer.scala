@@ -66,8 +66,8 @@ class Producer[K, V](
     this(config,
          new DefaultEventHandler[K, V](
              config,
-             CoreUtils.createObject[Partitioner](
-                 config.partitionerClass, config.props),
+             CoreUtils.createObject[Partitioner](config.partitionerClass,
+                                                 config.props),
              CoreUtils.createObject[Encoder[V]](config.serializerClass,
                                                 config.props),
              CoreUtils.createObject[Encoder[K]](

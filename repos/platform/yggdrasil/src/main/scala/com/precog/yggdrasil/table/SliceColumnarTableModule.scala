@@ -58,7 +58,8 @@ import TableModule._
 
 //FIXME: This is only used in test at this point, kill with fire in favor of VFSColumnarTableModule
 trait SliceColumnarTableModule[M[+ _]]
-    extends BlockStoreColumnarTableModule[M] with ProjectionModule[M, Slice] {
+    extends BlockStoreColumnarTableModule[M]
+    with ProjectionModule[M, Slice] {
   type TableCompanion <: SliceColumnarTableCompanion
 
   trait SliceColumnarTableCompanion extends BlockStoreColumnarTableCompanion {

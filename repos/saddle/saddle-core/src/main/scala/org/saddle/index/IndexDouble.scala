@@ -101,7 +101,7 @@ class IndexDouble(keys: Vec[Double]) extends Index[Double] {
     else -(binarySearch(keys, t) + 1)
   }
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: Double => B): Index[B] =
     Index(VecImpl.map(keys)(f).toArray)
 

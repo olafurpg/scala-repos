@@ -12,7 +12,9 @@ import org.apache.camel.Component
 import org.scalatest.WordSpec
 
 class ActorComponentConfigurationTest
-    extends WordSpec with Matchers with SharedCamelSystem {
+    extends WordSpec
+    with Matchers
+    with SharedCamelSystem {
 
   val component: Component = camel.context.getComponent("akka")
 

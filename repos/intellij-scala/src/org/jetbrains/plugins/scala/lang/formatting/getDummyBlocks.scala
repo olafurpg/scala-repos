@@ -151,11 +151,11 @@ object getDummyBlocks {
           afterOpenBrace.last.getElementType == ScalaTokenTypes.tRBRACE
         for (child <- if (hasValidTail) beforeOpenBrace else correctChildren) {
           subBlocks.add(
-              getSubBlock(
-                  block,
-                  scalaSettings,
-                  child,
-                  indent = ScalaIndentProcessor.getChildIndent(block, child)))
+              getSubBlock(block,
+                          scalaSettings,
+                          child,
+                          indent =
+                            ScalaIndentProcessor.getChildIndent(block, child)))
         }
         if (hasValidTail) {
           subBlocks.add(
@@ -428,16 +428,19 @@ object getDummyBlocks {
               (firstSibling.getText match {
                 case "@param" | "@tparam" =>
                   if (scalaSettings.SD_ALIGN_PARAMETERS_COMMENTS)
-                    normalAlignment else null
+                    normalAlignment
+                  else null
                 case "@return" =>
                   if (scalaSettings.SD_ALIGN_RETURN_COMMENTS) normalAlignment
                   else null
                 case "@throws" =>
                   if (scalaSettings.SD_ALIGN_EXCEPTION_COMMENTS)
-                    normalAlignment else null
+                    normalAlignment
+                  else null
                 case _ =>
                   if (scalaSettings.SD_ALIGN_OTHER_TAGS_COMMENTS)
-                    normalAlignment else null
+                    normalAlignment
+                  else null
               }, wrap)
             } else
               (null,
@@ -820,7 +823,8 @@ object getDummyBlocks {
           lParen.getElementType == ScalaTokenTypes.tLBRACE =>
         val closingType =
           if (lParen.getElementType == ScalaTokenTypes.tLPARENTHESIS)
-            ScalaTokenTypes.tRPARENTHESIS else ScalaTokenTypes.tRBRACE
+            ScalaTokenTypes.tRPARENTHESIS
+          else ScalaTokenTypes.tRBRACE
         val (_, after) = tail.span(elem => elem.getElementType != closingType)
         if (after.isEmpty) {
           addTail(children)
@@ -845,7 +849,7 @@ object getDummyBlocks {
     val firstChildNode = node.getFirstChildNode
     var child = firstChildNode
     while (child.getTreeNext != null &&
-    child.getTreeNext.getElementType != ScalaTokenTypes.kELSE) {
+           child.getTreeNext.getElementType != ScalaTokenTypes.kELSE) {
       child = child.getTreeNext
     }
     val indent = ScalaIndentProcessor.getChildIndent(block, firstChildNode)
@@ -923,7 +927,8 @@ object getDummyBlocks {
     val prefixIndent = Indent.getSpaceIndent(
         marginIndent +
         (if (node.getElementType == ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
-           1 else 0),
+           1
+         else 0),
         true)
 
     val lines = node.getText.split("\n")
@@ -1026,10 +1031,10 @@ object getDummyBlocks {
     subBlocks
   }
 
-  private def getInfixBlocks(
-      node: ASTNode,
-      block: ScalaBlock,
-      parentAlignment: Alignment = null): util.ArrayList[Block] = {
+  private def getInfixBlocks(node: ASTNode,
+                             block: ScalaBlock,
+                             parentAlignment: Alignment =
+                               null): util.ArrayList[Block] = {
     val settings = block.getSettings
     val scalaSettings =
       settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
@@ -1080,7 +1085,7 @@ object getDummyBlocks {
                                       block: ScalaBlock,
                                       parentAlignment: Alignment = null,
                                       delegatedChildren: List[ASTNode] = List(
-                                            )): util.ArrayList[Block] = {
+                                          )): util.ArrayList[Block] = {
     val settings = block.getSettings
     val scalaSettings =
       settings.getCustomSettings(classOf[ScalaCodeStyleSettings])

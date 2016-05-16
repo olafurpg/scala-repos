@@ -58,7 +58,7 @@ object Test extends App {
 
         // a for comprehension using two generators
         for (i <- 1 until n;
-        j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
+             j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
       }
 
       /** Return the sum of the elements of 'xs'. */

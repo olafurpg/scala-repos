@@ -26,7 +26,10 @@ import org.scalactic.Constraint
   * Helper class for writing tests for typed Actors with ScalaTest.
   */
 class TypedSpec(config: Config)
-    extends Spec with Matchers with BeforeAndAfterAll with ScalaFutures
+    extends Spec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures
     with ConversionCheckedTripleEquals {
   import TypedSpec._
   import AskPattern._
@@ -58,7 +61,7 @@ class TypedSpec(config: Config)
     * Run an Actor-based test. The test procedure is most conveniently
     * formulated using the [[StepWise$]] behavior type.
     */
-  def runTest[T : ClassTag](name: String)(
+  def runTest[T: ClassTag](name: String)(
       behavior: Behavior[T]): Future[Status] =
     system ? (RunTest(name, Props(behavior), _, timeout.duration))
 
@@ -76,7 +79,7 @@ class TypedSpec(config: Config)
     }
   }
 
-  def muteExpectedException[T <: Exception : ClassTag](
+  def muteExpectedException[T <: Exception: ClassTag](
       message: String = null,
       source: String = null,
       start: String = "",
@@ -101,8 +104,8 @@ class TypedSpec(config: Config)
       def areEqual(a: Class[A], b: Class[B]) = a == b
     }
 
-  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]: Constraint[
-      Set[A], T] =
+  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]
+    : Constraint[Set[A], T] =
     new Constraint[Set[A], T] {
       def areEqual(a: Set[A], b: T) = a == b
     }
@@ -131,8 +134,8 @@ object TypedSpec {
   case class Failed(thr: Throwable) extends Status
   case object Timedout extends Status
 
-  def guardian(outstanding: Map[ActorRef[_], ActorRef[Status]] = Map.empty)
-    : Behavior[Command] =
+  def guardian(outstanding: Map[ActorRef[_], ActorRef[Status]] =
+        Map.empty): Behavior[Command] =
     FullTotal {
       case Sig(ctx, f @ t.Failed(ex, test)) ⇒
         outstanding get test match {

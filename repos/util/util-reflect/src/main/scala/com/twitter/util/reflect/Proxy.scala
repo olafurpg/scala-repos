@@ -11,11 +11,11 @@ class NonexistentTargetException
     extends Exception("MethodCall was invoked without a valid target.")
 
 object Proxy {
-  def apply[I <: AnyRef : Manifest](f: MethodCall[I] => AnyRef) = {
+  def apply[I <: AnyRef: Manifest](f: MethodCall[I] => AnyRef) = {
     new ProxyFactory[I](f).apply()
   }
 
-  def apply[I <: AnyRef : Manifest](target: I, f: MethodCall[I] => AnyRef) = {
+  def apply[I <: AnyRef: Manifest](target: I, f: MethodCall[I] => AnyRef) = {
     new ProxyFactory[I](f).apply(target)
   }
 }
@@ -36,7 +36,7 @@ object ProxyFactory {
   }
 }
 
-class AbstractProxyFactory[I <: AnyRef : Manifest] {
+class AbstractProxyFactory[I <: AnyRef: Manifest] {
   import ProxyFactory._
 
   final val interface = implicitly[Manifest[I]].runtimeClass
@@ -64,7 +64,7 @@ class AbstractProxyFactory[I <: AnyRef : Manifest] {
   }
 }
 
-class ProxyFactory[I <: AnyRef : Manifest](f: MethodCall[I] => AnyRef)
+class ProxyFactory[I <: AnyRef: Manifest](f: MethodCall[I] => AnyRef)
     extends AbstractProxyFactory[I] {
   def apply[T <: I](target: T) = newWithCallback(target, f)
   def apply() = newWithCallback(f)
@@ -72,7 +72,8 @@ class ProxyFactory[I <: AnyRef : Manifest](f: MethodCall[I] => AnyRef)
 
 private[reflect] class MethodInterceptor[I <: AnyRef](
     target: Option[I], callback: MethodCall[I] => AnyRef)
-    extends CGMethodInterceptor with Serializable {
+    extends CGMethodInterceptor
+    with Serializable {
   val targetRef = target.getOrElse(null).asInstanceOf[I]
 
   final def intercept(

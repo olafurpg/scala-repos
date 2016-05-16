@@ -40,7 +40,9 @@ import org.apache.spark.scheduler.{LiveListenerBus, SparkListenerExecutorAdded, 
 import org.apache.spark.scheduler.cluster.ExecutorInfo
 
 class MesosSchedulerBackendSuite
-    extends SparkFunSuite with LocalSparkContext with MockitoSugar {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with MockitoSugar {
 
   test("weburi is set in created scheduler driver") {
     val conf = new SparkConf
@@ -403,15 +405,13 @@ class MesosSchedulerBackendSuite
     assert(cpusDev.getScalar.getValue.equals(1.0))
     assert(cpusDev.getRole.equals("dev"))
     val executorResources = taskInfo.getExecutor.getResourcesList.asScala
-    assert(
-        executorResources.exists { r =>
-      r.getName.equals("mem") && r.getScalar.getValue.equals(484.0) &&
-      r.getRole.equals("prod")
+    assert(executorResources.exists { r =>
+      r.getName.equals("mem") &&
+      r.getScalar.getValue.equals(484.0) && r.getRole.equals("prod")
     })
-    assert(
-        executorResources.exists { r =>
-      r.getName.equals("cpus") && r.getScalar.getValue.equals(1.0) &&
-      r.getRole.equals("prod")
+    assert(executorResources.exists { r =>
+      r.getName.equals("cpus") &&
+      r.getScalar.getValue.equals(1.0) && r.getRole.equals("prod")
     })
   }
 }

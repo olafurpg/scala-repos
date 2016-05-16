@@ -54,8 +54,8 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         ExpectFailure[SparkException],
         AssertOnQuery(_.isActive === false),
         TestAwaitTermination(ExpectException[SparkException]),
-        TestAwaitTermination(
-            ExpectException[SparkException], timeoutMs = 2000),
+        TestAwaitTermination(ExpectException[SparkException],
+                             timeoutMs = 2000),
         TestAwaitTermination(ExpectException[SparkException], timeoutMs = 10),
         AssertOnQuery(q =>
                         q.exception.get.startOffset.get === q.streamProgress

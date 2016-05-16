@@ -69,11 +69,11 @@ trait Types {
       def read(json: JValue) = f(json)
     }
 
-  def fromJSON[A : JSONR](json: JValue): Result[A] =
+  def fromJSON[A: JSONR](json: JValue): Result[A] =
     implicitly[JSONR[A]].read(json)
-  def toJSON[A : JSONW](value: A): JValue = implicitly[JSONW[A]].write(value)
+  def toJSON[A: JSONW](value: A): JValue = implicitly[JSONW[A]].write(value)
 
-  def field[A : JSONR](name: String)(json: JValue): Result[A] = json match {
+  def field[A: JSONR](name: String)(json: JValue): Result[A] = json match {
     case JObject(fs) =>
       fs.find(_.name == name)
         .map(f => implicitly[JSONR[A]].read(f.value))
@@ -84,7 +84,7 @@ trait Types {
     case x => failure(UnexpectedJSONError(x, classOf[JObject])).toValidationNel
   }
 
-  def validate[A : JSONR](name: String): Kleisli[Result, JValue, A] =
+  def validate[A: JSONR](name: String): Kleisli[Result, JValue, A] =
     Kleisli(field[A](name))
 
   def makeObj(fields: Traversable[(String, JValue)]): JObject =

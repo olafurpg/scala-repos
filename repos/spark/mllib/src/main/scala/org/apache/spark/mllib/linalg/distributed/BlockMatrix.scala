@@ -141,10 +141,11 @@ class BlockMatrix @Since("1.3.0")(
     @Since("1.3.0") val colsPerBlock: Int,
     private var nRows: Long,
     private var nCols: Long)
-    extends DistributedMatrix with Logging {
+    extends DistributedMatrix
+    with Logging {
 
-  private type MatrixBlock = ((Int, Int),
-  Matrix) // ((blockRowIndex, blockColIndex), sub-matrix)
+  private type MatrixBlock =
+    ((Int, Int), Matrix) // ((blockRowIndex, blockColIndex), sub-matrix)
 
   /**
     * Alternate constructor for BlockMatrix without the input of the number of rows and columns.
@@ -236,13 +237,15 @@ class BlockMatrix @Since("1.3.0")(
     blockInfo.foreach {
       case ((blockRowIndex, blockColIndex), (m, n)) =>
         if ((blockRowIndex < numRowBlocks - 1 && m != rowsPerBlock) ||
-            (blockRowIndex == numRowBlocks - 1 && (m <= 0 || m > rowsPerBlock))) {
+            (blockRowIndex == numRowBlocks - 1 &&
+                (m <= 0 || m > rowsPerBlock))) {
           throw new SparkException(
               s"The MatrixBlock at ($blockRowIndex, $blockColIndex) has " +
               dimensionMsg)
         }
         if ((blockColIndex < numColBlocks - 1 && n != colsPerBlock) ||
-            (blockColIndex == numColBlocks - 1 && (n <= 0 || n > colsPerBlock))) {
+            (blockColIndex == numColBlocks - 1 &&
+                (n <= 0 || n > colsPerBlock))) {
           throw new SparkException(
               s"The MatrixBlock at ($blockRowIndex, $blockColIndex) has " +
               dimensionMsg)
@@ -356,9 +359,9 @@ class BlockMatrix @Since("1.3.0")(
     * operators such as (a, b) => -a + b
     * TODO: Make the use of zero matrices more storage efficient.
     */
-  private[mllib] def blockMap(other: BlockMatrix,
-                              binMap: (BM[Double],
-                              BM[Double]) => BM[Double]): BlockMatrix = {
+  private[mllib] def blockMap(
+      other: BlockMatrix,
+      binMap: (BM[Double], BM[Double]) => BM[Double]): BlockMatrix = {
     require(numRows() == other.numRows(),
             "Both matrices must have the same number of rows. " +
             s"A.numRows: ${numRows()}, B.numRows: ${other.numRows()}")
@@ -443,8 +446,8 @@ class BlockMatrix @Since("1.3.0")(
     val leftDestinations = leftMatrix.map {
       case (rowIndex, colIndex) =>
         val rightCounterparts = rightMatrix.filter(_._1 == colIndex)
-        val partitions = rightCounterparts.map(
-            b => partitioner.getPartition((rowIndex, b._2)))
+        val partitions = rightCounterparts.map(b =>
+              partitioner.getPartition((rowIndex, b._2)))
         ((rowIndex, colIndex), partitions.toSet)
     }.toMap
     val rightDestinations = rightMatrix.map {

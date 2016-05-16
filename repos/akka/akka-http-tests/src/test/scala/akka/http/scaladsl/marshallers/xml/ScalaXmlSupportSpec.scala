@@ -19,7 +19,10 @@ import akka.http.scaladsl.model._
 import MediaTypes._
 
 class ScalaXmlSupportSpec
-    extends FreeSpec with Matchers with ScalatestRouteTest with Inside {
+    extends FreeSpec
+    with Matchers
+    with ScalatestRouteTest
+    with Inside {
   import ScalaXmlSupport._
 
   "NodeSeqMarshaller should" - {

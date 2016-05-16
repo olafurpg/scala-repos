@@ -60,7 +60,8 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
   }
 
   class BufferedLineIterator
-      extends AbstractIterator[String] with Iterator[String] {
+      extends AbstractIterator[String]
+      with Iterator[String] {
     private val lineReader = decachedReader
     var nextLine: String = null
 

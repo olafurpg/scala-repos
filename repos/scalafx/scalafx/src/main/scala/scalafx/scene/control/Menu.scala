@@ -45,7 +45,8 @@ object Menu {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Menu.html]].
   */
 class Menu(override val delegate: jfxsc.Menu = new jfxsc.Menu("default"))
-    extends MenuItem(delegate) with jfxe.EventTarget
+    extends MenuItem(delegate)
+    with jfxe.EventTarget
     with SFXDelegate[jfxsc.Menu] {
 
   /**

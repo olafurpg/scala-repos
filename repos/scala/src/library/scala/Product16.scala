@@ -65,7 +65,8 @@ trait Product16[+T1,
                 +T14,
                 +T15,
                 +T16]
-    extends Any with Product {
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 16

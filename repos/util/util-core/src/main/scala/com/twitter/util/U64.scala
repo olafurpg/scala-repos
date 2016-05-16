@@ -80,11 +80,10 @@ class RichU64String(string: String) {
   def toU64ByteArray: Array[Byte] = {
     val padded = "0" * (16 - string.length()) + string
     (0 until 16 by 2)
-      .map(i =>
-            {
-          val parsed = Integer.parseInt(padded.slice(i, i + 2), 16)
-          assert(parsed >= 0)
-          parsed.toByte
+      .map(i => {
+        val parsed = Integer.parseInt(padded.slice(i, i + 2), 16)
+        assert(parsed >= 0)
+        parsed.toByte
       })
       .toArray
   }
@@ -100,7 +99,7 @@ object U64 {
 
   def u64ToBigint(x: Long): BigInt =
     if ((x & 0x8000000000000000L) != 0L)
-      ( (x & 0x7FFFFFFFFFFFFFFFL): BigInt) + bigInt0x8000000000000000L
+      ((x & 0x7FFFFFFFFFFFFFFFL): BigInt) + bigInt0x8000000000000000L
     else x: BigInt
 
   // compares x < y

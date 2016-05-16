@@ -8,7 +8,7 @@ object Test {
     case x: java.lang.IllegalArgumentException => shortName(x)
   }
 
-  def fn[T : Handler](body: => T): T = {
+  def fn[T: Handler](body: => T): T = {
     try body catch implicitly[Handler[T]]
   }
 

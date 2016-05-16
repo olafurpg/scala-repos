@@ -199,12 +199,12 @@ class MigrationTo0_11(
             log.info(
                 s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): scaling or restart")
             nextApp.copy(versionInfo = lastApp.versionInfo
-                    .withScaleOrRestartChange(nextApp.version))
+                  .withScaleOrRestartChange(nextApp.version))
           case _ =>
             log.info(
                 s"Adding versionInfo to ${nextApp.id} (${nextApp.version}): new config")
-            nextApp.copy(versionInfo = AppDefinition.VersionInfo.forNewConfig(
-                      nextApp.version))
+            nextApp.copy(versionInfo =
+                  AppDefinition.VersionInfo.forNewConfig(nextApp.version))
         }
       }
     }
@@ -233,9 +233,9 @@ class MigrationTo0_11(
             withVersionInfo = addVersionInfoToVersioned(
                 maybeLastApp, nextVersion, maybeNextApp)
             storedResult <- withVersionInfo
-              .map((newApp: AppDefinition) =>
-                    appRepository.store(newApp).map(Some(_)))
-              .getOrElse(maybeLastAppFuture)
+                             .map((newApp: AppDefinition) =>
+                                   appRepository.store(newApp).map(Some(_)))
+                             .getOrElse(maybeLastAppFuture)
           } yield storedResult
       }
     }
@@ -448,7 +448,8 @@ object StorageVersions {
   }
 
   implicit class OrderedStorageVersion(val version: StorageVersion)
-      extends AnyVal with Ordered[StorageVersion] {
+      extends AnyVal
+      with Ordered[StorageVersion] {
     override def compare(that: StorageVersion): Int = {
       def by(left: Int, right: Int, fn: => Int): Int =
         if (left.compareTo(right) != 0) left.compareTo(right) else fn

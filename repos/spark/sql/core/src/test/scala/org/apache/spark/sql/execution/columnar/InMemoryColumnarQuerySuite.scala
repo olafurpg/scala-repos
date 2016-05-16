@@ -236,7 +236,7 @@ class InMemoryColumnarQuerySuite extends QueryTest with SharedSQLContext {
           .rdd
           .map(id => Tuple1(s"str_$id"))
           .toDF("i")
-      )
+    )
 
     // Drop the cache.
     cached.unpersist()

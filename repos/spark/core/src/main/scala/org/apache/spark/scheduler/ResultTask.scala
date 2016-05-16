@@ -42,14 +42,14 @@ import org.apache.spark.rdd.RDD
   *                       internal metrics. Other accumulators will be registered later when
   *                       they are deserialized on the executors.
   */
-private[spark] class ResultTask[T, U](
-    stageId: Int,
-    stageAttemptId: Int,
-    taskBinary: Broadcast[Array[Byte]],
-    partition: Partition,
-    locs: Seq[TaskLocation],
-    val outputId: Int,
-    _initialAccums: Seq[Accumulator[_]] = InternalAccumulator.createAll())
+private[spark] class ResultTask[T, U](stageId: Int,
+                                      stageAttemptId: Int,
+                                      taskBinary: Broadcast[Array[Byte]],
+                                      partition: Partition,
+                                      locs: Seq[TaskLocation],
+                                      val outputId: Int,
+                                      _initialAccums: Seq[Accumulator[_]] =
+                                        InternalAccumulator.createAll())
     extends Task[U](stageId, stageAttemptId, partition.index, _initialAccums)
     with Serializable {
 
@@ -65,8 +65,8 @@ private[spark] class ResultTask[T, U](
       ser.deserialize[(RDD[T], (TaskContext, Iterator[T]) => U)](
           ByteBuffer.wrap(taskBinary.value),
           Thread.currentThread.getContextClassLoader)
-    _executorDeserializeTime = System.currentTimeMillis() -
-    deserializeStartTime
+    _executorDeserializeTime =
+      System.currentTimeMillis() - deserializeStartTime
 
     metrics = Some(context.taskMetrics)
     func(context, rdd.iterator(partition, context))

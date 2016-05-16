@@ -17,7 +17,7 @@ import scala.util.Try
 class ReflectiveDynamicAccess(val classLoader: ClassLoader)
     extends DynamicAccess {
 
-  override def getClassFor[T : ClassTag](fqcn: String): Try[Class[_ <: T]] =
+  override def getClassFor[T: ClassTag](fqcn: String): Try[Class[_ <: T]] =
     Try[Class[_ <: T]]({
       val c =
         Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
@@ -26,7 +26,7 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader)
       else throw new ClassCastException(t + " is not assignable from " + c)
     })
 
-  override def createInstanceFor[T : ClassTag](
+  override def createInstanceFor[T: ClassTag](
       clazz: Class[_], args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
     Try {
       val types = args.map(_._1).toArray
@@ -44,13 +44,13 @@ class ReflectiveDynamicAccess(val classLoader: ClassLoader)
         throw i.getTargetException
     }
 
-  override def createInstanceFor[T : ClassTag](
+  override def createInstanceFor[T: ClassTag](
       fqcn: String, args: immutable.Seq[(Class[_], AnyRef)]): Try[T] =
     getClassFor(fqcn) flatMap { c ⇒
       createInstanceFor(c, args)
     }
 
-  override def getObjectFor[T : ClassTag](fqcn: String): Try[T] = {
+  override def getObjectFor[T: ClassTag](fqcn: String): Try[T] = {
     val classTry =
       if (fqcn.endsWith("$")) getClassFor(fqcn)
       else getClassFor(fqcn + "$") recoverWith { case _ ⇒ getClassFor(fqcn) }

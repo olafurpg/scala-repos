@@ -46,7 +46,8 @@ import org.apache.spark.util.random.XORShiftRandom
   */
 @Since("1.0.0")
 class DecisionTree @Since("1.0.0")(private val strategy: Strategy)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   strategy.assertValid()
 
@@ -594,9 +595,10 @@ object DecisionTree extends Serializable with Logging {
     /**
       * Do the same thing as binSeqOp, but with nodeIdCache.
       */
-    def binSeqOpWithNodeIdCache(agg: Array[DTStatsAggregator],
-                                dataPoint: (BaggedPoint[TreePoint],
-                                Array[Int])): Array[DTStatsAggregator] = {
+    def binSeqOpWithNodeIdCache(
+        agg: Array[DTStatsAggregator],
+        dataPoint: (BaggedPoint[TreePoint], Array[Int]))
+      : Array[DTStatsAggregator] = {
       treeToNodeToIndexInfo.foreach {
         case (treeIndex, nodeIndexToInfo) =>
           val baggedPoint = dataPoint._1
@@ -628,7 +630,8 @@ object DecisionTree extends Serializable with Logging {
         treeToNodeToIndexInfo.values.foreach { nodeIdToNodeInfo =>
           nodeIdToNodeInfo.values.foreach { nodeIndexInfo =>
             assert(nodeIndexInfo.featureSubset.isDefined)
-            mutableNodeToFeatures(nodeIndexInfo.nodeIndexInGroup) = nodeIndexInfo.featureSubset.get
+            mutableNodeToFeatures(nodeIndexInfo.nodeIndexInGroup) =
+              nodeIndexInfo.featureSubset.get
           }
         }
         Some(mutableNodeToFeatures.toMap)
@@ -639,7 +642,8 @@ object DecisionTree extends Serializable with Logging {
     nodesForGroup.foreach {
       case (treeIndex, nodesForTree) =>
         nodesForTree.foreach { node =>
-          nodes(treeToNodeToIndexInfo(treeIndex)(node.id).nodeIndexInGroup) = node
+          nodes(treeToNodeToIndexInfo(treeIndex)(node.id).nodeIndexInGroup) =
+            node
         }
     }
 
@@ -942,9 +946,9 @@ object DecisionTree extends Serializable with Logging {
                 val rightChildStats = binAggregates
                   .getParentImpurityCalculator()
                   .subtract(leftChildStats)
-                predictWithImpurity = Some(
-                    predictWithImpurity.getOrElse(calculatePredictImpurity(
-                            leftChildStats, rightChildStats)))
+                predictWithImpurity =
+                  Some(predictWithImpurity.getOrElse(calculatePredictImpurity(
+                              leftChildStats, rightChildStats)))
                 val gainStats =
                   calculateGainForSplit(leftChildStats,
                                         rightChildStats,
@@ -1025,9 +1029,9 @@ object DecisionTree extends Serializable with Logging {
                   binAggregates.getImpurityCalculator(nodeFeatureOffset,
                                                       lastCategory)
                 rightChildStats.subtract(leftChildStats)
-                predictWithImpurity = Some(
-                    predictWithImpurity.getOrElse(calculatePredictImpurity(
-                            leftChildStats, rightChildStats)))
+                predictWithImpurity =
+                  Some(predictWithImpurity.getOrElse(calculatePredictImpurity(
+                              leftChildStats, rightChildStats)))
                 val gainStats =
                   calculateGainForSplit(leftChildStats,
                                         rightChildStats,
@@ -1129,8 +1133,8 @@ object DecisionTree extends Serializable with Logging {
         logDebug(
             s"featureIndex = $featureIndex, numSplits = ${featureSplits.length}")
 
-        featureSplits.map(
-            threshold => new Split(featureIndex, threshold, Continuous, Nil))
+        featureSplits.map(threshold =>
+              new Split(featureIndex, threshold, Continuous, Nil))
       }
 
       val bins = {
@@ -1161,8 +1165,8 @@ object DecisionTree extends Serializable with Logging {
         math.min(continuousFeatures.length, input.partitions.length)
 
       input
-        .flatMap(
-            point => continuousFeatures.map(idx => (idx, point.features(idx))))
+        .flatMap(point =>
+              continuousFeatures.map(idx => (idx, point.features(idx))))
         .groupByKey(numPartitions)
         .map { case (k, v) => findSplits(k, v) }
         .collectAsMap()

@@ -39,14 +39,13 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
         val map = new mutable.HashMap[String, Seq[String]]()
         map += (("getContainingClass", Seq("com.intellij.psi.PsiMember")))
         map += (("getQualifiedName", Seq("com.intellij.psi.PsiClass")))
-        map +=
-        (("getName",
-          Seq("com.intellij.navigation.NavigationItem",
-              "com.intellij.psi.PsiNamedElement")))
+        map += (("getName",
+                 Seq("com.intellij.navigation.NavigationItem",
+                     "com.intellij.psi.PsiNamedElement")))
         map += (("getClasses", Seq("com.intellij.psi.PsiClassOwner")))
         map += (("getClassNames", Seq("com.intellij.psi.PsiClassOwnerEx")))
-        map +=
-        (("hasModifierProperty", Seq("com.intellij.psi.PsiModifierListOwner")))
+        map += (("hasModifierProperty",
+                 Seq("com.intellij.psi.PsiModifierListOwner")))
         resolve match {
           case m: PsiMethod =>
             map.get(m.name) match {

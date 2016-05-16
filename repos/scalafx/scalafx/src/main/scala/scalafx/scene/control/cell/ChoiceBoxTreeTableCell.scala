@@ -115,7 +115,8 @@ object ChoiceBoxTreeTableCell {
     * $SATISFY
     */
   @deprecated(
-      message = "Use forTreeTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
+      message =
+        "Use forTreeTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
       since = "1.0")
   def forTreeTableColumn[S, T](
       converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
@@ -192,8 +193,9 @@ object ChoiceBoxTreeTableCell {
   * @define URL0 [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxTreeTableCell.html
   * @define ORIGINALDOC Original Documentation]].
   */
-class ChoiceBoxTreeTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTreeTableCell[
-        S, T] = new jfxscc.ChoiceBoxTreeTableCell[S, T])
+class ChoiceBoxTreeTableCell[S, T](
+    override val delegate: jfxscc.ChoiceBoxTreeTableCell[S, T] =
+      new jfxscc.ChoiceBoxTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.ChoiceBoxTreeTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxTreeTableCell[S, T], T]

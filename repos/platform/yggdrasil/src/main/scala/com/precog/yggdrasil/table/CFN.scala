@@ -146,8 +146,8 @@ object CF2Array {
       for {
         (ColumnRef(CPath(CPathIndex(0)), _), col1) <- columns0
         (ColumnRef(CPath(CPathIndex(1)), _), col2) <- columns0
-                                                         if pf isDefinedAt
-                                                     (col1, col2, range)
+        if pf isDefinedAt
+        (col1, col2, range)
       } yield {
         val (tpe, cols, defined) = pf((col1, col2, range))
         tpe -> (cols.asInstanceOf[Array[Array[_]]], defined)

@@ -59,8 +59,10 @@ case class PartitionedTextLine[P](path: String,
     val valueConverter: TupleConverter[(Long, String)],
     val partitionSetter: TupleSetter[P],
     val partitionConverter: TupleConverter[P])
-    extends SchemedSource with TypedSink[(P, String)]
-    with Mappable[(P, (Long, String))] with HfsTapProvider
+    extends SchemedSource
+    with TypedSink[(P, String)]
+    with Mappable[(P, (Long, String))]
+    with HfsTapProvider
     with java.io.Serializable {
 
   // The partition fields, offset by the value arity.

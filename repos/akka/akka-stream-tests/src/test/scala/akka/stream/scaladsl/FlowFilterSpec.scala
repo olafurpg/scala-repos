@@ -18,8 +18,7 @@ class FlowFilterSpec extends AkkaSpec with ScriptedTest {
 
     "filter" in {
       def script =
-        Script(
-            TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange map { _ ⇒
           val x = random.nextInt();
           Seq(x) -> (if ((x & 1) == 0) Seq(x) else Seq())
         }: _*)

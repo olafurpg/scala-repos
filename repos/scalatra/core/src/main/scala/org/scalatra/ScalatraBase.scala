@@ -106,9 +106,14 @@ object ScalatraBase {
   * to all supported backends.
   */
 trait ScalatraBase
-    extends ScalatraContext with CoreDsl with DynamicScope with Initializable
-    with ServletApiImplicits with ScalatraParamsImplicits
-    with DefaultImplicitConversions with SessionSupport {
+    extends ScalatraContext
+    with CoreDsl
+    with DynamicScope
+    with Initializable
+    with ServletApiImplicits
+    with ScalatraParamsImplicits
+    with DefaultImplicitConversions
+    with SessionSupport {
 
   @deprecated("Use servletContext instead", "2.1.0")
   def applicationContext: ServletContext = servletContext
@@ -206,22 +211,19 @@ trait ScalatraBase
       }
     }
 
-    cradleHalt(result = runActions,
-               e =>
-                 {
-                   cradleHalt({
-                     result = errorHandler(e)
-                     rendered = false
-                   }, e =>
-                     {
-                       runCallbacks(Failure(e))
-                       try {
-                         renderUncaughtException(e)
-                       } finally {
-                         runRenderCallbacks(Failure(e))
-                       }
-                   })
-               })
+    cradleHalt(result = runActions, e => {
+      cradleHalt({
+        result = errorHandler(e)
+        rendered = false
+      }, e => {
+        runCallbacks(Failure(e))
+        try {
+          renderUncaughtException(e)
+        } finally {
+          runRenderCallbacks(Failure(e))
+        }
+      })
+    })
 
     if (!rendered) renderResponse(result)
   }
@@ -394,8 +396,8 @@ trait ScalatraBase
     val routeParams =
       matchedRoute.map(_.multiParams).getOrElse(Map.empty).map {
         case (key, values) =>
-          key -> values.map(
-              s => if (s.nonBlank) UriDecoder.secondStep(s) else s)
+          key -> values.map(s =>
+                if (s.nonBlank) UriDecoder.secondStep(s) else s)
       }
     request(MultiParamsKey) = originalParams ++ routeParams
   }
@@ -676,9 +678,9 @@ trait ScalatraBase
   def relativeUrl(path: String,
                   params: Iterable[(String, Any)] = Iterable.empty,
                   includeContextPath: Boolean = true,
-                  includeServletPath: Boolean = true)(
-      implicit request: HttpServletRequest,
-      response: HttpServletResponse): String = {
+                  includeServletPath: Boolean =
+                    true)(implicit request: HttpServletRequest,
+                          response: HttpServletResponse): String = {
     url(path,
         params,
         includeContextPath,

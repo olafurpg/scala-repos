@@ -24,7 +24,8 @@ object MyBuild extends Build {
     Project(
         "root",
         file("."),
-        settings = buildSettings ++ Seq(
+        settings =
+          buildSettings ++ Seq(
               run <<= run in Compile in core
           )
     ) aggregate (macros, core)
@@ -32,11 +33,12 @@ object MyBuild extends Build {
   lazy val macros: Project = Project(
       "macros",
       file("macros"),
-      settings = buildSettings ++ Seq(
+      settings =
+        buildSettings ++ Seq(
             libraryDependencies <+=
               (scalaVersion)("org.scala-lang" % "scala-reflect" % _),
             libraryDependencies ++=
-            (if (scalaVersion.value.startsWith("2.10"))
+              (if (scalaVersion.value.startsWith("2.10"))
                List("org.scalamacros" %% "quasiquotes" % paradiseVersion)
              else Nil)
         )

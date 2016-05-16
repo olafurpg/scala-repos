@@ -114,8 +114,8 @@ object Server {
     * @return The result of the block of code.
     */
   def withApplication[T](application: Application,
-                         config: ServerConfig = ServerConfig(
-                               port = Some(0), mode = Mode.Test))(
+                         config: ServerConfig =
+                           ServerConfig(port = Some(0), mode = Mode.Test))(
       block: Port => T)(implicit provider: ServerProvider): T = {
     Play.start(application)
     val server = provider.createServer(config, application)

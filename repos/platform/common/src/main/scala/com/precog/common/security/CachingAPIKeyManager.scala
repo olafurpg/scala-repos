@@ -51,10 +51,11 @@ object CachingAPIKeyManagerSettings {
   )
 }
 
-class CachingAPIKeyManager[M[+ _]](
-    manager: APIKeyManager[M],
-    settings: CachingAPIKeyManagerSettings = CachingAPIKeyManagerSettings.Default)
-    extends APIKeyManager[M] with Logging {
+class CachingAPIKeyManager[M[+ _]](manager: APIKeyManager[M],
+                                   settings: CachingAPIKeyManagerSettings =
+                                     CachingAPIKeyManagerSettings.Default)
+    extends APIKeyManager[M]
+    with Logging {
   implicit val M = manager.M
 
   private val apiKeyCache =

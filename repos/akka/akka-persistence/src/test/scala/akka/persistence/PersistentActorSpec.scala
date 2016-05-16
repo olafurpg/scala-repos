@@ -250,7 +250,8 @@ object PersistentActorSpec {
 
           1 to 3 foreach { i ⇒
             persistAsync(Evt(s"$data-${incCounter()}")) { evt ⇒
-              sender() ! ("a" + evt.data.toString.drop(1)) // c-1 => a-1, as in "ack"
+              sender() ! ("a" +
+                  evt.data.toString.drop(1)) // c-1 => a-1, as in "ack"
             }
           }
       }
@@ -598,7 +599,8 @@ object PersistentActorSpec {
   }
 
   class StackableTestPersistentActor(val probe: ActorRef)
-      extends StackableTestPersistentActor.BaseActor with PersistentActor
+      extends StackableTestPersistentActor.BaseActor
+      with PersistentActor
       with StackableTestPersistentActor.MixinActor {
     override def persistenceId: String = "StackableTestPersistentActor"
 
@@ -702,7 +704,8 @@ object PersistentActorSpec {
 }
 
 abstract class PersistentActorSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config)
+    with ImplicitSender {
   import PersistentActorSpec._
 
   override protected def beforeEach() {

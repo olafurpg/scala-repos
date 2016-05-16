@@ -196,8 +196,8 @@ class InMemoryCatalog extends ExternalCatalog {
       db: String, oldName: String, newName: String): Unit = synchronized {
     requireTableExists(db, oldName)
     val oldDesc = catalog(db).tables(oldName)
-    oldDesc.table = oldDesc.table.copy(
-        name = TableIdentifier(newName, Some(db)))
+    oldDesc.table =
+      oldDesc.table.copy(name = TableIdentifier(newName, Some(db)))
     catalog(db).tables.put(newName, oldDesc)
     catalog(db).tables.remove(oldName)
   }

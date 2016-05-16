@@ -21,12 +21,12 @@ final class Env(config: Config,
 
   lazy val indexer = new PerfStatIndexer(storage = storage,
                                          sequencer = system.actorOf(
-                                               Props(
-                                                   classOf[lila.hub.Sequencer],
-                                                   None,
-                                                   None,
-                                                   lila.log("perfStat")
-                                               )))
+                                             Props(
+                                                 classOf[lila.hub.Sequencer],
+                                                 None,
+                                                 None,
+                                                 lila.log("perfStat")
+                                             )))
 
   lazy val jsonView = new JsonView(lightUser)
 

@@ -23,7 +23,8 @@ import scalikejdbc._
 /** JDBC implementation of [[EngineInstances]] */
 class JDBCEngineInstances(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EngineInstances with Logging {
+    extends EngineInstances
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "engineinstances")

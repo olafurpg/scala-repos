@@ -33,8 +33,8 @@ private[kafka] abstract class GenericRequestAndHeader(
   }
 
   def sizeInBytes(): Int = {
-    2 /* version id */ + 4 /* correlation id */ + (2 + clientId.length) /* client id */ +
-    body.sizeOf()
+    2 /* version id */ + 4 /* correlation id */ +
+    (2 + clientId.length) /* client id */ + body.sizeOf()
   }
 
   override def toString(): String = {

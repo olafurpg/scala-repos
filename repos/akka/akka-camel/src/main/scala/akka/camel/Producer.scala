@@ -65,7 +65,8 @@ trait ProducerSupport extends Actor with CamelSupport {
             context.actorOf(Props(new ProducerChild(endpoint, processor))))
         messages = {
           for (child ← producerChild;
-          (snd, msg) ← messages) child.tell(transformOutgoingMessage(msg), snd)
+               (snd, msg) ← messages) child.tell(
+              transformOutgoingMessage(msg), snd)
           Vector.empty
         }
       }

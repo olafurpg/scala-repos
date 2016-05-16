@@ -39,7 +39,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.util.ByteUnit
 
 class UtilsSuite
-    extends SparkFunSuite with ResetSystemProperties with Logging {
+    extends SparkFunSuite
+    with ResetSystemProperties
+    with Logging {
 
   test("timeConversion") {
     // Test -1
@@ -579,10 +581,9 @@ class UtilsSuite
 
   test("timeIt with prepare") {
     var cnt = 0
-    val prepare = () =>
-      {
-        cnt += 1
-        Thread.sleep(1000)
+    val prepare = () => {
+      cnt += 1
+      Thread.sleep(1000)
     }
     val time = Utils.timeIt(2)({}, Some(prepare))
     require(cnt === 2, "prepare should be called twice")

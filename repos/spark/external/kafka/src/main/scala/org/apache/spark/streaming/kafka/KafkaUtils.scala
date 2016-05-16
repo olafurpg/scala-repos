@@ -83,8 +83,8 @@ object KafkaUtils {
     * @tparam T type of Kafka message value decoder
     * @return DStream of (Kafka message key, Kafka message value)
     */
-  def createStream[K : ClassTag,
-                   V : ClassTag,
+  def createStream[K: ClassTag,
+                   V: ClassTag,
                    U <: Decoder[_]: ClassTag,
                    T <: Decoder[_]: ClassTag](
       ssc: StreamingContext,
@@ -252,8 +252,8 @@ object KafkaUtils {
     * @tparam VD type of Kafka message value decoder
     * @return RDD of (Kafka message key, Kafka message value)
     */
-  def createRDD[K : ClassTag,
-                V : ClassTag,
+  def createRDD[K: ClassTag,
+                V: ClassTag,
                 KD <: Decoder[K]: ClassTag,
                 VD <: Decoder[V]: ClassTag](
       sc: SparkContext,
@@ -291,11 +291,11 @@ object KafkaUtils {
     * @tparam R type returned by messageHandler
     * @return RDD of R
     */
-  def createRDD[K : ClassTag,
-                V : ClassTag,
+  def createRDD[K: ClassTag,
+                V: ClassTag,
                 KD <: Decoder[K]: ClassTag,
                 VD <: Decoder[V]: ClassTag,
-                R : ClassTag](
+                R: ClassTag](
       sc: SparkContext,
       kafkaParams: Map[String, String],
       offsetRanges: Array[OffsetRange],
@@ -439,11 +439,11 @@ object KafkaUtils {
     * @tparam R type returned by messageHandler
     * @return DStream of R
     */
-  def createDirectStream[K : ClassTag,
-                         V : ClassTag,
+  def createDirectStream[K: ClassTag,
+                         V: ClassTag,
                          KD <: Decoder[K]: ClassTag,
                          VD <: Decoder[V]: ClassTag,
-                         R : ClassTag](
+                         R: ClassTag](
       ssc: StreamingContext,
       kafkaParams: Map[String, String],
       fromOffsets: Map[TopicAndPartition, Long],
@@ -489,8 +489,8 @@ object KafkaUtils {
     * @tparam VD type of Kafka message value decoder
     * @return DStream of (Kafka message key, Kafka message value)
     */
-  def createDirectStream[K : ClassTag,
-                         V : ClassTag,
+  def createDirectStream[K: ClassTag,
+                         V: ClassTag,
                          KD <: Decoder[K]: ClassTag,
                          VD <: Decoder[V]: ClassTag](
       ssc: StreamingContext,
@@ -685,7 +685,7 @@ private[kafka] class KafkaUtilsPythonHelper {
     new JavaRDD(rdd)
   }
 
-  private def createRDD[V : ClassTag](
+  private def createRDD[V: ClassTag](
       jsc: JavaSparkContext,
       kafkaParams: JMap[String, String],
       offsetRanges: JList[OffsetRange],
@@ -729,7 +729,7 @@ private[kafka] class KafkaUtilsPythonHelper {
     new JavaDStream(stream)
   }
 
-  private def createDirectStream[V : ClassTag](
+  private def createDirectStream[V: ClassTag](
       jssc: JavaStreamingContext,
       kafkaParams: JMap[String, String],
       topics: JSet[String],

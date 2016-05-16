@@ -42,7 +42,7 @@ final class ScriptedTests(resourceBaseDirectory: File,
     import GlobFilter._
     var failed = false
     for (groupDir <- (resourceBaseDirectory * group).get;
-    nme <- (groupDir * name).get) yield {
+         nme <- (groupDir * name).get) yield {
       val g = groupDir.getName
       val n = nme.getName
       val str = s"$g / $n"
@@ -267,8 +267,8 @@ private[test] final class ListTests(
       log.warn("No tests in test group " + groupName)
       Set.empty
     } else {
-      val (included, skipped) = allTests.toList.partition(
-          test => accept(ScriptedTest(groupName, test.getName)))
+      val (included, skipped) = allTests.toList.partition(test =>
+            accept(ScriptedTest(groupName, test.getName)))
       if (included.isEmpty) log.warn("Test group " + groupName + " skipped.")
       else if (skipped.nonEmpty) {
         log.warn("Tests skipped in group " + group.getName + ":")

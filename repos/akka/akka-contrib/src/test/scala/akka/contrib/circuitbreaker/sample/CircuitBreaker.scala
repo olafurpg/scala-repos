@@ -56,7 +56,8 @@ object CircuitBreaker {
 
 //#basic-sample
 class CircuitBreaker(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
 
   val serviceCircuitBreaker = context.actorOf(
@@ -96,7 +97,8 @@ class CircuitBreaker(potentiallyFailingService: ActorRef)
 
 //#ask-sample
 class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.pattern._
 
@@ -143,7 +145,8 @@ class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
 
 //#ask-with-failure-sample
 class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.pattern._
   import akka.contrib.circuitbreaker.Implicits.futureExtensions
@@ -178,7 +181,8 @@ class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
 
 //#ask-with-circuit-breaker-sample
 class CircuitBreakerAskWithCircuitBreaker(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.contrib.circuitbreaker.Implicits.askWithCircuitBreaker
 

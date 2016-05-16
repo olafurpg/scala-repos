@@ -32,14 +32,16 @@ class MatchToPartialFunctionInspection
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case fun @ ScFunctionExpr(
         Seq(param), Some(ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
-        if ref.resolve() == param && !(param.typeElement.isDefined &&
-            notExpectedType(fun)) && checkSameResolve(fun) =>
+        if ref.resolve() == param &&
+        !(param.typeElement.isDefined && notExpectedType(fun)) &&
+        checkSameResolve(fun) =>
       registerProblem(holder, ms, fun)
     case fun @ ScFunctionExpr(
         Seq(param),
         Some(ScBlock(ms @ ScMatchStmt(ref: ScReferenceExpression, _))))
-        if ref.resolve() == param && !(param.typeElement.isDefined &&
-            notExpectedType(fun)) && checkSameResolve(fun) =>
+        if ref.resolve() == param &&
+        !(param.typeElement.isDefined && notExpectedType(fun)) &&
+        checkSameResolve(fun) =>
       registerProblem(holder, ms, fun) //if fun is last statement in block, result can be block without braces
     case ms @ ScMatchStmt(und: ScUnderscoreSection, _)
         if checkSameResolve(ms) =>
@@ -158,9 +160,7 @@ class MatchToPartialFunctionQuickFix(
           .asScala
         for {
           (clause, index) <- matchStmt.caseClauses.zipWithIndex if refs.exists(
-                                ref =>
-                                  PsiTreeUtil.isAncestor(
-                                      clause, ref.getElement, false))
+              ref => PsiTreeUtil.isAncestor(clause, ref.getElement, false))
         } yield index
       case _ => Nil
     }

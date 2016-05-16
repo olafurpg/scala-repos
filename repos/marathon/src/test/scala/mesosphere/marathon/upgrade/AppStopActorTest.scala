@@ -19,8 +19,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class AppStopActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll with MockitoSugar {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with MockitoSugar {
 
   var driver: SchedulerDriver = _
   var taskTracker: TaskTracker = _

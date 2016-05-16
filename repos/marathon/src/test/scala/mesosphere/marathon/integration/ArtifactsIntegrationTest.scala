@@ -8,8 +8,10 @@ import mesosphere.marathon.integration.setup._
 import org.scalatest.{ConfigMap, GivenWhenThen, Matchers}
 
 class ArtifactsIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with GivenWhenThen with Matchers {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with GivenWhenThen
+    with Matchers {
   var artifactsDir: File = Files.createTempDir()
 
   override def extraMarathonParameters =

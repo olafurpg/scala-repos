@@ -23,7 +23,8 @@ package test
 import com.precog.yggdrasil.util.IdSourceConfig
 
 object Run
-    extends com.precog.yggdrasil.table.GrouperSpec[YId] with YIdInstances {
+    extends com.precog.yggdrasil.table.GrouperSpec[YId]
+    with YIdInstances {
   type YggConfig = IdSourceConfig
   val yggConfig = new IdSourceConfig {
     val idSource = new FreshAtomicIdSource

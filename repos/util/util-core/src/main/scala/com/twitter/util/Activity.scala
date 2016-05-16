@@ -145,7 +145,7 @@ object Activity {
     *
     *   @inheritdoc
     */
-  def collect[T : ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
+  def collect[T: ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
       implicit newBuilder: CanBuild[T, CC[T]]): Activity[CC[T]] = {
     if (acts.isEmpty) return Activity.value(newBuilder().result)
 
@@ -845,28 +845,29 @@ object Activity {
       u: Activity[U],
       v: Activity[V]): Activity[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    collect(Seq(a,
-                b,
-                c,
-                d,
-                e,
-                f,
-                g,
-                h,
-                i,
-                j,
-                k,
-                l,
-                m,
-                n,
-                o,
-                p,
-                q,
-                r,
-                s,
-                t,
-                u,
-                v)) map { ss =>
+    collect(
+        Seq(a,
+            b,
+            c,
+            d,
+            e,
+            f,
+            g,
+            h,
+            i,
+            j,
+            k,
+            l,
+            m,
+            n,
+            o,
+            p,
+            q,
+            r,
+            s,
+            t,
+            u,
+            v)) map { ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],

@@ -45,7 +45,8 @@ object AdaptiveLoadBalancingRouterMultiJvmSpec extends MultiNodeConfig {
         // allocate 70% of free space
         val allocateBytes = (0.7 * (max - used)).toInt
         val numberOfArrays = allocateBytes / 1024
-        usedMemory = Array.ofDim(numberOfArrays, 248) // each 248 element Int array will use ~ 1 kB
+        usedMemory =
+          Array.ofDim(numberOfArrays, 248) // each 248 element Int array will use ~ 1 kB
         log.info("used heap after: [{}] bytes",
                  ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
         sender() ! "done"
@@ -100,7 +101,9 @@ class AdaptiveLoadBalancingRouterMultiJvmNode3
 
 abstract class AdaptiveLoadBalancingRouterSpec
     extends MultiNodeSpec(AdaptiveLoadBalancingRouterMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import AdaptiveLoadBalancingRouterMultiJvmSpec._
 
   def currentRoutees(router: ActorRef) =
@@ -134,8 +137,8 @@ abstract class AdaptiveLoadBalancingRouterSpec
             settings = ClusterRouterPoolSettings(totalInstances = 10,
                                                  maxInstancesPerNode = 1,
                                                  allowLocalRoutees = true,
-                                                 useRole = None))
-          .props(Props[Echo]),
+                                                 useRole =
+                                                   None)).props(Props[Echo]),
         name)
     // it may take some time until router receives cluster member events
     awaitAssert { currentRoutees(router).size should ===(roles.size) }

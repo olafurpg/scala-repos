@@ -31,7 +31,9 @@ import org.apache.spark.internal.Logging
   */
 private[streaming] class FileBasedWriteAheadLogReader(
     path: String, conf: Configuration)
-    extends Iterator[ByteBuffer] with Closeable with Logging {
+    extends Iterator[ByteBuffer]
+    with Closeable
+    with Logging {
 
   private val instream = HdfsUtils.getInputStream(path, conf)
   private var closed =

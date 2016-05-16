@@ -43,7 +43,8 @@ class ClusterClientStopMultiJvmNode2 extends ClusterClientStopSpec
 class ClusterClientStopMultiJvmNode3 extends ClusterClientStopSpec
 
 class ClusterClientStopSpec
-    extends MultiNodeSpec(ClusterClientStopSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterClientStopSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import ClusterClientStopSpec._
@@ -100,9 +101,9 @@ class ClusterClientStopSpec
         watch(c)
 
         expectTerminated(c, 10.seconds)
-        EventFilter.warning(
-            start = "Receptionist reconnect not successful within",
-            occurrences = 1)
+        EventFilter.warning(start =
+                              "Receptionist reconnect not successful within",
+                            occurrences = 1)
       }
 
       runOn(first, second) {

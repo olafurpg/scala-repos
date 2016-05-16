@@ -32,7 +32,9 @@ object ActorLifeCycleSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorLifeCycleSpec
     extends AkkaSpec("akka.actor.serialize-messages=off")
-    with BeforeAndAfterEach with ImplicitSender with DefaultTimeout {
+    with BeforeAndAfterEach
+    with ImplicitSender
+    with DefaultTimeout {
   import ActorLifeCycleSpec._
 
   "An Actor" must {
@@ -157,10 +159,9 @@ class ActorLifeCycleSpec
       }))
       a ! "hello"
       expectMsg(42)
-      a ! Become(ctx ⇒
-            {
-          case "fail" ⇒ throw new RuntimeException("buh")
-          case x ⇒ ctx.sender() ! 43
+      a ! Become(ctx ⇒ {
+        case "fail" ⇒ throw new RuntimeException("buh")
+        case x ⇒ ctx.sender() ! 43
       })
       expectMsg("ok")
       a ! "hello"

@@ -43,18 +43,20 @@ import org.apache.spark.util.NextIterator
   * @param offsetRanges offset ranges that define the Kafka data belonging to this RDD
   * @param messageHandler function for translating each message into the desired type
   */
-private[kafka] class KafkaRDD[K : ClassTag,
-                              V : ClassTag,
+private[kafka] class KafkaRDD[K: ClassTag,
+                              V: ClassTag,
                               U <: Decoder[_]: ClassTag,
                               T <: Decoder[_]: ClassTag,
-                              R : ClassTag] private[spark](
+                              R: ClassTag] private[spark](
     sc: SparkContext,
     kafkaParams: Map[String, String],
     val offsetRanges: Array[OffsetRange],
     leaders: Map[TopicAndPartition, (String, Int)],
     messageHandler: MessageAndMetadata[K, V] => R
 )
-    extends RDD[R](sc, Nil) with Logging with HasOffsetRanges {
+    extends RDD[R](sc, Nil)
+    with Logging
+    with HasOffsetRanges {
   override def getPartitions: Array[Partition] = {
     offsetRanges.zipWithIndex.map {
       case (o, i) =>
@@ -101,7 +103,7 @@ private[kafka] class KafkaRDD[K : ClassTag,
     val res = context.runJob(
         this,
         (tc: TaskContext,
-        it: Iterator[R]) => it.take(parts(tc.partitionId)).toArray,
+         it: Iterator[R]) => it.take(parts(tc.partitionId)).toArray,
         parts.keys.toArray)
     res.foreach(buf ++= _)
     buf.toArray
@@ -263,11 +265,11 @@ private[kafka] object KafkaRDD {
     *  ending point of the batch
     * @param messageHandler function for translating each message into the desired type
     */
-  def apply[K : ClassTag,
-            V : ClassTag,
+  def apply[K: ClassTag,
+            V: ClassTag,
             U <: Decoder[_]: ClassTag,
             T <: Decoder[_]: ClassTag,
-            R : ClassTag](
+            R: ClassTag](
       sc: SparkContext,
       kafkaParams: Map[String, String],
       fromOffsets: Map[TopicAndPartition, Long],

@@ -31,7 +31,9 @@ object BindingFactoryTest {
 
 @RunWith(classOf[JUnitRunner])
 class BindingFactoryTest
-    extends FunSuite with MockitoSugar with BeforeAndAfter {
+    extends FunSuite
+    with MockitoSugar
+    with BeforeAndAfter {
   import BindingFactoryTest._
 
   var saveBase: Dtab = Dtab.empty
@@ -81,8 +83,7 @@ class BindingFactoryTest
           news += 1
           def apply(conn: ClientConnection) = {
             tcOpt.foreach(_.advance(1234.microseconds))
-            Future.value(
-                Service.mk { _ =>
+            Future.value(Service.mk { _ =>
               Future.value(bound.addr)
             })
           }
@@ -111,8 +112,7 @@ class BindingFactoryTest
     (bound: Name.Bound) =>
       new ServiceFactory[Unit, Var[Addr]] {
         def apply(conn: ClientConnection) =
-          Future.value(
-              Service.mk { _ =>
+          Future.value(Service.mk { _ =>
             Future.exception(new Exception("nup"))
           })
         def close(deadline: Time) = Future.Done

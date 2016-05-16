@@ -23,7 +23,8 @@ object ShortBuffer {
 abstract class ShortBuffer private[nio](_capacity: Int,
                                         private[nio] val _array: Array[Short],
                                         private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[ShortBuffer] {
+    extends Buffer(_capacity)
+    with Comparable[ShortBuffer] {
 
   private[nio] type ElementType = Short
   private[nio] type BufferType = ShortBuffer

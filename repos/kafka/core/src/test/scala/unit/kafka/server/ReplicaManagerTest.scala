@@ -134,8 +134,8 @@ class ReplicaManagerTest {
           requiredAcks = 3,
           internalTopicsAllowed = false,
           messagesPerPartition = Map(
-                new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
-                    new Message("first message".getBytes))),
+              new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
+                  new Message("first message".getBytes))),
           responseCallback = callback)
     } finally {
       rm.shutdown(checkpointHW = false)
@@ -219,8 +219,8 @@ class ReplicaManagerTest {
           requiredAcks = -1,
           internalTopicsAllowed = false,
           messagesPerPartition = Map(
-                new TopicPartition(topic, 0) -> new ByteBufferMessageSet(
-                    new Message("first message".getBytes))),
+              new TopicPartition(topic, 0) -> new ByteBufferMessageSet(
+                  new Message("first message".getBytes))),
           responseCallback = produceCallback)
 
       // Fetch some messages
@@ -229,8 +229,8 @@ class ReplicaManagerTest {
           replicaId = -1,
           fetchMinBytes = 100000,
           fetchInfo = collection.immutable.Map(
-                new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(
-                    0, 100000)),
+              new TopicAndPartition(topic, 0) -> new PartitionFetchInfo(
+                  0, 100000)),
           responseCallback = fetchCallback)
 
       // Make this replica the follower

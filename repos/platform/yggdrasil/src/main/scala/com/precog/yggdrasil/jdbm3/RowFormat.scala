@@ -88,7 +88,8 @@ object RowFormat {
     IdentitiesRowFormatV1(columnRefs)
 
   case class ValueRowFormatV1(_columnRefs: Seq[ColumnRef])
-      extends ValueRowFormat with RowFormatCodecs {
+      extends ValueRowFormat
+      with RowFormatCodecs {
     // This is really stupid, but required to work w/ JDBM.
     @transient lazy val columnRefs: Seq[ColumnRef] =
       _columnRefs map { ref =>
@@ -100,7 +101,8 @@ object RowFormat {
   }
 
   case class SortingKeyRowFormatV1(_columnRefs: Seq[ColumnRef])
-      extends RowFormatCodecs with SortingRowFormat {
+      extends RowFormatCodecs
+      with SortingRowFormat {
     @transient lazy val columnRefs: Seq[ColumnRef] =
       _columnRefs map { ref =>
         ref.copy(ctype = ref.ctype.readResolve())
@@ -470,8 +472,7 @@ trait ValueRowFormat extends RowFormat with RowFormatSupport {
 
     def encodedSize(xs: List[CValue]) =
       xs.foldLeft(rawBitSetCodec.encodedSize(undefineds(xs))) { (acc, x) =>
-        acc +
-        (x match {
+        acc + (x match {
               case x: CWrappedValue[_] =>
                 codecForCValueType(x.cType).encodedSize(x.value)
               case _ => 0
@@ -480,8 +481,7 @@ trait ValueRowFormat extends RowFormat with RowFormatSupport {
 
     override def maxSize(xs: List[CValue]) =
       xs.foldLeft(rawBitSetCodec.maxSize(undefineds(xs))) { (acc, x) =>
-        acc +
-        (x match {
+        acc + (x match {
               case x: CWrappedValue[_] =>
                 codecForCValueType(x.cType).maxSize(x.value)
               case _ => 0
@@ -529,8 +529,8 @@ trait ValueRowFormat extends RowFormat with RowFormatSupport {
 
     def writeMore(more: S, sink: ByteBuffer) = more match {
       case (Left(s), xs) =>
-        rawBitSetCodec.writeMore(s, sink) map (s => (Left(s), xs)) orElse writeCValues(
-            xs, sink)
+        rawBitSetCodec.writeMore(s, sink) map (s =>
+              (Left(s), xs)) orElse writeCValues(xs, sink)
       case (Right(s), xs) =>
         s.more(sink) map (s => (Right(s), xs)) orElse writeCValues(xs, sink)
     }
@@ -744,7 +744,7 @@ trait SortingRowFormat extends RowFormat with StdCodecs with RowFormatSupport {
       val bType = bbuf.get()
 
       if ((aType & 0xF0) == (bType & 0xF0)) {
-        ( (aType & 0xF0).toByte) match {
+        ((aType & 0xF0).toByte) match {
           case FUndefined => 0
           case FBoolean =>
             abuf.get() - bbuf.get()

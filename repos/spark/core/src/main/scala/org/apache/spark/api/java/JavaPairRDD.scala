@@ -323,8 +323,10 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * Approximate version of countByKey that can return a partial result if it does
     * not finish within a timeout.
     */
-  def countByKeyApprox(timeout: Long, confidence: Double = 0.95)
-    : PartialResult[java.util.Map[K, BoundedDouble]] =
+  def countByKeyApprox(
+      timeout: Long,
+      confidence: Double =
+        0.95): PartialResult[java.util.Map[K, BoundedDouble]] =
     rdd.countByKeyApprox(timeout, confidence).map(mapAsSerializableJavaMap)
 
   /**
@@ -1075,33 +1077,32 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
 }
 
 object JavaPairRDD {
-  private[spark] def groupByResultToJava[K : ClassTag, T](
+  private[spark] def groupByResultToJava[K: ClassTag, T](
       rdd: RDD[(K, Iterable[T])]): RDD[(K, JIterable[T])] = {
     rddToPairRDDFunctions(rdd).mapValues(_.asJava)
   }
 
-  private[spark] def cogroupResultToJava[K : ClassTag, V, W](
+  private[spark] def cogroupResultToJava[K: ClassTag, V, W](
       rdd: RDD[(K, (Iterable[V], Iterable[W]))])
     : RDD[(K, (JIterable[V], JIterable[W]))] = {
     rddToPairRDDFunctions(rdd).mapValues(x => (x._1.asJava, x._2.asJava))
   }
 
-  private[spark] def cogroupResult2ToJava[K : ClassTag, V, W1, W2](
+  private[spark] def cogroupResult2ToJava[K: ClassTag, V, W1, W2](
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2]))])
     : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2]))] = {
-    rddToPairRDDFunctions(rdd).mapValues(
-        x => (x._1.asJava, x._2.asJava, x._3.asJava))
+    rddToPairRDDFunctions(rdd).mapValues(x =>
+          (x._1.asJava, x._2.asJava, x._3.asJava))
   }
 
-  private[spark] def cogroupResult3ToJava[K : ClassTag, V, W1, W2, W3](
+  private[spark] def cogroupResult3ToJava[K: ClassTag, V, W1, W2, W3](
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2], Iterable[W3]))])
     : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3]))] = {
-    rddToPairRDDFunctions(rdd).mapValues(
-        x => (x._1.asJava, x._2.asJava, x._3.asJava, x._4.asJava))
+    rddToPairRDDFunctions(rdd).mapValues(x =>
+          (x._1.asJava, x._2.asJava, x._3.asJava, x._4.asJava))
   }
 
-  def fromRDD[K : ClassTag, V : ClassTag](
-      rdd: RDD[(K, V)]): JavaPairRDD[K, V] = {
+  def fromRDD[K: ClassTag, V: ClassTag](rdd: RDD[(K, V)]): JavaPairRDD[K, V] = {
     new JavaPairRDD[K, V](rdd)
   }
 

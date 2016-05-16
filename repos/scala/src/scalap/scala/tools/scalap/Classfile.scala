@@ -30,7 +30,8 @@ class Classfile(in: ByteArrayReader) {
     var attribs: List[Attribute] = Nil
     var i = 0
     while (i < n) {
-      attribs = Attribute(in.nextChar.toInt, in.nextBytes(in.nextInt)) :: attribs
+      attribs =
+        Attribute(in.nextChar.toInt, in.nextBytes(in.nextInt)) :: attribs
       i = i + 1
     }
     attribs
@@ -41,11 +42,12 @@ class Classfile(in: ByteArrayReader) {
     var members: List[Member] = Nil
     var i = 0
     while (i < n) {
-      members = Member(field,
-                       in.nextChar.toInt,
-                       in.nextChar.toInt,
-                       in.nextChar.toInt,
-                       readAttribs) :: members
+      members =
+        Member(field,
+               in.nextChar.toInt,
+               in.nextChar.toInt,
+               in.nextChar.toInt,
+               readAttribs) :: members
       i = i + 1
     }
     members
@@ -98,8 +100,9 @@ class Classfile(in: ByteArrayReader) {
         val tag = in.nextByte
         // Double sized entry
         if (tag == CONSTANT_LONG || tag == CONSTANT_DOUBLE) {
-          pool(i) = if (tag == CONSTANT_LONG) LongConst(in.nextLong)
-          else DoubleConst(in.nextDouble)
+          pool(i) =
+            if (tag == CONSTANT_LONG) LongConst(in.nextLong)
+            else DoubleConst(in.nextDouble)
           i = i + 1
           pool(i) = Empty
         } else

@@ -17,7 +17,8 @@ class SourceResolver(
 )(
     implicit vfs: EnsimeVFS
 )
-    extends FileChangeListener with SLF4JLogging {
+    extends FileChangeListener
+    with SLF4JLogging {
 
   // it's not worth doing incremental updates - this is cheap
   // (but it would be nice to have a "debounce" throttler)

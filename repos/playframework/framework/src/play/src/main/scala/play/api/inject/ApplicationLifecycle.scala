@@ -63,8 +63,7 @@ trait ApplicationLifecycle {
     * immediately and return a successful future.
     */
   def addStopHook(hook: Callable[_ <: CompletionStage[_]]): Unit = {
-    addStopHook(
-        () =>
+    addStopHook(() =>
           FutureConverters.toScala(
               hook.call().asInstanceOf[CompletionStage[_]]))
   }

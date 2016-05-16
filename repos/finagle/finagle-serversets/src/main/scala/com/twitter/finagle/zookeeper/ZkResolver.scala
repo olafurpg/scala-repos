@@ -24,7 +24,8 @@ class ZkResolverException(msg: String) extends Exception(msg)
 
 // Note: this is still used by finagle-memcached.
 private[finagle] class ZkGroup(serverSet: ServerSet, path: String)
-    extends Thread("ZkGroup(%s)".format(path)) with Group[ServiceInstance] {
+    extends Thread("ZkGroup(%s)".format(path))
+    with Group[ServiceInstance] {
   setDaemon(true)
   start()
 
@@ -79,8 +80,8 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
   // With the current serverset client, instances are maintained
   // forever; additional resource leaks aren't created by caching
   // instances here.
-  private type CacheKey = (Set[InetSocketAddress], String, Option[String],
-  Option[Int])
+  private type CacheKey =
+    (Set[InetSocketAddress], String, Option[String], Option[Int])
   private val cache = new mutable.HashMap[CacheKey, Var[Addr]]
 
   def this() = this(DefaultZkClientFactory)

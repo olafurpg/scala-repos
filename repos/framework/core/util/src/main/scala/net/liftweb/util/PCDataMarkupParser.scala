@@ -327,7 +327,8 @@ trait PCDataMarkupParser[PCM <: MarkupParser with MarkupHandler]
 }
 
 class PCDataXmlParser(val input: Source)
-    extends ConstructingHandler with PCDataMarkupParser[PCDataXmlParser]
+    extends ConstructingHandler
+    with PCDataMarkupParser[PCDataXmlParser]
     with ExternalSources {
   val preserveWS = true
   ent ++= HtmlEntities()
@@ -426,7 +427,7 @@ object PCDataXmlParser {
     for {
       p <- tryo { new PCDataXmlParser(source) }
       _ = while (p.ch != '<' &&
-      p.curInput.hasNext) p.nextch // side effects, baby
+                 p.curInput.hasNext) p.nextch // side effects, baby
       bd <- tryo(p.document)
       doc <- Box !! bd
     } yield (doc.children: NodeSeq)
